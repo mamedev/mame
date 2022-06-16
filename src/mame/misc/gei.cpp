@@ -1027,7 +1027,7 @@ INTERRUPT_GEN_MEMBER(gei_state::vblank_irq)
 
 void gei_state::getrivia(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000); /* 4 MHz */
+	Z80(config, m_maincpu, XTAL::u(4000000)); /* 4 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::getrivia_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gei_state::vblank_irq));
 
@@ -1058,7 +1058,7 @@ void gei_state::getrivia(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.99);
 }
 
 void gei_state::findout(machine_config &config)

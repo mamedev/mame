@@ -22,7 +22,7 @@
 class acorn_ioc_device : public device_t, public device_serial_interface
 {
 public:
-	acorn_ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	acorn_ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <unsigned N> auto peripheral_r() { static_assert(N >= 1 && N <= 7); return m_peripherals_r[N - 1].bind(); }
 	template <unsigned N> auto peripheral_w() { static_assert(N >= 1 && N <= 7); return m_peripherals_w[N - 1].bind(); }

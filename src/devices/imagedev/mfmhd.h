@@ -113,7 +113,7 @@ public:
 	int             get_actual_heads();
 
 protected:
-	mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void        device_start() override;
 	virtual void        device_stop() override;
@@ -188,7 +188,7 @@ private:
 class mfm_hd_generic_device : public mfm_harddisk_device
 {
 public:
-	mfm_hd_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mfm_hd_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(MFMHD_GENERIC, mfm_hd_generic_device)
@@ -196,7 +196,7 @@ DECLARE_DEVICE_TYPE(MFMHD_GENERIC, mfm_hd_generic_device)
 class mfm_hd_st213_device : public mfm_harddisk_device
 {
 public:
-	mfm_hd_st213_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mfm_hd_st213_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(MFMHD_ST213, mfm_hd_st213_device)
@@ -204,7 +204,7 @@ DECLARE_DEVICE_TYPE(MFMHD_ST213, mfm_hd_st213_device)
 class mfm_hd_st225_device : public mfm_harddisk_device
 {
 public:
-	mfm_hd_st225_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mfm_hd_st225_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(MFMHD_ST225, mfm_hd_st225_device)
@@ -212,7 +212,7 @@ DECLARE_DEVICE_TYPE(MFMHD_ST225, mfm_hd_st225_device)
 class mfm_hd_st251_device : public mfm_harddisk_device
 {
 public:
-	mfm_hd_st251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mfm_hd_st251_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(MFMHD_ST251, mfm_hd_st251_device)
@@ -228,7 +228,7 @@ public:
 	template <typename T>
 	mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts,
 		const char *dflt, mfmhd_enc_t enc, int spinup, int cache, const mfmhd_format_type format, bool fixed = false)
-		: mfm_harddisk_connector(mconfig, tag, owner, 0)
+		: mfm_harddisk_connector(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -237,7 +237,7 @@ public:
 		configure(enc, spinup, cache, format);
 	}
 
-	mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	~mfm_harddisk_connector();
 
 	mfm_harddisk_device *get_device();

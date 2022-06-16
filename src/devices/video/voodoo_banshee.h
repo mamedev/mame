@@ -41,14 +41,14 @@ class voodoo_banshee_device : public voodoo_2_device
 {
 protected:
 	// internal construction
-	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo::voodoo_model model);
+	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, voodoo::voodoo_model model);
 
 public:
 	// nominal clock values
-	static constexpr u32 NOMINAL_CLOCK = 90'000'000;
+	static constexpr XTAL NOMINAL_CLOCK = XTAL::u(90'000'000);
 
 	// construction
-	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		voodoo_banshee_device(mconfig, VOODOO_BANSHEE, tag, owner, clock, voodoo::voodoo_model::VOODOO_BANSHEE) { }
 
 	// core address map and read/write helpers
@@ -172,10 +172,10 @@ class voodoo_3_device : public voodoo_banshee_device
 {
 public:
 	// nominal clock values
-	static constexpr u32 NOMINAL_CLOCK = 132'000'000;
+	static constexpr XTAL NOMINAL_CLOCK = XTAL::u(132'000'000);
 
 	// construction
-	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

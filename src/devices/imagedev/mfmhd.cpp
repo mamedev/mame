@@ -304,7 +304,7 @@ enum
 	STEP_SETTLE
 };
 
-mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		m_index_timer(nullptr),
@@ -938,7 +938,7 @@ int mfm_harddisk_device::get_actual_heads()
 /*
     The generic HD takes any kind of CHD HD image and magically creates enough heads and cylinders.
 */
-mfm_hd_generic_device::mfm_hd_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mfm_hd_generic_device::mfm_hd_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 : mfm_harddisk_device(mconfig, MFMHD_GENERIC, tag, owner, clock)
 {
 }
@@ -948,7 +948,7 @@ DEFINE_DEVICE_TYPE(MFMHD_GENERIC, mfm_hd_generic_device, "mfm_harddisk", "Generi
 /*
     Various models.
 */
-mfm_hd_st213_device::mfm_hd_st213_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mfm_hd_st213_device::mfm_hd_st213_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 : mfm_harddisk_device(mconfig, MFMHD_ST213, tag, owner, clock)
 {
 	m_phys_cylinders = 670;
@@ -961,7 +961,7 @@ mfm_hd_st213_device::mfm_hd_st213_device(const machine_config &mconfig, const ch
 
 DEFINE_DEVICE_TYPE(MFMHD_ST213, mfm_hd_st213_device, "mfm_hd_st213", "Seagate ST-213 MFM hard disk")
 
-mfm_hd_st225_device::mfm_hd_st225_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mfm_hd_st225_device::mfm_hd_st225_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 : mfm_harddisk_device(mconfig, MFMHD_ST225, tag, owner, clock)
 {
 	m_phys_cylinders = 670;
@@ -974,7 +974,7 @@ mfm_hd_st225_device::mfm_hd_st225_device(const machine_config &mconfig, const ch
 
 DEFINE_DEVICE_TYPE(MFMHD_ST225, mfm_hd_st225_device, "mfm_hd_st225", "Seagate ST-225 MFM hard disk")
 
-mfm_hd_st251_device::mfm_hd_st251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mfm_hd_st251_device::mfm_hd_st251_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 : mfm_harddisk_device(mconfig, MFMHD_ST251, tag, owner, clock)
 {
 	m_phys_cylinders = 821;
@@ -1182,7 +1182,7 @@ uint16_t* mfmhd_trackimage_cache::get_trackimage(int cylinder, int head)
 
 // ================================================================
 
-mfm_harddisk_connector::mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+mfm_harddisk_connector::mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock):
 	device_t(mconfig, MFM_HD_CONNECTOR, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_encoding(),

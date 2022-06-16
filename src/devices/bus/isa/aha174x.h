@@ -20,7 +20,7 @@
 class aha174x_device : public device_t, public device_isa16_card_interface
 {
 protected:
-	aha174x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	aha174x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 
@@ -36,7 +36,7 @@ protected:
 class aha1740_device : public aha174x_device
 {
 public:
-	aha1740_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	aha1740_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
@@ -48,7 +48,7 @@ protected:
 class aha1742a_device : public aha174x_device
 {
 public:
-	aha1742a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	aha1742a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 

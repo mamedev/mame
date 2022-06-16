@@ -11,7 +11,7 @@ class psx_multitap_device : public device_t,
 							public device_psx_controller_interface
 {
 public:
-	psx_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psx_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

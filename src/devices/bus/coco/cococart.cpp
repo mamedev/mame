@@ -123,7 +123,7 @@ ALLOW_SAVE_TYPE(cococart_slot_device::line_value);
 //-------------------------------------------------
 //  cococart_slot_device - constructor
 //-------------------------------------------------
-cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COCOCART_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_cococart_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),

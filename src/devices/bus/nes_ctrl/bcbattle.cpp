@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(NES_BARCODE_BATTLER, nes_bcbattle_device, "nes_bcbattle", "Ep
 
 void nes_bcbattle_device::device_add_mconfig(machine_config &config)
 {
-	BARCODE_READER(config, "battler", 0);
+	BARCODE_READER(config, "battler");
 }
 
 
@@ -75,7 +75,7 @@ TIMER_CALLBACK_MEMBER(nes_bcbattle_device::scan_tick)
 //  nes_bcbattle_device - constructor
 //-------------------------------------------------
 
-nes_bcbattle_device::nes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_bcbattle_device::nes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_BARCODE_BATTLER, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_reader(*this, "battler")

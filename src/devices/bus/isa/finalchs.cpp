@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(ISA8_FINALCHS, isa8_finalchs_device, "isa_finalchs", "The Fin
 //  constructor
 //-------------------------------------------------
 
-isa8_finalchs_device::isa8_finalchs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_finalchs_device::isa8_finalchs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA8_FINALCHS, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),

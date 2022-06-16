@@ -26,7 +26,7 @@ class aquarius_ram_device :
 {
 protected:
 	// construction/destruction
-	aquarius_ram_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, uint16_t size);
+	aquarius_ram_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock, uint16_t size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -47,7 +47,7 @@ class aquarius_ram4_device : public aquarius_ram_device
 {
 public:
 	// construction/destruction
-	aquarius_ram4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	aquarius_ram4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> aquarius_ram16_device
@@ -56,7 +56,7 @@ class aquarius_ram16_device : public aquarius_ram_device
 {
 public:
 	// construction/destruction
-	aquarius_ram16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	aquarius_ram16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> aquarius_ram32_device
@@ -65,7 +65,7 @@ class aquarius_ram32_device : public aquarius_ram_device
 {
 public:
 	// construction/destruction
-	aquarius_ram32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	aquarius_ram32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -77,7 +77,7 @@ class aquarius_ram16p_device :
 {
 public:
 	// construction/destruction
-	aquarius_ram16p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	aquarius_ram16p_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

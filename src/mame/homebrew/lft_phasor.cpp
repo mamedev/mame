@@ -13,7 +13,7 @@
 #include "emupal.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK        17734470
+#define MASTER_CLOCK        XTAL::u(17734470)
 
 #define SAMPLES_PER_FRAME    (355255)
 
@@ -215,7 +215,7 @@ void lft_phasor_state::phasor(machine_config &config)
 
 	SPEAKER(config, "avr8").front_center();
 
-	DAC_6BIT_R2R(config, m_dac, 0).add_route(0, "avr8", 0.5);
+	DAC_6BIT_R2R(config, m_dac).add_route(0, "avr8", 0.5);
 }
 
 ROM_START( phasor )

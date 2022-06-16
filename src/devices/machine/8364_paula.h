@@ -52,7 +52,7 @@
 class paula_8364_device : public device_t, public device_sound_interface
 {
 public:
-	paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto mem_read_cb() { return m_chipmem_r.bind(); }

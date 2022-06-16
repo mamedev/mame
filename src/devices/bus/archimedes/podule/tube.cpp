@@ -22,7 +22,7 @@ class arc_tube_device :
 {
 public:
 	// construction/destruction
-	arc_tube_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_tube_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -62,7 +62,7 @@ void arc_tube_device::device_add_mconfig(machine_config &config)
 //  arc_tube_device - constructor
 //-------------------------------------------------
 
-arc_tube_device::arc_tube_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_tube_device::arc_tube_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_TUBE, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 {

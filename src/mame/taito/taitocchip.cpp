@@ -110,7 +110,7 @@ This chip *ALWAYS* has a bypass capacitor (ceramic, 104, 0.10 uF) soldered on to
 
 DEFINE_DEVICE_TYPE(TAITO_CCHIP, taito_cchip_device, "cchip", "Taito TC0030CMD (C-Chip)")
 
-taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TAITO_CCHIP, tag, owner, clock),
 	m_upd7811(*this, "upd7811"),
 	m_upd4464_bank(*this, "upd4464_bank"),
@@ -235,7 +235,7 @@ void taito_cchip_device::device_add_mconfig(machine_config &config)
 	upd.an6_func().set([this] { return BIT(m_in_ad_cb(), 6) ? 0xff : 0; });
 	upd.an7_func().set([this] { return BIT(m_in_ad_cb(), 7) ? 0xff : 0; });
 
-	ADDRESS_MAP_BANK(config, m_upd4464_bank, 0);
+	ADDRESS_MAP_BANK(config, m_upd4464_bank);
 	m_upd4464_bank->set_map(&taito_cchip_device::cchip_ram_bank);
 	m_upd4464_bank->set_endianness(ENDIANNESS_LITTLE);
 	m_upd4464_bank->set_data_width(8);
@@ -243,7 +243,7 @@ void taito_cchip_device::device_add_mconfig(machine_config &config)
 	m_upd4464_bank->set_stride(0x400);
 
 	// the 68k has a different view into the banked memory?
-	ADDRESS_MAP_BANK(config, m_upd4464_bank68, 0);
+	ADDRESS_MAP_BANK(config, m_upd4464_bank68);
 	m_upd4464_bank68->set_map(&taito_cchip_device::cchip_ram_bank68);
 	m_upd4464_bank68->set_endianness(ENDIANNESS_LITTLE);
 	m_upd4464_bank68->set_data_width(8);

@@ -69,7 +69,7 @@ DEFINE_DEVICE_TYPE(ASTROCADE_IO, astrocade_io_device, "astrocade_io", "Astrocade
 //  astrocade_io_device - constructor
 //-------------------------------------------------
 
-astrocade_io_device::astrocade_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+astrocade_io_device::astrocade_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ASTROCADE_IO, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)

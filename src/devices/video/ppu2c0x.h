@@ -136,7 +136,7 @@ public:
 
 	bool in_vblanking() { return (m_scanline >= m_vblank_first_scanline - 1); }
 protected:
-	ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal_map);
+	ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock, address_map_constructor internal_map);
 
 	// registers definition
 	enum
@@ -174,7 +174,7 @@ protected:
 	};
 
 	// construction/destruction
-	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
@@ -250,7 +250,7 @@ private:
 
 class ppu2c0x_rgb_device : public ppu2c0x_device {
 protected:
-	ppu2c0x_rgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c0x_rgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual void init_palette_tables() override;
 
@@ -260,52 +260,52 @@ private:
 
 class ppu2c02_device : public ppu2c0x_device {
 public:
-	ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class ppu2c03b_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class ppu2c04_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class ppu2c07_device : public ppu2c0x_device {
 public:
-	ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class ppupalc_device : public ppu2c0x_device {
 public:
-	ppupalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppupalc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class ppu2c05_01_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class ppu2c05_02_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class ppu2c05_03_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class ppu2c05_04_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class ppu2c04_clone_device : public ppu2c0x_device {
 public:
-	ppu2c04_clone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c04_clone_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;

@@ -15,7 +15,7 @@ class nes_oekakids_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_oekakids_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_oekakids_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 	virtual uint8_t nt_r(offs_t offset) override;
@@ -43,7 +43,7 @@ class nes_fcg_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void fcg_write(offs_t offset, uint8_t data);
 	virtual void write_m(offs_t offset, uint8_t data) override;
@@ -51,7 +51,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_fcg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_fcg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -71,12 +71,12 @@ class nes_lz93d50_device : public nes_fcg_device
 {
 public:
 	// construction/destruction
-	nes_lz93d50_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_lz93d50_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override { fcg_write(offset, data); }
 
 protected:
-	nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -86,7 +86,7 @@ class nes_lz93d50_24c01_device : public nes_lz93d50_device
 {
 public:
 	// construction/destruction
-	nes_lz93d50_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_lz93d50_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read_m(offs_t offset) override;
 	virtual void write_h(offs_t offset, uint8_t data) override;
@@ -94,7 +94,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -113,7 +113,7 @@ class nes_lz93d50_24c02_device : public nes_lz93d50_24c01_device
 {
 public:
 	// construction/destruction
-	nes_lz93d50_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_lz93d50_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -127,7 +127,7 @@ class nes_fjump2_device : public nes_lz93d50_device
 {
 public:
 	// construction/destruction
-	nes_fjump2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_fjump2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read_m(offs_t offset) override;
 	virtual void write_m(offs_t offset, uint8_t data) override;

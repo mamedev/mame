@@ -199,7 +199,7 @@ void mice_state::mice2(machine_config &config)
 	I8255(config, "rttppi3");
 	I8255(config, "rttppi4");
 	I8255(config, "rttppi5");
-	I8155(config, "rtt8155", 0);
+	I8155(config, "rtt8155");
 }
 
 /* ROM definitions */

@@ -15,7 +15,7 @@
 class mulcd_device : public device_t
 {
 public:
-	mulcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mulcd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void set_contrast(u8 contrast);
 	void set_leds(u8 leds);

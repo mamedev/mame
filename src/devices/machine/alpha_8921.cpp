@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(ALPHA_8921, alpha_8921_device, "alpha_8921", "Alpha denshi AL
 //  alpha_8921_device - constructor
 //-------------------------------------------------
 
-alpha_8921_device::alpha_8921_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+alpha_8921_device::alpha_8921_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ALPHA_8921, tag, owner, clock)
 {
 }

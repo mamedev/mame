@@ -24,7 +24,7 @@
 
 DEFINE_DEVICE_TYPE(SGI_HPC3, hpc3_device, "hpc3", "SGI HPC3")
 
-hpc3_device::hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hpc3_device::hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SGI_HPC3, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_pio_space_config{

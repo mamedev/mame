@@ -42,7 +42,7 @@ class cr511b_device : public device_t
 {
 public:
 	// construction/destruction
-	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto stch_handler() { return m_stch_handler.bind(); }

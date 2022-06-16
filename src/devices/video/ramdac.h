@@ -26,12 +26,12 @@ class ramdac_device :   public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag)
-		: ramdac_device(mconfig, tag, owner, clock)
+	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag)
+		: ramdac_device(mconfig, tag, owner)
 	{
 		m_palette.set_tag(std::forward<T>(palette_tag));
 	}
-	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	void set_color_base(uint32_t color_base) { m_color_base = color_base; }

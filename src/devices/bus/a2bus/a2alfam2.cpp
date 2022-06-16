@@ -30,14 +30,14 @@ class a2bus_alfam2_device:
 	public device_a2bus_card_interface
 {
 public:
-	a2bus_alfam2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_alfam2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		a2bus_alfam2_device(mconfig, A2BUS_ALFAM2, tag, owner, clock)
 	{
 	}
 
 protected:
 	// construction/destruction
-	a2bus_alfam2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_alfam2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -60,7 +60,7 @@ private:
 class a2bus_aesms_device : public a2bus_alfam2_device
 {
 public:
-	a2bus_aesms_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_aesms_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		a2bus_alfam2_device(mconfig, A2BUS_AESMS, tag, owner, clock)
 	{
 	}
@@ -92,14 +92,14 @@ void a2bus_alfam2_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "alf_l").front_left();
 	SPEAKER(config, "alf_r").front_right();
 
-	SN76489(config, m_sn1, 1020484);
+	SN76489(config, m_sn1, XTAL::u(1020484));
 	m_sn1->add_route(ALL_OUTPUTS, "alf_l", 0.50);
 
-	SN76489(config, m_sn2, 1020484);
+	SN76489(config, m_sn2, XTAL::u(1020484));
 	m_sn2->add_route(ALL_OUTPUTS, "alf_l", 0.50);
 	m_sn2->add_route(ALL_OUTPUTS, "alf_r", 0.50);
 
-	SN76489(config, m_sn3, 1020484);
+	SN76489(config, m_sn3, XTAL::u(1020484));
 	m_sn3->add_route(ALL_OUTPUTS, "alf_r", 0.50);
 }
 
@@ -108,17 +108,17 @@ void a2bus_aesms_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "alf_l").front_left();
 	SPEAKER(config, "alf_r").front_right();
 
-	SN76489(config, m_sn1, 1020484);
+	SN76489(config, m_sn1, XTAL::u(1020484));
 	m_sn1->add_route(ALL_OUTPUTS, "alf_l", 0.50);
 
-	SN76489(config, m_sn2, 1020484);
+	SN76489(config, m_sn2, XTAL::u(1020484));
 	m_sn2->add_route(ALL_OUTPUTS, "alf_l", 0.50);
 	m_sn2->add_route(ALL_OUTPUTS, "alf_r", 0.50);
 
-	SN76489(config, m_sn3, 1020484);
+	SN76489(config, m_sn3, XTAL::u(1020484));
 	m_sn3->add_route(ALL_OUTPUTS, "alf_r", 0.50);
 
-	SN76489(config, m_sn4, 1020484);
+	SN76489(config, m_sn4, XTAL::u(1020484));
 	m_sn4->add_route(ALL_OUTPUTS, "alf_l", 0.50);
 	m_sn4->add_route(ALL_OUTPUTS, "alf_r", 0.50);
 }
@@ -127,7 +127,7 @@ void a2bus_aesms_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_alfam2_device::a2bus_alfam2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_alfam2_device::a2bus_alfam2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_sn1(*this, SN1_TAG),

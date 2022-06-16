@@ -22,7 +22,7 @@ public:
 	virtual void write_cart(offs_t offset, uint8_t data) override;
 
 protected:
-	msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 
@@ -49,7 +49,7 @@ protected:
 class msx_cart_sfg01_device : public msx_cart_sfg_device
 {
 public:
-	msx_cart_sfg01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_sfg01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -58,7 +58,7 @@ public:
 class msx_cart_sfg05_device : public msx_cart_sfg_device
 {
 public:
-	msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;

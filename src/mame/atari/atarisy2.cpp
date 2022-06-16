@@ -1243,7 +1243,7 @@ void atarisy2_state::atarisy2(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, "gfxdecode", 2, 8,8, TILEMAP_SCAN_ROWS, 128,64).set_info_callback(FUNC(atarisy2_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, "gfxdecode", 2, 8,8, TILEMAP_SCAN_ROWS, 64,48, 0).set_info_callback(FUNC(atarisy2_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, atarisy2_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, atarisy2_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1285,7 +1285,7 @@ void atarisy2_state::atarisy2(machine_config &config)
 void atarisy2_state::paperboy(machine_config &config)
 {
 	atarisy2(config);
-	SLAPSTIC(config, m_slapstic, 105);
+	SLAPSTIC(config, m_slapstic, XTAL::u(105));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0100000, 0100777, 0);
 	m_slapstic->set_view(m_vmmu);
 }
@@ -1298,7 +1298,7 @@ void atarisy2_state::_720(machine_config &config)
 	   issues with the sound CPU; temporarily increasing the sound CPU frequency
 	   to ~2.2MHz "fixes" the problem */
 
-	SLAPSTIC(config, m_slapstic, 107);
+	SLAPSTIC(config, m_slapstic, XTAL::u(107));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0100000, 0100777, 0);
 	m_slapstic->set_view(m_vmmu);
 }
@@ -1307,7 +1307,7 @@ void atarisy2_state::_720(machine_config &config)
 void atarisy2_state::ssprint(machine_config &config)
 {
 	atarisy2(config);
-	SLAPSTIC(config, m_slapstic, 108);
+	SLAPSTIC(config, m_slapstic, XTAL::u(108));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0100000, 0100777, 0);
 	m_slapstic->set_view(m_vmmu);
 
@@ -1319,7 +1319,7 @@ void atarisy2_state::ssprint(machine_config &config)
 void atarisy2_state::csprint(machine_config &config)
 {
 	atarisy2(config);
-	SLAPSTIC(config, m_slapstic, 109);
+	SLAPSTIC(config, m_slapstic, XTAL::u(109));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0100000, 0100777, 0);
 	m_slapstic->set_view(m_vmmu);
 
@@ -1331,7 +1331,7 @@ void atarisy2_state::csprint(machine_config &config)
 void atarisy2_state::apb(machine_config &config)
 {
 	atarisy2(config);
-	SLAPSTIC(config, m_slapstic, 110);
+	SLAPSTIC(config, m_slapstic, XTAL::u(110));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0100000, 0100777, 0);
 	m_slapstic->set_view(m_vmmu);
 }

@@ -31,9 +31,9 @@ class dspp_device : public cpu_device
 	friend class dspp_frontend;
 public:
 	// Construction/destruction
-	dspp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor code_map_ctor,
+	dspp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor code_map_ctor,
 		address_map_constructor data_map_ctor);
-	dspp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dspp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Static configuration helpers
 	auto int_handler() { return m_int_handler.bind(); }
@@ -389,5 +389,6 @@ public: // TODO
 // device type definition
 DECLARE_DEVICE_TYPE(DSPP, dspp_device);
 
+#include "dsppfe.h"
 
 #endif // MAME_CPU_DSPP_DSPP_H

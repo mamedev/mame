@@ -20,9 +20,9 @@
 #define COP402N_TAG "cop402n"
 #define AY8910_TAG  "ay8910"
 
-#define DESTRYER_CHR1   3579000.0 // unverified
+#define DESTRYER_CHR1   XTAL::u(3579000) // unverified
 #define DESTRYER_CHR2   XTAL(5'714'300)
-#define ALTAIR_CHR1     3579000.0 // unverified
+#define ALTAIR_CHR1     XTAL::u(3579000) // unverified
 #define ALTAIR_CHR2     cdp1869_device::DOT_CLK_PAL // unverified
 #define DRACO_CHR1      XTAL(4'433'610)
 #define DRACO_CHR2      cdp1869_device::DOT_CLK_PAL // unverified

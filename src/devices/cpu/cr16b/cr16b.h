@@ -10,7 +10,7 @@
 class cr16b_device : public cpu_device
 {
 public:
-	cr16b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cr16b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	enum {
 		CR16_PC, CR16_ISP, CR16_INTBASE,
@@ -23,7 +23,7 @@ public:
 
 protected:
 	// construction/destruction
-	cr16b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map);
+	cr16b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -44,12 +44,12 @@
 
 DEFINE_DEVICE_TYPE(RS232_PORT, rs232_port_device, "rs232", "RS-232 Port")
 
-rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	rs232_port_device(mconfig, RS232_PORT, tag, owner, clock)
 {
 }
 
-rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_single_card_slot_interface<device_rs232_port_interface>(mconfig, *this),
 	m_rxd(0),

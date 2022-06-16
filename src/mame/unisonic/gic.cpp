@@ -81,13 +81,13 @@ ROM_END
 //  gic_device - constructor
 //-------------------------------------------------
 
-gic_device::gic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gic_device::gic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: gic_device(mconfig, GIC, tag, owner, clock)
 {
 }
 
 
-gic_device::gic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+gic_device::gic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)

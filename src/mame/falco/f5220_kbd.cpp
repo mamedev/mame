@@ -184,7 +184,7 @@ ioport_constructor f5220_kbd_device::device_input_ports() const
 //  f5220_kbd_device - constructor
 //-------------------------------------------------
 
-f5220_kbd_device::f5220_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+f5220_kbd_device::f5220_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, F5220_KBD, tag, owner, clock),
 	device_matrix_keyboard_interface(mconfig, *this, "row_0", "row_1", "row_2", "row_3", "row_4", "row_5", "row_6", "row_7"),
 	m_int_handler(*this),

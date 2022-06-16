@@ -428,7 +428,7 @@ void mpf1_state::mpf1b(machine_config &config)
 void mpf1_state::mpf1p(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2500000);
+	Z80(config, m_maincpu, XTAL::u(2500000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpf1_state::mpf1p_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &mpf1_state::mpf1_step);
 	m_maincpu->set_addrmap(AS_IO, &mpf1_state::mpf1p_io_map);
@@ -438,10 +438,10 @@ void mpf1_state::mpf1p(machine_config &config)
 	config.set_default_layout(layout_mpf1p);
 
 	/* devices */
-	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, 2500000));
+	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, XTAL::u(2500000)));
 	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80CTC(config, m_ctc, 2500000);
+	Z80CTC(config, m_ctc, XTAL::u(2500000));
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	i8255_device &ppi(I8255A(config, I8255A_TAG));

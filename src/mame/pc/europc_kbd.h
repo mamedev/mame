@@ -17,7 +17,7 @@ class europc_keyboard_device : public device_t
 {
 public:
 	// device type constructor
-	europc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	europc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callback configuration
 	auto kbdata_callback() { return m_kbdata_callback.bind(); }

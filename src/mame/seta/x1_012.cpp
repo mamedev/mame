@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE(X1_012, x1_012_device, "x1_012", "Seta X1-012 Tile Layer")
 
-x1_012_device::x1_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+x1_012_device::x1_012_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, X1_012, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_tile_offset_callback(*this)

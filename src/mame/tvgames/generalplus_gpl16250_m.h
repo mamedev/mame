@@ -12,7 +12,7 @@ class full_memory_device :
 {
 public:
 	// construction/destruction
-	full_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	full_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	template <typename... T> full_memory_device& set_map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }

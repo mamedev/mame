@@ -392,7 +392,7 @@ void cz101_state::cz101(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(cz101_state::cz101_palette), 3);
 
-	HD44780(config, m_hd44780, 0);
+	HD44780(config, m_hd44780);
 	m_hd44780->set_lcd_size(2, 16);
 	m_hd44780->set_pixel_update_cb(FUNC(cz101_state::lcd_pixel_update));
 

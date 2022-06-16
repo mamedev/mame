@@ -126,7 +126,7 @@ void tk02_device::device_add_mconfig(machine_config &config)
 //  tk02_device - constructor
 //-------------------------------------------------
 
-tk02_device::tk02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tk02_device::tk02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TK02_80COL, tag, owner, clock),
 	device_tatung_pipe_interface(mconfig, *this),
 	m_pipe(*this, "pipe"),

@@ -661,7 +661,7 @@ void mario_state::mario_audio(machine_config &config)
 	m_discrete->set_intf(mario_discrete);
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 1);
 #else
-	NETLIST_SOUND(config, "snd_nl", 48000)
+	NETLIST_SOUND(config, "snd_nl", XTAL::u(48000))
 		.set_source(netlist_mario)
 		.add_route(ALL_OUTPUTS, "mono", 0.5);
 
@@ -676,14 +676,14 @@ void mario_state::mario_audio(machine_config &config)
 
 void mario_state::masao_audio(machine_config &config)
 {
-	Z80(config, m_audiocpu, 24576000/16);  /* ???? */
+	Z80(config, m_audiocpu, XTAL::u(24576000)/16);  /* ???? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mario_state::masao_sound_map);
 
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 14318000/6));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(14318000)/6));
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }

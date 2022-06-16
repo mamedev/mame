@@ -310,14 +310,14 @@ void quantum_state::quantum(machine_config &config)
 	screen.set_visarea(0, 900, 0, 600);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	AVG_QUANTUM(config, m_avg, 0);
+	AVG_QUANTUM(config, m_avg);
 	m_avg->set_vector("vector");
 	m_avg->set_memory(m_maincpu, AS_PROGRAM, 0x800000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	pokey_device &pokey1(POKEY(config, "pokey1", 600000));
+	pokey_device &pokey1(POKEY(config, "pokey1", XTAL::u(600000)));
 	pokey1.pot_r<0>().set(FUNC(quantum_state::input_1_r));
 	pokey1.pot_r<1>().set(FUNC(quantum_state::input_1_r));
 	pokey1.pot_r<2>().set(FUNC(quantum_state::input_1_r));
@@ -329,7 +329,7 @@ void quantum_state::quantum(machine_config &config)
 	pokey1.set_output_opamp(RES_K(1), 0.0, 5.0);
 	pokey1.add_route(0, "discrete", 1.0, 0);
 
-	pokey_device &pokey2(POKEY(config, "pokey2", 600000));
+	pokey_device &pokey2(POKEY(config, "pokey2", XTAL::u(600000)));
 	pokey2.pot_r<0>().set(FUNC(quantum_state::input_2_r));
 	pokey2.pot_r<1>().set(FUNC(quantum_state::input_2_r));
 	pokey2.pot_r<2>().set(FUNC(quantum_state::input_2_r));

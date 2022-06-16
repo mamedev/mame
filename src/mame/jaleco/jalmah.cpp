@@ -1110,7 +1110,7 @@ void urashima_state::machine_reset()
 
 void jalmah_state::jalmah(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000/2); // assume same as Mega System 1
+	M68000(config, m_maincpu, XTAL::u(12000000)/2); // assume same as Mega System 1
 	m_maincpu->set_addrmap(AS_PROGRAM, &jalmah_state::jalmah_map);
 	m_maincpu->set_vblank_int("screen", FUNC(jalmah_state::irq2_line_hold));
 
@@ -1122,7 +1122,7 @@ void jalmah_state::jalmah(machine_config &config)
 	MEGASYS1_TILEMAP(config, m_tmap[3], m_palette, 0x0300);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(12000000/2,406,0,256,263,16,240); // assume same as nmk16 & mega system 1
+	screen.set_raw(XTAL::u(12000000)/2,406,0,256,263,16,240); // assume same as nmk16 & mega system 1
 	screen.set_screen_update(FUNC(jalmah_state::screen_update_jalmah));
 	screen.set_palette(m_palette);
 
@@ -1131,7 +1131,7 @@ void jalmah_state::jalmah(machine_config &config)
 	TIMER(config, "mcusim").configure_periodic(FUNC(jalmah_state::mcu_sim), attotime::from_hz(10000));
 
 	SPEAKER(config, "mono").front_center();
-	okim6295_device &oki(OKIM6295(config, "oki", 4000000, okim6295_device::PIN7_LOW));
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(4000000), okim6295_device::PIN7_LOW));
 	oki.set_addrmap(0, &jalmah_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 0.5);
 }

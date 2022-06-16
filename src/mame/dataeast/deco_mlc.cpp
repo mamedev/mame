@@ -539,7 +539,7 @@ void deco_mlc_state::machine_reset()
 void deco_mlc_state::avengrgs(machine_config &config)
 {
 	// basic machine hardware
-	SH2(config, m_maincpu, 42000000/2); // 21 MHz clock confirmed on real board
+	SH2(config, m_maincpu, XTAL::u(42000000)/2); // 21 MHz clock confirmed on real board
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::avengrgs_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom); // Actually 93c45
@@ -563,7 +563,7 @@ void deco_mlc_state::avengrgs(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YMZ280B(config, m_ymz, 42000000 / 3);
+	YMZ280B(config, m_ymz, XTAL::u(42000000) / 3);
 	m_ymz->add_route(0, "lspeaker", 1.0);
 	m_ymz->add_route(1, "rspeaker", 1.0);
 }
@@ -571,7 +571,7 @@ void deco_mlc_state::avengrgs(machine_config &config)
 void deco_mlc_state::mlc(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 42000000/6); // 42 MHz -> 7MHz clock confirmed on real board
+	ARM(config, m_maincpu, XTAL::u(42000000)/6); // 42 MHz -> 7MHz clock confirmed on real board
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_no146_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom); // Actually 93c45
@@ -595,7 +595,7 @@ void deco_mlc_state::mlc(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YMZ280B(config, m_ymz, 42000000 / 3);
+	YMZ280B(config, m_ymz, XTAL::u(42000000) / 3);
 	m_ymz->add_route(0, "lspeaker", 1.0);
 	m_ymz->add_route(1, "rspeaker", 1.0);
 }
@@ -624,7 +624,7 @@ void deco_mlc_state::stadhr96(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_146_map);
 
-	DECO146PROT(config, m_deco146, 0);
+	DECO146PROT(config, m_deco146);
 	m_deco146->set_use_magic_read_address_xor(true);
 }
 

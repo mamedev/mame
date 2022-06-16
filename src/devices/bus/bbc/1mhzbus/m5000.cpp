@@ -120,7 +120,7 @@ void bbc_m87_device::device_add_mconfig(machine_config &config)
 //  bbc_hybrid_device - constructor
 //-------------------------------------------------
 
-bbc_m500_device::bbc_m500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_m500_device::bbc_m500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_1mhzbus(*this, "1mhzbus")
@@ -129,22 +129,22 @@ bbc_m500_device::bbc_m500_device(const machine_config &mconfig, device_type type
 {
 }
 
-bbc_m500_device::bbc_m500_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_m500_device::bbc_m500_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_m500_device(mconfig, BBC_M500, tag, owner, clock)
 {
 }
 
-bbc_m5000_device::bbc_m5000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_m5000_device::bbc_m5000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_m500_device(mconfig, BBC_M5000, tag, owner, clock)
 {
 }
 
-bbc_m3000_device::bbc_m3000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_m3000_device::bbc_m3000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_m500_device(mconfig, BBC_M3000, tag, owner, clock)
 {
 }
 
-bbc_m87_device::bbc_m87_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_m87_device::bbc_m87_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_m500_device(mconfig, BBC_M87, tag, owner, clock)
 {
 }
@@ -219,7 +219,7 @@ void bbc_m3000_device::jim_w(offs_t offset, uint8_t data)
 //  htmusic_device - constructor
 //-------------------------------------------------
 
-htmusic_device::htmusic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+htmusic_device::htmusic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HTMUSIC, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_counter(0)

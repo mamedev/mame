@@ -435,12 +435,12 @@ void dim68k_state::dim68k(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	UPD765A(config, m_fdc, 4'000'000, true, true); // these options unknown
+	UPD765A(config, m_fdc, XTAL::u(4'000'000), true, true); // these options unknown
 	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	m_fdc->intrq_wr_callback().set(FUNC(dim68k_state::fdc_irq_w));
 
-	MC6845(config, m_crtc, 1790000);
+	MC6845(config, m_crtc, XTAL::u(1790000));
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

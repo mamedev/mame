@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(SPG2XX_SYSDMA, spg2xx_sysdma_device, "spg2xx_sysdma", "SPG240
 
 
 
-spg2xx_sysdma_device::spg2xx_sysdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spg2xx_sysdma_device::spg2xx_sysdma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPG2XX_SYSDMA, tag, owner, clock)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 {

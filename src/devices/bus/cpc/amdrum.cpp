@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(CPC_AMDRUM, cpc_amdrum_device, "cpc_amdrum", "Amdrum")
 void cpc_amdrum_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "speaker").front_center();
-	ZN428E(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	ZN428E(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	// no pass-through
 }
 
@@ -31,7 +31,7 @@ void cpc_amdrum_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_amdrum_device::cpc_amdrum_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cpc_amdrum_device::cpc_amdrum_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CPC_AMDRUM, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_slot(nullptr),

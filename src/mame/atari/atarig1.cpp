@@ -368,7 +368,7 @@ void atarig1_state::atarig1(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_II(config, m_jsa, 0);
+	ATARI_JSA_II(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 	m_jsa->test_read_cb().set_ioport("IN0").bit(14);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.6);
@@ -385,7 +385,7 @@ void atarig1_state::hydrap(machine_config &config)
 	m_adc->in_callback<1>().set_ioport("ADC1");
 	m_adc->in_callback<2>().set_ioport("ADC2");
 
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_hydra);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc_hydra);
 }
 
 
@@ -393,7 +393,7 @@ void atarig1_state::hydra(machine_config &config)
 {
 	hydrap(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::hydra_map);
-	SLAPSTIC(config, m_slapstic, 116);
+	SLAPSTIC(config, m_slapstic, XTAL::u(116));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x78000, 0x79fff, 0x6000);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
@@ -404,8 +404,8 @@ void atarig1_state::pfslap111(machine_config &config)
 	atarig1(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
 
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
-	SLAPSTIC(config, m_slapstic, 111);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc_pitfight);
+	SLAPSTIC(config, m_slapstic, XTAL::u(111));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x38000, 0x39fff, 0x6000);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
@@ -416,8 +416,8 @@ void atarig1_state::pfslap112(machine_config &config)
 	atarig1(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
 
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
-	SLAPSTIC(config, m_slapstic, 112);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc_pitfight);
+	SLAPSTIC(config, m_slapstic, XTAL::u(112));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x38000, 0x39fff, 0x6000);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
@@ -428,8 +428,8 @@ void atarig1_state::pfslap113(machine_config &config)
 	atarig1(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
 
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
-	SLAPSTIC(config, m_slapstic, 113);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc_pitfight);
+	SLAPSTIC(config, m_slapstic, XTAL::u(113));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x38000, 0x39fff, 0x6000);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
@@ -440,8 +440,8 @@ void atarig1_state::pfslap114(machine_config &config)
 	atarig1(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
 
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
-	SLAPSTIC(config, m_slapstic, 114);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc_pitfight);
+	SLAPSTIC(config, m_slapstic, XTAL::u(114));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x38000, 0x39fff, 0x6000);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
@@ -452,7 +452,7 @@ void atarig1_state::pitfightb(machine_config &config)
 	atarig1(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarig1_state::pitfight_map);
 
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc_pitfight);
 }
 
 

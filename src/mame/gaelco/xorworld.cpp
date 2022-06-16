@@ -311,7 +311,7 @@ GFXDECODE_END
 void xorworld_state::xorworld(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10'000'000);   // 10 MHz
+	M68000(config, m_maincpu, XTAL::u(10'000'000));   // 10 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &xorworld_state::prg_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(xorworld_state::irq6_line_assert)); // irq 4 or 6
 	//m_maincpu->set_periodic_int(FUNC(xorworld_state::irq2_line_assert), attotime::from_hz(3 * 60)); //timed irq, unknown timing
@@ -342,7 +342,7 @@ void xorworld_state::xorworld(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SAA1099(config, "saa", 8'000'000).add_route(ALL_OUTPUTS, "mono", 1.0); // guessed clock
+	SAA1099(config, "saa", XTAL::u(8'000'000)).add_route(ALL_OUTPUTS, "mono", 1.0); // guessed clock
 }
 
 

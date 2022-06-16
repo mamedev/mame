@@ -30,10 +30,10 @@ class bbc_ariesb12_device :
 {
 public:
 	// construction/destruction
-	bbc_ariesb12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_ariesb12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	bbc_ariesb12_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_ariesb12_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -56,7 +56,7 @@ class bbc_ariesb20_device : public bbc_ariesb12_device
 {
 public:
 	// construction/destruction
-	bbc_ariesb20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_ariesb20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -82,7 +82,7 @@ class bbc_ariesb32_device : public bbc_ariesb12_device
 {
 public:
 	// construction/destruction
-	bbc_ariesb32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_ariesb32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -32,7 +32,7 @@ public:
 
 protected:
 	// construction/destruction
-	kp63_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 num_counters, u8 mode_mask);
+	kp63_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 num_counters, u8 mode_mask);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -81,14 +81,14 @@ class kp63_3channel_device : public kp63_device
 {
 public:
 	// device type constructor
-	kp63_3channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	kp63_3channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class kp63a_device : public kp63_device
 {
 public:
 	// device type constructor
-	kp63a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	kp63a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type declarations

@@ -12,8 +12,8 @@
 class edevices_device : public device_t
 {
 public:
-	edevices_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	edevices_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	edevices_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
+	edevices_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_bg_videoram_tag(T &&tag) { m_bg_videoram.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_mlow_videoram_tag(T &&tag) { m_mlow_videoram.set_tag(std::forward<T>(tag)); }
@@ -82,7 +82,7 @@ private:
 class edevices_sforce_device : public edevices_device
 {
 public:
-	edevices_sforce_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	edevices_sforce_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual int get_priority(const uint16_t *source) override;
 };

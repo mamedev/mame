@@ -959,7 +959,7 @@ void ti990_hdc_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 DEFINE_DEVICE_TYPE(TI990_HDC, ti990_hdc_device, "ti990_hdc", "Generic TI-990 Hard Disk Controller")
 
-ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI990_HDC, tag, owner, clock)
 	, m_memory_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_interrupt_callback(*this)

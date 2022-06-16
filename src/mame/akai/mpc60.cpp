@@ -135,7 +135,7 @@ void mpc60_state::mpc60(machine_config &config)
 	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w)); // FIXME: delayed and combined with DRQAD
 
-	hd61830_device &lcdc(HD61830(config, "lcdc", 0)); // LC7981
+	hd61830_device &lcdc(HD61830(config, "lcdc")); // LC7981
 	lcdc.set_addrmap(0, &mpc60_state::lcd_map);
 	lcdc.set_screen("screen");
 

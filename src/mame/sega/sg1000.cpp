@@ -636,7 +636,7 @@ void sf7000_state::sf7000(machine_config &config)
 	ppi.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi.out_pc_callback().set(FUNC(sf7000_state::ppi_pc_w));
 
-	i8251_device &upd8251(I8251(config, UPD8251_TAG, 0));
+	i8251_device &upd8251(I8251(config, UPD8251_TAG));
 	upd8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	upd8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	upd8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
@@ -645,7 +645,7 @@ void sf7000_state::sf7000(machine_config &config)
 	rs232.rxd_handler().set(UPD8251_TAG, FUNC(i8251_device::write_rxd));
 	rs232.dsr_handler().set(UPD8251_TAG, FUNC(i8251_device::write_dsr));
 
-	UPD765A(config, m_fdc, 8'000'000, false, false);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), false, false);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");

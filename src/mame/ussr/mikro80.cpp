@@ -212,7 +212,7 @@ u32 mikro80_state::screen_update_mikro80(screen_device &screen, bitmap_ind16 &bi
 void mikro80_state::mikro80(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 2000000);
+	I8080(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mikro80_state::mikro80_mem);
 	m_maincpu->set_addrmap(AS_IO, &mikro80_state::mikro80_io);
 
@@ -251,7 +251,7 @@ void mikro80_state::radio99(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &mikro80_state::radio99_io);
 
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.50);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.50);
 }
 
 void mikro80_state::kristall(machine_config &config)

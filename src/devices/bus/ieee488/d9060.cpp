@@ -469,7 +469,7 @@ inline void d9060_device_base::update_ieee_signals()
 //  d9060_device_base - constructor
 //-------------------------------------------------
 
-d9060_device_base::d9060_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+d9060_device_base::d9060_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, M6502_DOS_TAG)
@@ -496,7 +496,7 @@ d9060_device_base::d9060_device_base(const machine_config &mconfig, device_type 
 //  d9060_device - constructor
 //-------------------------------------------------
 
-d9060_device::d9060_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+d9060_device::d9060_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: d9060_device_base(mconfig, D9060, tag, owner, clock, TYPE_9060)
 {
 }
@@ -506,7 +506,7 @@ d9060_device::d9060_device(const machine_config &mconfig, const char *tag, devic
 //  d9090_device - constructor
 //-------------------------------------------------
 
-d9090_device::d9090_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+d9090_device::d9090_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: d9060_device_base(mconfig, D9090, tag, owner, clock, TYPE_9090)
 {
 }

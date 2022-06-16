@@ -277,11 +277,11 @@ void esqmr_state::mr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &esqmr_state::mr_map);
 
 	mc68340_serial_module_device &duart(*m_maincpu->subdevice<mc68340_serial_module_device>("serial"));
-	duart.set_clocks(500000, 500000, 1000000, 1000000);
+	duart.set_clocks(XTAL::u(500000), XTAL::u(500000), XTAL::u(1000000), XTAL::u(1000000));
 	duart.a_tx_cb().set(FUNC(esqmr_state::duart_tx_a));
 	duart.b_tx_cb().set(FUNC(esqmr_state::duart_tx_b));
 
-	M68HC705C4A(config, "mcu", 4'000'000);
+	M68HC705C4A(config, "mcu", XTAL::u(4'000'000));
 
 	//IDT7130(config, "dpram"); // present in PCB, but unknown purpose (mcu communication?)
 

@@ -4180,7 +4180,7 @@ class discrete_device : public device_t
 {
 protected:
 	// construction/destruction
-	discrete_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	discrete_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 public:
 	typedef std::vector<std::unique_ptr<discrete_task> > task_list_t;
@@ -4280,17 +4280,17 @@ class discrete_sound_device :   public discrete_device,
 {
 public:
 	// construction/destruction
-	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const discrete_block *intf)
+	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, const discrete_block *intf)
 		: discrete_sound_device(mconfig, tag, owner, clock)
 	{
 		set_intf(intf);
 	}
 	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const discrete_block *intf)
-		: discrete_sound_device(mconfig, tag, owner, uint32_t(0))
+		: discrete_sound_device(mconfig, tag, owner)
 	{
 		set_intf(intf);
 	}
-	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~discrete_sound_device() { }
 
 	/* --------------------------------- */

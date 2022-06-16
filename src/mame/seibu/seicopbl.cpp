@@ -403,7 +403,7 @@ void seibu_cop_bootleg_device::seibucopbl_map(address_map &map)
 	map(0x1b4, 0x1b5).r(FUNC(seibu_cop_bootleg_device::angle_r));
 }
 
-seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEIBU_COP_BOOTLEG, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_host_cpu(*this, finder_base::DUMMY_TAG),

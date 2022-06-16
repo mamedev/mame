@@ -30,7 +30,7 @@ enum
 class z80_device : public cpu_device, public z80_daisy_chain_interface
 {
 public:
-	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex);
 	template <typename... T> void set_memory_map(T &&... args) { set_addrmap(AS_PROGRAM, std::forward<T>(args)...); }
@@ -42,7 +42,7 @@ public:
 	auto halt_cb() { return m_halt_cb.bind(); }
 
 protected:
-	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -298,7 +298,7 @@ DECLARE_DEVICE_TYPE(Z80, z80_device)
 class nsc800_device : public z80_device
 {
 public:
-	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

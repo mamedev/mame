@@ -16,7 +16,7 @@
 
 class m8502_device : public m6510_device {
 public:
-	m8502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m8502_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 enum {

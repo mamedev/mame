@@ -18,13 +18,13 @@ class segas24_tile_device : public device_t, public device_gfx_interface
 	friend class segas24_tile_config;
 
 public:
-	segas24_tile_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint16_t _tile_mask)
+	segas24_tile_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint16_t _tile_mask)
 		: segas24_tile_device(mconfig, tag, owner, clock)
 	{
 		set_tile_mask(_tile_mask);
 	}
 
-	segas24_tile_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas24_tile_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_tile_mask(uint16_t _tile_mask) { tile_mask = _tile_mask; }
@@ -81,7 +81,7 @@ class segas24_sprite_device : public device_t
 	friend class segas24_sprite_config;
 
 public:
-	segas24_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas24_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -101,7 +101,7 @@ class segas24_mixer_device : public device_t
 	friend class segas24_mixer_config;
 
 public:
-	segas24_mixer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas24_mixer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

@@ -1144,11 +1144,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(common_state::scanline_irq)
 // Older hardware (ST-0020 + ST-0016)
 void jclub2o_state::jclub2o(machine_config &config)
 {
-	M68EC020(config, m_maincpu, 12000000);
+	M68EC020(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &jclub2o_state::jclub2o_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(common_state::scanline_irq), "screen", 0, 1);
 
-	ST0016_CPU(config, m_soundcpu, 8000000);
+	ST0016_CPU(config, m_soundcpu, XTAL::u(8000000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &jclub2o_state::st0016_mem);
 	m_soundcpu->set_addrmap(AS_IO, &jclub2o_state::st0016_io);
 	m_soundcpu->set_vblank_int("screen", FUNC(jclub2o_state::irq0_line_hold));
@@ -1171,7 +1171,7 @@ void jclub2o_state::jclub2o(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 
-	ST0020_SPRITES(config, m_st0020, 0);
+	ST0020_SPRITES(config, m_st0020);
 	m_st0020->set_is_jclub2(1);
 	m_st0020->set_palette(m_palette);
 
@@ -1190,7 +1190,7 @@ void jclub2o_state::jclub2o(machine_config &config)
 // Newer hardware (ST-0032)
 void jclub2_state::jclub2(machine_config &config)
 {
-	M68EC020(config, m_maincpu, 12000000);
+	M68EC020(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &jclub2_state::jclub2_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(common_state::scanline_irq), "screen", 0, 1);
 
@@ -1213,7 +1213,7 @@ void jclub2_state::jclub2(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
-	ST0020_SPRITES(config, m_st0020, 0);
+	ST0020_SPRITES(config, m_st0020);
 	m_st0020->set_is_st0032(1);
 	m_st0020->set_is_jclub2(1); // offsets
 	m_st0020->set_palette(m_palette);
@@ -1234,7 +1234,7 @@ void jclub2_state::jclub2(machine_config &config)
 
 void darkhors_state::darkhors(machine_config &config)
 {
-	M68EC020(config, m_maincpu, 12000000); // 36MHz/3 ??
+	M68EC020(config, m_maincpu, XTAL::u(12000000)); // 36MHz/3 ??
 	m_maincpu->set_addrmap(AS_PROGRAM, &darkhors_state::darkhors_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(common_state::scanline_irq), "screen", 0, 1);
 
@@ -1264,7 +1264,7 @@ void darkhors_state::darkhors(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 528000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(528000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 

@@ -50,7 +50,7 @@ DEFINE_DEVICE_TYPE(TEA1002, tea1002_device, "tea1002", "Mullard TEA1002 PAL colo
 //  paula_device - constructor
 //-------------------------------------------------
 
-tea1002_device::tea1002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tea1002_device::tea1002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TEA1002, tag, owner, clock)
 {
 }

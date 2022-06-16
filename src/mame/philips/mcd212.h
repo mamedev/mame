@@ -36,14 +36,14 @@ class mcd212_device : public device_t,
 {
 public:
 	template <typename T, typename U>
-	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&plane_a_tag, U &&plane_b_tag)
+	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&plane_a_tag, U &&plane_b_tag)
 		: mcd212_device(mconfig, tag, owner, clock)
 	{
 		m_planea.set_tag(std::forward<T>(plane_a_tag));
 		m_planeb.set_tag(std::forward<U>(plane_b_tag));
 	}
 
-	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto int_callback() { return m_int_callback.bind(); }
 

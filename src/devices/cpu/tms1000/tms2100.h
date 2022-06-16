@@ -69,10 +69,10 @@ enum
 class tms2100_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms2100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms2100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	tms2100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
+	tms2100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
 	// overrides
 	virtual void device_start() override;
@@ -131,22 +131,22 @@ protected:
 class tms2170_cpu_device : public tms2100_cpu_device
 {
 public:
-	tms2170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms2170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class tms2300_cpu_device : public tms2100_cpu_device
 {
 public:
-	tms2300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms2300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	tms2300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
+	tms2300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 };
 
 class tms2370_cpu_device : public tms2300_cpu_device
 {
 public:
-	tms2370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms2370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

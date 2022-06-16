@@ -679,11 +679,11 @@ void combatscb_state::machine_reset()
 void combatsc_state::combatsc(machine_config &config)
 {
 	// basic machine hardware
-	HD6309(config, m_maincpu, 3000000*4);  // 3 MHz?
+	HD6309(config, m_maincpu, XTAL::u(3000000)*4);  // 3 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &combatsc_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(combatsc_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 3579545);   // 3.579545 MHz
+	Z80(config, m_audiocpu, XTAL::u(3579545));   // 3.579545 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &combatsc_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(1200));
@@ -707,9 +707,9 @@ void combatsc_state::combatsc(machine_config &config)
 	m_palette->set_format(palette_device::xBGR_555, 8 * 16 * 16, 128);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
-	K007121(config, m_k007121[0], 0);
+	K007121(config, m_k007121[0]);
 	m_k007121[0]->set_palette_tag(m_palette);
-	K007121(config, m_k007121[1], 0);
+	K007121(config, m_k007121[1]);
 	m_k007121[1]->set_palette_tag(m_palette);
 
 	// sound hardware
@@ -717,7 +717,7 @@ void combatsc_state::combatsc(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 3000000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL::u(3000000)));
 	ymsnd.port_a_write_callback().set(FUNC(combatsc_state::portA_w));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
@@ -729,11 +729,11 @@ void combatsc_state::combatsc(machine_config &config)
 void combatscb_state::combatscb(machine_config &config)
 {
 	// basic machine hardware
-	HD6309(config, m_maincpu, 3000000*4);  // 3 MHz?
+	HD6309(config, m_maincpu, XTAL::u(3000000)*4);  // 3 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &combatscb_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(combatsc_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 3579545);   // 3.579545 MHz
+	Z80(config, m_audiocpu, XTAL::u(3579545));   // 3.579545 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &combatscb_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(1200));
@@ -757,9 +757,9 @@ void combatscb_state::combatscb(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	YM2203(config, "ymsnd", 3000000).add_route(ALL_OUTPUTS, "mono", 0.20);
+	YM2203(config, "ymsnd", XTAL::u(3000000)).add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_callback().set_inputline("audiocpu", 0, ASSERT_LINE);
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.30);

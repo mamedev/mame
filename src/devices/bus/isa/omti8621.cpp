@@ -51,7 +51,7 @@ class omti_disk_image_device : public harddisk_image_base_device
 {
 public:
 	// construction/destruction
-	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// image-level overrides
 	virtual bool support_command_line_image_creation() const noexcept override { return true; }
@@ -239,8 +239,8 @@ INPUT_PORTS_END
 
 void omti8621_device::device_add_mconfig(machine_config &config)
 {
-	OMTI_DISK(config, OMTI_DISK0_TAG, 0);
-	OMTI_DISK(config, OMTI_DISK1_TAG, 0);
+	OMTI_DISK(config, OMTI_DISK0_TAG);
+	OMTI_DISK(config, OMTI_DISK1_TAG);
 
 	UPD765A(config, m_fdc, 48_MHz_XTAL / 6, false, false); // clocked through FDC9239BT
 	m_fdc->intrq_wr_callback().set(FUNC(omti8621_device::fdc_irq_w));
@@ -370,14 +370,14 @@ void omti8621_device::device_reset()
 
 DEFINE_DEVICE_TYPE(ISA16_OMTI8621, omti8621_pc_device, "omti8621isa", "OMTI 8621 ESDI/floppy controller (ISA)")
 
-omti8621_pc_device::omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+omti8621_pc_device::omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: omti8621_device(mconfig, ISA16_OMTI8621, tag, owner, clock)
 {
 }
 
 DEFINE_DEVICE_TYPE(ISA16_OMTI8621_APOLLO, omti8621_apollo_device, "omti8621ap", "OMTI 8621 ESDI/floppy controller (Apollo)")
 
-omti8621_apollo_device::omti8621_apollo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+omti8621_apollo_device::omti8621_apollo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: omti8621_device(mconfig, ISA16_OMTI8621_APOLLO, tag, owner, clock)
 {
 }
@@ -1379,7 +1379,7 @@ uint8_t omti8621_device::fd_disk_chg_r()
 // device type definition
 DEFINE_DEVICE_TYPE(OMTI_DISK, omti_disk_image_device, "omti_disk_image", "OMTI 8621 ESDI disk")
 
-omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: harddisk_image_base_device(mconfig, OMTI_DISK, tag, owner, clock)
 	, m_type(0), m_cylinders(0), m_heads(0), m_sectors(0), m_sectorbytes(0), m_sector_count(0), m_image(nullptr)
 {

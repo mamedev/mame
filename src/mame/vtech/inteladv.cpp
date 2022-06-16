@@ -68,14 +68,14 @@ INPUT_PORTS_END
 
 void inteladv_state::inteladv(machine_config &config)
 {
-	ST2205U(config, m_maincpu, 4000000);
+	ST2205U(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_DATA, &inteladv_state::inteladv_map);
 	m_maincpu->in_pa_callback().set_ioport("POWER");
 }
 
 void inteladv_state::dyndesk(machine_config &config)
 {
-	ST2202(config, m_maincpu, 4000000);
+	ST2202(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_DATA, &inteladv_state::dyndesk_map);
 	m_maincpu->in_pa_callback().set_ioport("POWER");
 }

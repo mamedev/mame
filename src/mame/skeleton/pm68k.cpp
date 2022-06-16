@@ -60,10 +60,10 @@ void pm68k_state::machine_reset()
 void pm68k_state::pm68k(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pm68k_state::mem_map);
 
-	i8274_device& mpsc(I8274(config, "mpsc", 0));
+	i8274_device& mpsc(I8274(config, "mpsc"));
 	mpsc.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	mpsc.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	mpsc.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -71,7 +71,7 @@ void pm68k_state::pm68k(machine_config &config)
 	mpsc.out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	mpsc.out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 
-	am9513_device &stc(AM9513(config, "stc", 4000000));
+	am9513_device &stc(AM9513(config, "stc", XTAL::u(4000000)));
 	stc.out4_cb().set("mpsc", FUNC(i8274_device::rxca_w));
 	stc.out4_cb().append("mpsc", FUNC(i8274_device::txca_w));
 	stc.out5_cb().set("mpsc", FUNC(i8274_device::rxcb_w));

@@ -69,7 +69,7 @@ void interpro_sga_device::map(address_map &map)
 
 DEFINE_DEVICE_TYPE(INTERPRO_SGA, interpro_sga_device, "sga", "SRX Gate Array")
 
-interpro_sga_device::interpro_sga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+interpro_sga_device::interpro_sga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, INTERPRO_SGA, tag, owner, clock)
 	, m_berr_func(*this)
 {

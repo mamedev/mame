@@ -25,7 +25,7 @@ class scsp_device : public device_t,
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; } // DSP / EG incorrections, etc
 
-	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 22'579'200);
+	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(22'579'200));
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 	auto main_irq_cb() { return m_main_irq_cb.bind(); }

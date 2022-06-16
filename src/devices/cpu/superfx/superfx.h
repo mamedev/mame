@@ -105,7 +105,7 @@ public:
 
 protected:
 	// construction/destruction
-	superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -203,7 +203,7 @@ private:
 	inline uint8_t superfx_op_read(uint16_t addr);
 	inline uint8_t superfx_peekpipe();
 	inline uint8_t superfx_pipe();
-	inline void superfx_add_clocks_internal(uint32_t clocks);
+	inline void superfx_add_clocks_internal(const XTAL &clocks);
 	void superfx_timing_reset();
 	inline void superfx_dreg_sfr_sz_update();
 };
@@ -212,7 +212,7 @@ class superfx1_device :  public superfx_device
 {
 public:
 	// construction/destruction
-	superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_execute_interface overrides
@@ -224,7 +224,7 @@ class superfx2_device :  public superfx_device
 {
 public:
 	// construction/destruction
-	superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(SUPERFX1, superfx1_device)

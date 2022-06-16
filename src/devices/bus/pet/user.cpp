@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(PET_USER_PORT, pet_user_port_device, "pet_user_port", "PET user port")
 
-pet_user_port_device::pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pet_user_port_device::pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PET_USER_PORT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_2_handler(*this),

@@ -14,37 +14,37 @@ DEFINE_DEVICE_TYPE(HD6475348, hd6475348_device, "hd6475348", "Hitachi HD6475348 
 DEFINE_DEVICE_TYPE(HD6435368, hd6435368_device, "hd6435368", "Hitachi HD6435368 (H8/536)")
 DEFINE_DEVICE_TYPE(HD6475368, hd6475368_device, "hd6475368", "Hitachi HD6475368 (H8/536)")
 
-h8534_device::h8534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
+h8534_device::h8534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map)
 	: h8500_device(mconfig, type, tag, owner, clock, 20, 8, 11, 4, map)
 {
 }
 
-h8534_device::h8534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+h8534_device::h8534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: h8534_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8534_device::internal_map), this))
 {
 }
 
-hd6435348_device::hd6435348_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hd6435348_device::hd6435348_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: h8534_device(mconfig, HD6435348, tag, owner, clock)
 {
 }
 
-hd6475348_device::hd6475348_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hd6475348_device::hd6475348_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: h8534_device(mconfig, HD6475348, tag, owner, clock)
 {
 }
 
-h8536_device::h8536_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+h8536_device::h8536_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: h8534_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8536_device::internal_map), this))
 {
 }
 
-hd6435368_device::hd6435368_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hd6435368_device::hd6435368_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: h8536_device(mconfig, HD6435368, tag, owner, clock)
 {
 }
 
-hd6475368_device::hd6475368_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hd6475368_device::hd6475368_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: h8536_device(mconfig, HD6475368, tag, owner, clock)
 {
 }

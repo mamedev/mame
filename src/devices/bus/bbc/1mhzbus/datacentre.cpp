@@ -108,7 +108,7 @@ const tiny_rom_entry *bbc_datacentre_device::device_rom_region() const
 //  bbc_ide_device - constructor
 //-------------------------------------------------
 
-bbc_datacentre_device::bbc_datacentre_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bbc_datacentre_device::bbc_datacentre_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
 	: device_t(mconfig, BBC_DATACENTRE, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_links(*this, "LINKS")

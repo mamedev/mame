@@ -110,13 +110,13 @@ void rfslots8085_state::unkrfslt(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &rfslots8085_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &rfslots8085_state::sound_io_map);
 
-	I8155(config, "i8155", 0);
+	I8155(config, "i8155");
 
 	I8255(config, "i8255");
 
 	I8212(config, "i8212");
 
-	I8279(config, "i8279", 0);
+	I8279(config, "i8279");
 
 	SPEAKER(config, "mono").front_center();
 

@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(COMX_RAM, comx_ram_device, "comx_ram", "COMX-35 RAM Card")
 //  comx_ram_device - constructor
 //-------------------------------------------------
 
-comx_ram_device::comx_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+comx_ram_device::comx_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COMX_RAM, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_ram(*this, "ram", RAM_SIZE, ENDIANNESS_LITTLE),

@@ -7,7 +7,7 @@
 
 DEFINE_DEVICE_TYPE(SEC, sec_device, "sec", "Barcrest/Bell Fruit Serial Electronic Counter (SEC)")
 
-sec_device::sec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sec_device::sec_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEC, tag, owner, clock)
 {
 }

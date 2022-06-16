@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(NUBUS_APPLEENET, nubus_appleenet_device, "nb_aenet", "Apple N
 
 void nubus_mac8390_device::device_add_mconfig(machine_config &config)
 {
-	DP8390D(config, m_dp83902, 0);
+	DP8390D(config, m_dp83902);
 	m_dp83902->irq_callback().set(FUNC(nubus_mac8390_device::dp_irq_w));
 	m_dp83902->mem_read_callback().set(FUNC(nubus_mac8390_device::dp_mem_read));
 	m_dp83902->mem_write_callback().set(FUNC(nubus_mac8390_device::dp_mem_write));
@@ -71,19 +71,19 @@ const tiny_rom_entry *nubus_appleenet_device::device_rom_region() const
 //  nubus_mac8390_device - constructor
 //-------------------------------------------------
 
-nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	m_dp83902(*this, MAC8390_839X)
 {
 }
 
-nubus_asntmc3nb_device::nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_asntmc3nb_device::nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	nubus_mac8390_device(mconfig, NUBUS_ASNTMC3NB, tag, owner, clock)
 {
 }
 
-nubus_appleenet_device::nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_appleenet_device::nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	nubus_mac8390_device(mconfig, NUBUS_APPLEENET, tag, owner, clock)
 {
 }

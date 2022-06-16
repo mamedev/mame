@@ -219,7 +219,7 @@ offs_t device_sns_cart_interface::address_r()
 //-------------------------------------------------
 //  base_sns_cart_slot_device - constructor
 //-------------------------------------------------
-base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this),
 	device_slot_interface(mconfig, *this),
@@ -231,17 +231,17 @@ base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconf
 {
 }
 
-sns_cart_slot_device::sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sns_cart_slot_device::sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	base_sns_cart_slot_device(mconfig, SNS_CART_SLOT, tag, owner, clock)
 {
 }
 
-sns_sufami_cart_slot_device::sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sns_sufami_cart_slot_device::sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	base_sns_cart_slot_device(mconfig, SNS_SUFAMI_CART_SLOT, tag, owner, clock)
 {
 }
 
-sns_bsx_cart_slot_device::sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sns_bsx_cart_slot_device::sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	base_sns_cart_slot_device(mconfig, SNS_BSX_CART_SLOT, tag, owner, clock)
 {
 }

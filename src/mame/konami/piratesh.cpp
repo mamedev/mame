@@ -615,7 +615,7 @@ void piratesh_state::piratesh(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 //  screen.set_refresh_hz(60);
-	screen.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223); // TODO
+	screen.set_raw(XTAL::u(6000000), 288+16+32+48, 0, 287, 224+16+8+16, 0, 223); // TODO
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(600));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(24, 24+288-1, 16, 16+224-1);
@@ -623,27 +623,27 @@ void piratesh_state::piratesh(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::BGRx_888, 2048).enable_shadows().enable_hilights();
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(piratesh_state::piratesh_tile_callback));
 	m_k056832->set_config(K056832_BPP_4PIRATESH, 1, 0);
 	m_k056832->set_palette("palette");
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
-	K053250PS(config, m_k053250, 12000000, "palette", "screen", -16, 0);
+	K053250PS(config, m_k053250, XTAL::u(12000000), "palette", "screen", -16, 0);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(piratesh_state::piratesh_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_PS, -60, 24);
 	m_k055673->set_palette("palette");
 
 	// ????
-	//K053246(config, m_k053246, 0);
+	//K053246(config, m_k053246);
 	//m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback));
 	//m_k053246->set_config("k053246", NORMAL_PLANE_ORDER, -48+1, 23);
 	//m_k053246->set_palette(m_palette);
 
-	K054338(config, "k054338", 0, m_k055555).set_alpha_invert(1);
+	K054338(config, "k054338", m_k055555).set_alpha_invert(1);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

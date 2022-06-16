@@ -22,7 +22,7 @@ Atari Sprint 4 driver
 
 namespace {
 
-#define MASTER_CLOCK    12096000
+#define MASTER_CLOCK    XTAL::u(12096000)
 
 #define HTOTAL 384
 #define VTOTAL 262

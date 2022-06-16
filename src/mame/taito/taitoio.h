@@ -19,7 +19,7 @@
 class tc0040ioc_device : public device_t
 {
 public:
-	tc0040ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0040ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto read_0_callback() { return m_read_0_cb.bind(); }
 	auto read_1_callback() { return m_read_1_cb.bind(); }
@@ -62,7 +62,7 @@ DECLARE_DEVICE_TYPE(TC0040IOC, tc0040ioc_device)
 class tc0220ioc_device : public device_t
 {
 public:
-	tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto read_0_callback() { return m_read_0_cb.bind(); }
 	auto read_1_callback() { return m_read_1_cb.bind(); }
@@ -101,7 +101,7 @@ DECLARE_DEVICE_TYPE(TC0220IOC, tc0220ioc_device)
 class tc0510nio_device : public device_t
 {
 public:
-	tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto read_0_callback() { return m_read_0_cb.bind(); }
 	auto read_1_callback() { return m_read_1_cb.bind(); }
@@ -144,7 +144,7 @@ DECLARE_DEVICE_TYPE(TC0510NIO, tc0510nio_device)
 class tc0640fio_device : public device_t
 {
 public:
-	tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto read_0_callback() { return m_read_0_cb.bind(); }
 	auto read_1_callback() { return m_read_1_cb.bind(); }

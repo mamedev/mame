@@ -13,7 +13,7 @@
 class i82357_device : public device_t
 {
 public:
-	i82357_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	i82357_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_rtc_cb() { return m_out_rtc.bind(); }
 	auto out_int_cb() { return subdevice<pic8259_device>("pic0")->out_int_callback(); }

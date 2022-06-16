@@ -56,7 +56,7 @@ device_c64_expansion_card_interface::~device_c64_expansion_card_interface()
 //  c64_expansion_slot_device - constructor
 //-------------------------------------------------
 
-c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_c64_expansion_card_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),

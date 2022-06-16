@@ -56,7 +56,7 @@ void cms_fdc_device::device_add_mconfig(machine_config &config)
 //  cms_fdc_device - constructor
 //-------------------------------------------------
 
-cms_fdc_device::cms_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cms_fdc_device::cms_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CMS_FDC, tag, owner, clock)
 	, device_acorn_bus_interface(mconfig, *this)
 	, m_fdc(*this, "wd1770")

@@ -33,7 +33,7 @@ class segaxbd_state : public device_t
 {
 public:
 	// construction/destruction
-	segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void xboard_base_mconfig(machine_config &config);
 
@@ -81,7 +81,7 @@ protected:
 	void sound_portmap(address_map &map);
 	void sub_map(address_map &map);
 
-	segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device overrides
 //  virtual void machine_reset();
@@ -151,7 +151,7 @@ protected:
 class segaxbd_regular_state :  public segaxbd_state
 {
 public:
-	segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -162,7 +162,7 @@ protected:
 class segaxbd_fd1094_state :  public segaxbd_state
 {
 public:
-	segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -171,7 +171,7 @@ protected:
 class segaxbd_aburner2_state :  public segaxbd_state
 {
 public:
-	segaxbd_aburner2_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_aburner2_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -182,7 +182,7 @@ protected:
 class segaxbd_lastsurv_fd1094_state :  public segaxbd_state
 {
 public:
-	segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -191,7 +191,7 @@ protected:
 class segaxbd_lastsurv_state :  public segaxbd_state
 {
 public:
-	segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -201,7 +201,7 @@ protected:
 class segaxbd_smgp_fd1094_state :  public segaxbd_state
 {
 public:
-	segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -211,7 +211,7 @@ protected:
 class segaxbd_smgp_state :  public segaxbd_state
 {
 public:
-	segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -221,7 +221,7 @@ protected:
 class segaxbd_rascot_state :  public segaxbd_state
 {
 public:
-	segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -369,11 +369,11 @@ void poker72_state::machine_reset()
 void poker72_state::poker72(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 8000000);         // ? MHz
+	Z80(config, m_maincpu, XTAL::u(8000000));         // ? MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &poker72_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(poker72_state::irq0_line_hold));
 
-	I80C51(config, "subcpu", 8000000); // actually 89C51, ? MHz
+	I80C51(config, "subcpu", XTAL::u(8000000)); // actually 89C51, ? MHz
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

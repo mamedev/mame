@@ -76,14 +76,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: ql_rom_cartridge_slot_device(mconfig, tag, owner, 0)
+		: ql_rom_cartridge_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// computer interface
 	uint8_t read(offs_t offset, uint8_t data) { if (m_card) data = m_card->read(offset, data); return data; }

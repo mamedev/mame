@@ -20,7 +20,7 @@ class dragon_serial_device :
 {
 public:
 	// construction/destruction
-	dragon_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dragon_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type imperfect_features() { return feature::COMMS; }
 

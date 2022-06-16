@@ -44,7 +44,7 @@
 class astrocade_io_device : public device_t, public device_sound_interface
 {
 public:
-	astrocade_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	astrocade_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration access
 	auto si_cb() { return m_si_callback.bind(); }

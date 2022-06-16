@@ -392,14 +392,14 @@ void naomi_gdrom_board::write_from_qword(uint8_t *region, uint64_t qword)
 
 DEFINE_DEVICE_TYPE(IDE_GDROM, idegdrom_device, "ide_gdrom", "ide gdrom controller")
 
-idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *image_tag, const char *space_tag, int space_id)
+idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, const char *image_tag, const char *space_tag, int space_id)
 	: idegdrom_device(mconfig, tag, owner, clock)
 {
 	space_owner_tag = space_tag;
 	space_owner_id = space_id;
 }
 
-idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, IDE_GDROM, tag, owner, clock),
 	m_ide(*this, "ide"),
 	irq_cb(*this)
@@ -509,7 +509,7 @@ static INPUT_PORTS_START(gdrom_board_ioports)
 	PORT_CONFSETTING(0x00, "No")
 INPUT_PORTS_END
 
-naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock),
 	work_mode(0),
 	m_maincpu(*this, "dimmcpu"),
@@ -1122,21 +1122,21 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_gdrom_board::sh4_map);
 	m_maincpu->set_addrmap(AS_IO, &naomi_gdrom_board::sh4_io_map);
 
-	PCI_ROOT(config, "pci", 0);
-	SEGA315_6154(config, m_315_6154, 0);
+	PCI_ROOT(config, "pci");
+	SEGA315_6154(config, m_315_6154);
 	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &naomi_gdrom_board::pci_map);
 	IDE_GDROM(config, m_idegdrom, 0, image_tag, m_315_6154->tag(), sega_315_6154_device::AS_PCI_MEMORY);
 	m_idegdrom->irq_callback().set_inputline(m_maincpu, SH4_IRL2);
 	PIC16C622(config, m_securitycpu, PIC_CLOCK);
 	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
 	m_securitycpu->set_config(0x3fff - 0x04);
-	I2C_24C01(config, m_i2c0, 0);
+	I2C_24C01(config, m_i2c0);
 	m_i2c0->set_e0(0);
 	m_i2c0->set_wc(1);
-	I2C_24C01(config, m_i2c1, 0);
+	I2C_24C01(config, m_i2c1);
 	m_i2c1->set_e0(1);
 	m_i2c1->set_wc(1);
-	EEPROM_93C46_8BIT(config, m_eeprom, 0);
+	EEPROM_93C46_8BIT(config, m_eeprom);
 }
 
 // DIMM firmwares:

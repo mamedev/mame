@@ -11,7 +11,7 @@
 class wtl3132_device : public device_t
 {
 public:
-	wtl3132_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	wtl3132_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// output lines
 	auto out_fpcn() { return m_fpcn_cb.bind(); }

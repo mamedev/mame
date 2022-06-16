@@ -38,7 +38,7 @@ void lpc_acpi_device::map(address_map &map)
 	map(0x70, 0x70).rw(FUNC(lpc_acpi_device::sw_irq_gen_r), FUNC(lpc_acpi_device::sw_irq_gen_w));
 }
 
-lpc_acpi_device::lpc_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lpc_acpi_device::lpc_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: lpc_device(mconfig, LPC_ACPI, tag, owner, clock)
 {
 }

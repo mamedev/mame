@@ -72,7 +72,7 @@ void bbc_torchhd_device::device_add_mconfig(machine_config &config)
 //  bbc_sasi_device - constructor
 //-------------------------------------------------
 
-bbc_sasi_device::bbc_sasi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_sasi_device::bbc_sasi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_sasi(*this, "sasi:7:scsicb")
@@ -80,12 +80,12 @@ bbc_sasi_device::bbc_sasi_device(const machine_config &mconfig, device_type type
 {
 }
 
-bbc_sasi_device::bbc_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_sasi_device::bbc_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_sasi_device(mconfig, BBC_SASI, tag, owner, clock)
 {
 }
 
-bbc_torchhd_device::bbc_torchhd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_torchhd_device::bbc_torchhd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_sasi_device(mconfig, BBC_TORCHHD, tag, owner, clock)
 {
 }

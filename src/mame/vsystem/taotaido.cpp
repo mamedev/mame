@@ -345,7 +345,7 @@ void taotaido_state::taotaido(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taotaido_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &taotaido_state::sound_port_map); /* IRQs are triggered by the YM2610 */
 
-	vs9209_device &io1(VS9209(config, "io1", 0));
+	vs9209_device &io1(VS9209(config, "io1"));
 	io1.porta_input_cb().set_ioport("P1");
 	io1.portb_input_cb().set_ioport("P2");
 	io1.portc_input_cb().set_ioport("SYSTEM");
@@ -355,11 +355,11 @@ void taotaido_state::taotaido(machine_config &config)
 	io1.portg_output_cb().set(FUNC(taotaido_state::unknown_output_w));
 	io1.porth_input_cb().set_ioport("JP");
 
-	vs9209_device &io2(VS9209(config, "io2", 0));
+	vs9209_device &io2(VS9209(config, "io2"));
 	io2.porta_input_cb().set_ioport("P3");                   // used only by taotaida
 	io2.portb_input_cb().set_ioport("P4");                   // used only by taotaida
 
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taotaido);
 
@@ -374,7 +374,7 @@ void taotaido_state::taotaido(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x800);
 
-	VSYSTEM_SPR(config, m_spr, 0);
+	VSYSTEM_SPR(config, m_spr);
 	m_spr->set_tile_indirect_cb(FUNC(taotaido_state::tile_callback));
 	m_spr->set_gfx_region(0);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
@@ -387,7 +387,7 @@ void taotaido_state::taotaido(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);

@@ -227,11 +227,11 @@ void exchess_state::exchess(machine_config &config)
 	psu.read_b().set_ioport("IN.1");
 
 	/* video hardware */
-	HLCD0538(config, m_lcd1, 310); // measured
+	HLCD0538(config, m_lcd1, XTAL::u(310)); // measured
 	m_lcd1->write_cols().set(FUNC(exchess_state::lcd_output_w<0>));
 	m_lcd1->write_interrupt().set(m_lcd2, FUNC(hlcd0539_device::lcd_w));
 
-	HLCD0539(config, m_lcd2, 0);
+	HLCD0539(config, m_lcd2);
 	m_lcd2->write_cols().set(FUNC(exchess_state::lcd_output_w<1>));
 	m_lcd2->write_interrupt().set("psu", FUNC(f38t56_device::ext_int_w)).invert();
 

@@ -32,11 +32,11 @@ public:
 
 	// construction/destruction
 	nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, default_value value)
-		: nvram_device(mconfig, tag, owner, 0)
+		: nvram_device(mconfig, tag, owner)
 	{
 		set_default_value(value);
 	}
-	nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration helpers
 	void set_default_value(default_value value) { m_default_value = value; }

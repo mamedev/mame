@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(PCD3311, pcd3311_device, "pcd3311", "PCD3311")
 //  pcd3311_device - constructor
 //-------------------------------------------------
 
-pcd3311_device::pcd3311_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pcd3311_device::pcd3311_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PCD3311, tag, owner, clock),
 	device_sound_interface(mconfig, *this)
 {

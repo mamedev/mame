@@ -55,7 +55,7 @@ DEFINE_DEVICE_TYPE(C64H156, c64h156_device, "c64h156", "Commodore 64H156")
 //  c64h156_device - constructor
 //-------------------------------------------------
 
-c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64H156, tag, owner, clock),
 	m_write_atn(*this),
 	m_write_sync(*this),

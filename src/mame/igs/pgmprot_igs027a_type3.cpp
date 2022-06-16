@@ -191,7 +191,7 @@ void pgm_arm_type3_state::pgm_arm_type3(machine_config &config) // ARM7 Shared m
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type3_state::svg_68k_mem);
 
 	/* protection CPU */
-	ARM7(config, m_prot, 20000000);    // 55857G
+	ARM7(config, m_prot, XTAL::u(20000000));    // 55857G
 	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type3_state::_55857G_arm7_map);
 }
 
@@ -199,14 +199,14 @@ void pgm_arm_type3_state::pgm_arm_type3_22m(machine_config &config) // ARM7 uses
 {
 	pgm_arm_type3(config);
 
-	m_prot->set_clock(22000000);
+	m_prot->set_clock(XTAL::u(22000000));
 }
 
 void pgm_arm_type3_state::pgm_arm_type3_24m(machine_config &config) // ARM7 uses 24MHz XTAL (dmnfrntpcb happy6)
 {
 	pgm_arm_type3(config);
 
-	m_prot->set_clock(24000000);
+	m_prot->set_clock(XTAL::u(24000000));
 }
 
 void pgm_arm_type3_state::pgm_arm_type3_33m(machine_config &config) // ARM7 uses 33MHz XTAL (thegladpcb svg)

@@ -937,7 +937,7 @@ void dfs500_state::dfs500(machine_config &config)
 	m_cpanelcpu->set_irq_acknowledge_callback(FUNC(dfs500_state::irq_callback));
 
 	// CXQ71054P at IC16 (Programmable Timer / Counter)
-	PIT8254(config, m_cpanel_pit, 0);
+	PIT8254(config, m_cpanel_pit);
 	m_cpanel_pit->set_clk<0>(8_MHz_XTAL);
 	m_cpanel_pit->set_clk<1>(8_MHz_XTAL/2);
 	m_cpanel_pit->out_handler<1>().set(m_cpanel_pit, FUNC(pit8254_device::write_clk2));
@@ -962,7 +962,7 @@ void dfs500_state::dfs500(machine_config &config)
 
 	//Buzzer
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "buzzer", 4000).add_route(ALL_OUTPUTS, "mono", 0.05); // incorrect/arbitrary freq.
+	BEEP(config, "buzzer", XTAL::u(4000)).add_route(ALL_OUTPUTS, "mono", 0.05); // incorrect/arbitrary freq.
 																	   // I did not calculate the correct one yet.
 
 	/******************* Effects Processing Unit ********************/
@@ -976,7 +976,7 @@ void dfs500_state::dfs500(machine_config &config)
 	m_effectcpu->set_addrmap(AS_PROGRAM, &dfs500_state::effectcpu_mem_map);
 
 	// CXQ71054P at IC51 (Programmable Timer / Counter)
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(8_MHz_XTAL);
 	m_pit->set_clk<1>(8_MHz_XTAL);
 	m_pit->out_handler<1>().set(m_pit, FUNC(pit8254_device::write_clk2));
@@ -986,7 +986,7 @@ void dfs500_state::dfs500(machine_config &config)
 	m_pit->out_handler<0>().append(m_serial2, FUNC(i8251_device::write_rxc));
 
 	// NEC D71059C at IC52 (Programmable Interruption Controller)
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// CXQ71051P at IC53 (Serial Interface Unit)

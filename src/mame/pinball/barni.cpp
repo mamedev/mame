@@ -227,17 +227,17 @@ void barni_state::barni(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_barni);
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 //  m_pia1->writepa_handler().set(FUNC(barni_state::pia1_pa_w));
 //  m_pia1->writepb_handler().set(FUNC(barni_state::pia1_pb_w));
 //  m_pia1->readpa_handler().set(FUNC(barni_state::pia1_pa_r));
 
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 //  m_pia2->writepa_handler().set(FUNC(barni_state::pia2_pa_w));
 //  m_pia2->writepb_handler().set(FUNC(barni_state::pia2_pb_w));
 //  m_pia2->readpa_handler().set(FUNC(barni_state::pia2_pa_r));
 
-	MOS6522(config, m_via, 4'000'000 / 4);  // to check
+	MOS6522(config, m_via, XTAL::u(4'000'000) / 4);  // to check
 	m_via->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_via->writepa_handler().set(FUNC(barni_state::via_pa_w));
 	m_via->writepb_handler().set(FUNC(barni_state::via_pb_w));
@@ -245,28 +245,28 @@ void barni_state::barni(machine_config &config)
 //  m_via->cb2_handler().set(FUNC(barni_state::via_cb2_w));
 
 	// SOUND BOARD
-	M6802(config, m_audiocpu, 4000000); // guess - crystal value not shown
+	M6802(config, m_audiocpu, XTAL::u(4000000)); // guess - crystal value not shown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &barni_state::audiocpu_map);
 
-	PIA6821(config, m_pias1, 0); // U12
+	PIA6821(config, m_pias1); // U12
 	m_pias1->writepa_handler().set(m_speech, FUNC(tms5220_device::data_w));
 	m_pias1->writepb_handler().set(FUNC(barni_state::pias1_pb_w));
 	m_pias1->irqa_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);
 	m_pias1->irqb_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);
 
-	PIA6821(config, m_pias2, 0); // U17
+	PIA6821(config, m_pias2); // U17
 	m_pias2->writepb_handler().set(FUNC(barni_state::pias2_pb_w));
 	m_pias2->irqa_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);
 	m_pias2->irqb_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);
 
 	SPEAKER(config, "mono").front_center();
-	TMS5220C(config, m_speech, 640000);   // unknown clock
+	TMS5220C(config, m_speech, XTAL::u(640000));   // unknown clock
 	m_speech->irq_cb().set(m_pias1, FUNC(pia6821_device::cb1_w));
 	m_speech->ready_cb().set(m_pias1, FUNC(pia6821_device::ca2_w));
 	m_speech->add_route(ALL_OUTPUTS, "mono", 1.0);
 	//dac
-	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.275);
-	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "mono", 0.5); // discrete parts
+	MC1408(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.275);
+	DAC_4BIT_R2R(config, m_dac2).add_route(ALL_OUTPUTS, "mono", 0.5); // discrete parts
 	genpin_audio(config);
 }
 

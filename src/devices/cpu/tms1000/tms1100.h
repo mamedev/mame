@@ -63,10 +63,10 @@
 class tms1100_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
+	tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
 	// overrides
 	virtual void device_start() override;
@@ -81,19 +81,19 @@ protected:
 class tms1170_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class tms1300_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class tms1370_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

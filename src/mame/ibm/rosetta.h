@@ -24,7 +24,7 @@ public:
 		RAM_16M  = 0x0040'0000,
 	};
 
-	rosetta_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, ram_size ram = RAM_NONE);
+	rosetta_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, ram_size ram = RAM_NONE);
 
 	template <typename T> void set_mem(T &&tag, int spacenum) { m_mem_space.set_tag(std::forward<T>(tag), spacenum); }
 	template <typename T> void set_rom(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }

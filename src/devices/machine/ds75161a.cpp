@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(DS75161A, ds75161a_device, "ds75161a", "DS75161A GPIB Transce
 //  ds75161a_device - constructor
 //-------------------------------------------------
 
-ds75161a_device::ds75161a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ds75161a_device::ds75161a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DS75161A, tag, owner, clock),
 		m_in_ren_cb(*this),
 		m_in_ifc_cb(*this),

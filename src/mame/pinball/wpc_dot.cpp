@@ -312,10 +312,10 @@ uint32_t wpc_dot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 void wpc_dot_state::wpc_dot(machine_config &config)
 {
 	/* basic machine hardware */
-	M6809(config, m_maincpu, 2000000);
+	M6809(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_dot_state::wpc_dot_map);
 
-	WPCASIC(config, m_wpc, 0);
+	WPCASIC(config, m_wpc);
 	m_wpc->irq_callback().set(FUNC(wpc_dot_state::irq_w));
 	m_wpc->firq_callback().set(FUNC(wpc_dot_state::firq_w));
 	m_wpc->bank_write().set(FUNC(wpc_dot_state::rombank_w));

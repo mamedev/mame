@@ -41,28 +41,28 @@ DEFINE_DEVICE_TYPE(NES_JY_TYPEB, nes_jy_typeb_device, "nes_jyb", "NES Cart JY Co
 DEFINE_DEVICE_TYPE(NES_JY_TYPEC, nes_jy_typec_device, "nes_jyc", "NES Cart JY Company Type C PCB")
 
 
-nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_extra_chr_bank(0), m_extra_chr_mask(0), m_bank_6000(0),
 	m_irq_mode(0), m_irq_count(0), m_irq_prescale(0), m_irq_prescale_mask(0), m_irq_flip(0), m_irq_enable(0), m_irq_up(0), m_irq_down(0), irq_timer(nullptr)
 {
 }
 
-nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_JY_TYPEA, tag, owner, clock)
 {
 }
 
-nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_jy_typea_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_jy_typeb_device(mconfig, NES_JY_TYPEB, tag, owner, clock)
 {
 }
 
-nes_jy_typec_device::nes_jy_typec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_jy_typec_device::nes_jy_typec_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_jy_typeb_device(mconfig, NES_JY_TYPEC, tag, owner, clock)
 {
 }

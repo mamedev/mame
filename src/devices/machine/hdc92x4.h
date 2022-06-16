@@ -78,7 +78,7 @@ public:
 	void connect_hard_drive(mfm_harddisk_device *harddisk);
 
 protected:
-	hdc92x4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_hdc9234);
+	hdc92x4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool is_hdc9234);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -462,7 +462,7 @@ private:
 class hdc9224_device : public hdc92x4_device
 {
 public:
-	hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int step_time() override;
@@ -472,7 +472,7 @@ protected:
 class hdc9234_device : public hdc92x4_device
 {
 public:
-	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int step_time() override;

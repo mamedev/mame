@@ -1104,7 +1104,7 @@ void taitojc_state::taitojc(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	TC0640FIO(config, m_tc0640fio, 0);
+	TC0640FIO(config, m_tc0640fio);
 	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
 	m_tc0640fio->read_1_callback().set_ioport("COINS");
 	m_tc0640fio->read_2_callback().set_ioport("START");
@@ -1122,13 +1122,13 @@ void taitojc_state::taitojc(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(32768);
 
-	TC0780FPA(config, m_tc0780fpa, 0);
+	TC0780FPA(config, m_tc0780fpa);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "lspeaker", 1.0);
 	taito_en.add_route(1, "rspeaker", 1.0);
 }
@@ -1147,7 +1147,7 @@ void taitojc_state::dendego(machine_config &config)
 	SPEAKER(config, "vibration").seat();
 
 	/* clock frequency & pin 7 not verified */
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "vibration", 0.20);
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "vibration", 0.20);
 }
 
 

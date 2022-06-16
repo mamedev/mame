@@ -368,7 +368,7 @@ void cyberbal_state::cyberbal_base(machine_config &config)
 		.set_info_callback(FUNC(cyberbal_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha, "gfxdecode", 2, 16,8, TILEMAP_SCAN_ROWS, 64,32, 0)
 		.set_info_callback(FUNC(cyberbal_state::get_alpha_tile_info));
-	ATARI_MOTION_OBJECTS(config, m_mob, 0).set_screen("lscreen");
+	ATARI_MOTION_OBJECTS(config, m_mob).set_screen("lscreen");
 	m_mob->set_config(cyberbal_state::s_mob_config);
 	m_mob->set_gfxdecode("gfxdecode");
 
@@ -376,7 +376,7 @@ void cyberbal_state::cyberbal_base(machine_config &config)
 		.set_info_callback(FUNC(cyberbal_state::get_playfield2_tile_info));
 	TILEMAP(config, m_alpha2, "gfxdecode", 2, 16,8, TILEMAP_SCAN_ROWS, 64,32, 0)
 		.set_info_callback(FUNC(cyberbal_state::get_alpha2_tile_info));
-	ATARI_MOTION_OBJECTS(config, m_mob2, 0).set_screen("rscreen");
+	ATARI_MOTION_OBJECTS(config, m_mob2).set_screen("rscreen");
 	m_mob2->set_config(cyberbal_state::s_mob_config);
 	m_mob2->set_gfxdecode("gfxdecode");
 
@@ -420,7 +420,7 @@ void cyberbal_state::cyberbalt(machine_config &config)
 	cyberbal_base(config);
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	SLAPSTIC(config, m_slapstic, 116);
+	SLAPSTIC(config, m_slapstic, XTAL::u(116));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x18000, 0x1ffff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cyberbal_state::tournament_map);
@@ -446,7 +446,7 @@ void cyberbal2p_state::cyberbal2p(machine_config &config)
 		.set_info_callback(FUNC(cyberbal2p_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha, "gfxdecode", 2, 16,8, TILEMAP_SCAN_ROWS, 64,32, 0)
 		.set_info_callback(FUNC(cyberbal2p_state::get_alpha_tile_info));
-	ATARI_MOTION_OBJECTS(config, m_mob, 0).set_screen("screen");
+	ATARI_MOTION_OBJECTS(config, m_mob).set_screen("screen");
 	m_mob->set_config(cyberbal2p_state::s_mob_config);
 	m_mob->set_gfxdecode("gfxdecode");
 
@@ -462,7 +462,7 @@ void cyberbal2p_state::cyberbal2p(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_II(config, m_jsa, 0);
+	ATARI_JSA_II(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(15);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);

@@ -863,7 +863,7 @@ void camplynx_state::lynx_common(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.375); // unknown DAC
+	DAC_6BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.375); // unknown DAC
 }
 
 void camplynx_state::lynx_disk(machine_config &config)

@@ -11,7 +11,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(D9060HD, d9060hd_device, "d9060hd", "D9060HD")
 
-d9060hd_device::d9060hd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+d9060hd_device::d9060hd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scsihd_device(mconfig, D9060HD, tag, owner, clock)
 {
 }

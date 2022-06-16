@@ -143,7 +143,7 @@ static constexpr double out_neg_gain[] =
 
 DEFINE_DEVICE_TYPE(SN76477, sn76477_device, "sn76477", "TI SN76477 CSG")
 
-sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SN76477, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_enable(0),

@@ -517,7 +517,7 @@ void lastduel_state::machine_reset()
 void lastduel_state::lastduel(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000); // Unconfirmed - could be 8MHz
+	M68000(config, m_maincpu, XTAL::u(10000000)); // Unconfirmed - could be 8MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastduel_state::lastduel_map);
 	m_maincpu->set_vblank_int("screen", FUNC(lastduel_state::irq2_line_hold));
 	TIMER(config, "timer_irq").configure_periodic(FUNC(lastduel_state::lastduel_timer_cb), attotime::from_hz(120));

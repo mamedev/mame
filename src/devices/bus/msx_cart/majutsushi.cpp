@@ -9,7 +9,7 @@
 DEFINE_DEVICE_TYPE(MSX_CART_MAJUTSUSHI, msx_cart_majutsushi_device, "msx_cart_majutsushi", "MSX Cartridge - Majutsushi")
 
 
-msx_cart_majutsushi_device::msx_cart_majutsushi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_majutsushi_device::msx_cart_majutsushi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_MAJUTSUSHI, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_dac(*this, "dac")
@@ -29,7 +29,7 @@ void msx_cart_majutsushi_device::device_add_mconfig(machine_config &config)
 {
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC
 }
 
 

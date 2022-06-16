@@ -231,7 +231,7 @@ INTERRUPT_GEN_MEMBER(timelimt_state::main_nmi)
 void timelimt_state::timelimt(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5000000);   /* 5.000 MHz */
+	Z80(config, m_maincpu, XTAL::u(5000000));   /* 5.000 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &timelimt_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &timelimt_state::main_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(timelimt_state::main_nmi));

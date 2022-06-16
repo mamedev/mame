@@ -17,10 +17,10 @@ class spg110_device : public unsp_device, public device_mixer_interface
 
 {
 public:
-	spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T>
-	spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+	spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag)
 		: spg110_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
 
 protected:
-	spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
+	spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal);
 
 	void internal_map(address_map &map);
 

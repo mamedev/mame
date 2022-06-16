@@ -39,7 +39,7 @@ class saa5050_device :  public device_t
 {
 public:
 	// construction/destruction
-	saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_screen_size(int cols, int rows, int size) { m_cols = cols; m_rows = rows; m_size = size; }
 
@@ -63,7 +63,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	saa5050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	saa5050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -155,7 +155,7 @@ class saa5051_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa5051_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -168,7 +168,7 @@ class saa5052_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -181,7 +181,7 @@ class saa5053_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa5053_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -194,7 +194,7 @@ class saa5054_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5054_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa5054_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -207,7 +207,7 @@ class saa5055_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5055_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa5055_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -220,7 +220,7 @@ class saa5056_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa5056_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -233,7 +233,7 @@ class saa5057_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa5057_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

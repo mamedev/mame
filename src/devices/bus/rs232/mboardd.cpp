@@ -34,7 +34,7 @@ ROM_END
 class mockingboard_d_device : public device_t, public device_rs232_port_interface
 {
 public:
-	mockingboard_d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mockingboard_d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override;
 
@@ -61,7 +61,7 @@ private:
 	u8 m_c000_latch;
 };
 
-mockingboard_d_device::mockingboard_d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mockingboard_d_device::mockingboard_d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SERIAL_MOCKINGBOARD_D, tag, owner, clock)
 	, device_rs232_port_interface(mconfig, *this)
 	, m_cpu(*this, "mbdcpu")
@@ -80,9 +80,9 @@ void mockingboard_d_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	AY8913(config, m_ay1, 1022727);
+	AY8913(config, m_ay1, XTAL::u(1022727));
 	m_ay1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	AY8913(config, m_ay2, 1022727);
+	AY8913(config, m_ay2, XTAL::u(1022727));
 	m_ay2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 }
 

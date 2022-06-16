@@ -261,7 +261,7 @@ inline uint8_t mos7360_device::read_rom(offs_t offset)
 //  mos7360_device - constructor
 //-------------------------------------------------
 
-mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MOS7360, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),

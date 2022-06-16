@@ -417,7 +417,7 @@ void amust_state::machine_reset()
 	m_vsync = false;
 	m_drq = false;
 	m_fdc->set_ready_line_connected(1); // always ready for minifloppy; controlled by fdc for 20cm
-	m_fdc->set_unscaled_clock(4000000); // 4MHz for minifloppy; 8MHz for 20cm
+	m_fdc->set_unscaled_clock(XTAL::u(4000000)); // 4MHz for minifloppy; 8MHz for 20cm
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x0000, 0x07ff, m_rom);   // do it here for F3
@@ -476,7 +476,7 @@ void amust_state::amust(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beep, XTAL::u(800)).add_route(ALL_OUTPUTS, "mono", 0.50);
 	TIMER(config, m_beep_timer).configure_generic(FUNC(amust_state::beep_timer));
 
 	/* Devices */
@@ -488,17 +488,17 @@ void amust_state::amust(machine_config &config)
 	crtc.out_hsync_callback().set(FUNC(amust_state::hsync_w));
 	crtc.out_vsync_callback().set(FUNC(amust_state::vsync_w));
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), true, true);
 	m_fdc->drq_wr_callback().set(FUNC(amust_state::drq_w));
 	m_fdc->intrq_wr_callback().set(FUNC(amust_state::intrq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", amust_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", amust_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(153600)));
 	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart1(I8251(config, "uart1", 0));
+	i8251_device &uart1(I8251(config, "uart1"));
 	uart1.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -508,12 +508,12 @@ void amust_state::amust(machine_config &config)
 	rs232.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
 
-	I8251(config, "uart2", 0);
+	I8251(config, "uart2");
 	//uart2.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//uart2.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	//uart2.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	PIT8253(config, "pit", 0);
+	PIT8253(config, "pit");
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set(FUNC(amust_state::port04_r));

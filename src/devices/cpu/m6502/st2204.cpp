@@ -40,7 +40,7 @@
 DEFINE_DEVICE_TYPE(ST2202, st2202_device, "st2202", "Sitronix ST2202 Integrated Microcontroller")
 DEFINE_DEVICE_TYPE(ST2204, st2204_device, "st2204", "Sitronix ST2204 Integrated Microcontroller")
 
-st2204_device::st2204_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
+st2204_device::st2204_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map)
 	: st2xxx_device(mconfig, type, tag, owner, clock, map, 26, false) // logical; only 23 address lines are brought out
 	, m_dac_callback(*this)
 	, m_tmode{0}
@@ -58,12 +58,12 @@ st2204_device::st2204_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-st2204_device::st2204_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+st2204_device::st2204_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: st2204_device(mconfig, ST2204, tag, owner, clock, address_map_constructor(FUNC(st2204_device::int_map), this))
 {
 }
 
-st2202_device::st2202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+st2202_device::st2202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: st2204_device(mconfig, ST2202, tag, owner, clock, address_map_constructor(FUNC(st2202_device::int_map), this))
 {
 }

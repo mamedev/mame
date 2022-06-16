@@ -33,10 +33,10 @@ class bbc_tube_6502_device
 {
 public:
 	// construction/destruction
-	bbc_tube_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_tube_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	bbc_tube_6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_tube_6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -67,7 +67,7 @@ protected:
 class bbc_tube_6502p_device : public bbc_tube_6502_device
 {
 public:
-	bbc_tube_6502p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_tube_6502p_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -82,7 +82,7 @@ private:
 class bbc_tube_6502e_device : public bbc_tube_6502_device
 {
 public:
-	bbc_tube_6502e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_tube_6502e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -107,7 +107,7 @@ private:
 class bbc_tube_65c102_device : public bbc_tube_6502_device
 {
 public:
-	bbc_tube_65c102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_tube_65c102_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

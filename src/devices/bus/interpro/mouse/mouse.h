@@ -22,7 +22,7 @@ public:
 		set_fixed(false);
 	}
 
-	interpro_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	interpro_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callback configuration
 	auto state_func() { return m_state_func.bind(); }
@@ -66,7 +66,7 @@ public:
 	};
 
 	// constructor/destructor
-	interpro_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	interpro_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_button);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_x);

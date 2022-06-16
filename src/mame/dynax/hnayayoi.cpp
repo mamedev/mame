@@ -956,7 +956,7 @@ void hnayayoi_state::hnayayoi(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hnayayoi_state::hnayayoi_map);
 	m_maincpu->set_addrmap(AS_IO, &hnayayoi_state::hnayayoi_io_map);
 
-	CLOCK(config, "nmiclock", 8000).signal_handler().set(FUNC(hnayayoi_state::nmi_clock_w));
+	CLOCK(config, "nmiclock", XTAL::u(8000)).signal_handler().set(FUNC(hnayayoi_state::nmi_clock_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -992,7 +992,7 @@ void hnayayoi_state::hnayayoi(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.25);
 	ymsnd.add_route(3, "mono", 0.80);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }

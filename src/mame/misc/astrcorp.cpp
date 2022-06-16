@@ -1288,7 +1288,7 @@ void astoneag_state::astoneag(machine_config &config)
 
 	// Adds RAMDAC
 	PALETTE(config.replace(), m_palette).set_entries(256);
-	RAMDAC(config, m_ramdac, 0, m_palette);
+	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &astoneag_state::ramdac_map);
 
 	// Tiles are double size vertically

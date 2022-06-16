@@ -48,7 +48,7 @@ ioport_constructor bbcmc_joystick_device::device_input_ports() const
 //  bbcmc_joystick_device - constructor
 //-------------------------------------------------
 
-bbcmc_joystick_device::bbcmc_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbcmc_joystick_device::bbcmc_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBCMC_JOYSTICK, tag, owner, clock)
 	, device_bbc_joyport_interface(mconfig, *this)
 	, m_joy(*this, "JOY")

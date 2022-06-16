@@ -679,13 +679,13 @@ void mac_state::mac_via_sync()
 	u64 cycle = m_maincpu->total_cycles();
 
 	// Get the number of the cycle the via is in at that time
-	u64 via_cycle = cycle * m_via1->clock() / m_maincpu->clock();
+	u64 via_cycle = cycle * m_via1->clock().value() / m_maincpu->clock().value();
 
 	// The access is going to start at via_cycle+1 and end at
 	// via_cycle+1.5, compute what that means in maincpu cycles (the
 	// +1 rounds up, since the clocks are too different to ever be
 	// synced).
-	u64 main_cycle = (via_cycle*2+3) * m_maincpu->clock() / (2*m_via1->clock()) + 1;
+	u64 main_cycle = (via_cycle*2+3) * m_maincpu->clock().value() / (2*m_via1->clock().value()) + 1;
 
 	// Finally adjust the main cpu icount as needed.
 	m_maincpu->adjust_icount(-int(main_cycle - cycle));

@@ -125,7 +125,7 @@ ioport_constructor vme_mvme120_device::device_input_ports() const
 	return INPUT_PORTS_NAME(mvme120);
 }
 
-vme_mvme120_device::vme_mvme120_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mvme12x_variant board_id) :
+vme_mvme120_device::vme_mvme120_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, mvme12x_variant board_id) :
 	device_t(mconfig, type, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
@@ -139,24 +139,24 @@ vme_mvme120_device::vme_mvme120_device(const machine_config &mconfig, device_typ
 
 }
 
-vme_mvme120_card_device::vme_mvme120_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_mvme120_card_device::vme_mvme120_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_mvme120_card_device(mconfig, VME_MVME120, tag, owner, clock)
 {
 
 }
 
-vme_mvme121_card_device::vme_mvme121_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_mvme121_card_device::vme_mvme121_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_mvme121_card_device(mconfig, VME_MVME121, tag, owner, clock)
 {
 
 }
 
-vme_mvme122_card_device::vme_mvme122_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_mvme122_card_device::vme_mvme122_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_mvme122_card_device(mconfig, VME_MVME122, tag, owner, clock)
 {
 }
 
-vme_mvme123_card_device::vme_mvme123_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_mvme123_card_device::vme_mvme123_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_mvme123_card_device(mconfig, VME_MVME123, tag, owner, clock)
 {
 
@@ -386,7 +386,7 @@ void vme_mvme120_device::device_add_mconfig(machine_config &config)
 
 	// Missing: MMU, VMEbus
 
-	VME(config, "vme", 0);
+	VME(config, "vme");
 
 	/*
 	// Onboard RAM is always visible to VMEbus. (Decoding controlled by U28.)

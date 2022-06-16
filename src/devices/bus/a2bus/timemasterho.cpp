@@ -86,10 +86,10 @@ class a2bus_timemasterho_device:
 {
 public:
 	// construction/destruction
-	a2bus_timemasterho_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_timemasterho_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2bus_timemasterho_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_timemasterho_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -138,13 +138,13 @@ ioport_constructor a2bus_timemasterho_device::device_input_ports() const
 
 void a2bus_timemasterho_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 1021800);
+	PIA6821(config, m_pia, XTAL::u(1021800));
 	m_pia->writepa_handler().set(FUNC(a2bus_timemasterho_device::pia_out_a));
 	m_pia->writepb_handler().set(FUNC(a2bus_timemasterho_device::pia_out_b));
 	m_pia->irqa_handler().set(FUNC(a2bus_timemasterho_device::pia_irqa_w));
 	m_pia->irqb_handler().set(FUNC(a2bus_timemasterho_device::pia_irqb_w));
 
-	MSM5832(config, m_msm5832, 32768);
+	MSM5832(config, m_msm5832, XTAL::u(32768));
 }
 
 //-------------------------------------------------
@@ -160,7 +160,7 @@ const tiny_rom_entry *a2bus_timemasterho_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, TIMEMASTER_PIA_TAG),
@@ -170,7 +170,7 @@ a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconf
 {
 }
 
-a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_timemasterho_device(mconfig, A2BUS_TIMEMASTERHO, tag, owner, clock)
 {
 }

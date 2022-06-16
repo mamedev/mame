@@ -144,7 +144,7 @@ public:
 	}
 
 protected:
-	mitsumi_keyboard_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+	mitsumi_keyboard_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, type, tag, owner, clock)
 		, device_amiga_keyboard_interface(mconfig, *this)
 		, m_mcu{ *this, "mcu" }
@@ -267,7 +267,7 @@ private:
 class a500_keyboard_base : public mitsumi_watchdog_keyboard_base
 {
 protected:
-	a500_keyboard_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+	a500_keyboard_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, type, tag, owner, clock)
 		, m_reset_merger(*this, "reset")
 	{
@@ -325,7 +325,7 @@ private:
 class a600_keyboard_base : public mitsumi_keyboard_base
 {
 protected:
-	a600_keyboard_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+	a600_keyboard_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 		: mitsumi_keyboard_base(mconfig, type, tag, owner, clock)
 		, m_reset_merger(*this, "reset")
 	{
@@ -661,7 +661,7 @@ INPUT_PORTS_END
 class a500_keyboard_us : public a500_keyboard_base
 {
 public:
-	a500_keyboard_us(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a500_keyboard_us(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a500_keyboard_base(mconfig, A500_KBD_US, tag, owner, clock)
 	{ }
 
@@ -674,7 +674,7 @@ protected:
 class a500_keyboard_de : public a500_keyboard_base
 {
 public:
-	a500_keyboard_de(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a500_keyboard_de(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a500_keyboard_base(mconfig, A500_KBD_DE, tag, owner, clock)
 	{ }
 
@@ -687,7 +687,7 @@ protected:
 class a500_keyboard_fr : public a500_keyboard_base
 {
 public:
-	a500_keyboard_fr(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a500_keyboard_fr(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a500_keyboard_base(mconfig, A500_KBD_FR, tag, owner, clock)
 	{ }
 
@@ -700,7 +700,7 @@ protected:
 class a500_keyboard_it : public a500_keyboard_base
 {
 public:
-	a500_keyboard_it(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a500_keyboard_it(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a500_keyboard_base(mconfig, A500_KBD_IT, tag, owner, clock)
 	{ }
 
@@ -713,7 +713,7 @@ protected:
 class a500_keyboard_se : public a500_keyboard_base
 {
 public:
-	a500_keyboard_se(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a500_keyboard_se(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a500_keyboard_base(mconfig, A500_KBD_SE, tag, owner, clock)
 	{ }
 
@@ -726,7 +726,7 @@ protected:
 class a500_keyboard_es : public a500_keyboard_base
 {
 public:
-	a500_keyboard_es(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a500_keyboard_es(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a500_keyboard_base(mconfig, A500_KBD_ES, tag, owner, clock)
 	{ }
 
@@ -739,7 +739,7 @@ protected:
 class a500_keyboard_dk : public a500_keyboard_base
 {
 public:
-	a500_keyboard_dk(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a500_keyboard_dk(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a500_keyboard_base(mconfig, A500_KBD_DK, tag, owner, clock)
 	{ }
 
@@ -752,7 +752,7 @@ protected:
 class a500_keyboard_ch : public a500_keyboard_base
 {
 public:
-	a500_keyboard_ch(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a500_keyboard_ch(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a500_keyboard_base(mconfig, A500_KBD_CH, tag, owner, clock)
 	{ }
 
@@ -765,7 +765,7 @@ protected:
 class a500_keyboard_no : public a500_keyboard_base
 {
 public:
-	a500_keyboard_no(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a500_keyboard_no(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a500_keyboard_base(mconfig, A500_KBD_NO, tag, owner, clock)
 	{ }
 
@@ -778,7 +778,7 @@ protected:
 class a500_keyboard_gb : public a500_keyboard_base
 {
 public:
-	a500_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a500_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a500_keyboard_base(mconfig, A500_KBD_GB, tag, owner, clock)
 	{ }
 
@@ -796,7 +796,7 @@ protected:
 class a600_keyboard_us : public a600_keyboard_base
 {
 public:
-	a600_keyboard_us(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a600_keyboard_us(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a600_keyboard_base(mconfig, A600_KBD_US, tag, owner, clock)
 	{ }
 
@@ -809,7 +809,7 @@ protected:
 class a600_keyboard_de : public a600_keyboard_base
 {
 public:
-	a600_keyboard_de(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a600_keyboard_de(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a600_keyboard_base(mconfig, A600_KBD_DE, tag, owner, clock)
 	{ }
 
@@ -822,7 +822,7 @@ protected:
 class a600_keyboard_fr : public a600_keyboard_base
 {
 public:
-	a600_keyboard_fr(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a600_keyboard_fr(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a600_keyboard_base(mconfig, A600_KBD_FR, tag, owner, clock)
 	{ }
 
@@ -835,7 +835,7 @@ protected:
 class a600_keyboard_it : public a600_keyboard_base
 {
 public:
-	a600_keyboard_it(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a600_keyboard_it(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a600_keyboard_base(mconfig, A600_KBD_IT, tag, owner, clock)
 	{ }
 
@@ -848,7 +848,7 @@ protected:
 class a600_keyboard_se : public a600_keyboard_base
 {
 public:
-	a600_keyboard_se(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a600_keyboard_se(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a600_keyboard_base(mconfig, A600_KBD_SE, tag, owner, clock)
 	{ }
 
@@ -861,7 +861,7 @@ protected:
 class a600_keyboard_es : public a600_keyboard_base
 {
 public:
-	a600_keyboard_es(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a600_keyboard_es(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a600_keyboard_base(mconfig, A600_KBD_ES, tag, owner, clock)
 	{ }
 
@@ -874,7 +874,7 @@ protected:
 class a600_keyboard_dk : public a600_keyboard_base
 {
 public:
-	a600_keyboard_dk(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a600_keyboard_dk(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a600_keyboard_base(mconfig, A600_KBD_DK, tag, owner, clock)
 	{ }
 
@@ -887,7 +887,7 @@ protected:
 class a600_keyboard_ch : public a600_keyboard_base
 {
 public:
-	a600_keyboard_ch(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a600_keyboard_ch(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a600_keyboard_base(mconfig, A600_KBD_CH, tag, owner, clock)
 	{ }
 
@@ -900,7 +900,7 @@ protected:
 class a600_keyboard_no : public a600_keyboard_base
 {
 public:
-	a600_keyboard_no(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a600_keyboard_no(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a600_keyboard_base(mconfig, A600_KBD_NO, tag, owner, clock)
 	{ }
 
@@ -913,7 +913,7 @@ protected:
 class a600_keyboard_gb : public a600_keyboard_base
 {
 public:
-	a600_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a600_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a600_keyboard_base(mconfig, A600_KBD_GB, tag, owner, clock)
 	{ }
 
@@ -931,7 +931,7 @@ protected:
 class a1000_keyboard_us : public a1000_keyboard_base
 {
 public:
-	a1000_keyboard_us(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a1000_keyboard_us(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a1000_keyboard_base(mconfig, A1000_KBD_US, tag, owner, clock)
 	{ }
 
@@ -942,7 +942,7 @@ protected:
 class a1000_keyboard_de : public a1000_keyboard_base
 {
 public:
-	a1000_keyboard_de(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a1000_keyboard_de(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a1000_keyboard_base(mconfig, A1000_KBD_DE, tag, owner, clock)
 	{ }
 
@@ -955,7 +955,7 @@ protected:
 class a1000_keyboard_fr : public a1000_keyboard_base
 {
 public:
-	a1000_keyboard_fr(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a1000_keyboard_fr(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a1000_keyboard_base(mconfig, A1000_KBD_FR, tag, owner, clock)
 	{ }
 
@@ -968,7 +968,7 @@ protected:
 class a1000_keyboard_it : public a1000_keyboard_base
 {
 public:
-	a1000_keyboard_it(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a1000_keyboard_it(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a1000_keyboard_base(mconfig, A1000_KBD_IT, tag, owner, clock)
 	{ }
 
@@ -981,7 +981,7 @@ protected:
 class a1000_keyboard_se : public a1000_keyboard_base
 {
 public:
-	a1000_keyboard_se(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a1000_keyboard_se(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a1000_keyboard_base(mconfig, A1000_KBD_SE, tag, owner, clock)
 	{ }
 
@@ -994,7 +994,7 @@ protected:
 class a1000_keyboard_dk : public a1000_keyboard_base
 {
 public:
-	a1000_keyboard_dk(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a1000_keyboard_dk(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a1000_keyboard_base(mconfig, A1000_KBD_DK, tag, owner, clock)
 	{ }
 
@@ -1007,7 +1007,7 @@ protected:
 class a1000_keyboard_gb : public a1000_keyboard_base
 {
 public:
-	a1000_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a1000_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a1000_keyboard_base(mconfig, A1000_KBD_GB, tag, owner, clock)
 	{ }
 
@@ -1025,7 +1025,7 @@ protected:
 class a2000_keyboard_us : public mitsumi_watchdog_keyboard_base
 {
 public:
-	a2000_keyboard_us(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a2000_keyboard_us(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_US, tag, owner, clock)
 	{ }
 
@@ -1036,7 +1036,7 @@ protected:
 class a2000_keyboard_de : public mitsumi_watchdog_keyboard_base
 {
 public:
-	a2000_keyboard_de(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a2000_keyboard_de(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_DE, tag, owner, clock)
 	{ }
 
@@ -1049,7 +1049,7 @@ protected:
 class a2000_keyboard_fr : public mitsumi_watchdog_keyboard_base
 {
 public:
-	a2000_keyboard_fr(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a2000_keyboard_fr(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_FR, tag, owner, clock)
 	{ }
 
@@ -1062,7 +1062,7 @@ protected:
 class a2000_keyboard_it : public mitsumi_watchdog_keyboard_base
 {
 public:
-	a2000_keyboard_it(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a2000_keyboard_it(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_IT, tag, owner, clock)
 	{ }
 
@@ -1075,7 +1075,7 @@ protected:
 class a2000_keyboard_se : public mitsumi_watchdog_keyboard_base
 {
 public:
-	a2000_keyboard_se(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a2000_keyboard_se(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_SE, tag, owner, clock)
 	{ }
 
@@ -1088,7 +1088,7 @@ protected:
 class a2000_keyboard_es : public mitsumi_watchdog_keyboard_base
 {
 public:
-	a2000_keyboard_es(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a2000_keyboard_es(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_ES, tag, owner, clock)
 	{ }
 
@@ -1101,7 +1101,7 @@ protected:
 class a2000_keyboard_dk : public mitsumi_watchdog_keyboard_base
 {
 public:
-	a2000_keyboard_dk(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a2000_keyboard_dk(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_DK, tag, owner, clock)
 	{ }
 
@@ -1114,7 +1114,7 @@ protected:
 class a2000_keyboard_ch : public mitsumi_watchdog_keyboard_base
 {
 public:
-	a2000_keyboard_ch(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a2000_keyboard_ch(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_CH, tag, owner, clock)
 	{ }
 
@@ -1127,7 +1127,7 @@ protected:
 class a2000_keyboard_no : public mitsumi_watchdog_keyboard_base
 {
 public:
-	a2000_keyboard_no(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a2000_keyboard_no(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_NO, tag, owner, clock)
 	{ }
 
@@ -1140,7 +1140,7 @@ protected:
 class a2000_keyboard_gb : public mitsumi_watchdog_keyboard_base
 {
 public:
-	a2000_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	a2000_keyboard_gb(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: mitsumi_watchdog_keyboard_base(mconfig, A2000_KBD_GB, tag, owner, clock)
 	{ }
 

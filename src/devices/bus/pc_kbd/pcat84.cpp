@@ -107,7 +107,7 @@ const tiny_rom_entry *ibm_3270pc_122_keyboard_device::device_rom_region() const
 
 void ibm_pc_at_84_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	I8048(config, m_maincpu, 5364000);
+	I8048(config, m_maincpu, XTAL::u(5364000));
 	m_maincpu->bus_out_cb().set(FUNC(ibm_pc_at_84_keyboard_device::bus_w));
 	m_maincpu->p1_in_cb().set(FUNC(ibm_pc_at_84_keyboard_device::p1_r));
 	m_maincpu->p1_out_cb().set(FUNC(ibm_pc_at_84_keyboard_device::p1_w));
@@ -339,7 +339,7 @@ ioport_constructor ibm_3270pc_122_keyboard_device::device_input_ports() const
 //  ibm_pc_at_84_keyboard_device - constructor
 //-------------------------------------------------
 
-ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_pc_kbd_interface(mconfig, *this),
 	m_maincpu(*this, I8048_TAG),
@@ -354,12 +354,12 @@ ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config 
 {
 }
 
-ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ibm_pc_at_84_keyboard_device(mconfig, PC_KBD_IBM_PC_AT_84, tag, owner, clock)
 {
 }
 
-ibm_3270pc_122_keyboard_device::ibm_3270pc_122_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ibm_3270pc_122_keyboard_device::ibm_3270pc_122_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ibm_pc_at_84_keyboard_device(mconfig, PC_KBD_IBM_3270PC_122, tag, owner, clock)
 {
 }

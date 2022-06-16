@@ -20,7 +20,7 @@ class kp64_device : public device_t
 {
 public:
 	// device type constructor
-	kp64_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	kp64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callback configuration
 	auto out_callback() { return m_out_callback.bind(); }

@@ -167,15 +167,15 @@ class screen_device : public device_t
 
 public:
 	// construction/destruction
-	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, screen_type_enum type)
-		: screen_device(mconfig, tag, owner, u32(0))
+		: screen_device(mconfig, tag, owner, XTAL())
 	{
 		set_type(type);
 	}
 	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, screen_type_enum type, rgb_t color)
-		: screen_device(mconfig, tag, owner, u32(0))
+		: screen_device(mconfig, tag, owner, XTAL())
 	{
 		set_type(type);
 		set_color(color);
@@ -222,10 +222,10 @@ public:
 	/// \param [in] vbstart Index of first line in vertical blanking
 	///   period after visible lines.
 	/// \return Reference to device for method chaining.
-	screen_device &set_raw(u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
+private:
+	screen_device &internal_set_raw(u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
 	{
 		assert(pixclock != 0);
-		set_clock(pixclock);
 		m_refresh = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
 		m_vblank = m_refresh / vtotal * (vtotal - (vbstart - vbend));
 		m_width = htotal;
@@ -233,10 +233,12 @@ public:
 		m_visarea.set(hbend, hbstart ? hbstart - 1 : htotal - 1, vbend, vbstart - 1);
 		return *this;
 	}
+public:
 	screen_device &set_raw(const XTAL &xtal, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
 	{
 		xtal.validate(std::string("Configuring screen ") + tag());
-		return set_raw(xtal.value(), htotal, hbend, hbstart, vtotal, vbend, vbstart);
+		set_clock(xtal);
+		return internal_set_raw(xtal.value(), htotal, hbend, hbstart, vtotal, vbend, vbstart);
 	}
 	screen_device &set_raw(const XTAL &xtal, u16 htotal, u16 vtotal, rectangle visarea)
 	{

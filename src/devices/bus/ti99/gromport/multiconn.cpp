@@ -55,7 +55,7 @@ namespace bus::ti99::gromport {
 
 #define AUTO -1
 
-ti99_multi_cart_conn_device::ti99_multi_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ti99_multi_cart_conn_device::ti99_multi_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cartridge_connector_device(mconfig, TI99_GROMPORT_MULTI, tag, owner, clock),
 	m_active_slot(0),
 	m_fixed_slot(0),
@@ -303,10 +303,10 @@ void ti99_multi_cart_conn_device::device_reset(void)
 
 void ti99_multi_cart_conn_device::device_add_mconfig(machine_config &config)
 {
-	TI99_CART(config, "cartridge1", 0);
-	TI99_CART(config, "cartridge2", 0);
-	TI99_CART(config, "cartridge3", 0);
-	TI99_CART(config, "cartridge4", 0);
+	TI99_CART(config, "cartridge1");
+	TI99_CART(config, "cartridge2");
+	TI99_CART(config, "cartridge3");
+	TI99_CART(config, "cartridge4");
 }
 
 INPUT_CHANGED_MEMBER( ti99_multi_cart_conn_device::switch_changed )

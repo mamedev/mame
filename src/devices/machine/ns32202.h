@@ -16,7 +16,7 @@ public:
 	template <unsigned Number> void ir_w(int state);
 	template <unsigned ST1> void map(address_map &map);
 
-	ns32202_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	ns32202_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides

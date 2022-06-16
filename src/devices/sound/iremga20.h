@@ -24,7 +24,7 @@ class iremga20_device : public device_t,
 						public device_rom_interface<20>
 {
 public:
-	iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);

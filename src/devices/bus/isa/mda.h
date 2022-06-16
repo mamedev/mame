@@ -24,7 +24,7 @@ public:
 	friend class isa8_hercules_device;
 
 	// construction/destruction
-	isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t io_read(offs_t offset);
 	virtual void io_write(offs_t offset, uint8_t data);
@@ -37,7 +37,7 @@ public:
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 
 protected:
-	isa8_mda_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_mda_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -81,7 +81,7 @@ class isa8_hercules_device :
 {
 public:
 	// construction/destruction
-	isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t io_read(offs_t offset) override;
 	virtual void io_write(offs_t offset, uint8_t data) override;
@@ -115,7 +115,7 @@ class isa8_ec1840_0002_device :
 {
 public:
 	// construction/destruction
-	isa8_ec1840_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_ec1840_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

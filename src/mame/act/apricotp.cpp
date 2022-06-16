@@ -573,7 +573,7 @@ void fp_state::fp(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &fp_state::fp_io);
 	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
-	HD6301V1(config, m_soundcpu, 2000000);
+	HD6301V1(config, m_soundcpu, XTAL::u(2000000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &fp_state::sound_mem);
 	m_soundcpu->set_disable();
 
@@ -598,7 +598,7 @@ void fp_state::fp(machine_config &config)
 	PALETTE(config, "palette").set_entries(16);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_act_f1);
 
-	MC6845(config, m_crtc, 4000000);
+	MC6845(config, m_crtc, XTAL::u(4000000));
 	m_crtc->set_screen(SCREEN_CRT_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
@@ -606,29 +606,29 @@ void fp_state::fp(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SN76489A(config, SN76489AN_TAG, 2000000).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SN76489A(config, SN76489AN_TAG, XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* Devices */
-	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
+	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG);
 
-	AM9517A(config, m_dmac, 250000);
+	AM9517A(config, m_dmac, XTAL::u(250000));
 	m_dmac->out_eop_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
 	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(wd2797_device::data_r));
 	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(wd2797_device::data_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2000000);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(2000000);
 	m_pit->set_clk<2>(2000000);
 
-	Z80SIO(config, m_sio, 2500000);
+	Z80SIO(config, m_sio, XTAL::u(2500000));
 	m_sio->out_int_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
-	WD2797(config, m_fdc, 2000000);
+	WD2797(config, m_fdc, XTAL::u(2000000));
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 

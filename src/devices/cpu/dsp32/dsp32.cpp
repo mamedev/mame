@@ -142,7 +142,7 @@ DEFINE_DEVICE_TYPE(DSP32C, dsp32c_device, "dsp32c", "AT&T DSP32C")
 //  dsp32c_device - constructor
 //-------------------------------------------------
 
-dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, DSP32C, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 24),
 		m_pin(0),

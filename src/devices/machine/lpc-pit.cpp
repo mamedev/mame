@@ -13,7 +13,7 @@ void lpc_pit_device::map(address_map &map)
 	map(0x53, 0x53).w(FUNC(lpc_pit_device::control_w));
 }
 
-lpc_pit_device::lpc_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lpc_pit_device::lpc_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: lpc_device(mconfig, LPC_PIT, tag, owner, clock)
 {
 }

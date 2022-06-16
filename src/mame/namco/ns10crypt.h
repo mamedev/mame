@@ -17,7 +17,7 @@ public:
 	virtual ~ns10_decrypter_device();
 
 protected:
-	ns10_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ns10_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void init(int iv)=0;
 	virtual void device_start()override=0;
@@ -33,7 +33,7 @@ public:
 	uint16_t decrypt(uint16_t cipherword)override;
 
 protected:
-	ns10_type1_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ns10_type1_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	uint16_t m_mask = 0;
@@ -70,7 +70,7 @@ protected:
 		uint16_t(*nonlinear_calculation)(uint64_t, uint64_t, const gf2_reducer&);  // preliminary encoding; need research
 	};
 
-	ns10_type2_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const ns10_crypto_logic &logic);
+	ns10_type2_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const ns10_crypto_logic &logic);
 
 private:
 	uint16_t m_mask = 0;
@@ -91,13 +91,13 @@ private:
 class mrdrilr2_decrypter_device : public ns10_type1_decrypter_device
 {
 public:
-	mrdrilr2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mrdrilr2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class chocovdr_decrypter_device : public ns10_type2_decrypter_device
 {
 public:
-	chocovdr_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	chocovdr_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 private:
 	static uint16_t nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer &reducer);
 	static const ns10_crypto_logic crypto_logic;
@@ -106,7 +106,7 @@ private:
 class gamshara_decrypter_device : public ns10_type2_decrypter_device
 {
 public:
-	gamshara_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gamshara_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 private:
 	static uint16_t nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer &reducer);
 	static const ns10_crypto_logic crypto_logic;
@@ -115,7 +115,7 @@ private:
 class gjspace_decrypter_device : public ns10_type2_decrypter_device
 {
 public:
-	gjspace_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gjspace_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 private:
 	static uint16_t nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer &reducer);
 	static const ns10_crypto_logic crypto_logic;
@@ -124,7 +124,7 @@ private:
 class knpuzzle_decrypter_device : public ns10_type2_decrypter_device
 {
 public:
-	knpuzzle_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	knpuzzle_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 private:
 	static uint16_t nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer &reducer);
 	static const ns10_crypto_logic crypto_logic;
@@ -133,7 +133,7 @@ private:
 class konotako_decrypter_device : public ns10_type2_decrypter_device
 {
 public:
-	konotako_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konotako_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 private:
 	static uint16_t nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer &reducer);
 	static const ns10_crypto_logic crypto_logic;
@@ -142,7 +142,7 @@ private:
 class nflclsfb_decrypter_device : public ns10_type2_decrypter_device
 {
 public:
-	nflclsfb_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nflclsfb_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 private:
 	static uint16_t nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer &reducer);
 	static const ns10_crypto_logic crypto_logic;
@@ -151,7 +151,7 @@ private:
 class startrgn_decrypter_device : public ns10_type2_decrypter_device
 {
 public:
-	startrgn_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	startrgn_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 private:
 	static uint16_t nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer &reducer);
 	static const ns10_crypto_logic crypto_logic;

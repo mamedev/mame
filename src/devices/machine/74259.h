@@ -74,7 +74,7 @@ public:
 
 protected:
 	// construction/destruction
-	addressable_latch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool clear_active);
+	addressable_latch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool clear_active);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -105,7 +105,7 @@ private:
 class ls259_device : public addressable_latch_device
 {
 public:
-	ls259_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	ls259_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // ======================> hc259_device
@@ -113,7 +113,7 @@ public:
 class hc259_device : public addressable_latch_device
 {
 public:
-	hc259_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	hc259_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // ======================> hct259_device
@@ -121,7 +121,7 @@ public:
 class hct259_device : public addressable_latch_device
 {
 public:
-	hct259_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	hct259_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // ======================> f9334_device
@@ -129,7 +129,7 @@ public:
 class f9334_device : public addressable_latch_device
 {
 public:
-	f9334_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	f9334_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // ======================> cd4099_device
@@ -137,7 +137,7 @@ public:
 class cd4099_device : public addressable_latch_device
 {
 public:
-	cd4099_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	cd4099_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // device type definition

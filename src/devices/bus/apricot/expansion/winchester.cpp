@@ -50,7 +50,7 @@ void apricot_winchester_device::regs(address_map &map)
 
 void apricot_winchester_device::device_add_mconfig(machine_config &config)
 {
-	WD1010(config, m_hdc, 5000000);
+	WD1010(config, m_hdc, XTAL::u(5000000));
 	m_hdc->out_intrq_callback().set(FUNC(apricot_winchester_device::hdc_intrq_w));
 	m_hdc->in_data_callback().set(FUNC(apricot_winchester_device::hdc_data_r));
 	m_hdc->out_data_callback().set(FUNC(apricot_winchester_device::hdc_data_w));
@@ -65,8 +65,8 @@ void apricot_winchester_device::device_add_mconfig(machine_config &config)
 	latch.q_out_cb<6>().set(FUNC(apricot_winchester_device::clksel_w)); // buffer chip read/write clock select (host or wdc)
 	latch.q_out_cb<7>().set(FUNC(apricot_winchester_device::drive_w<1>));
 
-	HARDDISK(config, "hdc:0", 0);
-	HARDDISK(config, "hdc:1", 0);
+	HARDDISK(config, "hdc:0");
+	HARDDISK(config, "hdc:1");
 }
 
 
@@ -78,7 +78,7 @@ void apricot_winchester_device::device_add_mconfig(machine_config &config)
 //  apricot_winchester_device - constructor
 //-------------------------------------------------
 
-apricot_winchester_device::apricot_winchester_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apricot_winchester_device::apricot_winchester_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, APRICOT_WINCHESTER, tag, owner, clock),
 	device_apricot_expansion_card_interface(mconfig, *this),
 	m_hdc(*this, "hdc"),

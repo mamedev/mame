@@ -499,23 +499,23 @@ void xexex_state::xexex(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(xexex_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette(m_palette);
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246);
 	m_k053246->set_sprite_callback(FUNC(xexex_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48, 32);
 	m_k053246->set_palette(m_palette);
 
-	K053250(config, m_k053250, 0, m_palette, m_screen, -5, -16);
+	K053250(config, m_k053250, m_palette, m_screen, -5, -16);
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	K053252(config, m_k053252, XTAL(32'000'000)/4);
 
-	K054338(config, m_k054338, 0);
+	K054338(config, m_k054338);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

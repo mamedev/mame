@@ -91,12 +91,12 @@ template class device_finder<device_a2bus_card_interface, true>;
 //-------------------------------------------------
 //  a2bus_slot_device - constructor
 //-------------------------------------------------
-a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a2bus_slot_device(mconfig, A2BUS_SLOT, tag, owner, clock)
 {
 }
 
-a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_single_card_slot_interface<device_a2bus_card_interface>(mconfig, *this)
 	, m_a2bus(*this, finder_base::DUMMY_TAG)
@@ -132,12 +132,12 @@ DEFINE_DEVICE_TYPE(A2BUS, a2bus_device, "a2bus", "Apple II Bus")
 //  a2bus_device - constructor
 //-------------------------------------------------
 
-a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a2bus_device(mconfig, A2BUS, tag, owner, clock)
 {
 }
 
-a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_maincpu_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_out_irq_cb(*this)

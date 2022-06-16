@@ -34,7 +34,7 @@
 class mdcr_device : public device_t
 {
 public:
-	mdcr_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	mdcr_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	/// \brief The read clock, switches state when a bit is available.
 	///

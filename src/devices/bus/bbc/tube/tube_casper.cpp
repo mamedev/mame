@@ -85,7 +85,7 @@ const tiny_rom_entry *bbc_tube_casper_device::device_rom_region() const
 //  bbc_tube_casper_device - constructor
 //-------------------------------------------------
 
-bbc_tube_casper_device::bbc_tube_casper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_casper_device::bbc_tube_casper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_TUBE_CASPER, tag, owner, clock),
 		device_bbc_tube_interface(mconfig, *this),
 		m_m68000(*this, "m68000"),

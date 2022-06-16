@@ -415,7 +415,7 @@ void stargame_state::stargame(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_stargame);
 
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 50));
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", XTAL::u(50)));
 	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg2));
 	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg3)).invert();
 
@@ -432,7 +432,7 @@ void stargame_state::stargame(machine_config &config)
 	ay0.add_route(ALL_OUTPUTS, "aysnd", 1.5);
 	ay0.set_resistors_load(20000, 20000, 20000);
 	ay0.port_a_write_callback().set("dac", FUNC(dac_byte_interface::write));
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "aysnd", 0.5); // bunch of resistors
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "aysnd", 0.5); // bunch of resistors
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // ic=6A
 	mainlatch.q_out_cb<0>().set_nop(); // DADIS, handled by 0x68
@@ -444,7 +444,7 @@ void stargame_state::stargame(machine_config &config)
 	mainlatch.q_out_cb<6>().set(FUNC(stargame_state::reset2_w)); // SRESET
 	mainlatch.q_out_cb<7>().set_nop(); // MAKRES
 
-	TTL7474(config, m_7a, 0);
+	TTL7474(config, m_7a);
 	m_7a->comp_output_cb().set_inputline(m_audiocpu, INPUT_LINE_IRQ0).invert();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);

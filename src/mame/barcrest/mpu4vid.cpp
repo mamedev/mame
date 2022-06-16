@@ -2093,15 +2093,12 @@ void mpu4vid_state::ic3ss_vid_w(offs_t offset, uint8_t data)
 
 	// E clock = VIDEO_MASTER_CLOCK / 10
 
-	float num = (1000000/((m_t3l + 1)*(m_t3h + 1)));
+	XTAL num = XTAL::u(1000000)/((m_t3l + 1)*(m_t3h + 1));
 	float denom1 = ((m_t3h *(m_t3l + 1)+ 1)/(2*(m_t1 + 1)));
 
 	int denom2 = denom1 + 0.5f;//need to round up, this gives same precision as chip
-	int freq=num*denom2;
-	if (freq)
-	{
-		m_msm6376->set_unscaled_clock(freq);
-	}
+	XTAL freq=num*denom2;
+	m_msm6376->set_unscaled_clock(freq);
 }
 
 
@@ -2146,7 +2143,7 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	EF9369(config, m_ef9369).set_color_update_callback(FUNC(mpu4vid_state::ef9369_color_update));
 
 	PTM6840(config, m_ptm, VIDEO_MASTER_CLOCK / 10); /* 68k E clock */
-	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->set_external_clocks(XTAL(), XTAL(), XTAL());
 	m_ptm->o1_callback().set(FUNC(mpu4vid_state::vid_o1_callback));
 	m_ptm->o2_callback().set(FUNC(mpu4vid_state::vid_o2_callback));
 	m_ptm->o3_callback().set(FUNC(mpu4vid_state::vid_o3_callback));
@@ -2155,16 +2152,16 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	/* Present on all video cards */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	saa1099_device &saa(SAA1099(config, "saa", 8000000));
+	saa1099_device &saa(SAA1099(config, "saa", XTAL::u(8000000)));
 	saa.add_route(0, "lspeaker", 0.5);
 	saa.add_route(1, "rspeaker", 0.5);
 
-	ACIA6850(config, m_acia_0, 0);
+	ACIA6850(config, m_acia_0);
 	m_acia_0->txd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
 	m_acia_0->rts_handler().set("acia6850_1", FUNC(acia6850_device::write_dcd));
 	m_acia_0->irq_handler().set(FUNC(mpu4vid_state::m6809_acia_irq));
 
-	ACIA6850(config, m_acia_1, 0);
+	ACIA6850(config, m_acia_1);
 	m_acia_1->txd_handler().set("acia6850_0", FUNC(acia6850_device::write_rxd));
 	m_acia_1->rts_handler().set("acia6850_0", FUNC(acia6850_device::write_dcd));
 	m_acia_1->irq_handler().set(FUNC(mpu4vid_state::m68k_acia_irq));
@@ -2173,7 +2170,7 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 void mpu4vid_state::mpu4_vid_cheatchr(machine_config &config)
 {
 	mpu4_vid(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("video");
 	m_characteriser->set_allow_68k_cheat(true);
 }
@@ -2183,7 +2180,7 @@ void mpu4vid_state::mpu4_vid_strike(machine_config& config)
 	mpu4_vid(config);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map_strike);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_use_4k_table_sim(true);
 }
 
@@ -2202,7 +2199,7 @@ void mpu4vid_state::crmaze_base(machine_config &config)
 void mpu4vid_state::crmaze(machine_config& config)
 {
 	crmaze_base(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("video");
 	m_characteriser->set_allow_68k_cheat(true);
 
@@ -2213,19 +2210,19 @@ void mpu4vid_state::vid_oki(machine_config &config)
 	//On MPU4 Video, the sound board is clocked via the 68k E clock,
 	//and all samples are adjusted to fit the different clock speed.
 	PTM6840(config, m_ptm_ic3ss, VIDEO_MASTER_CLOCK / 10);
-	m_ptm_ic3ss->set_external_clocks(0, 0, 0);
+	m_ptm_ic3ss->set_external_clocks(XTAL(), XTAL(), XTAL());
 	m_ptm_ic3ss->o1_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c2));
 	m_ptm_ic3ss->o2_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c1));
 	m_ptm_ic3ss->o3_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_g1));
 
-	PIA6821(config, m_pia_ic4ss, 0);
+	PIA6821(config, m_pia_ic4ss);
 	m_pia_ic4ss->readpb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_r));
 	m_pia_ic4ss->writepa_handler().set(FUNC(mpu4vid_state::pia_gb_porta_w));
 	m_pia_ic4ss->writepb_handler().set(FUNC(mpu4vid_state::pia_gb_portb_w));
 	m_pia_ic4ss->ca2_handler().set(FUNC(mpu4vid_state::pia_gb_ca2_w));
 	m_pia_ic4ss->cb2_handler().set(FUNC(mpu4vid_state::pia_gb_cb2_w));
 
-	okim6376_device &msm6376(OKIM6376(config, "msm6376", 128000)); //Adjusted by IC3 on sound board
+	okim6376_device &msm6376(OKIM6376(config, "msm6376", XTAL::u(128000))); //Adjusted by IC3 on sound board
 	msm6376.add_route(0, "lspeaker", 0.5);
 	msm6376.add_route(1, "rspeaker", 0.5);
 }

@@ -152,7 +152,7 @@ WRITE_LINE_MEMBER( mc68340_serial_module_device::irq_w )
 	m_cpu->update_ipl();
 }
 
-mc68340_serial_module_device::mc68340_serial_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68340_serial_module_device::mc68340_serial_module_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
   : mc68340_duart_device(mconfig, MC68340_SERIAL_MODULE, tag, owner, clock)
 {
 }

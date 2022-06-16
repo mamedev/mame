@@ -442,12 +442,12 @@ void amspdwy_state::machine_reset()
 void amspdwy_state::amspdwy(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3000000);
+	Z80(config, m_maincpu, XTAL::u(3000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &amspdwy_state::amspdwy_map);
 	m_maincpu->set_addrmap(AS_IO, &amspdwy_state::amspdwy_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(amspdwy_state::irq0_line_hold)); /* IRQ: 60Hz, NMI: retn */
 
-	Z80(config, m_audiocpu, 3000000);
+	Z80(config, m_audiocpu, XTAL::u(3000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &amspdwy_state::amspdwy_sound_map);
 
 	config.set_perfect_quantum(m_maincpu);
@@ -471,7 +471,7 @@ void amspdwy_state::amspdwy(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	YM2151(config, m_ym2151, 3000000);
+	YM2151(config, m_ym2151, XTAL::u(3000000));
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 0);
 	m_ym2151->add_route(0, "lspeaker", 1.0);
 	m_ym2151->add_route(1, "rspeaker", 1.0);

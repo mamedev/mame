@@ -13,7 +13,7 @@
 class tms9927_device : public device_t, public device_video_interface
 {
 public:
-	tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto vsyn_callback() { return m_write_vsyn.bind(); }
 	auto hsyn_callback() { return m_write_hsyn.bind(); }
@@ -38,7 +38,7 @@ public:
 	bool cursor_bounds(rectangle &bounds) const;
 
 protected:
-	tms9927_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	tms9927_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -89,21 +89,21 @@ private:
 class crt5027_device : public tms9927_device
 {
 public:
-	crt5027_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	crt5027_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class crt5037_device : public tms9927_device
 {
 public:
-	crt5037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	crt5037_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class crt5057_device : public tms9927_device
 {
 public:
-	crt5057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	crt5057_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

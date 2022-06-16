@@ -53,10 +53,10 @@ INPUT_PORTS_END
 
 void kawai_k5_state::k5(machine_config &config)
 {
-	V40(config, m_maincpu, 16'000'000); // XTAL unknown
+	V40(config, m_maincpu, XTAL::u(16'000'000)); // XTAL unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &kawai_k5_state::mem_map);
 
-	T6963C(config, "lcdc", 0).set_addrmap(0, &kawai_k5_state::lcd_map);
+	T6963C(config, "lcdc").set_addrmap(0, &kawai_k5_state::lcd_map);
 }
 
 ROM_START(k5)

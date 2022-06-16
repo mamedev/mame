@@ -205,7 +205,7 @@ void mondial68k_state::mondial68k(machine_config &config)
 	m_board->set_delay(attotime::from_msec(100));
 
 	/* video hardware */
-	PCF2112(config, m_lcd, 50); // frequency guessed
+	PCF2112(config, m_lcd, XTAL::u(50)); // frequency guessed
 	m_lcd->write_segs().set(FUNC(mondial68k_state::lcd_output_w));
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);

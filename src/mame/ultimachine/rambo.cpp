@@ -20,7 +20,7 @@
 #include "emu.h"
 #include "cpu/avr8/avr8.h"
 
-#define MASTER_CLOCK    16000000
+#define MASTER_CLOCK    XTAL::u(16000000)
 
 /****************************************************\
 * I/O devices                                        *

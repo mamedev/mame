@@ -38,7 +38,7 @@ public:
 
 protected:
 	// construction/destruction
-	mtx_sdx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mtx_sdx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_memory_region m_sdx_rom;
 	required_device<mb8877_device> m_fdc;
@@ -53,7 +53,7 @@ class mtx_sdxbas_device : public mtx_sdx_device
 {
 public:
 	// construction/destruction
-	mtx_sdxbas_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mtx_sdxbas_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -69,7 +69,7 @@ class mtx_sdxcpm_device : public mtx_sdx_device
 {
 public:
 	// construction/destruction
-	mtx_sdxcpm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mtx_sdxcpm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

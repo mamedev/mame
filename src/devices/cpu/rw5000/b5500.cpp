@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(B5500, b5500_cpu_device, "b5500", "Rockwell B5500")
 
 
 // constructor
-b5500_cpu_device::b5500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+b5500_cpu_device::b5500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a5500_cpu_device(mconfig, B5500, tag, owner, clock, 10, address_map_constructor(FUNC(b5500_cpu_device::program_768x8), this), 6, address_map_constructor(FUNC(b5500_cpu_device::data_48x4), this))
 { }
 

@@ -22,7 +22,7 @@ public:
 	static constexpr int IRQ_LINE = 0;
 
 	// device type constructor
-	mk1_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mk1_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

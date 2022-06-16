@@ -27,7 +27,7 @@ void dec_ioga_device::map(address_map &map)
 	map(0x040120, 0x040123).rw(FUNC(dec_ioga_device::imsk_r), FUNC(dec_ioga_device::imsk_w));
 }
 
-dec_ioga_device::dec_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dec_ioga_device::dec_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DECSTATION_IOGA, tag, owner, clock),
 	m_irq_out_cb(*this)
 {

@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(QL_STANDARD_ROM_CARTRIDGE, ql_standard_rom_cartridge_device, 
 //  ql_standard_rom_cartridge_device - constructor
 //-------------------------------------------------
 
-ql_standard_rom_cartridge_device::ql_standard_rom_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ql_standard_rom_cartridge_device::ql_standard_rom_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, QL_STANDARD_ROM_CARTRIDGE, tag, owner, clock),
 	device_ql_rom_cartridge_card_interface(mconfig, *this)
 {

@@ -111,7 +111,7 @@ void cm1800_state::cm1800(machine_config &config)
 	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->set_auto_rdav(true);
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(153600)));
 	uart_clock.signal_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
 	uart_clock.signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 

@@ -20,7 +20,7 @@ class apexc_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto tape_read() { return m_tape_read_cb.bind(); }

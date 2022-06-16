@@ -51,7 +51,7 @@ device_bbc_userport_interface::~device_bbc_userport_interface()
 //  bbc_userport_slot_device - constructor
 //-------------------------------------------------
 
-bbc_userport_slot_device::bbc_userport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_userport_slot_device::bbc_userport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_USERPORT_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_bbc_userport_interface>(mconfig, *this)
 	, m_device(nullptr)

@@ -586,11 +586,11 @@ INPUT_PORTS_END
 
 void jchan_state::jchan(machine_config &config)
 {
-	M68000(config, m_maincpu, 16000000);
+	M68000(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &jchan_state::jchan_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(jchan_state::vblank), "screen", 0, 1);
 
-	M68000(config, m_subcpu, 16000000);
+	M68000(config, m_subcpu, XTAL::u(16000000));
 	m_subcpu->set_addrmap(AS_PROGRAM, &jchan_state::jchan_sub);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -611,7 +611,7 @@ void jchan_state::jchan(machine_config &config)
 	m_view2->set_palette(m_palette);
 
 	for (auto &spritegen : m_spritegen)
-		SKNS_SPRITE(config, spritegen, 0);
+		SKNS_SPRITE(config, spritegen);
 
 	KANEKO_TOYBOX(config, "toybox", "eeprom", "DSW1", "mcuram", "mcudata");
 
@@ -621,7 +621,7 @@ void jchan_state::jchan(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", 16000000));
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL::u(16000000)));
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }

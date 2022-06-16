@@ -77,9 +77,15 @@ public:
 	// construction/destruction
 
 	galgames_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u8 cart)
-		: galgames_cart_device(mconfig, GALGAMES_CART, tag, owner, (u32)0)
+		: galgames_cart_device(mconfig, GALGAMES_CART, tag, owner)
 	{
 		set_cart(cart);
+	}
+
+	galgames_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
+		: galgames_cart_device(mconfig, GALGAMES_CART, tag, owner, clock)
+	{
+		set_cart(0);
 	}
 
 	// static configuration
@@ -110,7 +116,7 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			u32 clock);
+			const XTAL &clock = XTAL());
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -147,9 +153,14 @@ class galgames_bios_cart_device : public galgames_cart_device
 public:
 	// construction/destruction
 	galgames_bios_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u8 cart)
-		: galgames_cart_device(mconfig, GALGAMES_BIOS_CART, tag, owner, (u32)0)
+		: galgames_cart_device(mconfig, GALGAMES_BIOS_CART, tag, owner)
 	{
 		set_cart(cart);
+	}
+
+	galgames_bios_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
+		: galgames_cart_device(mconfig, GALGAMES_BIOS_CART, tag, owner, clock)
+	{
 	}
 
 protected:
@@ -172,10 +183,16 @@ class galgames_starpak2_cart_device : public galgames_cart_device
 public:
 	// construction/destruction
 	galgames_starpak2_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u8 cart)
-		: galgames_cart_device(mconfig, GALGAMES_STARPAK2_CART, tag, owner, (u32)0)
+		: galgames_cart_device(mconfig, GALGAMES_STARPAK2_CART, tag, owner)
 	{
 		set_cart(cart);
 		set_pic_bits(5, 4, 2, 1);
+	}
+
+
+	galgames_starpak2_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
+		: galgames_cart_device(mconfig, GALGAMES_STARPAK2_CART, tag, owner, clock)
+	{
 	}
 
 protected:
@@ -202,10 +219,16 @@ class galgames_starpak3_cart_device : public galgames_cart_device
 public:
 	// construction/destruction
 	galgames_starpak3_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u8 cart)
-		: galgames_cart_device(mconfig, GALGAMES_STARPAK3_CART, tag, owner, (u32)0)
+		: galgames_cart_device(mconfig, GALGAMES_STARPAK3_CART, tag, owner)
 	{
 		set_cart(cart);
 		set_pic_bits(0, 2, 3, 4);
+	}
+
+
+	galgames_starpak3_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
+		: galgames_cart_device(mconfig, GALGAMES_STARPAK3_CART, tag, owner, clock)
+	{
 	}
 
 protected:
@@ -238,7 +261,7 @@ class galgames_slot_device : public device_t, public device_memory_interface
 {
 public:
 	// construction/destruction
-	galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void slot_map(address_map &map);
 
@@ -314,7 +337,7 @@ galgames_cart_device::galgames_cart_device(
 		device_type type,
 		const char *tag,
 		device_t *owner,
-		u32 clock):
+		const XTAL &clock):
 	device_t(mconfig, type, tag, owner, clock),
 	device_rom_interface(mconfig, *this),
 	m_cart(0),
@@ -567,7 +590,7 @@ void galgames_slot_device::slot_map(address_map &map)
 	map(0x200000, 0x23ffff).rw(FUNC(galgames_slot_device::rom_or_ram_r), FUNC(galgames_slot_device::ram_w));
 }
 
-galgames_slot_device::galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+galgames_slot_device::galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, GALGAMES_SLOT, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("slot_space", ENDIANNESS_BIG, 16,22, 0, address_map_constructor(FUNC(galgames_slot_device::slot_map), this)),
@@ -998,8 +1021,8 @@ void galgames_state::galgames_base(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(galgames_state::scanline_interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
-	GALGAMES_SLOT(config, m_slot, 0);
-	GALGAMES_BIOS_CART(config, "cart0", 0);
+	GALGAMES_SLOT(config, m_slot);
+	GALGAMES_BIOS_CART(config, "cart0");
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

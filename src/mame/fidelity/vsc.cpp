@@ -414,7 +414,7 @@ void vsc_state::vsc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &vsc_state::main_io);
 
-	auto &nmi_clock(CLOCK(config, "nmi_clock", 600)); // 555 timer, ideal frequency is 600Hz (measurement was 587Hz)
+	auto &nmi_clock(CLOCK(config, "nmi_clock", XTAL::u(600))); // 555 timer, ideal frequency is 600Hz (measurement was 587Hz)
 	nmi_clock.set_pulse_width(attotime::from_usec(845)); // active for 0.845ms (approx half)
 	nmi_clock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
@@ -439,7 +439,7 @@ void vsc_state::vsc(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
+	S14001A(config, m_speech, XTAL::u(25000)); // R/C circuit, around 25khz
 	m_speech->ext_read().set(FUNC(vsc_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }

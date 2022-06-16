@@ -139,7 +139,7 @@ DEFINE_DEVICE_TYPE(TI992_RAM32K, bus::ti99::internal::ti992_expram_device, "ti99
 
 namespace bus::ti99::internal {
 
-video992_device::video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+video992_device::video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	  device_video_interface(mconfig, *this),
 	  m_mem_read_cb(*this),
@@ -149,13 +149,13 @@ video992_device::video992_device(const machine_config &mconfig, device_type type
 {
 }
 
-video992_24_device::video992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+video992_24_device::video992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock )
 	: video992_device(mconfig, VIDEO99224, tag, owner, clock)
 {
 	m_beol = 0x70;
 }
 
-video992_32_device::video992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+video992_32_device::video992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock )
 	: video992_device(mconfig, VIDEO99232, tag, owner, clock)
 {
 	m_beol = 0x7f;
@@ -354,7 +354,7 @@ void video992_device::device_reset()
     [3] I/O Controller CF40051, Preliminary specification, Texas Instruments
 */
 
-io992_device::io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+io992_device::io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: bus::hexbus::hexbus_chained_device(mconfig, type, tag, owner, clock),
 		m_hexbus(*owner, TI992_HEXBUS_TAG),
 		m_cassette(*owner, TI992_CASSETTE),
@@ -366,13 +366,13 @@ io992_device::io992_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-io992_24_device::io992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+io992_24_device::io992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: io992_device(mconfig, IO99224, tag, owner, clock)
 {
 	m_have_banked_rom = false;
 }
 
-io992_32_device::io992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+io992_32_device::io992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: io992_device(mconfig, IO99232, tag, owner, clock)
 {
 	m_have_banked_rom = true;
@@ -608,7 +608,7 @@ ioport_constructor io992_device::device_input_ports() const
     Expansion port
 ********************************************************************/
 
-ti992_expport_device::ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ti992_expport_device::ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	:   device_t(mconfig, TI992_EXPPORT, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		m_connected(nullptr)
@@ -637,7 +637,7 @@ void ti992_expport_device::device_config_complete()
     Maps at 6000 - DFFF
     This is the only known expansion device
 */
-ti992_expram_device::ti992_expram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ti992_expram_device::ti992_expram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ti992_expport_attached_device(mconfig, TI992_RAM32K, tag, owner, clock),
 	m_ram(*this, "ram32k")
 {
@@ -671,7 +671,7 @@ void ti992_expram_device::write(offs_t offset, uint8_t value)
 
 void ti992_expram_device::device_add_mconfig(machine_config &config)
 {
-	RAM(config, m_ram, 0);
+	RAM(config, m_ram);
 	m_ram->set_default_size("32k");
 	m_ram->set_default_value(0);
 }

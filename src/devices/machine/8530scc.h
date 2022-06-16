@@ -26,7 +26,7 @@ public:
 		IRQ_B_EXT
 	};
 
-	scc8530_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc8530_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto intrq_callback() { return intrq_cb.bind(); }
 

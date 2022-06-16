@@ -27,7 +27,7 @@ class arc_rtfm_joystick_device:
 {
 public:
 	// construction/destruction
-	arc_rtfm_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_rtfm_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

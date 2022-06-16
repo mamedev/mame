@@ -25,7 +25,7 @@ class alesis_dm3ag_device : public device_t
 {
 public:
 	// construction/destruction
-	alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device interface
 	void write(uint8_t data);

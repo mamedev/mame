@@ -842,7 +842,7 @@ void plus4_state::machine_reset()
 void plus4_state::plus4(machine_config &config)
 {
 	// basic machine hardware
-	M7501(config, m_maincpu, 0);
+	M7501(config, m_maincpu);
 	m_maincpu->set_addrmap(AS_PROGRAM, &plus4_state::plus4_mem);
 	m_maincpu->read_callback().set(FUNC(plus4_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
@@ -861,7 +861,7 @@ void plus4_state::plus4(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	MOS7360(config, m_ted, 0);
+	MOS7360(config, m_ted);
 	m_ted->set_addrmap(0, &plus4_state::ted_videoram_map);
 	m_ted->set_screen(SCREEN_TAG);
 	m_ted->write_irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
@@ -885,7 +885,7 @@ void plus4_state::plus4(machine_config &config)
 	m_user->pk_handler().set(m_spi_user, FUNC(mos6529_device::write_p1));
 	m_user->pl_handler().set(m_acia, FUNC(mos6551_device::write_dsr)).invert(); // TODO: add missing pull up before inverter
 
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->rxc_handler().set(m_user, FUNC(pet_user_port_device::write_8));
 	m_acia->rts_handler().set(m_user, FUNC(pet_user_port_device::write_d)).invert();
@@ -893,7 +893,7 @@ void plus4_state::plus4(machine_config &config)
 	m_acia->txd_handler().set(m_user, FUNC(pet_user_port_device::write_m));
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	MOS6529(config, m_spi_user, 0);
+	MOS6529(config, m_spi_user);
 	m_spi_user->p_handler<0>().set(m_user, FUNC(pet_user_port_device::write_b));
 	m_spi_user->p_handler<1>().set(m_user, FUNC(pet_user_port_device::write_k));
 	m_spi_user->p_handler<2>().set(m_user, FUNC(pet_user_port_device::write_4));
@@ -903,7 +903,7 @@ void plus4_state::plus4(machine_config &config)
 	m_spi_user->p_handler<6>().set(m_user, FUNC(pet_user_port_device::write_j));
 	m_spi_user->p_handler<7>().set(m_user, FUNC(pet_user_port_device::write_f));
 
-	MOS6529(config, m_spi_kb, 0);
+	MOS6529(config, m_spi_kb);
 	m_spi_kb->p_handler<0>().set(FUNC(plus4_state::write_kb0));
 	m_spi_kb->p_handler<1>().set(FUNC(plus4_state::write_kb1));
 	m_spi_kb->p_handler<2>().set(FUNC(plus4_state::write_kb2));

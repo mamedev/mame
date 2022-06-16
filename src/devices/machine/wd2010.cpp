@@ -153,7 +153,7 @@ DEFINE_DEVICE_TYPE(WD2010, wd2010_device, "wd2010", "Western Digital WD2010 Winc
 //  wd2010_device - constructor
 //-------------------------------------------------
 
-wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, WD2010, tag, owner, clock)
 	, m_out_intrq_cb(*this)
 	, m_out_bdrq_cb(*this)

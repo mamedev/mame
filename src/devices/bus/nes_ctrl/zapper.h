@@ -27,14 +27,14 @@ class nes_zapper_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_bit34() override;
 	virtual u8 read_exp(offs_t offset) override;
 
 protected:
 	// construction/destruction
-	nes_zapper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_zapper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -55,7 +55,7 @@ class nes_bandaihs_device : public nes_zapper_device
 {
 public:
 	// construction/destruction
-	nes_bandaihs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_bandaihs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_exp(offs_t offset) override;
 	virtual void write(u8 data) override;

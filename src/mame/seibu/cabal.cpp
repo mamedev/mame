@@ -619,7 +619,7 @@ void cabal_state::cabal(machine_config &config)
 	m_audiocpu->set_addrmap(AS_OPCODES, &cabal_state::sound_decrypted_opcodes_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
+	SEI80BU(config, "sei80bu").set_device_rom_tag("audiocpu");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -634,7 +634,7 @@ void cabal_state::cabal(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	/* sound hardware */
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->set_rom_tag("audiocpu");
 	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));

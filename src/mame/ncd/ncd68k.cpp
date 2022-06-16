@@ -488,7 +488,7 @@ void ncd16_state::configure(machine_config &config)
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
 	// keyboard controller
-	M68705P3(config, m_mcu, 3'750'000);
+	M68705P3(config, m_mcu, XTAL::u(3'750'000));
 
 	// ethernet
 	AM7990(config, m_lance);
@@ -502,7 +502,7 @@ void ncd16_state::configure(machine_config &config)
 	m_screen->set_screen_update(FUNC(ncd16_state::screen_update));
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_5, HOLD_LINE);
 
-	BERT(config, m_bert, 0).set_memory(m_maincpu, AS_PROGRAM);
+	BERT(config, m_bert).set_memory(m_maincpu, AS_PROGRAM);
 
 	common(config);
 
@@ -524,7 +524,7 @@ void ncd16_state::configure(machine_config &config)
 void ncd17c_state::configure(machine_config &config)
 {
 	// basic machine hardware
-	M68020(config, m_maincpu, 20000000);
+	M68020(config, m_maincpu, XTAL::u(20000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ncd17c_state::map);
 
 	RAM(config, m_ram).set_default_size("32M");
@@ -537,7 +537,7 @@ void ncd17c_state::configure(machine_config &config)
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
 	// keyboard controller
-	M6805P2(config, m_mcu, 3'750'000);
+	M6805P2(config, m_mcu, XTAL::u(3'750'000));
 
 	// ethernet
 	AM7990(config, m_lance);

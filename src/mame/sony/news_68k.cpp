@@ -177,7 +177,7 @@ void news_68k_state::machine_reset()
 void news_68k_state::init_common()
 {
 	// HACK: hardwire the rate
-	m_fdc->set_rate(500000);
+	m_fdc->set_rate(XTAL::u(500000));
 }
 
 void news_68k_state::cpu_map(address_map &map)
@@ -332,13 +332,13 @@ void news_68k_state::common(machine_config &config)
 
 	M48T02(config, m_rtc);
 
-	DMAC_0266(config, m_dma, 0);
+	DMAC_0266(config, m_dma);
 	m_dma->set_bus(m_cpu, 0);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irq5);
 	m_irq5->output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ5);
 
-	SCC85C30(config, m_scc, 3993600);
+	SCC85C30(config, m_scc, XTAL::u(3993600));
 	m_scc->out_int_callback().set(
 		[this](int state)
 		{

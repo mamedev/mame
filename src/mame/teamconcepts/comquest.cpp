@@ -256,7 +256,7 @@ void comquest_state::machine_reset()
 void comquest_state::comquest(machine_config &config)
 {
 	/* basic machine hardware */
-	M68HC05L11(config, m_maincpu, 4000000);     /* 4000000? */
+	M68HC05L11(config, m_maincpu, XTAL::u(4000000));     /* 4000000? */
 
 /*
     8 bit bus, integrated io, serial io?,

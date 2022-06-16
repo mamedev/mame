@@ -39,7 +39,7 @@ void pci9050_device::map(address_map &map)
 	map(0x50, 0x53).rw(FUNC(pci9050_device::cntrl_r), FUNC(pci9050_device::cntrl_w));
 }
 
-pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, PCI9050, tag, owner, clock)
 	, m_user_input_handler(*this), m_user_output_handler(*this)
 {

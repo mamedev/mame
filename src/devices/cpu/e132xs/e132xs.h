@@ -273,7 +273,7 @@ protected:
 	};
 
 	// construction/destruction
-	hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+	hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock,
 						const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map);
 
 	void init(int scale_mask);
@@ -617,7 +617,7 @@ class e116t_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -630,7 +630,7 @@ class e116xt_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -643,7 +643,7 @@ class e116xs_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -656,7 +656,7 @@ class e116xsr_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -669,7 +669,7 @@ class e132n_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -682,7 +682,7 @@ class e132t_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -695,7 +695,7 @@ class e132xn_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -708,7 +708,7 @@ class e132xt_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -721,7 +721,7 @@ class e132xs_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -734,7 +734,7 @@ class e132xsr_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -747,7 +747,7 @@ class gms30c2116_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -760,7 +760,7 @@ class gms30c2132_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -773,7 +773,7 @@ class gms30c2216_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -786,7 +786,7 @@ class gms30c2232_device : public hyperstone_device
 {
 public:
 	// construction/destruction
-	gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

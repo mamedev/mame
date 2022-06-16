@@ -38,14 +38,14 @@ class pet_user_port_device : public device_t, public device_slot_interface
 public:
 	template <typename T>
 	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: pet_user_port_device(mconfig, tag, owner, 0)
+		: pet_user_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto p2_handler() { return m_2_handler.bind(); }
 	auto p3_handler() { return m_3_handler.bind(); }

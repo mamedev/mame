@@ -87,7 +87,7 @@ public:
 
 protected:
 	// construction/destruction
-	ttl7416x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool synchronous_reset, uint8_t limit);
+	ttl7416x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool synchronous_reset, uint8_t limit);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -128,25 +128,25 @@ private:
 class ttl74160_device : public ttl7416x_device
 {
 public:
-	ttl74160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ttl74160_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class ttl74161_device : public ttl7416x_device
 {
 public:
-	ttl74161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ttl74161_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class ttl74162_device : public ttl7416x_device
 {
 public:
-	ttl74162_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ttl74162_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class ttl74163_device : public ttl7416x_device
 {
 public:
-	ttl74163_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ttl74163_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // device type definition

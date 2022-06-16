@@ -59,7 +59,7 @@ ioport_constructor snes_mouse_device::device_input_ports() const
 //  snes_mouse_device - constructor
 //-------------------------------------------------
 
-snes_mouse_device::snes_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+snes_mouse_device::snes_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SNES_MOUSE, tag, owner, clock),
 	device_snes_control_port_interface(mconfig, *this),
 	m_buttons(*this, "BUTTONS"),

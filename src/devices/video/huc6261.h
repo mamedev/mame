@@ -24,7 +24,7 @@ public:
 	static constexpr unsigned LPF = 263;    // max number of lines in a single frame
 
 	// construction/destruction
-	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_vdc1_tag(T &&tag) { m_huc6270_a.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_vdc2_tag(T &&tag) { m_huc6270_b.set_tag(std::forward<T>(tag)); }

@@ -13,7 +13,7 @@ class hyperscan_card_device : public device_t,
 				public device_memcard_image_interface
 {
 public:
-	hyperscan_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hyperscan_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	int read();
 	void write(int state);

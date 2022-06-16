@@ -48,7 +48,7 @@
 DEFINE_DEVICE_TYPE(NES_APU,  nesapu_device,  "nesapu",  "RP2A0X APU")
 DEFINE_DEVICE_TYPE(APU_2A03, apu2a03_device, "apu2a03", "RP2A03 APU")
 
-nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_is_pal(0)
@@ -59,7 +59,7 @@ nesapu_device::nesapu_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-nesapu_device::nesapu_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
+nesapu_device::nesapu_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
 	: nesapu_device(mconfig, NES_APU, tag, owner, clock)
 {
 }

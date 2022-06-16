@@ -47,62 +47,62 @@ DEFINE_DEVICE_TYPE(NES_43272,       nes_43272_device,       "nes_43272",       "
 DEFINE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device,     "nes_eh8813a",     "NES Cart UNL-EH8813A PCB")
 
 
-nes_agci_device::nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_agci_device::nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_AGCI_50282, tag, owner, clock)
 {
 }
 
-nes_dreamtech_device::nes_dreamtech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_dreamtech_device::nes_dreamtech_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_DREAMTECH01, tag, owner, clock)
 {
 }
 
-nes_fukutake_device::nes_fukutake_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_fukutake_device::nes_fukutake_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_FUKUTAKE, tag, owner, clock), m_latch(0)
 {
 }
 
-nes_futuremedia_device::nes_futuremedia_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_futuremedia_device::nes_futuremedia_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_FUTUREMEDIA, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0)
 {
 }
 
-nes_magseries_device::nes_magseries_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_magseries_device::nes_magseries_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_MAGSERIES, tag, owner, clock)
 {
 }
 
-nes_daou306_device::nes_daou306_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_daou306_device::nes_daou306_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_DAOU306, tag, owner, clock)
 {
 }
 
-nes_cc21_device::nes_cc21_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_cc21_device::nes_cc21_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_CC21, tag, owner, clock)
 {
 }
 
-nes_xiaozy_device::nes_xiaozy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_xiaozy_device::nes_xiaozy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_XIAOZY, tag, owner, clock)
 {
 }
 
-nes_edu2k_device::nes_edu2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_edu2k_device::nes_edu2k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_EDU2K, tag, owner, clock)
 {
 }
 
-nes_jy830623c_device::nes_jy830623c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jy830623c_device::nes_jy830623c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_JY830623C, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0)
 {
 }
 
-nes_43272_device::nes_43272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_43272_device::nes_43272_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_43272, tag, owner, clock), m_latch(0)
 {
 }
 
-nes_eh8813a_device::nes_eh8813a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_eh8813a_device::nes_eh8813a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_EH8813A, tag, owner, clock), m_jumper(0), m_latch(0), m_reg(0)
 {
 }

@@ -14,7 +14,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(SDK85_ROMEXP, sdk85_romexp_device, "sdk85_romexp", "SDK-85 expansion ROM socket")
 
-sdk85_romexp_device::sdk85_romexp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sdk85_romexp_device::sdk85_romexp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SDK85_ROMEXP, tag, owner, clock)
 	, device_rom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_sdk85_romexp_card_interface>(mconfig, *this)

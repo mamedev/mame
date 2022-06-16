@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(OUTPUT_LATCH, output_latch_device, "output_latch", "Output Latch")
 
-output_latch_device::output_latch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+output_latch_device::output_latch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, OUTPUT_LATCH, tag, owner, clock)
 	, m_bit_handlers(*this)
 	, m_bits{ -1, -1, -1, -1, -1, -1, -1, -1 }

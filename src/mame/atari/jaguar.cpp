@@ -373,7 +373,7 @@ DECLARE_DEVICE_TYPE(COJAG_HARDDISK, cojag_hdd)
 class cojag_hdd : public ide_hdd_device
 {
 public:
-	cojag_hdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	cojag_hdd(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: ide_hdd_device(mconfig, COJAG_HARDDISK, tag, owner, clock)
 	{
 	}
@@ -1820,8 +1820,8 @@ void jaguar_state::cojagr3k(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
 
 	// TODO: subwoofer speaker
 }
@@ -1870,8 +1870,8 @@ void jaguar_state::jaguar(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
 
 	/* quickload */
 	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg").set_load_callback(FUNC(jaguar_state::quickload_cb));

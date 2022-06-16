@@ -107,7 +107,7 @@ template<const uint8_t* Table> void mpu4mod4yam_machines_state::cheatchr_pal_f(m
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod4yam_machines_state::memmap_characteriser_ym2413);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(Table);
@@ -119,7 +119,7 @@ template<uint8_t Fixed> void mpu4mod4yam_machines_state::bootleg_fixedret_f(mach
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod4yam_machines_state::memmap_bootleg_characteriser_ym2413);
 
-	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+	MPU4_CHARACTERISER_BL(config, m_characteriser_bl);
 	m_characteriser_bl->set_bl_fixed_return(Fixed);
 }
 

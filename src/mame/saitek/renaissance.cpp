@@ -381,7 +381,7 @@ void ren_state::ren(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 
 	// video hardware
-	SED1502(config, m_lcd, 32768).write_segs().set(FUNC(ren_state::lcd_output_w));
+	SED1502(config, m_lcd, XTAL::u(32768)).write_segs().set(FUNC(ren_state::lcd_output_w));
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(16, 34);
 	m_lcd_pwm->set_refresh(attotime::from_hz(30));
 	m_lcd_pwm->output_x().set(FUNC(ren_state::lcd_pwm_w));

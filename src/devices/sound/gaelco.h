@@ -19,7 +19,7 @@ class gaelco_gae1_device : public device_t,
 							public device_rom_interface<27> // Unknown address bits
 {
 public:
-	gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void set_bank_offsets(int offs1, int offs2, int offs3, int offs4)
 	{
@@ -33,7 +33,7 @@ public:
 	uint16_t gaelcosnd_r(offs_t offset);
 
 protected:
-	gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -81,7 +81,7 @@ DECLARE_DEVICE_TYPE(GAELCO_GAE1, gaelco_gae1_device)
 class gaelco_cg1v_device : public gaelco_gae1_device
 {
 public:
-	gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 DECLARE_DEVICE_TYPE(GAELCO_CG1V, gaelco_cg1v_device)

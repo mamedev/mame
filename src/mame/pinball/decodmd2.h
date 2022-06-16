@@ -19,13 +19,13 @@ class decodmd_type2_device : public device_t
 {
 public:
 	template <typename T>
-	decodmd_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gfxregion_tag)
+	decodmd_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&gfxregion_tag)
 		: decodmd_type2_device(mconfig, tag, owner, clock)
 	{
 		set_gfxregion(std::forward<T>(gfxregion_tag));
 	}
 
-	decodmd_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	decodmd_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void bank_w(uint8_t data);
 	void crtc_address_w(uint8_t data);

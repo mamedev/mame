@@ -295,7 +295,7 @@ void jazz_state::jazz(machine_config &config)
 	m_vram->set_default_value(0);
 
 	// local bus dma, timer and interrupt controller
-	MCT_ADR(config, m_mct_adr, 0);
+	MCT_ADR(config, m_mct_adr);
 	m_mct_adr->set_addrmap(0, &jazz_state::mct_map);
 	m_mct_adr->out_int_dma_cb().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 	m_mct_adr->out_int_device_cb().set_inputline(m_cpu, INPUT_LINE_IRQ1);
@@ -362,7 +362,7 @@ void jazz_state::jazz(machine_config &config)
 	m_kbdc->aux_irq().set(m_mct_adr, FUNC(mct_adr_device::irq<7>));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(78643200, 1280, 0, 1280, 1024, 0, 1024);
+	m_screen->set_raw(XTAL::u(78643200), 1280, 0, 1280, 1024, 0, 1024);
 	m_screen->set_screen_update(m_cvc, FUNC(g364_device::screen_update));
 	m_screen->screen_vblank().set(m_mct_adr, FUNC(mct_adr_device::irq<3>)); // maybe?
 
@@ -371,7 +371,7 @@ void jazz_state::jazz(machine_config &config)
 	m_cvc->set_vram(m_vram);
 
 	// WD16C552 (two 16550 + pc_lpt)
-	NS16550(config, m_ace[0], 4233600);
+	NS16550(config, m_ace[0], XTAL::u(4233600));
 	rs232_port_device &serial0(RS232_PORT(config, "serial0", default_rs232_devices, nullptr));
 
 	m_ace[0]->out_dtr_callback().set(serial0, FUNC(rs232_port_device::write_dtr));
@@ -399,7 +399,7 @@ void jazz_state::jazz(machine_config &config)
 	serial1.ri_handler().set(m_ace[1], FUNC(ns16550_device::ri_w));
 	serial1.rxd_handler().set(m_ace[1], FUNC(ns16550_device::rx_w));
 
-	PC_LPT(config, m_lpt, 0);
+	PC_LPT(config, m_lpt);
 	m_lpt->irq_handler().set(m_mct_adr, FUNC(mct_adr_device::irq<0>));
 
 	// TODO: sound, interrupt 2, drq 2(l) & 3(r)

@@ -141,7 +141,7 @@ DEFINE_DEVICE_TYPE(WHTSCSI_PLD, bus::ti99::peb::whtscsi_pld_device, PLD_TAG, "WH
 
 namespace bus::ti99::peb {
 
-whtech_scsi_card_device::whtech_scsi_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+whtech_scsi_card_device::whtech_scsi_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_WHTSCSI, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_buffer_ram(*this, BUFFER),
@@ -373,7 +373,7 @@ void whtech_scsi_card_device::device_add_mconfig(machine_config &config)
 	RAM(config, BUFFER).set_default_size("32K").set_default_value(0);
 
 	// PLD circuit
-	WHTSCSI_PLD(config, PLD_TAG, 0);
+	WHTSCSI_PLD(config, PLD_TAG);
 
 	// SCSI bus
 	NSCSI_BUS(config, m_scsibus);
@@ -487,7 +487,7 @@ ioport_constructor whtech_scsi_card_device::device_input_ports() const
 //    PLD circuit on the board
 // ========================================================================
 
-whtscsi_pld_device::whtscsi_pld_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+whtscsi_pld_device::whtscsi_pld_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	:  device_t(mconfig, WHTSCSI_PLD, tag, owner, clock),
 	   m_board(nullptr),
 	   m_selected(false),

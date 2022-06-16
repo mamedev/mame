@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(WPCASIC, wpc_device, "wpc", "Williams WPC ASIC")
 
-wpc_device::wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+wpc_device::wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, WPCASIC, tag, owner, clock),
 		m_dmd_visiblepage(0),
 		m_irq_cb(*this),

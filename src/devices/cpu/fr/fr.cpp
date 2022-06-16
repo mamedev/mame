@@ -15,7 +15,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(MB91F155A, mb91f155a_device, "mb91f155a", "Fujitsu MB91F155A")
 
-fr_cpu_device::fr_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int addrbits, address_map_constructor map)
+fr_cpu_device::fr_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int addrbits, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_space_config("program", ENDIANNESS_BIG, 32, addrbits, 0, map)
 	, m_regs{0}
@@ -28,7 +28,7 @@ fr_cpu_device::fr_cpu_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-mb91f155a_device::mb91f155a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mb91f155a_device::mb91f155a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: fr_cpu_device(mconfig, MB91F155A, tag, owner, clock, 24, address_map_constructor(FUNC(mb91f155a_device::internal_map), this))
 {
 }

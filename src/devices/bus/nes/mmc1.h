@@ -14,7 +14,7 @@ class nes_sxrom_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_sxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_m(offs_t offset) override;
 	virtual void write_m(offs_t offset, u8 data) override;
@@ -23,7 +23,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_sxrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_sxrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -53,7 +53,7 @@ class nes_sorom_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_sorom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_sorom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_m(offs_t offset) override;
 	virtual void write_m(offs_t offset, u8 data) override;
@@ -66,7 +66,7 @@ class nes_szrom_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_szrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_szrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_m(offs_t offset) override;
 	virtual void write_m(offs_t offset, u8 data) override;

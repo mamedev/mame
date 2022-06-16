@@ -37,12 +37,12 @@ DEFINE_DEVICE_TYPE(NES_BATMAP_000,  nes_batmap_000_device,  "nes_batmap_000",  "
 DEFINE_DEVICE_TYPE(NES_BATMAP_SRRX, nes_batmap_srrx_device, "nes_batmap_srrx", "NES Cart Batlab BATMAP-SRR-X PCB")
 
 
-nes_batmap_000_device::nes_batmap_000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_batmap_000_device::nes_batmap_000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BATMAP_000, tag, owner, clock)
 {
 }
 
-nes_batmap_srrx_device::nes_batmap_srrx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_batmap_srrx_device::nes_batmap_srrx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_BATMAP_SRRX, tag, owner, clock), m_reg(0), m_dpcm_addr(0), m_dpcm_ctrl(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0)
 {
 }

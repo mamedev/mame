@@ -464,7 +464,7 @@ void pb1000_state::machine_start()
 void pb1000_state::pb1000(machine_config &config)
 {
 	/* basic machine hardware */
-	HD61700(config, m_maincpu, 910000);
+	HD61700(config, m_maincpu, XTAL::u(910000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pb1000_state::pb1000_mem);
 	m_maincpu->lcd_ctrl().set(m_hd44352, FUNC(hd44352_device::control_write));
 	m_maincpu->lcd_read().set(m_hd44352, FUNC(hd44352_device::data_read));
@@ -486,7 +486,7 @@ void pb1000_state::pb1000(machine_config &config)
 	PALETTE(config, "palette", FUNC(pb1000_state::pb1000_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_pb1000);
 
-	HD44352(config, m_hd44352, 910000);
+	HD44352(config, m_hd44352, XTAL::u(910000));
 	m_hd44352->on_cb().set_inputline("maincpu", HD61700_ON_INT);
 
 	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
@@ -494,7 +494,7 @@ void pb1000_state::pb1000(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beeper, XTAL::u(3250)).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void pb1000_state::pb2000c(machine_config &config)

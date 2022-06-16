@@ -331,7 +331,7 @@ GFXDECODE_END
 void tank8_state::tank8(machine_config &config)
 {
 	/* basic machine hardware */
-	M6800(config, m_maincpu, 11055000 / 10); /* ? */
+	M6800(config, m_maincpu, XTAL::u(11055000) / 10); /* ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tank8_state::tank8_cpu_map);
 
 	/* video hardware */

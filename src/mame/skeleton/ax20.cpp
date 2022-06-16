@@ -150,7 +150,7 @@ void ax20_state::ax20(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ax20);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	I8272A(config, m_fdc, 8'000'000, true);
+	I8272A(config, m_fdc, XTAL::u(8'000'000), true);
 
 	/* Devices */
 	FLOPPY_CONNECTOR(config, "fdc:0", ax20_floppies, "525dd", isa8_fdc_device::floppy_formats);

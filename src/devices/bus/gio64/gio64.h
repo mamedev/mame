@@ -26,7 +26,7 @@ public:
 	// construction/destruction
 	template <typename T, typename U>
 	gio64_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gio64_tag, slot_type_t slot_type, U &&opts, const char *dflt)
-		: gio64_slot_device(mconfig, tag, owner, (uint32_t)0, slot_type)
+		: gio64_slot_device(mconfig, tag, owner, slot_type)
 	{
 		option_reset();
 		opts(*this);
@@ -34,7 +34,7 @@ public:
 		set_fixed(false);
 		m_gio64.set_tag(std::forward<T>(gio64_tag));
 	}
-	gio64_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, slot_type_t slot_type = GIO64_SLOT_EXP0);
+	gio64_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, slot_type_t slot_type = GIO64_SLOT_EXP0);
 
 protected:
 	// device-level overrides
@@ -80,11 +80,11 @@ public:
 	// construction/destruction
 	template <typename T>
 	gio64_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
-		: gio64_device(mconfig, tag, owner, (uint32_t)0)
+		: gio64_device(mconfig, tag, owner)
 	{
 	}
 
-	gio64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gio64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration
 	template <int N> auto interrupt_cb() { return m_interrupt_cb[N].bind(); }
@@ -113,7 +113,7 @@ public:
 	void write(offs_t offset, u64 data, u64 mem_mask);
 
 protected:
-	gio64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gio64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;

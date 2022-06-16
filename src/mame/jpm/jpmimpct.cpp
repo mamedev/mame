@@ -109,12 +109,12 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 
 DEFINE_DEVICE_TYPE(JPM_TOUCHSCREEN, jpmtouch_device, "jpmtouch", "JPM Touchscreen")
 
-jpmtouch_device::jpmtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+jpmtouch_device::jpmtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	jpmtouch_device(mconfig, JPM_TOUCHSCREEN, tag, owner, clock)
 {
 }
 
-jpmtouch_device::jpmtouch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+jpmtouch_device::jpmtouch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, JPM_TOUCHSCREEN, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_rxd_handler(*this),
@@ -140,8 +140,8 @@ void jpmtouch_device::device_reset()
 
 	set_data_frame(startbits, databits, parity, stopbits);
 
-	set_tra_rate(9600);
-	set_rcv_rate(9600);
+	set_tra_rate(XTAL::u(9600));
+	set_rcv_rate(XTAL::u(9600));
 
 	output_rxd(1);
 }
@@ -152,7 +152,7 @@ void jpmtouch_device::tx_queue()
 	{
 		if (m_sending != -1)
 		{
-			set_tra_rate(9600);
+			set_tra_rate(XTAL::u(9600));
 			uint8_t senddata = m_touch_data[m_sendpos];
 			transmit_register_setup(senddata);
 		}
@@ -202,8 +202,8 @@ void jpmtouch_device::touched(uint8_t x, uint8_t y)
  *
  *************************************/
 
-#define MC68681_1_CLOCK     3686400
-#define MC68681_2_CLOCK     3686400
+#define MC68681_1_CLOCK     XTAL::u(3686400)
+#define MC68681_2_CLOCK     XTAL::u(3686400)
 
 
 /*************************************
@@ -1287,7 +1287,7 @@ WRITE_LINE_MEMBER(jpmimpct_state::duart_irq_handler)
 
 void jpmimpct_state::base(machine_config &config)
 {
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, XTAL::u(8000000));
 	// map set later
 
 	MC68681(config, m_duart, MC68681_1_CLOCK);
@@ -1313,11 +1313,11 @@ void jpmimpct_state::base(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	METERS(config, m_meters, 0).set_number(5);
+	METERS(config, m_meters).set_number(5);
 
 	// TODO: only add this to the sets that need it connected
 	m_duart->a_tx_cb().set(m_datalogger, FUNC(bacta_datalogger_device::write_txd));
-	BACTA_DATALOGGER(config, m_datalogger, 0);
+	BACTA_DATALOGGER(config, m_datalogger);
 	m_datalogger->rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w));
 }
 
@@ -1393,10 +1393,10 @@ void jpmimpct_video_state::impact_video(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_video_state::impact_video_map);
 
-	TMS34010(config, m_dsp, 40000000);
+	TMS34010(config, m_dsp, XTAL::u(40000000));
 	m_dsp->set_addrmap(AS_PROGRAM, &jpmimpct_video_state::tms_program_map);
 	m_dsp->set_halt_on_reset(true);
-	m_dsp->set_pixel_clock(40000000/16);
+	m_dsp->set_pixel_clock(XTAL::u(40000000)/16);
 	m_dsp->set_pixels_per_clock(4);
 	m_dsp->set_scanline_rgb32_callback(FUNC(jpmimpct_video_state::scanline_update));
 	m_dsp->output_int().set(FUNC(jpmimpct_video_state::tms_irq));
@@ -1409,10 +1409,10 @@ void jpmimpct_video_state::impact_video(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(30000));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(40000000/4, 156*4, 0, 100*4, 328, 0, 300);
+	screen.set_raw(XTAL::u(40000000)/4, 156*4, 0, 100*4, 328, 0, 300);
 	screen.set_screen_update("dsp", FUNC(tms34010_device::tms340x0_rgb32));
 
-	BT477(config, m_ramdac, 40000000); // clock unknown
+	BT477(config, m_ramdac, XTAL::u(40000000)); // clock unknown
 }
 
 void jpmimpct_video_state::impact_video_touch(machine_config &config)

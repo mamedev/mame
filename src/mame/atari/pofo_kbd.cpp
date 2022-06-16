@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(POFO_KEYBOARD, pofo_keyboard_device, "pofo_keyboard", "Atari Portfolio keyboard");
 
-pofo_keyboard_device::pofo_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pofo_keyboard_device::pofo_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, POFO_KEYBOARD, tag, owner, clock),
 	device_matrix_keyboard_interface(mconfig, *this, "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"),
 	m_int_handler(*this)

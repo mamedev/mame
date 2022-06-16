@@ -364,7 +364,7 @@ void digilog320_state::digilog320(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	AM9519(config, m_uic, 0);
+	AM9519(config, m_uic);
 	m_uic->out_int_callback().set_inputline(m_subcpu, INPUT_LINE_IRQ0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -385,7 +385,7 @@ void digilog320_state::digilog320(machine_config &config)
 	m_duart->outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3);
 	m_duart->outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
 
-	I8251(config, "usart", 0);
+	I8251(config, "usart");
 
 	SCC8530N(config, m_scc[0], 3.6864_MHz_XTAL);
 

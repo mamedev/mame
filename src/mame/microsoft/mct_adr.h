@@ -11,7 +11,7 @@ class mct_adr_device
 	, public device_memory_interface
 {
 public:
-	mct_adr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mct_adr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto out_int_dma_cb() { return m_out_int_dma.bind(); }

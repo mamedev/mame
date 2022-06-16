@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(NAMCOS21_3D, namcos21_3d_device, "namcos21_3d", "Namco System 21 3D Rasterizer")
 
-namcos21_3d_device::namcos21_3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+namcos21_3d_device::namcos21_3d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NAMCOS21_3D, tag, owner, clock),
 	m_fixed_palbase(-1),
 	m_zz_shift(10),

@@ -22,7 +22,7 @@ class i82439tx_device : public northbridge_device, public pci_device_interface
 {
 public:
 	// construction/destruction
-	i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_region(const char *tag) { m_region_tag = tag; }
 

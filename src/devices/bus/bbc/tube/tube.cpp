@@ -42,7 +42,7 @@ device_bbc_tube_interface::device_bbc_tube_interface(const machine_config &mconf
 //  bbc_tube_slot_device - constructor
 //-------------------------------------------------
 
-bbc_tube_slot_device::bbc_tube_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bbc_tube_slot_device::bbc_tube_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, BBC_TUBE_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_bbc_tube_interface>(mconfig, *this),
 	m_card(nullptr),

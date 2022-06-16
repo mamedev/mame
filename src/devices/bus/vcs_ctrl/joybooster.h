@@ -27,7 +27,7 @@ class vcs_joystick_booster_device : public device_t,
 {
 public:
 	// construction/destruction
-	vcs_joystick_booster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vcs_joystick_booster_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_vcs_control_port_interface overrides
 	virtual uint8_t vcs_joy_r() override;

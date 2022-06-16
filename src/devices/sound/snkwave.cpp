@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(SNKWAVE, snkwave_device, "snkwave", "SNK Wave")
 //  snkwave_device - constructor
 //-------------------------------------------------
 
-snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SNKWAVE, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

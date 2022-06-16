@@ -47,7 +47,7 @@
 
 DEFINE_DEVICE_TYPE(PC8801_EXP_SLOT, pc8801_exp_slot_device, "pc8801_exp_slot", "PC-8801 Expansion Slot")
 
-pc8801_exp_slot_device::pc8801_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc8801_exp_slot_device::pc8801_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PC8801_EXP_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_pc8801_exp_interface>(mconfig, *this)
 	, m_iospace(*this, finder_base::DUMMY_TAG, -1)
@@ -99,7 +99,7 @@ WRITE_LINE_MEMBER( device_pc8801_exp_interface::int3_w ) { m_slot->m_int3_cb(sta
 WRITE_LINE_MEMBER( device_pc8801_exp_interface::int4_w ) { m_slot->m_int4_cb(state); }
 WRITE_LINE_MEMBER( device_pc8801_exp_interface::int5_w ) { m_slot->m_int5_cb(state); }
 
-pc8801_exp_device::pc8801_exp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+pc8801_exp_device::pc8801_exp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_pc8801_exp_interface(mconfig, *this)
 {

@@ -43,7 +43,7 @@ device_ep64_expansion_bus_card_interface::device_ep64_expansion_bus_card_interfa
 //  ep64_expansion_bus_slot_device - constructor
 //-------------------------------------------------
 
-ep64_expansion_bus_slot_device::ep64_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ep64_expansion_bus_slot_device::ep64_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, EP64_EXPANSION_BUS_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_ep64_expansion_bus_card_interface>(mconfig, *this)
 	, m_write_irq(*this)

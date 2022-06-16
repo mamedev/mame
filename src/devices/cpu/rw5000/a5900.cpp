@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(A5900, a5900_cpu_device, "a5900", "Rockwell A5900")
 
 
 // constructor
-a5900_cpu_device::a5900_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+a5900_cpu_device::a5900_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a5000_cpu_device(mconfig, A5900, tag, owner, clock, 9, address_map_constructor(FUNC(a5900_cpu_device::program_512x8), this), 6, address_map_constructor(FUNC(a5900_cpu_device::data_45x4), this))
 { }
 

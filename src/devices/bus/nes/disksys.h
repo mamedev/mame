@@ -16,7 +16,7 @@ class nes_disksys_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_disksys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_disksys_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read_ex(offs_t offset) override;
 	virtual uint8_t read_m(offs_t offset) override;

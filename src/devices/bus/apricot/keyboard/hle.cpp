@@ -221,7 +221,7 @@ void apricot_keyboard_hle_device::device_add_mconfig(machine_config &config)
 //  apricot_keyboard_hle_device - constructor
 //-------------------------------------------------
 
-apricot_keyboard_hle_device::apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apricot_keyboard_hle_device::apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, APRICOT_KEYBOARD_HLE, tag, owner, clock),
 	device_apricot_keyboard_interface(mconfig, *this),
 	device_buffered_serial_interface(mconfig, *this),
@@ -262,8 +262,8 @@ void apricot_keyboard_hle_device::device_reset()
 	transmit_register_reset();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rcv_rate(7800);
-	set_tra_rate(7800);
+	set_rcv_rate(XTAL::u(7800));
+	set_tra_rate(XTAL::u(7800));
 
 	reset_key_state();
 	start_processing(attotime::from_hz(7800));

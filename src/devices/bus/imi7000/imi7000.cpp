@@ -52,7 +52,7 @@ device_imi7000_interface::device_imi7000_interface(const machine_config &mconfig
 //  imi7000_slot_device - constructor
 //-------------------------------------------------
 
-imi7000_slot_device::imi7000_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+imi7000_slot_device::imi7000_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IMI7000_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_imi7000_interface>(mconfig, *this)
 	, m_card(nullptr)
@@ -78,7 +78,7 @@ void imi7000_slot_device::device_start()
 //  imi7000_bus_device - constructor
 //-------------------------------------------------
 
-imi7000_bus_device::imi7000_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+imi7000_bus_device::imi7000_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IMI7000_BUS, tag, owner, clock)
 	, m_units(*this, "%u", 0U)
 {

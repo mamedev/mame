@@ -375,7 +375,7 @@ void micronic_state::micronic(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beep).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* ram banks */
 	RAM(config, RAM_TAG).set_default_size("224K");

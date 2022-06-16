@@ -419,7 +419,7 @@ void chanbara_state::chanbara(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12000000/8));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12000000)/8));
 	ymsnd.irq_handler().set_inputline(m_maincpu, 0);
 	ymsnd.port_a_write_callback().set(FUNC(chanbara_state::ay_out_0_w));
 	ymsnd.port_b_write_callback().set(FUNC(chanbara_state::ay_out_1_w));

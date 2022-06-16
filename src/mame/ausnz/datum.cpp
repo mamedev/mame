@@ -203,18 +203,18 @@ void datum_state::datum(machine_config &config)
 	m_display->set_segmask(0x3f0, 0x7f);
 
 	/* Devices */
-	PIA6821(config, m_pia1, 0); // keyboard & display
+	PIA6821(config, m_pia1); // keyboard & display
 	m_pia1->readpa_handler().set(FUNC(datum_state::pa_r));
 	m_pia1->writepa_handler().set(FUNC(datum_state::pa_w));
 	m_pia1->writepb_handler().set(FUNC(datum_state::pb_w));
 	m_pia1->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 	m_pia1->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
-	PIA6821(config, m_pia2, 0); // expansion
+	PIA6821(config, m_pia2); // expansion
 	m_pia2->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 	m_pia2->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
-	ACIA6850(config, m_acia, 0); // rs232
+	ACIA6850(config, m_acia); // rs232
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));

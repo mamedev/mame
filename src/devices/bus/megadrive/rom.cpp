@@ -67,199 +67,199 @@ DEFINE_DEVICE_TYPE(MD_ROM_STARODYS, md_rom_starodys_device, "md_rom_starodys", "
 DEFINE_DEVICE_TYPE(MD_ROM_SRAM_ARG96, md_rom_sram_arg96_device, "md_rom_sram_arg96", "MD Futbol Argentino 96")
 
 
-md_std_rom_device::md_std_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+md_std_rom_device::md_std_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock), device_md_cart_interface(mconfig, *this)
 {
 }
 
-md_std_rom_device::md_std_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_std_rom_device::md_std_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_STD_ROM, tag, owner, clock)
 {
 }
 
-md_rom_sram_device::md_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_sram_device::md_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_rom_sram_device(mconfig, MD_ROM_SRAM, tag, owner, clock)
 {
 }
 
-md_rom_sram_device::md_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+md_rom_sram_device::md_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, type, tag, owner, clock)
 {
 }
 
 
-md_rom_sram_arg96_device::md_rom_sram_arg96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_sram_arg96_device::md_rom_sram_arg96_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_rom_sram_device(mconfig, MD_ROM_SRAM_ARG96, tag, owner, clock)
 {
 }
 
 
-md_rom_fram_device::md_rom_fram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_fram_device::md_rom_fram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_FRAM, tag, owner, clock)
 {
 }
 
-md_rom_cm2in1_device::md_rom_cm2in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_cm2in1_device::md_rom_cm2in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_CM2IN1, tag, owner, clock), m_base(0)
 {
 }
 
-md_rom_ssf2_device::md_rom_ssf2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_ssf2_device::md_rom_ssf2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_SSF2, tag, owner, clock), m_lastoff(0), m_lastdata(0)
 {
 }
 
-md_rom_bugslife_device::md_rom_bugslife_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_bugslife_device::md_rom_bugslife_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_BUGSLIFE, tag, owner, clock)
 {
 }
 
-md_rom_smouse_device::md_rom_smouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_smouse_device::md_rom_smouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_SMOUSE, tag, owner, clock)
 {
 }
 
-md_rom_smw64_device::md_rom_smw64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_smw64_device::md_rom_smw64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_SMW64, tag, owner, clock), m_latch0(0), m_latch1(0)
 {
 }
 
-md_rom_smb_device::md_rom_smb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_smb_device::md_rom_smb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_SMB, tag, owner, clock)
 {
 }
 
-md_rom_smb2_device::md_rom_smb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_smb2_device::md_rom_smb2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_SMB2, tag, owner, clock)
 {
 }
 
-md_rom_sbubl_device::md_rom_sbubl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_sbubl_device::md_rom_sbubl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_SBUBL, tag, owner, clock)
 {
 }
 
-md_rom_rx3_device::md_rom_rx3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_rx3_device::md_rom_rx3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_RX3, tag, owner, clock)
 {
 }
 
-md_rom_mjlov_device::md_rom_mjlov_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_mjlov_device::md_rom_mjlov_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_MJLOV, tag, owner, clock)
 {
 }
 
-md_rom_cjmjclub_device::md_rom_cjmjclub_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_cjmjclub_device::md_rom_cjmjclub_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_CJMJCLUB, tag, owner, clock)
 {
 }
 
-md_rom_kof98_device::md_rom_kof98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_kof98_device::md_rom_kof98_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_KOF98, tag, owner, clock)
 {
 }
 
-md_rom_kof99_device::md_rom_kof99_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_kof99_device::md_rom_kof99_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_KOF99, tag, owner, clock)
 {
 }
 
-md_rom_soulb_device::md_rom_soulb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_soulb_device::md_rom_soulb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_SOULB, tag, owner, clock)
 {
 }
 
-md_rom_chinf3_device::md_rom_chinf3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_chinf3_device::md_rom_chinf3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_CHINF3, tag, owner, clock), m_bank(0)
 {
 }
 
-md_rom_16mj2_device::md_rom_16mj2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_16mj2_device::md_rom_16mj2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_16MJ2, tag, owner, clock)
 {
 }
 
-md_rom_elfwor_device::md_rom_elfwor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_elfwor_device::md_rom_elfwor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_ELFWOR, tag, owner, clock)
 {
 }
 
-md_rom_yasech_device::md_rom_yasech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_yasech_device::md_rom_yasech_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_YASECH, tag, owner, clock)
 {
 }
 
-md_rom_lion2_device::md_rom_lion2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_lion2_device::md_rom_lion2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_LION2, tag, owner, clock), m_prot1_data(0), m_prot2_data(0)
 {
 }
 
-md_rom_lion3_device::md_rom_lion3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_lion3_device::md_rom_lion3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_LION3, tag, owner, clock), m_bank(0)
 {
 }
 
-md_rom_mcpirate_device::md_rom_mcpirate_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_mcpirate_device::md_rom_mcpirate_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_MCPIR, tag, owner, clock), m_bank(0)
 {
 }
 
-md_rom_pokea_device::md_rom_pokea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_pokea_device::md_rom_pokea_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_POKEA, tag, owner, clock)
 {
 }
 
-md_rom_pokestad_device::md_rom_pokestad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_pokestad_device::md_rom_pokestad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_POKESTAD, tag, owner, clock), m_bank(0)
 {
 }
 
-md_rom_realtec_device::md_rom_realtec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_realtec_device::md_rom_realtec_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_REALTEC, tag, owner, clock), m_bank_addr(0), m_bank_size(0), m_old_bank_addr(0)
 {
 }
 
-md_rom_redcl_device::md_rom_redcl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_redcl_device::md_rom_redcl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_REDCL, tag, owner, clock)
 {
 }
 
-md_rom_squir_device::md_rom_squir_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_squir_device::md_rom_squir_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_SQUIR, tag, owner, clock), m_latch(0)
 {
 }
 
-md_rom_tc2000_device::md_rom_tc2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_tc2000_device::md_rom_tc2000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_TC2000, tag, owner, clock)
 {
 }
 
-md_rom_tekkensp_device::md_rom_tekkensp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_tekkensp_device::md_rom_tekkensp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_TEKKENSP, tag, owner, clock), m_reg(0)
 {
 }
 
-md_rom_topf_device::md_rom_topf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_topf_device::md_rom_topf_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_TOPF, tag, owner, clock), m_latch(0)
 {
 }
 
-md_rom_radica_device::md_rom_radica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_radica_device::md_rom_radica_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_RADICA, tag, owner, clock), m_bank(0)
 {
 }
 
-md_rom_beggarp_device::md_rom_beggarp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_beggarp_device::md_rom_beggarp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_BEGGARP, tag, owner, clock), m_mode(0), m_lock(0)
 {
 }
 
-md_rom_wukong_device::md_rom_wukong_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_wukong_device::md_rom_wukong_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_WUKONG, tag, owner, clock), m_mode(0)
 {
 }
 
-md_rom_starodys_device::md_rom_starodys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_starodys_device::md_rom_starodys_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_rom_device(mconfig, MD_ROM_STARODYS, tag, owner, clock), m_mode(0), m_lock(0), m_ram_enable(0), m_base(0)
 {
 }

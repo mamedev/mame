@@ -568,7 +568,7 @@ void lastfght_state::lastfght(machine_config &config)
 	/* video hardware */
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &lastfght_state::ramdac_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

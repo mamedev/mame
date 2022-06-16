@@ -38,7 +38,7 @@ class nubus_image_device::messimg_disk_image_device : public device_t, public de
 {
 public:
 	// construction/destruction
-	messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// image-level overrides
 	virtual bool is_readable()  const noexcept override { return true; }
@@ -67,7 +67,7 @@ public:
 // device type definition
 DEFINE_DEVICE_TYPE(MESSIMG_DISK, nubus_image_device::messimg_disk_image_device, "messimg_disk_image", "Mac image")
 
-nubus_image_device::messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_image_device::messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MESSIMG_DISK, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_size(0), m_data(nullptr), m_ejected(false)
@@ -142,7 +142,7 @@ DEFINE_DEVICE_TYPE(NUBUS_IMAGE, nubus_image_device, "nb_image", "NuBus Disk Imag
 
 void nubus_image_device::device_add_mconfig(machine_config &config)
 {
-	MESSIMG_DISK(config, IMAGE_DISK0_TAG, 0);
+	MESSIMG_DISK(config, IMAGE_DISK0_TAG);
 }
 
 //-------------------------------------------------
@@ -162,12 +162,12 @@ const tiny_rom_entry *nubus_image_device::device_rom_region() const
 //  nubus_image_device - constructor
 //-------------------------------------------------
 
-nubus_image_device::nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_image_device::nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	nubus_image_device(mconfig, NUBUS_IMAGE, tag, owner, clock)
 {
 }
 
-nubus_image_device::nubus_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_image_device::nubus_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	m_image(nullptr)

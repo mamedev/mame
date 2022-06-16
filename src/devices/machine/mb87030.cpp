@@ -10,13 +10,13 @@
 
 DEFINE_DEVICE_TYPE(MB87030, mb87030_device, "mb87030", "Fujitsu MB87030 SCSI controller")
 
-mb87030_device::mb87030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mb87030_device::mb87030_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mb87030_device(mconfig, MB87030, tag, owner, clock)
 {
 
 }
 
-mb87030_device::mb87030_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+mb87030_device::mb87030_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	nscsi_device(mconfig, type, tag, owner, clock),
 	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
 	m_irq_handler(*this),

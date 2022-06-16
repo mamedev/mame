@@ -23,7 +23,7 @@
 
 DEFINE_DEVICE_TYPE(SEGA8_ROM_MGEAR, sega8_mgear_device, "sega8_mgear", "Master Gear Converter")
 
-sega8_mgear_device::sega8_mgear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_mgear_device::sega8_mgear_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_MGEAR, tag, owner, clock), m_subslot(*this, "subslot")
 {
 }

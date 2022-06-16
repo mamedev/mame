@@ -253,7 +253,7 @@ static const cassette_image::Options primo_cassette_options = {
 void primo_state::primoa32(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2500000);
+	Z80(config, m_maincpu, XTAL::u(2500000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &primo_state::primo32_mem);
 	m_maincpu->set_addrmap(AS_IO, &primo_state::primoa_io);
 

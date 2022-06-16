@@ -63,7 +63,7 @@ DEFINE_DEVICE_TYPE(DMV_K806, dmv_k806_device, "dmv_k806", "K806 mouse")
 //  dmv_k806_device - constructor
 //-------------------------------------------------
 
-dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DMV_K806, tag, owner, clock)
 	, device_dmvslot_interface( mconfig, *this )
 	, m_mcu(*this, "mcu")
@@ -116,7 +116,7 @@ void dmv_k806_device::device_add_mconfig(machine_config &config)
 	m_mcu->p2_out_cb().set(FUNC(dmv_k806_device::port2_w));
 	m_mcu->t1_in_cb().set(FUNC(dmv_k806_device::portt1_r));
 
-	TIMER(config, "mouse_timer", 0).configure_periodic(FUNC(dmv_k806_device::mouse_timer), attotime::from_hz(1000));
+	TIMER(config, "mouse_timer").configure_periodic(FUNC(dmv_k806_device::mouse_timer), attotime::from_hz(1000));
 }
 
 //-------------------------------------------------

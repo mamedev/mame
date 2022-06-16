@@ -121,7 +121,7 @@ class electron_cartslot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	electron_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
+	electron_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, T &&slot_options, const char *default_option)
 		: electron_cartslot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -130,7 +130,7 @@ public:
 		set_fixed(false);
 	}
 
-	electron_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	electron_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto irq_handler() { return m_irq_handler.bind(); }
@@ -158,7 +158,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nmi_w) { m_nmi_handler(state); }
 
 protected:
-	electron_cartslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	electron_cartslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

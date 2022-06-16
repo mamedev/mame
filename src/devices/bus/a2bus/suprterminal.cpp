@@ -47,10 +47,10 @@ class a2bus_suprterminal_device:
 {
 public:
 	// construction/destruction
-	a2bus_suprterminal_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	a2bus_suprterminal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2bus_suprterminal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	a2bus_suprterminal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -103,12 +103,12 @@ const tiny_rom_entry *a2bus_suprterminal_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_suprterminal_device::a2bus_suprterminal_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+a2bus_suprterminal_device::a2bus_suprterminal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_suprterminal_device(mconfig, A2BUS_SUPRTERMINAL, tag, owner, clock)
 {
 }
 
-a2bus_suprterminal_device::a2bus_suprterminal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+a2bus_suprterminal_device::a2bus_suprterminal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_crtc(*this, "crtc"),

@@ -57,7 +57,7 @@ ioport_constructor electron_click_device::device_input_ports() const
 //  electron_click_device - constructor
 //-------------------------------------------------
 
-electron_click_device::electron_click_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_click_device::electron_click_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_CLICK, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
 	, m_rtc(*this, "rtc")

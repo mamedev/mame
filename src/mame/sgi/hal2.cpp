@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(SGI_HAL2, hal2_device, "hal2", "SGI HAL2")
 
-hal2_device::hal2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hal2_device::hal2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SGI_HAL2, tag, owner, clock)
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
@@ -382,9 +382,9 @@ void hal2_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac);
 	m_ldac->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac);
 	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 }

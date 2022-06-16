@@ -15,15 +15,15 @@ DEFINE_DEVICE_TYPE(MM77LA, mm77la_device, "mm77la", "Rockwell MM77LA B8000") // 
 
 
 // constructor
-mm78la_device::mm78la_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+mm78la_device::mm78la_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mm78la_device(mconfig, MM78LA, tag, owner, clock, 11, address_map_constructor(FUNC(mm78la_device::program_2k), this), 7, address_map_constructor(FUNC(mm78la_device::data_128x4), this))
 { }
 
-mm78la_device::mm78la_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+mm78la_device::mm78la_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	mm78_device(mconfig, type, tag, owner, clock, prgwidth, program, datawidth, data)
 { }
 
-mm77la_device::mm77la_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+mm77la_device::mm77la_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mm78la_device(mconfig, MM77LA, tag, owner, clock, 11, address_map_constructor(FUNC(mm77la_device::program_1_5k), this), 7, address_map_constructor(FUNC(mm77la_device::data_96x4), this))
 { }
 

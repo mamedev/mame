@@ -22,7 +22,7 @@ public:
 
 protected:
 	// construction/destruction
-	atari_xga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	atari_xga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, type, tag, owner, clock)
 	{
 	}
@@ -36,7 +36,7 @@ protected:
 class atari_136094_0072_device : public atari_xga_device
 {
 public:
-	atari_136094_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_136094_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 	virtual uint32_t read(offs_t offset, uint32_t mem_mask = ~0) override;
@@ -68,7 +68,7 @@ private:
 class atari_136095_0072_device : public atari_xga_device
 {
 public:
-	atari_136095_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_136095_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void polylsb_write(offs_t offset, uint32_t data);
 	uint32_t polylsb_read(offs_t offset, uint32_t mem_mask = ~0);

@@ -24,7 +24,7 @@ class riot6532_device :  public device_t
 {
 public:
 	// construction/destruction
-	riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto in_pa_callback() { return m_in_pa_cb.bind(); }
 	auto out_pa_callback() { return m_out_pa_cb.bind(); }

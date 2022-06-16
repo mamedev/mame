@@ -92,7 +92,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: tvcexp_slot_device(mconfig, tag, owner, 0)
+		: tvcexp_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -100,7 +100,7 @@ public:
 		set_fixed(false);
 	}
 
-	tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~tvcexp_slot_device();
 
 	auto out_irq_callback() { return m_out_irq_cb.bind(); }

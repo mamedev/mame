@@ -609,7 +609,7 @@ void panicr_state::panicr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &panicr_state::panicr_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(panicr_state::scanline), "screen", 0, 1);
 
-	T5182(config, m_t5182, 0);
+	T5182(config, m_t5182);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

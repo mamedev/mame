@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(APEXC_CYLINDER, apexc_cylinder_image_device, "apexc_cylinder_
 DEFINE_DEVICE_TYPE(APEXC_TAPE_PUNCHER, apexc_tape_puncher_image_device, "apexc_tape_puncher_image", "APEXC Tape Puncher")
 DEFINE_DEVICE_TYPE(APEXC_TAPE_READER, apexc_tape_reader_image_device, "apexc_tape_reader_image", "APEXC Tape Reader")
 
-apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, APEXC_CYLINDER, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 {
@@ -65,7 +65,7 @@ void apexc_cylinder_image_device::call_unload()
 }
 
 
-apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: paper_tape_punch_device(mconfig, APEXC_TAPE_PUNCHER, tag, owner, clock)
 {
 }
@@ -83,7 +83,7 @@ void apexc_tape_puncher_image_device::write(uint8_t data)
 	}
 }
 
-apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: paper_tape_reader_device(mconfig, APEXC_TAPE_READER, tag, owner, clock)
 {
 }

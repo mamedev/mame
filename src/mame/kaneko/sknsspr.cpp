@@ -25,7 +25,7 @@
 DEFINE_DEVICE_TYPE(SKNS_SPRITE, sknsspr_device, "sknsspr", "SKNS Sprite")
 
 
-sknsspr_device::sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sknsspr_device::sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SKNS_SPRITE, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)

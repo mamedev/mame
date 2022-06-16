@@ -680,13 +680,13 @@ void nwktr_state::nwktr(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(9000));
 
-	M48T58(config, "m48t58", 0);
+	M48T58(config, "m48t58");
 
-	ADC12138(config, m_adc12138, 0);
+	ADC12138(config, m_adc12138);
 	m_adc12138->set_ipt_convert_callback(FUNC(nwktr_state::adc12138_input_callback));
 
-	K033906(config, "k033906_1", 0, m_voodoo[0]);
-	K033906(config, "k033906_2", 0, m_voodoo[1]);
+	K033906(config, "k033906_1", m_voodoo[0]);
+	K033906(config, "k033906_2", m_voodoo[1]);
 
 	// video hardware
 	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
@@ -714,10 +714,10 @@ void nwktr_state::nwktr(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(65536);
 
-	K001604(config, m_k001604[0], 0);
+	K001604(config, m_k001604[0]);
 	m_k001604[0]->set_palette(m_palette);
 
-	K001604(config, m_k001604[1], 0);
+	K001604(config, m_k001604[1]);
 	m_k001604[1]->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -730,11 +730,11 @@ void nwktr_state::nwktr(machine_config &config)
 	rfsnd.add_route(0, "lspeaker", 1.0);
 	rfsnd.add_route(1, "rspeaker", 1.0);
 
-	KONPPC(config, m_konppc, 0);
+	KONPPC(config, m_konppc);
 	m_konppc->set_num_boards(2);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
 
-	KONAMI_GN676_LAN(config, "gn676_lan", 0, m_work_ram);
+	KONAMI_GN676_LAN(config, "gn676_lan", m_work_ram);
 }
 
 void nwktr_state::thrilld(machine_config &config)

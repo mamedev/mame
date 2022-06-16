@@ -676,16 +676,16 @@ void vt240_state::vt240(machine_config &config)
 	m_duart->b_tx_cb().set("printer", FUNC(rs232_port_device::write_txd));
 	m_duart->outport_cb().set(FUNC(vt240_state::duartout_w));
 
-	I8251(config, m_i8251, 0);
+	I8251(config, m_i8251);
 	m_i8251->txd_handler().set(FUNC(vt240_state::tx_w));
 	m_i8251->dtr_handler().set(FUNC(vt240_state::lben_w));
 	m_i8251->rxrdy_handler().set(FUNC(vt240_state::irq9_w));
 	m_i8251->txrdy_handler().set(FUNC(vt240_state::irq7_w));
 
-	LK201(config, m_lk201, 0);
+	LK201(config, m_lk201);
 	m_lk201->tx_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
 
-	CLOCK(config, "keyboard_clock", 4800 * 64).signal_handler().set(FUNC(vt240_state::write_keyboard_clock)); // 8251 is set to /64 on the clock input
+	CLOCK(config, "keyboard_clock", XTAL::u(4800 * 64)).signal_handler().set(FUNC(vt240_state::write_keyboard_clock)); // 8251 is set to /64 on the clock input
 
 	RS232_PORT(config, m_host, default_rs232_devices, "null_modem");
 	m_host->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
@@ -705,14 +705,14 @@ void vt240_state::mc7105(machine_config &config)
 
 	config.device_remove("lk201");
 
-	ms7004_device &ms7004(MS7004(config, "ms7004", 0));
+	ms7004_device &ms7004(MS7004(config, "ms7004"));
 	ms7004.tx_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
 
 	m_i8251->txd_handler().set_nop();
 	//m_i8251->txd_handler().set("ms7004", FUNC(ms7004_device::rx_w));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
-	CLOCK(config.replace(), "keyboard_clock", 4960*64).signal_handler().set(FUNC(vt240_state::write_keyboard_clock));
+	CLOCK(config.replace(), "keyboard_clock", XTAL::u(4960*64)).signal_handler().set(FUNC(vt240_state::write_keyboard_clock));
 }
 
 /* ROM definition */

@@ -35,7 +35,7 @@ protected:
 class pc_joy_device : public device_t, public device_single_card_slot_interface<device_pc_joy_interface>
 {
 public:
-	pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint8_t joy_port_r();
 	void joy_port_w(uint8_t data);
@@ -55,7 +55,7 @@ class pc_basic_joy_device : public device_t,
 							public device_pc_joy_interface
 {
 public:
-	pc_basic_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pc_basic_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual uint8_t x1(int delta) override { return (m_x1->read() > delta); }

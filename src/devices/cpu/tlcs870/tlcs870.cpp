@@ -104,7 +104,7 @@ void tlcs870_device::tmp87ph40an_mem(address_map &map)
 }
 
 
-tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type optype, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
+tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type optype, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor program_map)
 	: cpu_device(mconfig, optype, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -118,7 +118,7 @@ tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type optype
 }
 
 
-tmp87ph40an_device::tmp87ph40an_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmp87ph40an_device::tmp87ph40an_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tlcs870_device(mconfig, TMP87PH40AN, tag, owner, clock, address_map_constructor(FUNC(tmp87ph40an_device::tmp87ph40an_mem), this))
 {
 }

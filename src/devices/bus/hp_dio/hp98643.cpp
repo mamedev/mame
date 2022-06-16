@@ -25,12 +25,12 @@ void dio16_98643_device::device_add_mconfig(machine_config &config)
 	m_lance->dma_in().set(FUNC(dio16_98643_device::lance_dma_in));
 }
 
-dio16_98643_device::dio16_98643_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dio16_98643_device::dio16_98643_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dio16_98643_device(mconfig, HPDIO_98643, tag, owner, clock)
 {
 }
 
-dio16_98643_device::dio16_98643_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dio16_98643_device::dio16_98643_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this),
 	m_lance(*this, "lance"),

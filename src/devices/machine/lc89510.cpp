@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(LC89510, lc89510_device, "lc89510", "LC89510 CD Controller")
 
-lc89510_device::lc89510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lc89510_device::lc89510_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LC89510, tag, owner, clock)
 {
 }

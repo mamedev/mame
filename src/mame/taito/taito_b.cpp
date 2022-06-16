@@ -1870,7 +1870,7 @@ void taitob_state::rastsag2(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -1907,7 +1907,7 @@ void taitob_state::rastsag2(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -1924,7 +1924,7 @@ void taitob_state::masterw(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -1963,7 +1963,7 @@ void taitob_state::masterw(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.25);
 	ymsnd.add_route(3, "mono", 0.80);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 }
@@ -1995,7 +1995,7 @@ void taitob_state::ashura(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -2032,7 +2032,7 @@ void taitob_state::ashura(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -2049,7 +2049,7 @@ void taitob_state::crimec(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -2086,7 +2086,7 @@ void taitob_state::crimec(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -2103,7 +2103,7 @@ void hitice_state::hitice(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -2142,10 +2142,10 @@ void hitice_state::hitice(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.25);
 	ymsnd.add_route(3, "mono", 0.80);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 }
@@ -2162,7 +2162,7 @@ void taitob_state::rambo3p(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -2199,7 +2199,7 @@ void taitob_state::rambo3p(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -2216,7 +2216,7 @@ void taitob_state::rambo3(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -2253,7 +2253,7 @@ void taitob_state::rambo3(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -2272,7 +2272,7 @@ void taitob_state::pbobble(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	TC0640FIO(config, m_tc0640fio, 0);
+	TC0640FIO(config, m_tc0640fio);
 	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
 	m_tc0640fio->read_1_callback().set_ioport("COIN");
 	m_tc0640fio->read_2_callback().set_ioport("START");
@@ -2312,7 +2312,7 @@ void taitob_state::pbobble(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -2331,7 +2331,7 @@ void taitob_state::spacedx(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	TC0640FIO(config, m_tc0640fio, 0);
+	TC0640FIO(config, m_tc0640fio);
 	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
 	m_tc0640fio->read_1_callback().set_ioport("COIN");
 	m_tc0640fio->read_2_callback().set_ioport("START");
@@ -2371,7 +2371,7 @@ void taitob_state::spacedx(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -2388,7 +2388,7 @@ void taitob_state::spacedxo(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -2425,7 +2425,7 @@ void taitob_state::spacedxo(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -2434,17 +2434,17 @@ void taitob_state::spacedxo(machine_config &config)
 void taitob_state::qzshowby(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);   /* 16 MHz according to the readme*/
+	M68000(config, m_maincpu, XTAL::u(16000000));   /* 16 MHz according to the readme*/
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::qzshowby_map);
 
-	Z80(config, m_audiocpu, 4000000);  /* 4 MHz */
+	Z80(config, m_audiocpu, XTAL::u(4000000));  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	TC0640FIO(config, m_tc0640fio, 0);
+	TC0640FIO(config, m_tc0640fio);
 	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
 	m_tc0640fio->read_1_callback().set_ioport("COIN");
 	m_tc0640fio->read_2_callback().set_ioport("START");
@@ -2478,13 +2478,13 @@ void taitob_state::qzshowby(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 8000000));
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -2501,7 +2501,7 @@ void taitob_state::viofight(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -2543,7 +2543,7 @@ void taitob_state::viofight(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", 4.224_MHz_XTAL / 4, okim6295_device::PIN7_HIGH)); // 1.056MHz clock frequency, but pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 }
@@ -2560,7 +2560,7 @@ void taitob_state::silentd(machine_config &config) /* ET910000B PCB */
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -2597,7 +2597,7 @@ void taitob_state::silentd(machine_config &config) /* ET910000B PCB */
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -2614,7 +2614,7 @@ void taitob_state::selfeena(machine_config &config) /* ET910000A PCB */
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -2651,7 +2651,7 @@ void taitob_state::selfeena(machine_config &config) /* ET910000A PCB */
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -2678,15 +2678,15 @@ void taitob_state::sbm_patch(void)
 void taitob_state::sbm(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);   /* 12 MHz */
+	M68000(config, m_maincpu, XTAL::u(12000000));   /* 12 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::sbm_map);
 
-	Z80(config, m_audiocpu, 4000000);  /* 4 MHz */
+	Z80(config, m_audiocpu, XTAL::u(4000000));  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0510NIO(config, m_tc0510nio, 0);
+	TC0510NIO(config, m_tc0510nio);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
 	m_tc0510nio->read_1_callback().set_ioport("DSWB");
 	m_tc0510nio->read_2_callback().set_ioport("JOY");
@@ -2717,13 +2717,13 @@ void taitob_state::sbm(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 8000000));
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -2732,15 +2732,15 @@ void taitob_state::sbm(machine_config &config)
 void taitob_c_state::realpunc(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_c_state::realpunc_map);
 
-	Z80(config, m_audiocpu, 6000000);
+	Z80(config, m_audiocpu, XTAL::u(6000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_c_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0510NIO(config, m_tc0510nio, 0);
+	TC0510NIO(config, m_tc0510nio);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
 	m_tc0510nio->read_1_callback().set_ioport("DSWB");
 	m_tc0510nio->read_2_callback().set_ioport("IN0");
@@ -2759,7 +2759,7 @@ void taitob_c_state::realpunc(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
-	hd63484_device &hd63484(HD63484(config, "hd63484", 0));
+	hd63484_device &hd63484(HD63484(config, "hd63484"));
 	hd63484.set_addrmap(0, &taitob_c_state::realpunc_hd63484_map);
 	hd63484.set_auto_configure_screen(false);
 
@@ -2775,13 +2775,13 @@ void taitob_c_state::realpunc(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 8000000));
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }

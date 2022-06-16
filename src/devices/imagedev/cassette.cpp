@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(CASSETTE, cassette_image_device, "cassette_image", "Cassette"
 //  cassette_image_device - constructor
 //-------------------------------------------------
 
-cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CASSETTE, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	device_sound_interface(mconfig, *this),

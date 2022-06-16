@@ -441,7 +441,7 @@ void rz1_state::rz1(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(rz1_state::rz1_palette), 3);
 
-	HD44780(config, m_hd44780, 0);
+	HD44780(config, m_hd44780);
 	m_hd44780->set_lcd_size(1, 16);
 	m_hd44780->set_pixel_update_cb(FUNC(rz1_state::lcd_pixel_update));
 
@@ -449,10 +449,10 @@ void rz1_state::rz1(machine_config &config)
 
 	// audio hardware
 	SPEAKER(config, "speaker").front_center();
-	UPD934G(config, m_pg[0], 1333000);
+	UPD934G(config, m_pg[0], XTAL::u(1333000));
 	m_pg[0]->data_callback().set(FUNC(rz1_state::upd934g_c_data_r));
 	m_pg[0]->add_route(ALL_OUTPUTS, "speaker", 1.0);
-	UPD934G(config, m_pg[1], 1280000);
+	UPD934G(config, m_pg[1], XTAL::u(1280000));
 	m_pg[1]->data_callback().set(FUNC(rz1_state::upd934g_b_data_r));
 	m_pg[1]->add_route(ALL_OUTPUTS, "speaker", 1.0);
 

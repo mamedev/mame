@@ -8,7 +8,7 @@
 
 class nextkbd_device : public device_t {
 public:
-	nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto int_change_wr_callback() { return int_change_cb.bind(); }
 	auto int_power_wr_callback() { return int_power_cb.bind(); }

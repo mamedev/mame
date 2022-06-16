@@ -12,7 +12,7 @@ class bl_handhelds_lcdc_device : public device_t
 {
 public:
 	// construction/destruction
-	bl_handhelds_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bl_handhelds_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void lcdc_command_w(u8 data);
 	u8 lcdc_data_r();

@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(MOS6529, mos6529_device, "mos6529", "MOS 6529")
 //  mos6529_device - constructor
 //-------------------------------------------------
 
-mos6529_device::mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mos6529_device::mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MOS6529, tag, owner, clock),
 	m_input(0),
 	m_p_handler(*this)

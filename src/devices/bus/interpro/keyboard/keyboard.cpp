@@ -9,7 +9,7 @@
 
 DEFINE_DEVICE_TYPE(INTERPRO_KEYBOARD_PORT, interpro_keyboard_port_device, "interpro_keyboard_port", "InterPro Keyboard Port")
 
-interpro_keyboard_port_device::interpro_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+interpro_keyboard_port_device::interpro_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, INTERPRO_KEYBOARD_PORT, tag, owner, clock)
 	, device_single_card_slot_interface<device_interpro_keyboard_port_interface>(mconfig, *this)
 	, m_rxd_handler(*this)

@@ -13,7 +13,7 @@
 #include "emupal.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK        20000000
+#define MASTER_CLOCK        XTAL::u(20000000)
 
 #define VISIBLE_CYCLES      480
 #define HSYNC_CYCLES        155
@@ -213,7 +213,7 @@ void lft_craft_state::craft(machine_config &config)
 
 	SPEAKER(config, "avr8").front_center();
 
-	DAC_6BIT_R2R(config, m_dac, 0).add_route(0, "avr8", 0.25); // pd1/pd2/pd4/pd5/pd6/pd7 + 2k(x7) + 1k(x5)
+	DAC_6BIT_R2R(config, m_dac).add_route(0, "avr8", 0.25); // pd1/pd2/pd4/pd5/pd6/pd7 + 2k(x7) + 1k(x5)
 }
 
 ROM_START( craft )

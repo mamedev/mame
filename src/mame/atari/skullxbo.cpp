@@ -254,7 +254,7 @@ void skullxbo_state::skullxbo(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 16,8, TILEMAP_SCAN_COLS, 64,64).set_info_callback(FUNC(skullxbo_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 16,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(skullxbo_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, skullxbo_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, skullxbo_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -269,7 +269,7 @@ void skullxbo_state::skullxbo(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_II(config, m_jsa, 0);
+	ATARI_JSA_II(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	m_jsa->test_read_cb().set_ioport("FF5802").bit(7);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.8);

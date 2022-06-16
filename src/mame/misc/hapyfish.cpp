@@ -513,7 +513,7 @@ void hapyfish_state::init_mini2440()
 
 void hapyfish_state::hapyfish(machine_config &config)
 {
-	ARM920T(config, m_maincpu, 100000000);
+	ARM920T(config, m_maincpu, XTAL::u(100000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &hapyfish_state::hapyfish_map);
 
 	PALETTE(config, "palette").set_entries(32768);
@@ -527,10 +527,10 @@ void hapyfish_state::hapyfish(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	UDA1341TS(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // uda1341ts.u12
-	UDA1341TS(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // uda1341ts.u12
+	UDA1341TS(config, m_ldac).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // uda1341ts.u12
+	UDA1341TS(config, m_rdac).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // uda1341ts.u12
 
-	S3C2440(config, m_s3c2440, 12000000);
+	S3C2440(config, m_s3c2440, XTAL::u(12000000));
 	m_s3c2440->set_palette_tag("palette");
 	m_s3c2440->set_screen_tag("screen");
 	m_s3c2440->core_pin_r_callback().set(FUNC(hapyfish_state::s3c2440_core_pin_r));
@@ -543,11 +543,11 @@ void hapyfish_state::hapyfish(machine_config &config)
 	m_s3c2440->nand_data_r_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_r));
 	m_s3c2440->nand_data_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_w));
 
-	NAND(config, m_nand, 0);
+	NAND(config, m_nand);
 	m_nand->set_nand_type(nand_device::chip::K9LAG08U0M);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 
-	NAND(config, m_nand2, 0);
+	NAND(config, m_nand2);
 	m_nand2->set_nand_type(nand_device::chip::K9LAG08U0M);
 	m_nand2->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 }

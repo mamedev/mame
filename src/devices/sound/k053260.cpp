@@ -90,7 +90,7 @@ const int k053260_device::pan_mul[8][2] = {
 //  k053260_device - constructor
 //-------------------------------------------------
 
-k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K053260, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)

@@ -248,7 +248,7 @@ INPUT_PORTS_END
 void mbaskb_state::mbaskb(machine_config &config)
 {
 	// basic machine hardware
-	MM5799(config, m_maincpu, 370000); // approximation
+	MM5799(config, m_maincpu, XTAL::u(370000)); // approximation
 	m_maincpu->write_do().set(FUNC(mbaskb_state::write_do));
 	m_maincpu->write_blk().set(FUNC(mbaskb_state::write_blk));
 	m_maincpu->write_s().set(FUNC(mbaskb_state::write_s));
@@ -456,7 +456,7 @@ INPUT_PORTS_END
 void qkracerm_state::qkracerm(machine_config &config)
 {
 	// basic machine hardware
-	MM5799(config, m_maincpu, 220000); // approximation
+	MM5799(config, m_maincpu, XTAL::u(220000)); // approximation
 	m_maincpu->set_option_ram_d12(true);
 	m_maincpu->set_option_lb_10(5);
 	m_maincpu->write_do().set(FUNC(qkracerm_state::write_do));
@@ -638,7 +638,7 @@ INPUT_PORTS_END
 void qkspeller_state::qkspeller(machine_config &config)
 {
 	// basic machine hardware
-	MM5799(config, m_maincpu, 220000); // approximation
+	MM5799(config, m_maincpu, XTAL::u(220000)); // approximation
 	m_maincpu->write_do().set(FUNC(qkspeller_state::write_do));
 	m_maincpu->write_s().set(FUNC(qkspeller_state::write_s));
 	m_maincpu->write_f().set(FUNC(qkspeller_state::write_f));
@@ -799,7 +799,7 @@ INPUT_PORTS_END
 void cambrp_state::cambrp(machine_config &config)
 {
 	// basic machine hardware
-	MM5799(config, m_maincpu, 200000); // approximation
+	MM5799(config, m_maincpu, XTAL::u(200000)); // approximation
 	m_maincpu->set_option_ram_d12(true);
 	m_maincpu->set_option_lb_10(4);
 	m_maincpu->write_do().set(FUNC(cambrp_state::write_do));

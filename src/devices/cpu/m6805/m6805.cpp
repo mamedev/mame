@@ -314,7 +314,7 @@ m6805_base_device::m6805_base_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		uint32_t clock,
+		const XTAL &clock,
 		device_type const type,
 		configuration_params const &params)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -327,7 +327,7 @@ m6805_base_device::m6805_base_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		uint32_t clock,
+		const XTAL &clock,
 		device_type const type,
 		configuration_params const &params,
 		address_map_constructor internal_map)
@@ -632,7 +632,7 @@ void m6805_base_device::execute_set_input(int inputnum, int state)
 /****************************************************************************
  * M68HC05EG section
  ****************************************************************************/
-m68hc05eg_device::m68hc05eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m68hc05eg_device::m68hc05eg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m6805_base_device(
 			mconfig,
 			tag,
@@ -687,7 +687,7 @@ std::unique_ptr<util::disasm_interface> m68hc05eg_device::create_disassembler()
 /****************************************************************************
  * HD63705 section
  ****************************************************************************/
-hd63705_device::hd63705_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd63705_device::hd63705_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m6805_base_device(mconfig,
 			tag,
 			owner,

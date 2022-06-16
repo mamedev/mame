@@ -83,13 +83,13 @@ DEFINE_DEVICE_TYPE(V70, v70_device, "v70", "NEC V70")
 
 // Set m_PIR (Processor ID) for NEC m_ LSB is reserved to NEC,
 // so I don't know what it contains.
-v60_device::v60_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+v60_device::v60_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: v60_device(mconfig, V60, tag, owner, clock, 16, 24, 0x00006000)
 {
 }
 
 
-v60_device::v60_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int databits, int addrbits, uint32_t pir)
+v60_device::v60_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int databits, int addrbits, uint32_t pir)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, databits, addrbits, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 24, 0)
@@ -100,7 +100,7 @@ v60_device::v60_device(const machine_config &mconfig, device_type type, const ch
 
 // Set m_PIR (Processor ID) for NEC v70. LSB is reserved to NEC,
 // so I don't know what it contains.
-v70_device::v70_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+v70_device::v70_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: v60_device(mconfig, V70, tag, owner, clock, 32, 32, 0x00007000)
 {
 }

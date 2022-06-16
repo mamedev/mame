@@ -593,11 +593,11 @@ GFXDECODE_END
 
 void mainsnk_state::mainsnk(machine_config &config)
 {
-	Z80(config, m_maincpu, 3360000);
+	Z80(config, m_maincpu, XTAL::u(3360000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mainsnk_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mainsnk_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL::u(4000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mainsnk_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &mainsnk_state::sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(mainsnk_state::irq0_line_assert), attotime::from_hz(244));
@@ -620,8 +620,8 @@ void mainsnk_state::mainsnk(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);
-	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);
+	AY8910(config, "ay1", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 0.35);
+	AY8910(config, "ay2", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 0.35);
 }
 
 

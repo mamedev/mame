@@ -16,7 +16,7 @@
 DEFINE_DEVICE_TYPE(VT82C496, vt82c496_device, "vt82c496", "VIA VT82C496 system chipset")
 
 
-vt82c496_device::vt82c496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vt82c496_device::vt82c496_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VT82C496, tag, owner, clock), m_cpu(*this, finder_base::DUMMY_TAG), m_space(nullptr), m_ram(*this, finder_base::DUMMY_TAG), m_rom(*this, finder_base::DUMMY_TAG),
 	  m_bios_c0_r(*this, "bios_c0_r"),
 	  m_bios_c4_r(*this, "bios_c4_r"),

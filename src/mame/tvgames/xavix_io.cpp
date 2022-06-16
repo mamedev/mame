@@ -12,7 +12,7 @@
 
 DEFINE_DEVICE_TYPE(XAVIXIO, xavix_io_device, "xavixio", "XaviX IO")
 
-xavix_io_device::xavix_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xavix_io_device::xavix_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XAVIXIO, tag, owner, clock)
 	, m_in0_cb(*this)
 	, m_in1_cb(*this)

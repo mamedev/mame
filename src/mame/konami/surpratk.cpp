@@ -320,17 +320,17 @@ void surpratk_state::surpratk(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(surpratk_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K053244(config, m_k053244, 0);
+	K053244(config, m_k053244);
 	m_k053244->set_palette(m_palette);
 	m_k053244->set_sprite_callback(FUNC(surpratk_state::sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();

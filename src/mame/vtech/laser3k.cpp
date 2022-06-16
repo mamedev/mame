@@ -960,7 +960,7 @@ void laser3k_state::laser3k_palette(palette_device &palette) const
 void laser3k_state::laser3k(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1021800);
+	M6502(config, m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &laser3k_state::laser3k_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -982,7 +982,7 @@ void laser3k_state::laser3k(machine_config &config)
 	RAM(config, "mainram").set_default_size("192K");
 
 	/* the 8048 isn't dumped, so substitute modified real Apple II h/w */
-	AY3600(config, m_ay3600, 0);
+	AY3600(config, m_ay3600);
 	m_ay3600->x0().set_ioport("X0");
 	m_ay3600->x1().set_ioport("X1");
 	m_ay3600->x2().set_ioport("X2");
@@ -999,7 +999,7 @@ void laser3k_state::laser3k(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
-	SN76489(config, m_sn, 1020484).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489(config, m_sn, XTAL::u(1020484)).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 ROM_START(las3000)

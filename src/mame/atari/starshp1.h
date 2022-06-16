@@ -36,7 +36,7 @@
 #include "tilemap.h"
 
 
-#define STARSHP1_MASTER_CLOCK       (12096000)
+#define STARSHP1_MASTER_CLOCK       XTAL::u(12096000)
 #define STARSHP1_CPU_CLOCK          (STARSHP1_MASTER_CLOCK / 16)
 #define STARSHP1_PIXEL_CLOCK        (STARSHP1_MASTER_CLOCK)
 #define STARSHP1_HTOTAL             (0x300)

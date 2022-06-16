@@ -286,7 +286,7 @@ void pzletime_state::machine_reset()
 void pzletime_state::pzletime(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);
+	M68000(config, m_maincpu, XTAL::u(10000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pzletime_state::pzletime_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pzletime_state::irq4_line_hold));
 
@@ -308,7 +308,7 @@ void pzletime_state::pzletime(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, 937500, okim6295_device::PIN7_HIGH); //freq & pin7 taken from stlforce
+	OKIM6295(config, m_oki, XTAL::u(937500), okim6295_device::PIN7_HIGH); //freq & pin7 taken from stlforce
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

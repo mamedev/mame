@@ -751,12 +751,12 @@ GFXDECODE_END
 void pgm2_state::pgm2(machine_config &config)
 {
 	/* basic machine hardware */
-	IGS036(config, m_maincpu, 100000000); // Unknown clock / divider
+	IGS036(config, m_maincpu, XTAL::u(100000000)); // Unknown clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_rom_map);
 
-	TIMER(config, m_mcu_timer, 0).configure_generic(FUNC(pgm2_state::mcu_interrupt));
+	TIMER(config, m_mcu_timer).configure_generic(FUNC(pgm2_state::mcu_interrupt));
 
-	ARM_AIC(config, m_arm_aic, 0).irq_callback().set(FUNC(pgm2_state::irq));
+	ARM_AIC(config, m_arm_aic).irq_callback().set(FUNC(pgm2_state::irq));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -779,14 +779,14 @@ void pgm2_state::pgm2(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymz774_device &ymz774(YMZ774(config, "ymz774", 16384000)); // is clock correct ?
+	ymz774_device &ymz774(YMZ774(config, "ymz774", XTAL::u(16384000))); // is clock correct ?
 	ymz774.add_route(0, "lspeaker", 1.0);
 	ymz774.add_route(1, "rspeaker", 1.0);
 
-	PGM2_MEMCARD(config, m_memcard[0], 0);
-	PGM2_MEMCARD(config, m_memcard[1], 0);
-	PGM2_MEMCARD(config, m_memcard[2], 0);
-	PGM2_MEMCARD(config, m_memcard[3], 0);
+	PGM2_MEMCARD(config, m_memcard[0]);
+	PGM2_MEMCARD(config, m_memcard[1]);
+	PGM2_MEMCARD(config, m_memcard[2]);
+	PGM2_MEMCARD(config, m_memcard[3]);
 }
 
 // not strictly needed as the video code supports changing on the fly, but makes recording easier etc.

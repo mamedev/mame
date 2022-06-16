@@ -35,7 +35,7 @@ TODO:
 DEFINE_DEVICE_TYPE(EF9340_1, ef9340_1_device, "ef9340_1", "Thomson EF9340+EF9341")
 
 
-ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, EF9340_1, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_charset(*this, "ef9340_1")

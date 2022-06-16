@@ -43,7 +43,7 @@
 
 DEFINE_DEVICE_TYPE(CDU561_25, cdu561_25_device, "cdu561_25", "Sony CDU561-25")
 
-cdu561_25_device::cdu561_25_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cdu561_25_device::cdu561_25_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CDU561_25, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, "scsic")
 {

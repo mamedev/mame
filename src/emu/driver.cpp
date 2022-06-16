@@ -23,7 +23,7 @@
 //-------------------------------------------------
 
 driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
-	: device_t(mconfig, type, tag, nullptr, 0)
+	: device_t(mconfig, type, tag, nullptr, XTAL())
 	, m_system(mconfig.gamedrv())
 	, m_flip_screen_x(0)
 	, m_flip_screen_y(0)

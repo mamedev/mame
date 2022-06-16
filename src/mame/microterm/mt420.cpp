@@ -123,7 +123,7 @@ INPUT_PORTS_END
 
 void mt420_state::mt420(machine_config &config)
 {
-	Z80(config, m_maincpu, 4'000'000);
+	Z80(config, m_maincpu, XTAL::u(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mt420_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mt420_state::io_map);
 

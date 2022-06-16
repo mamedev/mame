@@ -228,7 +228,7 @@ void mtxl_state::hdd(device_t *device)
 
 void mtxl_state::at486(machine_config &config)
 {
-	I486DX4(config, m_maincpu, 33000000);
+	I486DX4(config, m_maincpu, XTAL::u(33000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mtxl_state::at32_map);
 	m_maincpu->set_addrmap(AS_IO, &mtxl_state::at32_io);
 #ifndef REAL_PCI_CHIPSET
@@ -238,16 +238,16 @@ void mtxl_state::at486(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "ide", true).set_option_machine_config("ide", cdrom); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
+	ISA16_SLOT(config, "board1", "mb:isabus", pc_isa16_cards, "ide", true).set_option_machine_config("ide", cdrom); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
 
 	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 	uart.out_int_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir4_w));
 
-	MICROTOUCH(config, "microtouch", 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w));
+	MICROTOUCH(config, "microtouch", XTAL::u(9600)).stx().set(uart, FUNC(ins8250_uart_device::rx_w));
 
-	ad1848_device &cs4231(AD1848(config, "cs4231", 0));
+	ad1848_device &cs4231(AD1848(config, "cs4231"));
 	cs4231.irq().set("mb:pic8259_master", FUNC(pic8259_device::ir5_w));
 	cs4231.drq().set("mb:dma8237_1", FUNC(am9517a_device::dreq1_w));
 
@@ -287,7 +287,7 @@ void mtxl_state::at486(machine_config &config)
 
 void mtxl_state::at486hd(machine_config &config)
 {
-	I486DX4(config, m_maincpu, 33000000);
+	I486DX4(config, m_maincpu, XTAL::u(33000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mtxl_state::at32_map);
 	m_maincpu->set_addrmap(AS_IO, &mtxl_state::at32_io);
 #ifndef REAL_PCI_CHIPSET
@@ -297,16 +297,16 @@ void mtxl_state::at486hd(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "ide", true).set_option_machine_config("ide", hdd); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
+	ISA16_SLOT(config, "board1", "mb:isabus", pc_isa16_cards, "ide", true).set_option_machine_config("ide", hdd); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
 
 	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 	uart.out_int_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir4_w));
 
-	MICROTOUCH(config, "microtouch", 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w));
+	MICROTOUCH(config, "microtouch", XTAL::u(9600)).stx().set(uart, FUNC(ins8250_uart_device::rx_w));
 
-	ad1848_device &cs4231(AD1848(config, "cs4231", 0));
+	ad1848_device &cs4231(AD1848(config, "cs4231"));
 	cs4231.irq().set("mb:pic8259_master", FUNC(pic8259_device::ir5_w));
 	cs4231.drq().set("mb:dma8237_1", FUNC(am9517a_device::dreq1_w));
 

@@ -11,7 +11,7 @@
 class cheekyms_audio_device : public device_t
 {
 public:
-	cheekyms_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cheekyms_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER(mute_w);          // 15
 	DECLARE_WRITE_LINE_MEMBER(cheese_w);        // 13

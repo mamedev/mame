@@ -56,7 +56,7 @@ WRITE_LINE_MEMBER( device_astrocade_ctrl_interface::write_ltpen )
 //    Bally Astrocade controller port
 //**************************************************************************
 
-astrocade_ctrl_port_device::astrocade_ctrl_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+astrocade_ctrl_port_device::astrocade_ctrl_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ASTROCADE_CTRL_PORT, tag, owner, clock)
 	, device_single_card_slot_interface<device_astrocade_ctrl_interface>(mconfig, *this)
 	, m_ltpen(0)

@@ -10,7 +10,7 @@ void i6300esb_watchdog_device::map(address_map &map)
 {
 }
 
-i6300esb_watchdog_device::i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i6300esb_watchdog_device::i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, I6300ESB_WATCHDOG, tag, owner, clock)
 {
 }
@@ -89,7 +89,7 @@ void i6300esb_lpc_device::internal_io_map(address_map &map)
 }
 
 
-i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, I6300ESB_LPC, tag, owner, clock)
 	, acpi(*this, "acpi")
 	, rtc (*this, "rtc")

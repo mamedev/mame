@@ -28,7 +28,7 @@
 DEFINE_DEVICE_TYPE(HYPERSCAN_CTRL, hyperscan_ctrl_device, "hyperscan_ctrl", "Hyperscan controller HLE")
 
 
-hyperscan_ctrl_device::hyperscan_ctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hyperscan_ctrl_device::hyperscan_ctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HYPERSCAN_CTRL, tag, owner, clock)
 	, m_inputs(*this, "IN.%u", 0U)
 {

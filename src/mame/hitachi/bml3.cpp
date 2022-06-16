@@ -220,14 +220,14 @@ void bml3_state::keyboard_w(u8 data)
 
 void bml3_state::m6845_change_clock(u8 setting)
 {
-	int m6845_clock = CPU_CLOCK.value();    // CRTC and MPU are synchronous by default
+	XTAL m6845_clock = CPU_CLOCK;    // CRTC and MPU are synchronous by default
 
 	switch(setting & 0x88)
 	{
-		case 0x00: m6845_clock = C40_CLOCK.value(); break; //320 x 200
-		case 0x08: m6845_clock = C40_CLOCK.value(); break; //320 x 200, interlace
-		case 0x80: m6845_clock = C80_CLOCK.value(); break; //640 x 200
-		case 0x88: m6845_clock = C80_CLOCK.value(); break; //640 x 200, interlace
+		case 0x00: m6845_clock = C40_CLOCK; break; //320 x 200
+		case 0x08: m6845_clock = C40_CLOCK; break; //320 x 200, interlace
+		case 0x80: m6845_clock = C80_CLOCK; break; //640 x 200
+		case 0x88: m6845_clock = C80_CLOCK; break; //640 x 200, interlace
 	}
 
 	m_crtc->set_unscaled_clock(m6845_clock);
@@ -910,10 +910,10 @@ void bml3_state::bml3_common(machine_config &config)
 	TIMER(config, "kansas_w").configure_periodic(FUNC(bml3_state::kansas_w), attotime::from_hz(4800));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(bml3_state::kansas_r), attotime::from_hz(40000));
 
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set(FUNC(bml3_state::piaA_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
 	m_acia->rts_handler().set(FUNC(bml3_state::acia_rts_w));
 	m_acia->irq_handler().set(FUNC(bml3_state::acia_irq_w));
@@ -922,7 +922,7 @@ void bml3_state::bml3_common(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 9'600)); // 600 baud x 16(divider) = 9600
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(9'600))); // 600 baud x 16(divider) = 9600
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
@@ -931,7 +931,7 @@ void bml3_state::bml3_common(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* slot devices */
-	BML3BUS(config, m_bml3bus, 0);
+	BML3BUS(config, m_bml3bus);
 	m_bml3bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bml3bus->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_bml3bus->irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
@@ -957,7 +957,7 @@ void bml3_state::bml3(machine_config &config)
 #if 0
 	// TODO: slot device for sound card
 	// audio
-	YM2203(config, m_ym2203, 2000000); //unknown clock / divider
+	YM2203(config, m_ym2203, XTAL::u(2000000)); //unknown clock / divider
 	m_ym2203->set_flags(AY8910_LEGACY_OUTPUT);
 	m_ym2203->add_route(0, "mono", 0.25);
 	m_ym2203->add_route(1, "mono", 0.25);

@@ -467,12 +467,12 @@ void cchasm_state::cchasm(machine_config &config)
 	M68000(config, m_maincpu, CCHASM_68K_CLOCK);    /* 8 MHz (from schematics) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cchasm_state::memmap);
 
-	Z80(config, m_audiocpu, 3584229);       /* 3.58  MHz (from schematics) */
+	Z80(config, m_audiocpu, XTAL::u(3584229));       /* 3.58  MHz (from schematics) */
 	m_audiocpu->set_daisy_config(daisy_chain);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cchasm_state::sound_memmap);
 	m_audiocpu->set_addrmap(AS_IO, &cchasm_state::sound_portmap);
 
-	Z80CTC(config, m_ctc, 3584229 /* same as "audiocpu" */);
+	Z80CTC(config, m_ctc, XTAL::u(3584229) /* same as "audiocpu" */);
 	m_ctc->intr_callback().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<1>().set(FUNC(cchasm_state::ctc_timer_1_w));
 	m_ctc->zc_callback<2>().set(FUNC(cchasm_state::ctc_timer_2_w));
@@ -480,7 +480,7 @@ void cchasm_state::cchasm(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	VECTOR(config, m_vector, 0);
+	VECTOR(config, m_vector);
 	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
 	m_screen->set_refresh_hz(40);
 	m_screen->set_size(400, 300);
@@ -495,16 +495,16 @@ void cchasm_state::cchasm(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch3);
 	GENERIC_LATCH_8(config, m_soundlatch4);
 
-	AY8910(config, "ay1", 1818182).add_route(ALL_OUTPUTS, "speaker", 0.15);
+	AY8910(config, "ay1", XTAL::u(1818182)).add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	AY8910(config, "ay2", 1818182).add_route(ALL_OUTPUTS, "speaker", 0.15);
+	AY8910(config, "ay2", XTAL::u(1818182)).add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	DAC_1BIT(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.375);
-	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.375);
+	DAC_1BIT(config, m_dac1).add_route(ALL_OUTPUTS, "speaker", 0.375);
+	DAC_1BIT(config, m_dac2).add_route(ALL_OUTPUTS, "speaker", 0.375);
 
 	/* 6840 PTM */
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", CCHASM_68K_CLOCK/10));
-	ptm.set_external_clocks(0, (CCHASM_68K_CLOCK / 10).value(), 0);
+	ptm.set_external_clocks(XTAL(), CCHASM_68K_CLOCK / 10, XTAL());
 	ptm.irq_callback().set_inputline("maincpu", 4);
 }
 

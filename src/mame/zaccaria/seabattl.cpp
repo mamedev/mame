@@ -477,16 +477,16 @@ void seabattl_state::seabattl(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(seabattl_state::seabattl_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
-	S2636(config, m_s2636, 0);
+	S2636(config, m_s2636);
 	m_s2636->set_offsets(-13, -29);
 	m_s2636->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	DM9368(config, m_digits[0], 0).update_cb().set(FUNC(seabattl_state::digit_w<0>));
-	DM9368(config, m_digits[1], 0).update_cb().set(FUNC(seabattl_state::digit_w<1>));
-	DM9368(config, m_digits[2], 0).update_cb().set(FUNC(seabattl_state::digit_w<2>));
-	DM9368(config, m_digits[3], 0).update_cb().set(FUNC(seabattl_state::digit_w<3>));
-	DM9368(config, m_digits[4], 0).update_cb().set(FUNC(seabattl_state::digit_w<4>));
-	DM9368(config, m_digits[5], 0).update_cb().set(FUNC(seabattl_state::digit_w<5>));
+	DM9368(config, m_digits[0]).update_cb().set(FUNC(seabattl_state::digit_w<0>));
+	DM9368(config, m_digits[1]).update_cb().set(FUNC(seabattl_state::digit_w<1>));
+	DM9368(config, m_digits[2]).update_cb().set(FUNC(seabattl_state::digit_w<2>));
+	DM9368(config, m_digits[3]).update_cb().set(FUNC(seabattl_state::digit_w<3>));
+	DM9368(config, m_digits[4]).update_cb().set(FUNC(seabattl_state::digit_w<4>));
+	DM9368(config, m_digits[5]).update_cb().set(FUNC(seabattl_state::digit_w<5>));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

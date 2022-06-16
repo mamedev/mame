@@ -58,7 +58,7 @@ public:
 	};
 
 	// construction/destruction
-	mc14411_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc14411_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <std::size_t Line> auto out_f() { return m_out_fx_cbs[Line-1].bind(); }
 
@@ -71,7 +71,7 @@ public:
 	void timer_disable_all();
 
 protected:
-	mc14411_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mc14411_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

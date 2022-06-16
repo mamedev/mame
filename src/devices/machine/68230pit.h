@@ -72,7 +72,7 @@ class pit68230_device :  public device_t
 {
 public:
 	// construction/destruction
-	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto pa_in_callback() { return m_pa_in_cb.bind(); }
 	auto pa_out_callback() { return m_pa_out_cb.bind(); }
@@ -272,7 +272,7 @@ protected:
 		REG_TCR_TOUT_PC7_INT    = 0xe0, // 1 1 1
 	};
 
-	pit68230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	pit68230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	// device-level overrides
 	virtual void device_start() override;

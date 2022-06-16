@@ -24,7 +24,7 @@ class bbc_pointer_device :
 {
 protected:
 	// construction/destruction
-	bbc_pointer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_pointer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -53,7 +53,7 @@ class bbc_amxmouse_device : public bbc_pointer_device
 {
 public:
 	// construction/destruction
-	bbc_amxmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_amxmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t pb_r() override;
 
@@ -68,7 +68,7 @@ class bbc_m512mouse_device : public bbc_pointer_device
 {
 public:
 	// construction/destruction
-	bbc_m512mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_m512mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t pb_r() override;
 
@@ -83,7 +83,7 @@ class bbc_tracker_device : public bbc_pointer_device
 {
 public:
 	// construction/destruction
-	bbc_tracker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_tracker_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t pb_r() override;
 

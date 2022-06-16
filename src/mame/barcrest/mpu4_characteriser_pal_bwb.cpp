@@ -50,12 +50,12 @@ and two holding the appropriate call and response pairs for the two stages of op
 
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb, "mpu4chrpal_bwb", "BWB MPU4 Characteriser PAL")
 
-mpu4_characteriser_pal_bwb::mpu4_characteriser_pal_bwb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mpu4_characteriser_pal_bwb::mpu4_characteriser_pal_bwb(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mpu4_characteriser_pal_bwb(mconfig, MPU4_CHARACTERISER_PAL_BWB, tag, owner, clock)
 {
 }
 
-mpu4_characteriser_pal_bwb::mpu4_characteriser_pal_bwb(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+mpu4_characteriser_pal_bwb::mpu4_characteriser_pal_bwb(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock)
 {
 }

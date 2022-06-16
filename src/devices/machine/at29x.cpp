@@ -56,7 +56,7 @@
     Constructor for all variants
 */
 
-at29x_device::at29x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int memory_size, int device_id, int sector_size)
+at29x_device::at29x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int memory_size, int device_id, int sector_size)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_memory_size(memory_size),   // bytes
@@ -72,7 +72,7 @@ at29x_device::at29x_device(const machine_config &mconfig, device_type type, cons
 /*
     Constructor for AT29C020
 */
-at29c020_device::at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+at29c020_device::at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: at29x_device(mconfig, AT29C020, tag, owner, clock, 256*1024, 0xda, 256)
 {
 }
@@ -80,7 +80,7 @@ at29c020_device::at29c020_device(const machine_config &mconfig, const char *tag,
 /*
     Constructor for AT29C040
 */
-at29c040_device::at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+at29c040_device::at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: at29x_device(mconfig, AT29C040, tag, owner, clock, 512*1024, 0x5b, 512)
 {
 }
@@ -88,7 +88,7 @@ at29c040_device::at29c040_device(const machine_config &mconfig, const char *tag,
 /*
     Constructor for AT29C040A
 */
-at29c040a_device::at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+at29c040a_device::at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: at29x_device(mconfig, AT29C040A, tag, owner, clock, 512*1024, 0xa4, 256)
 {
 }

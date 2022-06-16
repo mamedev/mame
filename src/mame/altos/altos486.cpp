@@ -138,7 +138,7 @@ void altos486_state::altos486(machine_config &config)
 	iocpu.set_addrmap(AS_PROGRAM, &altos486_state::altos486_z80_mem);
 	iocpu.set_addrmap(AS_IO, &altos486_state::altos486_z80_io);
 
-	pic8259_device &pic8259(PIC8259(config, "pic8259", 0));
+	pic8259_device &pic8259(PIC8259(config, "pic8259"));
 	pic8259.out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 	pic8259.in_sp_callback().set_constant(1);
 	pic8259.read_slave_ack_callback().set(FUNC(altos486_state::read_rmx_ack));
@@ -209,12 +209,12 @@ void altos486_state::altos486(machine_config &config)
 	rs422_wn.dcd_handler().set("i8274", FUNC(i8274_device::dcda_w));
 	rs422_wn.cts_handler().set("i8274", FUNC(i8274_device::ctsa_w));
 
-	pit8253_device &pit0(PIT8253(config, "pit0", 0));
+	pit8253_device &pit0(PIT8253(config, "pit0"));
 	pit0.set_clk<0>(XTAL(22'118'400)/18); // FIXME
 	pit0.set_clk<1>(XTAL(22'118'400)/144); // FIXME
 	pit0.set_clk<2>(XTAL(22'118'400)/18); // FIXME
 
-	pit8253_device &pit1(PIT8253(config, "pit1", 0));
+	pit8253_device &pit1(PIT8253(config, "pit1"));
 	pit1.set_clk<0>(XTAL(22'118'400)/18); // FIXME
 	pit1.set_clk<1>(XTAL(22'118'400)/144); // FIXME
 	pit1.set_clk<2>(XTAL(22'118'400)/18); // FIXME

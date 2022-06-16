@@ -18,7 +18,7 @@ class upd775x_device : public device_t,
 	public device_rom_interface<17>
 {
 public:
-	enum : u32 { STANDARD_CLOCK = 640'000 };
+	static constexpr XTAL STANDARD_CLOCK = XTAL::u(640'000);
 
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 	DECLARE_WRITE_LINE_MEMBER( start_w );
@@ -63,7 +63,7 @@ protected:
 		MODE_SLAVE
 	};
 
-	upd775x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	upd775x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -128,12 +128,12 @@ class upd7759_device : public upd775x_device
 public:
 	auto drq() { return m_drqcallback.bind(); }
 
-	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = STANDARD_CLOCK);
+	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = STANDARD_CLOCK);
 
 	DECLARE_WRITE_LINE_MEMBER( md_w );
 
 protected:
-	upd7759_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	upd7759_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -152,10 +152,10 @@ protected:
 class upd7756_device : public upd775x_device
 {
 public:
-	upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = STANDARD_CLOCK);
+	upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = STANDARD_CLOCK);
 
 protected:
-	upd7756_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	upd7756_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_reset() override;
 

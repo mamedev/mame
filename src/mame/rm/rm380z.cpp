@@ -273,7 +273,7 @@ void rm380z_state::rm380z(machine_config &config)
 	FLOPPY_CONNECTOR(config, "wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_mfm_floppy_formats);
 
 	/* keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 }
 
@@ -297,7 +297,7 @@ void rm380z_state::rm480z(machine_config &config)
 //  PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* keyboard */
-//  generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+//  generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 //  keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 }
 

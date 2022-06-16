@@ -92,9 +92,9 @@ class cpc_expansion_slot_device : public device_t, public device_single_card_slo
 {
 public:
 	// construction/destruction
-	cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	template <typename T>
-	cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: cpc_expansion_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();

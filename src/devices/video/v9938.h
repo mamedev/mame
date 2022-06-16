@@ -86,7 +86,7 @@ public:
 
 protected:
 	// construction/destruction
-	v99x8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int model);
+	v99x8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int model);
 
 	const address_space_config      m_space_config;
 	address_space*                  m_vram_space;
@@ -257,7 +257,7 @@ protected:
 class v9938_device : public v99x8_device
 {
 public:
-	v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void palette_init() override;
@@ -266,7 +266,7 @@ protected:
 class v9958_device : public v99x8_device
 {
 public:
-	v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void palette_init() override;

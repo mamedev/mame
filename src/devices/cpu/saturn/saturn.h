@@ -66,7 +66,7 @@ class saturn_device : public cpu_device, public saturn_disassembler::config
 {
 public:
 	// construction/destruction
-	saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto out_func() { return m_out_func.bind(); }

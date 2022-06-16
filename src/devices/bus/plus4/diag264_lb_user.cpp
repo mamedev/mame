@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(DIAG264_USER_PORT_LOOPBACK, diag264_user_port_loopback_device
 //  diag264_user_port_loopback_device - constructor
 //-------------------------------------------------
 
-diag264_user_port_loopback_device::diag264_user_port_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+diag264_user_port_loopback_device::diag264_user_port_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DIAG264_USER_PORT_LOOPBACK, tag, owner, clock)
 	, device_pet_user_port_interface(mconfig, *this)
 {

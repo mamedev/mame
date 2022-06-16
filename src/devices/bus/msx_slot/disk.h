@@ -52,7 +52,7 @@ public:
 	}
 
 protected:
-	msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 
@@ -73,7 +73,7 @@ protected:
 class msx_slot_wd_disk_device : public msx_slot_disk_device
 {
 protected:
-	msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual void device_start() override;
 
@@ -85,7 +85,7 @@ protected:
 class msx_slot_tc8566_disk_device : public msx_slot_disk_device
 {
 protected:
-	msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual void device_start() override;
 
@@ -96,7 +96,7 @@ protected:
 class msx_slot_disk1_device : public msx_slot_wd_disk_device
 {
 public:
-	msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -118,7 +118,7 @@ private:
 class msx_slot_disk2_device : public msx_slot_wd_disk_device
 {
 public:
-	msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -138,7 +138,7 @@ private:
 class msx_slot_disk3_device : public msx_slot_tc8566_disk_device
 {
 public:
-	msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -148,7 +148,7 @@ public:
 class msx_slot_disk4_device : public msx_slot_tc8566_disk_device
 {
 public:
-	msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -158,7 +158,7 @@ public:
 class msx_slot_disk5_device : public msx_slot_wd_disk_device
 {
 public:
-	msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_start() override;
@@ -178,7 +178,7 @@ private:
 class msx_slot_disk6_device : public msx_slot_wd_disk_device
 {
 public:
-	msx_slot_disk6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_disk6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;

@@ -370,10 +370,10 @@ void joctronic_state::joctronic(machine_config &config)
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0, ASSERT_LINE); //SINT
 
-	LS259(config, "drivers1", 0); // IC4
-	LS259(config, "drivers2", 0); // IC3
-	LS259(config, "drivers3", 0); // IC2
-	LS259(config, "drivers4", 0); // IC1
+	LS259(config, "drivers1"); // IC4
+	LS259(config, "drivers2"); // IC3
+	LS259(config, "drivers3"); // IC2
+	LS259(config, "drivers4"); // IC1
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -386,8 +386,8 @@ void joctronic_state::joctronic(machine_config &config)
 
 	AY8910(config, "aysnd2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.40); // 1.5 MHz
 
-	DAC_8BIT_R2R(config, "r2r1", 0).add_route(ALL_OUTPUTS, "mono", 0.30);
-	DAC_8BIT_R2R(config, "r2r2", 0).add_route(ALL_OUTPUTS, "mono", 0.30);
+	DAC_8BIT_R2R(config, "r2r1").add_route(ALL_OUTPUTS, "mono", 0.30);
+	DAC_8BIT_R2R(config, "r2r2").add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
 void joctronic_state::slalom03(machine_config &config)
@@ -413,12 +413,12 @@ void joctronic_state::slalom03(machine_config &config)
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	//ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0, ASSERT_LINE); //SINT
 
-	HC259(config, "drivers1", 0); // IC1
-	HC259(config, "drivers2", 0); // IC2
-	HC259(config, "drivers3", 0); // IC3
-	HC259(config, "drivers4", 0); // IC4
-	HC259(config, "drivers5", 0); // IC5
-	HC259(config, "drivers6", 0); // IC6
+	HC259(config, "drivers1"); // IC1
+	HC259(config, "drivers2"); // IC2
+	HC259(config, "drivers3"); // IC3
+	HC259(config, "drivers4"); // IC4
+	HC259(config, "drivers5"); // IC5
+	HC259(config, "drivers6"); // IC6
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -432,9 +432,9 @@ void joctronic_state::slalom03(machine_config &config)
 	aysnd2.port_a_write_callback().set("r2r", FUNC(dac_8bit_r2r_device::data_w));
 	aysnd2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	DAC_8BIT_R2R(config, "r2r", 0).add_route(ALL_OUTPUTS, "mono", 0.30);
+	DAC_8BIT_R2R(config, "r2r").add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("oki", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_oki, XTAL(12'000'000)/2/16); // 375 kHz

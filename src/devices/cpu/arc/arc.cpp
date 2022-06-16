@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(ARC, arc_cpu_device, "arc_a4", "Argonaut ARCtangent A4")
 
 
-arc_cpu_device::arc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+arc_cpu_device::arc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, ARC, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 24, 0)
 	, m_pc(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)

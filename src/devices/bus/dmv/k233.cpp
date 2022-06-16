@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(DMV_K233, dmv_k233_device, "dmv_k233", "K233 16K Shared RAM")
 //  dmv_k233_device - constructor
 //-------------------------------------------------
 
-dmv_k233_device::dmv_k233_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k233_device::dmv_k233_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DMV_K233, tag, owner, clock)
 	, device_dmvslot_interface(mconfig, *this)
 	, m_enabled(false)

@@ -121,7 +121,7 @@ void nb1412m2_device::nb1412m2_map(address_map &map)
 //  nb1412m2_device - constructor
 //-------------------------------------------------
 
-nb1412m2_device::nb1412m2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nb1412m2_device::nb1412m2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NB1412M2, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(nb1412m2_device::nb1412m2_map), this))

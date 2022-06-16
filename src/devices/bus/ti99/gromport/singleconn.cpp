@@ -13,7 +13,7 @@ DEFINE_DEVICE_TYPE(TI99_GROMPORT_SINGLE, bus::ti99::gromport::ti99_single_cart_c
 
 namespace bus::ti99::gromport {
 
-ti99_single_cart_conn_device::ti99_single_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ti99_single_cart_conn_device::ti99_single_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cartridge_connector_device(mconfig, TI99_GROMPORT_SINGLE, tag, owner, clock),
 	m_cartridge(nullptr)
 {
@@ -85,7 +85,7 @@ void ti99_single_cart_conn_device::device_reset()
 
 void ti99_single_cart_conn_device::device_add_mconfig(machine_config &config)
 {
-	TI99_CART(config, "cartridge", 0);
+	TI99_CART(config, "cartridge");
 }
 
 } // end namespace bus::ti99::gromport

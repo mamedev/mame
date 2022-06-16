@@ -145,7 +145,7 @@ enum st_mask : unsigned
 	ST_SID = 0xf, // slave ID
 };
 
-ns32082_device::ns32082_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+ns32082_device::ns32082_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NS32082, tag, owner, clock)
 	, ns32000_slow_slave_interface(mconfig, *this)
 	, ns32000_mmu_interface(mconfig, *this)

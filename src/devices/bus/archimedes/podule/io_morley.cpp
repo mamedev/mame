@@ -36,7 +36,7 @@ class arc_io_morley_device :
 	public device_archimedes_podule_interface
 {
 protected:
-	arc_io_morley_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	arc_io_morley_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -63,7 +63,7 @@ class arc_bbcio_aga30_device : public arc_io_morley_device
 {
 public:
 	// construction/destruction
-	arc_bbcio_aga30_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_bbcio_aga30_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -82,7 +82,7 @@ class arc_ua_morley_device : public arc_io_morley_device
 {
 public:
 	// construction/destruction
-	arc_ua_morley_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_ua_morley_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -101,7 +101,7 @@ class arc_uma_morley_device : public arc_io_morley_device
 {
 public:
 	// construction/destruction
-	arc_uma_morley_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_uma_morley_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -266,7 +266,7 @@ void arc_uma_morley_device::device_add_mconfig(machine_config &config)
 //  arc_io_morley_device - constructor
 //-------------------------------------------------
 
-arc_io_morley_device::arc_io_morley_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+arc_io_morley_device::arc_io_morley_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")
@@ -276,17 +276,17 @@ arc_io_morley_device::arc_io_morley_device(const machine_config &mconfig, device
 {
 }
 
-arc_bbcio_aga30_device::arc_bbcio_aga30_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_bbcio_aga30_device::arc_bbcio_aga30_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_io_morley_device(mconfig, ARC_BBCIO_AGA30, tag, owner, clock)
 {
 }
 
-arc_ua_morley_device::arc_ua_morley_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_ua_morley_device::arc_ua_morley_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_io_morley_device(mconfig, ARC_UA_MORLEY, tag, owner, clock)
 {
 }
 
-arc_uma_morley_device::arc_uma_morley_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_uma_morley_device::arc_uma_morley_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_io_morley_device(mconfig, ARC_UMA_MORLEY, tag, owner, clock)
 {
 }

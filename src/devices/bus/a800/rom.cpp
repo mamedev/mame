@@ -32,60 +32,60 @@ DEFINE_DEVICE_TYPE(A5200_ROM_2CHIPS,   a5200_rom_2chips_device,   "a5200_16k2c",
 DEFINE_DEVICE_TYPE(A5200_ROM_BBSB,     a5200_rom_bbsb_device,     "a5200_bbsb",    "Atari 5200 ROM Cart BBSB")
 
 
-a800_rom_device::a800_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a800_rom_device::a800_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a800_cart_interface( mconfig, *this )
 {
 }
 
-a800_rom_device::a800_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a800_rom_device::a800_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a800_rom_device(mconfig, A800_ROM, tag, owner, clock)
 {
 }
 
 
-a800_rom_bbsb_device::a800_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a800_rom_bbsb_device::a800_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a800_rom_device(mconfig, A800_ROM_BBSB, tag, owner, clock)
 {
 }
 
 
 
-xegs_rom_device::xegs_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xegs_rom_device::xegs_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a800_rom_device(mconfig, XEGS_ROM, tag, owner, clock)
 	, m_bank(0)
 {
 }
 
 
-a800_rom_williams_device::a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a800_rom_williams_device::a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a800_rom_device(mconfig, A800_ROM_WILLIAMS, tag, owner, clock)
 	, m_bank(0)
 {
 }
 
 
-a800_rom_express_device::a800_rom_express_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a800_rom_express_device::a800_rom_express_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a800_rom_device(mconfig, A800_ROM_EXPRESS, tag, owner, clock)
 	, m_bank(0)
 {
 }
 
 
-a800_rom_turbo_device::a800_rom_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a800_rom_turbo_device::a800_rom_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a800_rom_device(mconfig, A800_ROM_TURBO, tag, owner, clock)
 	, m_bank(0)
 {
 }
 
 
-a800_rom_telelink2_device::a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a800_rom_telelink2_device::a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a800_rom_device(mconfig, A800_ROM_TELELINK2, tag, owner, clock)
 {
 }
 
 
-a800_rom_microcalc_device::a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a800_rom_microcalc_device::a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a800_rom_device(mconfig, A800_ROM_MICROCALC, tag, owner, clock)
 	, m_bank(0)
 {
@@ -108,13 +108,13 @@ a800_rom_corina_sram_device::a800_rom_corina_sram_device(const machine_config &m
 {
 }
 
-a5200_rom_2chips_device::a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a5200_rom_2chips_device::a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a800_rom_device(mconfig, A5200_ROM_2CHIPS, tag, owner, clock)
 {
 }
 
 
-a5200_rom_bbsb_device::a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a5200_rom_bbsb_device::a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a800_rom_device(mconfig, A5200_ROM_BBSB, tag, owner, clock)
 {
 }

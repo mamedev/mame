@@ -25,22 +25,22 @@ DEFINE_DEVICE_TYPE(VSMILE_KEYBOARD_GE, vsmile_keyboard_ge_device, "vsmile_keyboa
 //    V.Smile Keyboard
 //**************************************************************************
 
-vsmile_keyboard_us_device::vsmile_keyboard_us_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+vsmile_keyboard_us_device::vsmile_keyboard_us_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: vsmile_keyboard_device(mconfig, VSMILE_KEYBOARD_US, tag, owner, clock, 0x40)
 {
 }
 
-vsmile_keyboard_fr_device::vsmile_keyboard_fr_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+vsmile_keyboard_fr_device::vsmile_keyboard_fr_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: vsmile_keyboard_device(mconfig, VSMILE_KEYBOARD_FR, tag, owner, clock, 0x42)
 {
 }
 
-vsmile_keyboard_ge_device::vsmile_keyboard_ge_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+vsmile_keyboard_ge_device::vsmile_keyboard_ge_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: vsmile_keyboard_device(mconfig, VSMILE_KEYBOARD_GE, tag, owner, clock, 0x44)
 {
 }
 
-vsmile_keyboard_device::vsmile_keyboard_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock, uint8_t layout_type)
+vsmile_keyboard_device::vsmile_keyboard_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock, uint8_t layout_type)
 	: vsmile_ctrl_device_base(mconfig, type, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "ROW0", "ROW1", "ROW2", "ROW3", "ROW4")
 	, m_io_joy(*this, "JOY")

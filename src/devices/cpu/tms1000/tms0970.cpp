@@ -29,19 +29,19 @@ DEFINE_DEVICE_TYPE(TMS0970, tms0970_cpu_device, "tms0970", "Texas Instruments TM
 DEFINE_DEVICE_TYPE(TMS1990, tms1990_cpu_device, "tms1990", "Texas Instruments TMS1990") // 28-pin DIP, ? R pins..
 
 
-tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	tms0970_cpu_device(mconfig, TMS0970, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 1 /* stack levels */, 10 /* rom width */, address_map_constructor(FUNC(tms0970_cpu_device::rom_10bit), this), 6 /* ram width */, address_map_constructor(FUNC(tms0970_cpu_device::ram_6bit), this))
 { }
 
-tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
+tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms1000_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
 { }
 
-tms0950_cpu_device::tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+tms0950_cpu_device::tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	tms0970_cpu_device(mconfig, TMS0950, tag, owner, clock, 8, 11, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms0950_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(tms0950_cpu_device::ram_6bit), this))
 { }
 
-tms1990_cpu_device::tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+tms1990_cpu_device::tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	tms0970_cpu_device(mconfig, TMS1990, tag, owner, clock, 8, 11, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1990_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(tms1990_cpu_device::ram_6bit), this))
 { }
 

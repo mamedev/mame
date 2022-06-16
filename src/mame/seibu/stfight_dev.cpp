@@ -12,7 +12,7 @@
 DEFINE_DEVICE_TYPE(STFIGHT_VIDEO, stfight_video_device, "stfight_vid", "Seibu Street Fight Video")
 
 
-stfight_video_device::stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+stfight_video_device::stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, STFIGHT_VIDEO, tag, owner, clock),
 	m_gfxdecode(*this, "gfxdecode"),
 	m_palette(*this,"^palette"),

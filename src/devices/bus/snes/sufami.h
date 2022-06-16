@@ -15,7 +15,7 @@ class sns_rom_sufami_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_sufami_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_sufami_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// additional reading and writing
 	virtual uint8_t read_l(offs_t offset) override;
@@ -40,7 +40,7 @@ class sns_rom_strom_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_strom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_strom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// additional reading and writing
 	virtual uint8_t read_l(offs_t offset) override;

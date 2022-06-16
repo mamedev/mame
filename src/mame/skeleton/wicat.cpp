@@ -637,7 +637,7 @@ void wicat_state::wicat(machine_config &config)
 	m_via->writepb_handler().set(FUNC(wicat_state::via_b_w));
 	m_via->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	MM58174(config, m_rtc, 0);
+	MM58174(config, m_rtc);
 
 	// internal terminal
 	SCN2661C(config, m_uart[0], 5.0688_MHz_XTAL);  // connected to terminal board
@@ -705,7 +705,7 @@ void wicat_state::wicat(machine_config &config)
 
 	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, z8002_device::NMI_LINE);
 
-	IM6402(config, m_videouart, 0);
+	IM6402(config, m_videouart);
 	m_videouart->set_rrc(0);
 	m_videouart->set_trc(1200);
 	m_videouart->dr_callback().set(m_videoirq, FUNC(input_merger_device::in_w<2>));

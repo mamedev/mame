@@ -16,7 +16,7 @@
 class nes_vt02_vt03_soc_device : public device_t, public device_memory_interface
 {
 public:
-	nes_vt02_vt03_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_vt02_vt03_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void program_map(address_map &map);
 
@@ -56,7 +56,7 @@ public:
 	void set_default_palette_mode(vtxx_pal_mode pmode) { m_default_palette_mode = pmode; }
 
 protected:
-	nes_vt02_vt03_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_vt02_vt03_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -166,7 +166,7 @@ private:
 class nes_vt02_vt03_soc_pal_device : public nes_vt02_vt03_soc_device
 {
 public:
-	nes_vt02_vt03_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt02_vt03_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
@@ -175,7 +175,7 @@ protected:
 class nes_vt02_vt03_soc_scramble_device : public nes_vt02_vt03_soc_device
 {
 public:
-	nes_vt02_vt03_soc_scramble_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt02_vt03_soc_scramble_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;

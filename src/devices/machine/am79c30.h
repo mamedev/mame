@@ -55,7 +55,7 @@ class am79c30a_device : public device_t
 {
 public:
 	// device type constructor
-	am79c30a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	am79c30a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callback configuration
 	auto int_callback() { return m_int_callback.bind(); }

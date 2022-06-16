@@ -85,7 +85,7 @@ bool image_software_list_loader::load_software(device_image_interface &image, so
 //  software_list_device - constructor
 //-------------------------------------------------
 
-software_list_device::software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+software_list_device::software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SOFTWARE_LIST, tag, owner, clock),
 	m_list_type(softlist_type::ORIGINAL_SYSTEM),
 	m_filter(nullptr),

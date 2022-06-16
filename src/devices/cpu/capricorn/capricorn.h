@@ -17,7 +17,7 @@
 class capricorn_cpu_device : public cpu_device
 {
 public:
-	capricorn_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	capricorn_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t flatten_burst();
 

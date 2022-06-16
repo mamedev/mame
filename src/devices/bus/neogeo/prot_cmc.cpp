@@ -7,7 +7,7 @@
 DEFINE_DEVICE_TYPE(NG_CMC_PROT, cmc_prot_device, "ng_cmc_prot", "Neo Geo CMC42/CMC40 Protection")
 
 
-cmc_prot_device::cmc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cmc_prot_device::cmc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NG_CMC_PROT, tag, owner, clock),
 	type0_t03(nullptr),
 	type0_t12(nullptr),

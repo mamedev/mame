@@ -84,7 +84,7 @@ DEFINE_DEVICE_TYPE(TI99_IOPORT, bus::ti99::internal::ioport_device, "ti99_ioport
 
 namespace bus::ti99::internal {
 
-ioport_device::ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ioport_device::ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	:   device_t(mconfig, TI99_IOPORT, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		m_console_extint(*this),

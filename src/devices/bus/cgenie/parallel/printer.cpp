@@ -48,7 +48,7 @@ void cgenie_printer_device::device_add_mconfig(machine_config &config)
 //  cgenie_printer_device - constructor
 //-------------------------------------------------
 
-cgenie_printer_device::cgenie_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cgenie_printer_device::cgenie_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CGENIE_PRINTER, tag, owner, clock),
 	device_cg_parallel_interface(mconfig, *this),
 	m_centronics(*this, "centronics"),

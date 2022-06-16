@@ -22,7 +22,7 @@
 
 DEFINE_DEVICE_TYPE(M6502_VTSCR, m6502_vtscr, "m6502_vtscr", "M6502 with VTxx scrambling")
 
-m6502_vtscr::m6502_vtscr(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m6502_vtscr::m6502_vtscr(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m6502_device(mconfig, M6502_VTSCR, tag, owner, clock)
 {
 }

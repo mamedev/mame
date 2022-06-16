@@ -25,7 +25,7 @@ class nes_suborkey_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_suborkey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_suborkey_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read_exp(offs_t offset) override;
 	virtual void write(uint8_t data) override;

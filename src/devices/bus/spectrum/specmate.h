@@ -21,7 +21,7 @@ class spectrum_specmate_device : public device_t, public device_spectrum_expansi
 {
 public:
 	// construction/destruction
-	spectrum_specmate_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_specmate_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(freeze_button) { m_slot->nmi_w(newval ? CLEAR_LINE : ASSERT_LINE); }
 

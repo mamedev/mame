@@ -12,7 +12,7 @@ std::unique_ptr<util::disasm_interface> mcf5206e_device::create_disassembler()
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_COLDFIRE);
 }
 
-mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m68000_base_device(mconfig, tag, owner, clock, MCF5206E, 32,32)
 {
 }

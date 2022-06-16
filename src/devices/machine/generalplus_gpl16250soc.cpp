@@ -25,14 +25,14 @@
 
 DEFINE_DEVICE_TYPE(GCM394, sunplus_gcm394_device, "gcm394", "GeneralPlus GPL16250 System-on-a-Chip")
 
-sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sunplus_gcm394_base_device(mconfig, GCM394, tag, owner, clock)
 {
 }
 
 DEFINE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device, "gpac800", "GeneralPlus GPL16250 System-on-a-Chip (with NAND handling)")
 
-generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sunplus_gcm394_base_device(mconfig, GPAC800, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpac800_device::gpac800_internal_map), this))
 {
 }
@@ -40,7 +40,7 @@ generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mco
 
 DEFINE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device, "gpac800spi", "GeneralPlus GPL16250 (with SPI handling)")
 
-generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sunplus_gcm394_base_device(mconfig, GP_SPISPI, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpspispi_device::gpspispi_internal_map), this))
 {
 }
@@ -154,7 +154,7 @@ void generalplus_gpspi_direct_device::gpspi_direct_internal_map(address_map& map
 
 DEFINE_DEVICE_TYPE(GP_SPI_DIRECT, generalplus_gpspi_direct_device, "gpac800spi_direct", "GeneralPlus GPL16250 (with direct SPI handling)")
 
-generalplus_gpspi_direct_device::generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+generalplus_gpspi_direct_device::generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sunplus_gcm394_base_device(mconfig, GP_SPI_DIRECT, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpspi_direct_device::gpspi_direct_internal_map), this))
 {
 }

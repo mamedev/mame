@@ -40,7 +40,7 @@ void cr511b_device::device_add_mconfig(machine_config &config)
 //  cr511b_device - constructor
 //-------------------------------------------------
 
-cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CR511B, tag, owner, clock),
 	m_cdrom(*this, "cdrom"),
 	m_cdda(*this, "cdda"),

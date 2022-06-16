@@ -1136,7 +1136,7 @@ void konamim2_state::konamim2(machine_config &config)
 	// Common devices
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	ATA_INTERFACE(config, m_ata, 0);
+	ATA_INTERFACE(config, m_ata);
 	m_ata->irq_handler().set(FUNC(konamim2_state::ata_int));
 
 	m_ata->slot(0).option_add("cr589", CR589);
@@ -1152,8 +1152,8 @@ void konamim2_state::konamim2(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	// TODO!
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
 
@@ -1166,7 +1166,7 @@ void konamim2_state::konamim2(machine_config &config)
 
 void konamim2_state::set_ntsc(machine_config &config)
 {
-//  m_screen->set_raw(11750000, 766, 126, 126+640, 260, 20, 20+240); // TODO
+//  m_screen->set_raw(XTAL::u(11750000), 766, 126, 126+640, 260, 20, 20+240); // TODO
 	m_screen->set_refresh_hz(59.360001);
 	m_screen->set_size(768, 262);
 	m_screen->set_visarea(126, 126+640-1, 20, 20+240-1);
@@ -1174,7 +1174,7 @@ void konamim2_state::set_ntsc(machine_config &config)
 
 void konamim2_state::set_ntsc2(machine_config &config)
 {
-	//m_screen->set_raw(11750000, 766, 126, 126+640, 260, 20, 20+240); // TODO
+	//m_screen->set_raw(XTAL::u(11750000), 766, 126, 126+640, 260, 20, 20+240); // TODO
 	m_screen->set_refresh_hz(59.360001);
 	m_screen->set_size(768, 262*2); // TOTAL VICE ONLY WORKS WITH THIS!
 	m_screen->set_visarea(126, 126+640-1, 20, 20+240-1);
@@ -1182,7 +1182,7 @@ void konamim2_state::set_ntsc2(machine_config &config)
 
 void konamim2_state::set_arcres(machine_config &config)
 {
-	m_screen->set_raw(16934500, 684, 104, 104+512, 416, 26, 26+384);
+	m_screen->set_raw(XTAL::u(16934500), 684, 104, 104+512, 416, 26, 26+384);
 }
 
 void konamim2_state::add_ymz280b(machine_config &config)

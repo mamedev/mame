@@ -462,7 +462,7 @@ void cbasebal_state::machine_reset()
 void cbasebal_state::cbasebal(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 6000000);   // ???
+	Z80(config, m_maincpu, XTAL::u(6000000));   // ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &cbasebal_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &cbasebal_state::port_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cbasebal_state::decrypted_opcodes_map);
@@ -487,9 +487,9 @@ void cbasebal_state::cbasebal(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
 
-	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM2413(config, "ymsnd", XTAL::u(3579545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

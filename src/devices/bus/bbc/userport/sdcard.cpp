@@ -57,13 +57,13 @@ DEFINE_DEVICE_TYPE(BBC_SDCARDT, bbc_sdcardt_device, "bbc_sdcardt", "BBC Micro Tu
 
 void bbc_sdcard_device::device_add_mconfig(machine_config &config)
 {
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->spi_miso_callback().set([this](int state) { m_slot->cb2_w(state); });
 }
 
 void bbc_sdcardt_device::device_add_mconfig(machine_config &config)
 {
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->spi_miso_callback().set([this](int state) { if (!m_turbo) m_slot->cb2_w(state); });
 }
 
@@ -76,19 +76,19 @@ void bbc_sdcardt_device::device_add_mconfig(machine_config &config)
 //  bbc_sdcard_device - constructor
 //-------------------------------------------------
 
-bbc_sdcard_device::bbc_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_sdcard_device::bbc_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_userport_interface(mconfig, *this)
 	, m_sdcard(*this, "sdcard")
 {
 }
 
-bbc_sdcard_device::bbc_sdcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_sdcard_device::bbc_sdcard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_sdcard_device(mconfig, BBC_SDCARD, tag, owner, clock)
 {
 }
 
-bbc_sdcardt_device::bbc_sdcardt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_sdcardt_device::bbc_sdcardt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_sdcard_device(mconfig, BBC_SDCARDT, tag, owner, clock)
 	, m_turbo(false)
 {

@@ -142,7 +142,7 @@ static const uint8_t dec_2_seven_segs[] = {
 	0xc8    // 9
 };
 
-hp98035_io_card_device::hp98035_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp98035_io_card_device::hp98035_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig , HP98035_IO_CARD , tag , owner , clock),
 	  device_hp9845_io_interface(mconfig, *this),
 	  device_rtc_interface(mconfig , *this),

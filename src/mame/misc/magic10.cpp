@@ -793,7 +793,7 @@ void magic10_base_state::base(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);   // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);   // clock frequency & pin 7 not verified
 }
 
 

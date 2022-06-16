@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(TANBUS_TANRAM, tanbus_tanram_device, "tanbus_tanram", "Tanger
 //  tanbus_tanram_device - constructor
 //-------------------------------------------------
 
-tanbus_tanram_device::tanbus_tanram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tanbus_tanram_device::tanbus_tanram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TANBUS_TANRAM, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
 {

@@ -180,7 +180,7 @@ ioport_constructor dw_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME(dw_keyboard);
 }
 
-dw_keyboard_device::dw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dw_keyboard_device::dw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DW_KEYBOARD, tag, owner, clock)
 	, m_kbd(*this, "COL.%u", 0)
 	, m_mr(*this, "MR")

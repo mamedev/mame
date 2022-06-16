@@ -18,12 +18,12 @@
 DEFINE_DEVICE_TYPE(M6510, m6510_device, "m6510", "MOS Technology 6510")
 DEFINE_DEVICE_TYPE(M6508, m6508_device, "m6508", "MOS Technology 6508")
 
-m6510_device::m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m6510_device::m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m6510_device(mconfig, M6510, tag, owner, clock)
 {
 }
 
-m6510_device::m6510_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+m6510_device::m6510_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	m6502_device(mconfig, type, tag, owner, clock),
 	read_port(*this),
 	write_port(*this), dir(0), port(0), drive(0)
@@ -151,7 +151,7 @@ void m6510_device::mi_6510::write(uint16_t adr, uint8_t val)
 }
 
 
-m6508_device::m6508_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m6508_device::m6508_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m6510_device(mconfig, M6508, tag, owner, clock)
 {
 }

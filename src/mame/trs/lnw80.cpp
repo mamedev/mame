@@ -632,7 +632,7 @@ void lnw80_state::lnw80(machine_config &config)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
-	CLOCK(config, m_uart_clock, 19200 * 16);
+	CLOCK(config, m_uart_clock, XTAL::u(19200 * 16));
 	m_uart_clock->signal_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
 	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_tcp));
 

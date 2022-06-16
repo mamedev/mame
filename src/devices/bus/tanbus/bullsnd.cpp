@@ -40,7 +40,7 @@ void tanbus_bullsnd_device::device_add_mconfig(machine_config &config)
 //  tanbus_bullsnd_device - constructor
 //-------------------------------------------------
 
-tanbus_bullsnd_device::tanbus_bullsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tanbus_bullsnd_device::tanbus_bullsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TANBUS_BULLSND, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
 	, m_ay8910(*this, "ay8910%u", 0)

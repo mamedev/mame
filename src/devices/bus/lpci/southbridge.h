@@ -42,7 +42,7 @@ public:
 
 protected:
 	// construction/destruction
-	southbridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	southbridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -146,7 +146,7 @@ public:
 
 protected:
 	// construction/destruction
-	southbridge_extended_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	southbridge_extended_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -433,7 +433,7 @@ void bking_state::bking(machine_config &config)
 	ay2.port_b_write_callback().set(FUNC(bking_state::port_b_w));
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 void bking_state::bking3(machine_config &config)

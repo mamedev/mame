@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(RS232_LOOPBACK, rs232_loopback_device, "rs232_loopback", "RS232 Loopback")
 
-rs232_loopback_device::rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rs232_loopback_device::rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RS232_LOOPBACK, tag, owner, clock)
 	, device_rs232_port_interface(mconfig, *this)
 {
@@ -45,7 +45,7 @@ WRITE_LINE_MEMBER( rs232_loopback_device::input_dtr )
 
 DEFINE_DEVICE_TYPE(DEC_RS232_LOOPBACK, dec_rs232_loopback_device, "dec_rs232_loopback", "RS232 Loopback (DEC 12-15336-00)")
 
-dec_rs232_loopback_device::dec_rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dec_rs232_loopback_device::dec_rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DEC_RS232_LOOPBACK, tag, owner, clock)
 	, device_rs232_port_interface(mconfig, *this)
 {

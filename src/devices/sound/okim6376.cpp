@@ -113,7 +113,7 @@ void okim6376_device::ADPCMVoice::reset()
 DEFINE_DEVICE_TYPE(OKIM6376, okim6376_device, "okim6376", "OKI MSM6376 ADPCM")
 DEFINE_DEVICE_TYPE(OKIM6650, okim6650_device, "okim6650", "OKI MSM6650 ADPCM")
 
-okim6376_device::okim6376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits)
+okim6376_device::okim6376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int addrbits)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this),
@@ -135,12 +135,12 @@ okim6376_device::okim6376_device(const machine_config &mconfig, device_type type
 	override_address_width(addrbits);
 }
 
-okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: okim6376_device(mconfig, OKIM6376, tag, owner, clock, 21)
 {
 }
 
-okim6650_device::okim6650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+okim6650_device::okim6650_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: okim6376_device(mconfig, OKIM6650, tag, owner, clock, 23)
 {
 }

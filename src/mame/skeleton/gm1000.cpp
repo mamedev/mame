@@ -81,7 +81,7 @@ INPUT_PORTS_END
 
 void gm1000_state::gm1000(machine_config &config)
 {
-	M37702S1(config, m_maincpu, 4'000'000); // unknown clock; type guessed
+	M37702S1(config, m_maincpu, XTAL::u(4'000'000)); // unknown clock; type guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &gm1000_state::mem_map);
 	m_maincpu->p4_in_cb().set_ioport("P4");
 	m_maincpu->p6_in_cb().set_ioport("P6");
@@ -101,7 +101,7 @@ void gm1000_state::gm1000(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc"));
 	lcdc.set_lcd_size(2, 24);
 	lcdc.set_pixel_update_cb(FUNC(gm1000_state::lcd_pixel_update));
 	lcdc.set_function_set_at_any_time(true);

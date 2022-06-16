@@ -15,12 +15,12 @@
 #include "emu.h"
 #include "printer.h"
 
-serial_printer_device::serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+serial_printer_device::serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: serial_printer_device(mconfig, SERIAL_PRINTER, tag, owner, clock)
 {
 }
 
-serial_printer_device::serial_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+serial_printer_device::serial_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
@@ -35,7 +35,7 @@ serial_printer_device::serial_printer_device(const machine_config &mconfig, devi
 
 void serial_printer_device::device_add_mconfig(machine_config &config)
 {
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 	m_printer->online_callback().set(FUNC(serial_printer_device::printer_online));
 }
 
@@ -90,7 +90,7 @@ void serial_printer_device::rcv_complete()
 	m_printer->output(get_received_char());
 }
 
-radio_shack_serial_printer_device::radio_shack_serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+radio_shack_serial_printer_device::radio_shack_serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: serial_printer_device(mconfig, RADIO_SHACK_SERIAL_PRINTER, tag, owner, clock)
 {
 	m_initial_rx_state = 0;

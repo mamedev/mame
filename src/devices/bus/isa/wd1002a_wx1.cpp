@@ -46,7 +46,7 @@ const tiny_rom_entry *isa8_wd1002a_wx1_device::device_rom_region() const
 //  isa8_wd1002a_wx1_device - constructor
 //-------------------------------------------------
 
-isa8_wd1002a_wx1_device::isa8_wd1002a_wx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+isa8_wd1002a_wx1_device::isa8_wd1002a_wx1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISA8_WD1002A_WX1, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 {

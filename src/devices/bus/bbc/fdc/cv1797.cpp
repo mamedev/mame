@@ -86,7 +86,7 @@ const tiny_rom_entry *bbc_cv1797_device::device_rom_region() const
 //  bbc_cv1797_device - constructor
 //-------------------------------------------------
 
-bbc_cv1797_device::bbc_cv1797_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_cv1797_device::bbc_cv1797_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_CV1797, tag, owner, clock)
 	, device_bbc_fdc_interface(mconfig, *this)
 	, m_fdc(*this, "fd1797")

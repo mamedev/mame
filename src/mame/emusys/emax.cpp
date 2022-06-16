@@ -245,7 +245,7 @@ void emax_state::emax2(machine_config &config)
 
 	PIT8254(config, m_ctc);
 
-	WD1772(config, m_fdc, 8'000'000);
+	WD1772(config, m_fdc, XTAL::u(8'000'000));
 
 	ACIA6850(config, "acia1");
 	ACIA6850(config, "acia2");

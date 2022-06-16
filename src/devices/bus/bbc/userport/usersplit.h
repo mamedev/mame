@@ -26,7 +26,7 @@ class bbc_usersplit_device :
 {
 public:
 	// construction/destruction
-	bbc_usersplit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_usersplit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(userport_changed) { m_selected = newval; }
 

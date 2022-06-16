@@ -3271,11 +3271,11 @@ void funworld_state::fw1stpal(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia6821_device &pia0(PIA6821(config, "pia0"));
 	pia0.readpa_handler().set_ioport("IN0");
 	pia0.readpb_handler().set_ioport("IN1");
 
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia6821_device &pia1(PIA6821(config, "pia1"));
 	pia1.readpa_handler().set_ioport("IN2");
 	pia1.readpb_handler().set_ioport("DSW");
 	pia1.ca2_handler().set(FUNC(funworld_state::pia1_ca2_w));
@@ -3387,7 +3387,7 @@ void funworld_state::saloon(machine_config &config)
 	config.device_remove("pia1");
 
 	// Serial Memory
-	I2C_24C02(config, "i2cmem", 0).set_e0(1); // ? or maybe 2nd half of 24C04?
+	I2C_24C02(config, "i2cmem").set_e0(1); // ? or maybe 2nd half of 24C04?
 }
 
 

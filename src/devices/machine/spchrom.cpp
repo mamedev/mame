@@ -25,7 +25,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(SPEECHROM, speechrom_device, "speechrom", "TI Speech ROM")
 
-speechrom_device::speechrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+speechrom_device::speechrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPEECHROM, tag, owner, clock), m_speechrom_data(nullptr), m_speechROMlen(0),
 	m_speechROMaddr(0),
 	m_load_pointer(0),

@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(IQ151_MS151A, iq151_ms151a_device, "iq151_ms15a", "IQ151 MS15
 //  iq151_ms151a_device - constructor
 //-------------------------------------------------
 
-iq151_ms151a_device::iq151_ms151a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iq151_ms151a_device::iq151_ms151a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IQ151_MS151A, tag, owner, clock)
 	, device_iq151cart_interface(mconfig, *this)
 	, m_rom(nullptr), m_posx(0), m_posy(0), m_pen(0), m_paper(nullptr)

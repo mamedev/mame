@@ -32,7 +32,7 @@ class i8243_device :  public device_t
 {
 public:
 	// construction/destruction
-	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	auto p4_in_cb() { return m_readhandler[0].bind(); }

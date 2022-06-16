@@ -26,7 +26,7 @@ class bbc_fdc_slot_device : public device_t, public device_single_card_slot_inte
 public:
 	// construction/destruction
 	template <typename T>
-	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
+	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, T &&slot_options, const char *default_option)
 		: bbc_fdc_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -36,7 +36,7 @@ public:
 		set_insert_rom(true);
 	}
 
-	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	void set_insert_rom(bool insert_rom) { m_insert_rom = insert_rom; }
 	bool insert_rom() { return m_insert_rom; }

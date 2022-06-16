@@ -14,7 +14,7 @@ class nes_ffe3_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_ffe3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_ffe3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 };
@@ -26,7 +26,7 @@ class nes_ffe4_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_ffe4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_ffe4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_l(offs_t offset, uint8_t data) override;
 	virtual void write_h(offs_t offset, uint8_t data) override;
@@ -36,7 +36,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_ffe4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_ffe4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -61,7 +61,7 @@ class nes_ffe8_device : public nes_ffe4_device
 {
 public:
 	// construction/destruction
-	nes_ffe8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_ffe8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_l(offs_t offset, uint8_t data) override;
 	virtual void write_h(offs_t offset, uint8_t data) override {}

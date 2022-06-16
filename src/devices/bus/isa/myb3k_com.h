@@ -37,7 +37,7 @@ class isa8_myb3k_com_device :
 {
 public:
 	// construction/destruction
-	isa8_myb3k_com_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_myb3k_com_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER(pit_txc);
 	DECLARE_WRITE_LINE_MEMBER(pit_rxc);
@@ -51,7 +51,7 @@ public:
 	uint8_t dce_status();
 
 protected:
-	isa8_myb3k_com_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_myb3k_com_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

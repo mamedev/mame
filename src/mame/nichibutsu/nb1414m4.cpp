@@ -33,7 +33,7 @@ Notes:
 
 DEFINE_DEVICE_TYPE(NB1414M4, nb1414m4_device, "nb1414m4", "NB1414M4 Custom")
 
-nb1414m4_device::nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nb1414m4_device::nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NB1414M4, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_data(*this, DEVICE_SELF)

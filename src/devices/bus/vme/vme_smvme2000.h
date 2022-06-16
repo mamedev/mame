@@ -20,7 +20,7 @@ class vme_smvme2000_device
 	, public device_vme_card_interface
 {
 public:
-	vme_smvme2000_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	vme_smvme2000_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides

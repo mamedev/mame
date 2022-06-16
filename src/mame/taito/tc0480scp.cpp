@@ -152,7 +152,7 @@ Control registers
 
 DEFINE_DEVICE_TYPE(TC0480SCP, tc0480scp_device, "tc0480scp", "Taito TC0480SCP")
 
-tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TC0480SCP, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_pri_reg(0)

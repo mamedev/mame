@@ -161,11 +161,11 @@ void rcorsair_state::rcorsair(machine_config &config)
 	/* Main CPU is probably inside Custom Block with
 	   program code, unknown type */
 
-	Z80(config, m_maincpu, 8000000);
+	Z80(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &rcorsair_state::rcorsair_main_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(rcorsair_state::irq0_line_hold));
 
-	I8035(config, m_subcpu, 8000000);
+	I8035(config, m_subcpu, XTAL::u(8000000));
 	m_subcpu->set_addrmap(AS_PROGRAM, &rcorsair_state::rcorsair_sub_map);
 	m_subcpu->set_addrmap(AS_IO, &rcorsair_state::rcorsair_sub_io_map);
 

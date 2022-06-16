@@ -83,7 +83,7 @@ static const uint16_t BDAcharset[]=
 	0x4406, // 0100 0100 0000 0110 ?
 };
 
-bfm_bda_device::bfm_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bfm_bda_device::bfm_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BFM_BDA, tag, owner, clock)
 	, m_outputs()
 	, m_port_val(0)

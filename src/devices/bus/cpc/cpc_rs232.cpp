@@ -35,7 +35,7 @@ ROM_END
 // device machine config
 void cpc_rs232_device::device_add_mconfig(machine_config &config)
 {
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2000000);
 	m_pit->set_clk<1>(2000000);
 	m_pit->set_clk<2>(2000000);
@@ -76,12 +76,12 @@ const tiny_rom_entry *cpc_ams_rs232_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cpc_rs232_device(mconfig, CPC_RS232, tag, owner, clock)
 {
 }
 
-cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_pit(*this,"pit"),
@@ -91,7 +91,7 @@ cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, device_type ty
 {
 }
 
-cpc_ams_rs232_device::cpc_ams_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cpc_ams_rs232_device::cpc_ams_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cpc_rs232_device(mconfig, CPC_RS232_AMS, tag, owner, clock)
 {
 }

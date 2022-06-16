@@ -46,13 +46,13 @@ DEFINE_DEVICE_TYPE(AT45DB161, at45db161_device, "at45db161", "AT45DB161")
 //  at45db041_device - constructor
 //-------------------------------------------------
 
-at45db041_device::at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+at45db041_device::at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: at45db041_device(mconfig, AT45DB041, tag, owner, clock)
 {
 }
 
 
-at45db041_device::at45db041_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+at45db041_device::at45db041_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, write_so(*this)
@@ -60,13 +60,13 @@ at45db041_device::at45db041_device(const machine_config &mconfig, device_type ty
 }
 
 
-at45db081_device::at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+at45db081_device::at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: at45db041_device(mconfig, AT45DB081, tag, owner, clock)
 {
 }
 
 
-at45db161_device::at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+at45db161_device::at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: at45db041_device(mconfig, AT45DB161, tag, owner, clock)
 {
 }

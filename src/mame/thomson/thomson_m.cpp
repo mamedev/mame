@@ -500,7 +500,7 @@ DEFINE_DEVICE_TYPE(TO7_IO_LINE, to7_io_line_device, "to7_io_line", "TO7 Serial s
 //  to7_io_line_device - constructor
 //-------------------------------------------------
 
-to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TO7_IO_LINE, tag, owner, clock),
 	m_pia_io(*this, THOM_PIA_IO),
 	m_rs232(*this, "rs232"),
@@ -511,7 +511,7 @@ to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char
 void to7_io_line_device::device_add_mconfig(machine_config &config)
 {
 	/// THIS PIO is part of CC 90-232 expansion
-	PIA6821(config, m_pia_io, 0);
+	PIA6821(config, m_pia_io);
 	m_pia_io->readpa_handler().set(FUNC(to7_io_line_device::porta_in));
 	m_pia_io->writepa_handler().set(FUNC(to7_io_line_device::porta_out));
 	m_pia_io->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));

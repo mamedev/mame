@@ -19,13 +19,13 @@ class mc10_pak_device :
 {
 public:
 	// construction/destruction
-	mc10_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mc10_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual int max_rom_length() const override;
 	virtual image_init_result load() override;
 
 protected:
-	mc10_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	mc10_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

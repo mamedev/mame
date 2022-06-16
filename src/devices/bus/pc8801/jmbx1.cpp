@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(JMBX1, jmbx1_device, "jmbx1", "JMB-X1 \"Sound Board X\"")
 
-jmbx1_device::jmbx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+jmbx1_device::jmbx1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pc8801_exp_device(mconfig, JMBX1, tag, owner, clock)
 	, m_opm1(*this, "opm1")
 	, m_opm2(*this, "opm2")

@@ -15,7 +15,7 @@
 
 class m6507_device : public m6502_device {
 public:
-	m6507_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m6507_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

@@ -472,7 +472,7 @@ void spacefev_state::spacefev_sound(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	DAC_1BIT(config, m_n8080_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15);
+	DAC_1BIT(config, m_n8080_dac).add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	SN76477(config, m_sn);
 	m_sn->set_noise_params(RES_K(36), RES_K(150), CAP_N(1));
@@ -504,7 +504,7 @@ void sheriff_state::sheriff_sound(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	DAC_1BIT(config, m_n8080_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15);
+	DAC_1BIT(config, m_n8080_dac).add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	SN76477(config, m_sn);
 	m_sn->set_noise_params(RES_K(36), RES_K(100), CAP_N(1));
@@ -539,5 +539,5 @@ void helifire_state::helifire_sound(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
 }

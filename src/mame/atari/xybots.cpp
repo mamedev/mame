@@ -175,7 +175,7 @@ void xybots_state::xybots(machine_config &config)
 	M68000(config, m_maincpu, 14.318181_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xybots_state::main_map);
 
-	SLAPSTIC(config, m_slapstic, 107);
+	SLAPSTIC(config, m_slapstic, XTAL::u(107));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x8000, 0xffff, 0x7c0000);
 	m_slapstic->set_bank(m_slapstic_bank);
 
@@ -190,7 +190,7 @@ void xybots_state::xybots(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(xybots_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(xybots_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, xybots_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, xybots_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -206,7 +206,7 @@ void xybots_state::xybots(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ATARI_JSA_I(config, m_jsa, 0);
+	ATARI_JSA_I(config, m_jsa);
 	m_jsa->set_swapped_coins(true);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 	m_jsa->test_read_cb().set_ioport("FFE200").bit(8);

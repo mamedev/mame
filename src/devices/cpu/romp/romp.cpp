@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(ROMP, romp_device, "romp", "IBM ROMP")
 
 ALLOW_SAVE_TYPE(romp_device::branch_state);
 
-romp_device::romp_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+romp_device::romp_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, ROMP, tag, owner, clock)
 	, m_mem_config("memory", ENDIANNESS_BIG, 32, 32)
 	, m_mmu(*this, finder_base::DUMMY_TAG)

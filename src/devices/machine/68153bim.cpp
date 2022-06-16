@@ -69,10 +69,10 @@ DEFINE_DEVICE_TYPE(EI68C153,        ei68c153_device,  "ei68c153",         "EPIC 
 
 void bim68153_device::device_add_mconfig(machine_config &config)
 {
-	MC68153_CHANNEL(config, m_chn[0], 0);
-	MC68153_CHANNEL(config, m_chn[1], 0);
-	MC68153_CHANNEL(config, m_chn[2], 0);
-	MC68153_CHANNEL(config, m_chn[3], 0);
+	MC68153_CHANNEL(config, m_chn[0]);
+	MC68153_CHANNEL(config, m_chn[1]);
+	MC68153_CHANNEL(config, m_chn[2]);
+	MC68153_CHANNEL(config, m_chn[3]);
 }
 
 //**************************************************************************
@@ -82,7 +82,7 @@ void bim68153_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 //  bim68153_device - constructor
 //-------------------------------------------------
-bim68153_device::bim68153_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+bim68153_device::bim68153_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_chn{{*this, CHN0_TAG}, {*this, CHN1_TAG}, {*this, CHN2_TAG}, {*this, CHN3_TAG}}
 	, m_out_int_cb(*this)
@@ -96,14 +96,14 @@ bim68153_device::bim68153_device(const machine_config &mconfig, device_type type
 	LOG("%s\n", FUNCNAME);
 }
 
-bim68153_device::bim68153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bim68153_device::bim68153_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bim68153_device(mconfig, MC68153, tag, owner, clock, TYPE_MC68153)
 {
 	LOG("%s\n", FUNCNAME);
 }
 
 /* The EPIC EI68C153 is a CMOS implementation that is fully compatible with the bipolar MC68153 from Motorola */
-ei68c153_device::ei68c153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ei68c153_device::ei68c153_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bim68153_device(mconfig, EI68C153, tag, owner, clock, TYPE_EI68C153)
 {
 	LOG("%s\n", FUNCNAME);
@@ -318,7 +318,7 @@ void bim68153_device::write(offs_t offset, uint8_t data)
 //  BIM CHANNEL
 //**************************************************************************
 
-bim68153_channel::bim68153_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bim68153_channel::bim68153_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MC68153_CHANNEL, tag, owner, clock)
 	, m_out_iack_cb(*this)
 	, m_int_state(NONE)

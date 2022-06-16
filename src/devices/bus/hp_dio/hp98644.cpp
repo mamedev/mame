@@ -49,12 +49,12 @@ void dio16_98644_device::device_add_mconfig(machine_config &config)
 //  dio16_98644_device - constructor
 //-------------------------------------------------
 
-dio16_98644_device::dio16_98644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dio16_98644_device::dio16_98644_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dio16_98644_device(mconfig, HPDIO_98644, tag, owner, clock)
 {
 }
 
-dio16_98644_device::dio16_98644_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dio16_98644_device::dio16_98644_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this),
 	m_uart{*this, INS8250_TAG},

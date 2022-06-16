@@ -127,7 +127,7 @@ enum fcr_mask : u32
 // device type definitions
 DEFINE_DEVICE_TYPE(MC88100, mc88100_device, "mc88100", "Motorola MC88100")
 
-mc88100_device::mc88100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mc88100_device::mc88100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, MC88100, tag, owner, clock)
 	, m_code_config("code", ENDIANNESS_BIG, 32, 32, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 32, 32, 0)

@@ -46,7 +46,7 @@ DEFINE_DEVICE_TYPE(OKIM6258, okim6258_device, "okim6258", "OKI MSM6258 ADPCM")
 //  okim6258_device - constructor
 //-------------------------------------------------
 
-okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, OKIM6258, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_status(0),

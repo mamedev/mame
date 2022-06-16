@@ -36,11 +36,11 @@ INPUT_PORTS_END
 
 void bfmsys83_state::bfmsys83(machine_config &config)
 {
-	M6802(config, m_maincpu, 40000000/4);
+	M6802(config, m_maincpu, XTAL::u(40000000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bfmsys83_state::memmap);
 
 	SPEAKER(config, "mono").front_center();
-	AY8912(config, "aysnd", 40000000/4).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, "aysnd", XTAL::u(40000000)/4).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 /*

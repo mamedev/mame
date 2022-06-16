@@ -16,7 +16,7 @@
 DEFINE_DEVICE_TYPE(A26_ROM_COMPUMATE, a26_rom_cm_device, "a2600_cm", "Atari 2600 ROM Cart Compumate")
 
 
-a26_rom_cm_device::a26_rom_cm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_cm_device::a26_rom_cm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_COMPUMATE, tag, owner, clock)
 	, m_bank(*this, "bank")
 {

@@ -62,7 +62,7 @@
 DEFINE_DEVICE_TYPE(CIT101_KEYBOARD, cit101_keyboard_device, "cit101_kbd", "CIT-101 Keyboard")
 DEFINE_DEVICE_TYPE(CIT101E_KEYBOARD, cit101e_keyboard_device, "cit101e_kbd", "CIT-101e Keyboard")
 
-cit101_keyboard_device::cit101_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+cit101_keyboard_device::cit101_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_mcu(*this, "mcu")
 	, m_beeper(*this, "beeper")
@@ -74,12 +74,12 @@ cit101_keyboard_device::cit101_keyboard_device(const machine_config &mconfig, de
 {
 }
 
-cit101_keyboard_device::cit101_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cit101_keyboard_device::cit101_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cit101_keyboard_device(mconfig, CIT101_KEYBOARD, tag, owner, clock)
 {
 }
 
-cit101e_keyboard_device::cit101e_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cit101e_keyboard_device::cit101e_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cit101_keyboard_device(mconfig, CIT101E_KEYBOARD, tag, owner, clock)
 {
 }
@@ -368,7 +368,7 @@ void cit101_keyboard_device::device_add_mconfig(machine_config &config)
 	m_mcu->t1_in_cb().set_ioport("MODIFIERS").bit(1);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 786).add_route(ALL_OUTPUTS, "mono", 0.5); // unknown frequency (original keyboard has a NE555)
+	BEEP(config, m_beeper, XTAL::u(786)).add_route(ALL_OUTPUTS, "mono", 0.5); // unknown frequency (original keyboard has a NE555)
 }
 
 

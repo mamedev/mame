@@ -16,14 +16,14 @@ class k053250_device :  public device_t,
 {
 public:
 	template <typename T, typename U>
-	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, U &&screen_tag, int offx, int offy)
-		: k053250_device(mconfig, tag, owner, clock)
+	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, U &&screen_tag, int offx, int offy)
+		: k053250_device(mconfig, tag, owner)
 	{
 		set_palette(std::forward<T>(palette_tag));
 		set_screen(std::forward<U>(screen_tag));
 		set_offsets(offx, offy);
 	}
-	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void set_offsets(int offx, int offy)
 	{

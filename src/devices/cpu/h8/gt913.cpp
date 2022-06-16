@@ -25,7 +25,7 @@
 
 DEFINE_DEVICE_TYPE(GT913, gt913_device, "gt913", "Casio GT913F")
 
-gt913_device::gt913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gt913_device::gt913_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8_device(mconfig, GT913, tag, owner, clock, address_map_constructor(FUNC(gt913_device::map), this)),
 	device_mixer_interface(mconfig, *this, 2),
 	m_rom(*this, DEVICE_SELF),
@@ -104,7 +104,7 @@ void gt913_device::device_add_mconfig(machine_config &config)
 	m_sound->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_sound->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 
-	GT913_KBD_HLE(config, m_kbd, 0);
+	GT913_KBD_HLE(config, m_kbd);
 	m_kbd->irq_cb().set([this] (int val)
 	{
 		if (val)

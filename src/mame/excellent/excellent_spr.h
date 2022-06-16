@@ -10,7 +10,7 @@ class excellent_spr_device : public device_t, public device_gfx_interface, publi
 public:
 	typedef device_delegate<void (u32 &colour, u32 &pri_mask)> colpri_cb_delegate;
 
-	excellent_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	excellent_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_color_base(u16 base) { m_colbase = base; }
 	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb.set(std::forward<T>(args)...); }

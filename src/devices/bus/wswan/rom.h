@@ -13,7 +13,7 @@ class ws_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	ws_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ws_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual u16 read_rom20(offs_t offset, u16 mem_mask) override;
@@ -23,7 +23,7 @@ public:
 	virtual void write_io(offs_t offset, u16 data, u16 mem_mask) override;
 
 protected:
-	ws_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	ws_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -56,7 +56,7 @@ class ws_rom_sram_device : public ws_rom_device
 {
 public:
 	// construction/destruction
-	ws_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ws_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual u16 read_ram(offs_t offset, u16 mem_mask) override;
@@ -64,7 +64,7 @@ public:
 	virtual void write_io(offs_t offset, u16 data, u16 mem_mask) override;
 
 protected:
-	ws_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	ws_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -81,7 +81,7 @@ class ws_rom_eeprom_device : public ws_rom_device
 {
 public:
 	// construction/destruction
-	ws_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ws_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual u16 read_io(offs_t offset, u16 mem_mask) override;
@@ -105,7 +105,7 @@ class ws_wwitch_device : public ws_rom_sram_device
 {
 public:
 	// construction/destruction
-	ws_wwitch_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ws_wwitch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual u16 read_ram(offs_t offset, u16 mem_mask) override;

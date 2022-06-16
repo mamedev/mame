@@ -766,9 +766,9 @@ void zr107_state::zr107(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(65536);
 
-	K001005(config, m_k001005, 0, m_k001006_1);
+	K001005(config, m_k001005, m_k001006_1);
 
-	K001006(config, m_k001006_1, 0);
+	K001006(config, m_k001006_1);
 	m_k001006_1->set_gfx_region("textures");
 
 	K056800(config, m_k056800, XTAL(18'432'000));
@@ -791,7 +791,7 @@ void zr107_state::zr107(machine_config &config)
 	adc0838_device &adc(ADC0838(config, "adc0838"));
 	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
-	KONPPC(config, m_konppc, 0);
+	KONPPC(config, m_konppc);
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_ZR107);
 }
@@ -806,7 +806,7 @@ void midnrun_state::midnrun(machine_config &config)
 	// video hardware
 	m_screen->set_screen_update(FUNC(midnrun_state::screen_update));
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(midnrun_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_8, 1, 0);
 	m_k056832->set_palette(m_palette);
@@ -824,12 +824,12 @@ void jetwave_state::jetwave(machine_config &config)
 	m_screen->set_visarea(40, 511 + 40, 27, 383 + 27);      // needs CRTC emulation
 	m_screen->set_screen_update(FUNC(jetwave_state::screen_update));
 
-	K001604(config, m_k001604, 0);
+	K001604(config, m_k001604);
 	m_k001604->set_palette(m_palette);
 
 	// The second K001006 chip connects to the second K001005 chip.
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
-	K001006(config, m_k001006_2, 0);
+	K001006(config, m_k001006_2);
 	m_k001006_2->set_gfx_region("textures");
 
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);

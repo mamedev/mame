@@ -34,7 +34,7 @@ class x2201_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
-	x2201_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	x2201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// read/write handlers
 	u8 read(offs_t offset);

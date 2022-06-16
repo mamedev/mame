@@ -23,7 +23,7 @@ class hp1ll3_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
-	hp1ll3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp1ll3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Configuration
 	// Set VRAM size (in kw). Parameter must be <= 128 and it must be a power of 2.

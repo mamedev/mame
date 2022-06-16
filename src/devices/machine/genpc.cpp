@@ -455,7 +455,7 @@ void ibm5160_mb_device::device_add_mconfig(machine_config &config)
 	m_ppi8255->out_pb_callback().set(FUNC(ibm5160_mb_device::pc_ppi_portb_w));
 	m_ppi8255->in_pc_callback().set(FUNC(ibm5160_mb_device::pc_ppi_portc_r));
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace(":maincpu", AS_PROGRAM);
 	m_isabus->set_iospace(":maincpu", AS_IO);
 	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
@@ -517,7 +517,7 @@ ioport_constructor ibm5160_mb_device::device_input_ports() const
 //  ibm5160_mb_device - constructor
 //-------------------------------------------------
 
-ibm5160_mb_device::ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ibm5160_mb_device::ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ibm5160_mb_device(mconfig, IBM5160_MOTHERBOARD, tag, owner, clock)
 {
 }
@@ -697,12 +697,12 @@ ioport_constructor ibm5150_mb_device::device_input_ports() const
 //  ibm5150_mb_device - constructor
 //-------------------------------------------------
 
-ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ibm5150_mb_device(mconfig, IBM5150_MOTHERBOARD, tag, owner, clock)
 {
 }
 
-ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: ibm5160_mb_device(mconfig, type, tag, owner, clock)
 	, m_cassette(*this, "cassette")
 {
@@ -858,7 +858,7 @@ ioport_constructor ec1840_mb_device::device_input_ports() const
 //  ec1840_mb_device - constructor
 //-------------------------------------------------
 
-ec1840_mb_device::ec1840_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ec1840_mb_device::ec1840_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ec1841_mb_device(mconfig, EC1840_MOTHERBOARD, tag, owner, clock)
 {
 }
@@ -970,12 +970,12 @@ ioport_constructor ec1841_mb_device::device_input_ports() const
 //  ec1841_mb_device - constructor
 //-------------------------------------------------
 
-ec1841_mb_device::ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ec1841_mb_device::ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ibm5160_mb_device(mconfig, EC1841_MOTHERBOARD, tag, owner, clock)
 {
 }
 
-ec1841_mb_device::ec1841_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ec1841_mb_device::ec1841_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: ibm5160_mb_device(mconfig, type, tag, owner, clock)
 {
 }
@@ -1025,12 +1025,12 @@ uint8_t ec1841_mb_device::pc_ppi_portc_r()
 	return data;
 }
 
-pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pc_noppi_mb_device(mconfig, PCNOPPI_MOTHERBOARD, tag, owner, clock)
 {
 }
 
-pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: ibm5160_mb_device(mconfig, type, tag, owner, clock)
 {
 }

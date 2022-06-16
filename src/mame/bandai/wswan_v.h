@@ -22,7 +22,7 @@ public:
 	typedef device_delegate<void (int irq)> irq_cb_delegate;
 	typedef device_delegate<void ()> dmasnd_cb_delegate;
 
-	wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~wswan_video_device();
 
 	// static configuration

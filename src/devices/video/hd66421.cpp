@@ -123,7 +123,7 @@ inline void hd66421_device::writebyte(offs_t address, uint8_t data)
 //  hd66421_device - constructor
 //-------------------------------------------------
 
-hd66421_device::hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd66421_device::hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HD66421, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(FUNC(hd66421_device::hd66421), this))

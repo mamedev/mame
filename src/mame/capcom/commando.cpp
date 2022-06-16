@@ -342,7 +342,7 @@ GFXDECODE_END
 
 /* Sound Interface */
 
-#define XTAL        12000000
+#define XTAL        XTAL::u(12000000)
 #define PHI_B       XTAL/2/2
 #define PHI_MAIN    XTAL/2/2 // As seen in the schematics:
 // the signal goes into a bus arbitrion logic that doesn't affect its frequency

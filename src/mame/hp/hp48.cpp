@@ -1140,7 +1140,7 @@ void hp48_state::hp48(address_map &map)
 void hp48_state::hp48_common(machine_config &config)
 {
 	/* cpu */
-	SATURN(config, m_maincpu, 3937007); /* almost 4 MHz */
+	SATURN(config, m_maincpu, XTAL::u(3937007)); /* almost 4 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp48_state::hp48);
 	m_maincpu->out_func().set(FUNC(hp48_state::reg_out));
 	m_maincpu->in_func().set(FUNC(hp48_state::reg_in));
@@ -1168,7 +1168,7 @@ void hp48_state::hp48_common(machine_config &config)
 
 	/* sound */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void hp48_state::hp48gx(machine_config &config)
@@ -1208,7 +1208,7 @@ void hp48_state::hp48gp(machine_config &config)
 void hp48_state::hp48sx(machine_config &config)
 {
 	hp48_common(config);
-	m_maincpu->set_clock(2000000);
+	m_maincpu->set_clock(XTAL::u(2000000));
 	MCFG_MACHINE_START_OVERRIDE(hp48_state, hp48sx)
 
 	/* expansion ports */
@@ -1222,7 +1222,7 @@ void hp48_state::hp48sx(machine_config &config)
 void hp48_state::hp48s(machine_config &config)
 {
 	hp48_common(config);
-	m_maincpu->set_clock(2000000);
+	m_maincpu->set_clock(XTAL::u(2000000));
 	MCFG_MACHINE_START_OVERRIDE(hp48_state, hp48s)
 
 	/* serial I/O */

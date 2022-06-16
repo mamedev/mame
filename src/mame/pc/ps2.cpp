@@ -94,7 +94,7 @@ void ps2_state::machine_start()
 void ps2_state::ps2m30286(machine_config &config)
 {
 	/* basic machine hardware */
-	i80286_cpu_device &maincpu(I80286(config, m_maincpu, 10000000));
+	i80286_cpu_device &maincpu(I80286(config, m_maincpu, XTAL::u(10000000)));
 	maincpu.set_addrmap(AS_PROGRAM, &ps2_state::ps2_16_map);
 	maincpu.set_addrmap(AS_IO, &ps2_state::ps2_16_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -109,10 +109,10 @@ void ps2_state::ps2m30286(machine_config &config)
 	at_softlists(config);
 
 	// FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "vga", true);
-	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, "fdc", false);
-	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, "ide", false);
-	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, "comat", false);
+	ISA16_SLOT(config, "isa1", "mb:isabus", pc_isa16_cards, "vga", true);
+	ISA16_SLOT(config, "isa2", "mb:isabus", pc_isa16_cards, "fdc", false);
+	ISA16_SLOT(config, "isa3", "mb:isabus", pc_isa16_cards, "ide", false);
+	ISA16_SLOT(config, "isa4", "mb:isabus", pc_isa16_cards, "comat", false);
 
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84));
 	kbd.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
@@ -124,7 +124,7 @@ void ps2_state::ps2m30286(machine_config &config)
 
 void ps2_state::ps2386(machine_config &config)
 {
-	I386(config, m_maincpu, 12000000);
+	I386(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ps2_state::ps2_32_map);
 	m_maincpu->set_addrmap(AS_IO, &ps2_state::ps2_32_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -137,16 +137,16 @@ void ps2_state::ps2386(machine_config &config)
 	at_softlists(config);
 
 	// on board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
-	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "ide", true);
-	ISA16_SLOT(config, "board4", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
+	ISA16_SLOT(config, "board1", "mb:isabus", pc_isa16_cards, "fdcsmc", true); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board2", "mb:isabus", pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board3", "mb:isabus", pc_isa16_cards, "ide", true);
+	ISA16_SLOT(config, "board4", "mb:isabus", pc_isa16_cards, "lpt", true);
 	// ISA cards
-	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_et4k", false);
-	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", "mb:isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa2", "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", "mb:isabus", pc_isa16_cards, nullptr, false);
 
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
 	kbd.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
@@ -159,7 +159,7 @@ void ps2_state::ps2386(machine_config &config)
 void ps2_state::ps2386sx(machine_config &config)
 {
 	ps2386(config);
-	I386SX(config.replace(), m_maincpu, 12000000);
+	I386SX(config.replace(), m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ps2_state::ps2_16_map);
 	m_maincpu->set_addrmap(AS_IO, &ps2_state::ps2_16_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));

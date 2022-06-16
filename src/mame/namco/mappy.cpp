@@ -1365,13 +1365,13 @@ void mappy_state::superpac(machine_config &config)
 {
 	superpac_common(config);
 
-	NAMCO_56XX(config, m_namcoio[0], 0);
+	NAMCO_56XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_56XX(config, m_namcoio[1], 0);
+	NAMCO_56XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
@@ -1383,14 +1383,14 @@ void mappy_state::pacnpal(machine_config &config)
 {
 	superpac_common(config);
 
-	NAMCO_56XX(config, m_namcoio[0], 0);
+	NAMCO_56XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 	m_namcoio[0]->out_callback<0>().set(FUNC(mappy_state::out_lamps));
 
-	NAMCO_59XX(config, m_namcoio[1], 0);
+	NAMCO_59XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
@@ -1402,13 +1402,13 @@ void mappy_state::grobda(machine_config &config)
 {
 	superpac_common(config);
 
-	NAMCO_58XX(config, m_namcoio[0], 0);
+	NAMCO_58XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_56XX(config, m_namcoio[1], 0);
+	NAMCO_56XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
@@ -1442,13 +1442,13 @@ void mappy_state::phozon(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));    // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	NAMCO_58XX(config, m_namcoio[0], 0);
+	NAMCO_58XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_56XX(config, m_namcoio[1], 0);
+	NAMCO_56XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
@@ -1529,13 +1529,13 @@ void mappy_state::mappy(machine_config &config)
 {
 	mappy_common(config);
 
-	NAMCO_58XX(config, m_namcoio[0], 0);
+	NAMCO_58XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_58XX(config, m_namcoio[1], 0);
+	NAMCO_58XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
@@ -1549,13 +1549,13 @@ void mappy_state::digdug2(machine_config &config)
 
 	subdevice<watchdog_timer_device>("watchdog")->set_vblank_count("screen", 0);
 
-	NAMCO_58XX(config, m_namcoio[0], 0);
+	NAMCO_58XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_56XX(config, m_namcoio[1], 0);
+	NAMCO_56XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
@@ -1576,14 +1576,14 @@ void mappy_state::motos(machine_config &config)
 {
 	mappy_common(config);
 
-	NAMCO_56XX(config, m_namcoio[0], 0);
+	NAMCO_56XX(config, m_namcoio[0]);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
 	m_namcoio[0]->in_callback<1>().set_ioport("P1");
 	m_namcoio[0]->in_callback<2>().set_ioport("P2");
 	m_namcoio[0]->in_callback<3>().set_ioport("BUTTONS");
 	m_namcoio[0]->out_callback<0>().set(FUNC(mappy_state::out_lamps));
 
-	NAMCO_56XX(config, m_namcoio[1], 0);
+	NAMCO_56XX(config, m_namcoio[1]);
 	m_namcoio[1]->in_callback<0>().set("dipmux", FUNC(ls157_device::output_r));
 	m_namcoio[1]->in_callback<1>().set_ioport("DSW1");
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);

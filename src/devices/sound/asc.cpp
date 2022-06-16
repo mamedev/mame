@@ -49,7 +49,7 @@ DEFINE_DEVICE_TYPE(ASC, asc_device, "asc", "ASC")
 //  asc_device - constructor
 //-------------------------------------------------
 
-asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ASC, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, write_irq(*this)

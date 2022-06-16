@@ -57,7 +57,7 @@ ioport_constructor vcs_lightpen_device::device_input_ports() const
 //  vcs_lightpen_device - constructor
 //-------------------------------------------------
 
-vcs_lightpen_device::vcs_lightpen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vcs_lightpen_device::vcs_lightpen_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VCS_LIGHTPEN, tag, owner, clock),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),

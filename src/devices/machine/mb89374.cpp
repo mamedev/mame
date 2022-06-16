@@ -99,7 +99,7 @@ enum
 //  mb89374_device - constructor
 //-------------------------------------------------
 
-mb89374_device::mb89374_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock ) :
+mb89374_device::mb89374_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock ) :
 	device_t(mconfig, MB89374, tag, owner, clock),
 	device_execute_interface(mconfig, *this),
 	m_icount(0),

@@ -108,7 +108,7 @@ inline void tms3556_device::writebyte(offs_t address, uint8_t data)
 //  tms3556_device - constructor
 //-------------------------------------------------
 
-tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TMS3556, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),

@@ -28,7 +28,7 @@
 
 DEFINE_DEVICE_TYPE(SEGA005, sega005_sound_device, "sega005_sound", "Sega 005 Custom Sound")
 
-sega005_sound_device::sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega005_sound_device::sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA005, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_sega005_sound_timer(nullptr)
@@ -173,7 +173,7 @@ void segag80r_state::sega005_sound_board(machine_config &config)
 	m_samples->set_samples_names(sega005_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	SEGA005(config, "005", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	SEGA005(config, "005").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
@@ -413,7 +413,7 @@ static const char *const monsterb_sample_names[] =
 	nullptr
 };
 
-monsterb_sound_device::monsterb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+monsterb_sound_device::monsterb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MONSTERB_SOUND, tag, owner, clock)
 	, m_audiocpu(*this, "audiocpu")
 	, m_audiocpu_region(*this, "n7751")
@@ -557,7 +557,7 @@ void monsterb_sound_device::n7751_p2_w(uint8_t data)
 void monsterb_sound_device::device_add_mconfig(machine_config &config)
 {
 	/* basic machine hardware */
-	N7751(config, m_audiocpu, 6000000);
+	N7751(config, m_audiocpu, XTAL::u(6000000));
 	m_audiocpu->t1_in_cb().set_constant(0); // labelled as "TEST", connected to ground
 	m_audiocpu->p2_in_cb().set(FUNC(monsterb_sound_device::n7751_command_r));
 	m_audiocpu->bus_in_cb().set(FUNC(monsterb_sound_device::n7751_rom_r));
@@ -576,12 +576,12 @@ void monsterb_sound_device::device_add_mconfig(machine_config &config)
 	m_samples->set_samples_names(monsterb_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	TMS36XX(config, m_music, 247);
+	TMS36XX(config, m_music, XTAL::u(247));
 	m_music->set_subtype(tms36xx_device::subtype::TMS3617);
 	m_music->set_decays(0.5, 0.5, 0.5, 0.5, 0.5, 0.5);
 	m_music->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // 50K (R91-97)/100K (R98-106) ladder network
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // 50K (R91-97)/100K (R98-106) ladder network
 
 	SPEAKER(config, "speaker").front_center();
 }

@@ -35,7 +35,7 @@ class ecb_grip21_device : public device_t, public device_ecbbus_card_interface
 {
 public:
 	// construction/destruction
-	ecb_grip21_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ecb_grip21_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

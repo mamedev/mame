@@ -278,7 +278,7 @@ void clpoker_state::clpoker(machine_config &config)
 	screen.screen_vblank().set(FUNC(clpoker_state::vblank_w));
 
 	PALETTE(config, "palette").set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette")); // HM86171
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette")); // HM86171
 	ramdac.set_addrmap(0, &clpoker_state::ramdac_map);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_clpoker);

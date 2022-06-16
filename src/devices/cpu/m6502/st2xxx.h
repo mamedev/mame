@@ -85,7 +85,7 @@ public:
 	auto out_pl_callback() { return m_out_port_cb[6].bind(); }
 
 protected:
-	st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram);
+	st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram);
 
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_resolve_objects() override;

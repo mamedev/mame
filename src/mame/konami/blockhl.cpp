@@ -303,13 +303,13 @@ void blockhl_state::blockhl(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(blockhl_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(blockhl_state::sprite_callback));

@@ -950,7 +950,7 @@ void mekd3_state::mekd3(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// Keypad and display PIA. CA2 and CB2 are NC.
-	PIA6821(config, m_kpd_pia, 0);
+	PIA6821(config, m_kpd_pia);
 	m_kpd_pia->readpa_handler().set(FUNC(mekd3_state::keypad_key_r));
 	m_kpd_pia->readcb1_handler().set(FUNC(mekd3_state::keypad_cb1_r));
 	m_kpd_pia->writepa_handler().set(FUNC(mekd3_state::led_segment_w));
@@ -968,7 +968,7 @@ void mekd3_state::mekd3(machine_config &config)
 	// MEK68IO
 
 	// A 'user' PIA, I/O available at SK6.
-	PIA6821(config, m_pia_io1, 0);
+	PIA6821(config, m_pia_io1);
 	m_pia_io1->irqa_handler().set(m_mainnmi, FUNC(input_merger_device::in_w<2>));
 	m_pia_io1->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<1>));
 
@@ -976,14 +976,14 @@ void mekd3_state::mekd3(machine_config &config)
 	// PA0 can optionally be an audio bit input, at TP1.
 	// PA1 is a jumper mode input, and low by default.
 	// PA2 can optionally be an audio bit output, at TP2.
-	PIA6821(config, m_pia_io2, 0);
+	PIA6821(config, m_pia_io2);
 	m_pia_io2->readpa_handler().set(FUNC(mekd3_state::pia_io2a_r));
 	m_pia_io2->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<2>));
 	m_pia_io2->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<3>));
 
 	// RS232 ACIA
 	// /RTS, /CTS and /DCD are available at SK3.
-	ACIA6850(config, m_acia_io1, 0);
+	ACIA6850(config, m_acia_io1);
 	m_acia_io1->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia_io1->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_acia_io1->irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<4>));
@@ -1006,7 +1006,7 @@ void mekd3_state::mekd3(machine_config &config)
 
 	// /RTS is available at SK2.
 	// /CTS and /DCD are available at SK2, or can be jumpered low.
-	ACIA6850(config, m_acia_cas, 0);
+	ACIA6850(config, m_acia_cas);
 	m_acia_cas->txd_handler().set([this] (bool state) { m_cass_txbit = state; });
 	m_acia_cas->irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<5>));
 
@@ -1037,13 +1037,13 @@ void mekd3_state::mekd3(machine_config &config)
 	// CA2 light pen input.
 	// PB0 is mode flags and light pen control.
 	// CB1 is VSYNC, and CB2 is HSYNC.
-	PIA6821(config, m_r2_pia, 0);
+	PIA6821(config, m_r2_pia);
 	m_r2_pia->readpa_handler().set(FUNC(mekd3_state::r2_pia_pa_r));
 	m_r2_pia->readpb_handler().set(FUNC(mekd3_state::r2_pia_pb_r));
 	m_r2_pia->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<6>));
 	m_r2_pia->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<7>));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(mekd3_state::kbd_put));
 }
 

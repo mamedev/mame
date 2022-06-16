@@ -21,7 +21,7 @@ class hp_dc100_tape_device : public microtape_image_device
 {
 public:
 	// Construction
-	hp_dc100_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp_dc100_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_image_interface overrides
 	virtual image_init_result call_load() override;

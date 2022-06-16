@@ -29,7 +29,7 @@ class abc800_keyboard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	abc800_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc800_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// abc_keyboard_interface overrides
 	virtual void txd_w(int state) override;

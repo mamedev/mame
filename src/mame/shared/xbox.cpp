@@ -670,7 +670,7 @@ IRQ_CALLBACK_MEMBER(xbox_base_state::irq_callback)
 
 DEFINE_DEVICE_TYPE(XBOX_PIC16LC, xbox_pic16lc_device, "pic16lc", "XBOX PIC16LC")
 
-xbox_pic16lc_device::xbox_pic16lc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xbox_pic16lc_device::xbox_pic16lc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XBOX_PIC16LC, tag, owner, clock)
 {
 }
@@ -721,7 +721,7 @@ void xbox_pic16lc_device::device_reset()
 
 DEFINE_DEVICE_TYPE(XBOX_CX25871, xbox_cx25871_device, "cx25871", "XBOX CX25871")
 
-xbox_cx25871_device::xbox_cx25871_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xbox_cx25871_device::xbox_cx25871_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XBOX_CX25871, tag, owner, clock)
 {
 }
@@ -760,7 +760,7 @@ static int dummyeeprom[256] = {
 
 DEFINE_DEVICE_TYPE(XBOX_EEPROM, xbox_eeprom_device, "eeprom", "XBOX EEPROM")
 
-xbox_eeprom_device::xbox_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xbox_eeprom_device::xbox_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XBOX_EEPROM, tag, owner, clock)
 {
 }
@@ -800,7 +800,7 @@ void xbox_eeprom_device::device_reset()
 
 DEFINE_DEVICE_TYPE(XBOX_SUPERIO, xbox_superio_device, "superio_device", "XBOX debug SuperIO")
 
-xbox_superio_device::xbox_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xbox_superio_device::xbox_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XBOX_SUPERIO, tag, owner, clock)
 	, configuration_mode(false)
 	, index(0)
@@ -959,26 +959,26 @@ void xbox_base_state::xbox_base_map_io(address_map &map)
 void xbox_base_state::xbox_base(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM3(config, m_maincpu, 733333333); /* Wrong! family 6 model 8 stepping 10 */
+	PENTIUM3(config, m_maincpu, XTAL::u(733333333)); /* Wrong! family 6 model 8 stepping 10 */
 	m_maincpu->set_irq_acknowledge_callback(FUNC(xbox_base_state::irq_callback));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	PCI_ROOT(config,        "pci", 0);
+	PCI_ROOT(config,        "pci");
 	NV2A_HOST(config,       "pci:00.0", 0, m_maincpu);
 	NV2A_RAM(config,        "pci:00.3", 0, 128); // 128 megabytes
 	MCPX_ISALPC(config,     "pci:01.0", 0, 0).interrupt_output().set(FUNC(xbox_base_state::maincpu_interrupt));
-	XBOX_SUPERIO(config,    "pci:01.0:0", 0);
+	XBOX_SUPERIO(config,    "pci:01.0:0");
 	MCPX_SMBUS(config,      "pci:01.1", 0, 0).interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq11)); //.set(FUNC(xbox_base_state::smbus_interrupt_changed));
-	XBOX_PIC16LC(config,    "pci:01.1:110", 0); // these 3 are on smbus number 1
-	XBOX_CX25871(config,    "pci:01.1:145", 0);
-	XBOX_EEPROM(config,     "pci:01.1:154", 0);
+	XBOX_PIC16LC(config,    "pci:01.1:110"); // these 3 are on smbus number 1
+	XBOX_CX25871(config,    "pci:01.1:145");
+	XBOX_EEPROM(config,     "pci:01.1:154");
 	MCPX_OHCI(config,       "pci:02.0", 0, 0).interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq1));  //.set(FUNC(xbox_base_state::ohci_usb_interrupt_changed));
 	MCPX_OHCI(config,       "pci:03.0", 0, 0);
-	MCPX_ETH(config,        "pci:04.0", 0);
+	MCPX_ETH(config,        "pci:04.0");
 	MCPX_APU(config,        "pci:05.0", 0, 0, m_maincpu);
 	MCPX_AC97_AUDIO(config, "pci:06.0", 0, 0);
-	MCPX_AC97_MODEM(config, "pci:06.1", 0);
+	MCPX_AC97_MODEM(config, "pci:06.1");
 	PCI_BRIDGE(config,      "pci:08.0", 0, 0x10de01b8, 0);
 	MCPX_IDE(config,        "pci:09.0", 0, 0).pri_interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq14));  //.set(FUNC(xbox_base_state::ide_interrupt_changed));
 	NV2A_AGP(config,        "pci:1e.0", 0, 0x10de01b7, 0);

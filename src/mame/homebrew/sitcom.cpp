@@ -344,7 +344,7 @@ void sitcom_state::sitcom(machine_config &config)
 	m_maincpu->in_sid_func().set(FUNC(sitcom_state::sid_line));
 	m_maincpu->out_sod_func().set_output("sod_led");
 
-	CLOCK(config, "100hz", 100).signal_handler().set_inputline("maincpu", I8085_RST75_LINE);
+	CLOCK(config, "100hz", XTAL::u(100)).signal_handler().set_inputline("maincpu", I8085_RST75_LINE);
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(sitcom_state::update_ppi_pa));
@@ -352,8 +352,8 @@ void sitcom_state::sitcom(machine_config &config)
 	ppi.in_pc_callback().set_ioport("PORTC");
 
 	// video hardware
-	DL1414T(config, "ds0", u32(0)).update().set(FUNC(sitcom_state::update_ds<0>)); // left display
-	DL1414T(config, "ds1", u32(0)).update().set(FUNC(sitcom_state::update_ds<1>)); // right display
+	DL1414T(config, "ds0").update().set(FUNC(sitcom_state::update_ds<0>)); // left display
+	DL1414T(config, "ds1").update().set(FUNC(sitcom_state::update_ds<1>)); // right display
 
 	// host interface
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "null_modem"));
@@ -367,7 +367,7 @@ void sitcom_state::sitcom(machine_config &config)
 void sitcom_timer_state::sitcomtmr(machine_config &config)
 {
 	sitcom(config);
-	DL1414T(config, m_ds2, u32(0)).update().set(FUNC(sitcom_timer_state::update_ds<2>)); // remote display
+	DL1414T(config, m_ds2).update().set(FUNC(sitcom_timer_state::update_ds<2>)); // remote display
 	config.set_default_layout(layout_sitcomtmr);
 }
 

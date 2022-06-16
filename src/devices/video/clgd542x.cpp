@@ -46,22 +46,22 @@ DEFINE_DEVICE_TYPE(CIRRUS_GD5430, cirrus_gd5430_device, "clgd5430", "Cirrus Logi
 DEFINE_DEVICE_TYPE(CIRRUS_GD5446, cirrus_gd5446_device, "clgd5446", "Cirrus Logic GD5446")
 
 
-cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cirrus_gd5428_device(mconfig, CIRRUS_GD5428, tag, owner, clock)
 {
 }
 
-cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: svga_device(mconfig, type, tag, owner, clock)
 {
 }
 
-cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cirrus_gd5428_device(mconfig, CIRRUS_GD5430, tag, owner, clock)
 {
 }
 
-cirrus_gd5446_device::cirrus_gd5446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cirrus_gd5446_device::cirrus_gd5446_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cirrus_gd5428_device(mconfig, CIRRUS_GD5446, tag, owner, clock)
 {
 }

@@ -41,14 +41,14 @@ class compucolor_floppy_port_device : public rs232_port_device
 public:
 	template <typename T>
 	compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: rs232_port_device(mconfig, tag, owner, 0)
+		: rs232_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER( rw_w ) { if (m_dev) m_dev->rw_w(state); }
 	void stepper_w(uint8_t data) { if (m_dev) m_dev->stepper_w(data); }
@@ -70,7 +70,7 @@ class compucolor_floppy_device : public device_t, public device_compucolor_flopp
 {
 public:
 	// construction/destruction
-	compucolor_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	compucolor_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

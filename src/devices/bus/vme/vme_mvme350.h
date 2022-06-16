@@ -12,14 +12,14 @@ DECLARE_DEVICE_TYPE(VME_MVME350, vme_mvme350_card_device)
 class vme_mvme350_card_device : public device_t, public device_vme_card_interface
 {
 public:
-	vme_mvme350_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_mvme350_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Shared memory methods to be exported to the VME bus
 //  virtual uint16_t read16() override;
 //  virtual void write16(uint16_t data) override;
 
 protected:
-	vme_mvme350_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vme_mvme350_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

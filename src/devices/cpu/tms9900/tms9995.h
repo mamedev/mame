@@ -31,7 +31,7 @@ class tms9995_device : public cpu_device
 public:
 	static constexpr int AS_SETADDRESS = 4;
 
-	tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// READY input line. When asserted (high), the memory is ready for data exchange.
 	// We chose to use a direct method instead of a delegate to keep performance
@@ -60,7 +60,7 @@ public:
 	void set_overflow_interrupt( int enable ) { m_check_overflow = (enable!=0); }
 
 protected:
-	tms9995_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	tms9995_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void        device_start() override;
@@ -410,7 +410,7 @@ private:
 class tms9995_mp9537_device : public tms9995_device
 {
 public:
-	tms9995_mp9537_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	tms9995_mp9537_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: tms9995_device(mconfig, TMS9995_MP9537, tag, owner, clock)
 	{
 		m_mp9537 = true;

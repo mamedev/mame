@@ -145,7 +145,7 @@ void wangpc_tig_device::device_add_mconfig(machine_config &config)
 //  wangpc_tig_device - constructor
 //-------------------------------------------------
 
-wangpc_tig_device::wangpc_tig_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wangpc_tig_device::wangpc_tig_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WANGPC_TIG, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_hgdc0(*this, UPD7720_0_TAG),

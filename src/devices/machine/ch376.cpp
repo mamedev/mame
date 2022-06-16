@@ -74,7 +74,7 @@ static constexpr u8 CMD_BYTE_WR_GO = 0x3d;
 //  ch376_device - constructor
 //-------------------------------------------------
 
-ch376_device::ch376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ch376_device::ch376_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CH376, tag, owner, clock),
 	m_state(0),
 	m_status(0),

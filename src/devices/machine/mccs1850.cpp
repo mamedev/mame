@@ -280,7 +280,7 @@ TIMER_CALLBACK_MEMBER(mccs1850_device::advance_seconds)
 //  mccs1850_device - constructor
 //-------------------------------------------------
 
-mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MCCS1850, tag, owner, clock),
 	device_rtc_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),

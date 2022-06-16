@@ -2989,7 +2989,7 @@ void metro_state::daitorid(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, UPD7810_INTF2);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	OKIM6295(config, m_oki, 1200000, okim6295_device::PIN7_HIGH); // sample rate =  M6295 clock / 132
+	OKIM6295(config, m_oki, XTAL::u(1200000), okim6295_device::PIN7_HIGH); // sample rate =  M6295 clock / 132
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
@@ -3154,7 +3154,7 @@ void metro_state::dokyusei(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(1056000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
@@ -3182,7 +3182,7 @@ void metro_state::dokyusp(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(2112000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
@@ -3210,7 +3210,7 @@ void metro_state::gakusai(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(2112000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
@@ -3404,7 +3404,7 @@ void metro_state::vmetal(machine_config &config)
 
 	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ES8712(config, m_essnd, 0);
+	ES8712(config, m_essnd);
 	m_essnd->reset_handler().set(FUNC(metro_state::vmetal_es8712_irq));
 	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
 	m_essnd->set_msm_tag("msm");
@@ -3446,7 +3446,7 @@ void metro_state::blzntrnd(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "vdp2:palette", gfx_blzntrnd);
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_offsets(-77, -21);
 
 	/* sound hardware */

@@ -23,7 +23,7 @@ class flower_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// I/O operations
 	void lower_write(offs_t offset, u8 data);

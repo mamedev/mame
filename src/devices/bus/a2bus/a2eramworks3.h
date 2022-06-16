@@ -23,10 +23,10 @@ class a2eaux_ramworks3_device:
 {
 public:
 	// construction/destruction
-	a2eaux_ramworks3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2eaux_ramworks3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2eaux_ramworks3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2eaux_ramworks3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -48,7 +48,7 @@ private:
 class a2eaux_franklin384_device: public a2eaux_ramworks3_device
 {
 public:
-	a2eaux_franklin384_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2eaux_franklin384_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void write_c07x(u8 offset, u8 data) override;
@@ -57,7 +57,7 @@ protected:
 class a2eaux_franklin512_device: public a2eaux_ramworks3_device
 {
 public:
-	a2eaux_franklin512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2eaux_franklin512_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void write_c07x(u8 offset, u8 data) override;

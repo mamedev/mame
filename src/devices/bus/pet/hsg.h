@@ -26,7 +26,7 @@ class cbm8000_hsg_device : public device_t, public device_pet_expansion_card_int
 {
 protected:
 	// construction/destruction
-	cbm8000_hsg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cbm8000_hsg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -54,7 +54,7 @@ class cbm8000_hsg_a_device :  public cbm8000_hsg_device
 {
 public:
 	// construction/destruction
-	cbm8000_hsg_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cbm8000_hsg_a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -71,7 +71,7 @@ class cbm8000_hsg_b_device :  public cbm8000_hsg_device
 {
 public:
 	// construction/destruction
-	cbm8000_hsg_b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cbm8000_hsg_b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

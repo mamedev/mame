@@ -25,7 +25,7 @@ namespace bus::ti99::peb {
 class forti_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
-	forti_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	forti_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void write(offs_t offset, uint8_t data) override;
 	void readz(offs_t offset, uint8_t *value) override;
 	void crureadz(offs_t offset, uint8_t *value) override { }

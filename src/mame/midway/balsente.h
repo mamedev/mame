@@ -19,7 +19,7 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define BALSENTE_MASTER_CLOCK   (20000000)
+#define BALSENTE_MASTER_CLOCK   XTAL::u(20000000)
 #define BALSENTE_CPU_CLOCK      (BALSENTE_MASTER_CLOCK / 16)
 #define BALSENTE_PIXEL_CLOCK    (BALSENTE_MASTER_CLOCK / 4)
 #define BALSENTE_HTOTAL         (0x140)

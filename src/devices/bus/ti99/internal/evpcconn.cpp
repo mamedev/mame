@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(TI99_EVPCCONN, bus::ti99::internal::evpc_clock_connector, "ti
 
 namespace bus::ti99::internal {
 
-evpc_clock_connector::evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+evpc_clock_connector::evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99_EVPCCONN, tag, owner, clock),
 		m_vdpint(*this)
 {

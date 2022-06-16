@@ -25,13 +25,13 @@ class jaleco_ms32_sysctrl_device : public device_t
 public:
 	// construction/destruction
 	template <typename T>
-	jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&screen_tag)
+	jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag)
 		: jaleco_ms32_sysctrl_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
-	jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// I/O operations
 	void amap(address_map &map);
@@ -81,7 +81,7 @@ private:
 	devcb_write_line m_sound_ack_cb;
 	devcb_write_line m_sound_reset_cb;
 	u8 m_dotclock_setting;
-	inline u32 get_dotclock_frequency();
+	inline XTAL get_dotclock_frequency();
 	bool m_flip_screen_state;
 	struct {
 		u16 horz_blank, horz_display, vert_blank, vert_display;

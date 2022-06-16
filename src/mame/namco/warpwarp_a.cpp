@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE(WARPWARP_SOUND, warpwarp_sound_device, "warpwarp_sound", "Warp Warp Custom Sound")
 
-warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, WARPWARP_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_decay(nullptr),

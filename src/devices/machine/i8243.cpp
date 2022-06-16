@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(I8243, i8243_device, "i8243", "Intel 8243 I/O Expander")
 //  i8243_device - constructor
 //-------------------------------------------------
 
-i8243_device::i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8243_device::i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, I8243, tag, owner, clock)
 	, m_p{0, 0, 0, 0}
 	, m_p2out(0x0f), m_p2(0x0f), m_opcode(0), m_prog(1), m_cs(0)

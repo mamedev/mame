@@ -62,9 +62,9 @@ ROM_END
 //-------------------------------------------------
 void a2bus_a2sd_device::device_add_mconfig(machine_config &config)
 {
-	AT28C64B(config, m_flash, 0);
+	AT28C64B(config, m_flash);
 
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->spi_miso_callback().set(FUNC(a2bus_a2sd_device::spi_miso_w));
 }
 
@@ -81,7 +81,7 @@ const tiny_rom_entry *a2bus_a2sd_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_a2sd_device::a2bus_a2sd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_a2sd_device::a2bus_a2sd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_flash(*this, "flash"),
@@ -90,7 +90,7 @@ a2bus_a2sd_device::a2bus_a2sd_device(const machine_config &mconfig, device_type 
 {
 }
 
-a2bus_a2sd_device::a2bus_a2sd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_a2sd_device::a2bus_a2sd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_a2sd_device(mconfig, A2BUS_A2SD, tag, owner, clock)
 {
 }

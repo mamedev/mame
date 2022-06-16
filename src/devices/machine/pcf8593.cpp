@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(PCF8593, pcf8593_device, "pcf8593", "PCF8593 RTC")
 //  pcf8593_device - constructor
 //-------------------------------------------------
 
-pcf8593_device::pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pcf8593_device::pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PCF8593, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
 	, device_nvram_interface(mconfig, *this)

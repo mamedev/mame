@@ -1252,7 +1252,7 @@ void pcw_state::pcw(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcw_state::pcw_map);
 	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw_io);
 
-	I8041AH(config, m_printer_mcu, 11000000);  // 11MHz
+	I8041AH(config, m_printer_mcu, XTAL::u(11000000));  // 11MHz
 	m_printer_mcu->p2_in_cb().set(FUNC(pcw_state::mcu_printer_p2_r));
 	m_printer_mcu->p2_out_cb().set(FUNC(pcw_state::mcu_printer_p2_w));
 	m_printer_mcu->p1_in_cb().set(FUNC(pcw_state::mcu_printer_p1_r));
@@ -1260,7 +1260,7 @@ void pcw_state::pcw(machine_config &config)
 	m_printer_mcu->t1_in_cb().set(FUNC(pcw_state::mcu_printer_t1_r));
 	m_printer_mcu->t0_in_cb().set(FUNC(pcw_state::mcu_printer_t0_r));
 
-	I8048(config, m_keyboard_mcu, 5000000); // 5MHz
+	I8048(config, m_keyboard_mcu, XTAL::u(5000000)); // 5MHz
 	m_keyboard_mcu->p1_in_cb().set(FUNC(pcw_state::mcu_kb_scan_r));
 	m_keyboard_mcu->p1_out_cb().set(FUNC(pcw_state::mcu_kb_scan_w));
 	m_keyboard_mcu->p2_in_cb().set(FUNC(pcw_state::mcu_kb_scan_high_r));
@@ -1284,9 +1284,9 @@ void pcw_state::pcw(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 3750).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beeper, XTAL::u(3750)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	UPD765A(config, m_fdc, 4'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(4'000'000), true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pcw_state::pcw_fdc_interrupt));
 
 	SOFTWARE_LIST(config, "disk_list").set_original("pcw");
@@ -1294,7 +1294,7 @@ void pcw_state::pcw(machine_config &config)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("256K");
 
-	TIMER(config, "pcw_timer", 0).configure_periodic(FUNC(pcw_state::pcw_timer_interrupt), attotime::from_hz(300));
+	TIMER(config, "pcw_timer").configure_periodic(FUNC(pcw_state::pcw_timer_interrupt), attotime::from_hz(300));
 }
 
 void pcw_state::pcw8256(machine_config &config)

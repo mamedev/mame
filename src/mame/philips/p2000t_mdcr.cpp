@@ -92,7 +92,7 @@ void mdcr_device::device_add_mconfig(machine_config &config)
 	m_cassette->set_formats(p2000t_cassette_formats);
 }
 
-mdcr_device::mdcr_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+mdcr_device::mdcr_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 : device_t(mconfig, MDCR, tag, owner, clock)
 , m_cassette(*this, "cassette")
 , m_read_timer(nullptr)

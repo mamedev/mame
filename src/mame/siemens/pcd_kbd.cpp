@@ -31,7 +31,7 @@ void pcd_keyboard_device::pcd_keyboard_map(address_map &map)
 
 void pcd_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	i8035_device &mcu(I8035(config, "mcu", 5760000));
+	i8035_device &mcu(I8035(config, "mcu", XTAL::u(5760000)));
 	mcu.set_addrmap(AS_PROGRAM, &pcd_keyboard_device::pcd_keyboard_map);
 	mcu.bus_in_cb().set(FUNC(pcd_keyboard_device::bus_r));
 	mcu.p1_in_cb().set(FUNC(pcd_keyboard_device::p1_r));
@@ -222,7 +222,7 @@ ioport_constructor pcd_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pcd_keyboard );
 }
 
-pcd_keyboard_device::pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pcd_keyboard_device::pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PCD_KEYBOARD, tag, owner, clock)
 	, m_rows(*this, "ROW.%u", 0)
 	, m_p1(0)

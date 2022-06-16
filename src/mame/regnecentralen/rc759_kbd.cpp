@@ -151,7 +151,7 @@ ioport_constructor rc759_kbd_hle_device::device_input_ports() const
 //  rc759_kbd_hle_device - constructor
 //-------------------------------------------------
 
-rc759_kbd_hle_device::rc759_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+rc759_kbd_hle_device::rc759_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, RC759_KBD_HLE, tag, owner, clock),
 	device_matrix_keyboard_interface(mconfig, *this, "row_0", "row_1", "row_2", "row_3", "row_4", "row_5", "row_6"),
 	m_int_handler(*this)

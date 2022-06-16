@@ -9,7 +9,7 @@
 class dsp56000_device_base : public cpu_device
 {
 protected:
-	dsp56000_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	dsp56000_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -44,13 +44,13 @@ protected:
 class dsp56000_device : public dsp56000_device_base
 {
 public:
-	dsp56000_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	dsp56000_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 };
 
 class dsp56001_device : public dsp56000_device_base
 {
 public:
-	dsp56001_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	dsp56001_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(DSP56000, dsp56000_device)

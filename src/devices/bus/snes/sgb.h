@@ -23,7 +23,7 @@ public:
 
 protected:
 	// construction/destruction
-	sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -77,7 +77,7 @@ class sns_rom_sgb1_device : public sns_rom_sgb_device
 {
 public:
 	// construction/destruction
-	sns_rom_sgb1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_sgb1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -90,7 +90,7 @@ class sns_rom_sgb2_device : public sns_rom_sgb_device
 {
 public:
 	// construction/destruction
-	sns_rom_sgb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_sgb2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

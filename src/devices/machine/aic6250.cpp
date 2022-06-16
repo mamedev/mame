@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(AIC6251A, aic6251a_device, "aic6251a", "Adaptec AIC-6251A Fas
 static char const *const nscsi_phase[] = { "DATA OUT", "DATA IN", "COMMAND", "STATUS", "*", "*", "MESSAGE OUT", "MESSAGE IN" };
 static char const *const aic6250_phase[] = { "DATA OUT", "*", "DATA IN", "*", "COMMAND", "MESSAGE OUT", "STATUS", "MESSAGE IN" };
 
-aic6250_device::aic6250_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+aic6250_device::aic6250_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nscsi_device(mconfig, type, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_int_cb(*this)
@@ -59,12 +59,12 @@ aic6250_device::aic6250_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-aic6250_device::aic6250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+aic6250_device::aic6250_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: aic6250_device(mconfig, AIC6250, tag, owner, clock)
 {
 }
 
-aic6251a_device::aic6251a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+aic6251a_device::aic6251a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: aic6250_device(mconfig, AIC6251A, tag, owner, clock)
 {
 }

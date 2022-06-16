@@ -334,7 +334,7 @@ MACHINE_RESET_MEMBER(pdp11_state,pdp11qb)
 void pdp11_state::pdp11(machine_config &config)
 {
 	/* basic machine hardware */
-	T11(config, m_maincpu, 4'000'000); // Need proper CPU here
+	T11(config, m_maincpu, XTAL::u(4'000'000)); // Need proper CPU here
 	m_maincpu->set_initial_mode(6 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pdp11_state::pdp11_mem);
 
@@ -351,8 +351,8 @@ void pdp11_state::pdp11(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
 	m_rs232->rxd_handler().set(m_dl11, FUNC(dl11_device::rx_w));
 
-	RX01(config, "rx01", 0);
-	QBUS(config, m_qbus, 0);
+	RX01(config, "rx01");
+	QBUS(config, m_qbus);
 	m_qbus->set_space(m_maincpu, AS_PROGRAM);
 	m_qbus->birq4().set_inputline(m_maincpu, T11_IRQ0);
 	QBUS_SLOT(config, "qbus" ":1", qbus_cards, "pc11");

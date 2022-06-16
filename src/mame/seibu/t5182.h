@@ -12,7 +12,7 @@ class t5182_device : public device_t
 
 {
 public:
-	t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	enum
 	{

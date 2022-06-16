@@ -14,7 +14,7 @@
 class locomo_device : public device_t
 {
 public:
-	locomo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	locomo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0U);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0U);

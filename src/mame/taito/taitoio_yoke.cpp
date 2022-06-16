@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(TAITOIO_YOKE, taitoio_yoke_device, "taitoio_yoke", "Taito I/O
 //  taitoio_yoke_device - constructor
 //-------------------------------------------------
 
-taitoio_yoke_device::taitoio_yoke_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+taitoio_yoke_device::taitoio_yoke_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TAITOIO_YOKE, tag, owner, clock)
 	, m_stick_x(*this, "STICK_X")
 	, m_stick_y(*this, "STICK_Y")

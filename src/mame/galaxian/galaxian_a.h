@@ -10,7 +10,7 @@
 class galaxian_sound_device : public device_t
 {
 public:
-	galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void pitch_w(uint8_t data);
 	void vol_w(offs_t offset, uint8_t data);
@@ -21,7 +21,7 @@ public:
 	void sound_w(offs_t offset, uint8_t data);
 
 protected:
-	galaxian_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	galaxian_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -37,7 +37,7 @@ private:
 class mooncrst_sound_device : public galaxian_sound_device
 {
 public:
-	mooncrst_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mooncrst_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -47,7 +47,7 @@ protected:
 class sbhoei_sound_device : public galaxian_sound_device
 {
 public:
-	sbhoei_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sbhoei_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void noise1_enable_w(offs_t offset, uint8_t data);
 	void noise2_enable_w(offs_t offset, uint8_t data);

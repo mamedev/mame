@@ -49,7 +49,7 @@ void bingo_state::init_bingo()
 void bingo_state::bingo(machine_config &config)
 {
 	/* basic machine hardware */
-	S2650(config, m_maincpu, 1000000);
+	S2650(config, m_maincpu, XTAL::u(1000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &bingo_state::bingo_map);
 }
 
@@ -93,7 +93,7 @@ void seeben_state::init_seeben()
 void seeben_state::seeben(machine_config &config)
 {
 	/* basic machine hardware */
-	I8085A(config, m_maincpu, 1000000);
+	I8085A(config, m_maincpu, XTAL::u(1000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &seeben_state::seeben_map);
 }
 
@@ -139,7 +139,7 @@ void splin_state::init_splin()
 void splin_state::splin(machine_config &config)
 {
 	/* basic machine hardware */
-	I80186(config, m_maincpu, 16000000);
+	I80186(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &splin_state::splin_map);
 }
 

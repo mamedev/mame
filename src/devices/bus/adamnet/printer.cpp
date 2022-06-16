@@ -85,7 +85,7 @@ void adam_printer_device::device_add_mconfig(machine_config &config)
 //  adam_printer_device - constructor
 //-------------------------------------------------
 
-adam_printer_device::adam_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adam_printer_device::adam_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ADAM_PRN, tag, owner, clock),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG)

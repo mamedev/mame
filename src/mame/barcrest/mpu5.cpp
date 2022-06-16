@@ -433,7 +433,7 @@ void mpu5_state::machine_start()
 
 void mpu5_state::mpu5(machine_config &config)
 {
-	M68340(config, m_maincpu, 16000000);    // ?
+	M68340(config, m_maincpu, XTAL::u(16000000));    // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu5_state::mpu5_map);
 
 	SEC(config, m_sec);

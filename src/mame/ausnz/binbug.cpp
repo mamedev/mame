@@ -261,7 +261,7 @@ void binbug_state::binbug(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_r").configure_periodic(FUNC(binbug_state::kansas_r), attotime::from_hz(40000));
 
-	CLOCK(config, m_clock, 4'800); // 300 baud x 16(divider) = 4800
+	CLOCK(config, m_clock, XTAL::u(4'800)); // 300 baud x 16(divider) = 4800
 	m_clock->signal_handler().set(FUNC(binbug_state::kansas_w));
 
 	/* basic machine hardware */
@@ -276,7 +276,7 @@ void binbug_state::binbug(machine_config &config)
 	/* quickload */
 	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(binbug_state::quickload_cb));
 
-	S100_BUS(config, m_s100, 0);
+	S100_BUS(config, m_s100);
 	S100_SLOT(config, "s100:1", binbug_s100_devices, "dg640");
 }
 

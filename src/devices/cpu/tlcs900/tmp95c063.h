@@ -15,7 +15,7 @@ class tmp95c063_device : public tlcs900h_device
 {
 public:
 	// construction/destruction
-	tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto port1_read()  { return m_port1_read.bind(); }

@@ -1768,11 +1768,11 @@ void nemesis_state::set_screen_raw_params(machine_config &config)
 void nemesis_state::nemesis(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	M68000(config, m_maincpu, XTAL::u(18432000)/2); /* 9.216 MHz? */
 //  14318180/2, /* From schematics, should be accurate */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::nemesis_map);
 
-	Z80(config, m_audiocpu, 14318180/8); /* 1.7897725MHz */
+	Z80(config, m_audiocpu, XTAL::u(14318180)/8); /* 1.7897725MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sound_map); /* fixed */
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // 13J
@@ -1785,7 +1785,7 @@ void nemesis_state::nemesis(machine_config &config)
 	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
 	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
-	WATCHDOG_TIMER(config, "watchdog", 0);
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1802,12 +1802,12 @@ void nemesis_state::nemesis(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL::u(14318180)/8));
 	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
 	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
 	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL::u(14318180)/8));
 	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
 	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
 	ay2.add_route(0, "filter2", 1.00);
@@ -1823,18 +1823,18 @@ void nemesis_state::nemesis(machine_config &config)
 	FILTER_RC(config, m_filter4);
 	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	K005289(config, m_k005289, 3579545);
+	K005289(config, m_k005289, XTAL::u(3579545));
 	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
 }
 
 void nemesis_state::gx400(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
+	M68000(config, m_maincpu, XTAL::u(18432000)/2); /* 9.216MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 14318180/8);        /* 1.7897725MHz */
+	Z80(config, m_audiocpu, XTAL::u(14318180)/8);        /* 1.7897725MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
@@ -1866,12 +1866,12 @@ void nemesis_state::gx400(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL::u(14318180)/8));
 	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
 	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
 	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL::u(14318180)/8));
 	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
 	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
 	ay2.add_route(0, "filter2", 1.00);
@@ -1887,10 +1887,10 @@ void nemesis_state::gx400(machine_config &config)
 	FILTER_RC(config, m_filter4);
 	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	K005289(config, m_k005289, 3579545);
+	K005289(config, m_k005289, XTAL::u(3579545));
 	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
 
-	VLM5030(config, m_vlm, 3579545);
+	VLM5030(config, m_vlm, XTAL::u(3579545));
 	m_vlm->set_addrmap(0, &nemesis_state::gx400_vlm_map);
 	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
 }
@@ -1898,11 +1898,11 @@ void nemesis_state::gx400(machine_config &config)
 void nemesis_state::konamigt(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	M68000(config, m_maincpu, XTAL::u(18432000)/2); /* 9.216 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::konamigt_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::konamigt_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 14318180/8);        /* 1.7897725MHz */
+	Z80(config, m_audiocpu, XTAL::u(14318180)/8);        /* 1.7897725MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
@@ -1932,12 +1932,12 @@ void nemesis_state::konamigt(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL::u(14318180)/8));
 	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
 	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
 	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL::u(14318180)/8));
 	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
 	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
 	ay2.add_route(0, "filter2", 1.00);
@@ -1953,18 +1953,18 @@ void nemesis_state::konamigt(machine_config &config)
 	FILTER_RC(config, m_filter4);
 	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	K005289(config, m_k005289, 3579545);
+	K005289(config, m_k005289, XTAL::u(3579545));
 	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 void nemesis_state::rf2_gx400(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
+	M68000(config, m_maincpu, XTAL::u(18432000)/2); /* 9.216MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::rf2_gx400_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 14318180/8); /* 1.7897725MHz */
+	Z80(config, m_audiocpu, XTAL::u(14318180)/8); /* 1.7897725MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
@@ -1996,12 +1996,12 @@ void nemesis_state::rf2_gx400(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL::u(14318180)/8));
 	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
 	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
 	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL::u(14318180)/8));
 	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
 	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
 	ay2.add_route(0, "filter2", 1.00);
@@ -2017,10 +2017,10 @@ void nemesis_state::rf2_gx400(machine_config &config)
 	FILTER_RC(config, m_filter4);
 	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	K005289(config, m_k005289, 3579545);
+	K005289(config, m_k005289, XTAL::u(3579545));
 	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	VLM5030(config, m_vlm, 3579545);
+	VLM5030(config, m_vlm, XTAL::u(3579545));
 	m_vlm->set_addrmap(0, &nemesis_state::gx400_vlm_map);
 	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
 }
@@ -2028,10 +2028,10 @@ void nemesis_state::rf2_gx400(machine_config &config)
 void nemesis_state::salamand(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
+	M68000(config, m_maincpu, XTAL::u(18432000)/2); /* 9.216MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::salamand_map);
 
-	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
+	Z80(config, m_audiocpu, XTAL::u(3579545)); /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sal_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -2053,17 +2053,17 @@ void nemesis_state::salamand(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	VLM5030(config, m_vlm, 3579545);
+	VLM5030(config, m_vlm, XTAL::u(3579545));
 	m_vlm->set_addrmap(0, &nemesis_state::salamand_vlm_map);
 	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 2.50);
 	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 2.50);
 
-	K007232(config, m_k007232, 3579545);
+	K007232(config, m_k007232, XTAL::u(3579545));
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
 	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.08);
 	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.08);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(3579545)));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
 	ymsnd.add_route(0, "rspeaker", 1.2); // reversed according to MT #4565
 	ymsnd.add_route(1, "lspeaker", 1.2);
@@ -2072,10 +2072,10 @@ void nemesis_state::salamand(machine_config &config)
 void nemesis_state::blkpnthr(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	M68000(config, m_maincpu, XTAL::u(18432000)/2); /* 9.216 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::blkpnthr_map);
 
-	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
+	Z80(config, m_audiocpu, XTAL::u(3579545)); /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::blkpnthr_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -2097,12 +2097,12 @@ void nemesis_state::blkpnthr(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	K007232(config, m_k007232, 3579545);
+	K007232(config, m_k007232, XTAL::u(3579545));
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
 	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
 	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(3579545)));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
 	ymsnd.add_route(0, "lspeaker", 1.0);
 	ymsnd.add_route(1, "rspeaker", 1.0);
@@ -2111,10 +2111,10 @@ void nemesis_state::blkpnthr(machine_config &config)
 void nemesis_state::citybomb(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	M68000(config, m_maincpu, XTAL::u(18432000)/2); /* 9.216 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::citybomb_map);
 
-	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
+	Z80(config, m_audiocpu, XTAL::u(3579545)); /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::city_sound_map);
 
 	adc0804_device &adc(ADC0804(config, "adc", RES_K(10), CAP_P(150)));
@@ -2138,25 +2138,25 @@ void nemesis_state::citybomb(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	K007232(config, m_k007232, 3579545);
+	K007232(config, m_k007232, XTAL::u(3579545));
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
 	m_k007232->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	ym3812_device &ym3812(YM3812(config, "ymsnd", 3579545));
+	ym3812_device &ym3812(YM3812(config, "ymsnd", XTAL::u(3579545)));
 //  ym3812.irq_handler().set_inputline("audiocpu", 0); ... Interrupts _are_ generated, I wonder where they go
 	ym3812.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	k051649_device &k051649(K051649(config, "k051649", 3579545));
+	k051649_device &k051649(K051649(config, "k051649", XTAL::u(3579545)));
 	k051649.add_route(ALL_OUTPUTS, "mono", 0.38);
 }
 
 void nemesis_state::nyanpani(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	M68000(config, m_maincpu, XTAL::u(18432000)/2); /* 9.216 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::nyanpani_map);
 
-	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
+	Z80(config, m_audiocpu, XTAL::u(3579545)); /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::city_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -2177,29 +2177,29 @@ void nemesis_state::nyanpani(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	K007232(config, m_k007232, 3579545);
+	K007232(config, m_k007232, XTAL::u(3579545));
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
 	m_k007232->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	ym3812_device &ym3812(YM3812(config, "ymsnd", 3579545));
+	ym3812_device &ym3812(YM3812(config, "ymsnd", XTAL::u(3579545)));
 //  ym3812.irq_handler().set_inputline("audiocpu", 0); ... Interrupts _are_ generated, I wonder where they go
 	ym3812.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	k051649_device &k051649(K051649(config, "k051649", 3579545));
+	k051649_device &k051649(K051649(config, "k051649", XTAL::u(3579545)));
 	k051649.add_route(ALL_OUTPUTS, "mono", 0.38);
 }
 
 void nemesis_state::hcrash(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 18432000/3); /* 6.144MHz */
+	M68000(config, m_maincpu, XTAL::u(18432000)/3); /* 6.144MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::hcrash_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::hcrash_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 14318180/4); /* 3.579545 MHz */
+	Z80(config, m_audiocpu, XTAL::u(14318180)/4); /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sal_sound_map);
 
-	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown clock (doesn't seem to be R/C here)
+	adc0804_device &adc(ADC0804(config, "adc", XTAL::u(640000))); // unknown clock (doesn't seem to be R/C here)
 	adc.vin_callback().set(FUNC(nemesis_state::selected_ip_r));
 
 	ls259_device &intlatch(LS259(config, "intlatch"));
@@ -2225,17 +2225,17 @@ void nemesis_state::hcrash(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	VLM5030(config, m_vlm, 3579545);
+	VLM5030(config, m_vlm, XTAL::u(3579545));
 	m_vlm->set_addrmap(0, &nemesis_state::salamand_vlm_map);
 	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 2.00);
 	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 2.00);
 
-	K007232(config, m_k007232, 3579545);
+	K007232(config, m_k007232, XTAL::u(3579545));
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
 	m_k007232->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
 	m_k007232->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(3579545)));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
 	ymsnd.add_route(0, "lspeaker", 0.50);
 	ymsnd.add_route(1, "rspeaker", 0.50);
@@ -2949,11 +2949,11 @@ PIN16 VCC
 void nemesis_state::bubsys(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
+	M68000(config, m_maincpu, XTAL::u(18432000)/2); /* 9.216MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::bubsys_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::bubsys_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 14318180/8); /* 1.7897725MHz */
+	Z80(config, m_audiocpu, XTAL::u(14318180)/8); /* 1.7897725MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
@@ -2986,12 +2986,12 @@ void nemesis_state::bubsys(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL::u(14318180)/8));
 	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
 	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
 	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL::u(14318180)/8));
 	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
 	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
 	ay2.add_route(0, "filter2", 1.00);
@@ -3007,10 +3007,10 @@ void nemesis_state::bubsys(machine_config &config)
 	FILTER_RC(config, m_filter4);
 	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	K005289(config, m_k005289, 3579545);
+	K005289(config, m_k005289, XTAL::u(3579545));
 	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
 
-	VLM5030(config, m_vlm, 3579545);
+	VLM5030(config, m_vlm, XTAL::u(3579545));
 	m_vlm->set_addrmap(0, &nemesis_state::gx400_vlm_map);
 	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
 }

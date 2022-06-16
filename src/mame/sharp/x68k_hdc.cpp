@@ -26,7 +26,7 @@ ALLOW_SAVE_TYPE(x68k_hdc_image_device::sasi_phase);
 
 DEFINE_DEVICE_TYPE(X68KHDC, x68k_hdc_image_device, "x68k_hdc_image", "SASI Hard Disk")
 
-x68k_hdc_image_device::x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+x68k_hdc_image_device::x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: harddisk_image_base_device(mconfig, X68KHDC, tag, owner, clock)
 {
 }

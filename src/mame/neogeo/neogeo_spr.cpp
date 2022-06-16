@@ -615,7 +615,7 @@ void neosprite_base_device::set_pens(const pen_t* pens)
 
 DEFINE_DEVICE_TYPE(NEOGEO_SPRITE_REGULAR, neosprite_regular_device, "neosprite_reg", "Neo-Geo Sprites (regular)")
 
-neosprite_regular_device::neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+neosprite_regular_device::neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: neosprite_base_device(mconfig, NEOGEO_SPRITE_REGULAR, tag, owner, clock)
 {
 }
@@ -663,7 +663,7 @@ inline void neosprite_regular_device::draw_pixel(int romaddr, uint32_t* dst, con
 
 DEFINE_DEVICE_TYPE(NEOGEO_SPRITE_OPTIMZIED, neosprite_optimized_device, "neosprite_opt", "Neo-Geo Sprites (optimized)")
 
-neosprite_optimized_device::neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+neosprite_optimized_device::neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: neosprite_base_device(mconfig, NEOGEO_SPRITE_OPTIMZIED, tag, owner, clock)
 	, m_spritegfx8(nullptr)
 {
@@ -740,7 +740,7 @@ inline void neosprite_optimized_device::draw_pixel(int romaddr, uint32_t* dst, c
 DEFINE_DEVICE_TYPE(NEOGEO_SPRITE_MIDAS, neosprite_midas_device, "midassprite", "MIDAS Sprites")
 
 
-neosprite_midas_device::neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+neosprite_midas_device::neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: neosprite_base_device(mconfig, NEOGEO_SPRITE_MIDAS, tag, owner, clock)
 {
 	m_bppshift = 8;

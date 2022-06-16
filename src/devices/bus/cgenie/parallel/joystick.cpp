@@ -93,7 +93,7 @@ ioport_constructor cgenie_joystick_device::device_input_ports() const
 //  cgenie_joystick_device - constructor
 //-------------------------------------------------
 
-cgenie_joystick_device::cgenie_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cgenie_joystick_device::cgenie_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CGENIE_JOYSTICK, tag, owner, clock),
 	device_cg_parallel_interface(mconfig, *this),
 	m_joy(*this, "JOY.%u", 0),

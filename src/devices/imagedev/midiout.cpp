@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(MIDIOUT, midiout_device, "midiout", "MIDI Out image device")
     ctor
 -------------------------------------------------*/
 
-midiout_device::midiout_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+midiout_device::midiout_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MIDIOUT, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		device_serial_interface(mconfig, *this),
@@ -47,8 +47,8 @@ void midiout_device::device_reset()
 {
 	// we don't Tx, we Rx at 31250 8-N-1
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rcv_rate(31250);
-	set_tra_rate(0);
+	set_rcv_rate(XTAL::u(31250));
+	set_tra_rate(XTAL::u(0));
 }
 
 /*-------------------------------------------------

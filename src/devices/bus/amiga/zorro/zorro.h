@@ -160,10 +160,10 @@ class zorro_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	zorro_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	zorro_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	template <typename T, typename O>
 	zorro_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&zorrotag, O &&opts, const char *dflt)
-		: zorro_slot_device(mconfig, tag, owner, 0)
+		: zorro_slot_device(mconfig, tag, owner)
 	{
 		set_zorro_slot(std::forward<T>(zorrotag));
 		option_reset();
@@ -176,7 +176,7 @@ public:
 	template <class T> void set_zorro_slot(T &&zorro_tag) { m_zorro_bus.set_tag(zorro_tag); }
 
 protected:
-	zorro_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	zorro_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -217,7 +217,7 @@ public:
 
 protected:
 	// construction/destruction
-	zorro_bus_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	zorro_bus_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override ATTR_COLD;
@@ -237,7 +237,7 @@ class exp_slot_device : public zorro_bus_device_base
 {
 public:
 	// construction/destruction
-	exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto ipl_handler() { return m_ipl_handler.bind(); }
 
@@ -251,7 +251,7 @@ public:
 	virtual void fc_w(int code) override;
 
 protected:
-	exp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	exp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override ATTR_COLD;
@@ -272,7 +272,7 @@ class zorro2_bus_device : public zorro_bus_device_base
 {
 public:
 	// construction/destruction
-	zorro2_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	zorro2_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~zorro2_bus_device();
 
 	auto eint1_handler() { return m_eint1_handler.bind(); }
@@ -295,7 +295,7 @@ public:
 	virtual void fc_w(int code) override;
 
 protected:
-	zorro2_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	zorro2_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override ATTR_COLD;

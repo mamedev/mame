@@ -12,12 +12,7 @@ class kaneko_view2_tilemap_device : public device_t, public device_gfx_interface
 public:
 	typedef device_delegate<void (u8, u32*)> view2_cb_delegate;
 
-	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: kaneko_view2_tilemap_device(mconfig, tag, owner, (u32)0)
-	{
-	}
-
-	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	void set_colbase(u16 base) { m_colbase = base; }

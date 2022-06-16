@@ -52,7 +52,7 @@ DEFINE_DEVICE_TYPE(IQ151_VIDEO64, iq151_video64_device, "iq151_video64", "IQ151 
 //  iq151_video64_device - constructor
 //-------------------------------------------------
 
-iq151_video64_device::iq151_video64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iq151_video64_device::iq151_video64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IQ151_VIDEO64, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr, "^^palette")
 	, device_iq151cart_interface( mconfig, *this )

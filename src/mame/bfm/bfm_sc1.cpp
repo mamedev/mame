@@ -1088,7 +1088,7 @@ void bfm_sc1_state::scorpion1(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 
-	BFM_BD1(config, m_vfd0, 60, 0);
+	BFM_BD1(config, m_vfd0, XTAL::u(60), 0);
 	SPEAKER(config, "mono").front_center();
 	GENERIC_LATCH_8(config, "soundlatch");
 	AY8912(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1109,7 +1109,7 @@ void bfm_sc1_state::scorpion1(machine_config &config)
 	REEL(config, m_reels[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reels[5]->optic_handler().set(FUNC(bfm_sc1_state::reel_optic_cb<5>));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1124,7 +1124,7 @@ void bfm_sc1_state::scorpion1_adder2(machine_config &config)
 
 	config.set_default_layout(layout_sc1_vid);
 
-	BFM_ADDER2(config, "adder2", 0);
+	BFM_ADDER2(config, "adder2");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

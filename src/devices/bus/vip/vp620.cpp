@@ -38,7 +38,7 @@ void vp620_device::kb_w(uint8_t data)
 
 void vp620_device::device_add_mconfig(machine_config &config)
 {
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(vp620_device::kb_w));
 }
 
@@ -52,7 +52,7 @@ void vp620_device::device_add_mconfig(machine_config &config)
 //  vp620_device - constructor
 //-------------------------------------------------
 
-vp620_device::vp620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vp620_device::vp620_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VP620, tag, owner, clock),
 	device_vip_byteio_port_interface(mconfig, *this),
 	m_keydata(0),

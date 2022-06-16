@@ -12,7 +12,7 @@
 
 DEFINE_DEVICE_TYPE(NES_APU_VT, nes_apu_vt_device, "nes_apu_vt", "XOP APU")
 
-nes_apu_vt_device::nes_apu_vt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_apu_vt_device::nes_apu_vt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nesapu_device(mconfig, NES_APU_VT, tag, owner, clock)
 {
 }

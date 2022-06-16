@@ -46,7 +46,7 @@ DEFINE_DEVICE_TYPE(INS8154, ins8154_device, "ins8154", "INS8154 RAM I/O")
 //  ins8154_device - constructor
 //-------------------------------------------------
 
-ins8154_device::ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ins8154_device::ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, INS8154, tag, owner, clock)
 	, m_in_a_cb(*this)
 	, m_out_a_cb(*this)

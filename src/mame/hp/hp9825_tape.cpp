@@ -75,7 +75,7 @@ enum : unsigned {
 // Device type definition
 DEFINE_DEVICE_TYPE(HP9825_TAPE, hp9825_tape_device, "hp9825_tape", "HP9825 tape sub-system")
 
-hp9825_tape_device::hp9825_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp9825_tape_device::hp9825_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 : device_t(mconfig , HP9825_TAPE , tag , owner , clock)
 	, m_flg_handler(*this)
 	, m_sts_handler(*this)
@@ -90,7 +90,7 @@ hp9825_tape_device::hp9825_tape_device(const machine_config &mconfig, const char
 
 void hp9825_tape_device::device_add_mconfig(machine_config &config)
 {
-	HP_DC100_TAPE(config , m_tape , 0);
+	HP_DC100_TAPE(config , m_tape);
 	m_tape->set_acceleration(ACCELERATION);
 	m_tape->set_set_points(SLOW_SPEED , FAST_SPEED);
 	m_tape->set_tick_size(TACH_TICK_LENGTH);
@@ -103,7 +103,7 @@ void hp9825_tape_device::device_add_mconfig(machine_config &config)
 	m_tape->rd_bit().set(FUNC(hp9825_tape_device::rd_bit_w));
 	m_tape->wr_bit().set(FUNC(hp9825_tape_device::wr_bit_r));
 
-	TTL74123(config , m_short_gap_timer , 0);
+	TTL74123(config , m_short_gap_timer);
 	m_short_gap_timer->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_short_gap_timer->set_resistor_value(RES_K(37.9));
 	m_short_gap_timer->set_capacitor_value(CAP_N(10));
@@ -111,7 +111,7 @@ void hp9825_tape_device::device_add_mconfig(machine_config &config)
 	m_short_gap_timer->set_clear_pin_value(1);
 	m_short_gap_timer->out_cb().set(FUNC(hp9825_tape_device::short_gap_w));
 
-	TTL74123(config , m_long_gap_timer , 0);
+	TTL74123(config , m_long_gap_timer);
 	m_long_gap_timer->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_long_gap_timer->set_resistor_value(RES_K(28.7));
 	m_long_gap_timer->set_capacitor_value(CAP_U(0.22));

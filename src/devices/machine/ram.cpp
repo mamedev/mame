@@ -120,7 +120,7 @@ DEFINE_DEVICE_TYPE(RAM, ram_device, "ram", "RAM")
 //  ram_device - constructor
 //-------------------------------------------------
 
-ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RAM, tag, owner, clock)
 	, m_size(0)
 	, m_default_size(0)

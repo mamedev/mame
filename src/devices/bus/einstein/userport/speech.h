@@ -25,7 +25,7 @@ class einstein_speech_device : public device_t, public device_einstein_userport_
 {
 public:
 	// construction/destruction
-	einstein_speech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	einstein_speech_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

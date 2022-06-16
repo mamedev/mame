@@ -78,7 +78,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
 
 protected:
-	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t sprite_limit, address_map_constructor internal);
+	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint16_t sprite_limit, address_map_constructor internal);
 
 	void internal_map(address_map &map);
 
@@ -151,15 +151,15 @@ class spg24x_device : public spg2xx_device
 {
 public:
 	template <typename T>
-	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag)
 		: spg24x_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
-	spg24x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t sprite_limit, address_map_constructor internal);
+	spg24x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint16_t sprite_limit, address_map_constructor internal);
 
-	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -169,26 +169,26 @@ class spg2xx_128_device : public spg24x_device
 {
 public:
 	template <typename T>
-	spg2xx_128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+	spg2xx_128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag)
 		: spg2xx_128_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
-	spg2xx_128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg2xx_128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class spg28x_device : public spg24x_device
 {
 public:
 	template <typename T>
-	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag)
 		: spg28x_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
-	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 };
 

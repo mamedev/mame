@@ -689,7 +689,7 @@ void taitoair_state::airsys(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -697,7 +697,7 @@ void taitoair_state::airsys(machine_config &config)
 	m_tc0220ioc->write_4_callback().set(FUNC(taitoair_state::coin_control_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
-	TAITOIO_YOKE(config, m_yoke, 0);
+	TAITOIO_YOKE(config, m_yoke);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -706,13 +706,13 @@ void taitoair_state::airsys(machine_config &config)
 //  m_screen->set_size(64*16, 32*16);
 //  m_screen->set_visarea(0*16, 32*16-1, 3*16, 28*16-1);
 	// Estimated, assume same as mlanding.cpp
-	m_screen->set_raw(16000000, 640, 0, 512, 462, 3*16, 28*16);
+	m_screen->set_raw(XTAL::u(16000000), 640, 0, 512, 462, 3*16, 28*16);
 	m_screen->set_screen_update(FUNC(taitoair_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::BLACK, 512*16+512*16);
 
-	TC0080VCO(config, m_tc0080vco, 0);
+	TC0080VCO(config, m_tc0080vco);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
 	m_tc0080vco->set_palette(m_palette);
@@ -726,7 +726,7 @@ void taitoair_state::airsys(machine_config &config)
 	ymsnd.add_route(1, "mono", 0.60);
 	ymsnd.add_route(2, "mono", 0.60);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }

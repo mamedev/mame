@@ -120,14 +120,14 @@ public:
 	};
 
 	template <typename T, typename U, typename V>
-	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag, U &&cpu2_tag, V &&cde_tag)
+	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu1_tag, U &&cpu2_tag, V &&cde_tag)
 		: m2_bda_device(mconfig, tag, owner, clock)
 	{
 		m_cpu1.set_tag(std::forward<T>(cpu1_tag));
 		m_cpu2.set_tag(std::forward<U>(cpu2_tag));
 		m_cde.set_tag(std::forward<V>(cde_tag));
 	}
-	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto videores_in() { return m_videores_in.bind(); }
 	auto ldac_handler() { return m_dac_l.bind(); }
@@ -239,7 +239,7 @@ public: // TODO: THIS SHOULD NOT BE PUBLIC
 class m2_powerbus_device : public device_t
 {
 public:
-	m2_powerbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m2_powerbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Static configuration helpers
 	auto int_handler() { return m_int_handler.bind(); }
@@ -293,7 +293,7 @@ private:
 class m2_memctl_device : public device_t
 {
 public:
-	m2_memctl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m2_memctl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <std::size_t Line> auto gpio_in_handler() { return m_gpio_in[Line].bind(); }
 	template <std::size_t Line> auto gpio_out_handler() { return m_gpio_out[Line].bind(); }
@@ -386,7 +386,7 @@ private:
 class m2_vdu_device : public device_t
 {
 public:
-	m2_vdu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m2_vdu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Static configuration helpers
 	auto vint0_int_handler() { return m_vint0_int_handler.bind(); }
@@ -449,7 +449,7 @@ private:
 class m2_ctrlport_device : public device_t
 {
 public:
-	m2_ctrlport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m2_ctrlport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t read(offs_t offset);
 	void write(offs_t offset, uint32_t data);
@@ -471,7 +471,7 @@ private:
 class m2_mpeg_device : public device_t
 {
 public:
-	m2_mpeg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m2_mpeg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t read(offs_t offset);
 	void write(offs_t offset, uint32_t data);
@@ -494,13 +494,13 @@ class m2_cde_device : public device_t
 {
 public:
 	template <typename T, typename U>
-	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu1_tag, U &&bda_tag)
+	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu1_tag, U &&bda_tag)
 		: m2_cde_device(mconfig, tag, owner, clock)
 	{
 		m_cpu1.set_tag(std::forward<T>(cpu1_tag));
 		m_bda.set_tag(std::forward<U>(bda_tag));
 	}
-	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Static configuration helpers
 	auto int_handler() { return m_int_handler.bind(); }

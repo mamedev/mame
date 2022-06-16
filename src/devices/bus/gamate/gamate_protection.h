@@ -12,7 +12,7 @@ class gamate_protection_device : public device_t
 {
 public:
 	// construction/destruction
-	gamate_protection_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gamate_protection_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	bool is_protection_passed();
 

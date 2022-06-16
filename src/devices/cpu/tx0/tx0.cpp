@@ -46,7 +46,7 @@ DEFINE_DEVICE_TYPE(TX0_8KW_OLD, tx0_8kwo_device, "tx0_8kwo_cpu", "MIT Lincoln La
 DEFINE_DEVICE_TYPE(TX0_64KW,    tx0_64kw_device, "tx0_64kw_cpu", "MIT Lincoln Laboratory TX-0 64KW")
 
 
-tx0_device::tx0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addr_bits, int address_mask, int ir_mask)
+tx0_device::tx0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int addr_bits, int address_mask, int ir_mask)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, addr_bits , -2), m_mbr(0), m_ac(0), m_mar(0), m_pc(0), m_ir(0), m_lr(0), m_xr(0), m_pf(0), m_tbr(0), m_tac(0), m_cm_sel(0)
 	, m_lr_sel(0), m_gbl_cm_sel(0), m_stop_cyc0(0), m_stop_cyc1(0), m_run(0), m_rim(0), m_cycle(0), m_ioh(0), m_ios(0), m_rim_step(0)
@@ -66,23 +66,23 @@ tx0_device::tx0_device(const machine_config &mconfig, device_type type, const ch
 	m_program_config.m_is_octal = true;
 }
 
-tx0_8kw_device::tx0_8kw_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+tx0_8kw_device::tx0_8kw_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: tx0_device(mconfig, type, tag, owner, clock, 13, ADDRESS_MASK_8KW, 037)
 {
 }
 
-tx0_8kw_device::tx0_8kw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tx0_8kw_device::tx0_8kw_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tx0_8kw_device(mconfig, TX0_8KW, tag, owner, clock)
 {
 }
 
-tx0_8kwo_device::tx0_8kwo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tx0_8kwo_device::tx0_8kwo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tx0_8kw_device(mconfig, TX0_8KW_OLD, tag, owner, clock)
 {
 }
 
 
-tx0_64kw_device::tx0_64kw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tx0_64kw_device::tx0_64kw_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tx0_device(mconfig, TX0_64KW, tag, owner, clock, 16, ADDRESS_MASK_64KW, 03)
 {
 }

@@ -27,7 +27,7 @@ class cdrom_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~cdrom_image_device();
 
 	void set_interface(const char *interface) { m_interface = interface; }
@@ -49,7 +49,7 @@ public:
 	cdrom_file *get_cdrom_file() { return m_cdrom_handle; }
 
 protected:
-	cdrom_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cdrom_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_config_complete() override;

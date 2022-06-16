@@ -218,7 +218,7 @@ void epson_ex800_device::ex800_mem(address_map &map)
 void epson_ex800_device::device_add_mconfig(machine_config &config)
 {
 	/* basic machine hardware */
-	upd7810_device &upd(UPD7810(config, m_maincpu, 12000000)); // 12 MHz?
+	upd7810_device &upd(UPD7810(config, m_maincpu, XTAL::u(12000000))); // 12 MHz?
 	upd.set_addrmap(AS_PROGRAM, &epson_ex800_device::ex800_mem);
 	upd.pa_in_cb().set(FUNC(epson_ex800_device::porta_r));
 	upd.pa_out_cb().set(FUNC(epson_ex800_device::porta_w));
@@ -231,7 +231,7 @@ void epson_ex800_device::device_add_mconfig(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 4000); // measured at 4000 Hz */
+	BEEP(config, m_beeper, XTAL::u(4000)); // measured at 4000 Hz */
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -342,7 +342,7 @@ ioport_constructor epson_ex800_device::device_input_ports() const
 //  epson_ex800_device - constructor
 //-------------------------------------------------
 
-epson_ex800_device::epson_ex800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+epson_ex800_device::epson_ex800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, EPSON_EX800, tag, owner, clock),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),

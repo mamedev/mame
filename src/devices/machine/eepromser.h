@@ -216,7 +216,7 @@ class eeprom_serial_##_lowercase##_##_bits##bit_device : public eeprom_serial_##
 { \
 public: \
 	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming = eeprom_serial_streaming::DISABLE); \
-	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock); \
+	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock); \
 }; \
 DECLARE_DEVICE_TYPE(EEPROM_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device)
 

@@ -26,7 +26,7 @@ class tanbus_tanhrg_device :
 {
 public:
 	// construction/destruction
-	tanbus_tanhrg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tanbus_tanhrg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -57,7 +57,7 @@ class tanbus_tanhrgc_device :
 {
 public:
 	// construction/destruction
-	tanbus_tanhrgc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tanbus_tanhrgc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

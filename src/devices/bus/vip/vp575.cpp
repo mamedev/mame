@@ -83,7 +83,7 @@ void vp575_device::device_add_mconfig(machine_config &config)
 //  vp575_device - constructor
 //-------------------------------------------------
 
-vp575_device::vp575_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vp575_device::vp575_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VP575, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_expansion_slot(*this, "exp%u", 1)

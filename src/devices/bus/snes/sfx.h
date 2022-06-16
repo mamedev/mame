@@ -14,7 +14,7 @@ class sns_rom_superfx_device : public sns_rom_device
 {
 protected:
 	// construction/destruction
-	sns_rom_superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -48,7 +48,7 @@ class sns_rom_superfx1_device : public sns_rom_superfx_device
 {
 public:
 	// construction/destruction
-	sns_rom_superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -58,7 +58,7 @@ class sns_rom_superfx2_device : public sns_rom_superfx_device
 {
 public:
 	// construction/destruction
-	sns_rom_superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

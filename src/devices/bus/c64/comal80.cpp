@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(C64_COMAL80, c64_comal80_cartridge_device, "c64_comal80", "C6
 //  c64_comal80_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_comal80_cartridge_device::c64_comal80_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_comal80_cartridge_device::c64_comal80_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_COMAL80, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)

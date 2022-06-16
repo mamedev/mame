@@ -53,7 +53,7 @@ class svi_slot_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	svi_slot_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	svi_slot_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~svi_slot_bus_device();
 
 	// callbacks
@@ -101,7 +101,7 @@ public:
 	// construction/destruction
 	template <typename T, typename U>
 	svi_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus, U &&opts, char const *dflt)
-		: svi_slot_device(mconfig, tag, owner, 0)
+		: svi_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -110,7 +110,7 @@ public:
 		set_bus(std::forward<T>(bus));
 	}
 
-	svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_bus(T &&tag) { m_bus.set_tag(std::forward<T>(tag)); }
 

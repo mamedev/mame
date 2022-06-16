@@ -16,7 +16,7 @@ class sns_rom_sdd1_device : public device_t,
 {
 public:
 	// construction/destruction
-	sns_rom_sdd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_sdd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_l(offs_t offset) override;
@@ -27,7 +27,7 @@ public:
 	virtual void chip_write(offs_t offset, uint8_t data) override;
 
 protected:
-	sns_rom_sdd1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_sdd1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

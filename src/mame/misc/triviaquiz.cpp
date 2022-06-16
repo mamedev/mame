@@ -150,7 +150,7 @@ void triviaquiz_state::triviaquiz(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &triviaquiz_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &triviaquiz_state::io_map);
 
-	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_addrmap(AS_PROGRAM, &triviaquiz_state::romboard_map);
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(20);

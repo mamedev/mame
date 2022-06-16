@@ -20,7 +20,7 @@
 DEFINE_DEVICE_TYPE(A78_HISCORE, a78_hiscore_device, "a78_hiscore", "Atari 7800 High Score Cart")
 
 
-a78_hiscore_device::a78_hiscore_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_hiscore_device::a78_hiscore_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_device(mconfig, A78_HISCORE, tag, owner, clock)
 	, m_hscslot(*this, "hsc_slot")
 {

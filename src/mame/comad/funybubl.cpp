@@ -220,12 +220,12 @@ void funybubl_state::machine_start()
 void funybubl_state::funybubl(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);      /* 6 MHz?? */
+	Z80(config, m_maincpu, XTAL::u(12000000)/2);      /* 6 MHz?? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funybubl_state::funybubl_map);
 	m_maincpu->set_addrmap(AS_IO, &funybubl_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(funybubl_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 8000000/2);      /* 4 MHz?? */
+	Z80(config, m_audiocpu, XTAL::u(8000000)/2);      /* 4 MHz?? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &funybubl_state::sound_map);
 
 	ADDRESS_MAP_BANK(config, m_vrambank).set_map(&funybubl_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 13, 0x1000);
@@ -249,7 +249,7 @@ void funybubl_state::funybubl(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	OKIM6295(config, m_oki, 8000000/8, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(8000000)/8, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->set_addrmap(0, &funybubl_state::oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }

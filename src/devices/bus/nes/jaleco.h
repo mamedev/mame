@@ -15,7 +15,7 @@ class nes_jf11_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jf11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_jf11_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_m(offs_t offset, u8 data) override;
 };
@@ -27,7 +27,7 @@ class nes_jf13_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jf13_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_jf13_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_m(offs_t offset, u8 data) override;
 
@@ -46,7 +46,7 @@ class nes_jf16_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jf16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_jf16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
@@ -60,14 +60,14 @@ class nes_jf17_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jf17_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_jf17_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
 protected:
-	nes_jf17_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool m_prg_flip);
+	nes_jf17_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool m_prg_flip);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -86,7 +86,7 @@ class nes_jf17_adpcm_device : public nes_jf17_device
 {
 public:
 	// construction/destruction
-	nes_jf17_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_jf17_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -99,7 +99,7 @@ class nes_jf19_device : public nes_jf17_device
 {
 public:
 	// construction/destruction
-	nes_jf19_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_jf19_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -109,7 +109,7 @@ class nes_jf19_adpcm_device : public nes_jf17_device
 {
 public:
 	// construction/destruction
-	nes_jf19_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_jf19_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -122,7 +122,7 @@ class nes_ss88006_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_ss88006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_ss88006_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_m(offs_t offset) override;
 	virtual void write_m(offs_t offset, u8 data) override;
@@ -131,7 +131,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_ss88006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_ss88006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -159,7 +159,7 @@ class nes_jf23_device : public nes_ss88006_device
 {
 public:
 	// construction/destruction
-	nes_jf23_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_jf23_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -172,7 +172,7 @@ class nes_jf24_device : public nes_ss88006_device
 {
 public:
 	// construction/destruction
-	nes_jf24_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_jf24_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -185,7 +185,7 @@ class nes_jf29_device : public nes_ss88006_device
 {
 public:
 	// construction/destruction
-	nes_jf29_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_jf29_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -198,7 +198,7 @@ class nes_jf33_device : public nes_ss88006_device
 {
 public:
 	// construction/destruction
-	nes_jf33_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_jf33_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

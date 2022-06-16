@@ -26,13 +26,13 @@ class pxa255_periphs_device : public device_t
 {
 public:
 	template <typename T>
-	pxa255_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	pxa255_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag)
 		: pxa255_periphs_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	pxa255_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pxa255_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto gpio0_write() { return m_gpio0_w.bind(); }
 	auto gpio0_read() { return m_gpio0_r.bind(); }

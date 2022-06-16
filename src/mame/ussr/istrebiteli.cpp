@@ -36,13 +36,13 @@
 class istrebiteli_sound_device : public device_t, public device_sound_interface
 {
 public:
-	template <typename T> istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&region_tag)
+	template <typename T> istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&region_tag)
 		: istrebiteli_sound_device(mconfig, tag, owner, clock)
 	{
 		m_rom.set_tag(std::forward<T>(region_tag));
 	}
 
-	istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void sound_w(uint8_t data);
 
@@ -71,7 +71,7 @@ DECLARE_DEVICE_TYPE(ISTREBITELI_SOUND, istrebiteli_sound_device)
 
 DEFINE_DEVICE_TYPE(ISTREBITELI_SOUND, istrebiteli_sound_device, "istrebiteli_sound", "Istrebiteli Sound")
 
-istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISTREBITELI_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),

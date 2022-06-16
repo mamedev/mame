@@ -328,11 +328,11 @@ void dbz_state::machine_reset()
 void dbz_state::dbz(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);
+	M68000(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &dbz_state::dbz_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(dbz_state::dbz_scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL::u(4000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dbz_state::dbz_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &dbz_state::dbz_sound_io_map);
 
@@ -349,27 +349,27 @@ void dbz_state::dbz(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x4000/2).enable_shadows();
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(dbz_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 1);
 	m_k056832->set_palette("palette");
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246);
 	m_k053246->set_sprite_callback(FUNC(dbz_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -87, 32); // or -52, 16?
 	m_k053246->set_palette("palette");
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
-	K053936(config, m_k053936_1, 0);
+	K053936(config, m_k053936_1);
 	m_k053936_1->set_wrap(1);
 	m_k053936_1->set_offsets(-46, -16);
 
-	K053936(config, m_k053936_2, 0);
+	K053936(config, m_k053936_2);
 	m_k053936_2->set_wrap(1);
 	m_k053936_2->set_offsets(-46, -16);
 
-	K053252(config, m_k053252, 16000000/2);
+	K053252(config, m_k053252, XTAL::u(16000000)/2);
 	m_k053252->int1_ack().set(FUNC(dbz_state::dbz_irq2_ack_w));
 
 	/* sound hardware */
@@ -378,12 +378,12 @@ void dbz_state::dbz(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(4000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 1.0);
 	ymsnd.add_route(1, "rspeaker", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH));
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }

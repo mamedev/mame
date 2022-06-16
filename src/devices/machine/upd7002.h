@@ -25,7 +25,7 @@ public:
 	typedef device_delegate<int (int channel_number)> get_analogue_delegate;
 	typedef device_delegate<void (int data)> eoc_delegate;
 
-	upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename... T> void set_get_analogue_callback(T &&... args) { m_get_analogue_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_eoc_callback(T &&... args) { m_eoc_cb.set(std::forward<T>(args)...); }

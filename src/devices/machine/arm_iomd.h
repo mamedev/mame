@@ -34,8 +34,8 @@ class arm_iomd_device : public device_t
 {
 public:
 	// construction/destruction
-	arm_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	arm_iomd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	arm_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
+	arm_iomd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <unsigned N> auto iocr_read_od() { return m_iocr_read_od_cb[N].bind(); }
 	template <unsigned N> auto iocr_write_od() { return m_iocr_write_od_cb[N].bind(); }
@@ -167,7 +167,7 @@ class arm7500fe_iomd_device : public arm_iomd_device
 {
 public:
 	// construction/destruction
-	arm7500fe_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm7500fe_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 	auto iolines_read() { return m_iolines_read_cb.bind(); }

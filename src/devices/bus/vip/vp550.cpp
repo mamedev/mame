@@ -32,11 +32,11 @@ void vp550_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	CDP1863(config, m_pfg[0], 0);
+	CDP1863(config, m_pfg[0]);
 	m_pfg[0]->set_clock2(0);
 	m_pfg[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	CDP1863(config, m_pfg[1], 0);
+	CDP1863(config, m_pfg[1]);
 	m_pfg[1]->set_clock2(0);
 	m_pfg[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -51,7 +51,7 @@ void vp550_device::device_add_mconfig(machine_config &config)
 //  vp550_device - constructor
 //-------------------------------------------------
 
-vp550_device::vp550_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vp550_device::vp550_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VP550, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_pfg(*this, "u%u", 1U),

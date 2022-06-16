@@ -22,7 +22,7 @@ class sn74s381_device : public device_t
 {
 public:
 	// construction/destruction
-	sn74s381_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sn74s381_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void a_w(uint8_t data);
 	void b_w(uint8_t data);

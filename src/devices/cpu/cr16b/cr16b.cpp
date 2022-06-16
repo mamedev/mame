@@ -15,7 +15,7 @@
 // device type definitions
 DEFINE_DEVICE_TYPE(CR16B, cr16b_device, "cr16b", "CompactRISC CR16B")
 
-cr16b_device::cr16b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
+cr16b_device::cr16b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_space_config("program", ENDIANNESS_LITTLE, 16, 21, 0, map)
 	, m_regs{0}
@@ -32,7 +32,7 @@ cr16b_device::cr16b_device(const machine_config &mconfig, device_type type, cons
 }
 
 // TODO: figure out some actual device types instead
-cr16b_device::cr16b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cr16b_device::cr16b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cr16b_device(mconfig, CR16B, tag, owner, clock, address_map_constructor())
 {
 }

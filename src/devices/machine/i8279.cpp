@@ -93,7 +93,7 @@ DEFINE_DEVICE_TYPE(I8279, i8279_device, "i8279", "Intel 8279 KDC")
 //  i8279_device - constructor
 //-------------------------------------------------
 
-i8279_device::i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+i8279_device::i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, I8279, tag, owner, clock),
 	m_out_irq_cb(*this),
 	m_out_sl_cb(*this),

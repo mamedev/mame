@@ -29,7 +29,7 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 class fdc37c93x_device : public device_t, public device_isa16_card_interface
 {
 public:
-	fdc37c93x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fdc37c93x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~fdc37c93x_device() {}
 
 	// optional information overrides

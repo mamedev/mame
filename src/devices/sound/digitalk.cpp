@@ -263,7 +263,7 @@ static constexpr int pitch_vals[32] = {
 
 DEFINE_DEVICE_TYPE(DIGITALKER, digitalker_device, "digitalker", "MM54104 Digitalker")
 
-digitalker_device::digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+digitalker_device::digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DIGITALKER, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),

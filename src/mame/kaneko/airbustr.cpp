@@ -768,7 +768,7 @@ void airbustr_state::airbustrb(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_airbustr);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 768);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
+	KANEKO_PANDORA(config, m_pandora);
 	m_pandora->set_gfx_region(1);
 	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 

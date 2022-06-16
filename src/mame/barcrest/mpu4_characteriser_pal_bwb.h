@@ -15,7 +15,7 @@ class mpu4_characteriser_pal_bwb : public device_t
 {
 public:
 	// construction/destruction
-	mpu4_characteriser_pal_bwb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpu4_characteriser_pal_bwb(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_common_key(uint8_t commonkey)
 	{
@@ -33,7 +33,7 @@ public:
 	constexpr static uint8_t bwb_chr_table_common[16] = {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 protected:
-	mpu4_characteriser_pal_bwb(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mpu4_characteriser_pal_bwb(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

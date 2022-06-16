@@ -158,7 +158,7 @@ void f387x_state::f387x(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &f387x_state::io_map);
 	m_maincpu->romc08_callback().set_constant(0x80);
 
-	F3853(config, "smi", 0);
+	F3853(config, "smi");
 
 	RS232_PORT(config, m_rs232c, default_rs232_devices, "terminal");
 	m_rs232c->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));

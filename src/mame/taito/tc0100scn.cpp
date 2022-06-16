@@ -152,7 +152,7 @@ the wide tilemap mode)
 DEFINE_DEVICE_TYPE(TC0100SCN, tc0100scn_device, "tc0100scn", "Taito TC0100SCN")
 DEFINE_DEVICE_TYPE(TC0620SCC, tc0620scc_device, "tc0620scc", "Taito TC0620SCC")
 
-tc0100scn_base_device::tc0100scn_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+tc0100scn_base_device::tc0100scn_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_gfxlayout(TC0100SCN_LAYOUT_DEFAULT)
@@ -181,12 +181,12 @@ tc0100scn_base_device::tc0100scn_base_device(const machine_config &mconfig, devi
 	std::fill(std::begin(m_bg_colbank), std::end(m_bg_colbank), 0);
 }
 
-tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tc0100scn_base_device(mconfig, TC0100SCN, tag, owner, clock)
 {
 }
 
-tc0620scc_device::tc0620scc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tc0620scc_device::tc0620scc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tc0100scn_base_device(mconfig, TC0620SCC, tag, owner, clock)
 {
 }

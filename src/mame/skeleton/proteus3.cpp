@@ -415,16 +415,16 @@ void proteus3_state::proteus3(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(proteus3_state::video_w));
 	m_pia->ca2_handler().set(FUNC(proteus3_state::ca2_w));
 	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(proteus3_state::kbd_put));
 
 	/* cassette */
-	ACIA6850(config, m_acia1, 0);
+	ACIA6850(config, m_acia1);
 	m_acia1->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
 	SPEAKER(config, "mono").front_center();
@@ -435,7 +435,7 @@ void proteus3_state::proteus3(machine_config &config)
 	TIMER(config, "kansas_r").configure_periodic(FUNC(proteus3_state::kansas_r), attotime::from_hz(40000));
 
 	// optional tty keyboard
-	ACIA6850(config, m_acia2, 0);
+	ACIA6850(config, m_acia2);
 	m_acia2->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia2->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 

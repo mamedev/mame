@@ -13,7 +13,7 @@ class intv_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	intv_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	intv_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint16_t read_rom04(offs_t offset) override { return INTV_ROM16_READ(offset + 0x0400); }
@@ -33,7 +33,7 @@ public:
 	virtual uint16_t read_romf0(offs_t offset) override { return INTV_ROM16_READ(offset + 0xf000); }
 
 protected:
-	intv_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	intv_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override {}
@@ -46,7 +46,7 @@ class intv_ram_device : public intv_rom_device
 {
 public:
 	// construction/destruction
-	intv_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	intv_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint16_t read_ram(offs_t offset) override { return (int)m_ram[offset & (m_ram.size() - 1)]; }
@@ -59,7 +59,7 @@ class intv_gfact_device : public intv_rom_device
 {
 public:
 	// construction/destruction
-	intv_gfact_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	intv_gfact_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint16_t read_ram(offs_t offset) override { return (int)m_ram[offset & (m_ram.size() - 1)]; }
@@ -72,7 +72,7 @@ class intv_wsmlb_device : public intv_rom_device
 {
 public:
 	// construction/destruction
-	intv_wsmlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	intv_wsmlb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

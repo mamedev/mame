@@ -590,7 +590,7 @@ static void apple1_cards(device_slot_interface &device)
 
 void apple1_state::apple1(machine_config &config)
 {
-	M6502(config, m_maincpu, 960000);        // effective CPU speed
+	M6502(config, m_maincpu, XTAL::u(960000));        // effective CPU speed
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple1_state::apple1_map);
 
 	// video timings are identical to the Apple II, unsurprisingly
@@ -601,13 +601,13 @@ void apple1_state::apple1(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(apple1_state::pia_keyboard_r));
 	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
 	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));
 
-	A1BUS(config, A1_BUS_TAG, 0).set_space(m_maincpu, AS_PROGRAM);
-	A1BUS_SLOT(config, "exp", 0, A1_BUS_TAG, apple1_cards, "cassette");
+	A1BUS(config, A1_BUS_TAG).set_space(m_maincpu, AS_PROGRAM);
+	A1BUS_SLOT(config, "exp", A1_BUS_TAG, apple1_cards, "cassette");
 
 	SNAPSHOT(config, "snapshot", "snp").set_load_callback(FUNC(apple1_state::snapshot_cb));
 

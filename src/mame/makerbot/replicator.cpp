@@ -49,7 +49,7 @@
 #define VERBOSE         (0)
 #include "logmacro.h"
 
-#define MASTER_CLOCK    16000000
+#define MASTER_CLOCK    XTAL::u(16000000)
 
 //Port A bits:
 //Bit 0 unused
@@ -731,12 +731,12 @@ void replicator_state::replicator(machine_config &config)
 	PALETTE(config, "palette", FUNC(replicator_state::palette_init), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_replicator);
 
-	HD44780(config, "hd44780", 0).set_lcd_size(4, 20);
+	HD44780(config, "hd44780").set_lcd_size(4, 20);
 
 	/* sound hardware */
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(0, "speaker", 0.5);
+	DAC_1BIT(config, m_dac).add_route(0, "speaker", 0.5);
 }
 
 ROM_START( replica1 )

@@ -75,11 +75,11 @@ uint32_t uknc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 void uknc_state::uknc(machine_config &config)
 {
 	/* basic machine hardware */
-	K1801VM2(config, m_maincpu, 8'000'000);
+	K1801VM2(config, m_maincpu, XTAL::u(8'000'000));
 	m_maincpu->set_initial_mode(0x8000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &uknc_state::uknc_mem);
 
-	k1801vm2_device &subcpu(K1801VM2(config, "subcpu", 6'250'000));
+	k1801vm2_device &subcpu(K1801VM2(config, "subcpu", XTAL::u(6'250'000)));
 	subcpu.set_initial_mode(0x8000);
 	subcpu.set_addrmap(AS_PROGRAM, &uknc_state::uknc_sub_mem);
 

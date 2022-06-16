@@ -70,7 +70,7 @@ INPUT_PORTS_END
 void astropc_state::astropc(machine_config &config)
 {
 	/* basic machine hardware */
-	I486(config, m_maincpu, 40000000 ); // ??
+	I486(config, m_maincpu, XTAL::u(40000000) ); // ??
 	m_maincpu->set_addrmap(AS_PROGRAM, &astropc_state::astropc_map);
 	m_maincpu->set_addrmap(AS_IO, &astropc_state::astropc_io);
 }

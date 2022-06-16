@@ -25,7 +25,7 @@ class mcms_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	mcms_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcms_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void voiceregs_w(offs_t offset, uint8_t data);
 	void control_w(offs_t offset, uint8_t data);
@@ -67,7 +67,7 @@ class a2bus_mcms1_device:
 {
 public:
 	// construction/destruction
-	a2bus_mcms1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_mcms1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// comms from card 2 (oscillator parameter writes)
 	mcms_device *get_engine(void);
@@ -75,7 +75,7 @@ public:
 	required_device<mcms_device> m_mcms;
 
 protected:
-	a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -98,10 +98,10 @@ class a2bus_mcms2_device:
 {
 public:
 	// construction/destruction
-	a2bus_mcms2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_mcms2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

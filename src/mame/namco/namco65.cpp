@@ -13,7 +13,7 @@ some of this can likely be moved into the actual MCU core too
 
 DEFINE_DEVICE_TYPE(NAMCOC65, namcoc65_device, "namcoc65", "Namco C65 I/O")
 
-namcoc65_device::namcoc65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+namcoc65_device::namcoc65_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NAMCOC65, tag, owner, clock),
 	m_mcu(*this, "mcu"),
 	m_in_pb_cb(*this),

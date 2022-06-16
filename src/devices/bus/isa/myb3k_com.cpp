@@ -49,7 +49,7 @@ void isa8_myb3k_com_device::device_add_mconfig(machine_config &config)
 	// TODO: configure RxC and TxC from RS232 connector when these are defined is rs232.h
 
 	/* Timer chip */
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(XTAL(15'974'400) / 8); /* TxC */
 	pit.out_handler<0>().set(FUNC(isa8_myb3k_com_device::pit_txc));
 	pit.set_clk<1>(XTAL(15'974'400) / 8); /* RxC */
@@ -66,12 +66,12 @@ void isa8_myb3k_com_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 //  isa8_myb3k_com_device - constructor
 //-------------------------------------------------
-isa8_myb3k_com_device::isa8_myb3k_com_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_myb3k_com_device::isa8_myb3k_com_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_myb3k_com_device(mconfig, ISA8_MYB3K_COM, tag, owner, clock)
 {
 }
 
-isa8_myb3k_com_device::isa8_myb3k_com_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_myb3k_com_device::isa8_myb3k_com_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_iobase(*this, "DPSW1")

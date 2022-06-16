@@ -62,7 +62,7 @@ ALLOW_SAVE_TYPE(pace_device::cycle);
 //  pace_device - constructor
 //-------------------------------------------------
 
-pace_device::pace_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+pace_device::pace_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_space_config("program", ENDIANNESS_LITTLE, 16, 16, -1)
 	, m_bps_callback(*this)
@@ -89,7 +89,7 @@ pace_device::pace_device(const machine_config &mconfig, device_type type, const 
 //  ins8900_device - constructor
 //-------------------------------------------------
 
-ins8900_device::ins8900_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ins8900_device::ins8900_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pace_device(mconfig, INS8900, tag, owner, clock)
 {
 }

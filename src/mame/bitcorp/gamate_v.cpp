@@ -46,7 +46,7 @@ void gamate_video_device::vram_map(address_map &map)
 	map(0x0000, 0x3fff).ram().share("vram"); // 2x 8KB SRAMs
 }
 
-gamate_video_device::gamate_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gamate_video_device::gamate_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, GAMATE_VIDEO, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_vram_space_config("vramspace", ENDIANNESS_BIG, 8, 14, 0, address_map_constructor(FUNC(gamate_video_device::vram_map), this)),

@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(SPG24X_VIDEO, spg24x_video_device, "spg24x_video", "SPG240-se
 #define VIDEO_IRQ_ENABLE    m_video_regs[0x62]
 #define VIDEO_IRQ_STATUS    m_video_regs[0x63]
 
-spg2xx_video_device::spg2xx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+spg2xx_video_device::spg2xx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_guny_in(*this),
 	m_gunx_in(*this),
@@ -42,7 +42,7 @@ spg2xx_video_device::spg2xx_video_device(const machine_config &mconfig, device_t
 {
 }
 
-spg24x_video_device::spg24x_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spg24x_video_device::spg24x_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	spg2xx_video_device(mconfig, SPG24X_VIDEO, tag, owner, clock)
 {
 }
@@ -479,5 +479,5 @@ TIMER_CALLBACK_MEMBER(spg2xx_video_device::screenpos_hit)
 
 void spg2xx_video_device::device_add_mconfig(machine_config &config)
 {
-	SPG_RENDERER(config, m_renderer, 0);
+	SPG_RENDERER(config, m_renderer);
 }

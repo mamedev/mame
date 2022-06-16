@@ -255,7 +255,7 @@ void sorcerer_state::port34_w(u8 data)
 	}
 
 	m_fdc3->dden_w(BIT(data, 6));
-	m_fdc3->set_unscaled_clock (BIT(data, 4) ? 2'000'000 : 1'000'000);
+	m_fdc3->set_unscaled_clock (BIT(data, 4) ? XTAL::u(2'000'000) : XTAL::u(1'000'000));
 }
 
 // ************ DIGITRIO DMA **************

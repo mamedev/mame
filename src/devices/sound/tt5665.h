@@ -35,13 +35,13 @@ public:
 	};
 
 	// construction/destruction
-	tt5665_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, ss_state ss, u8 s0_s1)
+	tt5665_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, ss_state ss, u8 s0_s1)
 		: tt5665_device(mconfig, tag, owner, clock)
 	{
 		config_ss(ss);
 		config_s0_s1(s0_s1);
 	}
-	tt5665_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tt5665_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration helpers
 	void config_ss(ss_state ss) { assert(!started()); m_ss_state = ss; }

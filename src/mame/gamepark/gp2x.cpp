@@ -363,7 +363,7 @@ INPUT_PORTS_END
 
 void gp2x_state::gp2x(machine_config &config)
 {
-	ARM9(config, m_maincpu, 80000000);
+	ARM9(config, m_maincpu, XTAL::u(80000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &gp2x_state::gp2x_map);
 
 	PALETTE(config, "palette").set_entries(32768);

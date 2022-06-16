@@ -28,7 +28,7 @@ void smbus_device::map(address_map &map)
 	map(0x17, 0x17).r(FUNC(smbus_device::notify_dhigh_r));
 }
 
-smbus_device::smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+smbus_device::smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, SMBUS, tag, owner, clock)
 {
 }

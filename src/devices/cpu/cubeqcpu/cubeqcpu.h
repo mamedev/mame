@@ -20,7 +20,7 @@ class cquestsnd_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto dac_w() { return m_dac_w.bind(); }
@@ -112,7 +112,7 @@ class cquestrot_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	cquestrot_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cquestrot_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto linedata_w() { return m_linedata_w.bind(); }
@@ -224,7 +224,7 @@ class cquestlin_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto linedata_r() { return m_linedata_r.bind(); }

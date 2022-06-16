@@ -55,7 +55,7 @@ void vtech_printer_interface_device::device_add_mconfig(machine_config &config)
 //  vtech_printer_interface_device - constructor
 //-------------------------------------------------
 
-vtech_printer_interface_device::vtech_printer_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vtech_printer_interface_device::vtech_printer_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vtech_ioexp_device(mconfig, VTECH_PRINTER_INTERFACE, tag, owner, clock),
 	m_centronics(*this, "centronics"),
 	m_latch(*this, "latch"),

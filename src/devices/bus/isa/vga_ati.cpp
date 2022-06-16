@@ -82,7 +82,7 @@ void isa16_vga_gfxultra_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(ati_vga_device::screen_update));
 
-	ATI_VGA(config, m_vga, 0);
+	ATI_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x100000);
 }
@@ -93,7 +93,7 @@ void isa16_vga_gfxultrapro_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(mach32_device::screen_update));
 
-	ATIMACH32(config, m_vga, 0);
+	ATIMACH32(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x400000);
 }
@@ -104,7 +104,7 @@ void isa16_vga_mach64_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(mach64_device::screen_update));
 
-	ATIMACH64(config, m_vga, 0);
+	ATIMACH64(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x400000);
 }
@@ -137,21 +137,21 @@ const tiny_rom_entry *isa16_vga_mach64_device::device_rom_region() const
 //  isa8_vga_device - constructor
 //-------------------------------------------------
 
-isa16_vga_gfxultra_device::isa16_vga_gfxultra_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa16_vga_gfxultra_device::isa16_vga_gfxultra_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA16_VGA_GFXULTRA, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
 	m_vga(*this, "vga"), m_8514(*this, "vga:8514a")
 {
 }
 
-isa16_vga_gfxultrapro_device::isa16_vga_gfxultrapro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa16_vga_gfxultrapro_device::isa16_vga_gfxultrapro_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA16_SVGA_GFXULTRAPRO, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
 	m_vga(*this, "vga")
 {
 }
 
-isa16_vga_mach64_device::isa16_vga_mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa16_vga_mach64_device::isa16_vga_mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA16_SVGA_MACH64, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
 	m_vga(*this, "vga")

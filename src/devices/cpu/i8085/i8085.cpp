@@ -201,12 +201,12 @@ DEFINE_DEVICE_TYPE(I8080A, i8080a_cpu_device, "i8080a", "Intel 8080A")
 DEFINE_DEVICE_TYPE(I8085A, i8085a_cpu_device, "i8085a", "Intel 8085A")
 
 
-i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8085a_cpu_device(mconfig, I8085A, tag, owner, clock, CPUTYPE_8085A)
 {
 }
 
-i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int cputype)
+i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int cputype)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
@@ -221,12 +221,12 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type 
 {
 }
 
-i8080_cpu_device::i8080_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+i8080_cpu_device::i8080_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8085a_cpu_device(mconfig, I8080, tag, owner, clock, CPUTYPE_8080)
 {
 }
 
-i8080a_cpu_device::i8080a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+i8080a_cpu_device::i8080a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8085a_cpu_device(mconfig, I8080A, tag, owner, clock, CPUTYPE_8080A)
 {
 }

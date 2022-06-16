@@ -102,7 +102,7 @@ ROM_END
 //  LIVE DEVICE
 //**************************************************************************
 
-a1200_kbd_device::a1200_kbd_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+a1200_kbd_device::a1200_kbd_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, A1200_KBD, tag, owner, clock)
 	, device_amiga_keyboard_interface(mconfig, *this)
 	, m_rows(*this, "ROW%u", 0)

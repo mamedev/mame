@@ -59,7 +59,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: vip_byteio_port_device(mconfig, tag, owner, 0)
+		: vip_byteio_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -67,7 +67,7 @@ public:
 		set_fixed(false);
 	}
 
-	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto inst_callback() { return m_write_inst.bind(); }
 

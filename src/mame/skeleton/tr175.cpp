@@ -88,7 +88,7 @@ INPUT_PORTS_END
 
 void tr175_state::tr175(machine_config &config)
 {
-	M68000(config, m_maincpu, 12'000'000);
+	M68000(config, m_maincpu, XTAL::u(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tr175_state::mem_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -106,7 +106,7 @@ void tr175_state::tr175(machine_config &config)
 	duart.irq_cb().set_inputline("maincpu", M68K_IRQ_1);
 
 	PALETTE(config, "palette").set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &tr175_state::ramdac_map);
 }
 

@@ -18,7 +18,7 @@
 class chessmachine_device : public device_t
 {
 public:
-	chessmachine_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	chessmachine_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto data_out() { return m_data_out.bind(); } // data_r

@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(CD40105, cmos_40105_device, "cd40105", "CD40105B FIFO Registe
 //  cmos_40105_device - constructor
 //-------------------------------------------------
 
-cmos_40105_device::cmos_40105_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cmos_40105_device::cmos_40105_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CD40105, tag, owner, clock),
 		m_write_dir(*this),
 		m_write_dor(*this),

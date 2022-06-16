@@ -29,7 +29,7 @@
 
 DEFINE_DEVICE_TYPE(SA1111, sa1111_device, "sa1111", "Intel SA1111 Microprocessor Companion Chip")
 
-sa1111_device::sa1111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sa1111_device::sa1111_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SA1111, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_audio_codec(*this, finder_base::DUMMY_TAG)

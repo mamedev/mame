@@ -41,7 +41,7 @@ device_cpc_expansion_card_interface::~device_cpc_expansion_card_interface()
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_expansion_slot_device::cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cpc_expansion_slot_device::cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CPC_EXPANSION_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_cpc_expansion_card_interface>(mconfig, *this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)

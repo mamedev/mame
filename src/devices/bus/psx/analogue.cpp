@@ -6,7 +6,7 @@
 DEFINE_DEVICE_TYPE(PSX_DUALSHOCK,       psx_dualshock_device,       "psx_dualshock_pad",   "Playstation Dualshock Pad")
 DEFINE_DEVICE_TYPE(PSX_ANALOG_JOYSTICK, psx_analog_joystick_device, "psx_analog_joystick", "Playstation Analog Joystick")
 
-psx_analog_controller_device::psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, model mod) :
+psx_analog_controller_device::psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, model mod) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_psx_controller_interface(mconfig, *this),
 	m_model(mod),
@@ -24,12 +24,12 @@ psx_analog_controller_device::psx_analog_controller_device(const machine_config 
 {
 }
 
-psx_dualshock_device::psx_dualshock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+psx_dualshock_device::psx_dualshock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	psx_analog_controller_device(mconfig, PSX_DUALSHOCK, tag, owner, clock, model::DUALSHOCK)
 {
 }
 
-psx_analog_joystick_device::psx_analog_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+psx_analog_joystick_device::psx_analog_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	psx_analog_controller_device(mconfig, PSX_ANALOG_JOYSTICK, tag, owner, clock, model::JOYSTICK)
 {
 }

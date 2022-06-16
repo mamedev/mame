@@ -32,7 +32,7 @@ public:
 
 protected:
 	// construction/destruction
-	isa8_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
@@ -46,7 +46,7 @@ class isa8_upd765_fdc_device : public isa8_fdc_device
 {
 protected:
 	// construction/destruction
-	isa8_upd765_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_upd765_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -72,10 +72,10 @@ private:
 
 class isa8_fdc_xt_device : public isa8_upd765_fdc_device {
 public:
-	isa8_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	isa8_fdc_xt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_fdc_xt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -87,7 +87,7 @@ protected:
 
 class isa8_fdc_at_device : public isa8_upd765_fdc_device {
 public:
-	isa8_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -99,7 +99,7 @@ protected:
 
 class isa8_fdc_smc_device : public isa8_fdc_device {
 public:
-	isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -109,7 +109,7 @@ protected:
 
 class isa8_fdc_ps2_device : public isa8_fdc_device {
 public:
-	isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -119,7 +119,7 @@ protected:
 
 class isa8_fdc_superio_device : public isa8_fdc_device {
 public:
-	isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -129,7 +129,7 @@ protected:
 
 class isa8_ec1841_0003_device : public isa8_fdc_xt_device {
 public:
-	isa8_ec1841_0003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_ec1841_0003_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

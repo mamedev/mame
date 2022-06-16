@@ -26,7 +26,7 @@ class vp585_device : public device_t,
 {
 public:
 	// construction/destruction
-	vp585_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vp585_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

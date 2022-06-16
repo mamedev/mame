@@ -8,7 +8,7 @@
 class bt459_device : public device_t, public device_palette_interface
 {
 public:
-	bt459_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt459_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static const u8 BT459_ID  = 0x4a; // magic number found in the id register
 	static const u8 BT459_REV = 0xb0; // device revision B found in revision register

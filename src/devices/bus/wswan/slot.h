@@ -134,7 +134,7 @@ class ws_cart_slot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&opts, const char *dflt)
+	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: ws_cart_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -142,7 +142,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~ws_cart_slot_device();
 
 	// image-level overrides

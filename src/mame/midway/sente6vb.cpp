@@ -107,7 +107,7 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sente6vb_device::mem_map);
 	m_audiocpu->set_addrmap(AS_IO, &sente6vb_device::io_map);
 
-	ACIA6850(config, m_uart, 0);
+	ACIA6850(config, m_uart);
 	m_uart->txd_handler().set([this] (int state) { m_send_cb(state); });
 	m_uart->irq_handler().set([this] (int state) { m_uint = bool(state); });
 
@@ -116,9 +116,9 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 	uartclock.signal_handler().append(m_uart, FUNC(acia6850_device::write_txc));
 	uartclock.signal_handler().append(m_uart, FUNC(acia6850_device::write_rxc));
 
-	TIMER(config, m_counter_0_timer, 0).configure_generic(FUNC(sente6vb_device::clock_counter_0_ff));
+	TIMER(config, m_counter_0_timer).configure_generic(FUNC(sente6vb_device::clock_counter_0_ff));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->out_handler<0>().set(FUNC(sente6vb_device::counter_0_set_out));
 	m_pit->out_handler<2>().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 	m_pit->set_clk<1>(8_MHz_XTAL / 4);
@@ -126,13 +126,13 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	mm5837_stream_device &noise(MM5837_STREAM(config, "noise", 0));
+	mm5837_stream_device &noise(MM5837_STREAM(config, "noise"));
 //  noise.set_vdd(-6.5);   // seems too low -- possible the mapping in mm5837 is wrong
 	noise.set_vdd(-8.0);
 
 	for (auto &cem_device : m_cem_device)
 	{
-		CEM3394(config, cem_device, 0);
+		CEM3394(config, cem_device);
 		cem_device->set_vco_zero_freq(431.894);
 		cem_device->set_filter_zero_freq(1300.0);
 		cem_device->add_route(ALL_OUTPUTS, "mono", 0.90);
@@ -165,7 +165,7 @@ const tiny_rom_entry *sente6vb_device::device_rom_region() const
  *
  *************************************/
 
-sente6vb_device::sente6vb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sente6vb_device::sente6vb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SENTE6VB, tag, owner, clock),
 	m_pit(*this, "pit"),
 	m_counter_0_timer(*this, "8253_0_timer"),

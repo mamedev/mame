@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(SV803, sv803_device, "sv803", "SV-803 16k RAM Cartridge")
 //  sv803_device - constructor
 //-------------------------------------------------
 
-sv803_device::sv803_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sv803_device::sv803_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SV803, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this)
 {

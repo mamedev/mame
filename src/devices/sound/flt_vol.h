@@ -15,7 +15,7 @@
 class filter_volume_device : public device_t, public device_sound_interface
 {
 public:
-	filter_volume_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	filter_volume_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void flt_volume_set_volume(float volume);
 

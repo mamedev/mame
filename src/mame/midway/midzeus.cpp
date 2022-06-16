@@ -1278,9 +1278,9 @@ void midzeus_state::midzeus(machine_config &config)
 	m_screen->set_palette("palette");
 
 	/* sound hardware */
-	DCS2_AUDIO_2104(config, "dcs", 0);
+	DCS2_AUDIO_2104(config, "dcs");
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_yearoffs(94);
 }
@@ -1295,7 +1295,7 @@ void midzeus_state::mk4(machine_config &config)
 void midzeus_state::invasn(machine_config &config)
 {
 	midzeus(config);
-	PIC16C57(config, "pic", 8000000);  /* ? */
+	PIC16C57(config, "pic", XTAL::u(8000000));  /* ? */
 	m_ioasic->set_upper(468/* or 488 */);
 }
 
@@ -1317,20 +1317,20 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_zeus->irq_callback().set(FUNC(midzeus2_state::zeus_irq));
 
 	/* sound hardware */
-	DCS2_AUDIO_2104(config, "dcs", 0);
+	DCS2_AUDIO_2104(config, "dcs");
 
-	M48T35(config, m_m48t35, 0);
+	M48T35(config, m_m48t35);
 
 	/* I/O hardware */
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_yearoffs(99);
 	m_ioasic->set_upper(474);
 
-	IBM21S851(config, m_fw_phy, 0);
+	IBM21S851(config, m_fw_phy);
 	m_fw_phy->reset_cb().set(m_fw_link, FUNC(tsb12lv01a_device::phy_reset_w));
 
-	TSB12LV01A(config, m_fw_link, 0);
+	TSB12LV01A(config, m_fw_link);
 	m_fw_link->int_cb().set(FUNC(midzeus2_state::firewire_irq));
 	m_fw_link->phy_read().set(m_fw_phy, FUNC(ibm21s851_device::read));
 	m_fw_link->phy_write().set(m_fw_phy, FUNC(ibm21s851_device::write));
@@ -1345,7 +1345,7 @@ void midzeus2_state::crusnexo(machine_config &config)
 void midzeus2_state::thegrid(machine_config &config)
 {
 	midzeus2(config);
-	PIC16C57(config, "pic", 8000000).set_disable();  // unverified clock, not hooked up
+	PIC16C57(config, "pic", XTAL::u(8000000)).set_disable();  // unverified clock, not hooked up
 	m_ioasic->set_upper(474/* or 491 */);
 }
 

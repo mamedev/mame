@@ -121,7 +121,7 @@ void ad_59mc07_device::sound_portmap(address_map &map)
 //  ad_59mc07_device: Constructor
 //-------------------------------------------------
 
-ad_59mc07_device::ad_59mc07_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ad_59mc07_device::ad_59mc07_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AD_59MC07, tag, owner, clock),
 	m_audiocpu(*this, "audiocpu"),
 	m_audio8155(*this, "audio8155"),
@@ -138,8 +138,8 @@ ad_59mc07_device::ad_59mc07_device(const machine_config &mconfig, const char *ta
 // have been hand-tuned to a recording claiming to be an original recording from the
 // boards.  You can adjust this in the Slider Controls while using -cheat if needed.
 
-#define MSM5232_MAX_CLOCK 6144000
-#define MSM5232_MIN_CLOCK  214000   // unstable
+#define MSM5232_MAX_CLOCK XTAL::u(6144000)
+#define MSM5232_MIN_CLOCK XTAL::u( 214000)   // unstable
 
 
 
@@ -156,7 +156,7 @@ TIMER_CALLBACK_MEMBER(ad_59mc07_device::frq_adjuster_callback)
 {
 	uint8_t frq = m_frq_adjuster->read();
 
-	m_msm->set_clock(MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
+	m_msm->set_clock(XTAL::u(MSM5232_MIN_CLOCK.value() + frq * (MSM5232_MAX_CLOCK.value() - MSM5232_MIN_CLOCK.value() / 100)));
 //popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", m_8155_port_c, m_8155_port_a, m_ay_port_a, m_ay_port_b, m_cymbal_ctrl & 15);
 
 	m_cymvol *= 0.94f;
@@ -334,9 +334,9 @@ void ad_59mc07_device::device_add_mconfig(machine_config &config)
 	I8085A(config, m_audiocpu, 6.144_MHz_XTAL); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ad_59mc07_device::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &ad_59mc07_device::sound_portmap);
-	m_audiocpu->set_clk_out(m_audio8155, FUNC(i8155_device::set_unscaled_clock_int));
+	m_audiocpu->set_clk_out(m_audio8155, FUNC(i8155_device::set_unscaled_clock_ns));
 
-	I8155(config, m_audio8155, 0);
+	I8155(config, m_audio8155);
 	m_audio8155->out_pa_callback().set(FUNC(ad_59mc07_device::i8155_porta_w));
 	m_audio8155->out_pb_callback().set(FUNC(ad_59mc07_device::i8155_portb_w));
 	m_audio8155->out_pc_callback().set(FUNC(ad_59mc07_device::i8155_portc_w));
@@ -367,8 +367,8 @@ void ad_59mc07_device::device_add_mconfig(machine_config &config)
 	aysnd.port_b_write_callback().set(FUNC(ad_59mc07_device::ay8910_portb_w));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.105);
 
-	DAC_6BIT_R2R(config, m_dac_1, 0).add_route(ALL_OUTPUTS, "speaker", 0.35); // unknown DAC
-	DAC_6BIT_R2R(config, m_dac_2, 0).add_route(ALL_OUTPUTS, "speaker", 0.35); // unknown DAC
+	DAC_6BIT_R2R(config, m_dac_1).add_route(ALL_OUTPUTS, "speaker", 0.35); // unknown DAC
+	DAC_6BIT_R2R(config, m_dac_2).add_route(ALL_OUTPUTS, "speaker", 0.35); // unknown DAC
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(3);
@@ -472,7 +472,7 @@ void ad_60mc01_device::sound_portmap(address_map &map)
 //  ad_60mc01_device: Constructor
 //-------------------------------------------------
 
-ad_60mc01_device::ad_60mc01_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ad_60mc01_device::ad_60mc01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AD_60MC01, tag, owner, clock),
 	m_audiocpu(*this, "audiocpu"),
 	m_soundlatch(*this, "soundlatch")

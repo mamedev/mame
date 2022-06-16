@@ -505,7 +505,7 @@ void toki_state::toki(machine_config &config)
 	m_audiocpu->set_addrmap(AS_OPCODES, &toki_state::toki_audio_opcodes_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
+	SEI80BU(config, "sei80bu").set_device_rom_tag("audiocpu");
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -529,7 +529,7 @@ void toki_state::toki(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)); // verified on pcb
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->set_rom_tag(m_audiocpu_rom);
 	m_seibu_sound->set_rombank_tag("seibu_bank1");
@@ -549,11 +549,11 @@ void toki_state::jujuba(machine_config &config)
 void toki_state::tokib(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);   /* 10MHz causes bad slowdowns with monkey machine rd1, but is correct, 20Mhz XTAL */
+	M68000(config, m_maincpu, XTAL::u(10000000));   /* 10MHz causes bad slowdowns with monkey machine rd1, but is correct, 20Mhz XTAL */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toki_state::tokib_map);
 	m_maincpu->set_vblank_int("screen", FUNC(toki_state::irq6_line_hold)); /* VBL (could be level1, same vector) */
 
-	Z80(config, m_audiocpu, 4000000);  /* verified with PCB */
+	Z80(config, m_audiocpu, XTAL::u(4000000));  /* verified with PCB */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toki_state::tokib_audio_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -578,10 +578,10 @@ void toki_state::tokib(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3579545));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL::u(3579545)));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(toki_state::tokib_adpcm_int)); /* interrupt function */
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 4KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.60);

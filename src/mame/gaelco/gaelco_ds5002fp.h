@@ -12,7 +12,7 @@ DECLARE_DEVICE_TYPE(GAELCO_DS5002FP, gaelco_ds5002fp_device)
 class gaelco_ds5002fp_device : public device_t, public device_memory_interface
 {
 public:
-	gaelco_ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gaelco_ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t implementation

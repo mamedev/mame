@@ -1870,7 +1870,7 @@ void mcr_state::mcr_91490(machine_config & config)
 	mcr_90010(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(5000000);
+	m_maincpu->set_clock(XTAL::u(5000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_91490_map);
 	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_91490_portmap);
 

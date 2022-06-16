@@ -267,12 +267,12 @@ static const z80_daisy_config daisy_chain[] =
 void m79152pc_state::m79152pc(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4'000'000); // UA880D
+	Z80(config, m_maincpu, XTAL::u(4'000'000)); // UA880D
 	m_maincpu->set_addrmap(AS_PROGRAM, &m79152pc_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &m79152pc_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	I8035(config, m_mcu, 6'000'000); // NEC D8035HLC
+	I8035(config, m_mcu, XTAL::u(6'000'000)); // NEC D8035HLC
 	m_mcu->set_addrmap(AS_PROGRAM, &m79152pc_state::mcu_map);
 	m_mcu->set_addrmap(AS_IO, &m79152pc_state::mcu_io_map);
 	m_mcu->t0_in_cb().set(FUNC(m79152pc_state::mcu_t0_r));
@@ -291,7 +291,7 @@ void m79152pc_state::m79152pc(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_m79152pc);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0)); // КР580ВИ53
+	pit8253_device &pit(PIT8253(config, "pit")); // КР580ВИ53
 	pit.set_clk<1>(921600);
 	pit.set_clk<2>(921600);
 	pit.out_handler<1>().set(m_uart, FUNC(z80sio_device::txcb_w));
@@ -316,7 +316,7 @@ void m79152pc_state::m79152pc(machine_config &config)
 	centronics_device &printer(CENTRONICS(config, "printer", centronics_devices, nullptr));
 	printer.ack_handler().set("ppi", FUNC(i8255_device::pc2_w));
 
-	z80ctc_device &ctc(Z80CTC(config, "ctc", 4'000'000));
+	z80ctc_device &ctc(Z80CTC(config, "ctc", XTAL::u(4'000'000)));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	ctc.set_clk<2>(921600);
 	ctc.zc_callback<2>().set(m_uart, FUNC(z80sio_device::txca_w));
@@ -324,7 +324,7 @@ void m79152pc_state::m79152pc(machine_config &config)
 
 	// FIXME: Channel A should be the modem channel. Channel B should be a PC keyboard
 	// that outputs XT scancodes, which are then rebroadcast through channel A!
-	Z80SIO(config, m_uart, 4'000'000); // UB8560D
+	Z80SIO(config, m_uart, XTAL::u(4'000'000)); // UB8560D
 	m_uart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_uart->out_txda_callback().set("keyboard", FUNC(rs232_port_device::write_txd));
 	m_uart->out_dtra_callback().set("keyboard", FUNC(rs232_port_device::write_dtr));
@@ -341,7 +341,7 @@ void m79152pc_state::m79152pc(machine_config &config)
 	//modem.cts_handler().set(m_uart, FUNC(z80sio_device::ctsb_w));
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 1000);
+	BEEP(config, m_beep, XTAL::u(1000));
 	m_beep->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

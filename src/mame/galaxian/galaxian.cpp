@@ -7499,7 +7499,7 @@ void galaxian_state::konami_sound_1x_ay8910(machine_config &config)
 	m_ay8910[0]->add_route(1, "konami", 1.0, 1);
 	m_ay8910[0]->add_route(2, "konami", 1.0, 2);
 
-	NETLIST_SOUND(config, "konami", 48000)
+	NETLIST_SOUND(config, "konami", XTAL::u(48000))
 		.set_source(netlist_konami1x)
 		.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
@@ -7546,7 +7546,7 @@ void galaxian_state::konami_sound_2x_ay8910(machine_config &config)
 	m_ay8910[1]->add_route(1, "konami", 1.0, 4);
 	m_ay8910[1]->add_route(2, "konami", 1.0, 5);
 
-	NETLIST_SOUND(config, "konami", 48000)
+	NETLIST_SOUND(config, "konami", XTAL::u(48000))
 		.set_source(netlist_konami2x)
 		.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
@@ -7598,7 +7598,7 @@ void galaxian_state::galaxian(machine_config &config)
 {
 	galaxian_base(config);
 
-	GALAXIAN_SOUND(config, "cust", 0);
+	GALAXIAN_SOUND(config, "cust");
 }
 
 void galaxian_state::galartic(machine_config &config)
@@ -7724,7 +7724,7 @@ void galaxian_state::mooncrst(machine_config &config)
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::mooncrst_map);
 
-	MOONCRST_SOUND(config, "cust", 0);
+	MOONCRST_SOUND(config, "cust");
 }
 
 void galaxian_state::eagle(machine_config &config)
@@ -7788,12 +7788,12 @@ void bmxstunts_state::bmxstunts(machine_config &config)
 {
 	galaxian_base(config);
 
-	M6502(config.replace(), m_maincpu, 3'072'000 / 2); // Synertek 6502A, TODO: verify clock
+	M6502(config.replace(), m_maincpu, XTAL::u(3'072'000) / 2); // Synertek 6502A, TODO: verify clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmxstunts_state::bmxstunts_map);
 
 	set_irq_line(0);
 
-	SN76489A(config, m_snsnd, 3'072'000); // SN76489AN, TODO: verify clock
+	SN76489A(config, m_snsnd, XTAL::u(3'072'000)); // SN76489AN, TODO: verify clock
 	m_snsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
@@ -7899,7 +7899,7 @@ void galaxian_state::checkman(machine_config &config)
 	mooncrst(config);
 
 	/* basic machine hardware */
-	Z80(config, m_audiocpu, 1620000);  /* 1.62 MHz */
+	Z80(config, m_audiocpu, XTAL::u(1620000));  /* 1.62 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::checkman_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &galaxian_state::checkman_sound_portmap);
 	m_audiocpu->set_vblank_int("screen", FUNC(galaxian_state::irq0_line_hold));   /* NMIs are triggered by the main CPU */
@@ -7907,7 +7907,7 @@ void galaxian_state::checkman(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
-	AY8910(config, m_ay8910[0], 1789750).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8910(config, m_ay8910[0], XTAL::u(1789750)).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -7918,7 +7918,7 @@ void galaxian_state::checkmaj(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::galaxian_map_base); // no discrete sound
 
-	Z80(config, m_audiocpu, 1620000);
+	Z80(config, m_audiocpu, XTAL::u(1620000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &galaxian_state::checkmaj_sound_map);
 
 	TIMER(config, "irq0").configure_scanline(FUNC(galaxian_state::checkmaj_irq0_gen), "screen", 0, 8);
@@ -7926,7 +7926,7 @@ void galaxian_state::checkmaj(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	// sound hardware
-	AY8910(config, m_ay8910[0], 1620000);
+	AY8910(config, m_ay8910[0], XTAL::u(1620000));
 	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 2);
 }
@@ -7956,14 +7956,14 @@ void kingball_state::kingball(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &kingball_state::kingball_map);
 
-	Z80(config, m_audiocpu, 5000000/2);
+	Z80(config, m_audiocpu, XTAL::u(5000000)/2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kingball_state::kingball_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kingball_state::kingball_sound_portmap);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	// sound hardware
-	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.53); // unknown DAC
+	DAC_4BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.53); // unknown DAC
 }
 
 
@@ -8241,7 +8241,7 @@ void nihon_sfx_state::sfx(machine_config &config)
 	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND + 3 * 8 * GALAXIAN_XSCALE, GALAXIAN_HBSTART - 2 * 8 * GALAXIAN_XSCALE, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
 
 	/* DAC for the sample player */
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // 16-pin IC (not identified by schematics)
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 1.0); // 16-pin IC (not identified by schematics)
 }
 
 
@@ -8276,7 +8276,7 @@ void monsterz_state::monsterz(machine_config &config)
 		});
 
 	/* DAC for the sample player */
-	DAC_8BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // TODO: check dac type
+	DAC_8BIT_R2R(config, m_dac2).add_route(ALL_OUTPUTS, "speaker", 1.0); // TODO: check dac type
 }
 
 
@@ -8336,7 +8336,7 @@ void sbhoei_state::sbhoei(machine_config &config)
 
 	SP0250(config, m_sp0250, 3.12_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	SBHOEI_SOUND(config, "cust", 0);
+	SBHOEI_SOUND(config, "cust");
 }
 
 

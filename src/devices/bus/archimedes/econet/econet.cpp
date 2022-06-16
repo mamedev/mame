@@ -29,7 +29,7 @@ void arc_econet_device::device_add_mconfig(machine_config &config)
 	m_adlc->out_txd_cb().set("econet", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(DEVICE_SELF_OWNER, FUNC(archimedes_econet_slot_device::efiq_w));
 
-	econet_device &econet(ECONET(config, "econet", 0));
+	econet_device &econet(ECONET(config, "econet"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
@@ -46,7 +46,7 @@ void arc_econet_device::device_add_mconfig(machine_config &config)
 //  archimedes_econet_device - constructor
 //-------------------------------------------------
 
-arc_econet_device::arc_econet_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_econet_device::arc_econet_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_ECONET, tag, owner, clock)
 	, device_archimedes_econet_interface(mconfig, *this)
 	, m_adlc(*this, "mc6854")

@@ -72,7 +72,7 @@ class mos6526_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_tod_clock(int clock) { m_tod_clock = clock; }
 
@@ -108,7 +108,7 @@ protected:
 		TYPE_5710
 	};
 
-	mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -218,7 +218,7 @@ protected:
 class mos6526a_device : public mos6526_device
 {
 public:
-	mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -227,7 +227,7 @@ public:
 class mos8520_device : public mos6526_device
 {
 public:
-	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -242,7 +242,7 @@ protected:
 class mos5710_device : public mos6526_device
 {
 public:
-	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	//uint8_t read(offs_t offset);
 	//void write(offs_t offset, uint8_t data);

@@ -9,7 +9,7 @@
 #define IRQ_M4_RTC      0x04    /* RTC on Model 4 */
 #define CASS_RISE       0x01    /* high speed cass on Model III/4) */
 #define CASS_FALL       0x02    /* high speed cass on Model III/4) */
-#define MODEL4_MASTER_CLOCK 20275200
+#define MODEL4_MASTER_CLOCK XTAL::u(20275200)
 
 
 TIMER_CALLBACK_MEMBER(trs80m3_state::cassette_data_callback)

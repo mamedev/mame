@@ -49,7 +49,7 @@
 
 DEFINE_DEVICE_TYPE(SNK68_SPR, snk68_spr_device, "snk68_spr", "SNK68 Sprites")
 
-snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SNK68_SPR, tag, owner, clock)
 	, m_newtilecb(*this, FUNC(snk68_spr_device::tile_callback_noindirect))
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)

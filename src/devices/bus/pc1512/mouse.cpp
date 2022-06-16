@@ -44,7 +44,7 @@ device_pc1512_mouse_port_interface::device_pc1512_mouse_port_interface(const mac
 //  pc1512_mouse_port_device - constructor
 //-------------------------------------------------
 
-pc1512_mouse_port_device::pc1512_mouse_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pc1512_mouse_port_device::pc1512_mouse_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PC1512_MOUSE_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_pc1512_mouse_port_interface>(mconfig, *this),
 	m_write_x(*this),
@@ -55,7 +55,7 @@ pc1512_mouse_port_device::pc1512_mouse_port_device(const machine_config &mconfig
 {
 }
 
-pc1512_mouse_device::pc1512_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pc1512_mouse_device::pc1512_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PC1512_MOUSE, tag, owner, clock),
 	device_pc1512_mouse_port_interface(mconfig, *this)
 {

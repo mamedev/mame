@@ -53,7 +53,7 @@ public:
 
 	// construction/destruction
 	template <typename T>
-	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&opts, const char *dflt)
+	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: cococart_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -61,7 +61,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto cart_callback() { return m_cart_callback.bind(); }
 	auto nmi_callback() { return m_nmi_callback.bind(); }

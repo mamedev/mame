@@ -371,10 +371,10 @@ void pcktgal_state::machine_start()
 void pcktgal_state::pcktgal(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 2000000);
+	M6502(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcktgal_state::main_map);
 
-	DECO_222(config, m_audiocpu, 1500000);
+	DECO_222(config, m_audiocpu, XTAL::u(1500000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pcktgal_state::sound_map);
 	// IRQs are caused by the ADPCM chip
 	// NMIs are caused by the main CPU
@@ -392,7 +392,7 @@ void pcktgal_state::pcktgal(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_pcktgal);
 	PALETTE(config, m_palette, FUNC(pcktgal_state::palette), 512);
 
-	DECO_BAC06(config, m_tilegen, 0);
+	DECO_BAC06(config, m_tilegen);
 	m_tilegen->set_gfx_region_wide(0, 0, 0);
 	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
 
@@ -401,10 +401,10 @@ void pcktgal_state::pcktgal(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2203(config, "ym1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.60);
-	YM3812(config, "ym2", 3000000).add_route(ALL_OUTPUTS, "mono", 1.00);
+	YM2203(config, "ym1", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.60);
+	YM3812(config, "ym2", XTAL::u(3000000)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(pcktgal_state::adpcm_int));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // 8kHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.70);
@@ -420,7 +420,7 @@ void pcktgal_state::bootleg(machine_config &config)
 void pcktgal_state::pcktgal2(machine_config &config)
 {
 	pcktgal(config);
-	M6502(config.replace(), m_audiocpu, 1500000); // doesn't use the encrypted 222
+	M6502(config.replace(), m_audiocpu, XTAL::u(1500000)); // doesn't use the encrypted 222
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pcktgal_state::sound_map);
 }
 

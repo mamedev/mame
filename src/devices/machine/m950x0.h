@@ -75,19 +75,19 @@ protected:
 class m95010_device : public m950x0_device
 {
 public:
-	m95010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	m95010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class m95020_device : public m950x0_device
 {
 public:
-	m95020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	m95020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class m95040_device : public m950x0_device
 {
 public:
-	m95040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	m95040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 DECLARE_DEVICE_TYPE(M95010, m95010_device)

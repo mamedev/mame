@@ -610,7 +610,7 @@ void pdp1_state::machine_start()
 
 DEFINE_DEVICE_TYPE(PDP1_READTAPE, pdp1_readtape_image_device, "pdp1_readtape_image", "PDP-1 Tape Reader")
 
-pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: paper_tape_reader_device(mconfig, PDP1_READTAPE, tag, owner, clock)
 	, m_maincpu(*this, "^maincpu")
 	, m_st_ptr(*this)
@@ -633,7 +633,7 @@ void pdp1_readtape_image_device::device_start()
 
 DEFINE_DEVICE_TYPE(PDP1_PUNCHTAPE, pdp1_punchtape_image_device, "pdp1_punchtape_image_device", "PDP-1 Tape Puncher")
 
-pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: paper_tape_punch_device(mconfig, PDP1_PUNCHTAPE, tag, owner, clock)
 	, m_maincpu(*this, "^maincpu")
 	, m_st_ptp(*this)
@@ -654,7 +654,7 @@ void pdp1_punchtape_image_device::device_start()
 
 DEFINE_DEVICE_TYPE(PDP1_TYPEWRITER, pdp1_typewriter_device, "pdp1_typewriter_image", "PDP-1 Typewriter")
 
-pdp1_typewriter_device::pdp1_typewriter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pdp1_typewriter_device::pdp1_typewriter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PDP1_TYPEWRITER, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, m_maincpu(*this, "^maincpu")
@@ -682,7 +682,7 @@ void pdp1_typewriter_device::device_start()
 
 DEFINE_DEVICE_TYPE(PDP1_CYLINDER, pdp1_cylinder_image_device, "pdp1_cylinder_image", "PDP-1 Cylinder")
 
-pdp1_cylinder_image_device::pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pdp1_cylinder_image_device::pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PDP1_CYLINDER, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, m_maincpu(*this, "^maincpu")
@@ -1763,7 +1763,7 @@ void pdp1_state::pdp1(machine_config &config)
 {
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */
-	PDP1(config, m_maincpu, 1000000); /* the CPU core uses microsecond counts */
+	PDP1(config, m_maincpu, XTAL::u(1000000)); /* the CPU core uses microsecond counts */
 	m_maincpu->set_reset_param(&pdp1_reset_param);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pdp1_state::pdp1_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pdp1_state::pdp1_interrupt));   /* dummy interrupt: handles input */
@@ -1808,7 +1808,7 @@ void pdp1_state::pdp1(machine_config &config)
 	screen.screen_vblank().set(FUNC(pdp1_state::screen_vblank_pdp1));
 	screen.set_palette(m_palette);
 
-	CRT(config, m_crt, 0);
+	CRT(config, m_crt);
 	m_crt->set_num_levels(pen_crt_num_levels);
 	m_crt->set_offsets(crt_window_offset_x, crt_window_offset_y);
 	m_crt->set_size(crt_window_width, crt_window_height);

@@ -15,7 +15,7 @@ class bus_mouse_device : public device_t
 {
 public:
 	// construction/destruction
-	bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto extint_callback() { return m_write_extint.bind(); }
 

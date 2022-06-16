@@ -509,11 +509,11 @@ void pturn_state::machine_reset()
 
 void pturn_state::pturn(machine_config &config)
 {
-	Z80(config, m_maincpu, 12000000/3);
+	Z80(config, m_maincpu, XTAL::u(12000000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pturn_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pturn_state::main_intgen));
 
-	Z80(config, m_audiocpu, 12000000/3);
+	Z80(config, m_audiocpu, XTAL::u(12000000)/3);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pturn_state::sub_map);
 	m_audiocpu->set_periodic_int(FUNC(pturn_state::sub_intgen), attotime::from_hz(3*60));
 
@@ -543,9 +543,9 @@ void pturn_state::pturn(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay1", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay2", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 

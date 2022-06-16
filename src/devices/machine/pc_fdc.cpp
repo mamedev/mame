@@ -38,7 +38,7 @@ void pc_fdc_xt_device::map(address_map &map)
 }
 
 
-pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock), fdc(*this, "upd765"),
 	intrq_cb(*this),
 	drq_cb(*this)
@@ -62,7 +62,7 @@ void pc_fdc_family_device::dma_w(uint8_t data)
 
 void pc_fdc_family_device::device_add_mconfig(machine_config &config)
 {
-	UPD765A(config, fdc, 8'000'000, false, false);
+	UPD765A(config, fdc, XTAL::u(8'000'000), false, false);
 	fdc->intrq_wr_callback().set(FUNC(pc_fdc_family_device::irq_w));
 	fdc->drq_wr_callback().set(FUNC(pc_fdc_family_device::drq_w));
 }
@@ -166,6 +166,6 @@ void pc_fdc_family_device::check_drq()
 		drq_cb(drq);
 }
 
-pc_fdc_xt_device::pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : pc_fdc_family_device(mconfig, PC_FDC_XT, tag, owner, clock)
+pc_fdc_xt_device::pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : pc_fdc_family_device(mconfig, PC_FDC_XT, tag, owner, clock)
 {
 }

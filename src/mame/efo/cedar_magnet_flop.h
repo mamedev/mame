@@ -14,7 +14,7 @@ class cedar_magnet_flop_device : public device_t
 {
 public:
 	// construction/destruction
-	cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 port60_r();
 	u8 port61_r();

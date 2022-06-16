@@ -13,7 +13,7 @@ class k037122_device : public device_t,
 public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; } // unimplemented tilemap ROZ, scroll registers
 
-	k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_gfx_index(int index) { m_gfx_index = index; }

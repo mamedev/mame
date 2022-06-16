@@ -588,7 +588,7 @@ void mil4000_state::mil4000(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mil4000);
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // frequency from 1000 kHz resonator. pin 7 high not verified.
+	OKIM6295(config, "oki", XTAL::u(1000000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // frequency from 1000 kHz resonator. pin 7 high not verified.
 }
 
 

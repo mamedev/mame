@@ -42,7 +42,7 @@ class saa1043_device : public device_t
 {
 public:
 	// construction/destruction
-	saa1043_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa1043_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	enum outputs : uint32_t
 	{

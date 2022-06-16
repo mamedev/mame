@@ -109,7 +109,7 @@ void korgz3_state::korgz3(machine_config &config)
 {
 	// All clocks unknown
 
-	V30(config, m_maincpu, 8'000'000); // D70116C-8
+	V30(config, m_maincpu, XTAL::u(8'000'000)); // D70116C-8
 	m_maincpu->set_addrmap(AS_PROGRAM, &korgz3_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &korgz3_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
@@ -117,7 +117,7 @@ void korgz3_state::korgz3(machine_config &config)
 	pic8259_device &pic(PIC8259(config, "pic")); // not visible on PCB; part of MB603112 ASIC?
 	pic.out_int_callback().set_inputline(m_maincpu, 0);
 
-	HD6303Y(config, m_synthcpu, 12'000'000); // HD63C03YP
+	HD6303Y(config, m_synthcpu, XTAL::u(12'000'000)); // HD63C03YP
 	m_synthcpu->set_addrmap(AS_PROGRAM, &korgz3_state::synth_map);
 	m_synthcpu->out_p5_cb().set(FUNC(korgz3_state::p5_w));
 	m_synthcpu->in_p6_cb().set(FUNC(korgz3_state::adc_port_r));
@@ -125,12 +125,12 @@ void korgz3_state::korgz3(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // D43256AC-12LL + battery
 
-	M58990(config, m_adc, 1'000'000); // M58990P-1
+	M58990(config, m_adc, XTAL::u(1'000'000)); // M58990P-1
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2414_device &ymsnd(YM2414(config, "ymsnd", 3'579'545)); // YM2414B
+	ym2414_device &ymsnd(YM2414(config, "ymsnd", XTAL::u(3'579'545))); // YM2414B
 	ymsnd.add_route(0, "lspeaker", 0.60);
 	ymsnd.add_route(1, "rspeaker", 0.60);
 }

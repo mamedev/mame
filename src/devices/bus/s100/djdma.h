@@ -26,7 +26,7 @@ class s100_djdma_device : public device_t, public device_s100_card_interface
 {
 public:
 	// construction/destruction
-	s100_djdma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	s100_djdma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

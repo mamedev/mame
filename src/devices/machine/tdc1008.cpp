@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(TDC1008, tdc1008_device, "tdc1008", "TRW TDC1008 Multiplier-A
 //  tdc1008_device - constructor
 //-------------------------------------------------
 
-tdc1008_device::tdc1008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tdc1008_device::tdc1008_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TDC1008, tag, owner, clock)
 	, m_x_in(0)
 	, m_y_in(0)

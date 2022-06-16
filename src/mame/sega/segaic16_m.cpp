@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(SEGA_315_5250_COMPARE_TIMER, sega_315_5250_compare_timer_devi
 //  sega_315_5248_multiplier_device - constructor
 //-------------------------------------------------
 
-sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, tag, owner, clock)
 {
 }
@@ -107,7 +107,7 @@ void sega_315_5248_multiplier_device::device_reset()
 //  sega_315_5249_divider_device - constructor
 //-------------------------------------------------
 
-sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA_315_5249_DIVIDER, tag, owner, clock)
 {
 }
@@ -252,7 +252,7 @@ void sega_315_5249_divider_device::execute(int mode)
 //  constructor
 //-------------------------------------------------
 
-sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, tag, owner, clock)
 	, m_68kint_callback(*this)
 	, m_zint_callback(*this)

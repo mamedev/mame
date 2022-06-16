@@ -61,7 +61,7 @@ void acorn_fdc_device::device_add_mconfig(machine_config &config)
 //  acorn_fdc_device - constructor
 //-------------------------------------------------
 
-acorn_fdc_device::acorn_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_fdc_device::acorn_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACORN_FDC, tag, owner, clock)
 	, device_acorn_bus_interface(mconfig, *this)
 	, m_fdc(*this, "i8271")

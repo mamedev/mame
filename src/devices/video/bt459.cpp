@@ -32,7 +32,7 @@ void bt459_device::map(address_map &map)
 	map(0x03, 0x03).rw(FUNC(bt459_device::palette_r), FUNC(bt459_device::palette_w));
 }
 
-bt459_device::bt459_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bt459_device::bt459_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BT459, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 {

@@ -50,7 +50,7 @@
 
 DEFINE_DEVICE_TYPE(WPCSND, wpcsnd_device, "wpcsnd", "Williams WPC Sound")
 
-wpcsnd_device::wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+wpcsnd_device::wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, WPCSND, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this)
 	, m_cpu(*this, "bgcpu")
@@ -107,13 +107,13 @@ void wpcsnd_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &wpcsnd_device::wpcsnd_map);
 	config.set_maximum_quantum(attotime::from_hz(50));
 
-	YM2151(config, m_ym2151, 3580000);
+	YM2151(config, m_ym2151, XTAL::u(3580000));
 	m_ym2151->irq_handler().set(FUNC(wpcsnd_device::ym2151_irq_w));
 	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.25);
 
-	AD7524(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25);
+	AD7524(config, "dac").add_route(ALL_OUTPUTS, *this, 0.25);
 
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.5);
+	HC55516(config, m_hc55516).add_route(ALL_OUTPUTS, *this, 0.5);
 }
 
 

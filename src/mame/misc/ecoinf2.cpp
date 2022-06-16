@@ -506,7 +506,7 @@ INPUT_PORTS_END
 void ecoinf2_state::ecoinf2_oxo(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80180(config, m_maincpu, 4000000); // some of these hit invalid opcodes with a plain z80, some don't?
+	Z80180(config, m_maincpu, XTAL::u(4000000)); // some of these hit invalid opcodes with a plain z80, some don't?
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinf2_state::oxo_memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinf2_state::oxo_portmap);
 
@@ -547,10 +547,10 @@ void ecoinf2_state::ecoinf2_oxo(machine_config &config)
 	REEL(config, m_reels[3], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
 	m_reels[3]->optic_handler().set(FUNC(ecoinf2_state::reel_optic_cb<3>));
 
-	METERS(config, m_meters, 0);
+	METERS(config, m_meters);
 	m_meters->set_number(8);
 
-//  I8255(config, "ic25_dips", 0);
+//  I8255(config, "ic25_dips");
 }
 
 

@@ -318,7 +318,7 @@ DEFINE_DEVICE_TYPE(CGB_PPU, cgb_ppu_device, "cgb_ppu", "CGB PPU")
 
 
 
-dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size)
+dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_lr35902(*this, finder_base::DUMMY_TAG)
@@ -328,25 +328,25 @@ dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmg_ppu_device::dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmg_ppu_device(mconfig, DMG_PPU, tag, owner, clock, 0x2000)
 {
 	m_enable_experimental_engine = true;
 }
 
-mgb_ppu_device::mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mgb_ppu_device::mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmg_ppu_device(mconfig, MGB_PPU, tag, owner, clock, 0x2000)
 {
 	m_enable_experimental_engine = true;
 }
 
-sgb_ppu_device::sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sgb_ppu_device::sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmg_ppu_device(mconfig, SGB_PPU, tag, owner, clock, 0x2000)
 {
 	m_enable_experimental_engine = false;
 }
 
-cgb_ppu_device::cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cgb_ppu_device::cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmg_ppu_device(mconfig, CGB_PPU, tag, owner, clock, 0x4000)
 {
 	m_enable_experimental_engine = false;

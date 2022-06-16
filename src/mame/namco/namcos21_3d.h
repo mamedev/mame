@@ -8,7 +8,7 @@
 class namcos21_3d_device : public device_t
 {
 public:
-	namcos21_3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namcos21_3d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// config
 	void set_fixed_palbase(int base) { m_fixed_palbase = base; }

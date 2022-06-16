@@ -20,7 +20,7 @@ class wpcsnd_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	required_device<cpu_device> m_cpu;
 	required_device<ym2151_device> m_ym2151;

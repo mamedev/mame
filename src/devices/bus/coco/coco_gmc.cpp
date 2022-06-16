@@ -38,7 +38,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+		coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 		virtual void device_add_mconfig(machine_config &config) override;
 
 	protected:
@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_GMC, device_cococart_interface, coco_pak_gmc
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
-coco_pak_gmc_device::coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_pak_gmc_device::coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: coco_pak_banked_device(mconfig, COCO_PAK_GMC, tag, owner, clock)
 	, m_psg(*this, SN76489AN_TAG)
 {

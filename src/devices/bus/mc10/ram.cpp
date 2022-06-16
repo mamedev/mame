@@ -31,7 +31,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		mc10_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+		mc10_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	protected:
 		// device-level overrides
@@ -55,7 +55,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(MC10_PAK_RAM, device_mc10cart_interface, mc10_pak_ram
 //  mc10_pak_device - constructor
 //-------------------------------------------------
 
-mc10_pak_ram_device::mc10_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mc10_pak_ram_device::mc10_pak_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MC10_PAK_RAM, tag, owner, clock)
 	, device_mc10cart_interface(mconfig, *this)
 	, m_share(*this, "ext_ram", 1024*16, ENDIANNESS_BIG)

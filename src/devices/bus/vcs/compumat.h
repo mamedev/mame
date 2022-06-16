@@ -17,7 +17,7 @@ class a26_rom_cm_device : public a26_rom_base_device
 {
 public:
 	// construction/destruction
-	a26_rom_cm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_cm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;

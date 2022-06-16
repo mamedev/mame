@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(ES8712, es8712_device, "es8712", "Excellent Systems ES8712 So
 //  es8712_device - constructor
 //-------------------------------------------------
 
-es8712_device::es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+es8712_device::es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ES8712, tag, owner, clock)
 	, device_rom_interface(mconfig, *this)
 	, m_adpcm_select(*this, "adpcm_select")
@@ -59,7 +59,7 @@ es8712_device::es8712_device(const machine_config &mconfig, const char *tag, dev
 
 void es8712_device::device_add_mconfig(machine_config &config)
 {
-	HCT157(config, m_adpcm_select, 0); // TODO : gcpinbal case, differs per games?
+	HCT157(config, m_adpcm_select); // TODO : gcpinbal case, differs per games?
 	m_adpcm_select->out_callback().set(FUNC(es8712_device::msm_w));
 }
 

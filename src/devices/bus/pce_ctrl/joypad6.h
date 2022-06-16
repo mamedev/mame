@@ -31,7 +31,7 @@ public:
 
 protected:
 	// construction/destruction
-	pce_joypad6_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	pce_joypad6_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -64,11 +64,11 @@ class pce_avenue_pad_6_device : public pce_joypad6_base_device
 {
 public:
 	// construction/destruction
-	pce_avenue_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pce_avenue_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// construction/destruction
-	pce_avenue_pad_6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	pce_avenue_pad_6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -90,7 +90,7 @@ class pce_arcade_pad_6_device : public pce_avenue_pad_6_device
 {
 public:
 	// construction/destruction
-	pce_arcade_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pce_arcade_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

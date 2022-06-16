@@ -30,7 +30,7 @@ class ym3802_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	ym3802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym3802_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }

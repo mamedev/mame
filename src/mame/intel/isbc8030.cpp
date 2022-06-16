@@ -92,10 +92,10 @@ void isbc8030_state::isbc8030(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &isbc8030_state::isbc8030_io);
 	m_maincpu->in_inta_func().set(m_pic, FUNC(pic8259_device::acknowledge));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(XTAL(22'118'400) / 18);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(XTAL(22'118'400) / 18);
@@ -103,12 +103,12 @@ void isbc8030_state::isbc8030(machine_config &config)
 	m_pit->out_handler<2>().set(m_usart, FUNC(i8251_device::write_rxc));
 	m_pit->out_handler<2>().append(m_usart, FUNC(i8251_device::write_txc));
 
-	I8251(config, m_usart, 0);
+	I8251(config, m_usart);
 	m_usart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_usart->dtr_handler().set(m_rs232, FUNC(rs232_port_device::write_dtr));
 	m_usart->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
 
-	I8255A(config, m_ppi, 0);
+	I8255A(config, m_ppi);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
 	m_rs232->rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));

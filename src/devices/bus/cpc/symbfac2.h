@@ -21,7 +21,7 @@ class cpc_symbiface2_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t ide_cs0_r(offs_t offset);
 	void ide_cs0_w(offs_t offset, uint8_t data);

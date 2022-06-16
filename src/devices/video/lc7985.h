@@ -14,7 +14,7 @@
 class lc7985_device : public device_t
 {
 public:
-	lc7985_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	lc7985_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void ir_w(u8 data);
 	u8 status_r();

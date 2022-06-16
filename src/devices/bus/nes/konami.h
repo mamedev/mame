@@ -16,7 +16,7 @@ class nes_konami_vrc1_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_konami_vrc1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_konami_vrc1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
@@ -37,7 +37,7 @@ class nes_konami_vrc2_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_konami_vrc2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_konami_vrc2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_m(offs_t offset) override;
 	virtual void write_m(offs_t offset, u8 data) override;
@@ -47,7 +47,7 @@ public:
 
 protected:
 	// construction/destruction
-	nes_konami_vrc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_konami_vrc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -64,7 +64,7 @@ class nes_konami_vrc3_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_konami_vrc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_konami_vrc3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
@@ -91,7 +91,7 @@ class nes_konami_vrc4_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_konami_vrc4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_konami_vrc4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_m(offs_t offset) override;
 	virtual void write_m(offs_t offset, u8 data) override;
@@ -101,7 +101,7 @@ public:
 
 protected:
 	// construction/destruction
-	nes_konami_vrc4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_konami_vrc4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -137,7 +137,7 @@ class nes_konami_vrc6_device : public nes_konami_vrc4_device
 {
 public:
 	// construction/destruction
-	nes_konami_vrc6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_konami_vrc6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
@@ -156,7 +156,7 @@ class nes_konami_vrc7_device : public nes_konami_vrc4_device
 {
 public:
 	// construction/destruction
-	nes_konami_vrc7_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_konami_vrc7_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 

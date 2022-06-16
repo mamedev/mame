@@ -58,7 +58,7 @@ namespace {
 // device type definition
 DEFINE_DEVICE_TYPE(HP98046_IO_CARD, hp98046_io_card_device , "hp98046" , "HP98046 card")
 
-hp98046_io_card_device::hp98046_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp98046_io_card_device::hp98046_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HP98046_IO_CARD, tag, owner, clock)
 	, device_hp9845_io_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")

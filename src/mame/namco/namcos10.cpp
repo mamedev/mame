@@ -1008,56 +1008,56 @@ void namcos10_state::ns10_mrdrilr2(machine_config &config)
 {
 	namcos10_memm(config);
 	/* decrypter device (CPLD in hardware?) */
-	MRDRILR2_DECRYPTER(config, "decrypter", 0);
+	MRDRILR2_DECRYPTER(config, "decrypter");
 }
 
 void namcos10_state::ns10_chocovdr(machine_config &config)
 {
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	CHOCOVDR_DECRYPTER(config, "decrypter", 0);
+	CHOCOVDR_DECRYPTER(config, "decrypter");
 }
 
 void namcos10_state::ns10_gamshara(machine_config &config)
 {
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	GAMSHARA_DECRYPTER(config, "decrypter", 0);
+	GAMSHARA_DECRYPTER(config, "decrypter");
 }
 
 void namcos10_state::ns10_gjspace(machine_config &config)
 {
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	GJSPACE_DECRYPTER(config, "decrypter", 0);
+	GJSPACE_DECRYPTER(config, "decrypter");
 }
 
 void namcos10_state::ns10_knpuzzle(machine_config &config)
 {
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	KNPUZZLE_DECRYPTER(config, "decrypter", 0);
+	KNPUZZLE_DECRYPTER(config, "decrypter");
 }
 
 void namcos10_state::ns10_konotako(machine_config &config)
 {
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	KONOTAKO_DECRYPTER(config, "decrypter", 0);
+	KONOTAKO_DECRYPTER(config, "decrypter");
 }
 
 void namcos10_state::ns10_nflclsfb(machine_config &config)
 {
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	NFLCLSFB_DECRYPTER(config, "decrypter", 0);
+	NFLCLSFB_DECRYPTER(config, "decrypter");
 }
 
 void namcos10_state::ns10_startrgn(machine_config &config)
 {
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	STARTRGN_DECRYPTER(config, "decrypter", 0);
+	STARTRGN_DECRYPTER(config, "decrypter");
 }
 
 static INPUT_PORTS_START( namcos10 )

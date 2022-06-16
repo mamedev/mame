@@ -229,7 +229,7 @@ void kaypro_state::kayproii(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* piezo-device needs to be measured */
+	BEEP(config, m_beep, XTAL::u(950)).add_route(ALL_OUTPUTS, "mono", 1.00); /* piezo-device needs to be measured */
 
 	/* devices */
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(kaypro_state::quickload_cb));
@@ -320,10 +320,10 @@ void kaypro_state::kaypro484(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 1.00); // piezo-device needs to be measured
+	BEEP(config, m_beep, XTAL::u(950)).add_route(ALL_OUTPUTS, "mono", 1.00); // piezo-device needs to be measured
 
 	/* devices */
-	MC6845(config, m_crtc, 2000000); // comes out of ULA - needs to be measured
+	MC6845(config, m_crtc, XTAL::u(2000000)); // comes out of ULA - needs to be measured
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(7);
@@ -335,7 +335,7 @@ void kaypro_state::kaypro484(machine_config &config)
 	kbd.rxd_cb().set("sio_1", FUNC(z80sio_device::rxb_w));
 	kbd.rxd_cb().append("sio_1", FUNC(z80sio_device::syncb_w));
 
-	CLOCK(config, "kbdtxrxc", 4800).signal_handler().set("sio_1", FUNC(z80sio_device::rxtxcb_w));
+	CLOCK(config, "kbdtxrxc", XTAL::u(4800)).signal_handler().set("sio_1", FUNC(z80sio_device::rxtxcb_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(kaypro_state::write_centronics_busy));

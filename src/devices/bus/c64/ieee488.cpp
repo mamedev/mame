@@ -143,7 +143,7 @@ void c64_ieee488_device::tpi_pc_w(uint8_t data)
 
 void c64_ieee488_device::device_add_mconfig(machine_config &config)
 {
-	TPI6525(config, m_tpi, 0);
+	TPI6525(config, m_tpi);
 	m_tpi->in_pa_cb().set(FUNC(c64_ieee488_device::tpi_pa_r));
 	m_tpi->out_pa_cb().set(FUNC(c64_ieee488_device::tpi_pa_w));
 	m_tpi->in_pb_cb().set(m_bus, FUNC(ieee488_device::dio_r));
@@ -151,7 +151,7 @@ void c64_ieee488_device::device_add_mconfig(machine_config &config)
 	m_tpi->in_pc_cb().set(FUNC(c64_ieee488_device::tpi_pc_r));
 	m_tpi->out_pc_cb().set(FUNC(c64_ieee488_device::tpi_pc_w));
 
-	IEEE488(config, m_bus, 0);
+	IEEE488(config, m_bus);
 	ieee488_slot_device::add_cbm_defaults(config, nullptr);
 
 	C64_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), c64_expansion_cards, nullptr);
@@ -168,7 +168,7 @@ void c64_ieee488_device::device_add_mconfig(machine_config &config)
 //  c64_ieee488_device - constructor
 //-------------------------------------------------
 
-c64_ieee488_device::c64_ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_ieee488_device::c64_ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_IEEE488, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_tpi(*this, MOS6525_TAG),

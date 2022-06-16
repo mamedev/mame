@@ -36,7 +36,7 @@ INPUT_PORTS_EXTERN(ie15);
 class ie15_device : public device_t, public device_serial_interface
 {
 public:
-	ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Interface to a RS232 connection.
 	auto rs232_conn_txd_handler() { return m_rs232_conn_txd_handler.bind(); }
@@ -51,7 +51,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
 protected:
-	ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;

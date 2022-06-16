@@ -16,7 +16,7 @@ DECLARE_DEVICE_TYPE(KONAMI_573_MULTI_SESSION_UNIT, k573msu_device)
 class k573msu_device : public device_t
 {
 public:
-	k573msu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k573msu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

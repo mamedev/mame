@@ -278,12 +278,12 @@ void tosh1000_state::tosh1000(machine_config &config)
 	TC8521(config, "rtc", XTAL(32'768));
 
 	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false).set_option_machine_config("fdc_xt", cfg_fdc_35);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, "fdc_xt", false).set_option_machine_config("fdc_xt", cfg_fdc_35);
+	ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa5", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", "mb:isa", pc_isa8_cards, nullptr, false);
 
 //  SOFTWARE_LIST(config, "flop_list").set_original("tosh1000");
 
@@ -294,7 +294,7 @@ void tosh1000_state::tosh1000(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 
-	TOSH1000_BRAM(config, m_bram, 0);
+	TOSH1000_BRAM(config, m_bram);
 }
 
 

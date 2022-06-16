@@ -72,7 +72,7 @@ void axc51base_cpu_device::io_internal(address_map& map)
 }
 
 
-axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, address_map_constructor io_map, int program_width, int data_width, uint8_t features)
+axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor program_map, address_map_constructor data_map, address_map_constructor io_map, int program_width, int data_width, uint8_t features)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 11, 0, data_map)
@@ -104,7 +104,7 @@ axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device
 }
 
 
-axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+axc51base_cpu_device::axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int program_width, int data_width, uint8_t features)
 	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(axc51base_cpu_device::program_internal), this), address_map_constructor(FUNC(axc51base_cpu_device::data_internal), this), address_map_constructor(FUNC(axc51base_cpu_device::io_internal), this),  program_width, data_width, features)
 {
 }
@@ -1546,12 +1546,12 @@ void ax208_cpu_device::device_reset()
 
 // AX208 (specific CPU)
 
-ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: axc51base_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ax208_cpu_device::ax208_internal_program_mem), this), address_map_constructor(FUNC(ax208_cpu_device::data_internal), this), address_map_constructor(FUNC(axc51base_cpu_device::io_internal), this), 0, 8)
 {
 }
 
-ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ax208_cpu_device::ax208_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ax208_cpu_device(mconfig, AX208, tag, owner, clock)
 {
 }
@@ -1565,7 +1565,7 @@ std::unique_ptr<util::disasm_interface> ax208_cpu_device::create_disassembler()
 
 
 
-ax208p_cpu_device::ax208p_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ax208p_cpu_device::ax208p_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ax208_cpu_device(mconfig, AX208P, tag, owner, clock)
 {
 }

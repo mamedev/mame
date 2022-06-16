@@ -52,7 +52,7 @@ void scm_500_state::machine_reset()
 
 void scm_500_state::scm_500(machine_config &config)
 {
-	I80C51GB(config, m_maincpu, 12'000'000); // unknown clock
+	I80C51GB(config, m_maincpu, XTAL::u(12'000'000)); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &scm_500_state::prog_map);
 }
 

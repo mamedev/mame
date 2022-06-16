@@ -887,7 +887,7 @@ void k053247_device::zdrawgfxzoom32GP(
 
 DEFINE_DEVICE_TYPE(K055673, k055673_device, "k055673", "K055673 Sprite Generator")
 
-k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: k053247_device(mconfig, K055673, tag, owner, clock)
 {
 }
@@ -1046,12 +1046,12 @@ void k055673_device::device_start()
 
 DEFINE_DEVICE_TYPE(K053247, k053247_device, "k053247", "K053246/K053247 Sprite Generator")
 
-k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: k053247_device(mconfig, K053247, tag, owner, clock)
 {
 }
 
-k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_gfx_interface(mconfig, *this, nullptr)

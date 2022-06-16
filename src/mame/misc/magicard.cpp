@@ -855,7 +855,7 @@ void magicard_base_state::magicard_base(machine_config &config)
 	m_scc66470->irq().set(FUNC(magicard_base_state::scc66470_irq));
 
 	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &magicard_state::ramdac_map);
 
 	SPEAKER(config, "mono").front_center();
@@ -882,7 +882,7 @@ void magicard_state::magicard_pic54(machine_config &config)
 {
 	magicard(config);
 
-	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400)); // correct?
+	pic16c54_device &pic(PIC16C54(config, "pic16c54", XTAL::u(3686400))); // correct?
 	pic.read_b().set(FUNC(magicard_state::pic_portb_r));
 	pic.write_b().set(FUNC(magicard_state::pic_portb_w));
 }
@@ -891,7 +891,7 @@ void magicard_state::magicard_pic56(machine_config &config)
 {
 	magicard(config);
 
-	pic16c56_device &pic(PIC16C56(config, "pic16c56", 3686400)); // correct?
+	pic16c56_device &pic(PIC16C56(config, "pic16c56", XTAL::u(3686400))); // correct?
 	pic.read_b().set(FUNC(magicard_state::pic_portb_r));
 	pic.write_b().set(FUNC(magicard_state::pic_portb_w));
 }
@@ -913,7 +913,7 @@ void hotslots_state::hotslots_base(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotslots_state::hotslots_map);
 
-	YMZ284(config, "ssg", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YMZ284(config, "ssg", XTAL::u(4000000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	RTC72421(config, m_rtc, XTAL(32'768)).out_int_handler().set(FUNC(hotslots_state::cpu_int1));
 
@@ -933,7 +933,7 @@ void hotslots_state::hotslots_pic54(machine_config &config)
 {
 	hotslots(config);
 
-	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400)); // correct?
+	pic16c54_device &pic(PIC16C54(config, "pic16c54", XTAL::u(3686400))); // correct?
 	pic.read_b().set(FUNC(hotslots_state::pic_portb_r));
 	pic.write_b().set(FUNC(hotslots_state::pic_portb_w));
 }
@@ -951,7 +951,7 @@ void hotslots_state::puzzleme(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotslots_state::puzzleme_map);
 
-	pic16c54_device &pic(PIC16C54(config, "pic16c54", 3686400)); // correct?
+	pic16c54_device &pic(PIC16C54(config, "pic16c54", XTAL::u(3686400))); // correct?
 	pic.read_b().set(FUNC(hotslots_state::pic_portb_r));
 	pic.write_b().set(FUNC(hotslots_state::pic_portb_w));
 

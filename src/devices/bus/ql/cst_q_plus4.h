@@ -26,7 +26,7 @@ class cst_q_plus4_device : public device_t, public device_ql_expansion_card_inte
 {
 public:
 	// construction/destruction
-	cst_q_plus4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cst_q_plus4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

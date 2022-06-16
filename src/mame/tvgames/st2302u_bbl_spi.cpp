@@ -264,7 +264,7 @@ INPUT_PORTS_END
 
 void bbl380_state::bbl380(machine_config &config)
 {
-	ST2302U(config, m_maincpu, 32000000); // unknown clock; type not confirmed
+	ST2302U(config, m_maincpu, XTAL::u(32000000)); // unknown clock; type not confirmed
 	m_maincpu->set_addrmap(AS_DATA, &bbl380_state::bbl380_map);
 	m_maincpu->in_pa_callback().set_ioport("IN0");
 	m_maincpu->in_pb_callback().set_ioport("IN1");
@@ -291,8 +291,8 @@ void bbl380_state::bbl380(machine_config &config)
 	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
 	m_screen->set_screen_update(FUNC(bbl380_state::screen_update));
 
-	BL_HANDHELDS_MENUCONTROL(config, m_menucontrol, 0);
-	BL_HANDHELDS_LCDC(config, m_lcdc, 0);
+	BL_HANDHELDS_MENUCONTROL(config, m_menucontrol);
+	BL_HANDHELDS_LCDC(config, m_lcdc);
 
 	// LCD controller seems to be either Sitronix ST7735R or (if RDDID bytes match) Ilitek ILI9163C
 	// (SoC's built-in LCDC is unused or nonexistent?)

@@ -246,7 +246,7 @@ void cesclassic_state::cesclassic_palette(palette_device &palette) const
 
 void cesclassic_state::cesclassic(machine_config &config)
 {
-	M68000(config, m_maincpu, 24000000/2);
+	M68000(config, m_maincpu, XTAL::u(24000000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cesclassic_state::cesclassic_map);
 	m_maincpu->set_vblank_int("l_lcd", FUNC(cesclassic_state::irq2_line_assert));  // TODO: unknown sources
 	m_maincpu->set_periodic_int(FUNC(cesclassic_state::irq3_line_assert), attotime::from_hz(60*8));
@@ -264,7 +264,7 @@ void cesclassic_state::cesclassic(machine_config &config)
 	PALETTE(config, m_palette, FUNC(cesclassic_state::cesclassic_palette), 4);
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, 24000000/16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);
+	OKIM6295(config, m_oki, XTAL::u(24000000)/16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 

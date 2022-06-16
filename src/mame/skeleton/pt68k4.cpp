@@ -427,22 +427,22 @@ void pt68k4_state::pt68k2(machine_config &config)
 	pc_kbdc.out_clock_cb().set(FUNC(pt68k4_state::keyboard_clock_w));
 	pc_kbdc.out_data_cb().set(FUNC(pt68k4_state::keyboard_data_w));
 
-	M48T02(config, TIMEKEEPER_TAG, 0);
+	M48T02(config, TIMEKEEPER_TAG);
 
 	WD1772(config, m_wdfdc, 16_MHz_XTAL / 2);
 	FLOPPY_CONNECTOR(config, m_floppy_connector[0], pt68k_floppies, "525dd", pt68k4_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy_connector[1], pt68k_floppies, "525dd", pt68k4_state::floppy_formats);
 
-	ISA8(config, m_isa, 0);
+	ISA8(config, m_isa);
 	m_isa->set_custom_spaces();
 	m_isa->irq5_callback().set(FUNC(pt68k4_state::irq5_w));
 
-	ISA8_SLOT(config, "isa1", 0, m_isa, pt68k4_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", 0, m_isa, pt68k4_isa8_cards, nullptr, false),
+	ISA8_SLOT(config, "isa1", m_isa, pt68k4_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", m_isa, pt68k4_isa8_cards, nullptr, false),
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
@@ -467,18 +467,18 @@ void pt68k4_state::pt68k4(machine_config &config)
 	pc_kbdc.out_clock_cb().set(FUNC(pt68k4_state::keyboard_clock_w));
 	pc_kbdc.out_data_cb().set(FUNC(pt68k4_state::keyboard_data_w));
 
-	M48T02(config, TIMEKEEPER_TAG, 0);
+	M48T02(config, TIMEKEEPER_TAG);
 
-	ISA8(config, m_isa, 0);
+	ISA8(config, m_isa);
 	m_isa->set_custom_spaces();
 
-	ISA8_SLOT(config, "isa1", 0, m_isa, pt68k4_isa8_cards, "fdc_at", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, m_isa, pt68k4_isa8_cards, "cga", false);
-	ISA8_SLOT(config, "isa3", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", 0, m_isa, pt68k4_isa8_cards, nullptr, false),
-	ISA8_SLOT(config, "isa7", 0, m_isa, pt68k4_isa8_cards, nullptr, false),
+	ISA8_SLOT(config, "isa1", m_isa, pt68k4_isa8_cards, "fdc_at", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", m_isa, pt68k4_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa3", m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", m_isa, pt68k4_isa8_cards, nullptr, false),
+	ISA8_SLOT(config, "isa7", m_isa, pt68k4_isa8_cards, nullptr, false),
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
@@ -520,5 +520,5 @@ ROM_END
 
 /* Driver */
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                  FULLNAME  FLAGS
-COMP( 1988, pt68k2, 0,      0,      pt68k2,  pt68k4, pt68k4_state, empty_init, "Peripheral Technology", "PT68K2", MACHINE_SUPPORTS_SAVE )
-COMP( 1990, pt68k4, 0,      0,      pt68k4,  pt68k4, pt68k4_state, empty_init, "Peripheral Technology", "PT68K4", MACHINE_SUPPORTS_SAVE )
+COMP( 1988, pt68k2,      0, 0,      pt68k2,  pt68k4, pt68k4_state, empty_init, "Peripheral Technology", "PT68K2", MACHINE_SUPPORTS_SAVE )
+COMP( 1990, pt68k4,      0, 0,      pt68k4,  pt68k4, pt68k4_state, empty_init, "Peripheral Technology", "PT68K4", MACHINE_SUPPORTS_SAVE )

@@ -44,7 +44,7 @@
 class m6500_1_device : public m6502_mcu_device
 {
 public:
-	m6500_1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	m6500_1_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	auto pa_in_cb() { return m_port_in_cb[0].bind(); }
 	auto pb_in_cb() { return m_port_in_cb[1].bind(); }

@@ -438,10 +438,10 @@ void olyboss_state::olybossd(machine_config &config)
 
 	/* devices */
 
-	AM9519(config, m_uic, 0);
+	AM9519(config, m_uic);
 	m_uic->out_int_callback().set_inputline("maincpu", 0);
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), true, true);
 	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq2_w)).invert();
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
 	FLOPPY_CONNECTOR(config, m_fdd0, bosscd_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
@@ -469,7 +469,7 @@ void olyboss_state::olybossd(machine_config &config)
 	m_ppi->out_pc_callback().set(FUNC(olyboss_state::ppic_w));
 
 	/* keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(olyboss_state::keyboard_put));
 }
 
@@ -505,10 +505,10 @@ void olyboss_state::bossb85(machine_config &config)
 
 	/* devices */
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", bossb_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
@@ -532,7 +532,7 @@ void olyboss_state::bossb85(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 
 	/* keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(olyboss_state::keyboard85_put));
 }
 

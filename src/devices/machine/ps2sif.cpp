@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(SONYPS2_SIF, ps2_sif_device, "ps2sif", "PlayStation 2 SIF")
 
 /*static*/ const size_t ps2_sif_device::MAX_FIFO_DEPTH = 0x20;
 
-ps2_sif_device::ps2_sif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ps2_sif_device::ps2_sif_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYPS2_SIF, tag, owner, clock)
 	, m_intc(*this, finder_base::DUMMY_TAG)
 {

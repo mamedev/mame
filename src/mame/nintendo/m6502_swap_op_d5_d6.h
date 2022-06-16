@@ -18,7 +18,7 @@
 
 class m6502_swap_op_d5_d6 : public m6502_device {
 public:
-	m6502_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m6502_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_encryption_state(bool state);
 protected:
@@ -50,7 +50,7 @@ protected:
 
 class rp2a03_core_swap_op_d5_d6 : public rp2a03_core_device {
 public:
-	rp2a03_core_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rp2a03_core_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_encryption_state(bool state);
 protected:

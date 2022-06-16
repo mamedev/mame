@@ -285,6 +285,43 @@ public:
 		save_item(device, module, tag, index, value, &attotime::m_seconds, tempstr.c_str(), count);
 	}
 
+	// specializations for XTAL
+	template <typename ItemType>
+	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, XTAL>::value> save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
+	{
+		std::string tempstr;
+		tempstr.assign(valname).append(".base_clock");
+		save_item(device, module, tag, index, value, &XTAL::m_base_clock, tempstr.c_str());
+		tempstr.assign(valname).append(".current_clock");
+		save_item(device, module, tag, index, value, &XTAL::m_current_clock, tempstr.c_str());
+		tempstr.assign(valname).append(".disable_validation");
+		save_item(device, module, tag, index, value, &XTAL::m_disable_validation, tempstr.c_str());
+	}
+
+	template <typename ItemType>
+	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, XTAL>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
+	{
+		std::string tempstr;
+		tempstr.assign(valname).append(".base_clock");
+		save_item(device, module, tag, index, value, &XTAL::m_base_clock, tempstr.c_str());
+		tempstr.assign(valname).append(".current_clock");
+		save_item(device, module, tag, index, value, &XTAL::m_current_clock, tempstr.c_str());
+		tempstr.assign(valname).append(".disable_validation");
+		save_item(device, module, tag, index, value, &XTAL::m_disable_validation, tempstr.c_str());
+	}
+
+	template <typename ItemType>
+	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, XTAL>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
+	{
+		std::string tempstr;
+		tempstr.assign(valname).append(".base_clock");
+		save_item(device, module, tag, index, value, &XTAL::m_base_clock, tempstr.c_str());
+		tempstr.assign(valname).append(".current_clock");
+		save_item(device, module, tag, index, value, &XTAL::m_current_clock, tempstr.c_str());
+		tempstr.assign(valname).append(".disable_validation");
+		save_item(device, module, tag, index, value, &XTAL::m_disable_validation, tempstr.c_str());
+	}
+
 	// global memory registration
 	template <typename ItemType>
 	void save_item(ItemType &value, const char *valname, int index = 0)

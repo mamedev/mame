@@ -75,7 +75,7 @@ void skopro_state::machine_reset()
 void skopro_state::skopro(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM4(config, m_maincpu, 100000000); // actually a Pentium E2160 at 1.80 GHz
+	PENTIUM4(config, m_maincpu, XTAL::u(100000000)); // actually a Pentium E2160 at 1.80 GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &skopro_state::skopro_map);
 
 	/* video hardware */

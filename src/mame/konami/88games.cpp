@@ -298,11 +298,11 @@ void _88games_state::machine_reset()
 void _88games_state::_88games(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI(config, m_maincpu, 3000000); /* ? */
+	KONAMI(config, m_maincpu, XTAL::u(3000000)); /* ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_88games_state::main_map);
 	m_maincpu->line().set(FUNC(_88games_state::banking_callback));
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, XTAL::u(3579545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &_88games_state::sound_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -320,18 +320,18 @@ void _88games_state::_88games(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(_88games_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(_88games_state::sprite_callback));
 
-	K051316(config, m_k051316, 0);
+	K051316(config, m_k051316);
 	m_k051316->set_palette("palette");
 	m_k051316->set_zoom_callback(FUNC(_88games_state::zoom_callback));
 
@@ -340,7 +340,7 @@ void _88games_state::_88games(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "mono", 0.75).add_route(1, "mono", 0.75);
+	YM2151(config, "ymsnd", XTAL::u(3579545)).add_route(0, "mono", 0.75).add_route(1, "mono", 0.75);
 
 	UPD7759(config, m_upd7759[0]).add_route(ALL_OUTPUTS, "mono", 0.30);
 

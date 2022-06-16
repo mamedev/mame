@@ -9,7 +9,7 @@ void sb0400_device::map(address_map &map)
 {
 }
 
-sb0400_device::sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sb0400_device::sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, SB0400, tag, owner, clock)
 {
 }

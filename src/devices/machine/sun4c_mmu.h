@@ -20,7 +20,7 @@
 class sun4_mmu_base_device : public device_t, public sparc_mmu_interface
 {
 public:
-	sun4_mmu_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock
+	sun4_mmu_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock
 		, uint8_t ctx_mask, uint8_t pmeg_mask, uint32_t page_mask, uint32_t seg_entry_shift, uint32_t seg_entry_mask
 		, uint32_t page_entry_mask, uint32_t cache_mask)
 		: sun4_mmu_base_device(mconfig, type, tag, owner, clock)
@@ -105,7 +105,7 @@ public:
 	void hw_flush_all_w(uint32_t offset, uint32_t data, uint32_t mem_mask);
 
 protected:
-	sun4_mmu_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sun4_mmu_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	struct page_entry
 	{
@@ -225,13 +225,13 @@ protected:
 class sun4_mmu_device : public sun4_mmu_base_device
 {
 public:
-	sun4_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sun4_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class sun4c_mmu_device : public sun4_mmu_base_device
 {
 public:
-	sun4c_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sun4c_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(SUN4_MMU, sun4_mmu_device)

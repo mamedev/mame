@@ -52,7 +52,7 @@ void bml3bus_mp1805_device::floppy_drives(device_slot_interface &device)
 
 void bml3bus_mp1805_device::device_add_mconfig(machine_config &config)
 {
-	MC6843(config, m_mc6843, 500000);
+	MC6843(config, m_mc6843, XTAL::u(500000));
 	m_mc6843->force_ready();
 	m_mc6843->irq().set(FUNC(bml3bus_mp1805_device::nmi_w));
 
@@ -131,7 +131,7 @@ void bml3bus_mp1805_device::bml3_mp1805_w(uint8_t data)
 //  LIVE DEVICE
 //**************************************************************************
 
-bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, BML3BUS_MP1805, tag, owner, clock),
 	device_bml3bus_card_interface(mconfig, *this),
 	m_floppy(*this, "%u", 0U),

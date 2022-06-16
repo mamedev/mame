@@ -87,16 +87,16 @@ INPUT_PORTS_END
 
 void gaminator_state::gaminator(machine_config &config)
 {
-	MCF5206E(config, m_maincpu, 40000000); /* definitely Coldfire, model / clock uncertain */
+	MCF5206E(config, m_maincpu, XTAL::u(40000000)); /* definitely Coldfire, model / clock uncertain */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaminator_state::gaminator_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaminator_state::irq6_line_hold)); // irq6 seems to be needed to get past the ROM checking
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", m_maincpu);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
 	screen.set_screen_update("vga", FUNC(gamtor_vga_device::screen_update));
 
-	gamtor_vga_device &vga(GAMTOR_VGA(config, "vga", 0));
+	gamtor_vga_device &vga(GAMTOR_VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x100000);
 

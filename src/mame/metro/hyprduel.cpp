@@ -436,7 +436,7 @@ void hyprduel_state::hyprduel(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(4000000)));
 	ymsnd.irq_handler().set_inputline(m_subcpu, 1);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
@@ -462,7 +462,7 @@ void hyprduel_state::magerror(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 1.00);
+	YM2413(config, "ymsnd", XTAL::u(3579545)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	OKIM6295(config, "oki", 4000000/16/16*132, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.57); // clock frequency & pin 7 not verified
 }

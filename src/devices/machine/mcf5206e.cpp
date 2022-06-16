@@ -823,7 +823,7 @@ DEFINE_DEVICE_TYPE(MCF5206E_PERIPHERAL, mcf5206e_peripheral_device, "mcf5206e_pe
 //  mcf5206e_peripheral_device - constructor
 //-------------------------------------------------
 
-mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MCF5206E_PERIPHERAL, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_maincpu(*this, finder_base::DUMMY_TAG),

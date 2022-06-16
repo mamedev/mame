@@ -85,59 +85,59 @@ void bt455_device::map(address_map &map)
 	map(0x03, 0x03).rw(FUNC(bt455_device::overlay_r), FUNC(bt455_device::overlay_w));
 }
 
-bt45x_device_base::bt45x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors)
+bt45x_device_base::bt45x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const u32 palette_colors, const u32 overlay_colors)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_palette_colors(palette_colors)
 	, m_overlay_colors(overlay_colors)
 {
 }
 
-bt45x_rgb_device_base::bt45x_rgb_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors)
+bt45x_rgb_device_base::bt45x_rgb_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const u32 palette_colors, const u32 overlay_colors)
 	: bt45x_device_base(mconfig, type, tag, owner, clock, palette_colors, overlay_colors)
 	, device_palette_interface(mconfig, *this)
 {
 }
 
-bt45x_mono_device_base::bt45x_mono_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors)
+bt45x_mono_device_base::bt45x_mono_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const u32 palette_colors, const u32 overlay_colors)
 	: bt45x_device_base(mconfig, type, tag, owner, clock, palette_colors, overlay_colors)
 {
 }
 
-bt451_device::bt451_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bt451_device::bt451_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bt45x_rgb_device_base(mconfig, BT451, tag, owner, clock, 256, 4)
 {
 }
 
-bt453_device::bt453_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bt453_device::bt453_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bt45x_rgb_device_base(mconfig, BT453, tag, owner, clock, 256, 4)
 {
 }
 
-bt454_device::bt454_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bt454_device::bt454_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bt45x_rgb_device_base(mconfig, BT454, tag, owner, clock, 16, 1)
 {
 }
 
-bt455_device::bt455_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bt455_device::bt455_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bt45x_mono_device_base(mconfig, BT455, tag, owner, clock, 16, 1)
 {
 }
-bt457_device::bt457_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bt457_device::bt457_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bt45x_mono_device_base(mconfig, BT457, tag, owner, clock, 256, 4)
 {
 }
 
-bt458_device::bt458_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bt458_device::bt458_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: bt45x_rgb_device_base(mconfig, type, tag, owner, clock, 256, 4)
 {
 }
 
-bt458_device::bt458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bt458_device::bt458_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bt458_device(mconfig, BT458, tag, owner, clock)
 {
 }
 
-bt467_device::bt467_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bt467_device::bt467_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bt458_device(mconfig, BT467, tag, owner, clock)
 {
 }

@@ -836,7 +836,7 @@ These clocks make the emulation run too fast.
 void ironhors_base_state::base(machine_config &config)
 {
 	// basic machine hardware
-	MC6809E(config, m_maincpu, 18'432'000 / 6);        // 3.072 MHz??? mod by Shingo Suzuki 1999/10/15
+	MC6809E(config, m_maincpu, XTAL::u(18'432'000) / 6);        // 3.072 MHz??? mod by Shingo Suzuki 1999/10/15
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -844,7 +844,7 @@ void ironhors_base_state::base(machine_config &config)
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(1*8, 31*8-1, 2*8, 30*8-1);
-	m_screen->set_raw(18'432'000 / 4, 296, 8, 256 - 8, 255, 16, 240); // pixel clock is a guesswork
+	m_screen->set_raw(XTAL::u(18'432'000) / 4, 296, 8, 256 - 8, 255, 16, 240); // pixel clock is a guesswork
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(ironhors_state::palette), 16*8*16+16*8*16, 256);
@@ -854,7 +854,7 @@ void ironhors_base_state::base(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym2203(YM2203(config, "ym2203", 18'432'000 / 6));
+	ym2203_device &ym2203(YM2203(config, "ym2203", XTAL::u(18'432'000) / 6));
 	ym2203.port_a_write_callback().set(FUNC(ironhors_state::filter_w));
 	ym2203.add_route(0, "disc_ih", 1.0, 0);
 	ym2203.add_route(1, "disc_ih", 1.0, 1);
@@ -871,7 +871,7 @@ void ironhors_state::ironhors(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ironhors_state::master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(ironhors_state::scanline_tick), "screen", 0, 1);
 
-	Z80(config, m_soundcpu, 18'432'000 / 6);      // 3.072 MHz
+	Z80(config, m_soundcpu, XTAL::u(18'432'000) / 6);      // 3.072 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &ironhors_state::slave_map);
 	m_soundcpu->set_addrmap(AS_IO, &ironhors_state::slave_io_map);
 
@@ -903,7 +903,7 @@ void farwest_state::farwest(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &farwest_state::master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(farwest_state::scanline_tick), "screen", 0, 1);
 
-	Z80(config, m_soundcpu, 18'432'000 / 6);      // 3.072 MHz
+	Z80(config, m_soundcpu, XTAL::u(18'432'000) / 6);      // 3.072 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &farwest_state::slave_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_farwest);

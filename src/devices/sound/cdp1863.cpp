@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(CDP1863, cdp1863_device, "cdp1863", "RCA CDP1863")
 //  cdp1863_device - constructor
 //-------------------------------------------------
 
-cdp1863_device::cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cdp1863_device::cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CDP1863, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)

@@ -13,7 +13,7 @@ class s97269pb_device : public device_t
 {
 public:
 	// construction/destruction
-	s97269pb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s97269pb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// daughterboard logic
 	void palette_bank_w(uint8_t data);

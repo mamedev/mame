@@ -1111,15 +1111,15 @@ void bonzeadv_state::bonzeadv(machine_config &config)
 	screen.screen_vblank().set(FUNC(bonzeadv_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(bonzeadv_state::fixed_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	TC0110PCR(config, "tc0110pcr");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1130,7 +1130,7 @@ void bonzeadv_state::bonzeadv(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -1147,7 +1147,7 @@ void msm_state::asuka(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1165,16 +1165,16 @@ void msm_state::asuka(machine_config &config)
 	screen.screen_vblank().set(FUNC(msm_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(true);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(msm_state::variable_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	TC0110PCR(config, "tc0110pcr");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1190,10 +1190,10 @@ void msm_state::asuka(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      // 8 kHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 }
@@ -1214,7 +1214,7 @@ void cadash_state::cadash(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1232,17 +1232,17 @@ void cadash_state::cadash(machine_config &config)
 	screen.screen_vblank().set(FUNC(cadash_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(true);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(cadash_state::fixed_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	TC0110PCR(config, "tc0110pcr");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1253,7 +1253,7 @@ void cadash_state::cadash(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 }
@@ -1261,16 +1261,16 @@ void cadash_state::cadash(machine_config &config)
 void msm_state::mofflott(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 8000000);    // 8 MHz ???
+	M68000(config, m_maincpu, XTAL::u(8000000));    // 8 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &msm_state::asuka_map);
 	m_maincpu->set_vblank_int("screen", FUNC(msm_state::irq5_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);  // 4 MHz ???
+	Z80(config, m_audiocpu, XTAL::u(4000000));  // 4 MHz ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &msm_state::z80_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1288,35 +1288,35 @@ void msm_state::mofflott(machine_config &config)
 	screen.screen_vblank().set(FUNC(msm_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(msm_state::variable_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	TC0110PCR(config, "tc0110pcr");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(4000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.port_write_handler().set_membank(m_audiobank).mask(0x03);
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 0.25);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(msm_state::msm5205_vck));  // VCK function
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      // 8 kHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 }
@@ -1324,16 +1324,16 @@ void msm_state::mofflott(machine_config &config)
 void base_state::eto(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 8000000);    // 8 MHz ???
+	M68000(config, m_maincpu, XTAL::u(8000000));    // 8 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &base_state::eto_map);
 	m_maincpu->set_vblank_int("screen", FUNC(base_state::irq5_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);  // 4 MHz ???
+	Z80(config, m_audiocpu, XTAL::u(4000000));  // 4 MHz ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &base_state::z80_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1351,27 +1351,27 @@ void base_state::eto(machine_config &config)
 	screen.screen_vblank().set(FUNC(base_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(base_state::variable_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	TC0110PCR(config, "tc0110pcr");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(4000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.port_write_handler().set_membank(m_audiobank).mask(0x03);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 }

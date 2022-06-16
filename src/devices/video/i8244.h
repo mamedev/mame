@@ -45,7 +45,7 @@ class i8244_device :  public device_t
 {
 public:
 	// construction/destruction
-	i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq_cb() { return m_irq_func.bind(); }
@@ -106,7 +106,7 @@ protected:
 		} s;
 	};
 
-	i8244_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	i8244_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -177,7 +177,7 @@ class i8245_device : public i8244_device
 {
 public:
 	// construction/destruction
-	i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static auto parent_rom_device_type() { return &I8244; }
 

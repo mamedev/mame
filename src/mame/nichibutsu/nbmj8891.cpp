@@ -2208,9 +2208,9 @@ void nbmj8891_state::gionbana(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	YM3812(config, "fmsnd", 2500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	YM3812(config, "fmsnd", XTAL::u(2500000)).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.37); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.37); // unknown DAC
 }
 
 void nbmj8891_state::mgion(machine_config &config)

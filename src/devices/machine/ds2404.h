@@ -17,7 +17,7 @@ class ds2404_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
-	ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration helpers
 	void ref_year(uint32_t year) { m_ref_year = year; }

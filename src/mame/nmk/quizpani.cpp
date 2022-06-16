@@ -184,7 +184,7 @@ GFXDECODE_END
 
 void quizpani_state::quizpani(machine_config &config)
 {
-	M68000(config, m_maincpu, 10000000);
+	M68000(config, m_maincpu, XTAL::u(10000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &quizpani_state::quizpani_map);
 	m_maincpu->set_vblank_int("screen", FUNC(quizpani_state::irq4_line_hold));
 	m_maincpu->set_periodic_int(FUNC(quizpani_state::irq1_line_hold), attotime::from_hz(164)); // music tempo
@@ -204,7 +204,7 @@ void quizpani_state::quizpani(machine_config &config)
 
 	OKIM6295(config, "oki", 16000000/4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki");
 }
 

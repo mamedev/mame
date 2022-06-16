@@ -18,7 +18,7 @@ public:
 	auto srom_data_r() { return m_srom_data_cb.bind(); }
 
 protected:
-	alpha_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	alpha_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -76,7 +76,7 @@ protected:
 class alpha_ev4_device : public alpha_device
 {
 public:
-	alpha_ev4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	alpha_ev4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -253,7 +253,7 @@ protected:
 class dec_21064_device : public alpha_ev4_device
 {
 public:
-	dec_21064_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dec_21064_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_reset() override;

@@ -22,7 +22,7 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	tekram_eisa_scsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	tekram_eisa_scsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 
@@ -49,7 +49,7 @@ protected:
 class tekram_dc320b_device : public tekram_eisa_scsi_device
 {
 public:
-	tekram_dc320b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tekram_dc320b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -66,7 +66,7 @@ private:
 class tekram_dc320e_device : public tekram_eisa_scsi_device
 {
 public:
-	tekram_dc320e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tekram_dc320e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -79,7 +79,7 @@ private:
 class tekram_dc820_device : public tekram_eisa_scsi_device
 {
 public:
-	tekram_dc820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tekram_dc820_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -94,7 +94,7 @@ private:
 class tekram_dc820b_device : public tekram_eisa_scsi_device
 {
 public:
-	tekram_dc820b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tekram_dc820b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

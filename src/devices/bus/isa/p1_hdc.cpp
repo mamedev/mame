@@ -55,15 +55,15 @@ ROM_END
 
 void p1_hdc_device::device_add_mconfig(machine_config &config)
 {
-	WD2010(config, m_hdc, 5'000'000); // XXX clock?
+	WD2010(config, m_hdc, XTAL::u(5'000'000)); // XXX clock?
 	m_hdc->in_drdy_callback().set_constant(1);
 	m_hdc->in_index_callback().set_constant(1);
 	m_hdc->in_wf_callback().set_constant(1);
 	m_hdc->in_tk000_callback().set_constant(1);
 	m_hdc->in_sc_callback().set_constant(1);
 
-	HARDDISK(config, "hard0", 0);
-	HARDDISK(config, "hard1", 0);
+	HARDDISK(config, "hard0");
+	HARDDISK(config, "hard1");
 }
 
 
@@ -111,7 +111,7 @@ void p1_hdc_device::p1_HDC_w(offs_t offset, uint8_t data)
 //  p1_hdc_device - constructor
 //-------------------------------------------------
 
-p1_hdc_device::p1_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+p1_hdc_device::p1_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, P1_HDC, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_hdc(*this, "d17")

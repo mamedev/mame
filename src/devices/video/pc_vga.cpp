@@ -132,7 +132,7 @@ DEFINE_DEVICE_TYPE(MACH8,      mach8_device,      "mach8",      "Mach8")
 DEFINE_DEVICE_TYPE(XGA_COPRO,  xga_copro_device,  "xga_copro",  "IBM XGA Coprocessor")
 DEFINE_DEVICE_TYPE(OTI111,     oak_oti111_vga_device,  "oti111_vga",  "Oak Technologies Spitfire 64111")
 
-vga_device::vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vga_device::vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
@@ -140,63 +140,63 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 {
 }
 
-vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vga_device(mconfig, VGA, tag, owner, clock)
 {
 }
 
-svga_device::svga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+svga_device::svga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: vga_device(mconfig, type, tag, owner, clock)
 {
 }
 
-tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: svga_device(mconfig, TSENG_VGA, tag, owner, clock)
 {
 }
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: s3_vga_device(mconfig, S3_VGA, tag, owner, clock)
 {
 }
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: ati_vga_device(mconfig, type, tag, owner, clock)
 {
 }
 
-gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: svga_device(mconfig, GAMTOR_VGA, tag, owner, clock)
 {
 }
 
-ati_vga_device::ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ati_vga_device::ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ati_vga_device(mconfig, ATI_VGA, tag, owner, clock)
 {
 }
 
-ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: svga_device(mconfig, type, tag, owner, clock)
 {
 }
 
-ibm8514a_device::ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ibm8514a_device::ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ibm8514a_device(mconfig, IBM8514A, tag, owner, clock)
 {
 }
 
-ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_vga(*this, finder_base::DUMMY_TAG)
 {
 }
 
-mach8_device::mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mach8_device::mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: ibm8514a_device(mconfig, type, tag, owner, clock)
 {
 }
 
-mach8_device::mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mach8_device::mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mach8_device(mconfig, MACH8, tag, owner, clock)
 {
 }
@@ -2170,13 +2170,13 @@ void vga_device::mem_linear_w(offs_t offset, uint8_t data)
 
 void ati_vga_device::device_add_mconfig(machine_config &config)
 {
-	MACH8(config, "8514a", 0).set_vga_owner();
+	MACH8(config, "8514a").set_vga_owner();
 	EEPROM_93C46_16BIT(config, "ati_eeprom");
 }
 
 void s3_vga_device::device_add_mconfig(machine_config &config)
 {
-	IBM8514A(config, "8514a", 0).set_vga_owner();
+	IBM8514A(config, "8514a").set_vga_owner();
 }
 
 /******************************************
@@ -5845,7 +5845,7 @@ void mach8_device::mach8_ge_ext_config_w(uint16_t data)
 		popmessage("EEPROM enabled via 7AEE");
 }
 
-xga_copro_device::xga_copro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xga_copro_device::xga_copro_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XGA_COPRO, tag, owner, clock)
 	, m_var(TYPE::XGA)
 	, m_mem_read_cb(*this)
@@ -6593,7 +6593,7 @@ void xga_copro_device::device_reset()
 	m_pelmap = 0;
 }
 
-oak_oti111_vga_device::oak_oti111_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+oak_oti111_vga_device::oak_oti111_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: svga_device(mconfig, OTI111, tag, owner, clock)
 	, m_xga(*this, "xga")
 {
@@ -6601,7 +6601,7 @@ oak_oti111_vga_device::oak_oti111_vga_device(const machine_config &mconfig, cons
 
 void oak_oti111_vga_device::device_add_mconfig(machine_config &config)
 {
-	XGA_COPRO(config, m_xga, 0);
+	XGA_COPRO(config, m_xga);
 	m_xga->mem_read_callback().set(FUNC(oak_oti111_vga_device::mem_linear_r));
 	m_xga->mem_write_callback().set(FUNC(oak_oti111_vga_device::mem_linear_w));
 	m_xga->set_type(xga_copro_device::TYPE::OTI111);

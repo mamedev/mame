@@ -451,7 +451,7 @@ static void guab_floppies(device_slot_interface &device)
 void guab_state::guab(machine_config &config)
 {
 	/* TODO: Verify clock */
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &guab_state::guab_map);
 
 	/* TODO: Use real video timings */
@@ -468,7 +468,7 @@ void guab_state::guab(machine_config &config)
 
 	EF9369(config, "ef9369").set_color_update_callback(FUNC(guab_state::ef9369_color_update));
 
-	TMS34061(config, m_tms34061, 0);
+	TMS34061(config, m_tms34061);
 	m_tms34061->set_rowshift(8);  /* VRAM address is (row << rowshift) | col */
 	m_tms34061->set_vram_size(0x40000);
 	m_tms34061->int_callback().set_inputline("maincpu", 5);
@@ -477,11 +477,11 @@ void guab_state::guab(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	/* TODO: Verify clock */
-	SN76489(config, m_sn, 2000000);
+	SN76489(config, m_sn, XTAL::u(2000000));
 	m_sn->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
-	ptm.set_external_clocks(0, 0, 0);
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", XTAL::u(1000000)));
+	ptm.set_external_clocks(XTAL(), XTAL(), XTAL());
 	ptm.irq_callback().set_inputline("maincpu", 3);
 
 	i8255_device &ppi1(I8255(config, "i8255_1"));
@@ -506,22 +506,22 @@ void guab_state::guab(machine_config &config)
 	ppi4.in_pc_callback().set(FUNC(guab_state::watchdog_r));
 	ppi4.out_pc_callback().set(FUNC(guab_state::watchdog_w));
 
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta"));
 
-	acia6850_device &acia1(ACIA6850(config, "acia6850_1", 0));
+	acia6850_device &acia1(ACIA6850(config, "acia6850_1"));
 	acia1.txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 	acia1.irq_handler().set_inputline("maincpu", 4);
 
 	bacta.rxd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 19200)); // source? the ptm doesn't seem to output any common baud values
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(19200))); // source? the ptm doesn't seem to output any common baud values
 	acia_clock.signal_handler().set("acia6850_1", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia6850_1", FUNC(acia6850_device::write_rxc));
 
-	ACIA6850(config, "acia6850_2", 0);
+	ACIA6850(config, "acia6850_2");
 
 	// floppy
-	WD1773(config, m_fdc, 8000000);
+	WD1773(config, m_fdc, XTAL::u(8000000));
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, 6);
 	FLOPPY_CONNECTOR(config, "fdc:0", guab_floppies, "dd", guab_state::floppy_formats).set_fixed(true);
 

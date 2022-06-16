@@ -61,7 +61,7 @@ public:
 	void set_il2(bool value) { set_interrupt_value(INTERRUPT_EI2, value); }
 
 protected:
-	gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata);
+	gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const uint8_t *fontdata);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -257,7 +257,7 @@ class gime_ntsc_device : public gime_device
 {
 public:
 	template <typename T, typename U, typename V, typename W>
-	gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&ram_tag, V &&ext_tag, W &&region_tag)
+	gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag, U &&ram_tag, V &&ext_tag, W &&region_tag)
 		: gime_ntsc_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
@@ -267,14 +267,14 @@ public:
 		m_rom_region.set_tag(std::forward<W>(region_tag));
 	}
 
-	gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class gime_pal_device : public gime_device
 {
 public:
 	template <typename T, typename U, typename V, typename W>
-	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&ram_tag, V &&ext_tag, W &&region_tag)
+	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag, U &&ram_tag, V &&ext_tag, W &&region_tag)
 		: gime_pal_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
@@ -284,7 +284,7 @@ public:
 		m_rom_region.set_tag(std::forward<W>(region_tag));
 	}
 
-	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device)

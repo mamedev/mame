@@ -126,7 +126,7 @@ namespace {
 }
 
 // **** Constants ****
-static constexpr unsigned CPU_CLOCK = 613000;
+static constexpr XTAL CPU_CLOCK = XTAL::u(613000);
 // Time taken by hw timer updating (semi-made up) (in µsec)
 static constexpr unsigned TIMER_BUSY_USEC   = 128;
 static constexpr unsigned IRQ_KEYBOARD_BIT  = 0;
@@ -271,7 +271,7 @@ void hp80_base_state::hp80_base(machine_config &config)
 
 	// Beeper
 	SPEAKER(config, "mono").front_center();
-	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
+	DAC_1BIT(config, m_dac ).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
 	BEEP(config, m_beep, CPU_CLOCK / 512).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
 
 	// Optional ROMs
@@ -925,7 +925,7 @@ public:
 	hp85_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	// **** Constants of HP85 ****
-	static constexpr unsigned MASTER_CLOCK  = 9808000;
+	static constexpr XTAL MASTER_CLOCK  = XTAL::u(9808000);
 	// Video memory is actually made of 16384 4-bit nibbles
 	static constexpr unsigned VIDEO_MEM_SIZE    = 8192;
 	static constexpr unsigned ALPHA_MEM_SIZE    = 4096;
@@ -1575,11 +1575,11 @@ void hp85_state::hp85(machine_config &config)
 	TIMER(config, m_prt_busy_timer).configure_generic(FUNC(hp85_state::prt_busy_timer));
 
 	// Tape drive
-	HP_1MA6(config, "tape", 0);
+	HP_1MA6(config, "tape");
 
 	// Printer output
-	BITBANGER(config, m_prt_graph_out, 0);
-	BITBANGER(config, m_prt_alpha_out, 0);
+	BITBANGER(config, m_prt_graph_out);
+	BITBANGER(config, m_prt_alpha_out);
 
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp85_rom");
 }
@@ -1609,7 +1609,7 @@ public:
 	hp86_state(const machine_config &mconfig, device_type type, const char *tag, bool has_int_keyb = false);
 
 	// **** Constants of HP86 ****
-	static constexpr unsigned MASTER_CLOCK  = 12260000;
+	static constexpr XTAL MASTER_CLOCK  = XTAL::u(12260000);
 	static constexpr unsigned VIDEO_MEM_SIZE    = 16384;
 	static constexpr uint16_t VIDEO_ADDR_MASK   = VIDEO_MEM_SIZE - 1;
 	static constexpr uint16_t VIDEO_ALPHA_N_END = 0x10e0;

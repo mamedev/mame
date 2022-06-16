@@ -76,7 +76,7 @@ void bitmap_printer_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_cr_direction(1),
 	m_xpos(0),
@@ -108,13 +108,13 @@ bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, devi
 {
 }
 
-bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	bitmap_printer_device(mconfig, BITMAP_PRINTER, tag, owner, clock)
 {
 }
 
 bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, int paper_width, int paper_height, int hdpi, int vdpi) :
-	bitmap_printer_device(mconfig, tag, owner, u32(0))
+	bitmap_printer_device(mconfig, tag, owner)
 {
 	m_paper_width = paper_width;
 	m_paper_height = paper_height;

@@ -12,12 +12,12 @@ class seibu_cop_bootleg_device : public device_t, public device_memory_interface
 public:
 	template <typename T>
 	seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
-		: seibu_cop_bootleg_device(mconfig, tag, owner, (uint32_t)0)
+		: seibu_cop_bootleg_device(mconfig, tag, owner)
 	{
 		m_host_cpu.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data);

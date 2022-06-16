@@ -16,7 +16,7 @@
 #include "screen.h"
 #include "tilemap.h"
 
-#define IREMM10_MASTER_CLOCK        (12500000)
+#define IREMM10_MASTER_CLOCK        XTAL::u(12500000)
 
 #define IREMM10_CPU_CLOCK       (IREMM10_MASTER_CLOCK/16)
 #define IREMM10_PIXEL_CLOCK     (IREMM10_MASTER_CLOCK/2)
@@ -27,7 +27,7 @@
 #define IREMM10_VBSTART         (240)
 #define IREMM10_VBEND           (16)
 
-#define IREMM15_MASTER_CLOCK    (11730000)
+#define IREMM15_MASTER_CLOCK    XTAL::u(11730000)
 
 #define IREMM15_CPU_CLOCK       (IREMM15_MASTER_CLOCK/10)
 #define IREMM15_PIXEL_CLOCK     (IREMM15_MASTER_CLOCK/2)

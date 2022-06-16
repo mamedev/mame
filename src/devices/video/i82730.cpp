@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(I82730, i82730_device, "i82730", "Intel 82730")
 //  i82730_device - constructor
 //-------------------------------------------------
 
-i82730_device::i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i82730_device::i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, I82730, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_sint_handler(*this),

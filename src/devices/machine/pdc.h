@@ -34,7 +34,7 @@ class pdc_device : public device_t
 {
 public:
 	/* Constructor and Destructor */
-	pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	/* Callbacks */
 	auto m68k_r_callback() { return m_m68k_r_cb.bind(); }

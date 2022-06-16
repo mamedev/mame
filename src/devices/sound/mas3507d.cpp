@@ -46,7 +46,7 @@ ALLOW_SAVE_TYPE(mas3507d_device::i2c_command_t)
 // device type definition
 DEFINE_DEVICE_TYPE(MAS3507D, mas3507d_device, "mas3507d", "Micronas MAS 3507D MPEG decoder")
 
-mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MAS3507D, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, cb_mpeg_frame_sync(*this), cb_demand(*this)

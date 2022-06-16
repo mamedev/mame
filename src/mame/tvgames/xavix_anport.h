@@ -7,7 +7,7 @@
 class xavix_anport_device : public device_t
 {
 public:
-	xavix_anport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xavix_anport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto read_0_callback() { return m_in0_cb.bind(); }
 	auto read_1_callback() { return m_in1_cb.bind(); }

@@ -461,7 +461,7 @@ class jvs_master : public jvs_host
 {
 public:
 	// construction/destruction
-	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	int get_sense_line();
 	void send_packet(int destination, int length, uint8_t *data);
 	int received_packet(uint8_t *buffer);
@@ -469,7 +469,7 @@ public:
 
 DEFINE_DEVICE_TYPE(JVS_MASTER, jvs_master, "jvs_master", "JVS MASTER")
 
-jvs_master::jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+jvs_master::jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: jvs_host(mconfig, JVS_MASTER, tag, owner, clock)
 {
 }
@@ -517,7 +517,7 @@ DECLARE_DEVICE_TYPE(OHCI_HLEAN2131QC, ohci_hlean2131qc_device)
 class ohci_hlean2131qc_device : public device_t, public device_usb_ohci_function_interface
 {
 public:
-	ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void initialize() override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
@@ -575,7 +575,7 @@ DECLARE_DEVICE_TYPE(OHCI_HLEAN2131SC, ohci_hlean2131sc_device)
 class ohci_hlean2131sc_device : public device_t, public device_usb_ohci_function_interface
 {
 public:
-	ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void initialize() override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
@@ -876,7 +876,7 @@ const uint8_t ohci_hlean2131qc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
 const uint8_t ohci_hlean2131qc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
 const uint8_t ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x03,0xFF,0x0B };
 
-ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, OHCI_HLEAN2131QC, tag, owner, clock)
 	, device_usb_ohci_function_interface(mconfig, *this)
 	, m_jvs_master(*this, "^^^^jvs_master")
@@ -1204,7 +1204,7 @@ const uint8_t ohci_hlean2131sc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
 const uint8_t ohci_hlean2131sc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
 const uint8_t ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x00,0x44,0x00 };
 
-ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, OHCI_HLEAN2131SC, tag, owner, clock)
 	, device_usb_ohci_function_interface(mconfig, *this)
 {
@@ -1527,7 +1527,7 @@ class ide_baseboard_device : public ata_mass_storage_device
 {
 public:
 	// construction/destruction
-	ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual int  read_sector(uint32_t lba, void *buffer) override;
 	virtual int  write_sector(uint32_t lba, const void *buffer) override;
@@ -1552,7 +1552,7 @@ DEFINE_DEVICE_TYPE(IDE_BASEBOARD, ide_baseboard_device, "ide_baseboard", "IDE Ba
 //  ide_baseboard_device - constructor
 //-------------------------------------------------
 
-ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ata_mass_storage_device(mconfig, IDE_BASEBOARD, tag, owner, clock)
 {
 }
@@ -1856,7 +1856,7 @@ void chihiro_state::machine_start()
 class sega_network_board : public device_t
 {
 public:
-	sega_network_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_network_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -1866,7 +1866,7 @@ protected:
 
 DEFINE_DEVICE_TYPE(SEGA_NETWORK_BOARD, sega_network_board, "seganetw", "Sega Network Board")
 
-sega_network_board::sega_network_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_network_board::sega_network_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA_NETWORK_BOARD, tag, owner, clock)
 {
 }
@@ -1920,7 +1920,7 @@ void chihiro_state::chihiro_base(machine_config &config)
 	OHCI_USB_CONNECTOR(config, "pci:02.0:port3", usb_baseboard, nullptr, false);
 	OHCI_USB_CONNECTOR(config, "pci:02.0:port4", usb_baseboard, nullptr, false);
 
-	JVS_MASTER(config, "jvs_master", 0);
+	JVS_MASTER(config, "jvs_master");
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "jvs_master"));
 	sega837.set_port_tag<0>("TILT");
 	sega837.set_port_tag<1>("P1");
@@ -1941,7 +1941,7 @@ void chihiro_state::chihirogd(machine_config &config)
 	chihiro_base(config);
 	NAOMI_GDROM_BOARD(config, m_dimmboard, 0, ":gdrom", "pic");
 	m_dimmboard->irq_callback().set_nop();
-	SEGA_NETWORK_BOARD(config, "network", 0);
+	SEGA_NETWORK_BOARD(config, "network");
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

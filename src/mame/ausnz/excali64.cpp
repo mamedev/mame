@@ -387,7 +387,7 @@ d0,1,2,3,5 : same as port50
 void excali64_state::port70_w(u8 data)
 {
 	m_sys_status = data;
-	m_crtc->set_unscaled_clock(BIT(data, 2) ? 2e6 : 1e6);
+	m_crtc->set_unscaled_clock(BIT(data, 2) ? XTAL::u(2e6) : XTAL::u(1e6));
 	if (BIT(data, 1))
 	{
 		// select 64k ram
@@ -593,11 +593,11 @@ void excali64_state::excali64(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &excali64_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &excali64_state::io_map);
 
-	I8251(config, "uart", 0);
+	I8251(config, "uart");
 	//uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(16_MHz_XTAL / 16); /* Timer 0: tone gen for speaker */
 	pit.out_handler<0>().set("speaker", FUNC(speaker_sound_device::level_w));
 	//pit.set_clk<1>(16_MHz_XTAL / 16); /* Timer 1: baud rate gen for 8251 */
@@ -649,7 +649,7 @@ void excali64_state::excali64(machine_config &config)
 	m_dma->in_iorq_callback().set(FUNC(excali64_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(excali64_state::io_write_byte));
 
-	TTL74123(config, m_u12, 0);
+	TTL74123(config, m_u12);
 	m_u12->set_connection_type(TTL74123_GROUNDED);  /* Hook up type (no idea what this means) */
 	m_u12->set_resistor_value(RES_K(100));          /* resistor connected between RCext & 5v */
 	m_u12->set_capacitor_value(CAP_U(100));         /* capacitor connected between Cext and RCext */

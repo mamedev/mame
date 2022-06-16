@@ -515,11 +515,11 @@ void monzagp_state::monzagp(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(10920000, 700, 0, 560, 312, 11, 240); // 11-line offset makes attract mode look symmetric
+	screen.set_raw(XTAL::u(10920000), 700, 0, 560, 312, 11, 240); // 11-line offset makes attract mode look symmetric
 	screen.set_screen_update(FUNC(monzagp_state::screen_update));
 	screen.set_palette(m_palette);
 
-	DP8350(config, m_crtc, 10920000); // pins 21/22 connected to XTAL, 3 to GND, 5 to +5
+	DP8350(config, m_crtc, XTAL::u(10920000)); // pins 21/22 connected to XTAL, 3 to GND, 5 to +5
 	m_crtc->set_screen("screen");
 	m_crtc->refresh_control(0);
 	m_crtc->vsync_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ).invert(); // active low; no inverter should be needed

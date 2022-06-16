@@ -18,7 +18,7 @@ class s32comm_device : public device_t
 {
 public:
 	// construction/destruction
-	s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// single bit registers (74LS74)
 	uint8_t zfg_r(offs_t offset);

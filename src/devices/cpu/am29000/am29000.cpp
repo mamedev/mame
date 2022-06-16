@@ -78,7 +78,7 @@ DEFINE_DEVICE_TYPE(AM29000, am29000_cpu_device, "am29000", "AMC Am29000")
     STATE ACCESSORS
 ***************************************************************************/
 
-am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, AM29000, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 32, 32, 0)

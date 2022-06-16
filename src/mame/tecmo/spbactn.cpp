@@ -772,9 +772,9 @@ void spbactn_state::spbactn(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactn);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x2800 / 2);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen);
 
-	TECMO_MIXER(config, m_mixer, 0);
+	TECMO_MIXER(config, m_mixer);
 	m_mixer->set_mixer_shifts(8,10,4);
 	m_mixer->set_blendcols(   0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
 	m_mixer->set_regularcols( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 );
@@ -838,9 +838,9 @@ void spbactnp_state::spbactnp(machine_config &config)
 
 	config.set_default_layout(layout_spbactnp);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen);
 
-	TECMO_MIXER(config, m_mixer, 0);
+	TECMO_MIXER(config, m_mixer);
 	m_mixer->set_mixer_shifts(12,14,8);
 	m_mixer->set_blendcols(   0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
 	m_mixer->set_regularcols( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 );

@@ -50,7 +50,7 @@ void applefdintf_device::floppies_35(device_slot_interface &device)
 	device.option_add("35hd", MFD75W);
 }
 
-applefdintf_device::applefdintf_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+applefdintf_device::applefdintf_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_phases_cb(*this),
 	m_devsel_cb(*this),

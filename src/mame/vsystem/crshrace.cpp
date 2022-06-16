@@ -384,11 +384,11 @@ void crshrace_state::machine_reset()
 void crshrace_state::crshrace(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 16000000);    // 16 MHz ???
+	M68000(config, m_maincpu, XTAL::u(16000000));    // 16 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &crshrace_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(crshrace_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);   // 4 MHz ???
+	Z80(config, m_audiocpu, XTAL::u(4000000));   // 4 MHz ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &crshrace_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &crshrace_state::sound_io_map);
 
@@ -405,7 +405,7 @@ void crshrace_state::crshrace(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_crshrace);
 	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 2048);
 
-	VSYSTEM_SPR(config, m_spr, 0);
+	VSYSTEM_SPR(config, m_spr);
 	m_spr->set_tile_indirect_cb(FUNC(crshrace_state::tile_callback));
 	m_spr->set_gfx_region(2);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
@@ -413,7 +413,7 @@ void crshrace_state::crshrace(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_wrap(1);
 	m_k053936->set_offsets(-48, -21);
 
@@ -425,7 +425,7 @@ void crshrace_state::crshrace(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);

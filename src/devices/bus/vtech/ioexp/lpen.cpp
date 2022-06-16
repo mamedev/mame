@@ -37,7 +37,7 @@ void vtech_lpen_interface_device::io_map(address_map &map)
 //  vtech_lpen_interface_device - constructor
 //-------------------------------------------------
 
-vtech_lpen_interface_device::vtech_lpen_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vtech_lpen_interface_device::vtech_lpen_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vtech_ioexp_device(mconfig, VTECH_LPEN_INTERFACE, tag, owner, clock)
 {
 }

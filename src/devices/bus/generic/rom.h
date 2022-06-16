@@ -14,7 +14,7 @@ class generic_rom_device : public device_t, public device_generic_cart_interface
 {
 protected:
 	// construction/destruction
-	generic_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	generic_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override { }
@@ -27,7 +27,7 @@ class generic_rom_plain_device : public generic_rom_device
 {
 public:
 	// construction/destruction
-	generic_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) override;
@@ -35,7 +35,7 @@ public:
 	virtual uint32_t read32_rom(offs_t offset, uint32_t mem_mask) override;
 
 protected:
-	generic_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	generic_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -45,7 +45,7 @@ class generic_romram_plain_device : public generic_rom_plain_device
 {
 public:
 	// construction/destruction
-	generic_romram_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_romram_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_ram(offs_t offset) override;
@@ -59,7 +59,7 @@ class generic_rom_linear_device : public generic_rom_device
 {
 public:
 	// construction/destruction
-	generic_rom_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_rom_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) override;

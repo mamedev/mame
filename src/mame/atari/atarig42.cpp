@@ -578,7 +578,7 @@ void atarig42_state::atarig42(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_III(config, m_jsa, 0);
+	ATARI_JSA_III(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.8);
@@ -587,23 +587,23 @@ void atarig42_state::atarig42(machine_config &config)
 void atarig42_0x200_state::atarig42_0x200(machine_config &config)
 {
 	atarig42(config);
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x200);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc_0x200);
 
 	ADC0809(config, m_adc, 14.318181_MHz_XTAL / 16);
 	m_adc->in_callback<0>().set_ioport("A2D0");
 	m_adc->in_callback<1>().set_ioport("A2D1");
 
 	/* ASIC65 */
-	ASIC65(config, m_asic65, 0, ASIC65_ROMBASED);
+	ASIC65(config, m_asic65, ASIC65_ROMBASED);
 }
 
 void atarig42_0x400_state::atarig42_0x400(machine_config &config)
 {
 	atarig42(config);
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x400);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc_0x400);
 
 	/* ASIC65 */
-	ASIC65(config, m_asic65, 0, ASIC65_GUARDIANS);
+	ASIC65(config, m_asic65, ASIC65_GUARDIANS);
 }
 
 

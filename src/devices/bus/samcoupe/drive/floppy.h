@@ -26,7 +26,7 @@ class sam_floppy_device : public device_t, public device_samcoupe_drive_interfac
 {
 public:
 	// construction/destruction
-	sam_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sam_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// from host
 	virtual uint8_t read(offs_t offset) override;

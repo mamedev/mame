@@ -21,23 +21,23 @@ DEFINE_DEVICE_TYPE(VSMILE_ROM_STD,   vsmile_rom_device,       "vsmile_rom",     
 DEFINE_DEVICE_TYPE(VSMILE_ROM_NVRAM, vsmile_rom_nvram_device, "vsmile_rom_nvram", "V.Smile Cart + NVRAM")
 
 
-vsmile_rom_device::vsmile_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vsmile_rom_device::vsmile_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_vsmile_cart_interface(mconfig, *this)
 {
 }
 
-vsmile_rom_device::vsmile_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vsmile_rom_device::vsmile_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vsmile_rom_device(mconfig, VSMILE_ROM_STD, tag, owner, clock)
 {
 }
 
-vsmile_rom_nvram_device::vsmile_rom_nvram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vsmile_rom_nvram_device::vsmile_rom_nvram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: vsmile_rom_device(mconfig, type, tag, owner, clock)
 {
 }
 
-vsmile_rom_nvram_device::vsmile_rom_nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vsmile_rom_nvram_device::vsmile_rom_nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vsmile_rom_nvram_device(mconfig, VSMILE_ROM_NVRAM, tag, owner, clock)
 {
 }

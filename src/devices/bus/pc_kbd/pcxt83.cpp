@@ -232,7 +232,7 @@ ioport_constructor ibm_pc_xt_83_keyboard_device::device_input_ports() const
 //  ibm_pc_xt_83_keyboard_device - constructor
 //-------------------------------------------------
 
-ibm_pc_xt_83_keyboard_device::ibm_pc_xt_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ibm_pc_xt_83_keyboard_device::ibm_pc_xt_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PC_KBD_IBM_PC_XT_83, tag, owner, clock),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),

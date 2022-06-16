@@ -57,7 +57,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 			: device_t(mconfig, COCO_ORCH90, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
 			, m_eprom(*this, "eprom")
@@ -118,8 +118,8 @@ namespace
 	{
 		SPEAKER(config, "lspeaker").front_left();
 		SPEAKER(config, "rspeaker").front_right();
-		DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // ls374.ic5 + r7 (8x20k) + r9 (8x10k)
-		DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // ls374.ic4 + r6 (8x20k) + r8 (8x10k)
+		DAC_8BIT_R2R(config, m_ldac).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // ls374.ic5 + r7 (8x20k) + r9 (8x10k)
+		DAC_8BIT_R2R(config, m_rdac).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // ls374.ic4 + r6 (8x20k) + r8 (8x10k)
 	}
 
 	//-------------------------------------------------

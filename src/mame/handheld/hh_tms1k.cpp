@@ -546,7 +546,7 @@ INPUT_PORTS_END
 void matchnum_state::matchnum(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(325000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(matchnum_state::read_k));
 	m_maincpu->write_r().set(FUNC(matchnum_state::write_r));
 	m_maincpu->write_o().set(FUNC(matchnum_state::write_o));
@@ -659,7 +659,7 @@ INPUT_PORTS_END
 void arrball_state::arrball(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(325000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(arrball_state::read_k));
 	m_maincpu->write_r().set(FUNC(arrball_state::write_r));
 	m_maincpu->write_o().set(FUNC(arrball_state::write_o));
@@ -828,7 +828,7 @@ static const u16 mathmagi_output_pla[0x20] =
 void mathmagi_state::mathmagi(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 175000); // approximation - RC osc. R=68K, C=82pF
+	TMS1100(config, m_maincpu, XTAL::u(175000)); // approximation - RC osc. R=68K, C=82pF
 	m_maincpu->set_output_pla(mathmagi_output_pla);
 	m_maincpu->read_k().set(FUNC(mathmagi_state::read_k));
 	m_maincpu->write_r().set(FUNC(mathmagi_state::write_r));
@@ -968,7 +968,7 @@ INPUT_PORTS_END
 void bcheetah_state::bcheetah(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 100000); // approximation - RC osc. R=47K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(100000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(bcheetah_state::read_k));
 	m_maincpu->write_r().set(FUNC(bcheetah_state::write_r));
 	m_maincpu->write_o().set(FUNC(bcheetah_state::write_o));
@@ -1088,7 +1088,7 @@ INPUT_PORTS_END
 void tc7atc_state::tc7atc(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=68K, C=47pF
+	TMS1100(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=68K, C=47pF
 	m_maincpu->read_k().set(FUNC(tc7atc_state::read_k));
 	m_maincpu->write_r().set(FUNC(tc7atc_state::write_r));
 	m_maincpu->write_o().set(FUNC(tc7atc_state::write_o));
@@ -1259,7 +1259,7 @@ INPUT_PORTS_END
 void palmf31_state::palmf31(machine_config &config)
 {
 	// basic machine hardware
-	TMS1040(config, m_maincpu, 250000); // approximation
+	TMS1040(config, m_maincpu, XTAL::u(250000)); // approximation
 	m_maincpu->read_k().set(FUNC(palmf31_state::read_k));
 	m_maincpu->write_o().set(FUNC(palmf31_state::write_o));
 	m_maincpu->write_r().set(FUNC(palmf31_state::write_r));
@@ -1427,7 +1427,7 @@ INPUT_PORTS_END
 void palmmd8_state::palmmd8(machine_config &config)
 {
 	// basic machine hardware
-	TMS1070(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=68pf
+	TMS1070(config, m_maincpu, XTAL::u(250000)); // approximation - RC osc. R=56K, C=68pf
 	m_maincpu->read_k().set(FUNC(palmmd8_state::read_k));
 	m_maincpu->write_o().set(FUNC(palmmd8_state::write_o));
 	m_maincpu->write_r().set(FUNC(palmmd8_state::write_r));
@@ -1600,7 +1600,7 @@ INPUT_PORTS_END
 void cchime_state::cchime(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(400000)); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->read_k().set(FUNC(cchime_state::read_k));
 	m_maincpu->write_o().set(FUNC(cchime_state::write_o));
 	m_maincpu->write_r().set(FUNC(cchime_state::write_r));
@@ -1747,7 +1747,7 @@ INPUT_PORTS_END
 void amaztron_state::amaztron(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=33K?, C=100pF
+	TMS1100(config, m_maincpu, XTAL::u(300000)); // approximation - RC osc. R=33K?, C=100pF
 	m_maincpu->read_k().set(FUNC(amaztron_state::read_k));
 	m_maincpu->write_r().set(FUNC(amaztron_state::write_r));
 	m_maincpu->write_o().set(FUNC(amaztron_state::write_o));
@@ -1903,7 +1903,7 @@ INPUT_PORTS_END
 void zodiac_state::zodiac(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 500000); // approximation - RC osc. R=18K, C=100pF
+	TMS1100(config, m_maincpu, XTAL::u(500000)); // approximation - RC osc. R=18K, C=100pF
 	m_maincpu->read_k().set(FUNC(zodiac_state::read_k));
 	m_maincpu->write_r().set(FUNC(zodiac_state::write_r));
 	m_maincpu->write_o().set(FUNC(zodiac_state::write_o));
@@ -2032,7 +2032,7 @@ INPUT_PORTS_END
 void cqback_state::cqback(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 310000); // approximation - RC osc. R=33K, C=100pF
+	TMS1100(config, m_maincpu, XTAL::u(310000)); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->read_k().set(FUNC(cqback_state::read_k));
 	m_maincpu->write_r().set(FUNC(cqback_state::write_r));
 	m_maincpu->write_o().set(FUNC(cqback_state::write_o));
@@ -2162,7 +2162,7 @@ INPUT_PORTS_END
 void h2hfootb_state::h2hfootb(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 310000); // approximation - RC osc. R=39K, C=100pF
+	TMS1100(config, m_maincpu, XTAL::u(310000)); // approximation - RC osc. R=39K, C=100pF
 	m_maincpu->read_k().set(FUNC(h2hfootb_state::read_k));
 	m_maincpu->write_r().set(FUNC(h2hfootb_state::write_r));
 	m_maincpu->write_o().set(FUNC(h2hfootb_state::write_o));
@@ -2348,7 +2348,7 @@ INPUT_PORTS_END
 void h2hbaskb_state::h2hbaskb(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=100pF
+	TMS1000(config, m_maincpu, XTAL::u(375000)); // approximation - RC osc. R=43K, C=100pF
 	m_maincpu->read_k().set(FUNC(h2hbaskb_state::read_k));
 	m_maincpu->write_r().set(FUNC(h2hbaskb_state::write_r));
 	m_maincpu->write_o().set(FUNC(h2hbaskb_state::write_o));
@@ -2445,7 +2445,7 @@ void h2hbaseb_state::set_clock()
 {
 	// MCU clock is from an RC circuit with C=47pF, and R value is depending on
 	// skill switch: R=51K(1) or 43K(2)
-	m_maincpu->set_unscaled_clock((m_inputs[5]->read() & 1) ? 400000 : 350000);
+	m_maincpu->set_unscaled_clock((m_inputs[5]->read() & 1) ? XTAL::u(400000) : XTAL::u(350000));
 }
 
 void h2hbaseb_state::update_display()
@@ -2515,7 +2515,7 @@ INPUT_PORTS_END
 void h2hbaseb_state::h2hbaseb(machine_config &config)
 {
 	// basic machine hardware
-	TMS1170(config, m_maincpu, 350000); // see set_clock
+	TMS1170(config, m_maincpu, XTAL::u(350000)); // see set_clock
 	m_maincpu->read_k().set(FUNC(h2hbaseb_state::read_k));
 	m_maincpu->write_r().set(FUNC(h2hbaseb_state::write_r));
 	m_maincpu->write_o().set(FUNC(h2hbaseb_state::write_o));
@@ -2642,7 +2642,7 @@ INPUT_PORTS_END
 void h2hboxing_state::h2hboxing(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=39K, C=100pF
+	TMS1100(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=39K, C=100pF
 	m_maincpu->read_k().set(FUNC(h2hboxing_state::read_k));
 	m_maincpu->write_r().set(FUNC(h2hboxing_state::write_r));
 	m_maincpu->write_o().set(FUNC(h2hboxing_state::write_o));
@@ -2831,7 +2831,7 @@ INPUT_PORTS_END
 void quizwizc_state::quizwizc(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=100pF
+	TMS1000(config, m_maincpu, XTAL::u(300000)); // approximation - RC osc. R=43K, C=100pF
 	m_maincpu->read_k().set(FUNC(quizwizc_state::read_k));
 	m_maincpu->write_r().set(FUNC(quizwizc_state::write_r));
 	m_maincpu->write_o().set(FUNC(quizwizc_state::write_o));
@@ -3019,7 +3019,7 @@ INPUT_PORTS_END
 void tc4_state::tc4(machine_config &config)
 {
 	// basic machine hardware
-	TMS1400(config, m_maincpu, 450000); // approximation - RC osc. R=27.3K, C=100pF
+	TMS1400(config, m_maincpu, XTAL::u(450000)); // approximation - RC osc. R=27.3K, C=100pF
 	m_maincpu->read_k().set(FUNC(tc4_state::read_k));
 	m_maincpu->write_r().set(FUNC(tc4_state::write_r));
 	m_maincpu->write_o().set(FUNC(tc4_state::write_o));
@@ -3164,7 +3164,7 @@ INPUT_PORTS_END
 void mrmusical_state::mrmusical(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=33K, C=100pF
+	TMS1000(config, m_maincpu, XTAL::u(300000)); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->read_k().set(FUNC(mrmusical_state::read_k));
 	m_maincpu->write_o().set(FUNC(mrmusical_state::write_o));
 	m_maincpu->write_r().set(FUNC(mrmusical_state::write_r));
@@ -3289,7 +3289,7 @@ INPUT_PORTS_END
 void cnbaskb_state::cnbaskb(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(375000)); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->read_k().set(FUNC(cnbaskb_state::read_k));
 	m_maincpu->write_r().set(FUNC(cnbaskb_state::write_r));
 	m_maincpu->write_o().set(FUNC(cnbaskb_state::write_o));
@@ -3418,7 +3418,7 @@ INPUT_PORTS_END
 void cmsport_state::cmsport(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(cmsport_state::read_k));
 	m_maincpu->write_r().set(FUNC(cmsport_state::write_r));
 	m_maincpu->write_o().set(FUNC(cmsport_state::write_o));
@@ -3557,7 +3557,7 @@ INPUT_PORTS_END
 void cnfball_state::cnfball(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=39K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->read_k().set(FUNC(cnfball_state::read_k));
 	m_maincpu->write_r().set(FUNC(cnfball_state::write_r));
 	m_maincpu->write_o().set(FUNC(cnfball_state::write_o));
@@ -3693,7 +3693,7 @@ INPUT_PORTS_END
 void cnfball2_state::cnfball2(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
+	TMS1100(config, m_maincpu, XTAL::u(325000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(cnfball2_state::read_k));
 	m_maincpu->write_r().set(FUNC(cnfball2_state::write_r));
 	m_maincpu->write_o().set(FUNC(cnfball2_state::write_o));
@@ -3844,7 +3844,7 @@ INPUT_PORTS_END
 void eleciq_state::eleciq(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=50pF
+	TMS1000(config, m_maincpu, XTAL::u(325000)); // approximation - RC osc. R=47K, C=50pF
 	m_maincpu->read_k().set(FUNC(eleciq_state::read_k));
 	m_maincpu->write_r().set(FUNC(eleciq_state::write_r));
 	m_maincpu->write_o().set(FUNC(eleciq_state::write_o));
@@ -3960,7 +3960,7 @@ INPUT_PORTS_END
 void qfire_state::qfire(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(375000)); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->read_k().set(FUNC(qfire_state::read_k));
 	m_maincpu->write_r().set(FUNC(qfire_state::write_r));
 	m_maincpu->write_o().set(FUNC(qfire_state::write_o));
@@ -4080,7 +4080,7 @@ INPUT_PORTS_END
 void esoccer_state::esoccer(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 475000); // approximation - RC osc. R=47K, C=33pF
+	TMS1000(config, m_maincpu, XTAL::u(475000)); // approximation - RC osc. R=47K, C=33pF
 	m_maincpu->read_k().set(FUNC(esoccer_state::read_k));
 	m_maincpu->write_r().set(FUNC(esoccer_state::write_r));
 	m_maincpu->write_o().set(FUNC(esoccer_state::write_o));
@@ -4230,7 +4230,7 @@ INPUT_PORTS_END
 void ebball_state::ebball(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(375000)); // approximation - RC osc. R=43K, C=47pF
 	m_maincpu->read_k().set(FUNC(ebball_state::read_k));
 	m_maincpu->write_r().set(FUNC(ebball_state::write_r));
 	m_maincpu->write_o().set(FUNC(ebball_state::write_o));
@@ -4368,7 +4368,7 @@ INPUT_PORTS_END
 void ebball2_state::ebball2(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(ebball2_state::read_k));
 	m_maincpu->write_r().set(FUNC(ebball2_state::write_r));
 	m_maincpu->write_o().set(FUNC(ebball2_state::write_o));
@@ -4467,7 +4467,7 @@ void ebball3_state::set_clock()
 	// MCU clock is from an RC circuit(R=47K, C=33pF) oscillating by default at ~340kHz,
 	// but on PRO, the difficulty switch adds an extra 150K resistor to Vdd to speed
 	// it up to around ~440kHz.
-	m_maincpu->set_unscaled_clock((m_inputs[3]->read() & 1) ? 440000 : 340000);
+	m_maincpu->set_unscaled_clock((m_inputs[3]->read() & 1) ? XTAL::u(440000) : XTAL::u(340000));
 }
 
 void ebball3_state::update_display()
@@ -4552,7 +4552,7 @@ INPUT_PORTS_END
 void ebball3_state::ebball3(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 340000); // see set_clock
+	TMS1100(config, m_maincpu, XTAL::u(340000)); // see set_clock
 	m_maincpu->read_k().set(FUNC(ebball3_state::read_k));
 	m_maincpu->write_r().set(FUNC(ebball3_state::write_r));
 	m_maincpu->write_o().set(FUNC(ebball3_state::write_o));
@@ -4679,7 +4679,7 @@ INPUT_PORTS_END
 void esbattle_state::esbattle(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=33pF
+	TMS1000(config, m_maincpu, XTAL::u(450000)); // approximation - RC osc. R=47K, C=33pF
 	m_maincpu->read_k().set(FUNC(esbattle_state::read_k));
 	m_maincpu->write_r().set(FUNC(esbattle_state::write_r));
 	m_maincpu->write_o().set(FUNC(esbattle_state::write_o));
@@ -4784,7 +4784,7 @@ INPUT_PORTS_END
 void blastit_state::blastit(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=33pF
+	TMS1000(config, m_maincpu, XTAL::u(425000)); // approximation - RC osc. R=47K, C=33pF
 	m_maincpu->read_k().set(FUNC(blastit_state::read_k));
 	m_maincpu->write_r().set(FUNC(blastit_state::write_r));
 	m_maincpu->write_o().set(FUNC(blastit_state::write_o));
@@ -4862,7 +4862,7 @@ void einvader_state::set_clock()
 	// MCU clock is from an RC circuit(R=47K, C=56pF) oscillating by default at ~320kHz,
 	// but on PRO, the difficulty switch adds an extra 180K resistor to Vdd to speed
 	// it up to around ~400kHz.
-	m_maincpu->set_unscaled_clock((m_inputs[0]->read() & 8) ? 400000 : 320000);
+	m_maincpu->set_unscaled_clock((m_inputs[0]->read() & 8) ? XTAL::u(400000) : XTAL::u(320000));
 }
 
 void einvader_state::update_display()
@@ -4903,7 +4903,7 @@ INPUT_PORTS_END
 void einvader_state::einvader(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 320000); // see set_clock
+	TMS1100(config, m_maincpu, XTAL::u(320000)); // see set_clock
 	m_maincpu->read_k().set_ioport("IN.0");
 	m_maincpu->write_r().set(FUNC(einvader_state::write_r));
 	m_maincpu->write_o().set(FUNC(einvader_state::write_o));
@@ -5044,7 +5044,7 @@ INPUT_PORTS_END
 void efootb4_state::efootb4(machine_config &config)
 {
 	// basic machine hardware
-	TMS1670(config, m_maincpu, 400000); // approximation - RC osc. R=42K, C=47pF
+	TMS1670(config, m_maincpu, XTAL::u(400000)); // approximation - RC osc. R=42K, C=47pF
 	m_maincpu->read_k().set(FUNC(efootb4_state::read_k));
 	m_maincpu->write_r().set(FUNC(efootb4_state::write_r));
 	m_maincpu->write_o().set(FUNC(efootb4_state::write_o));
@@ -5188,7 +5188,7 @@ INPUT_PORTS_END
 void ebaskb2_state::ebaskb2(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 360000); // approximation - RC osc. R=33K, C=82pF
+	TMS1100(config, m_maincpu, XTAL::u(360000)); // approximation - RC osc. R=33K, C=82pF
 	m_maincpu->read_k().set(FUNC(ebaskb2_state::read_k));
 	m_maincpu->write_r().set(FUNC(ebaskb2_state::write_r));
 	m_maincpu->write_o().set(FUNC(ebaskb2_state::write_o));
@@ -5288,7 +5288,7 @@ void raisedvl_state::set_clock()
 	// 2,3: R=35K8 -> ~425kHz (combined)
 	// 4:   R=32K  -> ~465kHz (combined)
 	u8 inp = m_inputs[1]->read();
-	m_maincpu->set_unscaled_clock((inp & 0x20) ? 465000 : ((inp & 0x10) ? 425000 : 350000));
+	m_maincpu->set_unscaled_clock((inp & 0x20) ? XTAL::u(465000) : ((inp & 0x10) ? XTAL::u(425000) : XTAL::u(350000)));
 }
 
 void raisedvl_state::update_display()
@@ -5344,7 +5344,7 @@ INPUT_PORTS_END
 void raisedvl_state::raisedvl(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 350000); // see set_clock
+	TMS1100(config, m_maincpu, XTAL::u(350000)); // see set_clock
 	m_maincpu->read_k().set(FUNC(raisedvl_state::read_k));
 	m_maincpu->write_r().set(FUNC(raisedvl_state::write_r));
 	m_maincpu->write_o().set(FUNC(raisedvl_state::write_o));
@@ -5526,7 +5526,7 @@ INPUT_PORTS_END
 void mmarvin_state::mmarvin(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=51K, C=47pF
+	TMS1100(config, m_maincpu, XTAL::u(300000)); // approximation - RC osc. R=51K, C=47pF
 	m_maincpu->read_k().set(FUNC(mmarvin_state::read_k));
 	m_maincpu->write_r().set(FUNC(mmarvin_state::write_r));
 	m_maincpu->write_o().set(FUNC(mmarvin_state::write_o));
@@ -5672,7 +5672,7 @@ INPUT_PORTS_END
 void f2pbball_state::f2pbball(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=51K, C=39pF
+	TMS1000(config, m_maincpu, XTAL::u(325000)); // approximation - RC osc. R=51K, C=39pF
 	m_maincpu->read_k().set(FUNC(f2pbball_state::read_k));
 	m_maincpu->write_r().set(FUNC(f2pbball_state::write_r));
 	m_maincpu->write_o().set(FUNC(f2pbball_state::write_o));
@@ -5750,7 +5750,7 @@ void f3in1_state::machine_reset()
 void f3in1_state::set_clock()
 {
 	// MCU clock is from an RC circuit where C=47pF, R=39K(PROF) or 56K(REG)
-	m_maincpu->set_unscaled_clock((m_inputs[4]->read() & 1) ? 400000 : 300000);
+	m_maincpu->set_unscaled_clock((m_inputs[4]->read() & 1) ? XTAL::u(400000) : XTAL::u(300000));
 }
 
 void f3in1_state::update_display()
@@ -5820,7 +5820,7 @@ INPUT_PORTS_END
 void f3in1_state::f3in1(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 300000); // see set_clock
+	TMS1100(config, m_maincpu, XTAL::u(300000)); // see set_clock
 	m_maincpu->read_k().set(FUNC(f3in1_state::read_k));
 	m_maincpu->write_r().set(FUNC(f3in1_state::write_r));
 	m_maincpu->write_o().set(FUNC(f3in1_state::write_o));
@@ -5976,7 +5976,7 @@ INPUT_PORTS_END
 void gpoker_state::gpoker(machine_config &config)
 {
 	// basic machine hardware
-	TMS1370(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	TMS1370(config, m_maincpu, XTAL::u(375000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(gpoker_state::read_k));
 	m_maincpu->write_r().set(FUNC(gpoker_state::write_r));
 	m_maincpu->write_o().set(FUNC(gpoker_state::write_o));
@@ -5988,7 +5988,7 @@ void gpoker_state::gpoker(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 2400); // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
+	BEEP(config, m_beeper, XTAL::u(2400)); // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -6107,7 +6107,7 @@ void gjackpot_state::gjackpot(machine_config &config)
 	gpoker(config);
 
 	// basic machine hardware
-	TMS1670(config.replace(), m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	TMS1670(config.replace(), m_maincpu, XTAL::u(375000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(gjackpot_state::read_k));
 	m_maincpu->write_r().set(FUNC(gjackpot_state::write_r));
 	m_maincpu->write_o().set(FUNC(gjackpot_state::write_o));
@@ -6223,7 +6223,7 @@ INPUT_PORTS_END
 void ginv_state::ginv(machine_config &config)
 {
 	// basic machine hardware
-	TMS1370(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	TMS1370(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(ginv_state::read_k));
 	m_maincpu->write_r().set(FUNC(ginv_state::write_r));
 	m_maincpu->write_o().set(FUNC(ginv_state::write_o));
@@ -6348,7 +6348,7 @@ INPUT_PORTS_END
 void ginv1000_state::ginv1000(machine_config &config)
 {
 	// basic machine hardware
-	TMS1370(config, m_maincpu, 350000); // approximation
+	TMS1370(config, m_maincpu, XTAL::u(350000)); // approximation
 	m_maincpu->read_k().set(FUNC(ginv1000_state::read_k));
 	m_maincpu->write_r().set(FUNC(ginv1000_state::write_r));
 	m_maincpu->write_o().set(FUNC(ginv1000_state::write_o));
@@ -6486,7 +6486,7 @@ INPUT_PORTS_END
 void ginv2000_state::ginv2000(machine_config &config)
 {
 	// basic machine hardware
-	TMS1370(config, m_maincpu, 425000); // approximation - RC osc. R=36K, C=47pF
+	TMS1370(config, m_maincpu, XTAL::u(425000)); // approximation - RC osc. R=36K, C=47pF
 	m_maincpu->read_k().set(FUNC(ginv2000_state::read_k));
 	m_maincpu->write_r().set(FUNC(ginv2000_state::write_r));
 	m_maincpu->write_o().set(FUNC(ginv2000_state::write_o));
@@ -6790,7 +6790,7 @@ INPUT_PORTS_END
 void elecdet_state::elecdet(machine_config &config)
 {
 	// basic machine hardware
-	TMS0980(config, m_maincpu, 425000); // approximation
+	TMS0980(config, m_maincpu, XTAL::u(425000)); // approximation
 	m_maincpu->read_k().set(FUNC(elecdet_state::read_k));
 	m_maincpu->write_r().set(FUNC(elecdet_state::write_r));
 	m_maincpu->write_o().set(FUNC(elecdet_state::write_o));
@@ -6938,7 +6938,7 @@ INPUT_PORTS_END
 void starwbc_state::starwbc(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=51K, C=47pF
+	TMS1100(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=51K, C=47pF
 	m_maincpu->read_k().set(FUNC(starwbc_state::read_k));
 	m_maincpu->write_r().set(FUNC(starwbc_state::write_r));
 	m_maincpu->write_o().set(FUNC(starwbc_state::write_o));
@@ -7087,7 +7087,7 @@ INPUT_PORTS_END
 void liveafb_state::liveafb(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
+	TMS1100(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->read_k().set(FUNC(liveafb_state::read_k));
 	m_maincpu->write_r().set(FUNC(liveafb_state::write_r));
 	m_maincpu->write_o().set(FUNC(liveafb_state::write_o));
@@ -7238,7 +7238,7 @@ INPUT_PORTS_END
 void astro_state::astro(machine_config &config)
 {
 	// basic machine hardware
-	TMS1470(config, m_maincpu, 450000); // approximation - RC osc. R=4.7K, C=33pF
+	TMS1470(config, m_maincpu, XTAL::u(450000)); // approximation - RC osc. R=4.7K, C=33pF
 	m_maincpu->read_k().set(FUNC(astro_state::read_k));
 	m_maincpu->write_r().set(FUNC(astro_state::write_r));
 	m_maincpu->write_o().set(FUNC(astro_state::write_o));
@@ -7401,7 +7401,7 @@ static const u16 elecbowl_output_pla[0x20] =
 void elecbowl_state::elecbowl(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
+	TMS1100(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->set_output_pla(elecbowl_output_pla);
 	m_maincpu->read_k().set(FUNC(elecbowl_state::read_k));
 	m_maincpu->write_r().set(FUNC(elecbowl_state::write_r));
@@ -7569,12 +7569,12 @@ INPUT_PORTS_END
 void horseran_state::horseran(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
+	TMS1100(config, m_maincpu, XTAL::u(300000)); // approximation - RC osc. R=56K, C=47pF
 	m_maincpu->read_k().set(FUNC(horseran_state::read_k));
 	m_maincpu->write_r().set(FUNC(horseran_state::write_r));
 
 	// video hardware
-	HLCD0569(config, m_lcd, 1100); // C=0.022uF
+	HLCD0569(config, m_lcd, XTAL::u(1100)); // C=0.022uF
 	m_lcd->write_cols().set(FUNC(horseran_state::lcd_output_w));
 
 	PWM_DISPLAY(config, m_display).set_size(3+6, 24);
@@ -7764,7 +7764,7 @@ INPUT_PORTS_END
 void mdndclab_state::mdndclab(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 475000); // approximation - RC osc. R=27K, C=100pF
+	TMS1100(config, m_maincpu, XTAL::u(475000)); // approximation - RC osc. R=27K, C=100pF
 	m_maincpu->read_k().set(FUNC(mdndclab_state::read_k));
 	m_maincpu->write_r().set(FUNC(mdndclab_state::write_r));
 	m_maincpu->write_o().set(FUNC(mdndclab_state::write_o));
@@ -7880,7 +7880,7 @@ INPUT_PORTS_END
 void comp4_state::comp4(machine_config &config)
 {
 	// basic machine hardware
-	TMS0970(config, m_maincpu, 250000); // approximation
+	TMS0970(config, m_maincpu, XTAL::u(250000)); // approximation
 	m_maincpu->read_k().set(FUNC(comp4_state::read_k));
 	m_maincpu->write_r().set(FUNC(comp4_state::write_r));
 	m_maincpu->write_o().set(FUNC(comp4_state::write_o));
@@ -8049,7 +8049,7 @@ INPUT_PORTS_END
 void bship_state::bship(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(200000)); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->read_k().set(FUNC(bship_state::read_k));
 	m_maincpu->write_r().set(FUNC(bship_state::write_r));
 	m_maincpu->write_o().set(FUNC(bship_state::write_o));
@@ -8167,7 +8167,7 @@ u8 bshipb_state::read_k()
 void bshipb_state::bshipb(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(200000)); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->read_k().set(FUNC(bshipb_state::read_k));
 	m_maincpu->write_r().set(FUNC(bshipb_state::write_r));
 	m_maincpu->write_o().set(FUNC(bshipb_state::write_o));
@@ -8306,7 +8306,7 @@ INPUT_PORTS_END
 void simon_state::simon(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=33K, C=100pF
+	TMS1000(config, m_maincpu, XTAL::u(325000)); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->read_k().set(FUNC(simon_state::read_k));
 	m_maincpu->write_r().set(FUNC(simon_state::write_r));
 
@@ -8392,7 +8392,7 @@ void ssimon_state::set_clock()
 	// 1 Normal: R=37K -> ~275kHz
 	// 2 Super:  R=22K -> ~400kHz
 	u8 inp = m_inputs[6]->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? 400000 : ((inp & 1) ? 275000 : 200000));
+	m_maincpu->set_unscaled_clock((inp & 2) ? XTAL::u(400000) : ((inp & 1) ? XTAL::u(275000) : XTAL::u(200000)));
 }
 
 void ssimon_state::write_r(u32 data)
@@ -8475,7 +8475,7 @@ INPUT_PORTS_END
 void ssimon_state::ssimon(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 275000); // see set_clock
+	TMS1100(config, m_maincpu, XTAL::u(275000)); // see set_clock
 	m_maincpu->read_k().set(FUNC(ssimon_state::read_k));
 	m_maincpu->write_r().set(FUNC(ssimon_state::write_r));
 
@@ -8692,7 +8692,7 @@ INPUT_PORTS_END
 void bigtrak_state::bigtrak(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=83K, C=100pF
+	TMS1000(config, m_maincpu, XTAL::u(200000)); // approximation - RC osc. R=83K, C=100pF
 	m_maincpu->read_k().set(FUNC(bigtrak_state::read_k));
 	m_maincpu->write_r().set(FUNC(bigtrak_state::write_r));
 	m_maincpu->write_o().set(FUNC(bigtrak_state::write_o));
@@ -8939,7 +8939,7 @@ INPUT_PORTS_END
 void mbdtower_state::mbdtower(machine_config &config)
 {
 	// basic machine hardware
-	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=43K, C=56pF
+	TMS1400(config, m_maincpu, XTAL::u(425000)); // approximation - RC osc. R=43K, C=56pF
 	m_maincpu->read_k().set(FUNC(mbdtower_state::read_k));
 	m_maincpu->write_r().set(FUNC(mbdtower_state::write_r));
 	m_maincpu->write_o().set(FUNC(mbdtower_state::write_o));
@@ -9065,7 +9065,7 @@ INPUT_PORTS_END
 void arcmania_state::arcmania(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=100pF
+	TMS1100(config, m_maincpu, XTAL::u(250000)); // approximation - RC osc. R=56K, C=100pF
 	m_maincpu->read_k().set(FUNC(arcmania_state::read_k));
 	m_maincpu->write_r().set(FUNC(arcmania_state::write_r));
 	m_maincpu->write_o().set(FUNC(arcmania_state::write_o));
@@ -9199,7 +9199,7 @@ INPUT_PORTS_END
 void cnsector_state::cnsector(machine_config &config)
 {
 	// basic machine hardware
-	TMS0970(config, m_maincpu, 250000); // approximation
+	TMS0970(config, m_maincpu, XTAL::u(250000)); // approximation
 	m_maincpu->read_k().set(FUNC(cnsector_state::read_k));
 	m_maincpu->write_r().set(FUNC(cnsector_state::write_r));
 	m_maincpu->write_o().set(FUNC(cnsector_state::write_o));
@@ -9331,7 +9331,7 @@ INPUT_PORTS_END
 void merlin_state::merlin(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
+	TMS1100(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->read_k().set(FUNC(merlin_state::read_k));
 	m_maincpu->write_r().set(FUNC(merlin_state::write_r));
 	m_maincpu->write_o().set(FUNC(merlin_state::write_o));
@@ -9412,7 +9412,7 @@ void mmerlin_state::mmerlin(machine_config &config)
 	merlin(config);
 
 	// basic machine hardware
-	TMS1400(config.replace(), m_maincpu, 425000); // approximation - RC osc. R=30K, C=100pF
+	TMS1400(config.replace(), m_maincpu, XTAL::u(425000)); // approximation - RC osc. R=30K, C=100pF
 	m_maincpu->read_k().set(FUNC(mmerlin_state::read_k));
 	m_maincpu->write_r().set(FUNC(mmerlin_state::write_r));
 	m_maincpu->write_o().set(FUNC(mmerlin_state::write_o));
@@ -9526,7 +9526,7 @@ INPUT_PORTS_END
 void pbmastm_state::pbmastm(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(300000)); // approximation - RC osc. R=56K, C=47pF
 	m_maincpu->read_k().set(FUNC(pbmastm_state::read_k));
 	m_maincpu->write_r().set(FUNC(pbmastm_state::write_r));
 	m_maincpu->write_o().set(FUNC(pbmastm_state::write_o));
@@ -9647,7 +9647,7 @@ INPUT_PORTS_END
 void stopthief_state::stopthief(machine_config &config)
 {
 	// basic machine hardware
-	TMS0980(config, m_maincpu, 425000); // approximation
+	TMS0980(config, m_maincpu, XTAL::u(425000)); // approximation
 	m_maincpu->read_k().set(FUNC(stopthief_state::read_k));
 	m_maincpu->write_r().set(FUNC(stopthief_state::write_r));
 	m_maincpu->write_o().set(FUNC(stopthief_state::write_o));
@@ -9799,7 +9799,7 @@ INPUT_PORTS_END
 void bankshot_state::bankshot(machine_config &config)
 {
 	// basic machine hardware
-	TMS1400(config, m_maincpu, 475000); // approximation - RC osc. R=24K, C=100pF
+	TMS1400(config, m_maincpu, XTAL::u(475000)); // approximation - RC osc. R=24K, C=100pF
 	m_maincpu->read_k().set(FUNC(bankshot_state::read_k));
 	m_maincpu->write_r().set(FUNC(bankshot_state::write_r));
 	m_maincpu->write_o().set(FUNC(bankshot_state::write_o));
@@ -9932,7 +9932,7 @@ INPUT_PORTS_END
 void splitsec_state::splitsec(machine_config &config)
 {
 	// basic machine hardware
-	TMS1400(config, m_maincpu, 475000); // approximation - RC osc. R=24K, C=100pF
+	TMS1400(config, m_maincpu, XTAL::u(475000)); // approximation - RC osc. R=24K, C=100pF
 	m_maincpu->read_k().set(FUNC(splitsec_state::read_k));
 	m_maincpu->write_r().set(FUNC(splitsec_state::write_r));
 	m_maincpu->write_o().set(FUNC(splitsec_state::write_o));
@@ -10059,7 +10059,7 @@ INPUT_PORTS_END
 void lostreas_state::lostreas(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 425000); // approximation - RC osc. R=39K, C=47pF
+	TMS1100(config, m_maincpu, XTAL::u(425000)); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->read_k().set(FUNC(lostreas_state::read_k));
 	m_maincpu->write_r().set(FUNC(lostreas_state::write_r));
 	m_maincpu->write_o().set(FUNC(lostreas_state::write_o));
@@ -10206,7 +10206,7 @@ static const u16 alphie_output_pla[0x20] =
 void alphie_state::alphie(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 350000); // approximation
+	TMS1000(config, m_maincpu, XTAL::u(350000)); // approximation
 	m_maincpu->set_output_pla(alphie_output_pla);
 	m_maincpu->read_k().set(FUNC(alphie_state::read_k));
 	m_maincpu->write_r().set(FUNC(alphie_state::write_r));
@@ -10329,7 +10329,7 @@ INPUT_PORTS_END
 void tcfball_state::tcfball(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=56K, C=24pF
+	TMS1100(config, m_maincpu, XTAL::u(375000)); // approximation - RC osc. R=56K, C=24pF
 	m_maincpu->read_k().set(FUNC(tcfball_state::read_k));
 	m_maincpu->write_r().set(FUNC(tcfball_state::write_r));
 	m_maincpu->write_o().set(FUNC(tcfball_state::write_o));
@@ -10405,7 +10405,7 @@ void tcfballa_state::tcfballa(machine_config &config)
 	tcfball(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(375000); // approximation - RC osc. R=47K, C=50pF
+	m_maincpu->set_clock(XTAL::u(375000)); // approximation - RC osc. R=47K, C=50pF
 
 	config.set_default_layout(layout_tcfballa);
 }
@@ -10578,7 +10578,7 @@ static const u16 tandy12_output_pla[0x20] =
 void tandy12_state::tandy12(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	TMS1100(config, m_maincpu, XTAL::u(400000)); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->set_output_pla(tandy12_output_pla);
 	m_maincpu->read_k().set(FUNC(tandy12_state::read_k));
 	m_maincpu->write_r().set(FUNC(tandy12_state::write_r));
@@ -10702,7 +10702,7 @@ INPUT_PORTS_END
 void monkeysee_state::monkeysee(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 250000); // approximation - RC osc. R=68K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(250000)); // approximation - RC osc. R=68K, C=47pF
 	m_maincpu->read_k().set(FUNC(monkeysee_state::read_k));
 	m_maincpu->write_r().set(FUNC(monkeysee_state::write_r));
 	m_maincpu->write_o().set(FUNC(monkeysee_state::write_o));
@@ -10867,7 +10867,7 @@ INPUT_PORTS_END
 void t3in1sa_state::t3in1sa(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	TMS1100(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(t3in1sa_state::read_k));
 	m_maincpu->write_r().set(FUNC(t3in1sa_state::write_r));
 	m_maincpu->write_o().set(FUNC(t3in1sa_state::write_o));
@@ -11032,7 +11032,7 @@ INPUT_PORTS_END
 void speechp_state::speechp(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(400000)); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->read_k().set(FUNC(speechp_state::read_k));
 	m_maincpu->write_r().set(FUNC(speechp_state::write_r));
 	m_maincpu->write_o().set(FUNC(speechp_state::write_o));
@@ -11044,7 +11044,7 @@ void speechp_state::speechp(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	S14001A(config, m_speech, 25000); // approximation
+	S14001A(config, m_speech, XTAL::u(25000)); // approximation
 	m_speech->add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
@@ -11268,7 +11268,7 @@ INPUT_PORTS_END
 void tisr16_state::tisr16(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
+	TMS1000(config, m_maincpu, XTAL::u(300000)); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
 	m_maincpu->read_k().set(FUNC(tisr16_state::read_k));
 	m_maincpu->write_o().set(FUNC(tisr16_state::write_o));
 	m_maincpu->write_r().set(FUNC(tisr16_state::write_r));
@@ -11431,7 +11431,7 @@ INPUT_PORTS_END
 void ti1250_state::ti1250(machine_config &config)
 {
 	// basic machine hardware
-	TMS0950(config, m_maincpu, 200000); // approximation - RC osc. R=68K, C=68pf
+	TMS0950(config, m_maincpu, XTAL::u(200000)); // approximation - RC osc. R=68K, C=68pf
 	m_maincpu->read_k().set(FUNC(ti1250_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti1250_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti1250_state::write_r));
@@ -11450,7 +11450,7 @@ void ti1250_state::ti1270(machine_config &config)
 	ti1250(config);
 
 	// basic machine hardware
-	TMS0970(config.replace(), m_maincpu, 250000); // approximation
+	TMS0970(config.replace(), m_maincpu, XTAL::u(250000)); // approximation
 	m_maincpu->read_k().set(FUNC(ti1250_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti1250_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti1250_state::write_r));
@@ -11608,7 +11608,7 @@ INPUT_PORTS_END
 void ti25503_state::ti25503(machine_config &config)
 {
 	// basic machine hardware
-	TMS1040(config, m_maincpu, 250000); // approximation
+	TMS1040(config, m_maincpu, XTAL::u(250000)); // approximation
 	m_maincpu->read_k().set(FUNC(ti25503_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti25503_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti25503_state::write_r));
@@ -11760,7 +11760,7 @@ INPUT_PORTS_END
 void ti5100_state::ti5100(machine_config &config)
 {
 	// basic machine hardware
-	TMS1070(config, m_maincpu, 250000); // approximation
+	TMS1070(config, m_maincpu, XTAL::u(250000)); // approximation
 	m_maincpu->read_k().set(FUNC(ti5100_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti5100_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti5100_state::write_r));
@@ -12030,7 +12030,7 @@ INPUT_PORTS_END
 void ti30_state::ti30(machine_config &config)
 {
 	// basic machine hardware
-	TMS0980(config, m_maincpu, 400000); // guessed
+	TMS0980(config, m_maincpu, XTAL::u(400000)); // guessed
 	m_maincpu->read_k().set(FUNC(ti30_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti30_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti30_state::write_r));
@@ -12179,7 +12179,7 @@ INPUT_PORTS_END
 void ti1000_state::ti1000(machine_config &config)
 {
 	// basic machine hardware
-	TMS1990(config, m_maincpu, 250000); // approximation
+	TMS1990(config, m_maincpu, XTAL::u(250000)); // approximation
 	m_maincpu->read_k().set(FUNC(ti1000_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti1000_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti1000_state::write_r));
@@ -12297,7 +12297,7 @@ INPUT_PORTS_END
 void wizatron_state::wizatron(machine_config &config)
 {
 	// basic machine hardware
-	TMS0970(config, m_maincpu, 250000); // approximation
+	TMS0970(config, m_maincpu, XTAL::u(250000)); // approximation
 	m_maincpu->read_k().set(FUNC(wizatron_state::read_k));
 	m_maincpu->write_o().set(FUNC(wizatron_state::write_o));
 	m_maincpu->write_r().set(FUNC(wizatron_state::write_r));
@@ -12513,7 +12513,7 @@ INPUT_PORTS_END
 void lilprof78_state::lilprof78(machine_config &config)
 {
 	// basic machine hardware
-	TMS1990(config, m_maincpu, 250000); // approximation
+	TMS1990(config, m_maincpu, XTAL::u(250000)); // approximation
 	m_maincpu->read_k().set(FUNC(lilprof78_state::read_k));
 	m_maincpu->write_o().set(FUNC(lilprof78_state::write_o));
 	m_maincpu->write_r().set(FUNC(lilprof78_state::write_r));
@@ -12659,7 +12659,7 @@ INPUT_PORTS_END
 void ti1680_state::ti1680(machine_config &config)
 {
 	// basic machine hardware
-	TMS1980(config, m_maincpu, 300000); // approximation
+	TMS1980(config, m_maincpu, XTAL::u(300000)); // approximation
 	m_maincpu->read_k().set(FUNC(ti1680_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti1680_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti1680_state::write_r));
@@ -12791,7 +12791,7 @@ INPUT_PORTS_END
 void dataman_state::dataman(machine_config &config)
 {
 	// basic machine hardware
-	TMS1980(config, m_maincpu, 300000); // patent says 300kHz
+	TMS1980(config, m_maincpu, XTAL::u(300000)); // patent says 300kHz
 	m_maincpu->read_k().set(FUNC(dataman_state::read_k));
 	m_maincpu->write_o().set(FUNC(dataman_state::write_o));
 	m_maincpu->write_r().set(FUNC(dataman_state::write_r));
@@ -12970,7 +12970,7 @@ INPUT_PORTS_END
 void timaze_state::timaze(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=80K, C=27pF
+	TMS1000(config, m_maincpu, XTAL::u(200000)); // approximation - RC osc. R=80K, C=27pF
 	m_maincpu->read_k().set(FUNC(timaze_state::read_k));
 	m_maincpu->write_r().set(FUNC(timaze_state::write_r));
 	m_maincpu->write_o().set(FUNC(timaze_state::write_o));
@@ -13126,12 +13126,12 @@ INPUT_PORTS_END
 void tithermos_state::tithermos(machine_config &config)
 {
 	// basic machine hardware
-	TMS0970(config, m_maincpu, 250000); // approximation
+	TMS0970(config, m_maincpu, XTAL::u(250000)); // approximation
 	m_maincpu->read_k().set(FUNC(tithermos_state::read_k));
 	m_maincpu->write_r().set(FUNC(tithermos_state::write_r));
 	m_maincpu->write_o().set(FUNC(tithermos_state::write_o));
 
-	CLOCK(config, "ac_line", 60);
+	CLOCK(config, "ac_line", XTAL::u(60));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
@@ -13228,7 +13228,7 @@ INPUT_PORTS_END
 void subwars_state::subwars(machine_config &config)
 {
 	// basic machine hardware
-	TMS1200(config, m_maincpu, 550000); // approximation - RC osc. R=24K, C=47pF
+	TMS1200(config, m_maincpu, XTAL::u(550000)); // approximation - RC osc. R=24K, C=47pF
 	m_maincpu->read_k().set_ioport("IN.0");
 	m_maincpu->write_r().set(FUNC(subwars_state::write_r));
 	m_maincpu->write_o().set(FUNC(subwars_state::write_o));
@@ -13384,7 +13384,7 @@ INPUT_PORTS_END
 void playmaker_state::playmaker(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=20K, C=250pF
+	TMS1100(config, m_maincpu, XTAL::u(375000)); // approximation - RC osc. R=20K, C=250pF
 	m_maincpu->read_k().set(FUNC(playmaker_state::read_k));
 	m_maincpu->write_r().set(FUNC(playmaker_state::write_r));
 	m_maincpu->write_o().set(FUNC(playmaker_state::write_o));
@@ -13522,7 +13522,7 @@ INPUT_PORTS_END
 void dxfootb_state::dxfootb(machine_config &config)
 {
 	// basic machine hardware
-	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=47pF
+	TMS1400(config, m_maincpu, XTAL::u(425000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(dxfootb_state::read_k));
 	m_maincpu->write_r().set(FUNC(dxfootb_state::write_r));
 	m_maincpu->write_o().set(FUNC(dxfootb_state::write_o));
@@ -13643,7 +13643,7 @@ INPUT_PORTS_END
 void copycat_state::copycat(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 320000); // approximation - RC osc. R=47K, C=47pF
+	TMS1000(config, m_maincpu, XTAL::u(320000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(copycat_state::read_k));
 	m_maincpu->write_r().set(FUNC(copycat_state::write_r));
 	m_maincpu->write_o().set(FUNC(copycat_state::write_o));
@@ -13735,7 +13735,7 @@ INPUT_PORTS_END
 void copycatm2_state::copycatm2(machine_config &config)
 {
 	// basic machine hardware
-	TMS1730(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
+	TMS1730(config, m_maincpu, XTAL::u(275000)); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->read_k().set_ioport("IN.0");
 	m_maincpu->write_r().set(FUNC(copycatm2_state::write_r));
 	m_maincpu->write_o().set(FUNC(copycatm2_state::write_o));
@@ -13822,7 +13822,7 @@ INPUT_PORTS_END
 void ditto_state::ditto(machine_config &config)
 {
 	// basic machine hardware
-	TMS1700(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
+	TMS1700(config, m_maincpu, XTAL::u(275000)); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->read_k().set_ioport("IN.0");
 	m_maincpu->write_r().set(FUNC(ditto_state::write_r));
 	m_maincpu->write_o().set(FUNC(ditto_state::write_o));
@@ -13953,7 +13953,7 @@ INPUT_PORTS_END
 void t7in1ss_state::t7in1ss(machine_config &config)
 {
 	// basic machine hardware
-	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=47pF
+	TMS1400(config, m_maincpu, XTAL::u(425000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(t7in1ss_state::read_k));
 	m_maincpu->write_r().set(FUNC(t7in1ss_state::write_r));
 	m_maincpu->write_o().set(FUNC(t7in1ss_state::write_o));
@@ -14066,7 +14066,7 @@ void tbreakup_state::machine_reset()
 void tbreakup_state::set_clock()
 {
 	// MCU clock is from an analog circuit with resistor of 73K, PRO2 adds 100K
-	m_maincpu->set_unscaled_clock((m_inputs[3]->read() & 1) ? 500000 : 325000);
+	m_maincpu->set_unscaled_clock((m_inputs[3]->read() & 1) ? XTAL::u(500000) : XTAL::u(325000));
 }
 
 void tbreakup_state::update_display()
@@ -14146,7 +14146,7 @@ INPUT_PORTS_END
 void tbreakup_state::tbreakup(machine_config &config)
 {
 	// basic machine hardware
-	TMS1040(config, m_maincpu, 325000); // see set_clock
+	TMS1040(config, m_maincpu, XTAL::u(325000)); // see set_clock
 	m_maincpu->read_k().set(FUNC(tbreakup_state::read_k));
 	m_maincpu->write_r().set(FUNC(tbreakup_state::write_r));
 	m_maincpu->write_o().set(FUNC(tbreakup_state::write_o));
@@ -14288,7 +14288,7 @@ INPUT_PORTS_END
 void phpball_state::phpball(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	TMS1100(config, m_maincpu, XTAL::u(375000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(phpball_state::read_k));
 	m_maincpu->write_r().set(FUNC(phpball_state::write_r));
 	m_maincpu->write_o().set(FUNC(phpball_state::write_o));
@@ -14408,7 +14408,7 @@ INPUT_PORTS_END
 void tdracula_state::tdracula(machine_config &config)
 {
 	// basic machine hardware
-	TMS1475(config, m_maincpu, 500000); // approximation - RC osc. R=43K, C=47pF
+	TMS1475(config, m_maincpu, XTAL::u(500000)); // approximation - RC osc. R=43K, C=47pF
 	m_maincpu->read_k().set(FUNC(tdracula_state::read_k));
 	m_maincpu->write_r().set(FUNC(tdracula_state::write_r));
 	m_maincpu->write_o().set(FUNC(tdracula_state::write_o));
@@ -14541,7 +14541,7 @@ INPUT_PORTS_END
 void slepachi_state::slepachi(machine_config &config)
 {
 	// basic machine hardware
-	TMS2670(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
+	TMS2670(config, m_maincpu, XTAL::u(450000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set_ioport("IN.0");
 	m_maincpu->read_j().set_ioport("IN.1");
 	m_maincpu->write_r().set(FUNC(slepachi_state::write_r));
@@ -14705,7 +14705,7 @@ INPUT_PORTS_END
 void scruiser_state::scruiser(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	TMS1100(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(scruiser_state::read_k));
 	m_maincpu->write_r().set(FUNC(scruiser_state::write_r));
 	m_maincpu->write_o().set(FUNC(scruiser_state::write_o));
@@ -14865,7 +14865,7 @@ INPUT_PORTS_END
 void ssports4_state::ssports4(machine_config &config)
 {
 	// basic machine hardware
-	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	TMS1100(config, m_maincpu, XTAL::u(350000)); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->read_k().set(FUNC(ssports4_state::read_k));
 	m_maincpu->write_r().set(FUNC(ssports4_state::write_r));
 	m_maincpu->write_o().set(FUNC(ssports4_state::write_o));
@@ -15049,7 +15049,7 @@ INPUT_PORTS_END
 void xl25_state::xl25(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000C(config, m_maincpu, 300000); // approximation - RC osc. R=5.6K, C=47pF
+	TMS1000C(config, m_maincpu, XTAL::u(300000)); // approximation - RC osc. R=5.6K, C=47pF
 	m_maincpu->read_k().set(FUNC(xl25_state::read_k));
 	m_maincpu->write_r().set(FUNC(xl25_state::write_r));
 	m_maincpu->write_o().set(FUNC(xl25_state::write_o));

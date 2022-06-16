@@ -235,7 +235,7 @@ void as12_state::feleg(machine_config &config)
 	R65C02(config, m_maincpu, 4_MHz_XTAL); // R65C02P4
 	m_maincpu->set_addrmap(AS_PROGRAM, &as12_state::main_map);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 110K, 1K), ideal frequency is 600Hz
+	auto &irq_clock(CLOCK(config, "irq_clock", XTAL::u(600))); // from 556 timer (22nF, 110K, 1K), ideal frequency is 600Hz
 	irq_clock.set_pulse_width(attotime::from_usec(17)); // active for 17us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 

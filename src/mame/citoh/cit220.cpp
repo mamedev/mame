@@ -84,7 +84,7 @@ WRITE_LINE_MEMBER(cit220_state::cols_w)
 	{
 		m_132_cols = !state;
 		m_avdc->set_character_width(m_132_cols ? 9 : 10);
-		m_avdc->set_unscaled_clock(m_132_cols ? 22'096'000 / 9 : 14'916'000 / 10);
+		m_avdc->set_unscaled_clock(m_132_cols ? XTAL::u(22'096'000) / 9 : XTAL::u(14'916'000) / 10);
 	}
 }
 
@@ -159,17 +159,17 @@ INPUT_PORTS_END
 
 void cit220_state::cit220p(machine_config &config)
 {
-	I8085A(config, m_maincpu, 8'000'000);
+	I8085A(config, m_maincpu, XTAL::u(8'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cit220_state::cit220p_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &cit220_state::cit220p_io_map);
 	m_maincpu->out_sod_func().set(FUNC(cit220_state::sod_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	//m_screen->set_raw(14'916'000, 960, 0, 800, 259, 0, 240);
-	m_screen->set_raw(22'096'000, 1422, 0, 1188, 259, 0, 240);
+	//m_screen->set_raw(XTAL::u(14'916'000), 960, 0, 800, 259, 0, 240);
+	m_screen->set_raw(XTAL::u(22'096'000), 1422, 0, 1188, 259, 0, 240);
 	m_screen->set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
 
-	SCN2674(config, m_avdc, 22'096'000 / 9);
+	SCN2674(config, m_avdc, XTAL::u(22'096'000) / 9);
 	m_avdc->intr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 	m_avdc->set_character_width(9); // 10 in 80-column modes
 	m_avdc->set_display_callback(FUNC(cit220_state::draw_character));
@@ -177,13 +177,13 @@ void cit220_state::cit220p(machine_config &config)
 	m_avdc->set_addrmap(1, &cit220_state::attr_map);
 	m_avdc->set_screen(m_screen);
 
-	scn2681_device &duart(SCN2681(config, "duart", 3'686'400));
+	scn2681_device &duart(SCN2681(config, "duart", XTAL::u(3'686'400)));
 	duart.irq_cb().set_inputline(m_maincpu, I8085_RST55_LINE);
 	duart.outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3);
 	duart.outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
 	duart.outport_cb().append(FUNC(cit220_state::cols_w)).bit(7);
 
-	i8251_device &usart(I8251(config, "usart", 4'000'000));
+	i8251_device &usart(I8251(config, "usart", XTAL::u(4'000'000)));
 	usart.txd_handler().set("keyboard", FUNC(cit220p_keyboard_device::write_rxd));
 
 	cit220p_keyboard_device &keyboard(CIT220P_KEYBOARD(config, "keyboard"));

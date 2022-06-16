@@ -430,12 +430,12 @@ void fcrash_state::wofr1bl_spr_base_w(uint16_t data)
 void fcrash_state::fcrash(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);
+	M68000(config, m_maincpu, XTAL::u(10000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
 
-	Z80(config, m_audiocpu, 24000000/6); /* ? */
+	Z80(config, m_audiocpu, XTAL::u(24000000)/6); /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fcrash_state, fcrash)
@@ -459,24 +459,24 @@ void fcrash_state::fcrash(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 24000000/6));   /* ? */
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL::u(24000000)/6));   /* ? */
 	ym1.add_route(0, "mono", 0.10);
 	ym1.add_route(1, "mono", 0.10);
 	ym1.add_route(2, "mono", 0.10);
 	ym1.add_route(3, "mono", 1.0);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 24000000/6));   /* ? */
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL::u(24000000)/6));   /* ? */
 	ym2.add_route(0, "mono", 0.10);
 	ym2.add_route(1, "mono", 0.10);
 	ym2.add_route(2, "mono", 0.10);
 	ym2.add_route(3, "mono", 1.0);
 
-	MSM5205(config, m_msm_1, 24000000/64);  /* ? */
+	MSM5205(config, m_msm_1, XTAL::u(24000000)/64);  /* ? */
 	m_msm_1->vck_legacy_callback().set(FUNC(fcrash_state::m5205_int1)); /* interrupt function */
 	m_msm_1->set_prescaler_selector(msm5205_device::S96_4B);    /* 4KHz 4-bit */
 	m_msm_1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MSM5205(config, m_msm_2, 24000000/64);  /* ? */
+	MSM5205(config, m_msm_2, XTAL::u(24000000)/64);  /* ? */
 	m_msm_2->vck_legacy_callback().set(FUNC(fcrash_state::m5205_int2)); /* interrupt function */
 	m_msm_2->set_prescaler_selector(msm5205_device::S96_4B);    /* 4KHz 4-bit */
 	m_msm_2->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -485,12 +485,12 @@ void fcrash_state::fcrash(machine_config &config)
 void fcrash_state::ffightblb(machine_config &config)
 {
 		/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);
+	M68000(config, m_maincpu, XTAL::u(10000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
 
-	Z80(config, m_audiocpu, 24000000/6); /* ? */
+	Z80(config, m_audiocpu, XTAL::u(24000000)/6); /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::ffightblb_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fcrash_state, ffightblb)
@@ -514,7 +514,7 @@ void fcrash_state::ffightblb(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	OKIM6295(config, m_oki, 1000000 , okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, XTAL::u(1000000), okim6295_device::PIN7_HIGH);
 	m_oki->set_addrmap(0, &fcrash_state::ffightblb_oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.30);
 }
@@ -531,12 +531,12 @@ void fcrash_state::cawingbl(machine_config &config)
 void fcrash_state::kodb(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);
+	M68000(config, m_maincpu, XTAL::u(10000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::fcrash_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, XTAL::u(3579545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::kodb_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fcrash_state, kodb)
@@ -572,12 +572,12 @@ void fcrash_state::kodb(machine_config &config)
 void fcrash_state::mtwinsb(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);
+	M68000(config, m_maincpu, XTAL::u(10000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::mtwinsb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, XTAL::u(3579545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fcrash_state, mtwinsb)
@@ -647,12 +647,12 @@ void fcrash_state::sf2m1(machine_config &config)
 void fcrash_state::sgyxz(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, XTAL::u(3579545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fcrash_state, sgyxz)
@@ -703,12 +703,12 @@ void fcrash_state::wofr1bl(machine_config &config)
 void fcrash_state::varthb(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcrash_state::varthb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fcrash_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fcrash_state::cpu_space_map);
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, XTAL::u(3579545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcrash_state::sgyxz_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fcrash_state, cps1)

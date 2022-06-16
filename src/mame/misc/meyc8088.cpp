@@ -399,7 +399,7 @@ void meyc8088_state::meyc8088(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

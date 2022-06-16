@@ -15,7 +15,7 @@ class st_blitter_device : public device_t
 	static constexpr uint8_t CTRL_BUSY   = 0x80;
 
 public:
-	st_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	st_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(tag, spacenum); }
 	auto int_callback() { return m_int_callback.bind(); }

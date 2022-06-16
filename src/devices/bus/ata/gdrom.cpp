@@ -509,7 +509,7 @@ void gdrom_device::SetDevice(void *device)
 // device type definition
 DEFINE_DEVICE_TYPE(GDROM, gdrom_device, "gdrom", "GD-ROM")
 
-gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	atapi_cdrom_device(mconfig, GDROM, tag, owner, clock),
 	is_real_gdrom_disc(false)
 {

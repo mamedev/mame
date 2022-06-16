@@ -699,7 +699,7 @@ void djboy_state::djboy(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_djboy);
 	PALETTE(config, m_palette).set_entries(0x200);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
+	KANEKO_PANDORA(config, m_pandora);
 	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	SPEAKER(config, "lspeaker").front_left();

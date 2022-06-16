@@ -30,7 +30,7 @@
 
 DEFINE_DEVICE_TYPE(VINO, vino_device, "vino", "SGI VINO Controller")
 
-vino_device::vino_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vino_device::vino_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VINO, tag, owner, clock)
 	, m_i2c_data_out(*this)
 	, m_i2c_data_in(*this)

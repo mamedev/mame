@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(SDA2006, sda2006_device, "sda2006", "SDA2006 EEPROM")
 //  sda2006_device - constructor
 //-------------------------------------------------
 
-sda2006_device::sda2006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sda2006_device::sda2006_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SDA2006, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_latch(0)

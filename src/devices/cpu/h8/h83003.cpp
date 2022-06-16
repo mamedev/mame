@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(H83003, h83003_device, "h83003", "Hitachi H8/3003")
 
-h83003_device::h83003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h83003_device::h83003_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8h_device(mconfig, H83003, tag, owner, clock, address_map_constructor(FUNC(h83003_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),

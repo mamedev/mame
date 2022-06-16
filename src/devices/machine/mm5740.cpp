@@ -43,7 +43,7 @@ const tiny_rom_entry *mm5740_device::device_rom_region() const
 //  mm5740_device - constructor
 //-------------------------------------------------
 
-mm5740_device::mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mm5740_device::mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MM5740, tag, owner, clock),
 	m_read_x(*this),
 	m_read_shift(*this),

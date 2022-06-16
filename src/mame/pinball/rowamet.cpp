@@ -286,10 +286,10 @@ void rowamet_state::machine_reset()
 void rowamet_state::rowamet(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 1888888);
+	Z80(config, m_maincpu, XTAL::u(1888888));
 	m_maincpu->set_addrmap(AS_PROGRAM, &rowamet_state::main_mem_map);
 
-	Z80(config, m_audiocpu, 1888888);
+	Z80(config, m_audiocpu, XTAL::u(1888888));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &rowamet_state::audio_mem_map);
 	m_audiocpu->set_addrmap(AS_IO, &rowamet_state::audio_io_map);
 
@@ -299,7 +299,7 @@ void rowamet_state::rowamet(machine_config &config)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.75); // unknown DAC
 }
 
 /*-------------------------------------------------------------------

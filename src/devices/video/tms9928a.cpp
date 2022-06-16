@@ -56,7 +56,7 @@ void tms9928a_device::memmap(address_map &map)
 		map(0x0000, 0x3fff).ram();
 }
 
-tms9928a_device::tms9928a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t horz_total, bool is_50hz, bool is_reva, bool is_99)
+tms9928a_device::tms9928a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint16_t horz_total, bool is_50hz, bool is_reva, bool is_99)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
@@ -92,47 +92,47 @@ void tms9928a_device::device_config_complete()
 }
 
 
-tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9928a_device(mconfig, TMS9928A, tag, owner, clock, 342, false, true, true)
 {
 }
 
-tms9129_device::tms9129_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9129_device::tms9129_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9928a_device(mconfig, TMS9129, tag, owner, clock, 342, true, true, false)
 {
 }
 
-tms9918_device::tms9918_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9918_device::tms9918_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9928a_device(mconfig, TMS9918, tag, owner, clock, 342, false, false, true)
 {
 }
 
-tms9918a_device::tms9918a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9918a_device::tms9918a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9928a_device(mconfig, TMS9918A, tag, owner, clock, 342, false, true, true)
 {
 }
 
-tms9118_device::tms9118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9118_device::tms9118_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9928a_device(mconfig, TMS9118, tag, owner, clock, 342, false, true, false)
 {
 }
 
-tms9128_device::tms9128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9128_device::tms9128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9928a_device(mconfig, TMS9128, tag, owner, clock, 342, false, true, false)
 {
 }
 
-tms9929_device::tms9929_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9929_device::tms9929_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9928a_device(mconfig, TMS9929, tag, owner, clock, 342, true, false, true)
 {
 }
 
-tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9928a_device(mconfig, TMS9929A, tag, owner, clock, 342, true, true, true)
 {
 }
 
-efo90501_device::efo90501_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+efo90501_device::efo90501_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9928a_device(mconfig, EFO90501, tag, owner, clock, 346, true, true, true)
 {
 }

@@ -28,13 +28,13 @@ public:
 	// construction/destruction
 	template <typename T>
 	megasys1_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, uint16_t colorbase)
-		: megasys1_tilemap_device(mconfig, tag, owner, (uint32_t)0)
+		: megasys1_tilemap_device(mconfig, tag, owner)
 	{
 		set_palette(std::forward<T>(palette_tag));
 		set_colorbase(colorbase);
 	}
 
-	megasys1_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	megasys1_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	void set_8x8_scroll_factor(int scroll_factor) { m_8x8_scroll_factor = scroll_factor; }

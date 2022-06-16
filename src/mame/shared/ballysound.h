@@ -68,7 +68,7 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner) :
-		device_t(mconfig, type, tag, owner, 0),
+		device_t(mconfig, type, tag, owner),
 		device_mixer_interface(mconfig, *this),
 		m_snd_prom(*this, "sound"),
 		m_discrete(*this, "discrete"),

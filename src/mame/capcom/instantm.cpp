@@ -136,11 +136,11 @@ void instantm_state::instantm(machine_config &config)
 	subcpu.set_addrmap(AS_IO, &instantm_state::sub_io);
 
 	// all guesswork
-	clock_device &voice_clock(CLOCK(config, "voice_clock", 24000));
+	clock_device &voice_clock(CLOCK(config, "voice_clock", XTAL::u(24000)));
 	voice_clock.signal_handler().set(FUNC(instantm_state::clock_w));
 
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 

@@ -7,7 +7,7 @@
 DEFINE_DEVICE_TYPE(MSX_SYSTEMFLAGS, msx_systemflags_device, "msx_systemflags", "MSX System Flags")
 
 
-msx_systemflags_device::msx_systemflags_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_systemflags_device::msx_systemflags_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_SYSTEMFLAGS, tag, owner, clock)
 	, m_initial_value(0xff)
 	, m_system_flags(0xff)

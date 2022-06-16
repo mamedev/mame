@@ -52,7 +52,7 @@ void amiga_fdc_device::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_IPF_FORMAT);
 }
 
-amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AMIGA_FDC, tag, owner, clock)
 	, m_write_index(*this)
 	, m_read_dma(*this)

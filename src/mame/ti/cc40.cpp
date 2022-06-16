@@ -640,7 +640,7 @@ void cc40_state::cc40(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(cc40_state::cc40_palette), 3);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
+	hd44780_device &hd44780(HD44780(config, "hd44780"));
 	hd44780.set_lcd_size(2, 16); // 2*16 internal
 	hd44780.set_pixel_update_cb(FUNC(cc40_state::cc40_pixel_update));
 

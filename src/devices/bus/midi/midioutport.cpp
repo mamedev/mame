@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(MIDIOUT_PORT, midiout_port_device, "midiout_port", "MIDI Out port")
 
-midiout_port_device::midiout_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+midiout_port_device::midiout_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MIDIOUT_PORT, tag, owner, clock),
 	device_midi_port_interface(mconfig, *this),
 	m_midiout(*this, "midioutimg")
@@ -22,5 +22,5 @@ midiout_port_device::midiout_port_device(const machine_config &mconfig, const ch
 
 void midiout_port_device::device_add_mconfig(machine_config &config)
 {
-	MIDIOUT(config, m_midiout, 0);
+	MIDIOUT(config, m_midiout);
 }

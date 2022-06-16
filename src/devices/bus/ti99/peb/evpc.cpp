@@ -61,7 +61,7 @@ namespace bus::ti99::peb {
 #define EVPC_CRU_BASE 0x1400
 #define SOUNDCHIP_TAG "soundchip"
 
-snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock):
 	device_t(mconfig, TI99_EVPC, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),

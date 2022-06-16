@@ -728,20 +728,20 @@ void hp95lx_state::hp95lx(machine_config &config)
 	ADDRESS_MAP_BANK(config, "bankdev_e800").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "bankdev_ec00").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
-	PIT8254(config, m_pit8254, 0);
+	PIT8254(config, m_pit8254);
 	m_pit8254->set_clk<0>(XTAL(14'318'181) / 12); /* heartbeat IRQ */
 	m_pit8254->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	m_pit8254->set_clk<1>(XTAL(14'318'181) / 12); /* misc IRQ */
 	m_pit8254->out_handler<1>().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 
-	ISA8_SLOT(config, "board0", 0, "isa", pc_isa8_cards, "com", true);
+	ISA8_SLOT(config, "board0", "isa", pc_isa8_cards, "com", true);
 
 	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
 	pc_kbdc.out_clock_cb().set(FUNC(hp95lx_state::keyboard_clock_w));
@@ -751,7 +751,7 @@ void hp95lx_state::hp95lx(machine_config &config)
 	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // card slot
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
 	m_screen->set_screen_update(FUNC(hp95lx_state::screen_update));

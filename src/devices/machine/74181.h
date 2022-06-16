@@ -24,7 +24,7 @@ class ttl74181_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl74181_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ttl74181_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inputs
 	void input_a_w(uint8_t data);

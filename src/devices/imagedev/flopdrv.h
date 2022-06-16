@@ -90,13 +90,13 @@ class legacy_floppy_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const floppy_interface *config)
-		: legacy_floppy_image_device(mconfig, tag, owner, clock)
+	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const floppy_interface *config)
+		: legacy_floppy_image_device(mconfig, tag, owner)
 	{
 		set_floppy_config(config);
 	}
 
-	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	~legacy_floppy_image_device();
 
 	void set_floppy_config(const floppy_interface *config) { m_config = config; }
@@ -163,7 +163,7 @@ private:
 	TIMER_CALLBACK_MEMBER( set_wpt );
 
 protected:
-	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device overrides
 	virtual void device_config_complete() override;

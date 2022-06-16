@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(HYPROLYB_ADPCM, hyprolyb_adpcm_device, "hyprolyb_adpcm", "Hyper Olympics Audio")
 
-hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HYPROLYB_ADPCM, tag, owner, clock)
 	, m_audiocpu(*this, ":audiocpu")
 	, m_soundlatch2(*this, ":soundlatch2")

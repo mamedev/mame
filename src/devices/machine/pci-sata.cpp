@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(SATA, sata_device, "sata", "SATA AHCI interface")
 
-sata_device::sata_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sata_device::sata_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, SATA, tag, owner, clock)
 {
 }

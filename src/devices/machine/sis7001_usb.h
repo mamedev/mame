@@ -12,7 +12,7 @@ class sis7001_usb_device : public pci_device
 {
 public:
 	sis7001_usb_device(
-		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+		const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, 
 		int num_ports
 	) : sis7001_usb_device(mconfig, tag, owner, clock)
 	{
@@ -22,7 +22,7 @@ public:
 		// TODO: should really read from a std::list interface
 		m_downstream_ports = num_ports;
 	}
-	sis7001_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis7001_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::MEDIA; }
 

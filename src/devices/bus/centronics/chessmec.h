@@ -20,7 +20,7 @@ class centronics_chessmec_device : public device_t,
 {
 public:
 	// construction/destruction
-	centronics_chessmec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	centronics_chessmec_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

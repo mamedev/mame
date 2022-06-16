@@ -16,7 +16,7 @@ class dai_sound_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	dai_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	dai_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	DECLARE_WRITE_LINE_MEMBER(set_input_ch0);
 	DECLARE_WRITE_LINE_MEMBER(set_input_ch1);

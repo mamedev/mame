@@ -760,7 +760,7 @@ void atarisy1_state::atarisy1(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,64).set_info_callback(FUNC(atarisy1_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(atarisy1_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, atarisy1_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, atarisy1_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -796,7 +796,7 @@ void atarisy1_state::atarisy1(machine_config &config)
 void atarisy1_state::marble(machine_config &config)
 {
 	atarisy1(config);
-	SLAPSTIC(config, m_slapstic, 103);
+	SLAPSTIC(config, m_slapstic, XTAL::u(103));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x80000, 0x87fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
@@ -805,7 +805,7 @@ void atarisy1_state::peterpak(machine_config &config)
 {
 	atarisy1(config);
 	add_adc(config);
-	SLAPSTIC(config, m_slapstic, 107);
+	SLAPSTIC(config, m_slapstic, XTAL::u(107));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x80000, 0x87fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 
@@ -821,7 +821,7 @@ void atarisy1_state::indytemp(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	add_speech(config);
-	SLAPSTIC(config, m_slapstic, 105);
+	SLAPSTIC(config, m_slapstic, XTAL::u(105));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x80000, 0x87fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 
@@ -837,7 +837,7 @@ void atarisy1_state::roadrunn(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	add_speech(config);
-	SLAPSTIC(config, m_slapstic, 108);
+	SLAPSTIC(config, m_slapstic, XTAL::u(108));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x80000, 0x87fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 
@@ -851,7 +851,7 @@ void atarisy1_state::roadb109(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	add_speech(config);
-	SLAPSTIC(config, m_slapstic, 109);
+	SLAPSTIC(config, m_slapstic, XTAL::u(109));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x80000, 0x87fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 
@@ -864,7 +864,7 @@ void atarisy1_state::roadb110(machine_config &config)
 	atarisy1(config);
 	add_adc(config);
 	add_speech(config);
-	SLAPSTIC(config, m_slapstic, 110);
+	SLAPSTIC(config, m_slapstic, XTAL::u(110));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x80000, 0x87fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 

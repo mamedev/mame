@@ -20,7 +20,7 @@
 class vino_device : public device_t
 {
 public:
-	vino_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	vino_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

@@ -55,7 +55,7 @@ namespace {
 	}
 }
 
-rs232_sync_io_device::rs232_sync_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rs232_sync_io_device::rs232_sync_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig , RS232_SYNC_IO , tag , owner , clock)
 	, device_rs232_port_interface(mconfig , *this)
 	, m_stream(*this , "stream")

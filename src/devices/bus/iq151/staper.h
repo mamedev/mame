@@ -21,7 +21,7 @@ class iq151_staper_device :
 {
 public:
 	// construction/destruction
-	iq151_staper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iq151_staper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -29,7 +29,7 @@ Other: LED, 20MHz crystal. Next to the MC68901P is another chip just as large (4
 DEFINE_DEVICE_TYPE(TTI_QTS1, qts1_device, "qts1", "TTI QTS-1 SCSI Host Adapter")
 
 
-qts1_device::qts1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+qts1_device::qts1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TTI_QTS1, tag, owner, clock)
 	, device_qbus_card_interface(mconfig, *this)
 	, m_localcpu(*this, "localcpu")

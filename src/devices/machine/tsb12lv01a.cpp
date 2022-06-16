@@ -23,7 +23,7 @@
 
 DEFINE_DEVICE_TYPE(TSB12LV01A, tsb12lv01a_device, "tsb12lv01a", "TSB12LV01A IEEE 1394 Link Controller")
 
-tsb12lv01a_device::tsb12lv01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tsb12lv01a_device::tsb12lv01a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TSB12LV01A, tag, owner, clock)
 	, m_int_cb(*this)
 	, m_phy_read_cb(*this)

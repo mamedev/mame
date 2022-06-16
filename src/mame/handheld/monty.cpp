@@ -248,8 +248,8 @@ void monty_state::monty(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(monty_state::screen_update));
 
-	SED1503(config, m_lcd[0], 32768).write_segs().set(FUNC(monty_state::lcd_output_w<0>));
-	SED1503(config, m_lcd[1], 32768).write_segs().set(FUNC(monty_state::lcd_output_w<1>));
+	SED1503(config, m_lcd[0], XTAL::u(32768)).write_segs().set(FUNC(monty_state::lcd_output_w<0>));
+	SED1503(config, m_lcd[1], XTAL::u(32768)).write_segs().set(FUNC(monty_state::lcd_output_w<1>));
 	config.set_default_layout(layout_monty);
 
 	// Sound hardware

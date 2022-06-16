@@ -31,7 +31,7 @@ public:
 	u16 key_r();
 
 protected:
-	setapcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	setapcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -82,7 +82,7 @@ private:
 class nile_sound_device : public setapcm_device<8, 160>
 {
 public:
-	nile_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nile_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> st0032_sound_device
@@ -90,7 +90,7 @@ public:
 class st0032_sound_device : public setapcm_device<16, 384>
 {
 public:
-	st0032_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	st0032_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 //**************************************************************************

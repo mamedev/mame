@@ -626,7 +626,7 @@ static void pc100_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-#define MASTER_CLOCK 6988800
+#define MASTER_CLOCK XTAL::u(6988800)
 
 void pc100_state::pc100(machine_config &config)
 {
@@ -652,17 +652,17 @@ void pc100_state::pc100(machine_config &config)
 	ppi2.out_pb_callback().set(FUNC(pc100_state::upper_mask_w));
 	ppi2.out_pc_callback().set(FUNC(pc100_state::crtc_bank_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic->in_sp_callback().set_constant(0); // ???
 
-	i8251_device &i8251(I8251(config, "uart8251", 0));
+	i8251_device &i8251(I8251(config, "uart8251"));
 	//i8251.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//i8251.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	//i8251.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	i8251.rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pc100_state::irqnmi_w));
 	m_fdc->drq_wr_callback().set(FUNC(pc100_state::drqnmi_w));
 
@@ -687,7 +687,7 @@ void pc100_state::pc100(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper, XTAL::u(2400)).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 /* ROM definition */

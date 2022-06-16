@@ -203,7 +203,7 @@ void eeprom_parallel_28xx_device::unlock_write32(uint32_t data) { oe_w(1); }
 
 // macro for defining a new device class
 #define DEFINE_PARALLEL_EEPROM_DEVICE(_baseclass, _lowercase, _uppercase, _bits, _cells) \
-eeprom_parallel_##_lowercase##_device::eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) \
+eeprom_parallel_##_lowercase##_device::eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) \
 	: eeprom_parallel_##_baseclass##_device(mconfig, EEPROM_##_uppercase, tag, owner) \
 { \
 	size(_cells, _bits); \

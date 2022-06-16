@@ -124,7 +124,7 @@ void c64_z80videopak_device::device_add_mconfig(machine_config &config)
 //  c64_z80videopak_device - constructor
 //-------------------------------------------------
 
-c64_z80videopak_device::c64_z80videopak_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+c64_z80videopak_device::c64_z80videopak_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	c64_cpm_cartridge_device(mconfig, C64_Z80VIDEOPAK, tag, owner, clock),
 	m_crtc(*this, HD46505SP_TAG),
 	m_palette(*this, "palette"),

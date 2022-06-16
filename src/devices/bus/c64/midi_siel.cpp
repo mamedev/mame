@@ -46,7 +46,7 @@ WRITE_LINE_MEMBER( c64_siel_midi_cartridge_device::write_acia_clock )
 
 void c64_siel_midi_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set(FUNC(c64_siel_midi_cartridge_device::acia_irq_w));
 
@@ -54,7 +54,7 @@ void c64_siel_midi_cartridge_device::device_add_mconfig(machine_config &config)
 
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(31250*16)));
 	acia_clock.signal_handler().set(FUNC(c64_siel_midi_cartridge_device::write_acia_clock));
 }
 
@@ -68,7 +68,7 @@ void c64_siel_midi_cartridge_device::device_add_mconfig(machine_config &config)
 //  c64_siel_midi_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_siel_midi_cartridge_device::c64_siel_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_siel_midi_cartridge_device::c64_siel_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_MIDI_SIEL, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MC6850_TAG)

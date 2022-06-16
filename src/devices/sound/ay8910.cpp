@@ -1302,7 +1302,7 @@ void ay8910_device::ay8910_statesave()
 
 void ay8910_device::device_start()
 {
-	const int master_clock = clock();
+	const XTAL master_clock = clock();
 
 	if (m_ioports < 1 && !(m_port_a_read_cb.isnull() && m_port_a_write_cb.isnull()))
 		fatalerror("Device '%s' is a %s and has no port A!", tag(), name());
@@ -1378,7 +1378,7 @@ void ay8910_device::set_volume(int channel,int volume)
 			set_output_gain(ch, volume / 100.0);
 }
 
-void ay8910_device::ay_set_clock(int clock)
+void ay8910_device::ay_set_clock(const XTAL &clock)
 {
 	// FIXME: this doesn't belong here, it should be an input pin exposed via devcb
 	if (((m_feature & PSG_PIN26_IS_CLKSEL) && (m_flags & YM2149_PIN26_LOW)) || (m_feature & PSG_HAS_INTERNAL_DIVIDER))
@@ -1588,12 +1588,12 @@ void ay8914_device::write(offs_t offset, u8 data)
 
 DEFINE_DEVICE_TYPE(AY8910, ay8910_device, "ay8910", "AY-3-8910A PSG")
 
-ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ay8910_device(mconfig, AY8910, tag, owner, clock, PSG_TYPE_AY, 3, 2)
 {
 }
 
-ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
+ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock,
 								psg_type_t psg_type, int streams, int ioports, int feature)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
@@ -1658,7 +1658,7 @@ void ay8910_device::set_type(psg_type_t psg_type)
 
 DEFINE_DEVICE_TYPE(AY8912, ay8912_device, "ay8912", "AY-3-8912A PSG")
 
-ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ay8910_device(mconfig, AY8912, tag, owner, clock, PSG_TYPE_AY, 3, 1)
 {
 }
@@ -1666,7 +1666,7 @@ ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(AY8913, ay8913_device, "ay8913", "AY-3-8913 PSG")
 
-ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ay8910_device(mconfig, AY8913, tag, owner, clock, PSG_TYPE_AY, 3, 0)
 {
 }
@@ -1674,7 +1674,7 @@ ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(AY8914, ay8914_device, "ay8914", "AY-3-8914A PSG")
 
-ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ay8910_device(mconfig, AY8914, tag, owner, clock, PSG_TYPE_AY, 3, 2, PSG_EXTENDED_ENVELOPE)
 {
 }
@@ -1682,7 +1682,7 @@ ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(AY8930, ay8930_device, "ay8930", "AY8930 EPSG")
 
-ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ay8910_device(mconfig, AY8930, tag, owner, clock, PSG_TYPE_YM, 3, 2, PSG_PIN26_IS_CLKSEL | PSG_HAS_EXPANDED_MODE)
 {
 }
@@ -1690,7 +1690,7 @@ ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(YM2149, ym2149_device, "ym2149", "YM2149 SSG")
 
-ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ay8910_device(mconfig, YM2149, tag, owner, clock, PSG_TYPE_YM, 3, 2, PSG_PIN26_IS_CLKSEL)
 {
 }
@@ -1698,7 +1698,7 @@ ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(YM3439, ym3439_device, "ym3439", "YM3439 SSGC")
 
-ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ay8910_device(mconfig, YM3439, tag, owner, clock, PSG_TYPE_YM, 3, 2, PSG_PIN26_IS_CLKSEL)
 {
 }
@@ -1706,7 +1706,7 @@ ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(YMZ284, ymz284_device, "ymz284", "YMZ284 SSGL")
 
-ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ay8910_device(mconfig, YMZ284, tag, owner, clock, PSG_TYPE_YM, 1, 0)
 {
 }
@@ -1714,7 +1714,7 @@ ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(YMZ294, ymz294_device, "ymz294", "YMZ294 SSGLP")
 
-ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ay8910_device(mconfig, YMZ294, tag, owner, clock, PSG_TYPE_YM, 1, 0)
 {
 }
@@ -1722,7 +1722,7 @@ ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(SUNSOFT_5B_SOUND, sunsoft_5b_sound_device, "sunsoft_5b_sound", "Sunsoft/Yamaha 5B 6630B (Sound)")
 
-sunsoft_5b_sound_device::sunsoft_5b_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sunsoft_5b_sound_device::sunsoft_5b_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ay8910_device(mconfig, SUNSOFT_5B_SOUND, tag, owner, clock, PSG_TYPE_YM, 1, 0, PSG_HAS_INTERNAL_DIVIDER)
 {
 }

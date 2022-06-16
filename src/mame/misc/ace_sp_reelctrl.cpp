@@ -11,18 +11,18 @@
 DEFINE_DEVICE_TYPE(ACE_SP_REELCTRL, ace_sp_reelctrl_device, "ace_sp_reelctrl", "ACE sp.ACE Reel Controller PCB")
 DEFINE_DEVICE_TYPE(ACE_SP_REELCTRL_PCP, ace_sp_reelctrl_pcp_device, "ace_sp_reelctrl_pcp", "ACE sp.ACE Reel Controller PCB (PCP clone)")
 
-ace_sp_reelctrl_base_device::ace_sp_reelctrl_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+ace_sp_reelctrl_base_device::ace_sp_reelctrl_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_mcu(*this, "mcu")
 {
 }
 
-ace_sp_reelctrl_device::ace_sp_reelctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ace_sp_reelctrl_device::ace_sp_reelctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ace_sp_reelctrl_base_device(mconfig, ACE_SP_REELCTRL, tag, owner, clock)
 {
 }
 
-ace_sp_reelctrl_pcp_device::ace_sp_reelctrl_pcp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ace_sp_reelctrl_pcp_device::ace_sp_reelctrl_pcp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ace_sp_reelctrl_base_device(mconfig, ACE_SP_REELCTRL_PCP, tag, owner, clock)
 {
 }

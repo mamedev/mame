@@ -62,7 +62,7 @@ public:
 	static constexpr unsigned SCANLINE_EFX_BOTTOM_END     = SCANLINE_DISPLAY_END;
 
 	// construction/destruction
-	cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto int_cb() { return m_write_int.bind(); }
 	auto dma_out_cb() { return m_write_dma_out.bind(); }

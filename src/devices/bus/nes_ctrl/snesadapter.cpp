@@ -45,7 +45,7 @@ void nes_snesadapter_device::device_add_mconfig(machine_config &config)
 //  nes_snesadapter_device - constructor
 //-------------------------------------------------
 
-nes_snesadapter_device::nes_snesadapter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_snesadapter_device::nes_snesadapter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_SNESADAPTER, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_snesctrl(*this, "port")

@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(MPC105, mpc105_device, "mpc105", "Motorola MPC105")
 //  mpc105_device - constructor
 //-------------------------------------------------
 
-mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MPC105, tag, owner, clock),
 	pci_device_interface( mconfig, *this ),
 	m_bank_base_default(0),

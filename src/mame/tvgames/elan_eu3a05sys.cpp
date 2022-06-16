@@ -8,7 +8,7 @@
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_SYS, elan_eu3a05sys_device, "elan_eu3a05sys", "Elan EU3A05 System")
 
-elan_eu3a05sys_device::elan_eu3a05sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+elan_eu3a05sys_device::elan_eu3a05sys_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	elan_eu3a05commonsys_device(mconfig, ELAN_EU3A05_SYS, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("regs", ENDIANNESS_NATIVE, 8, 5, 0, address_map_constructor(FUNC(elan_eu3a05sys_device::map), this))

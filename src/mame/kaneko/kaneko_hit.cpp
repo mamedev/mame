@@ -35,7 +35,7 @@ TODO:
 
 DEFINE_DEVICE_TYPE(KANEKO_HIT, kaneko_hit_device, "kaneko_hit", "Kaneko CALC Hitbox")
 
-kaneko_hit_device::kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+kaneko_hit_device::kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, KANEKO_HIT, tag, owner, clock),
 	m_watchdog(*this, "^watchdog")
 {

@@ -553,7 +553,7 @@ void pasogo_state::pasogo(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "ems").set_map(&pasogo_state::emsbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x4000);
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);

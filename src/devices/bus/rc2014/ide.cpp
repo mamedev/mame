@@ -21,7 +21,7 @@ class rc2014_ide_base : public device_t, public device_rc2014_card_interface
 {
 protected:
 	// construction/destruction
-	rc2014_ide_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	rc2014_ide_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -41,7 +41,7 @@ protected:
 	uint8_t m_prev;
 };
 
-rc2014_ide_base::rc2014_ide_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+rc2014_ide_base::rc2014_ide_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_ata(*this, "ata")
@@ -56,7 +56,7 @@ void rc2014_ide_base::device_start()
 
 void rc2014_ide_base::device_add_mconfig(machine_config &config)
 {
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(rc2014_ide_base::ppi_pa_r));
 	m_ppi->in_pb_callback().set(FUNC(rc2014_ide_base::ppi_pb_r));
 	m_ppi->out_pa_callback().set(FUNC(rc2014_ide_base::ppi_pa_w));
@@ -75,7 +75,7 @@ class rc2014_82c55_ide_device : public rc2014_ide_base
 {
 public:
 	// construction/destruction
-	rc2014_82c55_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rc2014_82c55_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -93,7 +93,7 @@ private:
 	uint8_t m_dior;
 };
 
-rc2014_82c55_ide_device::rc2014_82c55_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rc2014_82c55_ide_device::rc2014_82c55_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rc2014_ide_base(mconfig, RC2014_82C55_IDE, tag, owner, clock)
 	, m_sw(*this, "SW1")
 	, m_jp(*this, "JP%u", 1U)
@@ -206,7 +206,7 @@ class rc2014_ide_hdd_device : public rc2014_ide_base
 {
 public:
 	// construction/destruction
-	rc2014_ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rc2014_ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -218,7 +218,7 @@ private:
 	required_ioport m_jp;
 };
 
-rc2014_ide_hdd_device::rc2014_ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rc2014_ide_hdd_device::rc2014_ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rc2014_ide_base(mconfig, RC2014_IDE_HDD, tag, owner, clock)
 	, m_jp(*this, "J1")
 {

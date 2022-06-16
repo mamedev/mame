@@ -825,10 +825,10 @@ void sat_console_state::saturn(machine_config &config)
 	m_slave->set_is_slave(1);
 	TIMER(config, "slave_scantimer").configure_scanline(FUNC(sat_console_state::saturn_slave_scanline), "screen", 0, 1);
 
-	M68000(config, m_audiocpu, 11289600); //256 x 44100 Hz = 11.2896 MHz
+	M68000(config, m_audiocpu, XTAL::u(11289600)); //256 x 44100 Hz = 11.2896 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sat_console_state::sound_mem);
 
-	SEGA_SCU(config, m_scu, 0);
+	SEGA_SCU(config, m_scu);
 	m_scu->set_hostcpu(m_maincpu);
 
 //  SH-1
@@ -876,7 +876,7 @@ void sat_console_state::saturn(machine_config &config)
 	m_scsp->add_route(0, "lspeaker", 1.0);
 	m_scsp->add_route(1, "rspeaker", 1.0);
 
-	stvcd_device &stvcd(STVCD(config, "stvcd", 0));
+	stvcd_device &stvcd(STVCD(config, "stvcd"));
 	stvcd.add_route(0, "scsp", 1.0, 0);
 	stvcd.add_route(1, "scsp", 1.0, 1);
 
@@ -899,7 +899,7 @@ static void saturn_cart(device_slot_interface &device)
 void sat_console_state::saturnus(machine_config &config)
 {
 	saturn(config);
-	SATURN_CDB(config, "saturn_cdb", 16000000);
+	SATURN_CDB(config, "saturn_cdb", XTAL::u(16000000));
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-U");
 
@@ -912,7 +912,7 @@ void sat_console_state::saturnus(machine_config &config)
 void sat_console_state::saturneu(machine_config &config)
 {
 	saturn(config);
-	SATURN_CDB(config, "saturn_cdb", 16000000);
+	SATURN_CDB(config, "saturn_cdb", XTAL::u(16000000));
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("PAL");
 
@@ -925,7 +925,7 @@ void sat_console_state::saturneu(machine_config &config)
 void sat_console_state::saturnjp(machine_config &config)
 {
 	saturn(config);
-	SATURN_CDB(config, "saturn_cdb", 16000000);
+	SATURN_CDB(config, "saturn_cdb", XTAL::u(16000000));
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-J");
 
@@ -938,7 +938,7 @@ void sat_console_state::saturnjp(machine_config &config)
 void sat_console_state::saturnkr(machine_config &config)
 {
 	saturn(config);
-	SATURN_CDB(config, "saturn_cdb", 16000000);
+	SATURN_CDB(config, "saturn_cdb", XTAL::u(16000000));
 
 	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-K");
 

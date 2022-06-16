@@ -30,7 +30,7 @@
 
 DEFINE_DEVICE_TYPE(SIS900_ETH, sis900_eth_device, "sis900_eth", "SiS 900 Fast Ethernet Adapter")
 
-sis900_eth_device::sis900_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sis900_eth_device::sis900_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, SIS900_ETH, tag, owner, clock)
 	, m_eeprom(*this, "eeprom")
 	, m_eth_rom(*this, "eth_rom")

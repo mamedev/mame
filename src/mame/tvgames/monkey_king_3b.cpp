@@ -151,7 +151,7 @@ void mk3b_soc_state::mk3b_soc(machine_config &config)
 {
 	// type unknown (should actually have VFP?)
 	// debug output suggests 240MHz clock
-	ARM920T(config, m_maincpu, 240000000);
+	ARM920T(config, m_maincpu, XTAL::u(240000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mk3b_soc_state::map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -421,7 +421,7 @@ ROM_END
 
 } // anonymous namespace
 
-lle_device_base::lle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+lle_device_base::lle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_interpro_keyboard_port_interface(mconfig, *this)
 	, m_mcu(*this, "mcu")
@@ -447,7 +447,7 @@ void lle_device_base::device_add_mconfig(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_ext).set_map(&lle_device_base::ext_map).set_options(ENDIANNESS_NATIVE, 8, 12, 0x100);
 
 	SPEAKER(config, "keyboard").front_center();
-	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "keyboard", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "keyboard", 0.25);
 }
 
 void lle_device_base::device_start()
@@ -595,7 +595,7 @@ void lle_device_base::bus_w(u8 data)
 	m_bus = data;
 }
 
-lle_en_us_device::lle_en_us_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+lle_en_us_device::lle_en_us_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: lle_device_base(mconfig, INTERPRO_LLE_EN_US_KEYBOARD, tag, owner, clock)
 {
 }

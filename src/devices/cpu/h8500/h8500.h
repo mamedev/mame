@@ -21,7 +21,7 @@ public:
 	void set_mode(u8 mode) { assert(!configured()); m_mode_control = mode; }
 
 protected:
-	h8500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int addrbits, int buswidth, int ramsize, int defmode, address_map_constructor map);
+	h8500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int addrbits, int buswidth, int ramsize, int defmode, address_map_constructor map);
 
 	// device-level overrides
 	virtual void device_config_complete() override;

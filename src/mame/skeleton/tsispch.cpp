@@ -411,11 +411,11 @@ void tsispch_state::prose2k(machine_config &config)
 	m_dsp->p1().set(FUNC(tsispch_state::dsp_to_8086_p1_w));
 
 	/* PIC 8259 */
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* uarts */
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -423,13 +423,13 @@ void tsispch_state::prose2k(machine_config &config)
 	m_uart->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir3_w));
 	m_uart->txempty_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	clock_device &clock(CLOCK(config, "baudclock", 153600)); // this comes from a resonator? or a divider? not sure.
+	clock_device &clock(CLOCK(config, "baudclock", XTAL::u(153600))); // this comes from a resonator? or a divider? not sure.
 	clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_12BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC (TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up)
+	DAC_12BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC (TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up)
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set("i8251a_u15", FUNC(i8251_device::write_rxd));

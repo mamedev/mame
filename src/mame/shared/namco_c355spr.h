@@ -12,7 +12,7 @@ class namco_c355spr_device : public device_t, public device_gfx_interface, publi
 {
 public:
 	// construction/destruction
-	namco_c355spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	namco_c355spr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void set_color_base(u16 base) { m_colbase = base; }
 	void set_scroll_offsets(int x, int y) { m_scrolloffs[0] = x; m_scrolloffs[1] = y; }
@@ -72,7 +72,7 @@ public:
 	bitmap_ind16 &screen_bitmap() { return m_screenbitmap; }
 
 protected:
-	namco_c355spr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	namco_c355spr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// device-level overrides
 	virtual void device_start() override;

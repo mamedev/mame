@@ -1795,7 +1795,7 @@ static void mz2500_floppies(device_slot_interface &device)
 void mz2500_state::mz2500(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 6000000);
+	Z80(config, m_maincpu, XTAL::u(6000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz2500_state::mz2500_map);
 	m_maincpu->set_addrmap(AS_IO, &mz2500_state::mz2500_io);
 	m_maincpu->set_vblank_int("screen", FUNC(mz2500_state::mz2500_vbl));
@@ -1814,17 +1814,17 @@ void mz2500_state::mz2500(machine_config &config)
 	ppi.in_pc_callback().set(FUNC(mz2500_state::mz2500_portc_r));
 	ppi.out_pc_callback().set(FUNC(mz2500_state::mz2500_portc_w));
 
-	z80pio_device& pio(Z80PIO(config, "z80pio_1", 6000000));
+	z80pio_device& pio(Z80PIO(config, "z80pio_1", XTAL::u(6000000)));
 	pio.in_pa_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_r));
 	pio.out_pa_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_w));
 	pio.in_pb_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_r));
 
-	Z80SIO(config, "z80sio", 6000000);
+	Z80SIO(config, "z80sio", XTAL::u(6000000));
 
 	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->alarm().set(FUNC(mz2500_state::mz2500_rtc_alarm_irq));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(31250);
 	m_pit->out_handler<0>().set(FUNC(mz2500_state::pit8253_clk0_irq));
 	// TODO: is this really right?
@@ -1854,7 +1854,7 @@ void mz2500_state::mz2500(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ym(YM2203(config, "ym", 2000000)); //unknown clock / divider
+	ym2203_device &ym(YM2203(config, "ym", XTAL::u(2000000))); //unknown clock / divider
 	ym.port_a_read_callback().set(FUNC(mz2500_state::opn_porta_r));
 	ym.port_b_read_callback().set_ioport("DSW1");
 	ym.port_a_write_callback().set(FUNC(mz2500_state::opn_porta_w));
@@ -1863,7 +1863,7 @@ void mz2500_state::mz2500(machine_config &config)
 	ym.add_route(2, "mono", 0.50);
 	ym.add_route(3, "mono", 0.50);
 
-	BEEP(config, m_beeper, 4096).add_route(ALL_OUTPUTS,"mono",0.50);
+	BEEP(config, m_beeper, XTAL::u(4096)).add_route(ALL_OUTPUTS,"mono",0.50);
 }
 
 

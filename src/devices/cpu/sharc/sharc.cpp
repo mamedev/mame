@@ -75,7 +75,7 @@ void adsp21062_device::internal_data(address_map &map)
 	map(0x70000, 0x7ffff).rw(FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
 }
 
-adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, ADSP21062, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 24, -3, address_map_constructor(FUNC(adsp21062_device::internal_pgm), this))
 	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2, address_map_constructor(FUNC(adsp21062_device::internal_data), this))

@@ -21,7 +21,7 @@ class z80cpu_base : public device_t
 {
 protected:
 	// construction/destruction
-	z80cpu_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	z80cpu_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -34,7 +34,7 @@ protected:
 	required_device<z80_device> m_maincpu;
 };
 
-z80cpu_base::z80cpu_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+z80cpu_base::z80cpu_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_maincpu(*this, "maincpu")
 {
@@ -60,7 +60,7 @@ class z80cpu_device : public z80cpu_base, public device_rc2014_card_interface
 {
 public:
 	// construction/destruction
-	z80cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	z80cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -68,7 +68,7 @@ protected:
 	virtual void device_resolve_objects() override;
 };
 
-z80cpu_device::z80cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+z80cpu_device::z80cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80cpu_base(mconfig, RC2014_Z80CPU, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 {
@@ -96,14 +96,14 @@ class z80cpu21_device : public z80cpu_base, public device_rc2014_ext_card_interf
 {
 public:
 	// construction/destruction
-	z80cpu21_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	z80cpu21_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
 };
 
-z80cpu21_device::z80cpu21_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+z80cpu21_device::z80cpu21_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80cpu_base(mconfig, RC2014_Z80CPU_21, tag, owner, clock)
 	, device_rc2014_ext_card_interface(mconfig, *this)
 {

@@ -95,14 +95,14 @@ class a2bus_mouse_device:
 {
 public:
 	// construction/destruction
-	a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -183,14 +183,14 @@ ioport_constructor a2bus_mouse_device::device_input_ports() const
 
 void a2bus_mouse_device::device_add_mconfig(machine_config &config)
 {
-	M68705P3(config, m_mcu, 2043600);
+	M68705P3(config, m_mcu, XTAL::u(2043600));
 	m_mcu->porta_r().set(FUNC(a2bus_mouse_device::mcu_port_a_r));
 	m_mcu->portb_r().set(FUNC(a2bus_mouse_device::mcu_port_b_r));
 	m_mcu->porta_w().set(FUNC(a2bus_mouse_device::mcu_port_a_w));
 	m_mcu->portb_w().set(FUNC(a2bus_mouse_device::mcu_port_b_w));
 	m_mcu->portc_w().set(FUNC(a2bus_mouse_device::mcu_port_c_w));
 
-	PIA6821(config, m_pia, 1021800);
+	PIA6821(config, m_pia, XTAL::u(1021800));
 	m_pia->writepa_handler().set(FUNC(a2bus_mouse_device::pia_out_a));
 	m_pia->writepb_handler().set(FUNC(a2bus_mouse_device::pia_out_b));
 	m_pia->tspb_handler().set_constant(0x00);
@@ -212,7 +212,7 @@ const tiny_rom_entry *a2bus_mouse_device::device_rom_region() const
     LIVE DEVICE
 ***************************************************************************/
 
-a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, MOUSE_PIA_TAG),
@@ -225,7 +225,7 @@ a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_typ
 {
 }
 
-a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_mouse_device(mconfig, A2BUS_MOUSE, tag, owner, clock)
 {
 }

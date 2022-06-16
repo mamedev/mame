@@ -328,7 +328,7 @@ void phc25_state::phc25(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &psg(AY8910(config, AY8910_TAG, 1'000'000));
+	ay8910_device &psg(AY8910(config, AY8910_TAG, XTAL::u(1'000'000)));
 	psg.port_a_read_callback().set_ioport("JOY0");
 	psg.port_b_read_callback().set_ioport("JOY1");
 	psg.add_route(ALL_OUTPUTS, "mono", 2.00);

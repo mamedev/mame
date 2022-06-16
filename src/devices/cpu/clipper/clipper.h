@@ -148,7 +148,7 @@ public:
 	};
 
 protected:
-	clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const endianness_t endianness, const u32 cpuid);
+	clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const endianness_t endianness, const u32 cpuid);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -325,7 +325,7 @@ protected:
 class clipper_c100_device : public clipper_device
 {
 public:
-	clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual cammu_device &get_icammu() const override { return *m_icammu; }
@@ -339,7 +339,7 @@ private:
 class clipper_c300_device : public clipper_device
 {
 public:
-	clipper_c300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	clipper_c300_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual cammu_device &get_icammu() const override { return *m_icammu; }
@@ -353,7 +353,7 @@ private:
 class clipper_c400_device : public clipper_device
 {
 public:
-	clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

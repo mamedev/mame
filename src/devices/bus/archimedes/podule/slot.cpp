@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(ARCHIMEDES_PODULE_SLOT, archimedes_podule_slot_device, "archi
 //-------------------------------------------------
 //  archimedes_podule_slot_device - constructor
 //-------------------------------------------------
-archimedes_podule_slot_device::archimedes_podule_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+archimedes_podule_slot_device::archimedes_podule_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARCHIMEDES_PODULE_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_archimedes_podule_interface>(mconfig, *this)
 	, m_exp(*this, finder_base::DUMMY_TAG)
@@ -63,7 +63,7 @@ DEFINE_DEVICE_TYPE(ARCHIMEDES_EXPANSION_BUS, archimedes_exp_device, "archimedes_
 //  archimedes_exp_device - constructor
 //-------------------------------------------------
 
-archimedes_exp_device::archimedes_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+archimedes_exp_device::archimedes_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARCHIMEDES_EXPANSION_BUS, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_ioc_config("podule_ioc", ENDIANNESS_LITTLE, 32, 16, 0, address_map_constructor(FUNC(archimedes_exp_device::ioc_map), this))

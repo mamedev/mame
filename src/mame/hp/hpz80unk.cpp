@@ -194,7 +194,7 @@ void hpz80unk_state::hpz80unk(machine_config &config)
 	m_uart[2]->set_auto_rdav(true);
 	RS232_PORT(config, "rs232c", default_rs232_devices, nullptr);
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(153600)));
 	uart_clock.signal_handler().set(m_uart[0], FUNC(ay51013_device::write_tcp));
 	uart_clock.signal_handler().append(m_uart[0], FUNC(ay51013_device::write_rcp));
 	uart_clock.signal_handler().append(m_uart[1], FUNC(ay51013_device::write_tcp));

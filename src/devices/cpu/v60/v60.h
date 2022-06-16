@@ -84,12 +84,12 @@ class v60_device : public cpu_device
 {
 public:
 	// construction/destruction
-	v60_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v60_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void stall();
 
 protected:
-	v60_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int databits, int addrbits, uint32_t pir);
+	v60_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int databits, int addrbits, uint32_t pir);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -785,7 +785,7 @@ class v70_device : public v60_device
 {
 public:
 	// construction/destruction
-	v70_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v70_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

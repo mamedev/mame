@@ -38,7 +38,7 @@ class crt9212_device : public device_t
 {
 public:
 	// construction/destruction
-	crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_wen2(int state) { m_wen2 = state; }
 	auto dout() { return m_write_dout.bind(); }

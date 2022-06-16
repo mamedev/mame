@@ -102,7 +102,7 @@ void konin_state::konin(machine_config &config)
 	maincpu.out_inte_func().set(m_picu, FUNC(i8214_device::inte_w));
 	maincpu.set_irq_acknowledge_callback("intlatch", FUNC(i8212_device::inta_cb));
 
-	i8212_device &intlatch(I8212(config, "intlatch", 0));
+	i8212_device &intlatch(I8212(config, "intlatch"));
 	intlatch.md_rd_callback().set_constant(0);
 	intlatch.di_rd_callback().set(m_picu, FUNC(i8214_device::vector_r));
 	intlatch.int_wr_callback().set_inputline("maincpu", I8085_INTR_LINE);
@@ -110,19 +110,19 @@ void konin_state::konin(machine_config &config)
 	I8214(config, m_picu, XTAL(4'000'000));
 	m_picu->int_wr_callback().set("intlatch", FUNC(i8212_device::stb_w));
 
-	pit8253_device &mainpit(PIT8253(config, "mainpit", 0));
+	pit8253_device &mainpit(PIT8253(config, "mainpit"));
 	// wild guess at UART clock and source
 	mainpit.set_clk<0>(1536000);
 	mainpit.out_handler<0>().set("uart", FUNC(i8251_device::write_txc));
 	mainpit.out_handler<0>().append("uart", FUNC(i8251_device::write_rxc));
 
-	I8255(config, "mainppi", 0);
+	I8255(config, "mainppi");
 
-	PIT8253(config, m_iopit, 0);
+	PIT8253(config, m_iopit);
 
-	I8255(config, m_ioppi, 0);
+	I8255(config, m_ioppi);
 
-	i8251_device &uart(I8251(config, "uart", 0));
+	i8251_device &uart(I8251(config, "uart"));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

@@ -126,7 +126,7 @@ void hx5102_device::crumap(address_map &map)
 	map(0x17f0, 0x17ff).w(m_crulatch[1], FUNC(ls259_device::write_d0));
 }
 
-hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock):
 	hexbus_chained_device(mconfig, HX5102, tag, owner, clock),
 	m_flopcpu(*this, TMS9995_TAG),
 	m_ready_old(CLEAR_LINE),
@@ -663,7 +663,7 @@ INPUT_PORTS_END
 void hx5102_device::device_add_mconfig(machine_config& config)
 {
 	// Hexbus controller
-	IBC(config, m_hexbus_ctrl, 0);
+	IBC(config, m_hexbus_ctrl);
 	m_hexbus_ctrl->hexbus_cb().set(FUNC(hx5102_device::hexbus_out));
 	m_hexbus_ctrl->hsklatch_cb().set(FUNC(hx5102_device::hsklatch_out));
 
@@ -722,7 +722,7 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 	m_speedmf->out_cb().set(FUNC(hx5102_device::mspeed_w));
 
 	// READY flipflop
-	TTL7474(config, m_readyff, 0);
+	TTL7474(config, m_readyff);
 	m_readyff->comp_output_cb().set(FUNC(hx5102_device::board_ready));
 
 	// RAM

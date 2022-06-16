@@ -38,7 +38,7 @@ device_isbx_card_interface::device_isbx_card_interface(const machine_config &mco
 //  isbx_slot_device - constructor
 //-------------------------------------------------
 
-isbx_slot_device::isbx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isbx_slot_device::isbx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISBX_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_isbx_card_interface>(mconfig, *this),
 	m_write_mintr0(*this),

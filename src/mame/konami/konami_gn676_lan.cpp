@@ -67,7 +67,7 @@ TODO:
 
 DEFINE_DEVICE_TYPE(KONAMI_GN676_LAN, konami_gn676_lan_device, "konami_gn676_lan", "Konami GN676 Network PCB")
 
-konami_gn676_lan_device::konami_gn676_lan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+konami_gn676_lan_device::konami_gn676_lan_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KONAMI_GN676_LAN, tag, owner, clock),
 	m_fpga_uploaded(false),
 	m_lanc2_ram_r(0),

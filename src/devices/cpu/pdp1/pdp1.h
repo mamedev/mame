@@ -71,7 +71,7 @@ public:
 	};
 
 	// construction/destruction
-	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <int I, typename... T> void set_iot_callback(T &&... args) { m_extern_iot[I].set(std::forward<T>(args)...); }
 	template <typename... T> void set_io_sc_callback(T &&... args) { m_io_sc_callback.set(std::forward<T>(args)...); }

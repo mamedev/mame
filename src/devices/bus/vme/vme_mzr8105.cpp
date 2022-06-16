@@ -41,18 +41,18 @@ void vme_mzr8105_card_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_maincpu, XTAL(10'000'000))
 	m_maincpu->set_addrmap(AS_PROGRAM, &vme_mzr8105_card_device::mzr8105_mem);
 
-	VME(config, "vme", 0).use_owner_spaces();
+	VME(config, "vme").use_owner_spaces();
 	VME_SLOT(config, "slot1", mzr8105_vme_cards, "mzr8300", 1, "vme");
 }
 
-vme_mzr8105_card_device::vme_mzr8105_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vme_mzr8105_card_device::vme_mzr8105_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vme_mzr8105_card_device(mconfig, VME_MZR8105, tag, owner, clock)
 {
 	m_slot = 1;
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
-vme_mzr8105_card_device::vme_mzr8105_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+vme_mzr8105_card_device::vme_mzr8105_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_vme_card_interface(mconfig, *this)
 {

@@ -59,7 +59,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 protected:
-	st2205u_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram);
+	st2205u_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram);
 
 	virtual void device_reset() override;
 
@@ -180,7 +180,7 @@ public:
 		ST_BRR
 	};
 
-	st2205u_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	st2205u_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -254,7 +254,7 @@ private:
 class st2302u_device : public st2205u_base_device
 {
 public:
-	st2302u_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	st2302u_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

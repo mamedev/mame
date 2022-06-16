@@ -22,17 +22,17 @@ DEFINE_DEVICE_TYPE(ARCADIA_ROM_STD,  arcadia_rom_device,  "arcadia_rom",  "Emers
 DEFINE_DEVICE_TYPE(ARCADIA_ROM_GOLF, arcadia_golf_device, "arcadia_golf", "Emerson Arcadia Golf Cart")
 
 
-arcadia_rom_device::arcadia_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+arcadia_rom_device::arcadia_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock), device_arcadia_cart_interface(mconfig, *this)
 {
 }
 
-arcadia_rom_device::arcadia_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+arcadia_rom_device::arcadia_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arcadia_rom_device(mconfig, ARCADIA_ROM_STD, tag, owner, clock)
 {
 }
 
-arcadia_golf_device::arcadia_golf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+arcadia_golf_device::arcadia_golf_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arcadia_rom_device(mconfig, ARCADIA_ROM_GOLF, tag, owner, clock)
 {
 }

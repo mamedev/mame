@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(MD_SEPROM_CODEMAST, md_seprom_codemast_device, "md_seprom_cod
 DEFINE_DEVICE_TYPE(MD_SEPROM_MM96,     md_seprom_mm96_device,     "md_seprom_mm96",     "MD Micro Machine 96")
 
 // Sampras, Super Skidmarks?
-md_jcart_device::md_jcart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+md_jcart_device::md_jcart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_md_cart_interface(mconfig, *this)
 	, m_jcart3(*this, "JCART3")
@@ -43,25 +43,25 @@ md_jcart_device::md_jcart_device(const machine_config &mconfig, device_type type
 {
 }
 
-md_jcart_device::md_jcart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_jcart_device::md_jcart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_jcart_device(mconfig, MD_JCART, tag, owner, clock)
 {
 }
 
 // Micro Machines 2, Micro Machines Military
-md_seprom_codemast_device::md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+md_seprom_codemast_device::md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: md_jcart_device(mconfig, type, tag, owner, clock)
 	, m_i2cmem(*this, "i2cmem"), m_i2c_mem(0), m_i2c_clk(0)
 {
 }
 
-md_seprom_codemast_device::md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_seprom_codemast_device::md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_seprom_codemast_device(mconfig, MD_SEPROM_CODEMAST, tag, owner, clock)
 {
 }
 
 // Micro Machines 96
-md_seprom_mm96_device::md_seprom_mm96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_seprom_mm96_device::md_seprom_mm96_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_seprom_codemast_device(mconfig, MD_SEPROM_MM96, tag, owner, clock)
 {
 }

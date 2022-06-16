@@ -450,7 +450,7 @@ void flkatck_state::flkatck(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_flkatck);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).set_endianness(ENDIANNESS_LITTLE);
 
-	K007121(config, m_k007121, 0);
+	K007121(config, m_k007121);
 	m_k007121->set_palette_tag("palette");
 
 	// sound hardware

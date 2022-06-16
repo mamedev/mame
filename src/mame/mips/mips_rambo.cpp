@@ -26,7 +26,7 @@
 
 DEFINE_DEVICE_TYPE(MIPS_RAMBO, mips_rambo_device, "mips_rambo", "MIPS RAMBO")
 
-mips_rambo_device::mips_rambo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mips_rambo_device::mips_rambo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MIPS_RAMBO, tag, owner, clock)
 	, m_ram(*this, finder_base::DUMMY_TAG)
 	, m_irq_out_cb(*this)

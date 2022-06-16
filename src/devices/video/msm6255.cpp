@@ -77,7 +77,7 @@ void msm6255_device::msm6255(address_map &map)
 //  msm6255_device - constructor
 //-------------------------------------------------
 
-msm6255_device::msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+msm6255_device::msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MSM6255, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),

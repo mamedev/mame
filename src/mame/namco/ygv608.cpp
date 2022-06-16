@@ -315,7 +315,7 @@ void ygv608_device::port_map(address_map &map)
 //  ygv608_device - constructor
 //-------------------------------------------------
 
-ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock )
 	: device_t(mconfig, YGV608, tag, owner, clock),
 	  device_gfx_interface(mconfig, *this, gfx_ygv608, DEVICE_SELF),
 	  device_memory_interface(mconfig, *this),

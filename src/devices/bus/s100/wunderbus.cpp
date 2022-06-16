@@ -88,7 +88,7 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
 
 void s100_wunderbus_device::device_add_mconfig(machine_config &config)
 {
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set(FUNC(s100_wunderbus_device::pic_int_w));
 	m_pic->in_sp_callback().set_constant(1);
 
@@ -233,7 +233,7 @@ ioport_constructor s100_wunderbus_device::device_input_ports() const
 //  s100_wunderbus_device - constructor
 //-------------------------------------------------
 
-s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, S100_WUNDERBUS, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this),
 	m_pic(*this, I8259A_TAG),

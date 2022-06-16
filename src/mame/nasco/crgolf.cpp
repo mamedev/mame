@@ -755,7 +755,7 @@ void crgolfhi_state::crgolfhi(machine_config &config)
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &crgolfhi_state::sound_map);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(crgolfhi_state::vck_callback));
 	m_msm->set_prescaler_selector(msm5205_device::S64_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);

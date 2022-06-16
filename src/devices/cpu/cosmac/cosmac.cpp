@@ -358,7 +358,7 @@ DEFINE_DEVICE_TYPE(CDP1806, cdp1806_device, "cdp1806", "RCA CDP1806")
 //  cosmac_device - constructor
 //-------------------------------------------------
 
-cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		cosmac_disassembler::config(),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
@@ -391,7 +391,7 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 //  cdp1801_device - constructor
 //-------------------------------------------------
 
-cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cosmac_device(mconfig, CDP1801, tag, owner, clock)
 { }
 
@@ -400,11 +400,11 @@ cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, d
 //  cdp1802_device - constructor
 //-------------------------------------------------
 
-cdp1802_device::cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cdp1802_device::cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cdp1802_device(mconfig, CDP1802, tag, owner, clock)
 { }
 
-cdp1802_device::cdp1802_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+cdp1802_device::cdp1802_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	cosmac_device(mconfig, type, tag, owner, clock)
 { }
 
@@ -413,11 +413,11 @@ cdp1802_device::cdp1802_device(const machine_config &mconfig, device_type type, 
 //  cdp1804_device - constructor
 //-------------------------------------------------
 
-cdp1804_device::cdp1804_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cdp1804_device::cdp1804_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cdp1804_device(mconfig, CDP1804, tag, owner, clock)
 { }
 
-cdp1804_device::cdp1804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+cdp1804_device::cdp1804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	cdp1802_device(mconfig, type, tag, owner, clock)
 { }
 
@@ -426,11 +426,11 @@ cdp1804_device::cdp1804_device(const machine_config &mconfig, device_type type, 
 //  cdp1805_device - constructor
 //-------------------------------------------------
 
-cdp1805_device::cdp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cdp1805_device::cdp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cdp1805_device(mconfig, CDP1805, tag, owner, clock)
 { }
 
-cdp1805_device::cdp1805_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+cdp1805_device::cdp1805_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	cdp1804_device(mconfig, type, tag, owner, clock)
 { }
 
@@ -439,7 +439,7 @@ cdp1805_device::cdp1805_device(const machine_config &mconfig, device_type type, 
 //  cdp1806_device - constructor
 //-------------------------------------------------
 
-cdp1806_device::cdp1806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cdp1806_device::cdp1806_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cdp1805_device(mconfig, CDP1806, tag, owner, clock)
 { }
 

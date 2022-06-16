@@ -31,12 +31,12 @@ DEFINE_DEVICE_TYPE(Z88_256K_ROM, z88_256k_rom_device, "z88_256k_rom", "Z88 256KB
 //  z88_32k_rom_device - constructor
 //-------------------------------------------------
 
-z88_32k_rom_device::z88_32k_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z88_32k_rom_device::z88_32k_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z88_32k_rom_device(mconfig, Z88_32K_ROM, tag, owner, clock)
 {
 }
 
-z88_32k_rom_device::z88_32k_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+z88_32k_rom_device::z88_32k_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, device_z88cart_interface(mconfig, *this)
@@ -50,7 +50,7 @@ z88_32k_rom_device::z88_32k_rom_device(const machine_config &mconfig, device_typ
 //  z88_128k_rom_device - constructor
 //-------------------------------------------------
 
-z88_128k_rom_device::z88_128k_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z88_128k_rom_device::z88_128k_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z88_32k_rom_device(mconfig, Z88_128K_ROM, tag, owner, clock)
 {
 }
@@ -59,7 +59,7 @@ z88_128k_rom_device::z88_128k_rom_device(const machine_config &mconfig, const ch
 //  z88_256k_rom_device - constructor
 //-------------------------------------------------
 
-z88_256k_rom_device::z88_256k_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z88_256k_rom_device::z88_256k_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z88_32k_rom_device(mconfig, Z88_256K_ROM, tag, owner, clock)
 {
 }

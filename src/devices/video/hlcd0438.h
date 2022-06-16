@@ -42,7 +42,7 @@
 class hlcd0438_device : public device_t
 {
 public:
-	hlcd0438_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hlcd0438_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto write_segs() { return m_write_segs.bind(); } // BP pin in offset, SEG pins in data

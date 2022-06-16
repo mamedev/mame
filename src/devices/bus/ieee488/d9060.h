@@ -36,7 +36,7 @@ protected:
 	};
 
 	// construction/destruction
-	d9060_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	d9060_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -97,7 +97,7 @@ class d9060_device : public d9060_device_base
 {
 public:
 	// construction/destruction
-	d9060_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	d9060_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -107,7 +107,7 @@ class d9090_device : public d9060_device_base
 {
 public:
 	// construction/destruction
-	d9090_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	d9090_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

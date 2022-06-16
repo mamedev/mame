@@ -80,8 +80,8 @@ public:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
 
 	// stream creation
-	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate);
-	sound_stream *stream_alloc(int inputs, int outputs, int sample_rate, sound_stream_flags flags);
+	sound_stream *stream_alloc(int inputs, int outputs, const XTAL &sample_rate);
+	sound_stream *stream_alloc(int inputs, int outputs, const XTAL &sample_rate, sound_stream_flags flags);
 
 	// helpers
 	int inputs() const;

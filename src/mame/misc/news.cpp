@@ -238,7 +238,7 @@ void news_state::machine_reset()
 void news_state::news(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 8'000'000);         // ? MHz
+	Z80(config, m_maincpu, XTAL::u(8'000'000));         // ? MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &news_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(news_state::irq0_line_hold));
 
@@ -258,7 +258,7 @@ void news_state::news(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1'056'000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1'056'000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 

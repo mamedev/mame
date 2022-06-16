@@ -53,27 +53,27 @@ ROM_START( c76 )
 ROM_END
 
 
-namco_c69_device::namco_c69_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco_c69_device::namco_c69_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m37702m2_device(mconfig, NAMCO_C69, tag, owner, clock)
 {
 }
 
-namco_c70_device::namco_c70_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco_c70_device::namco_c70_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m37702m2_device(mconfig, NAMCO_C70, tag, owner, clock)
 {
 }
 
-namco_c74_device::namco_c74_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco_c74_device::namco_c74_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m37702m2_device(mconfig, NAMCO_C74, tag, owner, clock)
 {
 }
 
-namco_c75_device::namco_c75_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco_c75_device::namco_c75_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m37702m2_device(mconfig, NAMCO_C75, tag, owner, clock)
 {
 }
 
-namco_c76_device::namco_c76_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco_c76_device::namco_c76_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m37702m2_device(mconfig, NAMCO_C76, tag, owner, clock)
 {
 }

@@ -15,31 +15,31 @@ DEFINE_DEVICE_TYPE(GAMATE_ROM_BANKED,        gamate_rom_banked_device,      "gam
 DEFINE_DEVICE_TYPE(GAMATE_ROM_4IN1,          gamate_rom_4in1_device,        "gamate_rom_4in1",         "GAMATE 4-in-1 Cartridge")
 
 
-gamate_rom_plain_device::gamate_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+gamate_rom_plain_device::gamate_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock), device_gamate_cart_interface(mconfig, *this),
 	m_protection(*this, "protection")
 {
 }
 
-gamate_rom_plain_device::gamate_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gamate_rom_plain_device::gamate_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	gamate_rom_plain_device(mconfig, GAMATE_ROM_PLAIN, tag, owner, clock)
 {
 }
 
-gamate_rom_banked_device::gamate_rom_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gamate_rom_banked_device::gamate_rom_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	gamate_rom_plain_device(mconfig, GAMATE_ROM_BANKED, tag, owner, clock),
 	m_bank(0)
 {
 }
 
-gamate_rom_banked_device::gamate_rom_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+gamate_rom_banked_device::gamate_rom_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	gamate_rom_plain_device(mconfig, type, tag, owner, clock),
 	m_bank(0)
 {
 }
 
 
-gamate_rom_4in1_device::gamate_rom_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gamate_rom_4in1_device::gamate_rom_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	gamate_rom_banked_device(mconfig, GAMATE_ROM_4IN1, tag, owner, clock),
 	m_multibank(0)
 {
@@ -170,7 +170,7 @@ void gamate_rom_4in1_device::write_rom(offs_t offset, uint8_t data)
 
 void gamate_rom_plain_device::device_add_mconfig(machine_config &config)
 {
-	GAMATE_PROT(config, m_protection, 0);
+	GAMATE_PROT(config, m_protection);
 }
 
 

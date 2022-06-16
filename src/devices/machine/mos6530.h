@@ -46,7 +46,7 @@
 class mos6530_device : public device_t
 {
 public:
-	mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto in_pa_callback() { return m_in_pa_cb.bind(); }
 	auto out_pa_callback() { return m_out_pa_cb.bind(); }

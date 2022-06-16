@@ -12,7 +12,7 @@
 class elan_eu3a14vid_device : public elan_eu3a05commonvid_device, public device_memory_interface
 {
 public:
-	elan_eu3a14vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	elan_eu3a14vid_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_addrbank(T &&tag) { m_bank.set_tag(std::forward<T>(tag)); }

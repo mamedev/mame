@@ -75,12 +75,12 @@ void cmd_hd_device::mem_map(address_map &map)
 
 void cmd_hd_device::device_add_mconfig(machine_config &config)
 {
-	M6502(config, m_maincpu, 2000000);
+	M6502(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmd_hd_device::mem_map);
 
-	MOS6522(config, M6522_1_TAG, 2000000);
-	MOS6522(config, M6522_2_TAG, 2000000);
-	I8255A(config, I8255A_TAG, 0);
+	MOS6522(config, M6522_1_TAG, XTAL::u(2000000));
+	MOS6522(config, M6522_2_TAG, XTAL::u(2000000));
+	I8255A(config, I8255A_TAG);
 	RTC72421(config, RTC72421A_TAG, XTAL(32'768));
 
 	SCSI_PORT(config, m_scsibus);
@@ -97,7 +97,7 @@ void cmd_hd_device::device_add_mconfig(machine_config &config)
 //  cmd_hd_device - constructor
 //-------------------------------------------------
 
-cmd_hd_device::cmd_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cmd_hd_device::cmd_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CMD_HD, tag, owner, clock),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),

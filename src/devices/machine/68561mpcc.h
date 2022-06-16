@@ -47,7 +47,7 @@ class mpcc_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	mpcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void configure_clocks(int rxc, int txc)
 	{
@@ -77,7 +77,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( txc_w ) {} // { m_chanA->txc_w(state); }
 
 protected:
-	mpcc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	mpcc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -407,49 +407,49 @@ protected:
 class mpcc68560_device  : public mpcc_device
 {
 public:
-	mpcc68560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int rxc, int txc)
+	mpcc68560_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, int rxc, int txc)
 		: mpcc68560_device(mconfig, tag, owner, clock)
 	{
 		configure_clocks(rxc, txc);
 	}
 
-	mpcc68560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcc68560_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mpcc68560a_device  : public mpcc_device
 {
 public:
-	mpcc68560a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int rxc, int txc)
+	mpcc68560a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, int rxc, int txc)
 		: mpcc68560a_device(mconfig, tag, owner, clock)
 	{
 		configure_clocks(rxc, txc);
 	}
 
-	mpcc68560a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcc68560a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mpcc68561_device  : public mpcc_device
 {
 public:
-	mpcc68561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int rxc, int txc)
+	mpcc68561_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, int rxc, int txc)
 		: mpcc68561_device(mconfig, tag, owner, clock)
 	{
 		configure_clocks(rxc, txc);
 	}
 
-	mpcc68561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcc68561_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mpcc68561a_device  : public mpcc_device
 {
 public:
-	mpcc68561a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int rxc, int txc)
+	mpcc68561a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, int rxc, int txc)
 		: mpcc68561a_device(mconfig, tag, owner, clock)
 	{
 		configure_clocks(rxc, txc);
 	}
 
-	mpcc68561a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcc68561a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition

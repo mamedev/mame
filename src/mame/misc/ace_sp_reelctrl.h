@@ -12,7 +12,7 @@ class ace_sp_reelctrl_base_device : public device_t
 {
 public:
 protected:
-	ace_sp_reelctrl_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	ace_sp_reelctrl_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -27,7 +27,7 @@ private:
 class ace_sp_reelctrl_device : public ace_sp_reelctrl_base_device
 {
 public:
-	ace_sp_reelctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ace_sp_reelctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -38,7 +38,7 @@ private:
 class ace_sp_reelctrl_pcp_device : public ace_sp_reelctrl_base_device
 {
 public:
-	ace_sp_reelctrl_pcp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ace_sp_reelctrl_pcp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

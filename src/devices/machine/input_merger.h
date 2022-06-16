@@ -57,28 +57,28 @@ protected:
 class input_merger_any_high_device : public input_merger_device
 {
 public:
-	input_merger_any_high_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	input_merger_any_high_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 
 class input_merger_all_high_device : public input_merger_device
 {
 public:
-	input_merger_all_high_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	input_merger_all_high_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 
 class input_merger_any_low_device : public input_merger_device
 {
 public:
-	input_merger_any_low_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	input_merger_any_low_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 
 class input_merger_all_low_device : public input_merger_device
 {
 public:
-	input_merger_all_low_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	input_merger_all_low_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 

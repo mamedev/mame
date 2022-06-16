@@ -104,7 +104,7 @@ typedef zeus2_renderer::extent_t z2_poly_extent;
 class zeus2_device : public device_t, public device_video_interface
 {
 public:
-	zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t zeus2_r(offs_t offset);

@@ -567,7 +567,7 @@ void alvg_state::pca008(machine_config &config)
 	m_bsmt->add_route(0, "lspeaker", 1.2);
 	m_bsmt->add_route(1, "rspeaker", 1.2);
 
-	CLOCK(config, "fclock", 2'000'000 / 4096).signal_handler().set_inputline(m_audiocpu, 1);
+	CLOCK(config, "fclock", XTAL::u(2'000'000) / 4096).signal_handler().set_inputline(m_audiocpu, 1);
 }
 
 void alvg_state::pca020(machine_config &config)
@@ -590,7 +590,7 @@ void alvg_state::pca020(machine_config &config)
 	screen.set_palette("palette");
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	CLOCK(config, "dclock", 100).signal_handler().set_inputline(m_dmdcpu, MCS51_INT1_LINE); // unknown frequency, need to be measured.
+	CLOCK(config, "dclock", XTAL::u(100)).signal_handler().set_inputline(m_dmdcpu, MCS51_INT1_LINE); // unknown frequency, need to be measured.
 }
 
 void alvg_state::alvg(machine_config &config)

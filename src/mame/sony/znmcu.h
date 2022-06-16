@@ -11,7 +11,7 @@ DECLARE_DEVICE_TYPE(ZNMCU, znmcu_device)
 class znmcu_device : public device_t
 {
 public:
-	znmcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	znmcu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto dsw_handler() { return m_dsw_handler.bind(); }

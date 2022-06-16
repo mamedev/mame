@@ -12,7 +12,7 @@
 
 DEFINE_DEVICE_TYPE(AD1848, ad1848_device, "ad1848", "AD1848 16-bit SoundPort Stereo Codec")
 
-ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, AD1848, tag, owner, clock),
 	m_irq_cb(*this),
 	m_drq_cb(*this),
@@ -25,8 +25,8 @@ void ad1848_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_16BIT_R2R(config, m_ldac).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 }
 
 

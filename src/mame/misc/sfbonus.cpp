@@ -1286,7 +1286,7 @@ void sfbonus_state::ramdac_map(address_map &map)
 
 void sfbonus_state::sfbonus(machine_config &config)
 {
-	Z80(config, m_maincpu, 6000000); // custom packaged z80 CPU ?? Mhz
+	Z80(config, m_maincpu, XTAL::u(6000000)); // custom packaged z80 CPU ?? Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &sfbonus_state::sfbonus_map);
 	m_maincpu->set_addrmap(AS_IO, &sfbonus_state::sfbonus_io);
 	m_maincpu->set_vblank_int("screen", FUNC(sfbonus_state::irq0_line_hold));
@@ -1307,13 +1307,13 @@ void sfbonus_state::sfbonus(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x100*2); // *2 for priority workaround / custom drawing
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &sfbonus_state::ramdac_map);
 
 
 	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1000000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); // clock frequency & pin 7 not verified
 }
 
 /* Super Ball */

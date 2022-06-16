@@ -296,7 +296,7 @@ void travrusa_state::machine_reset()
 void travrusa_state::travrusa(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);   /* 4 MHz (?) */
+	Z80(config, m_maincpu, XTAL::u(4000000));   /* 4 MHz (?) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &travrusa_state::main_map);
 
 	/* video hardware */
@@ -317,7 +317,7 @@ void travrusa_state::travrusa(machine_config &config)
 
 	/* sound hardware */
 	//m52_sound_c_audio(config);
-	IREM_M52_SOUNDC_AUDIO(config, "irem_audio", 0);
+	IREM_M52_SOUNDC_AUDIO(config, "irem_audio");
 }
 
 void travrusa_state::shtrider(machine_config &config)

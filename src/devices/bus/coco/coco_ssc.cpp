@@ -85,7 +85,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+		coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 		// optional information overrides
 		virtual const tiny_rom_entry *device_rom_region() const override;
@@ -126,7 +126,7 @@ namespace
 		public device_sound_interface
 	{
 	public:
-		cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+		cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 		~cocossc_sac_device() { }
 		bool sound_activity_circuit_output();
 
@@ -200,7 +200,7 @@ ROM_END
 //  coco_ssc_device - constructor
 //-------------------------------------------------
 
-coco_ssc_device::coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_ssc_device::coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, COCO_SSC, tag, owner, clock),
 		device_cococart_interface(mconfig, *this ),
 		m_tms7040(*this, PIC_TAG),
@@ -475,7 +475,7 @@ void coco_ssc_device::ssc_port_d_w(u8 data)
 //  cocossc_sac_device - constructor
 //-------------------------------------------------
 
-cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, COCOSSC_SAC, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

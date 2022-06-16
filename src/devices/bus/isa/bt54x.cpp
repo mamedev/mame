@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(BT542B, bt542b_device, "bt542b", "BusTek BT-542B SCSI Host Ad
 DEFINE_DEVICE_TYPE(BT542BH, bt542bh_device, "bt542bh", "BusLogic BT-542B SCSI Host Adapter (Rev. H)")
 DEFINE_DEVICE_TYPE(BT545S, bt545s_device, "bt545s", "BusLogic BT-545S Fast SCSI Host Adapter")
 
-bt54x_device::bt54x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+bt54x_device::bt54x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_mpu(*this, "mpu")
@@ -34,17 +34,17 @@ bt54x_device::bt54x_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-bt542b_device::bt542b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+bt542b_device::bt542b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bt54x_device(mconfig, BT542B, tag, owner, clock)
 {
 }
 
-bt542bh_device::bt542bh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+bt542bh_device::bt542bh_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bt54x_device(mconfig, BT542BH, tag, owner, clock)
 {
 }
 
-bt545s_device::bt545s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+bt545s_device::bt545s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bt54x_device(mconfig, BT545S, tag, owner, clock)
 {
 }
@@ -89,7 +89,7 @@ void bt54x_device::fsc_config(device_t *device)
 
 void bt54x_device::fsc_base(machine_config &config)
 {
-	//ncr86c05_device &busintf(NCR86C05(config, "busintf", 0));
+	//ncr86c05_device &busintf(NCR86C05(config, "busintf"));
 	//busintf.mint_callback().set(m_mpu, FUNC(i80188_cpu_device::int1_w));
 	//busintf.dma_ack_callback().set("scsi:7:scsic", FUNC(ncr53cf94_device::dma_w));
 
@@ -111,7 +111,7 @@ void bt542b_device::device_add_mconfig(machine_config &config)
 	I80188(config, m_mpu, 16_MHz_XTAL);
 	m_mpu->set_addrmap(AS_PROGRAM, &bt542b_device::local_map);
 
-	//ncr86c05_device &busintf(NCR86C05(config, "busintf", 0));
+	//ncr86c05_device &busintf(NCR86C05(config, "busintf"));
 	//busintf.mint_callback().set(m_mpu, FUNC(i80188_cpu_device::int1_w));
 	//busintf.dma_ack_callback().set("scsi:7:scsic", FUNC(ncr53c94_device::dma_w));
 

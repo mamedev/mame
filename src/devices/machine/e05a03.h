@@ -18,7 +18,7 @@
 class e05a03_device : public device_t
 {
 public:
-	e05a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e05a03_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto nlq_lp_wr_callback() { return m_write_nlq_lp.bind(); }
 	auto pe_lp_wr_callback() { return m_write_pe_lp.bind(); }

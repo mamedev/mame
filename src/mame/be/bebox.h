@@ -126,7 +126,7 @@ private:
 	void mpc105_config(device_t *device);
 	void cirrus_config(device_t *device);
 
-	pci_connector_device & add_pci_slot(machine_config &config, const char *tag, size_t index, const char *default_tag);
+	pci_connector_device & add_pci_slot(machine_config &config, const char *tag, const char *default_tag);
 
 	void main_mem(address_map &map);
 	void slave_mem(address_map &map);

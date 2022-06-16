@@ -350,12 +350,12 @@ void cps1bl_5205_state::sf2mdta_layer_w(offs_t offset, uint16_t data)
 void cps1bl_5205_state::captcommb2(machine_config &config)
 {
 	// xtals: 30MHz, 24MHz, 400KHz
-	M68000(config, m_maincpu, 24000000 / 2);   // 12MHz measured on pcb
+	M68000(config, m_maincpu, XTAL(24000000) / 2);   // 12MHz measured on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps1bl_5205_state::captcommb2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_5205_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_5205_state::cpu_space_map);
 
-	Z80(config, m_audiocpu, 30000000 / 8);  // 3.75MHz measured on pcb
+	Z80(config, m_audiocpu, XTAL(30000000) / 8);  // 3.75MHz measured on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps1bl_5205_state::captcommb2_z80map);
 
 	MCFG_MACHINE_START_OVERRIDE(cps1bl_5205_state, captcommb2)
@@ -373,24 +373,24 @@ void cps1bl_5205_state::captcommb2(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2151_device &ym2151(YM2151(config, "2151", 30000000 / 8));  // 3.75MHz measured on pcb
+	ym2151_device &ym2151(YM2151(config, "2151", XTAL(30000000) / 8));  // 3.75MHz measured on pcb
 	// IRQ pin not used
 	ym2151.add_route(0, "mono", 0.35);
 	ym2151.add_route(1, "mono", 0.35);
 
-	LS157(config, m_msm_mux[0], 0);
+	LS157(config, m_msm_mux[0]);
 	m_msm_mux[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
 
-	LS157(config, m_msm_mux[1], 0);
+	LS157(config, m_msm_mux[1]);
 	m_msm_mux[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
-	MSM5205(config, m_msm_1, 400000);  // 400kHz measured on pcb
+	MSM5205(config, m_msm_1, XTAL(400000));  // 400kHz measured on pcb
 	m_msm_1->vck_callback().set(FUNC(cps1bl_5205_state::captcommb2_mux_select_w));
 	m_msm_1->vck_callback().append(m_msm_2, FUNC(msm5205_device::vclk_w));
 	m_msm_1->set_prescaler_selector(msm5205_device::S96_4B);
 	m_msm_1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MSM5205(config, m_msm_2, 400000);
+	MSM5205(config, m_msm_2, XTAL(400000));
 	m_msm_2->set_prescaler_selector(msm5205_device::SEX_4B);
 	m_msm_2->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -411,11 +411,11 @@ void cps1bl_5205_state::sf2b(machine_config &config)
 void cps1bl_5205_state::sf2mdt(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps1bl_5205_state::sf2mdt_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_5205_state::irq4_line_hold)); /* triggers the sprite ram and scroll writes */
 
-	Z80(config, m_audiocpu, 3750000);
+	Z80(config, m_audiocpu, XTAL::u(3750000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps1bl_5205_state::captcommb2_z80map);
 
 	MCFG_MACHINE_START_OVERRIDE(cps1bl_5205_state, sf2mdt)
@@ -436,21 +436,21 @@ void cps1bl_5205_state::sf2mdt(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "2151", 3750000).add_route(0, "mono", 0.35).add_route(1, "mono", 0.35);
+	YM2151(config, "2151", XTAL::u(3750000)).add_route(0, "mono", 0.35).add_route(1, "mono", 0.35);
 
-	LS157(config, m_msm_mux[0], 0);
+	LS157(config, m_msm_mux[0]);
 	m_msm_mux[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
 
-	LS157(config, m_msm_mux[1], 0);
+	LS157(config, m_msm_mux[1]);
 	m_msm_mux[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
-	MSM5205(config, m_msm_1, 400000);  // 400kHz ?
+	MSM5205(config, m_msm_1, XTAL::u(400000));  // 400kHz ?
 	m_msm_1->vck_callback().set(FUNC(cps1bl_5205_state::captcommb2_mux_select_w));
 	m_msm_1->vck_callback().append(m_msm_2, FUNC(msm5205_device::vclk_w));
 	m_msm_1->set_prescaler_selector(msm5205_device::S96_4B);
 	m_msm_1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MSM5205(config, m_msm_2, 400000);
+	MSM5205(config, m_msm_2, XTAL::u(400000));
 	m_msm_2->set_prescaler_selector(msm5205_device::SEX_4B);
 	m_msm_2->add_route(ALL_OUTPUTS, "mono", 0.25);
 }

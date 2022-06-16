@@ -20,12 +20,12 @@ DEFINE_DEVICE_TYPE(APRICOT_EXPANSION_SLOT, apricot_expansion_slot_device, "apric
 //  apricot_expansion_slot_device - constructor
 //-------------------------------------------------
 
-apricot_expansion_slot_device::apricot_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apricot_expansion_slot_device::apricot_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	apricot_expansion_slot_device(mconfig, APRICOT_EXPANSION_SLOT, tag, owner, clock)
 {
 }
 
-apricot_expansion_slot_device::apricot_expansion_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+apricot_expansion_slot_device::apricot_expansion_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_single_card_slot_interface<device_apricot_expansion_card_interface>(mconfig, *this)
 {
@@ -57,7 +57,7 @@ DEFINE_DEVICE_TYPE(APRICOT_EXPANSION_BUS, apricot_expansion_bus_device, "apricot
 //  apricot_expansion_bus_device - constructor
 //-------------------------------------------------
 
-apricot_expansion_bus_device::apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apricot_expansion_bus_device::apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, APRICOT_EXPANSION_BUS, tag, owner, clock),
 	m_program(*this, finder_base::DUMMY_TAG, -1),
 	m_io(*this, finder_base::DUMMY_TAG, -1),

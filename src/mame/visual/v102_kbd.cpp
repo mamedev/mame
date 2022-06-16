@@ -21,19 +21,19 @@ DEFINE_DEVICE_TYPE(V102_KEYBOARD, v102_keyboard_device, "v102_kbd", "Visual 102 
 DEFINE_DEVICE_TYPE(V550_KEYBOARD, v550_keyboard_device, "v550_kbd", "Visual 550 Keyboard")
 
 visual_mcs48_keyboard_device::visual_mcs48_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner)
-	: device_t(mconfig, type, tag, owner, 0U)
+	: device_t(mconfig, type, tag, owner)
 	, m_txd_callback(*this)
 	, m_kbdc(*this, "kbdc")
 	, m_keys(*this, "KEY%u", 0U)
 {
 }
 
-v102_keyboard_device::v102_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+v102_keyboard_device::v102_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: visual_mcs48_keyboard_device(mconfig, V102_KEYBOARD, tag, owner)
 {
 }
 
-v550_keyboard_device::v550_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+v550_keyboard_device::v550_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: visual_mcs48_keyboard_device(mconfig, V550_KEYBOARD, tag, owner)
 {
 }
@@ -356,7 +356,7 @@ void v102_keyboard_device::device_add_mconfig(machine_config &config)
 
 void v550_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	I8039(config, m_kbdc, 4'608'000);
+	I8039(config, m_kbdc, XTAL::u(4'608'000));
 	m_kbdc->set_addrmap(AS_PROGRAM, &v550_keyboard_device::prog_map);
 	m_kbdc->p1_in_cb().set(FUNC(v550_keyboard_device::p1_r));
 	m_kbdc->p2_out_cb().set(FUNC(v550_keyboard_device::p2_w));

@@ -29,7 +29,7 @@ class gromport_device : public device_t, public device_slot_interface
 {
 public:
 	template <typename U>
-	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, U &&opts, const char *dflt)
 		: gromport_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -38,7 +38,7 @@ public:
 		set_fixed(false);
 	}
 
-	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void readz(offs_t offset, uint8_t *value);
 	void write(offs_t offset, uint8_t data);
@@ -95,7 +95,7 @@ public:
 	virtual bool is_grom_idle() = 0;
 
 protected:
-	cartridge_connector_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cartridge_connector_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void device_config_complete() override;
 
 	gromport_device*    m_gromport;

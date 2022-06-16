@@ -656,7 +656,7 @@ void peyper_state::machine_reset()
 void peyper_state::peyper(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2'500'000);
+	Z80(config, m_maincpu, XTAL::u(2'500'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &peyper_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &peyper_state::io_map);
 	m_maincpu->set_periodic_int(FUNC(peyper_state::irq0_line_hold), attotime::from_hz(1250));
@@ -668,17 +668,17 @@ void peyper_state::peyper(machine_config &config)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
-	ay8910_device &ay1(AY8910(config, "ay1", 2500000));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL::u(2500000)));
 	ay1.port_a_write_callback().set(FUNC(peyper_state::p1a_w));
 	ay1.port_b_write_callback().set(FUNC(peyper_state::p1b_w));
 	ay1.add_route(ALL_OUTPUTS, "ayvol", 1.0);
-	ay8910_device &ay2(AY8910(config, "ay2", 2500000));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL::u(2500000)));
 	ay2.port_a_write_callback().set(FUNC(peyper_state::p2a_w));
 	ay2.port_b_write_callback().set(FUNC(peyper_state::p2b_w));
 	ay2.add_route(ALL_OUTPUTS, "ayvol", 1.0);
 
 	/* Devices */
-	i8279_device &kbdc(I8279(config, "i8279", 2500000));
+	i8279_device &kbdc(I8279(config, "i8279", XTAL::u(2500000)));
 	kbdc.out_sl_callback().set(FUNC(peyper_state::col_w));      // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(peyper_state::disp_w));   // display A&B
 	kbdc.in_rl_callback().set(FUNC(peyper_state::sw_r));        // kbd RL lines
@@ -697,7 +697,7 @@ void peyper_state::petaco(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	//I8279
-	i8279_device &kbdc(I8279(config, "i8279", 2500000));
+	i8279_device &kbdc(I8279(config, "i8279", XTAL::u(2500000)));
 	kbdc.out_sl_callback().set(FUNC(peyper_state::col_w));      // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(peyper_state::disp_w));   // display A&B
 	kbdc.in_rl_callback().set(FUNC(peyper_state::sw_r));        // kbd RL lines

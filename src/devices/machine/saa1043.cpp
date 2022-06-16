@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(SAA1043, saa1043_device, "saa1043", "Philips SAA1043")
 
 /*static*/ const uint32_t saa1043_device::s_line_counts[4] = { 624, 624, 524, 524 };
 
-saa1043_device::saa1043_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+saa1043_device::saa1043_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SAA1043, tag, owner, clock)
 	, m_outputs(*this)
 	, m_type(PAL)

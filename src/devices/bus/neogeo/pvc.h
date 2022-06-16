@@ -53,7 +53,7 @@ DECLARE_DEVICE_TYPE(NEOGEO_PVC_CART, neogeo_pvc_cart_device)
 class neogeo_pvc_mslug5_cart_device : public neogeo_pvc_cart_device
 {
 public:
-	neogeo_pvc_mslug5_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_pvc_mslug5_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type() override { return 1; }
 };
@@ -68,7 +68,7 @@ DECLARE_DEVICE_TYPE(NEOGEO_PVC_MSLUG5_CART, neogeo_pvc_mslug5_cart_device)
 class neogeo_pvc_svc_cart_device : public neogeo_pvc_cart_device
 {
 public:
-	neogeo_pvc_svc_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_pvc_svc_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type() override { return 2; }
 };
@@ -83,7 +83,7 @@ DECLARE_DEVICE_TYPE(NEOGEO_PVC_SVC_CART, neogeo_pvc_svc_cart_device)
 class neogeo_pvc_kof2003_cart_device : public neogeo_pvc_cart_device
 {
 public:
-	neogeo_pvc_kof2003_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_pvc_kof2003_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type() override { return 2; }
 };
@@ -98,7 +98,7 @@ DECLARE_DEVICE_TYPE(NEOGEO_PVC_KOF2003_CART, neogeo_pvc_kof2003_cart_device)
 class neogeo_pvc_kof2003h_cart_device : public neogeo_pvc_cart_device
 {
 public:
-	neogeo_pvc_kof2003h_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_pvc_kof2003h_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type() override { return 2; }
 };

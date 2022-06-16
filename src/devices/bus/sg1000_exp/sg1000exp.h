@@ -29,7 +29,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	sg1000_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, bool const fixed)
-		: sg1000_expansion_slot_device(mconfig, tag, owner, 0)
+		: sg1000_expansion_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -37,7 +37,7 @@ public:
 		set_fixed(fixed);
 	}
 
-	sg1000_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sg1000_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~sg1000_expansion_slot_device();
 
 	uint8_t read(offs_t offset);

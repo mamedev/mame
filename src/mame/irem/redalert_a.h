@@ -22,14 +22,14 @@ class irem_m37b_audio_device : public device_t
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; } // missing analog effects
 
-	irem_m37b_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock = 0U);
+	irem_m37b_audio_device(const machine_config &config, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	DECLARE_READ_LINE_MEMBER(sound_status_r);
 
 	void audio_command_w(uint8_t data);
 
 protected:
-	irem_m37b_audio_device(const machine_config &config, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	irem_m37b_audio_device(const machine_config &config, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -61,7 +61,7 @@ private:
 class panther_audio_device : public irem_m37b_audio_device
 {
 public:
-	panther_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock = 0U);
+	panther_audio_device(const machine_config &config, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -74,7 +74,7 @@ private:
 class irem_m37b_ue17b_audio_device : public irem_m37b_audio_device
 {
 public:
-	irem_m37b_ue17b_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock = 0U);
+	irem_m37b_ue17b_audio_device(const machine_config &config, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void voice_command_w(uint8_t data);
 
@@ -94,7 +94,7 @@ class demoneye_audio_device : public device_t
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	demoneye_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock = 0U);
+	demoneye_audio_device(const machine_config &config, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void audio_command_w(uint8_t data);
 

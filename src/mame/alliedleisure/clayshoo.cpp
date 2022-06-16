@@ -325,7 +325,7 @@ void clayshoo_state::machine_reset()
 void clayshoo_state::clayshoo(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5068000/4);      /* 5.068/4 Mhz (divider is a guess) */
+	Z80(config, m_maincpu, XTAL::u(5068000)/4);      /* 5.068/4 Mhz (divider is a guess) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &clayshoo_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &clayshoo_state::main_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(clayshoo_state::irq0_line_hold));

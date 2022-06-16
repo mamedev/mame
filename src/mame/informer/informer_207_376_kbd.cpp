@@ -187,7 +187,7 @@ ioport_constructor informer_207_376_kbd_hle_device::device_input_ports() const
 //  informer_207_376_kbd_hle_device - constructor
 //-------------------------------------------------
 
-informer_207_376_kbd_hle_device::informer_207_376_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+informer_207_376_kbd_hle_device::informer_207_376_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, INFORMER_207_376_KBD_HLE, tag, owner, clock),
 	device_buffered_serial_interface(mconfig, *this),
 	device_matrix_keyboard_interface(mconfig, *this, "row_0", "row_1", "row_2", "row_3", "row_4", "row_5", "row_6", "row_7"),
@@ -217,8 +217,8 @@ void informer_207_376_kbd_hle_device::device_reset()
 	transmit_register_reset();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
-	set_rcv_rate(2400);
-	set_tra_rate(2400);
+	set_rcv_rate(XTAL::u(2400));
+	set_tra_rate(XTAL::u(2400));
 
 	reset_key_state();
 	start_processing(attotime::from_hz(2400));

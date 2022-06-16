@@ -44,7 +44,7 @@ DEFINE_DEVICE_TYPE(RAMDAC, ramdac_device, "ramdac", "RAMDAC")
 //  ramdac_device - constructor
 //-------------------------------------------------
 
-ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RAMDAC, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(FUNC(ramdac_device::ramdac_palram), this)),

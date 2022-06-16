@@ -600,10 +600,10 @@ void ddayjlc_state::ddayjlc_palette(palette_device &palette) const
 void ddayjlc_state::ddayjlc(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/3);
+	Z80(config, m_maincpu, XTAL::u(12000000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddayjlc_state::main_map);
 
-	Z80(config, m_audiocpu, 12000000/4);
+	Z80(config, m_audiocpu, XTAL::u(12000000)/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ddayjlc_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -625,11 +625,11 @@ void ddayjlc_state::ddayjlc(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ay8910_device &ay1(AY8910(config, "ay1", 12000000/6));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL::u(12000000)/6));
 	ay1.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	AY8910(config, "ay2", 12000000/6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	AY8910(config, "ay2", XTAL::u(12000000)/6).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

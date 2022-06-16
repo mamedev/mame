@@ -261,7 +261,7 @@ void electron_state::electron(machine_config &config)
 	PALETTE(config, "palette", FUNC(electron_state::electron_colours), 8);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beeper, XTAL::u(300)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	RAM(config, m_ram).set_default_size("32K");
 

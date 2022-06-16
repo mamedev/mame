@@ -204,7 +204,7 @@ static void b2m_floppies(device_slot_interface &device)
 void b2m_state::b2m(machine_config &config)
 {
 	/* basic machine hardware */
-	i8080_cpu_device &maincpu(I8080(config, m_maincpu, 2000000));
+	i8080_cpu_device &maincpu(I8080(config, m_maincpu, XTAL::u(2000000)));
 	maincpu.set_addrmap(AS_PROGRAM, &b2m_state::b2m_mem);
 	maincpu.set_addrmap(AS_IO, &b2m_state::b2m_io);
 	maincpu.set_vblank_int("screen", FUNC(b2m_state::vblank_interrupt));
@@ -221,7 +221,7 @@ void b2m_state::b2m(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(b2m_state::b2m_palette), 4);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(0);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir1_w));
 	m_pit->set_clk<1>(2000000);
@@ -243,7 +243,7 @@ void b2m_state::b2m(machine_config &config)
 	ppi3.out_pb_callback().set(FUNC(b2m_state::romdisk_portb_w));
 	ppi3.out_pc_callback().set(FUNC(b2m_state::romdisk_portc_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* sound */
@@ -251,7 +251,7 @@ void b2m_state::b2m(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* uart */
-	I8251(config, "uart", 0);
+	I8251(config, "uart");
 
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->drq_wr_callback().set(FUNC(b2m_state::fdc_drq));

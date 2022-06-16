@@ -15,7 +15,7 @@
 class meters_device : public device_t
 {
 public:
-	meters_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	meters_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_number(int number) { m_number_mtr = number; }
 

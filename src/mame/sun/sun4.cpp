@@ -1355,7 +1355,7 @@ void sun4_base_state::ncr53c90a(device_t *device)
 {
 	ncr53c90a_device &adapter = downcast<ncr53c90a_device &>(*device);
 
-	adapter.set_clock(10000000);
+	adapter.set_clock(XTAL::u(10000000));
 	adapter.irq_handler_cb().set(*this, FUNC(sun4_base_state::scsi_irq));
 	adapter.drq_handler_cb().set(*this, FUNC(sun4_base_state::scsi_drq));
 }
@@ -1365,7 +1365,7 @@ void sun4_base_state::sun4_base(machine_config &config)
 	RAM(config, m_ram).set_default_size("16M").set_default_value(0x00);
 	m_ram->set_extra_options("4M,8M,12M,16M,20M,24M,28M,32M,36M,40M,48M,52M,64M");
 
-	M48T02(config, TIMEKEEPER_TAG, 0);
+	M48T02(config, TIMEKEEPER_TAG);
 
 	N82077AA(config, m_fdc, 24_MHz_XTAL);
 	m_fdc->set_ready_line_connected(false);
@@ -1427,7 +1427,7 @@ void sun4_base_state::sun4_base(machine_config &config)
 void sun4_state::sun4(machine_config &config)
 {
 	/* basic machine hardware */
-	SPARCV7(config, m_maincpu, 16'670'000);
+	SPARCV7(config, m_maincpu, XTAL::u(16'670'000));
 	m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4_asi_desc); });
 	m_maincpu->set_addrmap(0, &sun4_state::debugger_map);
 
@@ -1436,7 +1436,7 @@ void sun4_state::sun4(machine_config &config)
 	// MMU Type 1 device space
 	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
-	SUN4_MMU(config, m_mmu, 25'000'000);
+	SUN4_MMU(config, m_mmu, XTAL::u(25'000'000));
 	m_mmu->type1_r().set(m_type1space, FUNC(address_map_bank_device::read32));
 	m_mmu->type1_w().set(m_type1space, FUNC(address_map_bank_device::write32));
 	m_mmu->set_cpu(m_maincpu);
@@ -1449,7 +1449,7 @@ void sun4_state::sun4(machine_config &config)
 void sun4c_state::sun4c(machine_config &config)
 {
 	/* basic machine hardware */
-	SPARCV7(config, m_maincpu, 20'000'000);
+	SPARCV7(config, m_maincpu, XTAL::u(20'000'000));
 	m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4c_asi_desc); });
 	m_maincpu->set_addrmap(0x00, &sun4c_state::debugger_map);
 	m_maincpu->set_addrmap(0x12, &sun4c_state::system_asi_map);
@@ -1472,7 +1472,7 @@ void sun4c_state::sun4c(machine_config &config)
 	// MMU Type 1 device space
 	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4c_state::type1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
-	SUN4C_MMU(config, m_mmu, 20'000'000);
+	SUN4C_MMU(config, m_mmu, XTAL::u(20'000'000));
 	m_mmu->type1_r().set(m_type1space, FUNC(address_map_bank_device::read32));
 	m_mmu->type1_w().set(m_type1space, FUNC(address_map_bank_device::write32));
 	m_mmu->set_cpu(m_maincpu);
@@ -1483,7 +1483,7 @@ void sun4c_state::sun4c(machine_config &config)
 	m_maincpu->set_mmu(m_mmu);
 
 	// SBus
-	SBUS(config, m_sbus, 20'000'000, m_maincpu, m_type1space, 0);
+	SBUS(config, m_sbus, XTAL::u(20'000'000), m_maincpu, m_type1space, 0);
 	m_sbus->irq<0>().set(FUNC(sun4c_state::sbus_irq_w<SPARC_IRQ1>));
 	m_sbus->irq<1>().set(FUNC(sun4c_state::sbus_irq_w<SPARC_IRQ2>));
 	m_sbus->irq<2>().set(FUNC(sun4c_state::sbus_irq_w<SPARC_IRQ3>));
@@ -1491,9 +1491,9 @@ void sun4c_state::sun4c(machine_config &config)
 	m_sbus->irq<4>().set(FUNC(sun4c_state::sbus_irq_w<SPARC_IRQ7>));
 	m_sbus->irq<5>().set(FUNC(sun4c_state::sbus_irq_w<SPARC_IRQ8>));
 	m_sbus->irq<6>().set(FUNC(sun4c_state::sbus_irq_w<SPARC_IRQ9>));
-	SBUS_SLOT(config, m_sbus_slot[0], 20'000'000, m_sbus, 0, sbus_cards, nullptr);
-	SBUS_SLOT(config, m_sbus_slot[1], 20'000'000, m_sbus, 1, sbus_cards, nullptr);
-	SBUS_SLOT(config, m_sbus_slot[2], 20'000'000, m_sbus, 2, sbus_cards, nullptr);
+	SBUS_SLOT(config, m_sbus_slot[0], XTAL::u(20'000'000), m_sbus, 0, sbus_cards, nullptr);
+	SBUS_SLOT(config, m_sbus_slot[1], XTAL::u(20'000'000), m_sbus, 1, sbus_cards, nullptr);
+	SBUS_SLOT(config, m_sbus_slot[2], XTAL::u(20'000'000), m_sbus, 2, sbus_cards, nullptr);
 }
 
 void sun4c_state::sun4_20(machine_config &config)

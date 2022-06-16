@@ -71,7 +71,7 @@ namespace {
 #define Z80PIO2_TAG     "d12"
 // You could use a piezo at 455 kHz, or a crystal 500 to 2500 kHz.
 // Cassette successfully tested at 455 kHz
-#define MASTER_CLOCK    455000
+#define MASTER_CLOCK    XTAL(455000)
 
 class c80_state : public driver_device
 {

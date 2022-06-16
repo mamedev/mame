@@ -583,7 +583,7 @@ INPUT_PORTS_END
 void tk2000_state::tk2000(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1021800);     /* close to actual CPU frequency of 1.020484 MHz */
+	M6502(config, m_maincpu, XTAL::u(1021800));     /* close to actual CPU frequency of 1.020484 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tk2000_state::apple2_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(tk2000_state::apple2_interrupt), "screen", 0, 1);

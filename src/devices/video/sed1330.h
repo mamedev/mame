@@ -26,7 +26,7 @@ class sed1330_device :  public device_t,
 {
 public:
 	// construction/destruction
-	sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t status_r();
 	void command_w(uint8_t data);

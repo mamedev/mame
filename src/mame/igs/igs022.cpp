@@ -19,7 +19,7 @@
 #define VERBOSE (0)
 #include "logmacro.h"
 
-igs022_device::igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+igs022_device::igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IGS022, tag, owner, clock)
 	, m_sharedprotram(*this, "sharedprotram")
 	, m_rom(*this, DEVICE_SELF)

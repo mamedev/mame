@@ -15,13 +15,13 @@
 class vboy_flat_rom_device : public device_t, public device_vboy_cart_interface
 {
 public:
-	vboy_flat_rom_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	vboy_flat_rom_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device_vboy_cart_interface implementation
 	virtual image_init_result load() override ATTR_COLD;
 
 protected:
-	vboy_flat_rom_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	vboy_flat_rom_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -31,7 +31,7 @@ protected:
 class vboy_flat_rom_sram_device : public vboy_flat_rom_device
 {
 public:
-	vboy_flat_rom_sram_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	vboy_flat_rom_sram_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device_vboy_cart_interface implementation
 	virtual image_init_result load() override ATTR_COLD;

@@ -18,7 +18,7 @@ class f8_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// used by F3850 systems that override the normal zero reset address
 	auto romc08_callback() { return m_romc08_callback.bind(); }

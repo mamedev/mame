@@ -626,7 +626,7 @@ void midtunit_state::tunit_adpcm(machine_config &config)
 
 	/* basic machine hardware */
 	SPEAKER(config, "speaker").front_center();
-	WILLIAMS_ADPCM_SOUND(config, m_adpcm_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	WILLIAMS_ADPCM_SOUND(config, m_adpcm_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 
@@ -635,7 +635,7 @@ void midtunit_state::tunit_dcs(machine_config &config)
 	tunit_core(config);
 
 	/* basic machine hardware */
-	DCS_AUDIO_2K(config, m_dcs, 0);
+	DCS_AUDIO_2K(config, m_dcs);
 }
 
 

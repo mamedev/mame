@@ -177,21 +177,21 @@ static const z80_daisy_config daisy_chain[] =
 
 void iez80_state::iez80(machine_config &config)
 {
-	Z80(config, m_maincpu, 2'500'000); // unknown clock
+	Z80(config, m_maincpu, XTAL::u(2'500'000)); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &iez80_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &iez80_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	Z80DMA(config, "dma", 4'000'000); // unknown clock
+	Z80DMA(config, "dma", XTAL::u(4'000'000)); // unknown clock
 
-	z80ctc_device& ctc(Z80CTC(config, "ctc", 4'000'000)); // unknown clock
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL::u(4'000'000))); // unknown clock
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80PIO(config, "pio", 4'000'000); // unknown clock
+	Z80PIO(config, "pio", XTAL::u(4'000'000)); // unknown clock
 
-	Z80DART(config, "dart1", 4'000'000); // unknown clock (5.0688_MHz_XTAL near)
+	Z80DART(config, "dart1", XTAL::u(4'000'000)); // unknown clock (5.0688_MHz_XTAL near)
 
-	Z80DART(config, "dart2", 4'000'000); // unknown clock (5.0688_MHz_XTAL near)
+	Z80DART(config, "dart2", XTAL::u(4'000'000)); // unknown clock (5.0688_MHz_XTAL near)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

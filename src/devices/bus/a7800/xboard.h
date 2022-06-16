@@ -17,7 +17,7 @@ class a78_xboard_device : public a78_rom_device
 {
 public:
 	// construction/destruction
-	a78_xboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a78_xboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_04xx(offs_t offset) override;
@@ -26,7 +26,7 @@ public:
 	virtual void write_40xx(offs_t offset, uint8_t data) override;
 
 protected:
-	a78_xboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a78_xboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -44,7 +44,7 @@ class a78_xm_device : public a78_xboard_device
 {
 public:
 	// construction/destruction
-	a78_xm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a78_xm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_04xx(offs_t offset) override;

@@ -217,12 +217,12 @@ INPUT_PORTS_END
 void delta1_state::delta1(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 2000000); // LC circuit, measured 2MHz
+	F8(config, m_maincpu, XTAL::u(2000000)); // LC circuit, measured 2MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &delta1_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &delta1_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &f3853(F3853(config, "f3853", 2000000));
+	f3853_device &f3853(F3853(config, "f3853", XTAL::u(2000000)));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	/* video hardware */

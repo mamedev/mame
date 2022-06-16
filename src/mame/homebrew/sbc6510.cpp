@@ -290,7 +290,7 @@ void sbc6510_state::sbc6510(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_sbc6510);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

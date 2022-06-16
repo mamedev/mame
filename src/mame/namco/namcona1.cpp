@@ -1067,7 +1067,7 @@ void namcona1_state::namcona_base(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	C219(config, m_c219, 44100);
+	C219(config, m_c219, XTAL::u(44100));
 	m_c219->set_addrmap(0, &namcona1_state::namcona1_c219_map);
 	m_c219->add_route(0, "rspeaker", 1.00);
 	m_c219->add_route(1, "lspeaker", 1.00);

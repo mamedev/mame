@@ -576,7 +576,7 @@ WRITE_LINE_MEMBER( by133_state::u11_ca2_w )
 WRITE_LINE_MEMBER( by133_state::u7_cb2_w )
 {
 	// red led
-	m_beep->set_clock(950);
+	m_beep->set_clock(XTAL::u(950));
 	m_beep->set_state(state);
 	m_sound_int_handler(state);
 }
@@ -795,7 +795,7 @@ void by133_state::by133(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIA6821(config, m_pia_u7, 0);
+	PIA6821(config, m_pia_u7);
 	m_pia_u7->readpa_handler().set(FUNC(by133_state::u7_a_r));
 	m_pia_u7->writepa_handler().set(FUNC(by133_state::u7_a_w));
 	m_pia_u7->readpb_handler().set(FUNC(by133_state::u7_b_r));
@@ -805,7 +805,7 @@ void by133_state::by133(machine_config &config)
 	m_pia_u7->irqa_handler().set_inputline("videocpu", M6809_FIRQ_LINE);
 	m_pia_u7->irqa_handler().set_inputline("videocpu", M6809_FIRQ_LINE);
 
-	PIA6821(config, m_pia_u10, 0);
+	PIA6821(config, m_pia_u10);
 	m_pia_u10->readpa_handler().set(FUNC(by133_state::u10_a_r));
 	m_pia_u10->writepa_handler().set(FUNC(by133_state::u10_a_w));
 	m_pia_u10->readpb_handler().set(FUNC(by133_state::u10_b_r));
@@ -816,7 +816,7 @@ void by133_state::by133(machine_config &config)
 	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	TIMER(config, "babypac1").configure_periodic(FUNC(by133_state::u10_timer), attotime::from_hz(120)); // mains freq*2
 
-	PIA6821(config, m_pia_u11, 0);
+	PIA6821(config, m_pia_u11);
 	m_pia_u11->readpa_handler().set(FUNC(by133_state::u11_a_r));
 	m_pia_u11->writepa_handler().set(FUNC(by133_state::u11_a_w));
 	m_pia_u11->readpb_handler().set(FUNC(by133_state::u11_b_r));
@@ -844,7 +844,7 @@ void by133_state::by133(machine_config &config)
 	m_cheap_squeak->sound_ack_w_handler().set(m_pia_u11, FUNC(pia6821_device::cb2_w));
 
 	SPEAKER(config, "beee").front_center();
-	BEEP(config, m_beep, 600).add_route(ALL_OUTPUTS, "beee", 0.10);
+	BEEP(config, m_beep, XTAL::u(600)).add_route(ALL_OUTPUTS, "beee", 0.10);
 }
 
 void by133_state::granny(machine_config &config)

@@ -308,7 +308,7 @@ uint32_t gp32_state::s3c240x_lcd_r(offs_t offset)
 
 void gp32_state::s3c240x_lcd_configure()
 {
-	uint32_t vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
+	uint32_t vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval;
 	double framerate, vclk;
 	rectangle visarea;
 	vspw = BITS( m_s3c240x_lcd_regs[1], 5, 0);
@@ -320,9 +320,9 @@ void gp32_state::s3c240x_lcd_configure()
 	hfpd = BITS( m_s3c240x_lcd_regs[2], 7, 0);
 	hozval = BITS( m_s3c240x_lcd_regs[2], 18, 8);
 	clkval = BITS( m_s3c240x_lcd_regs[0], 17, 8);
-	hclk = s3c240x_get_hclk(MPLLCON);
-	LOGMASKED(LOG_VRAM, "LCD - vspw %d vbpd %d lineval %d vfpd %d hspw %d hbpd %d hfpd %d hozval %d clkval %d hclk %d\n", vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk);
-	vclk = (double)(hclk / ((clkval + 1) * 2));
+	XTAL hclk = s3c240x_get_hclk(MPLLCON);
+	LOGMASKED(LOG_VRAM, "LCD - vspw %d vbpd %d lineval %d vfpd %d hspw %d hbpd %d hfpd %d hozval %d clkval %d hclk %d\n", vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk.value());
+	vclk = hclk.dvalue() / ((clkval + 1) * 2);
 	LOGMASKED(LOG_VRAM, "LCD - vclk %f\n", vclk);
 	framerate = vclk / (((vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1)) * ((hspw + 1) + (hbpd + 1) + (hfpd + 1) + (hozval + 1)));
 	LOGMASKED(LOG_VRAM, "LCD - framerate %f\n", framerate);
@@ -400,17 +400,17 @@ void gp32_state::s3c240x_lcd_palette_w(offs_t offset, uint32_t data, uint32_t me
 // CLOCK & POWER MANAGEMENT
 
 
-uint32_t gp32_state::s3c240x_get_fclk(int reg)
+XTAL gp32_state::s3c240x_get_fclk(int reg)
 {
 	uint32_t data, mdiv, pdiv, sdiv;
 	data = m_s3c240x_clkpow_regs[reg]; // MPLLCON or UPLLCON
 	mdiv = BITS( data, 19, 12);
 	pdiv = BITS( data, 9, 4);
 	sdiv = BITS( data, 1, 0);
-	return (uint32_t)((double)((mdiv + 8) * 12000000) / (double)((pdiv + 2) * (1 << sdiv)));
+	return XTAL::u(12000000) * ((mdiv + 8) << sdiv) / (pdiv + 2);
 }
 
-uint32_t gp32_state::s3c240x_get_hclk(int reg)
+XTAL gp32_state::s3c240x_get_hclk(int reg)
 {
 	switch (m_s3c240x_clkpow_regs[5] & 0x3) // CLKDIVN
 	{
@@ -419,10 +419,10 @@ uint32_t gp32_state::s3c240x_get_hclk(int reg)
 		case 2 : return s3c240x_get_fclk(reg) / 2;
 		case 3 : return s3c240x_get_fclk(reg) / 2;
 	}
-	return 0;
+	return XTAL();
 }
 
-uint32_t gp32_state::s3c240x_get_pclk(int reg)
+XTAL gp32_state::s3c240x_get_pclk(int reg)
 {
 	switch (m_s3c240x_clkpow_regs[5] & 0x3) // CLKDIVN
 	{
@@ -431,7 +431,7 @@ uint32_t gp32_state::s3c240x_get_pclk(int reg)
 		case 2 : return s3c240x_get_fclk(reg) / 2;
 		case 3 : return s3c240x_get_fclk(reg) / 4;
 	}
-	return 0;
+	return XTAL();
 }
 
 uint32_t gp32_state::s3c240x_clkpow_r(offs_t offset)
@@ -570,11 +570,11 @@ void gp32_state::s3c240x_pwm_start(int timer)
 	static const int tcon_shift[] = { 0, 8, 12, 16, 20 };
 	const uint32_t *regs = &m_s3c240x_pwm_regs[3+timer*3];
 	uint32_t prescaler, mux, cnt, cmp, auto_reload;
-	double freq, hz;
+	double hz;
 	LOGMASKED(LOG_STARTSTOP, "PWM %d start\n", timer);
 	prescaler = (m_s3c240x_pwm_regs[0] >> prescaler_shift[timer]) & 0xFF;
 	mux = (m_s3c240x_pwm_regs[1] >> mux_shift[timer]) & 0x0F;
-	freq = s3c240x_get_pclk(MPLLCON) / (prescaler + 1) / mux_table[mux];
+	XTAL freq = s3c240x_get_pclk(MPLLCON) / (prescaler + 1) / mux_table[mux];
 	cnt = BITS( regs[0], 15, 0);
 	if (timer != 4)
 	{
@@ -586,8 +586,8 @@ void gp32_state::s3c240x_pwm_start(int timer)
 		cmp = 0;
 		auto_reload = BIT( m_s3c240x_pwm_regs[2], tcon_shift[timer] + 2);
 	}
-	hz = freq / (cnt - cmp + 1);
-	LOGMASKED(LOG_MISC, "PWM %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, s3c240x_get_fclk(MPLLCON), s3c240x_get_hclk(MPLLCON), s3c240x_get_pclk(MPLLCON), prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
+	hz = freq.dvalue() / (cnt - cmp + 1);
+	LOGMASKED(LOG_MISC, "PWM %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, s3c240x_get_fclk(MPLLCON).value(), s3c240x_get_hclk(MPLLCON).value(), s3c240x_get_pclk(MPLLCON).value(), prescaler, mux_table[mux], freq.value(), cnt, cmp, auto_reload, hz);
 	if (auto_reload)
 	{
 		m_s3c240x_pwm_timer[timer]->adjust( attotime::from_hz( hz), timer, attotime::from_hz( hz));
@@ -1456,8 +1456,8 @@ void gp32_state::s3c240x_iis_start()
 	prescaler_control_a = BITS( m_s3c240x_iis_regs[2], 9, 5);
 	prescaler_control_b = BITS( m_s3c240x_iis_regs[2], 4, 0);
 	codeclk = BIT( m_s3c240x_iis_regs[1], 2);
-	freq = (double)(s3c240x_get_pclk(MPLLCON) / (prescaler_control_a + 1) / codeclk_table[codeclk]) * 2; // why do I have to multiply by two?
-	LOGMASKED(LOG_MISC, "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", s3c240x_get_pclk(MPLLCON), prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
+	freq = s3c240x_get_pclk(MPLLCON).dvalue() / (prescaler_control_a + 1) / codeclk_table[codeclk] * 2; // why do I have to multiply by two?
+	LOGMASKED(LOG_MISC, "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", s3c240x_get_pclk(MPLLCON).value(), prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
 	m_s3c240x_iis_timer->adjust( attotime::from_hz( freq), 0, attotime::from_hz( freq));
 }
 
@@ -1684,7 +1684,7 @@ void gp32_state::machine_reset()
 
 void gp32_state::gp32(machine_config &config)
 {
-	ARM9(config, m_maincpu, 40000000);
+	ARM9(config, m_maincpu, XTAL::u(40000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &gp32_state::gp32_map);
 
 	PALETTE(config, m_palette).set_entries(32768);
@@ -1700,12 +1700,12 @@ void gp32_state::gp32(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	SMARTMEDIA(config, m_smartmedia, 0);
+	SMARTMEDIA(config, m_smartmedia);
 
 	SOFTWARE_LIST(config, "memc_list").set_original("gp32");
 }

@@ -22,7 +22,7 @@ class swim1_device : public applefdintf_device
 {
 public:
 	// construction/destruction
-	swim1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	swim1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read(offs_t offset) override;
 	virtual void write(offs_t offset, u8 data) override;

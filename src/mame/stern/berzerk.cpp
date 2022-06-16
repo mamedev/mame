@@ -1192,7 +1192,7 @@ void berzerk_state::berzerk(machine_config &config)
 	m_s14001a->add_route(ALL_OUTPUTS, "s14001a_volume", 0.5);
 	FILTER_VOLUME(config, m_s14001a_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	EXIDY(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.33);
+	EXIDY(config, m_custom).add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
 

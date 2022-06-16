@@ -24,7 +24,7 @@ class mtx_rompak_device : public device_t, public device_mtx_exp_interface
 {
 public:
 	// construction/destruction
-	mtx_rompak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mtx_rompak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

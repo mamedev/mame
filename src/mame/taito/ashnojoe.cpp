@@ -567,7 +567,7 @@ void ashnojoe_state::ashnojoe(machine_config &config)
 	ymsnd.port_b_write_callback().set(FUNC(ashnojoe_state::ym2203_write_b));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.1);
 
-	MSM5205(config, m_msm, 384'000);
+	MSM5205(config, m_msm, XTAL::u(384'000));
 	m_msm->vck_legacy_callback().set(FUNC(ashnojoe_state::vclk_cb));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);

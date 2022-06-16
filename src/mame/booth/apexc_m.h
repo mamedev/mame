@@ -32,7 +32,7 @@ class apexc_cylinder_image_device : public device_t, public device_image_interfa
 {
 public:
 	// construction/destruction
-	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// image-level overrides
 	virtual bool is_readable()  const noexcept override { return true; }
@@ -103,7 +103,7 @@ class apexc_tape_puncher_image_device : public paper_tape_punch_device
 {
 public:
 	// construction/destruction
-	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// image-level overrides
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
@@ -118,12 +118,7 @@ class apexc_tape_reader_image_device : public paper_tape_reader_device
 {
 public:
 	// construction/destruction
-	apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: apexc_tape_reader_image_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
-	apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// image-level overrides
 	virtual const char *file_extensions() const noexcept override { return "tap"; }

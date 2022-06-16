@@ -171,7 +171,7 @@ static int scount = 0;
 
 DEFINE_DEVICE_TYPE(SWP30, swp30_device, "swp30", "Yamaha SWP30 sound chip")
 
-swp30_device::swp30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+swp30_device::swp30_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SWP30, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  device_rom_interface(mconfig, *this),

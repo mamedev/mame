@@ -39,23 +39,23 @@ DEFINE_DEVICE_TYPE(ADC12132, adc12132_device, "adc12132", "ADC12132")
 DEFINE_DEVICE_TYPE(ADC12138, adc12138_device, "adc12138", "ADC12138")
 
 
-adc12130_device::adc12130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adc12130_device::adc12130_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adc12138_device(mconfig, ADC12130, tag, owner, clock)
 {
 }
 
 
-adc12132_device::adc12132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adc12132_device::adc12132_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adc12138_device(mconfig, ADC12132, tag, owner, clock)
 {
 }
 
 
-adc12138_device::adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adc12138_device::adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adc12138_device(mconfig, ADC12138, tag, owner, clock)
 {
 }
-adc12138_device::adc12138_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+adc12138_device::adc12138_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_ipt_read_cb(*this)
 {

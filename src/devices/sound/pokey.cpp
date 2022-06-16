@@ -192,7 +192,7 @@ DEFINE_DEVICE_TYPE(POKEY, pokey_device, "pokey", "Atari C012294 POKEY")
 //  pokey_device - constructor
 //-------------------------------------------------
 
-pokey_device::pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pokey_device::pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, POKEY, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	device_execute_interface(mconfig, *this),

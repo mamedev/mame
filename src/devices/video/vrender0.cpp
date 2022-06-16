@@ -30,7 +30,7 @@
 
 DEFINE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device, "vr0video", "MagicEyes VRender0 Video Engine")
 
-vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VIDEO_VRENDER0, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_idleskip_cb(*this)

@@ -469,7 +469,7 @@ WRITE_LINE_MEMBER(esq5505_state::esq5505_otis_irq)
 
 void esq5505_state::es5505_clock_changed(u32 data)
 {
-	m_pump->set_unscaled_clock(data);
+	m_pump->set_unscaled_clock(XTAL::u(data));
 }
 
 void esq5505_state::analog_w(offs_t offset, uint16_t data)
@@ -645,12 +645,12 @@ void esq5505_state::vfx(machine_config &config)
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 
-	MC68681(config, m_duart, 4000000);
+	MC68681(config, m_duart, XTAL::u(4000000));
 	m_duart->irq_cb().set(FUNC(esq5505_state::duart_irq_handler));
 	m_duart->a_tx_cb().set(FUNC(esq5505_state::duart_tx_a));
 	m_duart->b_tx_cb().set(FUNC(esq5505_state::duart_tx_b));
 	m_duart->outport_cb().set(FUNC(esq5505_state::duart_output));
-	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
+	m_duart->set_clocks(XTAL::u(500000), XTAL::u(500000), XTAL::u(1000000), XTAL::u(1000000));
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
@@ -715,7 +715,7 @@ void esq5505_state::vfxsd(machine_config &config)
 	vfx(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
 
-	WD1772(config, m_fdc, 8000000);
+	WD1772(config, m_fdc, XTAL::u(8000000));
 	FLOPPY_CONNECTOR(config, m_floppy_connector);
 	m_floppy_connector->option_add("35dd", FLOPPY_35_DD);
 	m_floppy_connector->set_default_option("35dd");
@@ -736,12 +736,12 @@ void esq5505_state::vfx32(machine_config &config)
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 
-	MC68681(config, m_duart,  4000000);
+	MC68681(config, m_duart,  XTAL::u(4000000));
 	m_duart->irq_cb().set(FUNC(esq5505_state::duart_irq_handler));
 	m_duart->a_tx_cb().set(FUNC(esq5505_state::duart_tx_a));
 	m_duart->b_tx_cb().set(FUNC(esq5505_state::duart_tx_b));
 	m_duart->outport_cb().set(FUNC(esq5505_state::duart_output));
-	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
+	m_duart->set_clocks(XTAL::u(500000), XTAL::u(500000), XTAL::u(1000000), XTAL::u(1000000));
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
@@ -773,7 +773,7 @@ void esq5505_state::vfx32(machine_config &config)
 	es5505.add_route(6, "pump", 1.0, 6);
 	es5505.add_route(7, "pump", 1.0, 7);
 
-	WD1772(config, m_fdc, 8000000);
+	WD1772(config, m_fdc, XTAL::u(8000000));
 	FLOPPY_CONNECTOR(config, m_floppy_connector, "35dd", FLOPPY_35_DD, true, floppy_formats);
 }
 

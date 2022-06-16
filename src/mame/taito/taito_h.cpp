@@ -588,7 +588,7 @@ void taitoh_state::taitoh_base(machine_config &config)
 	// video hardware
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
-	TC0080VCO(config, m_tc0080vco, 0);
+	TC0080VCO(config, m_tc0080vco);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
 	m_tc0080vco->set_palette(m_palette);
@@ -602,7 +602,7 @@ void taitoh_state::taitoh_base(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -615,7 +615,7 @@ void syvalion_state::syvalion(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &syvalion_state::syvalion_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoh_state::irq2_line_hold));
 
-	TC0040IOC(config, m_tc0040ioc, 0);
+	TC0040IOC(config, m_tc0040ioc);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0040ioc->read_2_callback().set_ioport("IN0");
@@ -641,7 +641,7 @@ void taitoh_state::recordbr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoh_state::recordbr_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoh_state::irq2_line_hold));
 
-	TC0040IOC(config, m_tc0040ioc, 0);
+	TC0040IOC(config, m_tc0040ioc);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0040ioc->read_2_callback().set_ioport("IN0");
@@ -679,7 +679,7 @@ void taitoh_state::dleague(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoh_state::dleague_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitoh_state::irq1_line_hold));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");

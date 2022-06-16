@@ -392,7 +392,7 @@ void spool99_state::spool99(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(1000000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
 }

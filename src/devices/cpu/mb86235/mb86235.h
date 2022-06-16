@@ -23,7 +23,7 @@ class mb86235_device :  public cpu_device
 
 public:
 	// construction/destruction
-	mb86235_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t clock);
+	mb86235_device(const machine_config &mconfig, const char *_tag, device_t *_owner, const XTAL &clock);
 	virtual ~mb86235_device() override;
 
 	template <typename T> void set_fifoin_tag(T &&fifo_tag) { m_fifoin.set_tag(std::forward<T>(fifo_tag)); }

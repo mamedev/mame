@@ -24,7 +24,7 @@ const int h8_dtc_device::vector_to_enable[92] = {
 	-1, 40, 41, -1                  // ERI2, RXI2, TXI2, TEI2
 };
 
-h8_dtc_device::h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_dtc_device::h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, H8_DTC, tag, owner, clock),
 	cpu(*this, DEVICE_SELF_OWNER)
 {

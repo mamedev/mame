@@ -344,7 +344,7 @@ void micro3d_state::micro3d(machine_config &config)
 	m_duart->inport_cb().set(FUNC(micro3d_state::duart_input_r));
 	m_duart->outport_cb().set(FUNC(micro3d_state::duart_output_w));
 
-	mc68901_device &mfp(MC68901(config, "mfp", 4000000));
+	mc68901_device &mfp(MC68901(config, "mfp", XTAL::u(4000000)));
 	mfp.set_timer_clock(4000000);
 	mfp.out_irq_cb().set_inputline("maincpu", M68K_IRQ_4);
 	mfp.out_tao_cb().set("mfp", FUNC(mc68901_device::rc_w));

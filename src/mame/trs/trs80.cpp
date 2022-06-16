@@ -520,7 +520,7 @@ void trs80_state::sys80(machine_config &config)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(trs80_state::screen_update_sys80));
 
 	config.device_remove("brg");
-	CLOCK(config, m_uart_clock, 19200 * 16);
+	CLOCK(config, m_uart_clock, XTAL::u(19200 * 16));
 	m_uart_clock->signal_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
 	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_tcp));
 }
@@ -540,7 +540,7 @@ void trs80_state::ht1080z(machine_config &config)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(trs80_state::screen_update_ht1080z));
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ht1080z);
 
-	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.25); // guess of clock
+	AY8910(config, "ay1", XTAL::u(1'500'000)).add_route(ALL_OUTPUTS, "mono", 0.25); // guess of clock
 	//ay1.port_a_read_callback(FUNC(trs80_state::...);  // ports are some kind of expansion slot
 	//ay1.port_b_read_callback(FUNC(trs80_state::...);
 

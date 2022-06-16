@@ -329,7 +329,7 @@ const tiny_rom_entry *spectrum_disciple_device::device_rom_region() const
 //  spectrum_plusd_device - constructor
 //-------------------------------------------------
 
-spectrum_plusd_device::spectrum_plusd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_plusd_device::spectrum_plusd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_rom(*this, "rom")
@@ -340,7 +340,7 @@ spectrum_plusd_device::spectrum_plusd_device(const machine_config &mconfig, devi
 {
 }
 
-spectrum_plusd_device::spectrum_plusd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_plusd_device::spectrum_plusd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_plusd_device(mconfig, SPECTRUM_PLUSD, tag, owner, clock)
 {
 }
@@ -349,7 +349,7 @@ spectrum_plusd_device::spectrum_plusd_device(const machine_config &mconfig, cons
 //  spectrum_disciple_device - constructor
 //-------------------------------------------------
 
-spectrum_disciple_device::spectrum_disciple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_disciple_device::spectrum_disciple_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_plusd_device(mconfig, SPECTRUM_DISCIPLE, tag, owner, clock)
 	, m_exp(*this, "exp")
 	, m_joy1(*this, "JOY1")

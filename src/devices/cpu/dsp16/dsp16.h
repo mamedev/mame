@@ -70,7 +70,7 @@ protected:
 			device_type type,
 			char const *tag,
 			device_t *owner,
-			u32 clock,
+			const XTAL &clock,
 			u8 yaau_bits,
 			address_map_constructor &&data_map);
 
@@ -342,7 +342,7 @@ class dsp16_device : public dsp16_device_base
 {
 public:
 	// construction/destruction
-	dsp16_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	dsp16_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// dsp16_device_base implementation
@@ -360,7 +360,7 @@ class dsp16a_device : public dsp16_device_base
 {
 public:
 	// construction/destruction
-	dsp16a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	dsp16a_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// dsp16_device_base implementation

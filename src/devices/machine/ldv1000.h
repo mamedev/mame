@@ -39,7 +39,7 @@ class pioneer_ldv1000_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto command_strobe_callback() { return m_command_strobe_cb.bind(); }
 

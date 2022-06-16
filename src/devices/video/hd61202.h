@@ -26,7 +26,7 @@ public:
 	typedef device_delegate<uint32_t (bitmap_ind16 &bitmap, const rectangle &cliprect, bool lcd_on, int start_line, uint8_t *ddr)> screen_update_delegate;
 
 	// construction/destruction
-	hd61202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	hd61202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	template <typename... T> void set_screen_update_cb(T &&... args) { m_screen_update_cb.set(std::forward<T>(args)...); }

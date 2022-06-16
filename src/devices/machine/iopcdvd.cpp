@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(SONYIOP_CDVD, iop_cdvd_device, "iopcdvd", "PlayStation 2 disc
 
 /*static*/ const size_t iop_cdvd_device::BUFFER_SIZE = 16; // Total guess
 
-iop_cdvd_device::iop_cdvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iop_cdvd_device::iop_cdvd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYIOP_CDVD, tag, owner, clock)
 	, m_intc(*this, finder_base::DUMMY_TAG)
 {

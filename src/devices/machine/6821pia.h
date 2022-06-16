@@ -34,7 +34,7 @@ class pia6821_device :  public device_t
 {
 public:
 	// construction/destruction
-	pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// TODO: REMOVE THESE
 	auto readpa_handler() { return m_in_a_handler.bind(); }

@@ -116,7 +116,7 @@ Scanline 0 is the start of vblank.
 #include "speaker.h"
 
 #define C7M (15.6672_MHz_XTAL / 2)
-#define C3_7M (15.6672_MHz_XTAL / 4).value()
+#define C3_7M (15.6672_MHz_XTAL / 4)
 
 // video parameters
 static constexpr int MAC_H_VIS   = 512;
@@ -1136,7 +1136,7 @@ void mac128_state::mac512ke(machine_config &config)
 	m_volfilter->add_route(ALL_OUTPUTS, "speaker", 0.195); // this filter has a max gain of ~5.126, so we diminish it by the inverse of that (0.195)
 	FILTER_BIQUAD(config, m_filter).opamp_sk_lowpass_setup(RES_K(47), RES_K(47), RES_M(999.99), RES_R(0.001), CAP_U(0.001), CAP_P(470)); // R18, R14, absent, short, C18, C19
 	m_filter->add_route(ALL_OUTPUTS, m_volfilter, 1.0);
-	DAC_12BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, m_filter, 1.0); // 2 x ls161; this is a 1-bit PWM value selecting an 8-bit fraction from 0/352nds to 255/352nds of a scanline, with /SNDRES forcing it active for 352/352nds.
+	DAC_12BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, m_filter, 1.0); // 2 x ls161; this is a 1-bit PWM value selecting an 8-bit fraction from 0/352nds to 255/352nds of a scanline, with /SNDRES forcing it active for 352/352nds.
 
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
@@ -1150,7 +1150,7 @@ void mac128_state::mac512ke(machine_config &config)
 	applefdintf_device::add_35(config, m_floppy[1]);
 
 	SCC85C30(config, m_scc, C7M);
-	m_scc->configure_channels(C3_7M, 0, C3_7M, 0);
+	m_scc->configure_channels(C3_7M, XTAL(), C3_7M, XTAL());
 	m_scc->out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
 
 	MOS6522(config, m_via, C7M/10);

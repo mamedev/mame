@@ -105,12 +105,12 @@ inline void ef9345_device::inc_y(uint8_t r)
 //  ef9345_device - constructor
 //-------------------------------------------------
 
-ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ef9345_device(mconfig, EF9345, tag, owner, clock, EF9345_MODE::TYPE_EF9345)
 {
 }
 
-ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, EF9345_MODE variant) :
+ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, EF9345_MODE variant) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -121,7 +121,7 @@ ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-ts9347_device::ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ts9347_device::ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ef9345_device(mconfig, TS9347, tag, owner, clock, EF9345_MODE::TYPE_TS9347)
 {
 }

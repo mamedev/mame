@@ -584,7 +584,7 @@ GFXDECODE_END
 void acefruit_state::acefruit(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2500000); /* 2.5MHz */
+	Z80(config, m_maincpu, XTAL::u(2500000)); /* 2.5MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &acefruit_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &acefruit_state::main_io);
 	m_maincpu->set_vblank_int("screen", FUNC(acefruit_state::vblank));

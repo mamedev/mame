@@ -848,7 +848,7 @@ void vixen_state::vixen(machine_config &config)
 	m_io_i8155->out_pc_callback().set(FUNC(vixen_state::io_i8155_pc_w));
 	m_io_i8155->out_to_callback().set(FUNC(vixen_state::io_i8155_to_w));
 
-	I8251(config, m_usart, 0);
+	I8251(config, m_usart);
 	m_usart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_usart->dtr_handler().set(m_rs232, FUNC(rs232_port_device::write_dtr));
 	m_usart->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));

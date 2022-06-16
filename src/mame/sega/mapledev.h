@@ -16,7 +16,7 @@ public:
 	virtual void maple_reset();
 
 protected:
-	maple_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	maple_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t reply_size = 0;
 	bool reply_partial = false;

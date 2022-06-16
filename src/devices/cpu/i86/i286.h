@@ -76,7 +76,7 @@ class i80286_cpu_device : public i8086_common_cpu_device
 {
 public:
 	// construction/destruction
-	i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

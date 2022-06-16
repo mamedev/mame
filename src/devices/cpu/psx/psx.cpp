@@ -1784,7 +1784,7 @@ void psxcpu_device::psxcpu_internal_map(address_map &map)
 //  psxcpu_device - constructor
 //-------------------------------------------------
 
-psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock ) :
+psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock ) :
 	cpu_device( mconfig, type, tag, owner, clock ),
 	m_program_config( "program", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(psxcpu_device::psxcpu_internal_map), this)),
 	m_gpu_read_handler( *this ),
@@ -1799,32 +1799,32 @@ psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, c
 	m_disable_rom_berr = false;
 }
 
-cxd8530aq_device::cxd8530aq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+cxd8530aq_device::cxd8530aq_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock )
 	: psxcpu_device( mconfig, CXD8530AQ, tag, owner, clock)
 {
 }
 
-cxd8530bq_device::cxd8530bq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+cxd8530bq_device::cxd8530bq_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock )
 	: psxcpu_device( mconfig, CXD8530BQ, tag, owner, clock)
 {
 }
 
-cxd8530cq_device::cxd8530cq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+cxd8530cq_device::cxd8530cq_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock )
 	: psxcpu_device( mconfig, CXD8530CQ, tag, owner, clock)
 {
 }
 
-cxd8661r_device::cxd8661r_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+cxd8661r_device::cxd8661r_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock )
 	: psxcpu_device( mconfig, CXD8661R, tag, owner, clock)
 {
 }
 
-cxd8606bq_device::cxd8606bq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+cxd8606bq_device::cxd8606bq_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock )
 	: psxcpu_device( mconfig, CXD8606BQ, tag, owner, clock)
 {
 }
 
-cxd8606cq_device::cxd8606cq_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+cxd8606cq_device::cxd8606cq_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock )
 	: psxcpu_device( mconfig, CXD8606CQ, tag, owner, clock)
 {
 }
@@ -3450,17 +3450,17 @@ device_memory_interface::space_config_vector psxcpu_device::memory_space_config(
 
 void psxcpu_device::device_add_mconfig(machine_config &config)
 {
-	auto &irq(PSX_IRQ(config, "irq", 0));
+	auto &irq(PSX_IRQ(config, "irq"));
 	irq.irq().set_inputline(DEVICE_SELF, PSXCPU_IRQ0);
 
-	auto &dma(PSX_DMA(config, "dma", 0));
+	auto &dma(PSX_DMA(config, "dma"));
 	dma.irq().set("irq", FUNC(psxirq_device::intin3));
 
-	auto &mdec(PSX_MDEC(config, "mdec", 0));
+	auto &mdec(PSX_MDEC(config, "mdec"));
 	dma.install_write_handler(0, psxdma_device::write_delegate(&psxmdec_device::dma_write, &mdec));
 	dma.install_read_handler(1, psxdma_device::write_delegate(&psxmdec_device::dma_read, &mdec));
 
-	auto &rcnt(PSX_RCNT(config, "rcnt", 0));
+	auto &rcnt(PSX_RCNT(config, "rcnt"));
 	rcnt.irq0().set("irq", FUNC(psxirq_device::intin4));
 	rcnt.irq1().set("irq", FUNC(psxirq_device::intin5));
 	rcnt.irq2().set("irq", FUNC(psxirq_device::intin6));

@@ -19,7 +19,7 @@ class m3comm_device : public device_t
 {
 public:
 	// construction/destruction
-	m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void m3_map(address_map &map);
 

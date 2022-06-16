@@ -12,7 +12,7 @@
 
 DEFINE_DEVICE_TYPE(DECOCOMN, decocomn_device, "decocomn", "DECO Common Video Functions")
 
-decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DECOCOMN, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_dirty_palette(nullptr),

@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE(MOS6551, mos6551_device, "mos6551", "MOS 6551 ACIA")
 
-mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MOS6551, tag, owner, clock),
 	m_internal_clock(*this, "clock"),
 	m_irq_handler(*this),
@@ -65,7 +65,7 @@ const int mos6551_device::transmitter_controls[4][3] =
 
 void mos6551_device::device_add_mconfig(machine_config &config)
 {
-	CLOCK(config, m_internal_clock, 0);
+	CLOCK(config, m_internal_clock);
 	m_internal_clock->signal_handler().set(FUNC(mos6551_device::internal_clock));
 }
 

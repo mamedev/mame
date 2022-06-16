@@ -57,7 +57,7 @@ ioport_constructor saturn_wheel_device::device_input_ports() const
 //  saturn_wheel_device - constructor
 //-------------------------------------------------
 
-saturn_wheel_device::saturn_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+saturn_wheel_device::saturn_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SATURN_WHEEL, tag, owner, clock),
 	device_saturn_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),

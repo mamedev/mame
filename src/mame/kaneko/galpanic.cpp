@@ -354,7 +354,7 @@ void galpanic_state::galpanic(machine_config &config)
 	// fg palette RAM, bit 0 seems to be a transparency flag for the front bitmap
 	PALETTE(config, m_palette, FUNC(galpanic_state::palette)).set_format(palette_device::GRBx_555, 1024 + 32768);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
+	KANEKO_PANDORA(config, m_pandora);
 	m_pandora->set_offsets(0, -16);
 	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 

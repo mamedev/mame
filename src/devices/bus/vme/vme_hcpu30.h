@@ -25,10 +25,10 @@ DECLARE_DEVICE_TYPE(VME_HCPU30, vme_hcpu30_card_device)
 class vme_hcpu30_card_device : public device_t, public device_vme_card_interface
 {
 public:
-	vme_hcpu30_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_hcpu30_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	vme_hcpu30_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vme_hcpu30_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

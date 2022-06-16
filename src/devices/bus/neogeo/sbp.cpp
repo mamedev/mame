@@ -16,7 +16,7 @@
 
 DEFINE_DEVICE_TYPE(NEOGEO_SBP_CART, neogeo_sbp_cart_device, "neocart_sbp", "Neo Geo Super Bubble Pop Cart")
 
-neogeo_sbp_cart_device::neogeo_sbp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_sbp_cart_device::neogeo_sbp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_rom_device(mconfig, NEOGEO_SBP_CART, tag, owner, clock)
 {
 }

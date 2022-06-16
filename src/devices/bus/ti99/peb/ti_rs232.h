@@ -30,7 +30,7 @@ class ti_rs232_pio_device : public device_t, public device_ti99_peribox_card_int
 	friend class ti_rs232_attached_device;
 
 public:
-	ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
 
@@ -131,7 +131,7 @@ private:
 class ti_rs232_attached_device : public device_t, public device_image_interface
 {
 public:
-	ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	bool is_readable()  const noexcept override           { return true; }
 	bool is_writeable() const noexcept override           { return true; }
@@ -160,7 +160,7 @@ private:
 class ti_pio_attached_device : public device_t, public device_image_interface
 {
 public:
-	ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	bool is_readable()  const noexcept override           { return true; }
 	bool is_writeable() const noexcept override           { return true; }

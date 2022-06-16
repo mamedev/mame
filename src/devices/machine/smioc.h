@@ -38,7 +38,7 @@ class smioc_device : public device_t
 {
 public:
 	/* Constructor and Destructor */
-	smioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smioc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto m68k_r_callback() { return m_m68k_r_cb.bind(); }
 	auto m68k_w_callback() { return m_m68k_w_cb.bind(); }

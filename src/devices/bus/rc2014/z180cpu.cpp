@@ -23,7 +23,7 @@ class z180cpu_base : public device_t, public device_rc2014_rc80_card_interface
 {
 protected:
 	// construction/destruction
-	z180cpu_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	z180cpu_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -43,7 +43,7 @@ protected:
 	static constexpr XTAL MAIN_CLOCK = XTAL(18'432'000);
 };
 
-z180cpu_base::z180cpu_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+z180cpu_base::z180cpu_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_rc2014_rc80_card_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
@@ -109,14 +109,14 @@ class sc111_device : public z180cpu_base
 {
 public:
 	// construction/destruction
-	sc111_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sc111_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 };
 
-sc111_device::sc111_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sc111_device::sc111_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z180cpu_base(mconfig, RC2014_SC111, tag, owner, clock)
 {
 }

@@ -47,7 +47,7 @@ class z80ctc_channel_device : public device_t
 
 public:
 	// construction/destruction
-	z80ctc_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	z80ctc_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides
@@ -82,11 +82,10 @@ class z80ctc_device :   public device_t,
 
 public:
 	// construction/destruction
-	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto intr_callback() { return m_intr_cb.bind(); }
 	template <int Channel> auto zc_callback() { return m_zc_cb[Channel].bind(); } // m_zc_cb[3] not supported on a standard ctc, only used for the tmpz84c015
-	template <int Channel> void set_clk(u32 clock) { channel_config(Channel).set_clock(clock); }
 	template <int Channel> void set_clk(const XTAL &xtal) { channel_config(Channel).set_clock(xtal); }
 
 	// read/write handlers

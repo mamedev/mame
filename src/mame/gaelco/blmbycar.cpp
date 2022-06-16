@@ -606,7 +606,7 @@ void base_state::base(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2000);
 
-	BLMBYCAR_SPRITES(config, m_sprites, 0);
+	BLMBYCAR_SPRITES(config, m_sprites);
 	m_sprites->set_gfxdecode_tag("gfxdecode");
 	m_sprites->set_screen_tag("screen");
 

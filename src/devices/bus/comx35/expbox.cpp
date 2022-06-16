@@ -116,7 +116,7 @@ void comx_eb_device::device_add_mconfig(machine_config &config)
 //  comx_eb_device - constructor
 //-------------------------------------------------
 
-comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COMX_EB, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "e000"),

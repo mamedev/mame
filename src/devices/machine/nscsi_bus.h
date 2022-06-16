@@ -12,7 +12,7 @@ class nscsi_slot_card_interface;
 class nscsi_bus_device : public device_t
 {
 public:
-	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void ctrl_w(int refid, uint32_t lines, uint32_t mask);
 	void data_w(int refid, uint32_t lines);
@@ -48,14 +48,14 @@ class nscsi_connector: public device_t,
 public:
 	template <typename T>
 	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false)
-		: nscsi_connector(mconfig, tag, owner, 0)
+		: nscsi_connector(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(fixed);
 	}
-	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~nscsi_connector();
 
 	nscsi_device *get_device();
@@ -131,7 +131,7 @@ public:
 	virtual void scsi_ctrl_changed();
 
 protected:
-	nscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 
@@ -311,7 +311,7 @@ protected:
 		SBUF_SENSE
 	};
 
-	nscsi_full_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nscsi_full_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

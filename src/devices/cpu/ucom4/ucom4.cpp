@@ -64,7 +64,7 @@ void ucom4_cpu_device::data_96x4(address_map &map)
 
 
 // device definitions
-ucom4_cpu_device::ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+ucom4_cpu_device::ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, prgwidth, 0, program)
 	, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
@@ -86,27 +86,27 @@ ucom4_cpu_device::ucom4_cpu_device(const machine_config &mconfig, device_type ty
 {
 }
 
-upd546_cpu_device::upd546_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upd546_cpu_device::upd546_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ucom4_cpu_device(mconfig, NEC_D546, tag, owner, clock, NEC_UCOM43, 3 /* stack levels */, 11 /* prg width */, address_map_constructor(FUNC(upd546_cpu_device::program_2k), this), 7 /* data width */, address_map_constructor(FUNC(upd546_cpu_device::data_96x4), this))
 {
 }
 
-upd553_cpu_device::upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upd553_cpu_device::upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ucom4_cpu_device(mconfig, NEC_D553, tag, owner, clock, NEC_UCOM43, 3, 11, address_map_constructor(FUNC(upd553_cpu_device::program_2k), this), 7, address_map_constructor(FUNC(upd553_cpu_device::data_96x4), this))
 {
 }
 
-upd557l_cpu_device::upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upd557l_cpu_device::upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ucom4_cpu_device(mconfig, NEC_D557L, tag, owner, clock, NEC_UCOM43, 3, 11, address_map_constructor(FUNC(upd557l_cpu_device::program_2k), this), 7, address_map_constructor(FUNC(upd557l_cpu_device::data_96x4), this))
 {
 }
 
-upd650_cpu_device::upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upd650_cpu_device::upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ucom4_cpu_device(mconfig, NEC_D650, tag, owner, clock, NEC_UCOM43, 3, 11, address_map_constructor(FUNC(upd650_cpu_device::program_2k), this), 7, address_map_constructor(FUNC(upd650_cpu_device::data_96x4), this))
 {
 }
 
-upd552_cpu_device::upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upd552_cpu_device::upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ucom4_cpu_device(mconfig, NEC_D552, tag, owner, clock, NEC_UCOM44, 1, 10, address_map_constructor(FUNC(upd552_cpu_device::program_1k), this), 6, address_map_constructor(FUNC(upd552_cpu_device::data_64x4), this))
 {
 }

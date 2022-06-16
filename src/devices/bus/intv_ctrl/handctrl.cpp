@@ -86,7 +86,7 @@ ioport_constructor intv_handctrl_device::device_input_ports() const
 //  intv_handctrl_device - constructor
 //-------------------------------------------------
 
-intv_handctrl_device::intv_handctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+intv_handctrl_device::intv_handctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, INTV_HANDCTRL, tag, owner, clock),
 	device_intv_control_port_interface(mconfig, *this),
 	m_cfg(*this, "OPTIONS"),

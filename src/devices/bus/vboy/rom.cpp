@@ -26,13 +26,13 @@ DEFINE_DEVICE_TYPE(VBOY_FLAT_ROM_SRAM, vboy_flat_rom_sram_device, "vboy_flatrom_
 //  vboy_flat_rom_device
 //**************************************************************************
 
-vboy_flat_rom_device::vboy_flat_rom_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+vboy_flat_rom_device::vboy_flat_rom_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	vboy_flat_rom_device(mconfig, VBOY_FLAT_ROM, tag, owner, clock)
 {
 }
 
 
-vboy_flat_rom_device::vboy_flat_rom_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+vboy_flat_rom_device::vboy_flat_rom_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_vboy_cart_interface(mconfig, *this)
 {
@@ -91,7 +91,7 @@ void vboy_flat_rom_device::device_start()
 //  vboy_flat_rom_sram_device
 //**************************************************************************
 
-vboy_flat_rom_sram_device::vboy_flat_rom_sram_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+vboy_flat_rom_sram_device::vboy_flat_rom_sram_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	vboy_flat_rom_device(mconfig, VBOY_FLAT_ROM_SRAM, tag, owner, clock)
 {
 }

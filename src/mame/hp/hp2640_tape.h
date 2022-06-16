@@ -19,7 +19,7 @@ class hp2640_tape_device : public device_t
 {
 public:
 	// construction/destruction
-	hp2640_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp2640_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto irq() { return m_irq_handler.bind(); }

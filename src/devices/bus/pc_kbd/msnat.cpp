@@ -205,7 +205,7 @@ ROM_START( microsoft_natural )
 ROM_END
 
 
-pc_kbd_microsoft_natural_device::pc_kbd_microsoft_natural_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc_kbd_microsoft_natural_device::pc_kbd_microsoft_natural_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PC_KBD_MICROSOFT_NATURAL, tag, owner, clock)
 	, device_pc_kbd_interface(mconfig, *this)
 	, m_cpu(*this, "ms_natrl_cpu")

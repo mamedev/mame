@@ -651,9 +651,9 @@ void scyclone_state::scyclone(machine_config &config)
 
 	// this is just taken from route16.cpp
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 ROM_START( scyclone )

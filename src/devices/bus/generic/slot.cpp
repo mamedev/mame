@@ -119,7 +119,7 @@ void device_generic_cart_interface::ram_alloc(u32 size)
 //  generic_slot_device
 //**************************************************************************
 
-generic_slot_device::generic_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+generic_slot_device::generic_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_rom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_generic_cart_interface>(mconfig, *this),
@@ -134,12 +134,12 @@ generic_slot_device::generic_slot_device(machine_config const &mconfig, device_t
 {
 }
 
-generic_socket_device::generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+generic_socket_device::generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	generic_slot_device(mconfig, GENERIC_SOCKET, tag, owner, clock)
 {
 }
 
-generic_cartslot_device::generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+generic_cartslot_device::generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	generic_slot_device(mconfig, GENERIC_CARTSLOT, tag, owner, clock)
 {
 }

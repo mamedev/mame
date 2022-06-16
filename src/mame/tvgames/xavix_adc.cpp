@@ -9,7 +9,7 @@
 
 DEFINE_DEVICE_TYPE(XAVIX_ADC, xavix_adc_device, "xavix_adc", "XaviX ADC")
 
-xavix_adc_device::xavix_adc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xavix_adc_device::xavix_adc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XAVIX_ADC, tag, owner, clock)
 	, m_in0_cb(*this)
 	, m_in1_cb(*this)

@@ -34,14 +34,14 @@ DEFINE_DEVICE_TYPE(GENERIC_RAM_64K_LINEAR,  generic_ram_64k_linear_device,   "ge
 DEFINE_DEVICE_TYPE(GENERIC_RAM_128K_LINEAR, generic_ram_128k_linear_device,  "generic_ram128l", "Generic RAM 128K (linear mapping)")
 
 
-generic_ram_plain_device::generic_ram_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t size)
+generic_ram_plain_device::generic_ram_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t size)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_generic_cart_interface(mconfig, *this)
 	, m_size(size)
 {
 }
 
-generic_ram_linear_device::generic_ram_linear_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t size)
+generic_ram_linear_device::generic_ram_linear_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t size)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_generic_cart_interface(mconfig, *this)
 	, m_size(size)
@@ -49,32 +49,32 @@ generic_ram_linear_device::generic_ram_linear_device(const machine_config &mconf
 }
 
 
-generic_ram_32k_plain_device::generic_ram_32k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+generic_ram_32k_plain_device::generic_ram_32k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_ram_plain_device(mconfig, GENERIC_RAM_32K_PLAIN, tag, owner, clock, 0x8000)
 {
 }
 
-generic_ram_64k_plain_device::generic_ram_64k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+generic_ram_64k_plain_device::generic_ram_64k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_ram_plain_device(mconfig, GENERIC_RAM_64K_PLAIN, tag, owner, clock, 0x10000)
 {
 }
 
-generic_ram_128k_plain_device::generic_ram_128k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+generic_ram_128k_plain_device::generic_ram_128k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_ram_plain_device(mconfig, GENERIC_RAM_128K_PLAIN, tag, owner, clock, 0x20000)
 {
 }
 
-generic_ram_32k_linear_device::generic_ram_32k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+generic_ram_32k_linear_device::generic_ram_32k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_ram_linear_device(mconfig, GENERIC_RAM_32K_LINEAR, tag, owner, clock, 0x8000)
 {
 }
 
-generic_ram_64k_linear_device::generic_ram_64k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+generic_ram_64k_linear_device::generic_ram_64k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_ram_linear_device(mconfig, GENERIC_RAM_64K_LINEAR, tag, owner, clock, 0x10000)
 {
 }
 
-generic_ram_128k_linear_device::generic_ram_128k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+generic_ram_128k_linear_device::generic_ram_128k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_ram_linear_device(mconfig, GENERIC_RAM_128K_LINEAR, tag, owner, clock, 0x20000)
 {
 }

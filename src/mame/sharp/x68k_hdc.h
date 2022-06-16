@@ -95,7 +95,7 @@ class x68k_hdc_image_device : public harddisk_image_base_device
 
 public:
 	// construction/destruction
-	x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// image-level overrides
 	virtual const char *file_extensions() const noexcept override { return "hdf"; }

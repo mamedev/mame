@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(MM5837_STREAM, mm5837_stream_device, "mm5837_stream", "MM5837
 //  mm5837_device - constructor
 //-------------------------------------------------
 
-mm5837_device::mm5837_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mm5837_device::mm5837_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MM5837, tag, owner, clock),
 	m_output_cb(*this),
 	m_timer(nullptr),
@@ -88,7 +88,7 @@ TIMER_CALLBACK_MEMBER(mm5837_device::update_clock_output)
 //  mm5837_stream_device - constructor
 //-------------------------------------------------
 
-mm5837_stream_device::mm5837_stream_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mm5837_stream_device::mm5837_stream_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MM5837_STREAM, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr),

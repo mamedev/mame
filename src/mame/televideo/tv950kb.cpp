@@ -12,7 +12,7 @@
 
 DEFINE_DEVICE_TYPE(TV950_KEYBOARD, tv950kb_device, "tv950kb", "TeleVideo 950 Keyboard")
 
-tv950kb_device::tv950kb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tv950kb_device::tv950kb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TV950_KEYBOARD, tag, owner, clock)
 	, m_tx_cb(*this)
 	, m_mcu(*this, "mcu")

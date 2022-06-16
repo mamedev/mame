@@ -364,7 +364,7 @@ class tx0_readtape_image_device : public paper_tape_reader_device
 {
 public:
 	// construction/destruction
-	tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// image-level overrides
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
@@ -383,7 +383,7 @@ private:
 
 DEFINE_DEVICE_TYPE(TX0_READTAPE, tx0_readtape_image_device, "tx0_readtape_image", "TX0 Tape Reader")
 
-tx0_readtape_image_device::tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tx0_readtape_image_device::tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: paper_tape_reader_device(mconfig, TX0_READTAPE, tag, owner, clock)
 	, m_tx0(*this, DEVICE_SELF_OWNER)
 {
@@ -393,7 +393,7 @@ class tx0_punchtape_image_device : public paper_tape_punch_device
 {
 public:
 	// construction/destruction
-	tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// image-level overrides
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
@@ -412,7 +412,7 @@ private:
 
 DEFINE_DEVICE_TYPE(TX0_PUNCHTAPE, tx0_punchtape_image_device, "tx0_punchtape_image", "TX0 Tape Puncher")
 
-tx0_punchtape_image_device::tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tx0_punchtape_image_device::tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: paper_tape_punch_device(mconfig, TX0_PUNCHTAPE, tag, owner, clock)
 	, m_tx0(*this, DEVICE_SELF_OWNER)
 {
@@ -424,7 +424,7 @@ class tx0_printer_image_device :    public device_t,
 {
 public:
 	// construction/destruction
-	tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// image-level overrides
 	virtual bool is_readable()  const noexcept override { return false; }
@@ -449,7 +449,7 @@ private:
 
 DEFINE_DEVICE_TYPE(TX0_PRINTER, tx0_printer_image_device, "tx0_printer_image", "TX0 Typewriter")
 
-tx0_printer_image_device::tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tx0_printer_image_device::tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TX0_PRINTER, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, m_tx0(*this, DEVICE_SELF_OWNER)
@@ -460,7 +460,7 @@ class tx0_magtape_image_device : public magtape_image_device
 {
 public:
 	// construction/destruction
-	tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// image-level overrides
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
@@ -478,7 +478,7 @@ private:
 
 DEFINE_DEVICE_TYPE(TX0_MAGTAPE, tx0_magtape_image_device, "tx0_magtape_image", "TX0 Magnetic Tape")
 
-tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: magtape_image_device(mconfig, TX0_MAGTAPE, tag, owner, clock)
 	, m_tx0(*this, DEVICE_SELF_OWNER)
 {
@@ -1544,7 +1544,7 @@ void tx0_state::tx0_64kw(machine_config &config)
 {
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is approximately 6usec) */
-	TX0_64KW(config, m_maincpu, 166667);
+	TX0_64KW(config, m_maincpu, XTAL::u(166667));
 	m_maincpu->cpy().set(FUNC(tx0_state::tx0_io_cpy));
 	m_maincpu->r1l().set(FUNC(tx0_state::tx0_io_r1l));
 	m_maincpu->dis().set(FUNC(tx0_state::tx0_io_dis));
@@ -1569,15 +1569,15 @@ void tx0_state::tx0_64kw(machine_config &config)
 	screen.screen_vblank().set(FUNC(tx0_state::screen_vblank_tx0));
 	screen.set_palette(m_palette);
 
-	CRT(config, m_crt, 0);
+	CRT(config, m_crt);
 	m_crt->set_num_levels(pen_crt_num_levels);
 	m_crt->set_offsets(crt_window_offset_x, crt_window_offset_y);
 	m_crt->set_size(crt_window_width, crt_window_height);
 
-	TX0_READTAPE(config, "readt", 0);
-	TX0_PUNCHTAPE(config, "punch", 0);
-	TX0_PRINTER(config, "typewriter", 0);
-	TX0_MAGTAPE(config, "magtape", 0);
+	TX0_READTAPE(config, "readt");
+	TX0_PUNCHTAPE(config, "punch");
+	TX0_PRINTER(config, "typewriter");
+	TX0_MAGTAPE(config, "magtape");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tx0);
 	PALETTE(config, m_palette, FUNC(tx0_state::tx0_palette), total_colors_needed + sizeof(tx0_pens), total_colors_needed);

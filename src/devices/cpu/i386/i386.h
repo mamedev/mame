@@ -29,7 +29,7 @@ class i386_device : public cpu_device, public device_vtlb_interface, public i386
 {
 public:
 	// construction/destruction
-	i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i386_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto smiact() { return m_smiact.bind(); }
@@ -42,7 +42,7 @@ public:
 	uint64_t debug_cacheflush(int params, const uint64_t *param);
 
 protected:
-	i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width);
+	i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int program_data_width, int program_addr_width, int io_data_width);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -1528,7 +1528,7 @@ class i386sx_device : public i386_device
 {
 public:
 	// construction/destruction
-	i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual u8 mem_pr8(offs_t address) override { return macache16.read_byte(address); }
@@ -1551,10 +1551,10 @@ class i486_device : public i386_device
 {
 public:
 	// construction/destruction
-	i486_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i486_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -1564,7 +1564,7 @@ class i486dx4_device : public i486_device
 {
 public:
 	// construction/destruction
-	i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_reset() override;
@@ -1575,10 +1575,10 @@ class pentium_device : public i386_device
 {
 public:
 	// construction/destruction
-	pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	pentium_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pentium_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI || inputnum == INPUT_LINE_SMI; }
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -1593,7 +1593,7 @@ class pentium_mmx_device : public pentium_device
 {
 public:
 	// construction/destruction
-	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -1605,7 +1605,7 @@ class mediagx_device : public i386_device
 {
 public:
 	// construction/destruction
-	mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -1617,10 +1617,10 @@ class pentium_pro_device : public pentium_device
 {
 public:
 	// construction/destruction
-	pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	pentium_pro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pentium_pro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
@@ -1633,7 +1633,7 @@ class pentium2_device : public pentium_pro_device
 {
 public:
 	// construction/destruction
-	pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -1645,7 +1645,7 @@ class pentium3_device : public pentium_pro_device
 {
 public:
 	// construction/destruction
-	pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -1659,7 +1659,7 @@ class pentium4_device : public pentium_device
 {
 public:
 	// construction/destruction
-	pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;

@@ -16,7 +16,7 @@
 class raiden2cop_device : public device_t
 {
 public:
-	raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Command Table
 	uint16_t cop_func_trigger[0x100/8];       /* function trigger */

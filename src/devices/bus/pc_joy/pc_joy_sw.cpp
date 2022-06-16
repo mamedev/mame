@@ -7,7 +7,7 @@
 
 DEFINE_DEVICE_TYPE(PC_MSSW_PAD, pc_mssw_pad_device, "mssw_pad", "Microsoft Sidewinder Pad")
 
-pc_mssw_pad_device::pc_mssw_pad_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+pc_mssw_pad_device::pc_mssw_pad_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	device_t(mconfig, PC_MSSW_PAD, tag, owner, clock),
 	device_pc_joy_interface(mconfig, *this),
 	m_btn1(*this, "btn1"),

@@ -8,7 +8,7 @@
 class elan_eu3a05gpio_device : public device_t
 {
 public:
-	elan_eu3a05gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	elan_eu3a05gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto write_0_callback() { return m_write_0_callback.bind(); }
 	auto write_1_callback() { return m_write_1_callback.bind(); }

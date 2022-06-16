@@ -412,7 +412,7 @@ WRITE_LINE_MEMBER(sbasketb_state::vblank_irq)
 void sbasketb_state::sbasketb(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI1(config, m_maincpu, 1'400'000);        // 1.400 MHz ??? TODO: From a 18.432 MHz XTAL this doesn't seem probable
+	KONAMI1(config, m_maincpu, XTAL::u(1'400'000));        // 1.400 MHz ??? TODO: From a 18.432 MHz XTAL this doesn't seem probable
 	m_maincpu->set_addrmap(AS_PROGRAM, &sbasketb_state::main_map);
 
 	Z80(config, m_audiocpu, XTAL(14'318'181) / 4); // 3.5795 MHz
@@ -447,9 +447,9 @@ void sbasketb_state::sbasketb(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	TRACKFLD_AUDIO(config, "soundbrd", 0, m_audiocpu, m_vlm);
+	TRACKFLD_AUDIO(config, "soundbrd", m_audiocpu, m_vlm);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 
 	SN76489(config, m_sn, XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
@@ -459,7 +459,7 @@ void sbasketb_state::sbasketb(machine_config &config)
 void sbasketb_state::sbasketbu(machine_config &config)
 {
 	sbasketb(config);
-	MC6809E(config.replace(), m_maincpu, 1'400'000);        // 6809E at 1.400 MHz ???
+	MC6809E(config.replace(), m_maincpu, XTAL::u(1'400'000));        // 6809E at 1.400 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &sbasketb_state::main_map);
 }
 

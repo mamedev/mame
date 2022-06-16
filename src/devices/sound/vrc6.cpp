@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(VRC6, vrc6snd_device, "vrc6snd", "Konami 053329 VRC VI (Sound
 //  vrc6snd_device - constructor
 //-------------------------------------------------
 
-vrc6snd_device::vrc6snd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+vrc6snd_device::vrc6snd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VRC6, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_freqctrl(0), m_pulsectrl{ 0, 0 }, m_sawrate(0), m_master_freq(0)

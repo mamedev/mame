@@ -71,12 +71,12 @@ DEFINE_DEVICE_TYPE(ACIA6850, acia6850_device, "acia6850", "MC6850 ACIA")
 //  acia6850_device - constructor
 //-------------------------------------------------
 
-acia6850_device::acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acia6850_device::acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: acia6850_device(mconfig, ACIA6850, tag, owner, clock)
 {
 }
 
-acia6850_device::acia6850_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+acia6850_device::acia6850_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_txd_handler(*this)
 	, m_rts_handler(*this)

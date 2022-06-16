@@ -43,7 +43,7 @@ void nubus_xceed30hr_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, XCEED30HR_SCREEN_NAME, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(nubus_xceed30hr_device::screen_update));
-	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	screen.set_raw(XTAL::u(25175000), 800, 0, 640, 525, 0, 480);
 	screen.set_size(1024, 768);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 }
@@ -65,12 +65,12 @@ const tiny_rom_entry *nubus_xceed30hr_device::device_rom_region() const
 //  nubus_xceed30hr_device - constructor
 //-------------------------------------------------
 
-nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	nubus_xceed30hr_device(mconfig, PDS030_XCEED30HR, tag, owner, clock)
 {
 }
 
-nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),

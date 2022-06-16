@@ -100,7 +100,7 @@ void cbm8000_hsg_a_device::device_add_mconfig(machine_config &config)
 	screen.set_refresh_hz(25);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	EF9365(config, m_gdc, 1750000);
+	EF9365(config, m_gdc, XTAL::u(1750000));
 	m_gdc->set_screen(SCREEN_TAG);
 	m_gdc->set_addrmap(0, &cbm8000_hsg_a_device::hsg_a_map);
 	m_gdc->set_palette_tag("palette");
@@ -117,7 +117,7 @@ void cbm8000_hsg_b_device::device_add_mconfig(machine_config &config)
 	screen.set_refresh_hz(50);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	EF9365(config, m_gdc, 1750000); //EF9366
+	EF9365(config, m_gdc, XTAL::u(1750000)); //EF9366
 	m_gdc->set_screen(SCREEN_TAG);
 	m_gdc->set_addrmap(0, &cbm8000_hsg_b_device::hsg_b_map);
 	m_gdc->set_palette_tag("palette");
@@ -135,7 +135,7 @@ void cbm8000_hsg_b_device::device_add_mconfig(machine_config &config)
 //  cbm8000_hsg_device - constructor
 //-------------------------------------------------
 
-cbm8000_hsg_device::cbm8000_hsg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+cbm8000_hsg_device::cbm8000_hsg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_gdc(*this, EF9365_TAG),
@@ -144,12 +144,12 @@ cbm8000_hsg_device::cbm8000_hsg_device(const machine_config &mconfig, device_typ
 {
 }
 
-cbm8000_hsg_a_device::cbm8000_hsg_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cbm8000_hsg_a_device::cbm8000_hsg_a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cbm8000_hsg_device(mconfig, CBM8000_HSG_A, tag, owner, clock)
 {
 }
 
-cbm8000_hsg_b_device::cbm8000_hsg_b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cbm8000_hsg_b_device::cbm8000_hsg_b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cbm8000_hsg_device(mconfig, CBM8000_HSG_B, tag, owner, clock)
 {
 }

@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(AHA1740, aha1740_device, "aha1740", "AHA-1740 Fast SCSI Host 
 DEFINE_DEVICE_TYPE(AHA1742A, aha1742a_device, "aha1742a", "AHA-1742A Fast SCSI Host Adapter")
 
 
-aha174x_device::aha174x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+aha174x_device::aha174x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_hpc(*this, "hpc")
@@ -52,12 +52,12 @@ aha174x_device::aha174x_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-aha1740_device::aha1740_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+aha1740_device::aha1740_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: aha174x_device(mconfig, AHA1740, tag, owner, clock)
 {
 }
 
-aha1742a_device::aha1742a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+aha1742a_device::aha1742a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: aha174x_device(mconfig, AHA1742A, tag, owner, clock)
 	, m_fdc(*this, "fdc")
 {
@@ -94,7 +94,7 @@ void aha1740_device::device_add_mconfig(machine_config &config)
 	m_busaic->hrst_callback().set_inputline(m_hpc, INPUT_LINE_RESET);
 	//m_busaic->srst_callback().set_inputline(m_hpc, hpc_device::EI_LINE);
 
-	I82355(config, "bmic", 0);
+	I82355(config, "bmic");
 	//bmic.lint_callback().set_inputline(m_hpc, hpc_device::I2_LINE);
 
 	IDT7201(config, m_fifo[0]);
@@ -121,7 +121,7 @@ void aha1742a_device::device_add_mconfig(machine_config &config)
 	m_busaic->hrst_callback().set_inputline(m_hpc, INPUT_LINE_RESET);
 	//m_busaic->srst_callback().set_inputline(m_hpc, hpc_device::EI_LINE);
 
-	I82355(config, "bmic", 0);
+	I82355(config, "bmic");
 	//bmic.lint_callback().set_inputline(m_hpc, hpc_device::I2_LINE);
 
 	IDT7201(config, m_fifo[0]);

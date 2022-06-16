@@ -41,7 +41,7 @@ void al_magicsound_device::device_add_mconfig(machine_config &config)
 	// According to the schematics, the clock is from the clock pin on the expansion port (4MHz), and
 	// passes through an inverter to each CLK pin on both timers.  This seems to be too fast.
 	// Timer outputs to SAM0/1/2/3 are sample clocks for each sound channel, D/A0 is the low bit of the channel select.
-	PIT8254(config, m_timer1, 0);
+	PIT8254(config, m_timer1);
 	m_timer1->set_clk<0>(4000000);
 	m_timer1->out_handler<0>().set(FUNC(al_magicsound_device::sam0_w));
 	m_timer1->set_clk<1>(4000000);
@@ -49,7 +49,7 @@ void al_magicsound_device::device_add_mconfig(machine_config &config)
 	m_timer1->set_clk<2>(4000000);
 	m_timer1->out_handler<2>().set(FUNC(al_magicsound_device::sam2_w));
 
-	PIT8254(config, m_timer2, 0);
+	PIT8254(config, m_timer2);
 	m_timer2->set_clk<0>(4000000);
 	m_timer2->out_handler<0>().set(FUNC(al_magicsound_device::sam3_w));
 	m_timer2->set_clk<1>(4000000);
@@ -57,7 +57,7 @@ void al_magicsound_device::device_add_mconfig(machine_config &config)
 	m_timer2->set_clk<2>(4000000);
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 	// no pass-through(?)
 }
 
@@ -66,7 +66,7 @@ void al_magicsound_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-al_magicsound_device::al_magicsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+al_magicsound_device::al_magicsound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, AL_MAGICSOUND, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_dac(*this,"dac"),

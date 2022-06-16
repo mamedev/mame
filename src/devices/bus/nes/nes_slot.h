@@ -387,7 +387,7 @@ class nes_cart_slot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: nes_cart_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -395,7 +395,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~nes_cart_slot_device();
 
 	// image-level overrides

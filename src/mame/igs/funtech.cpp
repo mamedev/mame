@@ -443,7 +443,7 @@ void fun_tech_corp_state::machine_start()
 void fun_tech_corp_state::funtech(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	Z80(config, m_maincpu, XTAL::u(4000000));         /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &fun_tech_corp_state::funtech_map);
 	m_maincpu->set_addrmap(AS_IO, &fun_tech_corp_state::funtech_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fun_tech_corp_state::vblank_interrupt));
@@ -467,7 +467,7 @@ void fun_tech_corp_state::funtech(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000)); /* M5255, ? MHz */
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(1500000))); /* M5255, ? MHz */
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.00);

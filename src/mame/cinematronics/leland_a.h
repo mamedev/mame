@@ -20,7 +20,7 @@
 class leland_80186_sound_device : public device_t
 {
 public:
-	leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template<class T> void set_master_cpu_tag(T &&tag) { m_master.set_tag(std::forward<T>(tag)); }
 
@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit1_2_w);
 
 protected:
-	leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -94,7 +94,7 @@ private:
 class redline_80186_sound_device : public leland_80186_sound_device
 {
 public:
-	redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void redline_dac_w(offs_t offset, u16 data);
 
 protected:
@@ -107,7 +107,7 @@ private:
 class ataxx_80186_sound_device : public leland_80186_sound_device
 {
 public:
-	ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -117,7 +117,7 @@ protected:
 class wsf_80186_sound_device : public leland_80186_sound_device
 {
 public:
-	wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

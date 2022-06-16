@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(UPD4992, upd4992_device, "upd4992", "uPD4992 RTC")
 //  upd4992_device - constructor
 //-------------------------------------------------
 
-upd4992_device::upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upd4992_device::upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UPD4992, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
 	, m_timer_clock(nullptr)

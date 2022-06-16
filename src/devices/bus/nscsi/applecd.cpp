@@ -44,7 +44,7 @@
 
 DEFINE_DEVICE_TYPE(APPLECD150, applecd150_device, "aplcd150", "AppleCD 150")
 
-applecd150_device::applecd150_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+applecd150_device::applecd150_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, APPLECD150, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, "scsic")
 {

@@ -195,7 +195,7 @@ void hotblock_state::hotblock(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotblock_state::hotblock_map);
 	m_maincpu->set_addrmap(AS_IO, &hotblock_state::hotblock_io);
 
-	I2C_24C02(config, "i2cmem", 0); // 24C02B1 // Some boards may use a 24C04, but using just half its capacity
+	I2C_24C02(config, "i2cmem"); // 24C02B1 // Some boards may use a 24C04, but using just half its capacity
 
 	ADDRESS_MAP_BANK(config, m_video_bank).set_map(&hotblock_state::banked_video_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x10000);
 

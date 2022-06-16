@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(SEGA315_6154, sega_315_6154_device, "sega315_6154", "Sega 315-6154 Northbridge")
 
-sega_315_6154_device::sega_315_6154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_315_6154_device::sega_315_6154_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_host_device(mconfig, SEGA315_6154, tag, owner, clock),
 	m_configuration_config("configuration_space", ENDIANNESS_LITTLE, 32, 20),
 	m_memory_config("memory_space", ENDIANNESS_LITTLE, 32, 32)

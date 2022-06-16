@@ -22,7 +22,7 @@ class sega_315_5649_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5649_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_315_5649_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto in_pa_callback() { return m_in_port_cb[0].bind(); }

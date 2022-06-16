@@ -748,7 +748,7 @@ void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 void avigo_state::avigo(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &avigo_state::avigo_mem);
 	m_maincpu->set_addrmap(AS_IO, &avigo_state::avigo_io);
 	config.set_maximum_quantum(attotime::from_hz(60));

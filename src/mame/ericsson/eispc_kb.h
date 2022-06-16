@@ -17,7 +17,7 @@ public:
 	auto num_cb() { return m_led_num_cb.bind(); }
 	auto scroll_cb() { return m_led_scroll_cb.bind(); }
 
-	eispc_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	eispc_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	DECLARE_INPUT_CHANGED_MEMBER(key);
 	DECLARE_WRITE_LINE_MEMBER(rxd_w);

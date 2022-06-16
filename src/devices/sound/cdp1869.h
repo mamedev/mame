@@ -147,12 +147,12 @@ public:
 
 	// construction/destruction
 	template <typename T>
-	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&addrmap)
+	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&addrmap)
 		: cdp1869_device(mconfig, tag, owner, clock)
 	{
 		set_addrmap(0, std::forward<T>(addrmap));
 	}
-	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto pal_ntsc_callback() { return m_read_pal_ntsc.bind(); }
 	auto prd_callback() { return m_write_prd.bind(); }

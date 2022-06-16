@@ -21,7 +21,7 @@ class tc8830f_device : public device_t,
 {
 public:
 	// construction/destruction
-	tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void reset();
 	void write_p(uint8_t data);

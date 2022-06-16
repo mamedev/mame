@@ -62,7 +62,7 @@ ALLOW_SAVE_TYPE(laserdisc_device::slider_position);
 //  laserdisc_device - constructor
 //-------------------------------------------------
 
-laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
@@ -332,7 +332,7 @@ void laserdisc_device::device_stop()
 void laserdisc_device::device_reset()
 {
 	// attempt to wire up the audio
-	m_stream->set_sample_rate(m_samplerate);
+	m_stream->set_sample_rate(XTAL::u(m_samplerate));
 
 	// set up the general ld
 	m_audiosquelch = 3;
@@ -856,7 +856,7 @@ void laserdisc_device::init_audio()
 	m_audio_callback.resolve();
 
 	// allocate a stream
-	m_stream = stream_alloc(0, 2, 48000);
+	m_stream = stream_alloc(0, 2, XTAL::u(48000));
 
 	// allocate audio buffers
 	m_audiomaxsamples = ((uint64_t)m_samplerate * 1000000 + m_fps_times_1million - 1) / m_fps_times_1million;

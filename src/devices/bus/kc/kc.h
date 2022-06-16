@@ -49,14 +49,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	kcexp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: kcexp_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: kcexp_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~kcexp_slot_device();
 
 	auto irq() { return m_out_irq_cb.bind(); }
@@ -81,7 +81,7 @@ public:
 	devcb_write_line                m_out_halt_cb;
 
 protected:
-	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -100,14 +100,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	kccart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: kccart_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: kccart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~kccart_slot_device();
 
 	// image-level overrides

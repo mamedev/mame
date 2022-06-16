@@ -14,7 +14,7 @@
 class clock_device : public device_t
 {
 public:
-	clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	clock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto signal_handler() { return m_signal_handler.bind(); }
 	auto &set_period(attotime period) { m_period = period; reinit(); return *this; }

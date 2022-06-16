@@ -14,7 +14,7 @@ class nes_cony_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_cony_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_cony_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_l(offs_t offset) override;
 	virtual u8 read_m(offs_t offset) override;
@@ -26,7 +26,7 @@ public:
 
 protected:
 	// construction/destruction
-	nes_cony_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 extra_addr, u8 mask);
+	nes_cony_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u16 extra_addr, u8 mask);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -57,7 +57,7 @@ class nes_cony1k_device : public nes_cony_device
 {
 public:
 	// construction/destruction
-	nes_cony1k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_cony1k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void set_chr() override;
 };
@@ -69,7 +69,7 @@ class nes_yoko_device : public nes_cony_device
 {
 public:
 	// construction/destruction
-	nes_yoko_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_yoko_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 };

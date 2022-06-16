@@ -89,7 +89,7 @@ void rbowlorama_state::machine_reset()
 void rbowlorama_state::rbowlorama(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM4(config, m_maincpu, 120000000); // Celeron, socket 478, 800/533MHz
+	PENTIUM4(config, m_maincpu, XTAL::u(120000000)); // Celeron, socket 478, 800/533MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &rbowlorama_state::rbowlorama_map);
 
 	// Video hardware

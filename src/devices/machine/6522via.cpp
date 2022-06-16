@@ -180,7 +180,7 @@ void via6522_device::map(address_map &map)
 //  via6522_device - constructor
 //-------------------------------------------------
 
-via6522_device::via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+via6522_device::via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		m_in_a_handler(*this),
 		m_in_b_handler(*this),
@@ -209,7 +209,7 @@ via6522_device::via6522_device(const machine_config &mconfig, device_type type, 
 //  mos6522_device - constructor
 //-------------------------------------------------
 
-mos6522_device::mos6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6522_device::mos6522_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: via6522_device(mconfig, MOS6522, tag, owner, clock)
 {
 }
@@ -219,7 +219,7 @@ mos6522_device::mos6522_device(const machine_config &mconfig, const char *tag, d
 //  r65c22_device - constructor
 //-------------------------------------------------
 
-r65c22_device::r65c22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+r65c22_device::r65c22_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: via6522_device(mconfig, R65C22, tag, owner, clock)
 {
 }
@@ -229,7 +229,7 @@ r65c22_device::r65c22_device(const machine_config &mconfig, const char *tag, dev
 //  r65c22_device - constructor
 //-------------------------------------------------
 
-r65nc22_device::r65nc22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+r65nc22_device::r65nc22_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: via6522_device(mconfig, R65NC22, tag, owner, clock)
 {
 }
@@ -239,7 +239,7 @@ r65nc22_device::r65nc22_device(const machine_config &mconfig, const char *tag, d
 //  w65c22s_device - constructor
 //-------------------------------------------------
 
-w65c22s_device::w65c22s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+w65c22s_device::w65c22s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: via6522_device(mconfig, W65C22S, tag, owner, clock)
 {
 }

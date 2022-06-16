@@ -117,8 +117,8 @@ void c64_multiscreen_cartridge_device::device_add_mconfig(machine_config &config
 	m6802_cpu_device &cpu(M6802(config, MC6802P_TAG, XTAL(4'000'000)));
 	cpu.set_addrmap(AS_PROGRAM, &c64_multiscreen_cartridge_device::multiscreen_mem);
 
-	PIA6821(config, MC6821P_0_TAG, 0);
-	PIA6821(config, MC6821P_1_TAG, 0);
+	PIA6821(config, MC6821P_0_TAG);
+	PIA6821(config, MC6821P_1_TAG);
 }
 
 
@@ -130,7 +130,7 @@ void c64_multiscreen_cartridge_device::device_add_mconfig(machine_config &config
 //  c64_multiscreen_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_multiscreen_cartridge_device::c64_multiscreen_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_multiscreen_cartridge_device::c64_multiscreen_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_MULTISCREEN, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this), m_bank(0)
 {

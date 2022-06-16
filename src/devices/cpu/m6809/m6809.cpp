@@ -136,7 +136,7 @@ DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "MC6809 (legacy)")
 //  m6809_base_device - constructor
 //-------------------------------------------------
 
-m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, int divider)
+m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, const device_type type, int divider)
 	: cpu_device(mconfig, type, tag, owner, clock),
 	m_lic_func(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16),
@@ -603,7 +603,7 @@ void m6809_base_device::mi_default::write(uint16_t adr, uint8_t val)
 //  mc6809_device
 //-------------------------------------------------
 
-mc6809_device::mc6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc6809_device::mc6809_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m6809_base_device(mconfig, tag, owner, clock, MC6809, 4)
 {
 }
@@ -614,7 +614,7 @@ mc6809_device::mc6809_device(const machine_config &mconfig, const char *tag, dev
 //  mc6809e_device
 //-------------------------------------------------
 
-mc6809e_device::mc6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc6809e_device::mc6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m6809_base_device(mconfig, tag, owner, clock, MC6809E, 1)
 {
 }
@@ -625,7 +625,7 @@ mc6809e_device::mc6809e_device(const machine_config &mconfig, const char *tag, d
 //  m6809_device
 //-------------------------------------------------
 
-m6809_device::m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m6809_device::m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m6809_base_device(mconfig, tag, owner, clock, M6809, 1)
 {
 }

@@ -21,7 +21,7 @@ class rc2014_ds1302_device : public device_t, public device_rc2014_card_interfac
 {
 public:
 	// construction/destruction
-	rc2014_ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rc2014_ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -37,7 +37,7 @@ private:
 	required_ioport m_addr;
 };
 
-rc2014_ds1302_device::rc2014_ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rc2014_ds1302_device::rc2014_ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RC2014_DS1302_RTC, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_rtc(*this, "rtc")

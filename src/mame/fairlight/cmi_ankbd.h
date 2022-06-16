@@ -16,7 +16,7 @@
 class cmi_alphanumeric_keyboard_device : public device_t
 {
 public:
-	cmi_alphanumeric_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	cmi_alphanumeric_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto txd_handler() { return m_txd_handler.bind(); }
 	auto rts_handler() { return m_rts_handler.bind(); }

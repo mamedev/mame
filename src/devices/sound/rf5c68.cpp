@@ -40,7 +40,7 @@ void rf5c164_device::rf5c164_map(address_map &map)
 //  rf5c68_device - constructor
 //-------------------------------------------------
 
-rf5c68_device::rf5c68_device(const machine_config & mconfig, device_type type, const char * tag, device_t * owner, u32 clock, int output_bits)
+rf5c68_device::rf5c68_device(const machine_config & mconfig, device_type type, const char * tag, device_t * owner, const XTAL &clock, int output_bits)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
@@ -54,7 +54,7 @@ rf5c68_device::rf5c68_device(const machine_config & mconfig, device_type type, c
 {
 }
 
-rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rf5c68_device(mconfig, RF5C68, tag, owner, clock, 10)
 {
 }
@@ -64,7 +64,7 @@ rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, dev
 //  rf5c164_device - constructor
 //-------------------------------------------------
 
-rf5c164_device::rf5c164_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rf5c164_device::rf5c164_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rf5c68_device(mconfig, RF5C164, tag, owner, clock, 16)
 {
 }

@@ -556,7 +556,7 @@ private:
 DEFINE_DEVICE_TYPE(CAPCOM_CPS2_COMM, cps2_comm_device, "cps2comm", "Capcom CPS-2 communication board")
 
 
-cps2_comm_device::cps2_comm_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+cps2_comm_device::cps2_comm_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CAPCOM_CPS2_COMM, tag, owner, clock),
 	m_config(*this, "CFG")
 {

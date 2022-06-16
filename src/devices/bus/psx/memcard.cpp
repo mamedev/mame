@@ -41,7 +41,7 @@ enum transfer_states
 	state_end
 };
 
-psxcard_device::psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+psxcard_device::psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PSXCARD, tag, owner, clock),
 	device_memcard_image_interface(mconfig, *this),
 	pkt_ptr(0),

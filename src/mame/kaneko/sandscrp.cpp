@@ -435,7 +435,7 @@ void sandscrp_state::sandscrp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sandscrp_state::sandscrp_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(sandscrp_state::interrupt));
 
-	Z80(config, m_audiocpu, 4000000);   /* Z8400AB1, Reads the DSWs: it can't be disabled */
+	Z80(config, m_audiocpu, XTAL::u(4000000));   /* Z8400AB1, Reads the DSWs: it can't be disabled */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sandscrp_state::sandscrp_soundmem);
 	m_audiocpu->set_addrmap(AS_IO, &sandscrp_state::sandscrp_soundport);
 
@@ -461,7 +461,7 @@ void sandscrp_state::sandscrp(machine_config &config)
 
 	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
+	KANEKO_PANDORA(config, m_pandora);
 	m_pandora->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
@@ -472,10 +472,10 @@ void sandscrp_state::sandscrp(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	OKIM6295(config, "oki", 12000000/6, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+	OKIM6295(config, "oki", XTAL::u(12000000)/6, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	/* YM3014B + YM2203C */
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 4000000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL::u(4000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.port_a_read_callback().set_ioport("DSW1");
 	ymsnd.port_b_read_callback().set_ioport("DSW2");

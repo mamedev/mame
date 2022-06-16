@@ -1940,8 +1940,8 @@ void segas24_state::system24(machine_config &config)
 	TIMER(config, "irq_frc").configure_periodic(FUNC(segas24_state::irq_frc_cb), attotime::from_hz(FRC_CLOCK_MODE1));
 
 	S24TILE(config, m_vtile, 0, 0xfff).set_palette("palette");
-	S24SPRITE(config, m_vsprite, 0);
-	S24MIXER(config, m_vmixer, 0);
+	S24SPRITE(config, m_vsprite);
+	S24MIXER(config, m_vmixer);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
@@ -1954,12 +1954,12 @@ void segas24_state::system24(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(4000000)));
 	ymsnd.irq_handler().set(FUNC(segas24_state::irq_ym));
 	ymsnd.add_route(0, "lspeaker", 0.50);
 	ymsnd.add_route(1, "rspeaker", 0.50);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "lspeaker", 0.5).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 }
 
 void segas24_state::system24_rom(machine_config &config)
@@ -2005,13 +2005,13 @@ void segas24_state::system24_floppy_hotrod(machine_config &config)
 	upd2.set_portx_tag("DIAL3");
 	upd2.set_porty_tag("DIAL4");
 
-	msm6253_device &adc1(MSM6253(config, "adc1", 0)); // IC5 - 33k/33p R/C clock
+	msm6253_device &adc1(MSM6253(config, "adc1")); // IC5 - 33k/33p R/C clock
 	adc1.set_input_tag<0>("PEDAL1");
 	adc1.set_input_tag<1>("PEDAL2");
 	adc1.set_input_tag<2>("PEDAL3");
 	adc1.set_input_tag<3>("PEDAL4");
 
-	MSM6253(config, "adc2", 0); // IC2 - 33k/33p R/C clock
+	MSM6253(config, "adc2"); // IC2 - 33k/33p R/C clock
 }
 
 void segas24_state::system24_floppy_fd1094(machine_config &config)

@@ -223,7 +223,7 @@ GFXDECODE_END
 
 void albazc_state::hanaroku(machine_config &config)
 {
-	Z80(config, m_maincpu, 6000000);         // ? MHz
+	Z80(config, m_maincpu, XTAL::u(6000000));         // ? MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &albazc_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(albazc_state::irq0_line_hold));
 
@@ -249,7 +249,7 @@ void albazc_state::hanaroku(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2149_device &aysnd(YM2149(config, "aysnd", 1500000)); // ? MHz
+	ym2149_device &aysnd(YM2149(config, "aysnd", XTAL::u(1500000))); // ? MHz
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);

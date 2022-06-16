@@ -18,13 +18,13 @@ class sa1111_device : public device_t
 {
 public:
 	template <typename T>
-	sa1111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	sa1111_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag)
 		: sa1111_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	sa1111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sa1111_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_audio_codec_tag(T &&tag) { m_audio_codec.set_tag(std::forward<T>(tag)); }
 

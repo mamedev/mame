@@ -52,7 +52,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts)
-		: nes_aladdin_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: nes_aladdin_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -60,7 +60,7 @@ public:
 		set_fixed(false);
 	}
 
-	nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~nes_aladdin_slot_device();
 
 	// image-level overrides
@@ -100,7 +100,7 @@ class nes_algn_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_algn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_algn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -108,7 +108,7 @@ public:
 	virtual void write_prg(uint32_t offset, uint8_t data) override;
 
 protected:
-	nes_algn_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_algn_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -122,7 +122,7 @@ class nes_algq_rom_device : public nes_algn_rom_device
 {
 public:
 	// construction/destruction
-	nes_algq_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_algq_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual void write_prg(uint32_t offset, uint8_t data) override;
@@ -152,7 +152,7 @@ class nes_aladdin_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_aladdin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_aladdin_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read_h(offs_t offset) override;
 	virtual void write_h(offs_t offset, uint8_t data) override;

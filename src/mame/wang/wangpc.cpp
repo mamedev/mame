@@ -1271,14 +1271,14 @@ void wangpc_state::on_disk1_unload(floppy_image_device *image)
 
 void wangpc_state::wangpc(machine_config &config)
 {
-	I8086(config, m_maincpu, 8000000);
+	I8086(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &wangpc_state::wangpc_mem);
 	m_maincpu->set_addrmap(AS_IO, &wangpc_state::wangpc_io);
 	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 	//config.m_perfect_cpu_quantum = subtag(I8086_TAG);
 
 	// devices
-	AM9517A(config, m_dmac, 4000000);
+	AM9517A(config, m_dmac, XTAL::u(4000000));
 	m_dmac->out_hreq_callback().set(FUNC(wangpc_state::hrq_w));
 	m_dmac->out_eop_callback().set(FUNC(wangpc_state::eop_w));
 	m_dmac->in_memr_callback().set(FUNC(wangpc_state::memr_r));
@@ -1294,16 +1294,16 @@ void wangpc_state::wangpc(machine_config &config)
 	m_dmac->out_dack_callback<2>().set(FUNC(wangpc_state::dack2_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(wangpc_state::dack3_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	I8255A(config, m_ppi, 0);
+	I8255A(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(wangpc_state::ppi_pa_r));
 	m_ppi->in_pb_callback().set(FUNC(wangpc_state::ppi_pb_r));
 	m_ppi->in_pc_callback().set(FUNC(wangpc_state::ppi_pc_r));
 	m_ppi->out_pc_callback().set(FUNC(wangpc_state::ppi_pc_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(500000);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(2000000);
@@ -1315,14 +1315,14 @@ void wangpc_state::wangpc(machine_config &config)
 	m_uart->dr_callback().set(FUNC(wangpc_state::uart_dr_w));
 	m_uart->tbre_callback().set(FUNC(wangpc_state::uart_tbre_w));
 
-	SCN2661C(config, m_epci, 5'068'800);
+	SCN2661C(config, m_epci, XTAL::u(5'068'800));
 	m_epci->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_epci->rxrdy_handler().set(FUNC(wangpc_state::epci_irq_w));
 	m_epci->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 	m_epci->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_epci->txemt_dschg_handler().set(FUNC(wangpc_state::epci_irq_w));
 
-	UPD765A(config, m_fdc, 8'000'000, false, false);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), false, false);
 	m_fdc->intrq_wr_callback().set(FUNC(wangpc_state::fdc_irq));
 	m_fdc->drq_wr_callback().set(FUNC(wangpc_state::fdc_drq));
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", wangpc_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
@@ -1349,7 +1349,7 @@ void wangpc_state::wangpc(machine_config &config)
 	WANGPC_KEYBOARD(config, "wangpckb").txd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 
 	// bus
-	WANGPC_BUS(config, m_bus, 0);
+	WANGPC_BUS(config, m_bus);
 	m_bus->irq2_wr_callback().set(FUNC(wangpc_state::bus_irq2_w));
 	m_bus->irq3_wr_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
 	m_bus->irq4_wr_callback().set(m_pic, FUNC(pic8259_device::ir4_w));

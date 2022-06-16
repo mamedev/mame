@@ -157,7 +157,7 @@ void vrc5074_device::device_add_mconfig(machine_config &config)
 	ttys00.cts_handler().set(m_uart, FUNC(ns16550_device::cts_w));
 }
 
-vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pci_host_device(mconfig, VRC5074, tag, owner, clock),
 	m_uart(*this, "uart"),
 	m_cpu_space(nullptr), m_cpu(*this, finder_base::DUMMY_TAG),

@@ -17,7 +17,7 @@ class fmscsi_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }

@@ -117,7 +117,7 @@ void vdm7932x_state::vdm7932x(machine_config &config) // all clocks unverified
 	m_subcpu->set_addrmap(AS_PROGRAM, &vdm7932x_state::sub_map);
 	m_subcpu->set_addrmap(AS_IO, &vdm7932x_state::subx_map);
 
-	PIT8253(config, "pit", 0); // UM8253-5
+	PIT8253(config, "pit"); // UM8253-5
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 24.0734_MHz_XTAL / 8)); // UA857D
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

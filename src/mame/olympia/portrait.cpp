@@ -256,11 +256,11 @@ GFXDECODE_END
 
 void portrait_state::portrait(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000);     /* 4 MHz ? */
+	Z80(config, m_maincpu, XTAL::u(4000000));     /* 4 MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &portrait_state::portrait_map);
 	m_maincpu->set_vblank_int("screen", FUNC(portrait_state::irq0_line_hold));
 
-	i8039_device &audiocpu(I8039(config, "audiocpu", 3120000));  /* ? */
+	i8039_device &audiocpu(I8039(config, "audiocpu", XTAL::u(3120000)));  /* ? */
 	audiocpu.set_addrmap(AS_PROGRAM, &portrait_state::portrait_sound_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -281,7 +281,7 @@ void portrait_state::portrait(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	TMS5200(config, m_tms, 640000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	TMS5200(config, m_tms, XTAL::u(640000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

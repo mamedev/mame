@@ -56,7 +56,7 @@ void vectrix_state::vectrix(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &vectrix_state::mem_map);
 	maincpu.set_addrmap(AS_IO, &vectrix_state::io_map);
 
-	I8251(config, "uart1", 0);
+	I8251(config, "uart1");
 }
 
 ROM_START( vectrix )

@@ -14,7 +14,7 @@ class nes_lrog017_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_lrog017_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_lrog017_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
@@ -28,7 +28,7 @@ class nes_holydivr_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_holydivr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_holydivr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
@@ -42,7 +42,7 @@ class nes_tam_s1_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_tam_s1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_tam_s1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
@@ -56,7 +56,7 @@ class nes_g101_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_g101_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_g101_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
@@ -64,7 +64,7 @@ public:
 
 protected:
 	// construction/destruction
-	nes_g101_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 prg_mask);
+	nes_g101_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 prg_mask);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -84,7 +84,7 @@ class nes_h3001_device : public nes_g101_device
 {
 public:
 	// construction/destruction
-	nes_h3001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_h3001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 

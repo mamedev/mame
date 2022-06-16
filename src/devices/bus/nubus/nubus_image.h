@@ -22,7 +22,7 @@ public:
 	class messimg_disk_image_device;
 
 	// construction/destruction
-	nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	enum
@@ -46,7 +46,7 @@ protected:
 		uint32_t bytecount;
 	};
 
-	nubus_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nubus_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

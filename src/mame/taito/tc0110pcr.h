@@ -9,7 +9,7 @@
 class tc0110pcr_device : public device_t, public device_palette_interface
 {
 public:
-	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u16 word_r(offs_t offset);
 	void word_w(offs_t offset, u16 data); /* color index goes up in step of 2 */

@@ -15,7 +15,7 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_PANASONIC08, msx_slot_panasonic08_device)
 class msx_slot_panasonic08_device : public device_t, public msx_internal_slot_interface
 {
 public:
-	msx_slot_panasonic08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_panasonic08_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	void set_rom_start(const char *region, uint32_t offset) { m_rom_region.set_tag(region); m_region_offset = offset; }

@@ -11,7 +11,7 @@
 class wpc_pic_device : public device_t
 {
 public:
-	wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~wpc_pic_device();
 
 	uint8_t read();

@@ -58,7 +58,7 @@ DEFINE_DEVICE_TYPE(FMSCSI, fmscsi_device, "fmscsi", "FM-SCSI")
  * Device
  */
 
-fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: legacy_scsi_host_adapter(mconfig, FMSCSI, tag, owner, clock),
 	m_irq_handler(*this),
 	m_drq_handler(*this)

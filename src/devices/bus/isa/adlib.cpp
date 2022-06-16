@@ -58,7 +58,7 @@ void isa8_adlib_device::device_add_mconfig(machine_config &config)
 //  isa8_adlib_device - constructor
 //-------------------------------------------------
 
-isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISA8_ADLIB, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_ym3812(*this, "ym3812")

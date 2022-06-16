@@ -148,7 +148,7 @@ const tiny_rom_entry *pc9801_118_device::device_rom_region() const
 //  pc9801_118_device - constructor
 //-------------------------------------------------
 
-pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pc9801_snd_device(mconfig, PC9801_118, tag, owner, clock),
 		m_bus(*this, DEVICE_SELF_OWNER),
 		m_opn3(*this, "opn3")

@@ -22,7 +22,7 @@ namespace bus::ti99::colorbus {
 class v9938_busmouse_device : public device_t, public device_v9938_colorbus_interface
 {
 public:
-	v9938_busmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v9938_busmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_changed );
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_pos_changed );
 

@@ -172,13 +172,13 @@ void compc_state::compc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &compc_state::compc_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	PCNOPPI_MOTHERBOARD(config, m_mb).set_cputag(m_maincpu);
 	m_mb->int_callback().set_inputline(m_maincpu, 0);
 	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_mb->kbdclk_callback().set("keyboard", FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_mb->kbddata_callback().set("keyboard", FUNC(pc_kbdc_device::data_write_from_mb));
 	config.device_remove("mb:pit8253");
-	fe2010_pit_device &pit(FE2010_PIT(config, "mb:pit8253", 0));
+	fe2010_pit_device &pit(FE2010_PIT(config, "mb:pit8253"));
 	pit.set_clk<0>(XTAL(14'318'181)/12.0); /* heartbeat IRQ */
 	pit.out_handler<0>().set("mb:pic8259", FUNC(pic8259_device::ir0_w));
 	pit.set_clk<1>(XTAL(14'318'181)/12.0); /* dram refresh */
@@ -187,10 +187,10 @@ void compc_state::compc(machine_config &config)
 	pit.out_handler<2>().set(m_mb, FUNC(ibm5160_mb_device::pc_pit8253_out2_changed));
 
 	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "mda", false);
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, "mda", false);
+	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa4", "mb:isa", pc_isa8_cards, "fdc_xt", false);
 
 	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "keyboard", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
 	pc_kbdc.out_clock_cb().set(m_mb, FUNC(pc_noppi_mb_device::keyboard_clock_w));

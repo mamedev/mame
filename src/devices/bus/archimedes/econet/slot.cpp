@@ -41,7 +41,7 @@ device_archimedes_econet_interface::device_archimedes_econet_interface(const mac
 //  archimedes_econet_slot_device - constructor
 //-------------------------------------------------
 
-archimedes_econet_slot_device::archimedes_econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+archimedes_econet_slot_device::archimedes_econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARCHIMEDES_ECONET_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_archimedes_econet_interface>(mconfig, *this)
 	, m_device(nullptr)

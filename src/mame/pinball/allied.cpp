@@ -674,7 +674,7 @@ void allied_state::allied(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_ic1, 0);
+	PIA6821(config, m_ic1);
 	m_ic1->readpa_handler().set(FUNC(allied_state::ic1_a_r));
 	//m_ic1->writepa_handler().set(FUNC(allied_state::ic1_a_w));
 	//m_ic1->readpb_handler().set(FUNC(allied_state::ic1_b_r));
@@ -684,7 +684,7 @@ void allied_state::allied(machine_config &config)
 	m_ic1->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
 	m_ic1->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
 
-	PIA6821(config, m_ic2, 0);
+	PIA6821(config, m_ic2);
 	m_ic2->readpa_handler().set(FUNC(allied_state::ic2_a_r));
 	//m_ic2->writepa_handler().set(FUNC(allied_state::ic2_a_w));
 	//m_ic2->readpb_handler().set(FUNC(allied_state::ic2_b_r));
@@ -694,7 +694,7 @@ void allied_state::allied(machine_config &config)
 	m_ic2->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
 	m_ic2->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
 
-	PIA6821(config, m_ic4, 0);
+	PIA6821(config, m_ic4);
 	m_ic4->readpa_handler().set(FUNC(allied_state::ic4_a_r));
 	//m_ic4->writepa_handler().set(FUNC(allied_state::ic4_a_w));
 	//m_ic4->readpb_handler().set(FUNC(allied_state::ic4_b_r));
@@ -704,7 +704,7 @@ void allied_state::allied(machine_config &config)
 	m_ic4->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
 	m_ic4->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
 
-	PIA6821(config, m_ic7, 0);
+	PIA6821(config, m_ic7);
 	m_ic7->readpa_handler().set(FUNC(allied_state::ic7_a_r));
 	//m_ic7->writepa_handler().set(FUNC(allied_state::ic7_a_w));
 	//m_ic7->readpb_handler().set(FUNC(allied_state::ic7_b_r));
@@ -714,7 +714,7 @@ void allied_state::allied(machine_config &config)
 	m_ic7->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
 	m_ic7->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
 
-	PIA6821(config, m_ic8, 0);
+	PIA6821(config, m_ic8);
 	//m_ic8->readpa_handler().set(FUNC(allied_state::ic8_a_r));
 	m_ic8->writepa_handler().set(FUNC(allied_state::ic8_a_w));
 	//m_ic8->readpb_handler().set(FUNC(allied_state::ic8_b_r));

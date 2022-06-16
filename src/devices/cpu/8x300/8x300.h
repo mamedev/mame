@@ -43,7 +43,7 @@ class n8x300_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto sc_callback() { return m_sc_callback.bind(); }
 	auto wc_callback() { return m_wc_callback.bind(); }
@@ -52,7 +52,7 @@ public:
 	auto rb_callback() { return m_rb_callback.bind(); }
 	auto iv_callback() { return m_iv_callback.bind(); }
 protected:
-	n8x300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	n8x300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -152,7 +152,7 @@ class n8x305_cpu_device : public n8x300_cpu_device
 {
 public:
 	// construction/destruction
-	n8x305_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	n8x305_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void set_reg(uint8_t reg, uint8_t val, bool xmit) override;

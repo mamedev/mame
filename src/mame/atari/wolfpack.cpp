@@ -296,7 +296,7 @@ GFXDECODE_END
 void wolfpack_state::wolfpack(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 12096000 / 16);
+	M6502(config, m_maincpu, XTAL::u(12096000) / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wolfpack_state::main_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -315,7 +315,7 @@ void wolfpack_state::wolfpack(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	S14001A(config, m_s14001a, 20000); /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
+	S14001A(config, m_s14001a, XTAL::u(20000)); /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
 	m_s14001a->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 

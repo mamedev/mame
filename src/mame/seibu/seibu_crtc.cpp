@@ -288,7 +288,7 @@ void seibu_crtc_device::layer_scroll_base_w(offs_t offset, uint16_t data, uint16
 //  seibu_crtc_device - constructor
 //-------------------------------------------------
 
-seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEIBU_CRTC, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),

@@ -45,7 +45,7 @@ static constexpr int TILES_PER_PAGE = TILES_PER_PAGE_X * TILES_PER_PAGE_Y;
 
 DEFINE_DEVICE_TYPE(MEGASYS1_TILEMAP, megasys1_tilemap_device, "ms1_tmap", "Mega System 1 Tilemap")
 
-megasys1_tilemap_device::megasys1_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+megasys1_tilemap_device::megasys1_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MEGASYS1_TILEMAP, tag, owner, clock),
 		device_gfx_interface(mconfig, *this),
 		m_scrollram(*this, DEVICE_SELF),

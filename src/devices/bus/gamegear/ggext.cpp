@@ -56,7 +56,7 @@ device_gg_ext_port_interface::~device_gg_ext_port_interface()
 //  gg_ext_port_device - constructor
 //-------------------------------------------------
 
-gg_ext_port_device::gg_ext_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gg_ext_port_device::gg_ext_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, GG_EXT_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_gg_ext_port_interface>(mconfig, *this),
 	m_screen(*this, finder_base::DUMMY_TAG),

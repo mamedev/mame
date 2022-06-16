@@ -55,10 +55,10 @@ class a2bus_thunderclock_device:
 {
 public:
 	// construction/destruction
-	a2bus_thunderclock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_thunderclock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2bus_thunderclock_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_thunderclock_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -107,7 +107,7 @@ const tiny_rom_entry *a2bus_thunderclock_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_upd1990ac(*this, THUNDERCLOCK_UPD1990_TAG),
@@ -116,7 +116,7 @@ a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconf
 {
 }
 
-a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_thunderclock_device(mconfig, A2BUS_THUNDERCLOCK, tag, owner, clock)
 {
 }

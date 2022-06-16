@@ -373,7 +373,7 @@ void alphatro_state::portf0_w(uint8_t data)
 			if (floppy)
 			{
 				floppy->mon_w(0);
-				m_fdc->set_rate(250000);
+				m_fdc->set_rate(XTAL::u(250000));
 			}
 		}
 	}
@@ -845,7 +845,7 @@ void alphatro_state::alphatro(machine_config &config)
 	m_dmac->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dmac->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->in_sp_callback().set_constant(1);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 

@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(IMAGE_PICTURE, picture_image_device, "picture_image", "Still 
 //  picture_image_device - constructor
 //-------------------------------------------------
 
-picture_image_device::picture_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+picture_image_device::picture_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, IMAGE_PICTURE, tag, owner, clock),
 	device_image_interface(mconfig, *this)
 {

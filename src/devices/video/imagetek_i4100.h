@@ -28,7 +28,7 @@ class imagetek_i4100_device : public device_t,
 {
 public:
 	// construction/destruction
-	imagetek_i4100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	imagetek_i4100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void map(address_map &map);
 
@@ -71,7 +71,7 @@ public:
 	u8 irq_cause_r();
 
 protected:
-	imagetek_i4100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_ext_tiles);
+	imagetek_i4100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool has_ext_tiles);
 
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
@@ -230,7 +230,7 @@ class imagetek_i4220_device : public imagetek_i4100_device
 {
 public:
 	// construction/destruction
-	imagetek_i4220_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	imagetek_i4220_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// needed by Blazing Tornado / Grand Striker 2 for mixing with PSAC
 	// (it's unknown how the chip enables external sync)
@@ -243,7 +243,7 @@ class imagetek_i4300_device : public imagetek_i4100_device
 {
 public:
 	// construction/destruction
-	imagetek_i4300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	imagetek_i4300_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void v3_map(address_map &map);
 	u8 irq_vector_r(offs_t offset);

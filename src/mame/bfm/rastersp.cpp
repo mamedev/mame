@@ -1434,7 +1434,7 @@ void rastersp_state::ncr53c700_config(device_t *device)
 {
 	auto *state = device->subdevice<rastersp_state>(":");
 	ncr53c7xx_device &scsictrl = downcast<ncr53c7xx_device &>(*device);
-	scsictrl.set_clock(66'000'000);
+	scsictrl.set_clock(XTAL::u(66'000'000));
 	scsictrl.irq_handler().set(*state, FUNC(rastersp_state::scsi_irq));
 	scsictrl.host_read().set(*state, FUNC(rastersp_state::ncr53c700_read));
 	scsictrl.host_write().set(*state, FUNC(rastersp_state::ncr53c700_write));
@@ -1442,22 +1442,22 @@ void rastersp_state::ncr53c700_config(device_t *device)
 
 void rastersp_state::rs_config_base(machine_config &config)
 {
-	I486(config, m_maincpu, 33'330'000);
+	I486(config, m_maincpu, XTAL::u(33'330'000));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(rastersp_state::irq_callback));
 	m_maincpu->set_addrmap(AS_IO, &rastersp_state::io_map);
 
-	TMS32031(config, m_dsp, 33'330'000);
+	TMS32031(config, m_dsp, XTAL::u(33'330'000));
 	m_dsp->set_mcbl_mode(true); // Boot-loader mode
 
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	NSCSI_BUS(config, "scsibus", 0);
+	NSCSI_BUS(config, "scsibus");
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(1));
 
-	nscsi_connector &connector7(NSCSI_CONNECTOR(config, "scsibus:7", 0));
+	nscsi_connector &connector7(NSCSI_CONNECTOR(config, "scsibus:7"));
 	connector7.option_add("harddisk", NSCSI_HARDDISK);
 	connector7.option_add_internal("ncr53c700", NCR53C7XX);
 	connector7.set_default_option("ncr53c700");
@@ -1480,13 +1480,13 @@ void rastersp_state::rs_config_base(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0);
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac);
 	m_ldac->add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
 	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 
-	SCC85C30(config, m_duart, 8'000'000);
-	m_duart->configure_channels(1'843'200, 0, 1'843'200, 0);
+	SCC85C30(config, m_duart, XTAL::u(8'000'000));
+	m_duart->configure_channels(XTAL::u(1'843'200), XTAL(), XTAL::u(1'843'200), XTAL());
 	m_duart->out_int_callback().set(FUNC(rastersp_state::duart_irq));
 }
 
@@ -1503,7 +1503,7 @@ void rastersp_state::rastersp(machine_config &config)
 
 	m_dsp->set_addrmap(AS_PROGRAM, &rastersp_state::dsp_map);
 
-	nscsi_connector &connector0(NSCSI_CONNECTOR(config, "scsibus:0", 0));
+	nscsi_connector &connector0(NSCSI_CONNECTOR(config, "scsibus:0"));
 	connector0.option_add("harddisk", NSCSI_HARDDISK);
 	connector0.option_add_internal("ncr53c700", NCR53C7XX);
 	connector0.set_default_option("harddisk");
@@ -1518,13 +1518,13 @@ void fbcrazy_state::fbcrazy(machine_config &config)
 
 	m_dsp->set_addrmap(AS_PROGRAM, &fbcrazy_state::dsp_map);
 
-	nscsi_connector &connector3(NSCSI_CONNECTOR(config, "scsibus:3", 0));
+	nscsi_connector &connector3(NSCSI_CONNECTOR(config, "scsibus:3"));
 	connector3.option_add("cdrom", NSCSI_CDROM);
 	connector3.option_add_internal("ncr53c700", NCR53C7XX);
 	connector3.set_default_option("cdrom");
 	connector3.set_fixed(true);
 
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta"));
 
 	m_duart->out_txda_callback().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 	bacta.rxd_handler().set(m_duart, FUNC(z80scc_device::rxa_w));

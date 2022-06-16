@@ -36,7 +36,7 @@ void t6a04_device::device_validity_check(validity_checker &valid) const
 //  t6a04_device - constructor
 //-------------------------------------------------
 
-t6a04_device::t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+t6a04_device::t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, T6A04, tag, owner, clock),
 	m_busy_flag(0), m_display_on(0), m_contrast(0),
 	m_xpos(0), m_ypos(0), m_zpos(0),

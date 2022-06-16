@@ -46,12 +46,12 @@ DEFINE_DEVICE_TYPE(SAMPLES, samples_device, "samples", "Samples")
 //  samples_device - constructors
 //-------------------------------------------------
 
-samples_device::samples_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+samples_device::samples_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: samples_device(mconfig, SAMPLES, tag, owner, clock)
 {
 }
 
-samples_device::samples_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+samples_device::samples_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_channels(0)

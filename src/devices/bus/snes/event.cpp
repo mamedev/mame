@@ -20,7 +20,7 @@
 DEFINE_DEVICE_TYPE(SNS_PFEST94, sns_pfest94_device, "sns_pfest94", "SNES Powerfest '94")
 
 
-sns_pfest94_device::sns_pfest94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_pfest94_device::sns_pfest94_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SNS_PFEST94, tag, owner, clock)
 	, device_sns_cart_interface(mconfig, *this)
 	, m_upd7725(*this, "dsp")
@@ -222,7 +222,7 @@ void sns_pfest94_device::dsp_data_map_lorom(address_map &map)
 
 void sns_pfest94_device::device_add_mconfig(machine_config &config)
 {
-	UPD7725(config, m_upd7725, 8000000);
+	UPD7725(config, m_upd7725, XTAL::u(8000000));
 	m_upd7725->set_addrmap(AS_PROGRAM, &sns_pfest94_device::dsp_prg_map_lorom);
 	m_upd7725->set_addrmap(AS_DATA, &sns_pfest94_device::dsp_data_map_lorom);
 }

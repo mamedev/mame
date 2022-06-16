@@ -51,7 +51,7 @@
 DEFINE_DEVICE_TYPE(ST2205U, st2205u_device, "st2205u", "Sitronix ST2205U Integrated Microcontroller")
 DEFINE_DEVICE_TYPE(ST2302U, st2302u_device, "st2302u", "Sitronix ST2302U Integrated Microcontroller")
 
-st2205u_base_device::st2205u_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram)
+st2205u_base_device::st2205u_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram)
 	: st2xxx_device(mconfig, type, tag, owner, clock, internal_map, data_bits, has_banked_ram)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
@@ -82,7 +82,7 @@ st2205u_base_device::st2205u_base_device(const machine_config &mconfig, device_t
 {
 }
 
-st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: st2205u_base_device(mconfig, ST2205U, tag, owner, clock,
 					address_map_constructor(FUNC(st2205u_device::int_map), this),
 					26, // logical; only 23 address lines are brought out
@@ -93,7 +93,7 @@ st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-st2302u_device::st2302u_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+st2302u_device::st2302u_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: st2205u_base_device(mconfig, ST2302U, tag, owner, clock,
 					address_map_constructor(FUNC(st2302u_device::int_map), this),
 					26, // ???

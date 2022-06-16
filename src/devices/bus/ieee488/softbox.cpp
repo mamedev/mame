@@ -239,7 +239,7 @@ void softbox_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &softbox_device::softbox_io);
 
 	// devices
-	i8251_device &i8251(I8251(config, I8251_TAG, 0));
+	i8251_device &i8251(I8251(config, I8251_TAG));
 	i8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	i8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
@@ -264,7 +264,7 @@ void softbox_device::device_add_mconfig(machine_config &config)
 	m_dbrg->fr_handler().set(I8251_TAG, FUNC(i8251_device::write_rxc));
 	m_dbrg->ft_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
 
-	CORVUS_HDC(config, m_hdc, 0);
+	CORVUS_HDC(config, m_hdc);
 	HARDDISK(config, "harddisk1", "corvus_hdd");
 	HARDDISK(config, "harddisk2", "corvus_hdd");
 	HARDDISK(config, "harddisk3", "corvus_hdd");
@@ -312,7 +312,7 @@ ioport_constructor softbox_device::device_input_ports() const
 //  softbox_device - constructor
 //-------------------------------------------------
 
-softbox_device::softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+softbox_device::softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SOFTBOX, tag, owner, clock)
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, Z80_TAG)

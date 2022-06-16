@@ -413,7 +413,7 @@ void sage2_state::sage2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sage2_state::sage2_mem);
 
 	// devices
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, M68K_IRQ_1);
 
 	i8255_device &ppi0(I8255A(config, I8255A_0_TAG));
@@ -426,7 +426,7 @@ void sage2_state::sage2(machine_config &config)
 	ppi1.in_pb_callback().set(FUNC(sage2_state::ppi1_pb_r));
 	ppi1.out_pc_callback().set(FUNC(sage2_state::ppi1_pc_w));
 
-	pit8253_device &i8253_0(PIT8253(config, I8253_0_TAG, 0));
+	pit8253_device &i8253_0(PIT8253(config, I8253_0_TAG));
 	i8253_0.set_clk<0>(0); // from U75 OUT0
 	i8253_0.out_handler<0>().set(m_pic, FUNC(pic8259_device::ir6_w));
 	i8253_0.set_clk<1>(XTAL(16'000'000)/2/125);
@@ -434,7 +434,7 @@ void sage2_state::sage2(machine_config &config)
 	i8253_0.set_clk<2>(0); // from OUT2
 	i8253_0.out_handler<2>().set(m_pic, FUNC(pic8259_device::ir0_w));
 
-	pit8253_device &i8253_1(PIT8253(config, I8253_1_TAG, 0));
+	pit8253_device &i8253_1(PIT8253(config, I8253_1_TAG));
 	i8253_1.set_clk<0>(XTAL(16'000'000)/2/125);
 	i8253_1.out_handler<0>().set(I8253_0_TAG, FUNC(pit8253_device::write_clk0));
 	i8253_1.set_clk<1>(XTAL(16'000'000)/2/13);
@@ -442,7 +442,7 @@ void sage2_state::sage2(machine_config &config)
 	i8253_1.set_clk<2>(XTAL(16'000'000)/2/13);
 	i8253_1.out_handler<2>().set(FUNC(sage2_state::br2_w));
 
-	I8251(config, m_usart0, 0);
+	I8251(config, m_usart0);
 	m_usart0->txd_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_usart0->dtr_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart0->rts_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
@@ -455,7 +455,7 @@ void sage2_state::sage2(machine_config &config)
 	rs232a.cts_handler().set(m_usart0, FUNC(i8251_device::write_cts));
 	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	I8251(config, m_usart1, 0);
+	I8251(config, m_usart1);
 	m_usart1->txd_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
 	m_usart1->dtr_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart1->rts_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
@@ -466,7 +466,7 @@ void sage2_state::sage2(machine_config &config)
 	rs232b.rxd_handler().set(m_usart1, FUNC(i8251_device::write_rxd));
 	rs232b.dsr_handler().set(m_usart1, FUNC(i8251_device::write_dsr));
 
-	UPD765A(config, m_fdc, 8'000'000, false, false);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), false, false);
 	m_fdc->intrq_wr_callback().set(FUNC(sage2_state::fdc_irq));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");

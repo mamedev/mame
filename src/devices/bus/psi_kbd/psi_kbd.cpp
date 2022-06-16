@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(PSI_KEYBOARD_INTERFACE, psi_keyboard_bus_device, "psi_kbd", "
 //  psi_keyboard_bus_device - constructor
 //-------------------------------------------------
 
-psi_keyboard_bus_device::psi_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+psi_keyboard_bus_device::psi_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PSI_KEYBOARD_INTERFACE, tag, owner, clock),
 	device_single_card_slot_interface<device_psi_keyboard_interface>(mconfig, *this),
 	m_kbd(nullptr),

@@ -520,7 +520,7 @@ void vp415_state::vp415(machine_config &config)
 	m_drivecpu->set_addrmap(AS_PROGRAM, &vp415_state::drive_program_map);
 	m_drivecpu->set_addrmap(AS_IO, &vp415_state::drive_io_map);
 
-	i8155_device &i8155(I8155(config, I8155_TAG, 0));
+	i8155_device &i8155(I8155(config, I8155_TAG));
 	i8155.out_pa_callback().set(CHARGEN_TAG, FUNC(mb88303_device::da_w));
 	i8155.in_pb_callback().set(FUNC(vp415_state::drive_i8155_pb_r));
 	i8155.in_pc_callback().set(FUNC(vp415_state::drive_i8155_pc_r));
@@ -530,7 +530,7 @@ void vp415_state::vp415(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(vp415_state::drive_i8255_pb_w));
 	ppi.in_pc_callback().set(FUNC(vp415_state::drive_i8255_pc_r));
 
-	MB88303(config, m_chargen, 0);
+	MB88303(config, m_chargen);
 
 	saa1043_device &saa1043(SAA1043(config, SYNCGEN_TAG, XTAL(5'000'000)));
 	saa1043.v2_callback().set(FUNC(vp415_state::refv_w));

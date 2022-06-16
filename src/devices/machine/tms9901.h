@@ -56,7 +56,7 @@ public:
 		P6
 	} pins;
 
-	tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_int_line(int pin_number, int state);
 

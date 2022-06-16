@@ -369,19 +369,19 @@ GFXDECODE_END
 void exzisus_state::exzisus(machine_config &config)
 {
 	// basic machine hardware
-	z80_device &cpua(Z80(config, "cpua", 6000000));
+	z80_device &cpua(Z80(config, "cpua", XTAL::u(6000000)));
 	cpua.set_addrmap(AS_PROGRAM, &exzisus_state::cpua_map);
 	cpua.set_vblank_int("screen", FUNC(exzisus_state::irq0_line_hold));
 
-	z80_device &cpub(Z80(config, "cpub", 6000000));
+	z80_device &cpub(Z80(config, "cpub", XTAL::u(6000000)));
 	cpub.set_addrmap(AS_PROGRAM, &exzisus_state::cpub_map);
 	cpub.set_vblank_int("screen", FUNC(exzisus_state::irq0_line_hold));
 
-	Z80(config, m_cpuc, 6000000);
+	Z80(config, m_cpuc, XTAL::u(6000000));
 	m_cpuc->set_addrmap(AS_PROGRAM, &exzisus_state::cpuc_map);
 	m_cpuc->set_vblank_int("screen", FUNC(exzisus_state::irq0_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 4000000));
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL::u(4000000)));
 	audiocpu.set_addrmap(AS_PROGRAM, &exzisus_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));   // 10 CPU slices per frame - enough for the sound CPU to read all commands
@@ -401,12 +401,12 @@ void exzisus_state::exzisus(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(4000000)));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag("cpub");
 	ciu.set_slave_tag("audiocpu");
 }

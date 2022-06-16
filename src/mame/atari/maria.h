@@ -12,7 +12,7 @@ class atari_maria_device :  public device_t
 {
 public:
 	// construction/destruction
-	atari_maria_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_maria_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_dmacpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }

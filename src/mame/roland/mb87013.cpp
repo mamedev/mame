@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(MB87013, mb87013_device, "mb87013", "Roland MB87013 QDC")
 //  mb87013_device - constructor
 //-------------------------------------------------
 
-mb87013_device::mb87013_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mb87013_device::mb87013_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MB87013, tag, owner, clock)
 	, m_sio_rd_callback(*this)
 	, m_sio_wr_callback(*this)

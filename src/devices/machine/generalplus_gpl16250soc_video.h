@@ -19,7 +19,7 @@
 class gcm394_base_video_device : public device_t, public device_video_interface
 {
 public:
-	gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
@@ -245,14 +245,14 @@ class gcm394_video_device : public gcm394_base_video_device
 {
 public:
 	template <typename T, typename U>
-	gcm394_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
+	gcm394_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag, U &&screen_tag)
 		: gcm394_video_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 		m_screen.set_tag(std::forward<U>(screen_tag));
 	}
 
-	gcm394_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gcm394_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device)

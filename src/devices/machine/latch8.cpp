@@ -99,7 +99,7 @@ void latch8_device::bit7_w(offs_t offset, uint8_t data) { bitx_w<7>(offset, data
 
 DEFINE_DEVICE_TYPE(LATCH8, latch8_device, "latch8", "8-bit latch")
 
-latch8_device::latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+latch8_device::latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LATCH8, tag, owner, clock)
 	, m_write_cb(*this)
 	, m_read_cb(*this)

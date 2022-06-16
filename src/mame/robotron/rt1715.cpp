@@ -737,7 +737,7 @@ void rt1715_state::rt1715(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(rt1715_state, rt1715)
 
 	/* keyboard */
-	z80_device &keyboard(Z80(config, "keyboard", 683000));
+	z80_device &keyboard(Z80(config, "keyboard", XTAL::u(683000)));
 	keyboard.set_addrmap(AS_PROGRAM, &rt1715_state::k7658_mem);
 	keyboard.set_addrmap(AS_IO, &rt1715_state::k7658_io);
 
@@ -801,7 +801,7 @@ void rt1715_state::rt1715w(machine_config &config)
 	m_crtc->drq_wr_callback().set(FUNC(rt1715_state::crtc_drq_w));
 
 	// operates in polled mode
-	I8272A(config, m_fdc, 8'000'000 / 4, false);
+	I8272A(config, m_fdc, XTAL::u(8'000'000) / 4, false);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w)).invert();
 	FLOPPY_CONNECTOR(config, "i8272:0", rt1715w_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "i8272:1", rt1715w_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);

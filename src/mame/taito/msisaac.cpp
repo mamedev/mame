@@ -777,16 +777,16 @@ void msisaac_state::machine_reset()
 void msisaac_state::msisaac(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4'000'000);
+	Z80(config, m_maincpu, XTAL::u(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &msisaac_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(msisaac_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 4'000'000);
+	Z80(config, m_audiocpu, XTAL::u(4'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &msisaac_state::sound_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(msisaac_state::irq0_line_hold));    // source of IRQs is unknown
 
 #ifdef USE_MCU
-	M68705(config, "mcu", 8'000'000 / 2).set_addrmap(AS_PROGRAM, &msisaac_state::buggychl_mcu_map);  // 4 MHz
+	M68705(config, "mcu", XTAL::u(8'000'000) / 2).set_addrmap(AS_PROGRAM, &msisaac_state::buggychl_mcu_map);  // 4 MHz
 	BUGGYCHL_MCU(config, m_bmcu, 0);
 #endif
 
@@ -808,13 +808,13 @@ void msisaac_state::msisaac(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	TA7630(config, m_ta7630);
 
-	AY8910(config, "ay1", 2'000'000).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay1", XTAL::u(2'000'000)).add_route(ALL_OUTPUTS, "mono", 0.15);
 	// port A/B likely to be TA7630 filters
 
-	AY8910(config, "ay2", 2'000'000).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay2", XTAL::u(2'000'000)).add_route(ALL_OUTPUTS, "mono", 0.15);
 	// port A/B likely to be TA7630 filters
 
-	MSM5232(config, m_msm, 2'000'000);
+	MSM5232(config, m_msm, XTAL::u(2'000'000));
 	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); // 0.65 (???) uF capacitors (match the sample, not verified)
 	m_msm->add_route(0, "mono", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "mono", 1.0);   // pin 29  4'-1

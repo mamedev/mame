@@ -25,7 +25,7 @@ class tms7000_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// read-only on 70x0
 	auto in_porta() { return m_port_in_cb[0].bind(); }
@@ -75,7 +75,7 @@ protected:
 	static constexpr uint32_t CHIP_FAMILY_70CX2   = 0x04;
 	static constexpr uint32_t CHIP_FAMILY_MASK    = 0x06;
 
-	tms7000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags);
+	tms7000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal, uint32_t info_flags);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -275,14 +275,14 @@ protected:
 class tms7020_device : public tms7000_device
 {
 public:
-	tms7020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms7020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms7020_exl_device : public tms7000_device
 {
 public:
-	tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void execute_one(uint8_t op) override;
@@ -295,35 +295,35 @@ private:
 class tms7040_device : public tms7000_device
 {
 public:
-	tms7040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms7040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms70c00_device : public tms7000_device
 {
 public:
-	tms70c00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms70c00_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms70c20_device : public tms7000_device
 {
 public:
-	tms70c20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms70c20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms70c40_device : public tms7000_device
 {
 public:
-	tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms70c46_device : public tms7000_device
 {
 public:
-	tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t control_r();
 	void control_w(uint8_t data);
@@ -351,28 +351,28 @@ private:
 class tms7001_device : public tms7000_device
 {
 public:
-	tms7001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms7001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms7041_device : public tms7000_device
 {
 public:
-	tms7041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms7041_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms7002_device : public tms7000_device
 {
 public:
-	tms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms7042_device : public tms7000_device
 {
 public:
-	tms7042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms7042_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

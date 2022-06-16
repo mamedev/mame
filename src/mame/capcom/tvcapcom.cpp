@@ -58,7 +58,7 @@ INPUT_PORTS_END
 void tvcapcom_state::tvcapcom(machine_config &config)
 {
 	/* basic machine hardware */
-	PPC603(config, m_maincpu, 72900000); // IBM PowerPC Broadway CPU @ 729 MHz  ?
+	PPC603(config, m_maincpu, XTAL::u(72900000)); // IBM PowerPC Broadway CPU @ 729 MHz  ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &tvcapcom_state::gc_map);
 	m_maincpu->set_disable();
 

@@ -19,7 +19,7 @@ class ccs7710_device : public device_t, public device_a2bus_card_interface
 {
 public:
 	// device type constructor
-	ccs7710_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ccs7710_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

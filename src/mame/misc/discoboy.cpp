@@ -459,7 +459,7 @@ void discoboy_state::discoboy(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.6);
 	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.6);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_msm, XTAL(400'000));

@@ -16,7 +16,7 @@
 
 DEFINE_DEVICE_TYPE(ULTRA14F, ultra14f_device, "ultra14f", "Ultra-14F SCSI Host Adapter")
 
-ultra14f_device::ultra14f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ultra14f_device::ultra14f_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ULTRA14F, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_uscpu(*this, "uscpu")

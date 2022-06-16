@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(TANBUS_SLOT, tanbus_slot_device, "tanbus_slot", "Microtan Bus
 //-------------------------------------------------
 //  tanbus_slot_device - constructor
 //-------------------------------------------------
-tanbus_slot_device::tanbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tanbus_slot_device::tanbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TANBUS_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_tanbus_interface>(mconfig, *this)
 	, m_tanbus(*this, DEVICE_SELF_OWNER)
@@ -58,7 +58,7 @@ DEFINE_DEVICE_TYPE(TANBUS, tanbus_device, "tanbus", "Microtan Bus")
 //  tanbus_device - constructor
 //-------------------------------------------------
 
-tanbus_device::tanbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tanbus_device::tanbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TANBUS, tag, owner, clock)
 	, m_out_irq_cb(*this)
 	, m_out_nmi_cb(*this)

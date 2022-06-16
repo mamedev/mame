@@ -67,7 +67,7 @@ void sega_fm_unit_device::device_add_mconfig(machine_config &config)
 //  sega_fm_unit_device - constructor
 //-------------------------------------------------
 
-sega_fm_unit_device::sega_fm_unit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sega_fm_unit_device::sega_fm_unit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SEGA_FM_UNIT, tag, owner, clock),
 	device_sg1000_expansion_slot_interface(mconfig, *this),
 	m_ym(*this, "ym2413"),

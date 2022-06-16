@@ -66,7 +66,7 @@ INPUT_PORTS_END
 void caprcyc_state::caprcyc(machine_config &config)
 {
 	/* basic machine hardware */
-	VR4300BE(config, m_maincpu, 100000000); // cpu configuration is unknown
+	VR4300BE(config, m_maincpu, XTAL::u(100000000)); // cpu configuration is unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &caprcyc_state::caprcyc_map);
 
 	/* no video! */

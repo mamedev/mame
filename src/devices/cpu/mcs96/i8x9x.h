@@ -68,7 +68,7 @@ public:
 	virtual u8 i8x9x_p2_mask() const noexcept { return 0xff; }
 
 protected:
-	i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int data_width);
+	i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int data_width);
 
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -170,7 +170,7 @@ private:
 
 class c8095_90_device : public i8x9x_device {
 public:
-	c8095_90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	c8095_90_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual u8 i8x9x_p0_mask() const noexcept override { return 0xf0; }
@@ -180,12 +180,12 @@ protected:
 
 class n8097bh_device : public i8x9x_device {
 public:
-	n8097bh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	n8097bh_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class p8098_device : public i8x9x_device {
 public:
-	p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual u8 i8x9x_p0_mask() const noexcept override { return 0xf0; }
@@ -195,7 +195,7 @@ protected:
 
 class p8798_device : public i8x9x_device {
 public:
-	p8798_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	p8798_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual u8 i8x9x_p0_mask() const noexcept override { return 0xf0; }

@@ -13,7 +13,7 @@ DEFINE_DEVICE_TYPE(PL190_VIC, vic_pl190_device, "vic_pl190", "ARM PL190 VIC")
 DEFINE_DEVICE_TYPE(UPD800468_VIC, vic_upd800468_device, "vic_upd800468", "NEC uPD800468 VIC")
 DEFINE_DEVICE_TYPE(PL192_VIC, vic_pl192_device, "vic_pl192", "ARM PL192 VIC")
 
-vic_pl190_device::vic_pl190_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vic_pl190_device::vic_pl190_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, num_vectors(16)
@@ -26,18 +26,18 @@ vic_pl190_device::vic_pl190_device(const machine_config &mconfig, device_type ty
 {
 }
 
-vic_pl190_device::vic_pl190_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vic_pl190_device::vic_pl190_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vic_pl190_device(mconfig, PL190_VIC, tag, owner, clock)
 {
 }
 
-vic_upd800468_device::vic_upd800468_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vic_upd800468_device::vic_upd800468_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vic_pl190_device(mconfig, UPD800468_VIC, tag, owner, clock)
 {
 	num_vectors = 32;
 }
 
-vic_pl192_device::vic_pl192_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vic_pl192_device::vic_pl192_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vic_pl190_device(mconfig, PL192_VIC, tag, owner, clock)
 {
 	num_vectors = 32;

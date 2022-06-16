@@ -1308,7 +1308,7 @@ void jpmsru_state::jpmsru_3k(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	NETLIST_SOUND(config, "nl_audio", 48000)
+	NETLIST_SOUND(config, "nl_audio", XTAL::u(48000))
 		.set_source(NETLIST_NAME(jpmsru))
 		.add_route(ALL_OUTPUTS, "mono", 0.1);
 
@@ -1413,7 +1413,7 @@ void jpmsru_dac_state::lc(machine_config &config)
 	jpmsru_6k(config);
 	m_maincpu->set_addrmap(AS_IO, &jpmsru_dac_state::outputs_lc);
 
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void jpmsru_state::lal(machine_config &config)

@@ -76,7 +76,7 @@ const int z80sti_device::PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
 //  z80sti_device - constructor
 //-------------------------------------------------
 
-z80sti_device::z80sti_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z80sti_device::z80sti_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, Z80STI, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, device_z80daisy_interface(mconfig, *this)

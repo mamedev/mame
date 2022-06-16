@@ -12,7 +12,7 @@
 DEFINE_DEVICE_TYPE(DECO_CPU6, deco_cpu6_device, "decocpu6", "DECO CPU-6")
 
 
-deco_cpu6_device::deco_cpu6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+deco_cpu6_device::deco_cpu6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m6502_device(mconfig, DECO_CPU6, tag, owner, clock)
 {
 }

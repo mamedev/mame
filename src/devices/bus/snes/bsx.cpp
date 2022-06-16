@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(SNS_HIROM_BSX, sns_rom_bsxhi_device,    "sns_rom_bsxhi", "SNE
 DEFINE_DEVICE_TYPE(SNS_BSMEMPAK,  sns_rom_bsmempak_device, "sns_bsmempak",  "SNES BS-X Memory packs")
 
 
-sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, type, tag, owner, clock)
 	, m_base_unit(nullptr)
 	, access_00_1f(0)
@@ -37,24 +37,24 @@ sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, device_typ
 {
 }
 
-sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_bsx_device(mconfig, SNS_ROM_BSX, tag, owner, clock)
 {
 }
 
-sns_rom_bsxlo_device::sns_rom_bsxlo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_bsxlo_device::sns_rom_bsxlo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_LOROM_BSX, tag, owner, clock)
 	, m_slot(*this, "bs_slot")
 {
 }
 
-sns_rom_bsxhi_device::sns_rom_bsxhi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_bsxhi_device::sns_rom_bsxhi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom21_device(mconfig, SNS_HIROM_BSX, tag, owner, clock)
 	, m_slot(*this, "bs_slot")
 {
 }
 
-sns_rom_bsmempak_device::sns_rom_bsmempak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_bsmempak_device::sns_rom_bsmempak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_BSMEMPAK, tag, owner, clock)
 	, m_command(0), m_write_old(0), m_write_new(0), m_flash_enable(0), m_read_enable(0), m_write_enable(0)
 {

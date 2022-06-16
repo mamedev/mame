@@ -36,7 +36,7 @@ kaneko16_sprite_device::kaneko16_sprite_device(
 		device_type type,
 		const char *tag,
 		device_t *owner,
-		u32 clock)
+		const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, device_video_interface(mconfig, *this)
@@ -589,12 +589,12 @@ void kaneko16_sprite_device::render_sprites(const rectangle &cliprect, u16* spri
 	draw_sprites(cliprect, spriteram16, spriteram16_bytes);
 }
 
-kaneko_vu002_sprite_device::kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+kaneko_vu002_sprite_device::kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kaneko16_sprite_device(mconfig, KANEKO_VU002_SPRITE, tag, owner, clock)
 {
 }
 
-kaneko_kc002_sprite_device::kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+kaneko_kc002_sprite_device::kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kaneko16_sprite_device(mconfig, KANEKO_KC002_SPRITE, tag, owner, clock)
 {
 }

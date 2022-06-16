@@ -408,7 +408,7 @@ DEFINE_DEVICE_TYPE(ESQPANEL2X16_SQ1, esqpanel2x16_sq1_device, "esqpanel216_sq1",
 //  esqpanel_device - constructor
 //-------------------------------------------------
 
-esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_light_states(0x3f), // maximum number of lights
@@ -453,8 +453,8 @@ void esqpanel_device::device_reset()
 {
 	// panel comms is at 62500 baud (double the MIDI rate), 8N2
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
-	set_rcv_rate(62500);
-	set_tra_rate(62500);
+	set_rcv_rate(XTAL::u(62500));
+	set_tra_rate(XTAL::u(62500));
 
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;
@@ -650,11 +650,11 @@ void esqpanel_device::set_analog_value(offs_t offset, uint16_t value)
 
 void esqpanel1x22_device::device_add_mconfig(machine_config &config)
 {
-	ESQ1X22(config, m_vfd, 60);
+	ESQ1X22(config, m_vfd, XTAL::u(60));
 }
 
 
-esqpanel1x22_device::esqpanel1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+esqpanel1x22_device::esqpanel1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	esqpanel_device(mconfig, ESQPANEL1X22, tag, owner, clock),
 	m_vfd(*this, "vfd")
 {
@@ -665,11 +665,11 @@ esqpanel1x22_device::esqpanel1x22_device(const machine_config &mconfig, const ch
 
 void esqpanel2x40_device::device_add_mconfig(machine_config &config)
 {
-	ESQ2X40(config, m_vfd, 60);
+	ESQ2X40(config, m_vfd, XTAL::u(60));
 }
 
 
-esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	esqpanel_device(mconfig, ESQPANEL2X40, tag, owner, clock),
 	m_vfd(*this, "vfd")
 {
@@ -680,10 +680,10 @@ esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const ch
 
 void esqpanel2x40_vfx_device::device_add_mconfig(machine_config &config)
 {
-	ESQ2X40(config, m_vfd, 60);
+	ESQ2X40(config, m_vfd, XTAL::u(60));
 }
 
-esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	esqpanel_device(mconfig, ESQPANEL2X40_VFX, tag, owner, clock),
 	m_vfd(*this, "vfd")
 {
@@ -706,11 +706,11 @@ bool esqpanel2x40_vfx_device::write_contents(std::ostream &o)
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
 void esqpanel2x16_sq1_device::device_add_mconfig(machine_config &config)
 {
-	ESQ2X16_SQ1(config, m_vfd, 60);
+	ESQ2X16_SQ1(config, m_vfd, XTAL::u(60));
 }
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
-esqpanel2x16_sq1_device::esqpanel2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+esqpanel2x16_sq1_device::esqpanel2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	esqpanel_device(mconfig, ESQPANEL2X16_SQ1, tag, owner, clock),
 	m_vfd(*this, "vfd")
 {

@@ -22,7 +22,7 @@ public:
 
 protected:
 	// construction/destruction
-	hpc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map);
+	hpc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -56,7 +56,7 @@ class hpc46003_device : public hpc_device
 {
 public:
 	// construction/destruction
-	hpc46003_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hpc46003_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides
@@ -70,7 +70,7 @@ class hpc46104_device : public hpc_device
 {
 public:
 	// construction/destruction
-	hpc46104_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hpc46104_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides

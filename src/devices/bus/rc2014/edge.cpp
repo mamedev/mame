@@ -21,10 +21,10 @@ class sc106_device : public device_t, public device_rc2014_rc80_card_interface
 {
 public:
 	// construction/destruction
-	sc106_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sc106_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	sc106_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	sc106_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -34,14 +34,14 @@ private:
 	required_device<rc2014_rc80_bus_device> m_rc80_bus;
 };
 
-sc106_device::sc106_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+sc106_device::sc106_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_rc2014_rc80_card_interface(mconfig, *this)
 	, m_rc80_bus(*this, ":bus")
 {
 }
 
-sc106_device::sc106_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sc106_device::sc106_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sc106_device(mconfig, RC2014_SC106, tag, owner, clock)
 {
 }
@@ -73,10 +73,10 @@ class sc107_device : public sc106_device
 {
 	public:
 	// construction/destruction
-	sc107_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sc107_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
-sc107_device::sc107_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sc107_device::sc107_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sc106_device(mconfig, RC2014_SC107, tag, owner, clock)
 {
 }
@@ -92,10 +92,10 @@ class sc113_device : public sc106_device
 {
 	public:
 	// construction/destruction
-	sc113_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sc113_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
-sc113_device::sc113_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sc113_device::sc113_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sc106_device(mconfig, RC2014_SC113, tag, owner, clock)
 {
 }
@@ -109,7 +109,7 @@ class sc141_device : public device_t, public device_rc2014_card_interface
 {
 public:
 	// construction/destruction
-	sc141_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sc141_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -120,7 +120,7 @@ private:
 	required_device<rc2014_bus_device> m_rc40_bus;
 };
 
-sc141_device::sc141_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sc141_device::sc141_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RC2014_SC141, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_rc40_bus(*this, ":bus")
@@ -157,7 +157,7 @@ class sc147_device : public device_t, public device_rc2014_card_interface
 {
 public:
 	// construction/destruction
-	sc147_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sc147_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -168,7 +168,7 @@ private:
 	required_device<rc2014_bus_device> m_rc40_bus;
 };
 
-sc147_device::sc147_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sc147_device::sc147_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RC2014_SC147, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_rc40_bus(*this, ":bus")

@@ -11,7 +11,7 @@ DEFINE_DEVICE_TYPE(MSX_CART_ASCII16_SRAM, msx_cart_ascii16_sram_device, "msx_car
 DEFINE_DEVICE_TYPE(MSX_CART_MSXWRITE,     msx_cart_msxwrite_device,     "msx_cart_msxwrite",     "MSX Cartridge - MSXWRITE")
 
 
-msx_cart_ascii8_device::msx_cart_ascii8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_ascii8_device::msx_cart_ascii8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_ASCII8, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -99,7 +99,7 @@ void msx_cart_ascii8_device::write_cart(offs_t offset, uint8_t data)
 
 
 
-msx_cart_ascii16_device::msx_cart_ascii16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_ascii16_device::msx_cart_ascii16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_ASCII16, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -193,7 +193,7 @@ void msx_cart_ascii16_device::write_cart(offs_t offset, uint8_t data)
 
 
 
-msx_cart_ascii8_sram_device::msx_cart_ascii8_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_ascii8_sram_device::msx_cart_ascii8_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_ASCII8_SRAM, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -322,7 +322,7 @@ void msx_cart_ascii8_sram_device::write_cart(offs_t offset, uint8_t data)
 
 
 
-msx_cart_ascii16_sram_device::msx_cart_ascii16_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_ascii16_sram_device::msx_cart_ascii16_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_ASCII16_SRAM, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -461,7 +461,7 @@ void msx_cart_ascii16_sram_device::write_cart(offs_t offset, uint8_t data)
 
 
 
-msx_cart_msxwrite_device::msx_cart_msxwrite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_msxwrite_device::msx_cart_msxwrite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_MSXWRITE, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)

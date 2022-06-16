@@ -41,7 +41,7 @@ public:
 
 protected:
 	// trampoline constructor
-	at_kbc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	at_kbc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device_t implementation
 	virtual void device_resolve_objects() override;
@@ -83,7 +83,7 @@ class at_keyboard_controller_device : public at_kbc_device_base
 {
 public:
 	// standard constructor
-	at_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	at_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t implementation
@@ -120,7 +120,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(aux_data_w);
 
 	// standard constructor
-	ps2_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	ps2_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t implementation

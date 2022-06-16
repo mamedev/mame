@@ -512,12 +512,12 @@ void neoprint_state::machine_start()
 
 void neoprint_state::neoprint(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &neoprint_state::neoprint_map);
 	m_maincpu->set_periodic_int(FUNC(neoprint_state::irq3_line_hold), attotime::from_hz(45)); /* camera / printer irq, unknown timing */
 	m_maincpu->set_vblank_int("screen", FUNC(neoprint_state::irq2_line_hold)); // lv1,2,3 valid?
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL::u(4000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &neoprint_state::audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &neoprint_state::audio_io_map);
 
@@ -556,12 +556,12 @@ MACHINE_RESET_MEMBER(neoprint_state,nprsp)
 
 void neoprint_state::nprsp(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &neoprint_state::nprsp_map);
 	m_maincpu->set_periodic_int(FUNC(neoprint_state::irq3_line_hold), attotime::from_hz(45)); /* camera / printer irq, unknown timing */
 	m_maincpu->set_vblank_int("screen", FUNC(neoprint_state::irq2_line_hold)); // lv1,2,3 valid?
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL::u(4000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &neoprint_state::audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &neoprint_state::audio_io_map);
 

@@ -25,7 +25,7 @@ const tiny_rom_entry *mulcd_device::device_rom_region() const
 	return ROM_NAME(mulcd);
 }
 
-mulcd_device::mulcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mulcd_device::mulcd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MULCD, tag, owner, clock),
 	m_lcd(*this, "hd44780"),
 	m_outputs(*this, "%03x.%d.%d", 0U, 0U, 0U),

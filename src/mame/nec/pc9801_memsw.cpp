@@ -97,7 +97,7 @@ DEFINE_DEVICE_TYPE(PC9801_MEMSW, pc9801_memsw_device, "pc9801_memsw", "NEC PC-98
 //  pc9801_memsw_device - constructor
 //-------------------------------------------------
 
-pc9801_memsw_device::pc9801_memsw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc9801_memsw_device::pc9801_memsw_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PC9801_MEMSW, tag, owner, clock),
 	device_nvram_interface(mconfig, *this)
 {

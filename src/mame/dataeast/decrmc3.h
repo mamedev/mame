@@ -35,13 +35,13 @@ class deco_rmc3_device : public device_t, public device_palette_interface
 {
 public:
 	// construction/destruction
-	deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 entries)
-		: deco_rmc3_device(mconfig, tag, owner, clock)
+	deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 entries)
+		: deco_rmc3_device(mconfig, tag, owner)
 	{
 		set_entries(entries);
 	}
 
-	deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	template <typename... T> void set_init(T &&... args) { m_init.set(std::forward<T>(args)...); }

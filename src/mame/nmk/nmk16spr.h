@@ -14,7 +14,7 @@ public:
 	typedef device_delegate<void (u32 &colour, u32 &pri_mask)> colpri_cb_delegate;
 	typedef device_delegate<void (u16 attr, int &flipx, int &flipy, int &code)> ext_cb_delegate;
 
-	nmk_16bit_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nmk_16bit_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb.set(std::forward<T>(args)...); }

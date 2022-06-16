@@ -26,16 +26,16 @@ DEFINE_DEVICE_TYPE(HLCD0539, hlcd0539_device, "hlcd0539", "Hughes HLCD 0539 LCD 
 //  constructor
 //-------------------------------------------------
 
-hlcd0538_device::hlcd0538_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+hlcd0538_device::hlcd0538_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_write_cols(*this), m_write_interrupt(*this)
 { }
 
-hlcd0538_device::hlcd0538_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+hlcd0538_device::hlcd0538_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	hlcd0538_device(mconfig, HLCD0538, tag, owner, clock)
 { }
 
-hlcd0539_device::hlcd0539_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+hlcd0539_device::hlcd0539_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	hlcd0538_device(mconfig, HLCD0539, tag, owner, clock)
 { }
 
@@ -52,7 +52,7 @@ void hlcd0538_device::device_start()
 
 	// timer (when LCD pin is oscillator)
 	m_lcd_timer = timer_alloc(FUNC(hlcd0538_device::toggle_lcd), this);
-	attotime period = (clock() != 0) ? attotime::from_hz(2 * clock()) : attotime::never;
+	attotime period = !clock().disabled() ? attotime::from_hz(2 * clock().value()) : attotime::never;
 	m_lcd_timer->adjust(period, 0, period);
 
 	// zerofill

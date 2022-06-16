@@ -19,7 +19,7 @@ public:
 
 protected:
 	// construction/destruction
-	saturn_bram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cart_type);
+	saturn_bram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int cart_type);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -35,28 +35,28 @@ class saturn_bram4mb_device : public saturn_bram_device
 {
 public:
 	// construction/destruction
-	saturn_bram4mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_bram4mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class saturn_bram8mb_device : public saturn_bram_device
 {
 public:
 	// construction/destruction
-	saturn_bram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_bram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class saturn_bram16mb_device : public saturn_bram_device
 {
 public:
 	// construction/destruction
-	saturn_bram16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_bram16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class saturn_bram32mb_device : public saturn_bram_device
 {
 public:
 	// construction/destruction
-	saturn_bram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_bram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

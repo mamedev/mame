@@ -374,7 +374,7 @@ void tv990_state::device_post_load()
 void tv990_state::tv990(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 14967500);   // verified (59.86992/4)
+	M68000(config, m_maincpu, XTAL::u(14967500));   // verified (59.86992/4)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tv990_state::tv990_mem);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -419,7 +419,7 @@ void tv990_state::tv990(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beep", 1000).add_route(ALL_OUTPUTS, "mono", 1.0); //whats the freq?
+	BEEP(config, "beep", XTAL::u(1000)).add_route(ALL_OUTPUTS, "mono", 1.0); //whats the freq?
 }
 
 /* ROM definition */

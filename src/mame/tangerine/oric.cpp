@@ -841,7 +841,7 @@ void oric_state::oric(machine_config &config, bool add_ext) // this variable not
 	m_centronics->set_output_latch(*m_cent_data_out);
 
 	/* cassette */
-	CASSETTE(config, m_cassette, 0);
+	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(oric_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
@@ -880,7 +880,7 @@ void telestrat_state::telstrat(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &telestrat_state::telestrat_mem);
 
 	/* acia */
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.irq_handler().set(FUNC(telestrat_state::acia_irq_w));
 

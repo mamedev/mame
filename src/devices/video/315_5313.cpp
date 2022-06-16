@@ -174,7 +174,7 @@ int sega315_5313_device::screen_hpos() { return screen().hpos() / (m_lcm_scaling
 
 DEFINE_DEVICE_TYPE(SEGA315_5313, sega315_5313_device, "sega315_5313", "Sega 315-5313 Megadrive VDP")
 
-sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	// mode 4 support, for SMS compatibility, is implemented in 315_5124.cpp
 	: sega315_5313_mode4_device(mconfig, SEGA315_5313, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0x00, 0x1f, 0, 0, line_315_5313_mode4)
 	, device_gfx_interface(mconfig, *this, nullptr, "gfx_palette")

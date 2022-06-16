@@ -446,10 +446,10 @@ void kchamp_state::kchampvs(machine_config &config)
 	AY8910(config, m_ay[0], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    // verified on PCB
 	AY8910(config, m_ay[1], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    // verified on PCB
 
-	LS157(config, m_adpcm_select, 0); // at 4C
+	LS157(config, m_adpcm_select); // at 4C
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MSM5205(config, m_msm, 375000);  // verified on PCB, discrete circuit clock
+	MSM5205(config, m_msm, XTAL::u(375000));  // verified on PCB, discrete circuit clock
 	m_msm->vck_callback().set(FUNC(kchamp_state::msmint));  // interrupt function
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  // 1 / 96 = 3906.25Hz playback
 	m_msm->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -501,7 +501,7 @@ void kchamp_state::kchamp(machine_config &config)
 	AY8910(config, m_ay[0], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); // Guess based on actual PCB recordings of karatedo
 	AY8910(config, m_ay[1], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); // Guess based on actual PCB recordings of karatedo
 
-	DAC08(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // IC11
+	DAC08(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.3); // IC11
 }
 
 void kchamp_state::kchamp_arfyc(machine_config &config)

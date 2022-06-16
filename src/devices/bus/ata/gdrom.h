@@ -16,7 +16,7 @@
 class gdrom_device : public atapi_cdrom_device
 {
 public:
-	gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Sega GD-ROM handler
 

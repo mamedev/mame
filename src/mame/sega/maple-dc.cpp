@@ -17,7 +17,7 @@ void maple_dc_device::amap(address_map &map)
 	map(0x8c, 0x8f).w(FUNC(maple_dc_device::sb_mdapro_w));
 }
 
-maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MAPLE_DC, tag, owner, clock),
 	cpu(*this, finder_base::DUMMY_TAG),
 	irq_cb(*this)

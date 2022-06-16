@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE2, mephisto_display2_device, "mdisplay
 //  constructor
 //-------------------------------------------------
 
-mephisto_display2_device::mephisto_display2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mephisto_display2_device::mephisto_display2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MEPHISTO_DISPLAY_MODULE2, tag, owner, clock)
 	, m_lcd(*this, "hd44780")
 	, m_dac(*this, "dac")
@@ -46,7 +46,7 @@ void mephisto_display2_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(mephisto_display2_device::lcd_palette), 3);
 
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd);
 	m_lcd->set_lcd_size(2, 16);
 	m_lcd->set_pixel_update_cb(FUNC(mephisto_display2_device::lcd_pixel_update));
 

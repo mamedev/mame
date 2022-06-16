@@ -89,7 +89,7 @@ namespace bus::ti99::internal {
 /*
     Constructor
 */
-datamux_device::datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+datamux_device::datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99_DATAMUX, tag, owner, clock),
 	m_video(*owner, TI99_VDP_TAG),
 	m_sound(*owner, TI99_SOUNDCHIP_TAG),

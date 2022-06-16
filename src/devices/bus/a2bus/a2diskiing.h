@@ -32,7 +32,7 @@ class diskiing_device:
 {
 protected:
 	// construction/destruction
-	diskiing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	diskiing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -56,13 +56,13 @@ private:
 class a2bus_diskiing_device: public diskiing_device
 {
 public:
-	a2bus_diskiing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_diskiing_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class a2bus_diskiing13_device: public diskiing_device
 {
 public:
-	a2bus_diskiing13_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_diskiing13_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -75,7 +75,7 @@ private:
 class a2bus_applesurance_device: public diskiing_device
 {
 public:
-	a2bus_applesurance_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_applesurance_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

@@ -35,13 +35,13 @@ class a2bus_ssb_device:
 {
 public:
 	// construction/destruction
-	a2bus_ssb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ssb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 	required_device<tms5220_device> m_tms;
 
 protected:
-	a2bus_ssb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ssb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -64,7 +64,7 @@ protected:
 void a2bus_ssb_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "ssbapple").front_center();
-	TMS5220(config, m_tms, 640000); // guess - this gives 8 kHz output according to the datasheet
+	TMS5220(config, m_tms, XTAL::u(640000)); // guess - this gives 8 kHz output according to the datasheet
 	m_tms->add_route(ALL_OUTPUTS, "ssbapple", 1.0);
 }
 
@@ -72,14 +72,14 @@ void a2bus_ssb_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ssb_device::a2bus_ssb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ssb_device::a2bus_ssb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
-a2bus_ssb_device::a2bus_ssb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ssb_device::a2bus_ssb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_ssb_device(mconfig, A2BUS_SSBAPPLE, tag, owner, clock)
 {
 }

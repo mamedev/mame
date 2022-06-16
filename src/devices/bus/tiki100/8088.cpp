@@ -73,7 +73,7 @@ void tiki100_8088_device::i8088_io(address_map &map)
 
 void tiki100_8088_device::device_add_mconfig(machine_config &config)
 {
-	I8088(config, m_maincpu, 6000000);
+	I8088(config, m_maincpu, XTAL::u(6000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tiki100_8088_device::i8088_mem);
 	m_maincpu->set_addrmap(AS_IO, &tiki100_8088_device::i8088_io);
 }
@@ -88,7 +88,7 @@ void tiki100_8088_device::device_add_mconfig(machine_config &config)
 //  tiki100_8088_device - constructor
 //-------------------------------------------------
 
-tiki100_8088_device::tiki100_8088_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tiki100_8088_device::tiki100_8088_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TIKI100_8088, tag, owner, clock),
 	device_tiki100bus_card_interface(mconfig, *this),
 	m_maincpu(*this, I8088_TAG),

@@ -83,7 +83,7 @@ const tiny_rom_entry *a2bus_agat840k_hle_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_agat840k_hle_device::a2bus_agat840k_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a2bus_agat840k_hle_device::a2bus_agat840k_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
 	, m_floppy_image(*this, "floppy%u", 0U)
@@ -95,7 +95,7 @@ a2bus_agat840k_hle_device::a2bus_agat840k_hle_device(const machine_config &mconf
 {
 }
 
-a2bus_agat840k_hle_device::a2bus_agat840k_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_agat840k_hle_device::a2bus_agat840k_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_agat840k_hle_device(mconfig, A2BUS_AGAT840K_HLE, tag, owner, clock)
 {
 }

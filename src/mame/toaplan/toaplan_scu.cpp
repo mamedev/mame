@@ -29,7 +29,7 @@ GFXDECODE_MEMBER( toaplan_scu_device::gfxinfo )
 GFXDECODE_END
 
 
-toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TOAPLAN_SCU, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo)
 	, device_video_interface(mconfig, *this)

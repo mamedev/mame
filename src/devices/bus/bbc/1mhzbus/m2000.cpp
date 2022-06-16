@@ -30,15 +30,15 @@ void bbc_m2000_device::device_add_mconfig(machine_config &config)
 {
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 
-	ACIA6850(config, m_acia1, 0);
+	ACIA6850(config, m_acia1);
 	m_acia1->txd_handler().set("mdout1", FUNC(midi_port_device::write_txd));
 	m_acia1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
-	ACIA6850(config, m_acia2, 0);
+	ACIA6850(config, m_acia2);
 	m_acia2->txd_handler().set("mdout2", FUNC(midi_port_device::write_txd));
 	m_acia2->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
-	ACIA6850(config, m_acia3, 0);
+	ACIA6850(config, m_acia3);
 	m_acia3->txd_handler().set("mdout3", FUNC(midi_port_device::write_txd));
 	m_acia3->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
@@ -66,7 +66,7 @@ void bbc_m2000_device::device_add_mconfig(machine_config &config)
 //  bbc_m2000_device - constructor
 //-------------------------------------------------
 
-bbc_m2000_device::bbc_m2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_m2000_device::bbc_m2000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_M2000, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_1mhzbus(*this, "1mhzbus")

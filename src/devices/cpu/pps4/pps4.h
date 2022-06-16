@@ -40,7 +40,7 @@ class pps4_device : public cpu_device
 {
 public:
 	// construction/destruction
-	pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto dia_cb() { return m_dia_cb.bind(); }
@@ -50,7 +50,7 @@ public:
 	u16 address_bus_r(address_space &space);
 
 protected:
-	pps4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	pps4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -171,7 +171,7 @@ class pps4_2_device : public pps4_device
 {
 public:
 	// construction/destruction
-	pps4_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pps4_2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

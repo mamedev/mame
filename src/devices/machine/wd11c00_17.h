@@ -22,7 +22,7 @@ class wd11c00_17_device :   public device_t
 {
 public:
 	// construction/destruction
-	wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_irq5_callback() { return m_out_irq5_cb.bind(); }
 	auto out_drq3_callback() { return m_out_drq3_cb.bind(); }

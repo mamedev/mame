@@ -9,7 +9,7 @@
 class z8038_device : public device_t
 {
 public:
-	z8038_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z8038_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// port 1 and 2 I̅N̅T̅ output lines
 	template <u8 Port> auto out_int_cb() { return m_out_int_cb[Port - 1].bind(); }

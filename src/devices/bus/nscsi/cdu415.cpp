@@ -18,7 +18,7 @@
 
 DEFINE_DEVICE_TYPE(CDU415, cdu415_device, "cdu415", "Sony CDU415 CD-R")
 
-cdu415_device::cdu415_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cdu415_device::cdu415_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CDU415, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, "cxd1804ar")
 	, m_mcu(*this, "mcu")
@@ -46,11 +46,11 @@ void cdu415_device::io_map(address_map &map)
 
 void cdu415_device::device_add_mconfig(machine_config &config)
 {
-	H83032(config, m_mcu, 10000000);
+	H83032(config, m_mcu, XTAL::u(10000000));
 	m_mcu->set_addrmap(AS_PROGRAM, &cdu415_device::mem_map);
 	m_mcu->set_addrmap(AS_IO, &cdu415_device::io_map);
 
-	NCR53C94(config, m_scsi, 25'000'000); // Temporary placeholder
+	NCR53C94(config, m_scsi, XTAL::u(25'000'000)); // Temporary placeholder
 }
 
 ROM_START(cdu415)

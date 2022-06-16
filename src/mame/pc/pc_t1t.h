@@ -53,7 +53,7 @@ protected:
 	};
 
 	// construction/destruction
-	pc_t1t_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pc_t1t_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_device<mc6845_device> m_mc6845;
 	uint8_t m_mode_control, m_color_select;
@@ -98,7 +98,7 @@ class pcvideo_t1000_device :  public pc_t1t_device
 {
 public:
 	// construction/destruction
-	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( disable_w );
@@ -123,7 +123,7 @@ class pcvideo_pcjr_device :  public pc_t1t_device
 {
 public:
 	// construction/destruction
-	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void write(offs_t offset, uint8_t data);
 

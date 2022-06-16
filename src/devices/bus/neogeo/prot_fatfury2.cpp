@@ -9,7 +9,7 @@
 DEFINE_DEVICE_TYPE(NG_FATFURY2_PROT, fatfury2_prot_device, "ng_fatfury_prot", "Neo Geo Fatal Fury 2 Protection")
 
 
-fatfury2_prot_device::fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+fatfury2_prot_device::fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NG_FATFURY2_PROT, tag, owner, clock),
 	m_pro_ct0(*this, "pro_ct0")
 {
@@ -18,7 +18,7 @@ fatfury2_prot_device::fatfury2_prot_device(const machine_config &mconfig, const 
 
 void fatfury2_prot_device::device_add_mconfig(machine_config &config)
 {
-	ALPHA_8921(config, m_pro_ct0, 0); // PRO-CT0 or SNK-9201
+	ALPHA_8921(config, m_pro_ct0); // PRO-CT0 or SNK-9201
 }
 
 void fatfury2_prot_device::device_start()

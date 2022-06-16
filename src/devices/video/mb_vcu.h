@@ -20,7 +20,7 @@ class mb_vcu_device : public device_t,
 {
 public:
 	// construction/destruction
-	mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }

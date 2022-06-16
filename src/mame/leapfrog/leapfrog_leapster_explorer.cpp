@@ -81,7 +81,7 @@ INPUT_PORTS_END
 
 void leapfrog_leapster_explorer_state::leapfrog_leapster_explorer(machine_config& config)
 {
-	ARM9(config, m_maincpu, 393000000); // unknown ARM9 type
+	ARM9(config, m_maincpu, XTAL::u(393000000)); // unknown ARM9 type
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

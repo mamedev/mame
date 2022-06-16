@@ -35,12 +35,12 @@ void sbus_cards(device_slot_interface &device)
 
 DEFINE_DEVICE_TYPE(SBUS_SLOT, sbus_slot_device, "sbus_slot", "Sun SBus Slot")
 
-sbus_slot_device::sbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sbus_slot_device::sbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sbus_slot_device(mconfig, SBUS_SLOT, tag, owner, clock)
 {
 }
 
-sbus_slot_device::sbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sbus_slot_device::sbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_single_card_slot_interface<device_sbus_card_interface>(mconfig, *this)
 	, m_sbus(*this, finder_base::DUMMY_TAG)
@@ -75,12 +75,12 @@ device_memory_interface::space_config_vector sbus_device::memory_space_config() 
 	};
 }
 
-sbus_device::sbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sbus_device::sbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sbus_device(mconfig, SBUS, tag, owner, clock)
 {
 }
 
-sbus_device::sbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sbus_device::sbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("sbus", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor())

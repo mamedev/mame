@@ -28,10 +28,10 @@ class c2n_device :  public device_t,
 {
 public:
 	// construction/destruction
-	c2n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c2n_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	c2n_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	c2n_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -63,7 +63,7 @@ class c1530_device :  public c2n_device
 {
 public:
 	// construction/destruction
-	c1530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1530_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -73,7 +73,7 @@ class c1531_device :  public c2n_device
 {
 public:
 	// construction/destruction
-	c1531_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1531_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

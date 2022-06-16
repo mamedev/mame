@@ -44,7 +44,7 @@
 DEFINE_DEVICE_TYPE(A26_ROM_SUPERCHARGER, a26_rom_ss_device, "a2600_ss", "Atari 2600 ROM Cart Supercharger")
 
 
-a26_rom_ss_device::a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a26_rom_ss_device::a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a26_rom_base_device(mconfig, A26_ROM_SUPERCHARGER, tag, owner, clock),
 	m_cassette(*this, "cassette"),
 	m_data(0),

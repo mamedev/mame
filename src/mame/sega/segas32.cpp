@@ -556,12 +556,12 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 
 DEFINE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state, "segas32_pcb", "Sega System 32 PCB")
 
-segas32_state::segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segas32_state::segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segas32_state(mconfig, SEGA_S32_PCB, tag, owner, clock, false)
 {
 }
 
-segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_multi32)
+segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool is_multi32)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_z80_shared_ram(*this,"z80_shared_ram")
 	, m_system32_workram(*this,"workram")
@@ -612,7 +612,7 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
  *
  *************************************/
 
-#define MASTER_CLOCK        32215900
+#define MASTER_CLOCK        XTAL::u(32215900)
 #define RFC_CLOCK           XTAL(50'000'000)
 #define MULTI32_CLOCK       XTAL(40'000'000)
 
@@ -2260,7 +2260,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segas32_state::system32_sound_portmap);
 
-	sega_315_5296_device &io_chip(SEGA_315_5296(config, "io_chip", 0)); // unknown clock
+	sega_315_5296_device &io_chip(SEGA_315_5296(config, "io_chip")); // unknown clock
 	io_chip.in_pa_callback().set_ioport("P1_A");
 	io_chip.in_pb_callback().set_ioport("P2_A");
 	io_chip.in_pc_callback().set_ioport("PORTC_A");
@@ -2308,12 +2308,12 @@ void segas32_state::device_add_mconfig(machine_config &config)
 	rfsnd.add_route(1, "rspeaker", 0.55);
 	rfsnd.set_addrmap(0, &segas32_state::rf5c68_map);
 
-	S32COMM(config, m_s32comm, 0);
+	S32COMM(config, m_s32comm);
 }
 
 DEFINE_DEVICE_TYPE(SEGA_S32_REGULAR_DEVICE, segas32_regular_state, "segas32_pcb_regular", "Sega System 32 regular PCB")
 
-segas32_regular_state::segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segas32_regular_state::segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segas32_state(mconfig, SEGA_S32_REGULAR_DEVICE, tag, owner, clock, false)
 {
 }
@@ -2335,7 +2335,7 @@ void segas32_analog_state::device_add_mconfig(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_analog_state::system32_analog_map);
 
-	msm6253_device &adc(MSM6253(config, "adc", 0));
+	msm6253_device &adc(MSM6253(config, "adc"));
 	adc.set_input_tag<0>("ANALOG1");
 	adc.set_input_tag<1>("ANALOG2");
 	adc.set_input_tag<2>("ANALOG3");
@@ -2344,12 +2344,12 @@ void segas32_analog_state::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(SEGA_S32_ANALOG_DEVICE, segas32_analog_state, "segas32_pcb_analog", "Sega System 32 analog PCB")
 
-segas32_analog_state::segas32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segas32_analog_state::segas32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segas32_analog_state(mconfig, SEGA_S32_ANALOG_DEVICE, tag, owner, clock)
 {
 }
 
-segas32_analog_state::segas32_analog_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+segas32_analog_state::segas32_analog_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: segas32_state(mconfig, type, tag, owner, clock, false)
 {
 }
@@ -2391,7 +2391,7 @@ void segas32_trackball_state::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(SEGA_S32_TRACKBALL_DEVICE, segas32_trackball_state, "segas32_pcb_trackball", "Sega System 32 trackball PCB")
 
-segas32_trackball_state::segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segas32_trackball_state::segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segas32_state(mconfig, SEGA_S32_TRACKBALL_DEVICE, tag, owner, clock, false)
 {
 }
@@ -2421,12 +2421,12 @@ void segas32_4player_state::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(SEGA_S32_4PLAYER_DEVICE, segas32_4player_state, "segas32_pcb_4player", "Sega System 32 4-player/fighting PCB")
 
-segas32_4player_state::segas32_4player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segas32_4player_state::segas32_4player_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segas32_4player_state(mconfig, SEGA_S32_4PLAYER_DEVICE, tag, owner, clock)
 {
 }
 
-segas32_4player_state::segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+segas32_4player_state::segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: segas32_state(mconfig, type, tag, owner, clock, false)
 {
 }
@@ -2448,16 +2448,16 @@ void segas32_v25_state::device_add_mconfig(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_v25_state::ga2_main_map);
 
-	MB8421(config, "dpram", 0);
+	MB8421(config, "dpram");
 
 	/* add a V25 for protection */
-	v25_device &mcu(V25(config, "mcu", 10000000));
+	v25_device &mcu(V25(config, "mcu", XTAL::u(10000000)));
 	mcu.set_addrmap(AS_PROGRAM, &segas32_v25_state::v25_map);
 }
 
 DEFINE_DEVICE_TYPE(SEGA_S32_V25_DEVICE, segas32_v25_state, "segas32_pcb_v25", "Sega System 32 V25 PCB")
 
-segas32_v25_state::segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segas32_v25_state::segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segas32_4player_state(mconfig, SEGA_S32_V25_DEVICE, tag, owner, clock)
 {
 }
@@ -2471,7 +2471,7 @@ void segas32_upd7725_state::device_add_mconfig(machine_config &config)
 	segas32_analog_state::device_add_mconfig(config);
 
 	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's ROM board where an fd1149 could go */
-	upd7725_device &dsp(UPD7725(config, "dsp", 8000000)); // TODO: Find real clock speed for the upd7725; this is a canned oscillator on the 837-8341 pcb
+	upd7725_device &dsp(UPD7725(config, "dsp", XTAL::u(8000000))); // TODO: Find real clock speed for the upd7725; this is a canned oscillator on the 837-8341 pcb
 	dsp.set_addrmap(AS_PROGRAM, &segas32_upd7725_state::upd7725_prg_map);
 	dsp.set_addrmap(AS_DATA, &segas32_upd7725_state::upd7725_data_map);
 	dsp.set_disable(); // TODO: disable for now, needs DMA pins and interrupts implemented in upd7725 core
@@ -2483,7 +2483,7 @@ void segas32_upd7725_state::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(SEGA_S32_UPD7725_DEVICE, segas32_upd7725_state, "segas32_pcb_upd7725", "Sega System 32 uPD7725 PCB")
 
-segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segas32_analog_state(mconfig, SEGA_S32_UPD7725_DEVICE, tag, owner, clock)
 {
 }
@@ -2539,7 +2539,7 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_cd_state::system32_cd_map);
 
-	mb89352_device &scsictrl(MB89352A(config, "mb89352", 8000000));
+	mb89352_device &scsictrl(MB89352A(config, "mb89352", XTAL::u(8000000)));
 	scsictrl.set_scsi_port("scsi");
 	scsictrl.irq_cb().set(FUNC(segas32_cd_state::scsi_irq_w));
 	scsictrl.drq_cb().set(FUNC(segas32_cd_state::scsi_drq_w));
@@ -2556,7 +2556,7 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(SEGA_S32_CD_DEVICE, segas32_cd_state, "segas32_pcb_cd", "Sega System 32 CD PCB")
 
-segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, tag, owner, clock, false)
 	, m_lamps(*this, "lamp%u", 0U)
 {
@@ -2575,7 +2575,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &sega_multi32_state::multi32_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &sega_multi32_state::multi32_sound_portmap);
 
-	sega_315_5296_device &io_chip_0(SEGA_315_5296(config, "io_chip_0", 0)); // unknown clock
+	sega_315_5296_device &io_chip_0(SEGA_315_5296(config, "io_chip_0")); // unknown clock
 	io_chip_0.in_pa_callback().set_ioport("P1_A");
 	io_chip_0.in_pb_callback().set_ioport("P2_A");
 	io_chip_0.in_pc_callback().set_ioport("PORTC_A");
@@ -2587,7 +2587,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	io_chip_0.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<0>));
 	io_chip_0.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
-	sega_315_5296_device &io_chip_1(SEGA_315_5296(config, "io_chip_1", 0)); // unknown clock
+	sega_315_5296_device &io_chip_1(SEGA_315_5296(config, "io_chip_1")); // unknown clock
 	io_chip_1.in_pa_callback().set_ioport("P1_B");
 	io_chip_1.in_pb_callback().set_ioport("P2_B");
 	io_chip_1.in_pc_callback().set_ioport("PORTC_B");
@@ -2636,18 +2636,18 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	m_multipcm->add_route(1, "lspeaker", 1.0);
 	m_multipcm->add_route(0, "rspeaker", 1.0);
 
-	S32COMM(config, m_s32comm, 0);
+	S32COMM(config, m_s32comm);
 }
 
 
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_DEVICE, sega_multi32_state, "segas32_pcb_multi", "Sega Multi 32")
 
-sega_multi32_state::sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_multi32_state::sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_multi32_state(mconfig, SEGA_MULTI32_DEVICE, tag, owner, clock)
 {
 }
 
-sega_multi32_state::sega_multi32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sega_multi32_state::sega_multi32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: segas32_state(mconfig, type, tag, owner, clock, true)
 {
 }
@@ -2668,7 +2668,7 @@ void sega_multi32_analog_state::device_add_mconfig(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega_multi32_analog_state::multi32_analog_map);
 
-	msm6253_device &adc(MSM6253(config, "adc", 0));
+	msm6253_device &adc(MSM6253(config, "adc"));
 	adc.set_input_tag<0>("ANALOG1");
 	adc.set_input_tag<1>("ANALOG2");
 	adc.set_input_cb<2>(FUNC(sega_multi32_analog_state::in2_analog_read));
@@ -2692,7 +2692,7 @@ void sega_multi32_analog_state::analog_bank_w(uint8_t data)
 
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_ANALOG_DEVICE, sega_multi32_analog_state, "segas32_pcb_multi_analog", "Sega Multi 32 analog PCB")
 
-sega_multi32_analog_state::sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_multi32_analog_state::sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_multi32_state(mconfig, SEGA_MULTI32_ANALOG_DEVICE, tag, owner, clock)
 	, m_analog_ports(*this, "ANALOG%u", 1)
 	, m_analog_bank(0)
@@ -2722,7 +2722,7 @@ void sega_multi32_6player_state::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_6PLAYER_DEVICE, sega_multi32_6player_state, "segas32_pcb_multi_6player", "Sega Multi 32 6-player PCB")
 
-sega_multi32_6player_state::sega_multi32_6player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_multi32_6player_state::sega_multi32_6player_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_multi32_state(mconfig, SEGA_MULTI32_6PLAYER_DEVICE, tag, owner, clock)
 {
 }
@@ -2790,68 +2790,68 @@ private:
 
 void segas32_new_state::sega_system32(machine_config &config)
 {
-	SEGA_S32_REGULAR_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_REGULAR_DEVICE(config, "mainpcb");
 }
 
 void segas32_new_state::sega_system32_analog(machine_config &config)
 {
-	SEGA_S32_ANALOG_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_ANALOG_DEVICE(config, "mainpcb");
 }
 
 void segas32_new_state::sega_system32_track(machine_config &config)
 {
-	SEGA_S32_TRACKBALL_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_TRACKBALL_DEVICE(config, "mainpcb");
 }
 
 void segas32_new_state::sega_system32_4p(machine_config &config)
 {
-	SEGA_S32_4PLAYER_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_4PLAYER_DEVICE(config, "mainpcb");
 }
 
 void segas32_new_state::sega_system32_cd(machine_config &config)
 {
-	SEGA_S32_CD_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_CD_DEVICE(config, "mainpcb");
 }
 
 // for f1en where there is a sub-board containing shared ram sitting underneath the ROM board bridging 2 PCBs (not a network link)
 void segas32_new_state::sega_system32_dual_direct(machine_config &config)
 {
-	SEGA_S32_ANALOG_DEVICE(config, "mainpcb", 0);
-	SEGA_S32_ANALOG_DEVICE(config, "slavepcb", 0);
+	SEGA_S32_ANALOG_DEVICE(config, "mainpcb");
+	SEGA_S32_ANALOG_DEVICE(config, "slavepcb");
 }
 
 // air rescue is like f1en above but also has the 837-8341 DSP daughterboard on the mainpcb side only
 void segas32_new_state::sega_system32_dual_direct_upd7725(machine_config &config)
 {
-	SEGA_S32_UPD7725_DEVICE(config, "mainpcb", 0);
-	SEGA_S32_ANALOG_DEVICE(config, "slavepcb", 0);
+	SEGA_S32_UPD7725_DEVICE(config, "mainpcb");
+	SEGA_S32_ANALOG_DEVICE(config, "slavepcb");
 }
 
 void segas32_new_state::sega_system32_ga2(machine_config &config)
 {
-	SEGA_S32_V25_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_V25_DEVICE(config, "mainpcb");
 	subdevice<v25_common_device>("mainpcb:mcu")->set_decryption_table(segas32_v25_state::ga2_opcode_table);
 }
 
 void segas32_new_state::sega_system32_arf(machine_config &config)
 {
-	SEGA_S32_V25_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_V25_DEVICE(config, "mainpcb");
 	subdevice<v25_common_device>("mainpcb:mcu")->set_decryption_table(segas32_v25_state::arf_opcode_table);
 }
 
 void segas32_new_state::sega_multi32(machine_config &config)
 {
-	SEGA_MULTI32_DEVICE(config, "mainpcb", 0);
+	SEGA_MULTI32_DEVICE(config, "mainpcb");
 }
 
 void segas32_new_state::sega_multi32_analog(machine_config &config)
 {
-	SEGA_MULTI32_ANALOG_DEVICE(config, "mainpcb", 0);
+	SEGA_MULTI32_ANALOG_DEVICE(config, "mainpcb");
 }
 
 void segas32_new_state::sega_multi32_6p(machine_config &config)
 {
-	SEGA_MULTI32_6PLAYER_DEVICE(config, "mainpcb", 0);
+	SEGA_MULTI32_6PLAYER_DEVICE(config, "mainpcb");
 }
 
 /*************************************

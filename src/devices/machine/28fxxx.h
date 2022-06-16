@@ -26,7 +26,7 @@ public:
 	void write(offs_t offset, u8 data);
 
 protected:
-	base_28fxxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 size, u8 manufacturer_code, u8 device_code);
+	base_28fxxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 size, u8 manufacturer_code, u8 device_code);
 
 	virtual void device_start() override;
 
@@ -69,19 +69,19 @@ private:
 class intel_28f010_device : public base_28fxxx_device
 {
 public:
-	intel_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	intel_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class amd_28f010_device : public base_28fxxx_device
 {
 public:
-	amd_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	amd_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class amd_28f020_device : public base_28fxxx_device
 {
 public:
-	amd_28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	amd_28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 DECLARE_DEVICE_TYPE(INTEL_28F010, intel_28f010_device)

@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(IMAGE_AVIVIDEO, avivideo_image_device, "avivideo_image", "AVI
 //  avivideo_image_device - constructor
 //-------------------------------------------------
 
-avivideo_image_device::avivideo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+avivideo_image_device::avivideo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, IMAGE_AVIVIDEO, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_frame(nullptr),

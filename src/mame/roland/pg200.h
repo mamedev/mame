@@ -10,7 +10,7 @@
 class pg200_device : public device_t
 {
 public:
-	pg200_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	pg200_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_start() override;

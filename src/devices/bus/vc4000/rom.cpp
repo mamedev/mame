@@ -198,27 +198,27 @@ DEFINE_DEVICE_TYPE(VC4000_ROM_RAM1K,  vc4000_ram1k_device,  "vc4000_ram1k",  "VC
 DEFINE_DEVICE_TYPE(VC4000_ROM_CHESS2, vc4000_chess2_device, "vc4000_chess2", "VC 4000 Chess II Cart")
 
 
-vc4000_rom_device::vc4000_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vc4000_rom_device::vc4000_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock), device_vc4000_cart_interface(mconfig, *this)
 {
 }
 
-vc4000_rom_device::vc4000_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vc4000_rom_device::vc4000_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vc4000_rom_device(mconfig, VC4000_ROM_STD, tag, owner, clock)
 {
 }
 
-vc4000_rom4k_device::vc4000_rom4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vc4000_rom4k_device::vc4000_rom4k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vc4000_rom_device(mconfig, VC4000_ROM_ROM4K, tag, owner, clock)
 {
 }
 
-vc4000_ram1k_device::vc4000_ram1k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vc4000_ram1k_device::vc4000_ram1k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vc4000_rom_device(mconfig, VC4000_ROM_RAM1K, tag, owner, clock)
 {
 }
 
-vc4000_chess2_device::vc4000_chess2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vc4000_chess2_device::vc4000_chess2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vc4000_rom_device(mconfig, VC4000_ROM_CHESS2, tag, owner, clock)
 {
 }

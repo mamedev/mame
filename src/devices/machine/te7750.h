@@ -22,7 +22,7 @@ class te7750_device : public device_t
 {
 public:
 	// construction/destruction
-	te7750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	te7750_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	auto in_port1_cb() { return m_input_cb[0].bind(); }
@@ -50,7 +50,7 @@ public:
 	void write(offs_t offset, u8 data);
 
 protected:
-	te7750_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	te7750_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -78,7 +78,7 @@ private:
 class te7751_device : public te7750_device
 {
 public:
-	te7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	te7751_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // ======================> te7752_device
@@ -86,7 +86,7 @@ public:
 class te7752_device : public te7750_device
 {
 public:
-	te7752_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	te7752_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // device type definitions

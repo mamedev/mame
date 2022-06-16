@@ -457,7 +457,7 @@ void ohmygod_state::machine_reset()
 void ohmygod_state::ohmygod(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ohmygod_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ohmygod_state::irq1_line_hold));
 
@@ -480,7 +480,7 @@ void ohmygod_state::ohmygod(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	okim6295_device &oki(OKIM6295(config, "oki", 14000000 / 8, okim6295_device::PIN7_HIGH));
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(14000000) / 8, okim6295_device::PIN7_HIGH));
 	oki.set_addrmap(0, &ohmygod_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }

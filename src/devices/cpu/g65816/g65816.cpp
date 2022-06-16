@@ -113,18 +113,18 @@ enum
 };
 
 
-g65816_device::g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+g65816_device::g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: g65816_device(mconfig, G65816, tag, owner, clock, CPU_TYPE_W65C816, address_map_constructor())
 {
 }
 
-g65802_device::g65802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+g65802_device::g65802_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: g65816_device(mconfig, G65802, tag, owner, clock, CPU_TYPE_W65C802, address_map_constructor())
 {
 }
 
 
-g65816_device::g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal)
+g65816_device::g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int cpu_type, address_map_constructor internal)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, (cpu_type == CPU_TYPE_W65C802) ? 16 : 24, 0, internal)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, (cpu_type == CPU_TYPE_W65C802) ? 16 : 24, 0, internal)
@@ -168,7 +168,7 @@ void _5a22_device::_5a22_map(address_map &map)
 }
 
 
-_5a22_device::_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+_5a22_device::_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: g65816_device(mconfig, _5A22, tag, owner, clock, CPU_TYPE_5A22, address_map_constructor(FUNC(_5a22_device::_5a22_map), this))
 {
 }

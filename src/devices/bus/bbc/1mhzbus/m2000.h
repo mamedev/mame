@@ -29,7 +29,7 @@ class bbc_m2000_device :
 {
 public:
 	// construction/destruction
-	bbc_m2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_m2000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

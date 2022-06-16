@@ -143,7 +143,7 @@ private:
 };
 
 
-#define MASTER_CLOCK        12440000
+#define MASTER_CLOCK        XTAL::u(12440000)
 
 
 /*************************************

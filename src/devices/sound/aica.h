@@ -19,7 +19,7 @@ class aica_device : public device_t, public device_sound_interface, public devic
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	aica_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	aica_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq() { return m_irq_cb.bind(); }
 	auto main_irq() { return m_main_irq_cb.bind(); }

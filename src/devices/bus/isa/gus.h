@@ -78,7 +78,7 @@ public:
 	};
 
 	// construction/destruction
-	gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto txirq_handler() { return m_txirq_handler.bind(); }
 	auto rxirq_handler() { return m_rxirq_handler.bind(); }
@@ -222,7 +222,7 @@ class isa16_gus_device :
 	public device_isa16_card_interface
 {
 public:
-	isa16_gus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa16_gus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void set_irq(uint8_t source);
 	void reset_irq(uint8_t source);
 	void set_midi_irq(uint8_t source);

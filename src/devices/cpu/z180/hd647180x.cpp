@@ -31,7 +31,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(HD647180X, hd647180x_device, "hd647180x", "Hitachi HD647180X MCU")
 
-hd647180x_device::hd647180x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd647180x_device::hd647180x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z180_device(mconfig, HD647180X, tag, owner, clock, true, address_map_constructor(FUNC(hd647180x_device::internal_map), this))
 	, m_port_input_cb(*this)
 	, m_port_output_cb(*this)

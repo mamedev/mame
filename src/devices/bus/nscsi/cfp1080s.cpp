@@ -22,7 +22,7 @@
 
 DEFINE_DEVICE_TYPE(CFP1080S, cfp1080s_device, "cfp1080s", "Conner CFP1080S")
 
-cfp1080s_device::cfp1080s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cfp1080s_device::cfp1080s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nscsi_device(mconfig, CFP1080S, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_hdcpu(*this, "hdcpu")
@@ -80,7 +80,7 @@ void cfp1080s_device::mem_map(address_map &map)
 
 void cfp1080s_device::device_add_mconfig(machine_config &config)
 {
-	MC68HC16Z1(config, m_hdcpu, 20'000'000); // exact type and clock unknown
+	MC68HC16Z1(config, m_hdcpu, XTAL::u(20'000'000)); // exact type and clock unknown
 	m_hdcpu->set_addrmap(AS_PROGRAM, &cfp1080s_device::mem_map);
 }
 

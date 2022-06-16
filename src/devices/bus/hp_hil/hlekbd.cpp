@@ -436,7 +436,7 @@ void hle_hp_itf_device::transmit_byte(uint8_t byte)
     abbreviated constructor
 --------------------------------------------------*/
 
-hle_hp_ipc_device::hle_hp_ipc_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+hle_hp_ipc_device::hle_hp_ipc_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: hle_device_base(mconfig, HP_IPC_HLE_KEYBOARD, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7", "COL8", "COL9", "COL10", "COL11", "COL12", "COL13", "COL14", "COL15")
 	, m_modifiers(*this, "COL8")
@@ -568,7 +568,7 @@ ioport_constructor hle_hp_ipc_device::device_input_ports() const
     abbreviated constructor
 --------------------------------------------------*/
 
-hle_hp_itf_device::hle_hp_itf_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+hle_hp_itf_device::hle_hp_itf_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: hle_device_base(mconfig, HP_ITF_HLE_KEYBOARD, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7", "COL8", "COL9", "COL10", "COL11", "COL12", "COL13", "COL14", "COL15")
 { }

@@ -21,7 +21,7 @@ class sed1356_device :  public device_t,
 {
 public:
 	// construction/destruction
-	sed1356_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sed1356_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void map(address_map &map);
 	void vram_map(address_map &map);

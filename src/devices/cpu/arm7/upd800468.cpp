@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(UPD800468_TIMER, upd800468_timer_device, "upd800468_timer", "NEC uPD800468 timer")
 
-upd800468_timer_device::upd800468_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+upd800468_timer_device::upd800468_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UPD800468_TIMER, tag, owner, clock)
 	, m_irq_cb(*this)
 {
@@ -122,7 +122,7 @@ void upd800468_device::upd800468_map(address_map &map)
 	map(0xfffff000, 0xffffffff).m(m_vic, FUNC(vic_upd800468_device::map));
 }
 
-upd800468_device::upd800468_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+upd800468_device::upd800468_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arm7_cpu_device(mconfig, UPD800468, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(upd800468_device::upd800468_map), this))
 	, m_vic(*this, "vic")
@@ -142,7 +142,7 @@ device_memory_interface::space_config_vector upd800468_device::memory_space_conf
 
 void upd800468_device::device_add_mconfig(machine_config &config)
 {
-	UPD800468_VIC(config, m_vic, 0);
+	UPD800468_VIC(config, m_vic);
 	m_vic->out_irq_cb().set_inputline(*this, ARM7_IRQ_LINE);
 	m_vic->out_fiq_cb().set_inputline(*this, ARM7_FIRQ_LINE);
 
@@ -157,7 +157,7 @@ void upd800468_device::device_add_mconfig(machine_config &config)
 	m_timer[2]->irq_cb().set(m_vic, FUNC(vic_upd800468_device::irq_w<23>));
 
 	// key/button controller is compatible with the one from earlier keyboards
-	GT913_KBD_HLE(config, m_kbd, 0);
+	GT913_KBD_HLE(config, m_kbd);
 	m_kbd->irq_cb().set(m_vic, FUNC(vic_upd800468_device::irq_w<31>));
 }
 

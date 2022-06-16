@@ -44,7 +44,7 @@ class pet_datassette_port_device : public device_t, public device_single_card_sl
 public:
 	template <typename T>
 	pet_datassette_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: pet_datassette_port_device(mconfig, tag, owner, 0)
+		: pet_datassette_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -52,7 +52,7 @@ public:
 		set_fixed(false);
 	}
 
-	pet_datassette_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pet_datassette_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~pet_datassette_port_device();
 
 	// static configuration helpers

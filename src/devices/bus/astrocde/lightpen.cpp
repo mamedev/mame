@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(ASTROCADE_LIGHTPEN, astrocade_lightpen_device, "astrocade_lig
 //    Bally Astrocade light pen input
 //**************************************************************************
 
-astrocade_lightpen_device::astrocade_lightpen_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+astrocade_lightpen_device::astrocade_lightpen_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ASTROCADE_LIGHTPEN, tag, owner, clock)
 	, device_astrocade_accessory_interface(mconfig, *this)
 	, m_trigger(*this, "TRIGGER")

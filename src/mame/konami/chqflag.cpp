@@ -338,26 +338,26 @@ void chqflag_state::chqflag(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback));
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	K051316(config, m_k051316[0], 0);
+	K051316(config, m_k051316[0]);
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_offsets(7, 0);
 	m_k051316[0]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_1));
 
-	K051316(config, m_k051316[1], 0);
+	K051316(config, m_k051316[1]);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_bpp(8);
 	m_k051316[1]->set_layermask(0xc0);
 	m_k051316[1]->set_wrap(1);
 	m_k051316[1]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_2));
 
-	K051733(config, "k051733", 0);
+	K051733(config, "k051733");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

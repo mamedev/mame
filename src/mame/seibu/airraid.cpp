@@ -435,7 +435,7 @@ void airraid_state::airraid(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 
-	AIRRAID_VIDEO(config, m_airraid_video, 0);
+	AIRRAID_VIDEO(config, m_airraid_video);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -445,13 +445,13 @@ void airraid_state::airraid(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
 	m_seibu_sound->set_rom_tag("audiocpu");
 	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 
-	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
+	SEI80BU(config, "sei80bu").set_device_rom_tag("audiocpu");
 }
 
 void airraid_state::airraide(machine_config &config)

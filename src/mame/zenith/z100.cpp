@@ -784,7 +784,7 @@ void z100_state::z100(machine_config &config)
 	m_keybeep->out_cb().set(FUNC(z100_state::beep_update));
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 1'000'000'000 / PERIOD_OF_555_ASTABLE_NSEC(RES_K(470), RES_K(470), CAP_U(.001)));
+	BEEP(config, m_beeper, XTAL::u(1'000'000'000) / PERIOD_OF_555_ASTABLE_NSEC(RES_K(470), RES_K(470), CAP_U(.001)));
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* video hardware */

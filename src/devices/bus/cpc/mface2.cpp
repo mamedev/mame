@@ -307,7 +307,7 @@ ioport_constructor cpc_multiface2_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_multiface2_device::cpc_multiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cpc_multiface2_device::cpc_multiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CPC_MFACE2, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_slot(nullptr), m_multiface_ram(nullptr), m_multiface_flags(0), m_romdis(0)

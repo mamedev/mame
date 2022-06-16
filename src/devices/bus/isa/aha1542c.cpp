@@ -344,7 +344,7 @@ const tiny_rom_entry *aha1542cp_device::device_rom_region() const
 
 void aha1542c_device::device_add_mconfig(machine_config &config)
 {
-	z80_device &cpu(Z80(config, Z84C0010_TAG, 10'000'000));
+	z80_device &cpu(Z80(config, Z84C0010_TAG, XTAL::u(10'000'000)));
 	cpu.set_addrmap(AS_PROGRAM, &aha1542c_device::z84c0010_mem);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
@@ -352,30 +352,30 @@ void aha1542c_device::device_add_mconfig(machine_config &config)
 
 void aha1542cp_device::device_add_mconfig(machine_config &config)
 {
-	z80_device &cpu(Z80(config, Z84C0010_TAG, 10'000'000));
+	z80_device &cpu(Z80(config, Z84C0010_TAG, XTAL::u(10'000'000)));
 	cpu.set_addrmap(AS_PROGRAM, &aha1542cp_device::local_mem);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 }
 
-aha1542c_device::aha1542c_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+aha1542c_device::aha1542c_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_eeprom(*this, "eeprom")
 {
 }
 
-aha1542c_device::aha1542c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+aha1542c_device::aha1542c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: aha1542c_device(mconfig, AHA1542C, tag, owner, clock)
 {
 }
 
-aha1542cf_device::aha1542cf_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+aha1542cf_device::aha1542cf_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: aha1542c_device(mconfig, AHA1542CF, tag, owner, clock)
 {
 }
 
-aha1542cp_device::aha1542cp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+aha1542cp_device::aha1542cp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: aha1542c_device(mconfig, AHA1542CP, tag, owner, clock)
 {
 }

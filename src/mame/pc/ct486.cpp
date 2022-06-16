@@ -144,7 +144,7 @@ void ct486_state::ct486(machine_config &config)
 	pc_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
 	pc_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
 	m_isabus->set_iospace(m_maincpu, AS_IO);
 	m_isabus->iochck_callback().set(m_cs4031, FUNC(cs4031_device::iochck_w));
@@ -166,15 +166,15 @@ void ct486_state::ct486(machine_config &config)
 	m_isabus->drq5_callback().set(m_cs4031, FUNC(cs4031_device::dreq5_w));
 	m_isabus->drq6_callback().set(m_cs4031, FUNC(cs4031_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_cs4031, FUNC(cs4031_device::dreq7_w));
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true);
-	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
-	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
-	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
-	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "svga_et4k", false);
-	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board1", "isabus", pc_isa16_cards, "fdcsmc", true);
+	ISA16_SLOT(config, "board2", "isabus", pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board3", "isabus", pc_isa16_cards, "ide", true);
+	ISA16_SLOT(config, "board4", "isabus", pc_isa16_cards, "lpt", true);
+	ISA16_SLOT(config, "isa1", "isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa2", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", "isabus", pc_isa16_cards, nullptr, false);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

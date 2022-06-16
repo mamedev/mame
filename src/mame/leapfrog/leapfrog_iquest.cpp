@@ -598,8 +598,8 @@ void leapfrog_iquest_state::port3_w(u8 data)
 void leapfrog_iquest_state::leapfrog_base(machine_config &config)
 {
 	// seems to have an IRQ vector at 002b, which would suggest it's an 8052 or similar, rather than plain 8031?
-	//I8052(config, m_maincpu, 96000000/10); // unknown clock
-	I8032(config, m_maincpu, 96000000/10); // unknown clock
+	//I8052(config, m_maincpu, XTAL::u(96000000)/10); // unknown clock
+	I8032(config, m_maincpu, XTAL::u(96000000)/10); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_iquest_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &leapfrog_iquest_state::ext_map);
 	m_maincpu->serial_tx_cb().set(FUNC(leapfrog_iquest_state::tx));

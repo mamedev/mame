@@ -360,7 +360,7 @@ void europc_pc_state::europc_io(address_map &map)
 class europc_fdc_device : public isa8_fdc_device
 {
 public:
-	europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -372,7 +372,7 @@ private:
 
 DEFINE_DEVICE_TYPE(EUROPC_FDC, europc_fdc_device, "europc_fdc", "EURO PC FDC hookup")
 
-europc_fdc_device::europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+europc_fdc_device::europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: isa8_fdc_device(mconfig, EUROPC_FDC, tag, owner, clock)
 {
 }
@@ -420,7 +420,7 @@ void europc_pc_state::europc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &europc_pc_state::europc_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	PCNOPPI_MOTHERBOARD(config, m_mb).set_cputag(m_maincpu);
 	m_mb->int_callback().set_inputline(m_maincpu, 0);
 	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_mb->kbddata_callback().set("kbd", FUNC(europc_keyboard_device::kbdata_w));
@@ -431,10 +431,10 @@ void europc_pc_state::europc(machine_config &config)
 	kbd.kbclk_callback().set(m_mb, FUNC(pc_noppi_mb_device::keyboard_clock_w));
 	kbd.reset_callback().set(FUNC(europc_pc_state::reset_in_w));
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "aga", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", true);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", true);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", europc_fdc, "fdc", true);
+	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, "aga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, "lpt", true);
+	ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, "com", true);
+	ISA8_SLOT(config, "isa4", "mb:isa", europc_fdc, "fdc", true);
 
 	M3002(config, m_rtc, 32.768_kHz_XTAL);
 
@@ -469,8 +469,8 @@ void europc_pc_state::euroxt(machine_config &config)
 	m_ram->set_default_size("768K");
 
 	subdevice<isa8_slot_device>("isa2")->set_default_option(nullptr);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, "xtide", true); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, "lpt", true);
+	ISA8_SLOT(config, "isa5", "mb:isa", pc_isa8_cards, "xtide", true); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa6", "mb:isa", pc_isa8_cards, "lpt", true);
 }
 
 ROM_START( europc )

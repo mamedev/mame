@@ -71,7 +71,7 @@ class uv201_device :    public device_t,
 {
 public:
 	// construction/destruction
-	uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto ext_int_wr_callback() { return m_write_ext_int.bind(); }
 	auto hblank_wr_callback() { return m_write_hblank.bind(); }

@@ -320,38 +320,38 @@ void v6809_state::v6809(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(v6809_state::crtc_update_row));
 	m_crtc->set_on_update_addr_change_callback(FUNC(v6809_state::crtc_update_addr));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(v6809_state::kbd_put));
 
 	// port A = drive select and 2 control lines ; port B = keyboard
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpb_handler().set(FUNC(v6809_state::pb_r));
 	m_pia0->writepa_handler().set(FUNC(v6809_state::pa_w));
 	m_pia0->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	m_pia0->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	// no idea what this does
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia6821_device &pia1(PIA6821(config, "pia1"));
 	pia1.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	pia1.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	ptm6840_device &ptm(PTM6840(config, "ptm", 16_MHz_XTAL / 4));
-	ptm.set_external_clocks(4000000.0/14.0, 4000000.0/14.0, (4000000.0/14.0)/8.0);
+	ptm.set_external_clocks(XTAL::u(4000000)/14, XTAL::u(4000000)/14, XTAL::u(4000000)/14/8);
 	ptm.o1_callback().set(FUNC(v6809_state::speaker_en_w));
 	ptm.o2_callback().set(FUNC(v6809_state::speaker_w));
 	ptm.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	ACIA6850(config, "acia0", 0);
+	ACIA6850(config, "acia0");
 
-	ACIA6850(config, "acia1", 0);
+	ACIA6850(config, "acia1");
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(153600)));
 	acia_clock.signal_handler().set("acia0", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia0", FUNC(acia6850_device::write_rxc));
 	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_rxc));
 
-	MM58174(config, "rtc", 0);
+	MM58174(config, "rtc");
 	//rtc.irq_handler().set(m_pia0, FUNC(pia6821_device::cb2_w));   // unsupported by RTC emulation
 
 	MB8876(config, m_fdc, 16_MHz_XTAL / 16);

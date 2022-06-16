@@ -27,7 +27,7 @@ class arc_bbcio_we_device :
 {
 public:
 	// construction/destruction
-	arc_bbcio_we_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_bbcio_we_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -129,7 +129,7 @@ void arc_bbcio_we_device::device_add_mconfig(machine_config &config)
 //  arc_bbcio_we_device - constructor
 //-------------------------------------------------
 
-arc_bbcio_we_device::arc_bbcio_we_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_bbcio_we_device::arc_bbcio_we_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_BBCIO_WE, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")

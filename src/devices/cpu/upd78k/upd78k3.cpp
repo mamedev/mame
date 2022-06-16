@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(UPD78312, upd78312_device, "upd78312", "NEC uPD78312")
 //  upd78k3_device - constructor
 //-------------------------------------------------
 
-upd78k3_device::upd78k3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor mem_map, address_map_constructor sfr_map)
+upd78k3_device::upd78k3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor mem_map, address_map_constructor sfr_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, mem_map)
 	, m_iram_config("iram", ENDIANNESS_LITTLE, 16, 8, 0, address_map_constructor(FUNC(upd78k3_device::iram_map), this))
@@ -264,12 +264,12 @@ void upd78k3_device::state_string_export(const device_state_entry &entry, std::s
 //  upd78312_device - constructor
 //-------------------------------------------------
 
-upd78312_device::upd78312_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upd78312_device::upd78312_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upd78312_device(mconfig, UPD78312, tag, owner, clock, address_map_constructor(FUNC(upd78312_device::mem_map), this))
 {
 }
 
-upd78312_device::upd78312_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
+upd78312_device::upd78312_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map)
 	: upd78k3_device(mconfig, type, tag, owner, clock, map,
 						address_map_constructor(FUNC(upd78312_device::sfr_map), this))
 {
@@ -280,7 +280,7 @@ upd78312_device::upd78312_device(const machine_config &mconfig, device_type type
 //  upd78310_device - constructor
 //-------------------------------------------------
 
-upd78310_device::upd78310_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upd78310_device::upd78310_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upd78312_device(mconfig, UPD78310, tag, owner, clock, address_map_constructor())
 {
 }

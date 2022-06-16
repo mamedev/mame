@@ -20,7 +20,7 @@ class rs232_sync_io_device : public device_t, public device_rs232_port_interface
 {
 public:
 	// construction/destruction
-	rs232_sync_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rs232_sync_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~rs232_sync_io_device();
 
 	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) override;

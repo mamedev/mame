@@ -17,10 +17,10 @@ class md_rom_svp_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_rom_svp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_rom_svp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	md_rom_svp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	md_rom_svp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 

@@ -203,7 +203,7 @@ void nes_arcstick_device::device_add_mconfig(machine_config &config)
 //  nes_joypad_device - constructor
 //-------------------------------------------------
 
-nes_joypad_device::nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 latch_fill)
+nes_joypad_device::nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 latch_fill)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_joypad(*this, "JOYPAD")
@@ -212,45 +212,45 @@ nes_joypad_device::nes_joypad_device(const machine_config &mconfig, device_type 
 {
 }
 
-nes_joypad_device::nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_joypad_device::nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_joypad_device(mconfig, NES_JOYPAD, tag, owner, clock)
 {
 }
 
-nes_fcpadexp_device::nes_fcpadexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 latch_fill)
+nes_fcpadexp_device::nes_fcpadexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 latch_fill)
 	: nes_joypad_device(mconfig, type, tag, owner, clock, latch_fill)
 {
 }
 
-nes_fcpadexp_device::nes_fcpadexp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_fcpadexp_device::nes_fcpadexp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_fcpadexp_device(mconfig, NES_FCPAD_EXP, tag, owner, clock)
 {
 }
 
-nes_fcpad2_device::nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_fcpad2_device::nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_joypad_device(mconfig, NES_FCPAD_P2, tag, owner, clock)
 	, m_mic(*this, "MIC")
 {
 }
 
-nes_ccpadl_device::nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ccpadl_device::nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_joypad_device(mconfig, NES_CCPAD_LEFT, tag, owner, clock)
 {
 }
 
-nes_ccpadr_device::nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ccpadr_device::nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_joypad_device(mconfig, NES_CCPAD_RIGHT, tag, owner, clock)
 {
 }
 
-nes_arcstick_device::nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_arcstick_device::nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_fcpadexp_device(mconfig, NES_ARCSTICK, tag, owner, clock)
 	, m_daisychain(*this, "subexp")
 	, m_cfg(*this, "CONFIG")
 {
 }
 
-nes_vboyctrl_device::nes_vboyctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_vboyctrl_device::nes_vboyctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_joypad_device(mconfig, NES_VBOYCTRL, tag, owner, clock, 0x8000)
 {
 }

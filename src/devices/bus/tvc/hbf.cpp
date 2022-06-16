@@ -55,7 +55,7 @@ DEFINE_DEVICE_TYPE(TVC_HBF, tvc_hbf_device, "tvc_hbf", "HBF floppy interface")
 //  tvc_hbf_device - constructor
 //-------------------------------------------------
 
-tvc_hbf_device::tvc_hbf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tvc_hbf_device::tvc_hbf_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TVC_HBF, tag, owner, clock),
 	device_tvcexp_interface( mconfig, *this ),
 	m_fdc(*this, "fdc"), m_rom(nullptr), m_ram(nullptr), m_rom_bank(0)

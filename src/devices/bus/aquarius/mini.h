@@ -24,7 +24,7 @@ class aquarius_mini_device:
 {
 public:
 	// construction/destruction
-	aquarius_mini_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	aquarius_mini_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 

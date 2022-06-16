@@ -294,11 +294,11 @@ void jupiter3_state::machine_reset()
 void jupiter2_state::jupiter2(machine_config &config)
 {
 	// basic machine hardware
-	M6800(config, m_maincpu, 2000000);
+	M6800(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &jupiter2_state::jupiter2_mem);
 
 	// devices
-	FD1771(config, INS1771N1_TAG, 1000000);
+	FD1771(config, INS1771N1_TAG, XTAL::u(1000000));
 	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
@@ -330,7 +330,7 @@ void jupiter2_state::jupiter2(machine_config &config)
 void jupiter3_state::jupiter3(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &jupiter3_state::jupiter3_mem);
 	m_maincpu->set_addrmap(AS_IO, &jupiter3_state::jupiter3_io);
 
@@ -346,11 +346,11 @@ void jupiter3_state::jupiter3(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// devices
-	FD1771(config, INS1771N1_TAG, 1000000);
+	FD1771(config, INS1771N1_TAG, XTAL::u(1000000));
 	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(jupiter3_state::kbd_put));
 
 	// internal ram

@@ -292,7 +292,7 @@ void palmz22_state::init_palmz22()
 
 void palmz22_state::palmz22(machine_config &config)
 {
-	ARM920T(config, m_maincpu, 266000000);
+	ARM920T(config, m_maincpu, XTAL::u(266000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &palmz22_state::map);
 
 	PALETTE(config, "palette").set_entries(32768);
@@ -304,7 +304,7 @@ void palmz22_state::palmz22(machine_config &config)
 	screen.set_visarea(0, 160 - 1, 0, 160 - 1);
 	screen.set_screen_update("s3c2410", FUNC(s3c2410_device::screen_update));
 
-	S3C2410(config, m_s3c2410, 12000000);
+	S3C2410(config, m_s3c2410, XTAL::u(12000000));
 	m_s3c2410->set_palette_tag("palette");
 	m_s3c2410->set_screen_tag("screen");
 	m_s3c2410->core_pin_r_callback().set(FUNC(palmz22_state::s3c2410_core_pin_r));
@@ -316,7 +316,7 @@ void palmz22_state::palmz22(machine_config &config)
 	m_s3c2410->nand_data_r_callback().set(FUNC(palmz22_state::s3c2410_nand_data_r));
 	m_s3c2410->nand_data_w_callback().set(FUNC(palmz22_state::s3c2410_nand_data_w));
 
-	NAND(config, m_nand, 0);
+	NAND(config, m_nand);
 	m_nand->set_nand_type(nand_device::chip::K9F5608U0D_J);
 	m_nand->rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::frnb_w));
 }

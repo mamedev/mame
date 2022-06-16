@@ -19,27 +19,27 @@ DEFINE_DEVICE_TYPE(MM76EL, mm76el_device, "mm76el", "Rockwell MM76EL B8600") // 
 
 
 // constructor
-mm76_device::mm76_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+mm76_device::mm76_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mm76_device(mconfig, MM76, tag, owner, clock, 10, address_map_constructor(FUNC(mm76_device::program_0_6k), this), 6, address_map_constructor(FUNC(mm76_device::data_48x4), this))
 { }
 
-mm76_device::mm76_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+mm76_device::mm76_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	pps41_base_device(mconfig, type, tag, owner, clock, prgwidth, program, datawidth, data)
 { }
 
-mm76l_device::mm76l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+mm76l_device::mm76l_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mm76_device(mconfig, MM76L, tag, owner, clock, 10, address_map_constructor(FUNC(mm76l_device::program_0_6k), this), 6, address_map_constructor(FUNC(mm76l_device::data_48x4), this))
 { }
 
-mm76e_device::mm76e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+mm76e_device::mm76e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mm76e_device(mconfig, MM76E, tag, owner, clock, 10, address_map_constructor(FUNC(mm76e_device::program_1k), this), 6, address_map_constructor(FUNC(mm76e_device::data_48x4), this))
 { }
 
-mm76e_device::mm76e_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+mm76e_device::mm76e_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	mm76_device(mconfig, type, tag, owner, clock, prgwidth, program, datawidth, data)
 { }
 
-mm76el_device::mm76el_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+mm76el_device::mm76el_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mm76e_device(mconfig, MM76EL, tag, owner, clock, 10, address_map_constructor(FUNC(mm76el_device::program_1k), this), 6, address_map_constructor(FUNC(mm76el_device::data_48x4), this))
 { }
 

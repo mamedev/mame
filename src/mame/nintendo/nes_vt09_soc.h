@@ -17,7 +17,7 @@
 class nes_vt09_soc_device : public nes_vt02_vt03_soc_device
 {
 public:
-	nes_vt09_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt09_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 	// are these even part of vt09, or should they be moved out of here rather than this being treated as a base class for them?
 	auto upper_read_412c_callback() { return m_upper_read_412c_callback.bind(); }
@@ -27,7 +27,7 @@ public:
 
 
 protected:
-	nes_vt09_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt09_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock);
 	void device_start() override;
 
 	virtual void device_add_mconfig(machine_config& config) override;

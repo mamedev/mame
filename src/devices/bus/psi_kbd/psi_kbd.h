@@ -46,14 +46,14 @@ class psi_keyboard_bus_device : public device_t, public device_single_card_slot_
 public:
 	// construction/destruction
 	psi_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *dflt)
-		: psi_keyboard_bus_device(mconfig, tag, owner, (uint32_t)0)
+		: psi_keyboard_bus_device(mconfig, tag, owner)
 	{
 		option_reset();
 		psi_keyboard_devices(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	psi_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psi_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~psi_keyboard_bus_device();
 
 	// callbacks

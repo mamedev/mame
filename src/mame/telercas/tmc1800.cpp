@@ -686,7 +686,7 @@ void tmc1800_state::machine_reset()
 
 	/* initialize beeper */
 	m_beeper->set_state(0);
-	m_beeper->set_clock(0);
+	m_beeper->set_clock(XTAL::u(0));
 }
 
 // OSCOM 1000B
@@ -797,7 +797,7 @@ void tmc1800_state::tmc1800(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb));
@@ -832,7 +832,7 @@ void osc1000b_state::osc1000b(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb));

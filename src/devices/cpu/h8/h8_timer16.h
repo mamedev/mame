@@ -56,9 +56,9 @@ public:
 	};
 
 
-	h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, int tgr_count, int tbr_count, const char *intc, int irq_base)
-		: h8_timer16_channel_device(mconfig, tag, owner, 0)
+		: h8_timer16_channel_device(mconfig, tag, owner)
 	{
 		set_info(tgr_count, tbr_count, intc, irq_base);
 	}
@@ -106,7 +106,7 @@ protected:
 	bool counter_incrementing;
 	bool channel_active;
 
-	h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -121,9 +121,9 @@ protected:
 
 class h8h_timer16_channel_device : public h8_timer16_channel_device {
 public:
-	h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, int tgr_count, int tbr_count, const char *intc, int irq_base)
-		: h8h_timer16_channel_device(mconfig, tag, owner, 0)
+		: h8h_timer16_channel_device(mconfig, tag, owner)
 	{
 		set_info(tgr_count, tbr_count, intc, irq_base);
 	}
@@ -140,10 +140,10 @@ protected:
 
 class h8s_timer16_channel_device : public h8_timer16_channel_device {
 public:
-	h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, int tgr_count, int _tier_mask, const char *intc, int irq_base,
 					int t0, int t1, int t2, int t3, int t4, int t5, int t6, int t7)
-		: h8s_timer16_channel_device(mconfig, tag, owner, 0)
+		: h8s_timer16_channel_device(mconfig, tag, owner)
 	{
 		set_info(tgr_count, _tier_mask, intc, irq_base, t0, t1, t2, t3, t4, t5, t6, t7);
 	}
@@ -164,9 +164,9 @@ protected:
 
 class h8_timer16_device : public device_t {
 public:
-	h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, int timer_count, uint8_t default_tstr)
-		: h8_timer16_device(mconfig, tag, owner, 0)
+		: h8_timer16_device(mconfig, tag, owner)
 	{
 		set_info(timer_count, default_tstr);
 	}

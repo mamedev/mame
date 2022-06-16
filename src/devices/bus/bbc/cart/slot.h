@@ -123,7 +123,7 @@ class bbc_cartslot_device : public electron_cartslot_device
 public:
 	// construction/destruction
 	template <typename T>
-	bbc_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
+	bbc_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, T &&slot_options, const char *default_option)
 		: electron_cartslot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -132,7 +132,7 @@ public:
 		set_fixed(false);
 	}
 
-	bbc_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const char *image_interface() const noexcept override { return "bbcm_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }

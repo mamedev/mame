@@ -56,7 +56,7 @@ ioport_constructor arc_rtfm_joystick_device::device_input_ports() const
 //  archimedes_rtfm_joystick_device - constructor
 //-------------------------------------------------
 
-arc_rtfm_joystick_device::arc_rtfm_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_rtfm_joystick_device::arc_rtfm_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_RTFM_JOY, tag, owner, clock)
 	, device_archimedes_econet_interface(mconfig, *this)
 	, m_joy(*this, "JOY%u", 0U)

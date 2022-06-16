@@ -1499,7 +1499,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		for (device_sound_interface &snd : sound_interface_enumerator(machine.root_device()))
 		{
 			device_execute_interface *exec;
-			if (!snd.device().interface(exec) && snd.device().unscaled_clock() != 0)
+			if (!snd.device().interface(exec) && !snd.device().unscaled_clock().disabled())
 			{
 				std::string str = string_format(_("Overclock %1$s sound"), snd.device().tag());
 				slider_alloc(std::move(str), 100, 1000, 4000, 10, std::bind(&mame_ui_manager::slider_overclock, this, std::ref(snd.device()), _1, _2));

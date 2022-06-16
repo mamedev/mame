@@ -76,7 +76,7 @@ DEFINE_DEVICE_TYPE(Z80CTC_CHANNEL, z80ctc_channel_device, "z80ctc_channel", "Z80
 //  z80ctc_device - constructor
 //-------------------------------------------------
 
-z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, Z80CTC, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
 	, m_intr_cb(*this)
@@ -286,7 +286,7 @@ void z80ctc_device::interrupt_check()
 //  z80ctc_channel_device - constructor
 //-------------------------------------------------
 
-z80ctc_channel_device::z80ctc_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+z80ctc_channel_device::z80ctc_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, Z80CTC_CHANNEL, tag, owner, clock),
 		m_device(*this, DEVICE_SELF_OWNER),
 		m_index(0),

@@ -100,7 +100,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 
 
 /* constants */
-#define MASTER_CLOCK    48000000
+#define MASTER_CLOCK    XTAL::u(48000000)
 
 
 /*************************************
@@ -454,7 +454,7 @@ void policetr_state::policetr(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	RAMDAC(config, m_ramdac, 0, m_palette);  // BT481A Palette RAMDAC
+	RAMDAC(config, m_ramdac, m_palette);  // BT481A Palette RAMDAC
 	m_ramdac->set_addrmap(0, &policetr_state::ramdac_map);
 
 	/* sound hardware */

@@ -297,7 +297,7 @@ void scorpion_state::scorpion(machine_config &config)
 
 	AY8912(config, "ay8912", X1 / 8).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	BETA_DISK(config, m_beta, 0);
+	BETA_DISK(config, m_beta);
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(scorpion_state::nmi_check_callback), attotime::from_hz(50));
 
 	config.device_remove("exp");

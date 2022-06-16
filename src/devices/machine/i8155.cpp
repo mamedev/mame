@@ -268,12 +268,12 @@ inline void i8155_device::write_port(int port, uint8_t data)
 //  i8155_device - constructor
 //-------------------------------------------------
 
-i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8155_device(mconfig, I8155, tag, owner, clock)
 {
 }
 
-i8155_device::i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+i8155_device::i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		m_in_pa_cb(*this),
 		m_in_pb_cb(*this),
@@ -296,7 +296,7 @@ i8155_device::i8155_device(const machine_config &mconfig, device_type type, cons
 //  i8156_device - constructor
 //-------------------------------------------------
 
-i8156_device::i8156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8156_device::i8156_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8155_device(mconfig, I8156, tag, owner, clock)
 {
 }

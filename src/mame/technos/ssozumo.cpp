@@ -411,11 +411,11 @@ INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
 void ssozumo_state::ssozumo(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 1'200'000); // 1.2 MHz ????
+	M6502(config, m_maincpu, XTAL::u(1'200'000)); // 1.2 MHz ????
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssozumo_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ssozumo_state::irq0_line_hold));
 
-	M6502(config, m_audiocpu, 975'000);         // 975 kHz ??
+	M6502(config, m_audiocpu, XTAL::u(975'000));         // 975 kHz ??
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ssozumo_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(ssozumo_state::sound_timer_irq), attotime::from_hz(272 / 16 * 57)); // guess, assume to be the same as tagteam
 
@@ -438,10 +438,10 @@ void ssozumo_state::ssozumo(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
-	YM2149(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "speaker", 0.3);
-	YM2149(config, "ay2", 1'500'000).add_route(ALL_OUTPUTS, "speaker", 0.3);
+	YM2149(config, "ay1", XTAL::u(1'500'000)).add_route(ALL_OUTPUTS, "speaker", 0.3);
+	YM2149(config, "ay2", XTAL::u(1'500'000)).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
 }
 
 

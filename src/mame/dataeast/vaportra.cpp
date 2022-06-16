@@ -399,7 +399,7 @@ void vaportra_state::vaportra(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vaportra);
 	PALETTE(config, m_palette).set_entries(1280);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -412,7 +412,7 @@ void vaportra_state::vaportra(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x30);
@@ -425,7 +425,7 @@ void vaportra_state::vaportra(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_MXC06(config, m_spritegen, 0);
+	DECO_MXC06(config, m_spritegen);
 	m_spritegen->set_colpri_callback(FUNC(vaportra_state::colpri_cb));
 
 	// sound hardware

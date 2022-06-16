@@ -652,7 +652,7 @@ void digel804_state::digel804(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_digel804);
 
-	MM74C923(config, m_kb, 0);
+	MM74C923(config, m_kb);
 	m_kb->da_wr_callback().set(FUNC(digel804_state::da_w));
 	m_kb->x1_rd_callback().set_ioport("LINE0");
 	m_kb->x2_rd_callback().set_ioport("LINE1");
@@ -660,7 +660,7 @@ void digel804_state::digel804(machine_config &config)
 	m_kb->x4_rd_callback().set_ioport("LINE3");
 
 	/* acia */
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(3.6864_MHz_XTAL/2);
 	m_acia->irq_handler().set(FUNC(digel804_state::acia_irq_w));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

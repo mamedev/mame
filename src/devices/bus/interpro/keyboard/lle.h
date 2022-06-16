@@ -20,7 +20,7 @@ class lle_device_base
 {
 protected:
 	// constructor/destructor
-	lle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	lle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -60,7 +60,7 @@ private:
 class lle_en_us_device : public lle_device_base
 {
 public:
-	lle_en_us_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	lle_en_us_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual tiny_rom_entry const *device_rom_region() const override;

@@ -24,10 +24,10 @@ class arc_midimax_device :
 {
 public:
 	// construction/destruction
-	arc_midimax_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_midimax_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	arc_midimax_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	arc_midimax_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -53,7 +53,7 @@ class arc_midimax2_device : public arc_midimax_device
 {
 public:
 	// construction/destruction
-	arc_midimax2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_midimax2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -127,7 +127,7 @@ void arc_midimax_device::device_add_mconfig(machine_config &config)
 //  arc_midimax_device - constructor
 //-------------------------------------------------
 
-arc_midimax_device::arc_midimax_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+arc_midimax_device::arc_midimax_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")
@@ -135,12 +135,12 @@ arc_midimax_device::arc_midimax_device(const machine_config &mconfig, device_typ
 {
 }
 
-arc_midimax_device::arc_midimax_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_midimax_device::arc_midimax_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_midimax_device(mconfig, ARC_MIDIMAX, tag, owner, clock)
 {
 }
 
-arc_midimax2_device::arc_midimax2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_midimax2_device::arc_midimax2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_midimax_device(mconfig, ARC_MIDIMAX2, tag, owner, clock)
 {
 }

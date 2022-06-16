@@ -11,7 +11,7 @@ class mcf5206e_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 

@@ -37,7 +37,7 @@ INPUT_PORTS_END
 
 void roland_ra30_state::ra30(machine_config &config)
 {
-	HD6415108(config, m_maincpu, 20'000'000);
+	HD6415108(config, m_maincpu, XTAL::u(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_ra30_state::mem_map);
 }
 

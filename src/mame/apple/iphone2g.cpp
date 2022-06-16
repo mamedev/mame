@@ -18,14 +18,14 @@
 class iphone2g_spi_device : public device_t, public device_memory_interface
 {
 public:
-	iphone2g_spi_device(const machine_config &mconfig, const char* tag, device_t *owner, uint32_t clock = 0);
+	iphone2g_spi_device(const machine_config &mconfig, const char* tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto out_irq_cb() { return m_out_irq_func.bind(); }
 
 	void map(address_map &map);
 
 protected:
-	iphone2g_spi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	iphone2g_spi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -111,7 +111,7 @@ void iphone2g_spi_device::device_reset()
 
 DEFINE_DEVICE_TYPE(IPHONE2G_SPI, iphone2g_spi_device, "iphone2g_spi", "iPhone 2G SPI controller")
 
-iphone2g_spi_device::iphone2g_spi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+iphone2g_spi_device::iphone2g_spi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_mmio_config("mmio", ENDIANNESS_LITTLE, 32, 32, 0)
@@ -119,7 +119,7 @@ iphone2g_spi_device::iphone2g_spi_device(const machine_config &mconfig, device_t
 {
 }
 
-iphone2g_spi_device::iphone2g_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iphone2g_spi_device::iphone2g_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: iphone2g_spi_device(mconfig, IPHONE2G_SPI, tag, owner, clock)
 {
 }
@@ -127,7 +127,7 @@ iphone2g_spi_device::iphone2g_spi_device(const machine_config &mconfig, const ch
 class iphone2g_timer_device : public device_t, public device_memory_interface
 {
 public:
-	iphone2g_timer_device(const machine_config &mconfig, const char* tag, device_t *owner, uint32_t clock = 0);
+	iphone2g_timer_device(const machine_config &mconfig, const char* tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto out_irq_cb() { return m_out_irq_func.bind(); }
 
@@ -135,7 +135,7 @@ public:
 	void timer_map(address_map &map);
 
 protected:
-	iphone2g_timer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	iphone2g_timer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -198,7 +198,7 @@ void iphone2g_timer_device::device_reset()
 
 DEFINE_DEVICE_TYPE(IPHONE2G_TIMER, iphone2g_timer_device, "iphone2g_timer", "iPhone 2G timers")
 
-iphone2g_timer_device::iphone2g_timer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+iphone2g_timer_device::iphone2g_timer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_mmio_config("mmio", ENDIANNESS_LITTLE, 32, 32, 0)
@@ -206,7 +206,7 @@ iphone2g_timer_device::iphone2g_timer_device(const machine_config &mconfig, devi
 {
 }
 
-iphone2g_timer_device::iphone2g_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iphone2g_timer_device::iphone2g_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: iphone2g_timer_device(mconfig, IPHONE2G_TIMER, tag, owner, clock)
 {
 }

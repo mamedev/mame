@@ -50,7 +50,7 @@ void device_ql_expansion_card_interface::interface_post_start()
 //  ql_expansion_slot_device - constructor
 //-------------------------------------------------
 
-ql_expansion_slot_device::ql_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ql_expansion_slot_device::ql_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, QL_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_ql_expansion_card_interface>(mconfig, *this),
 	m_write_ipl0l(*this),

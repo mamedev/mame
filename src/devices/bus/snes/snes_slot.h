@@ -234,7 +234,7 @@ public:
 	device_sns_cart_interface*      m_cart;
 
 protected:
-	base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -253,7 +253,7 @@ class sns_cart_slot_device : public base_sns_cart_slot_device
 public:
 	// construction/destruction
 	template <typename T>
-	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: sns_cart_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -261,7 +261,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "snes_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "sfc"; }
 };
@@ -274,14 +274,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: sns_sufami_cart_slot_device(mconfig, tag, owner, 0)
+		: sns_sufami_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "st_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "st"; }
 };
@@ -294,14 +294,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: sns_bsx_cart_slot_device(mconfig, tag, owner, 0)
+		: sns_bsx_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "bspack"; }
 	virtual const char *file_extensions() const noexcept override { return "bs"; }
 };

@@ -57,7 +57,7 @@ DEFINE_DEVICE_TYPE(A78_XBOARD, a78_xboard_device, "a78_xboard", "Atari 7800 XBoa
 DEFINE_DEVICE_TYPE(A78_XM,     a78_xm_device,     "a78_xm",     "Atari 7800 XM expansion module")
 
 
-a78_xboard_device::a78_xboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a78_xboard_device::a78_xboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_device(mconfig, type, tag, owner, clock)
 	, m_xbslot(*this, "xb_slot")
 	, m_pokey(*this, "xb_pokey")
@@ -66,13 +66,13 @@ a78_xboard_device::a78_xboard_device(const machine_config &mconfig, device_type 
 }
 
 
-a78_xboard_device::a78_xboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_xboard_device::a78_xboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_xboard_device(mconfig, A78_XBOARD, tag, owner, clock)
 {
 }
 
 
-a78_xm_device::a78_xm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_xm_device::a78_xm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_xboard_device(mconfig, A78_XM, tag, owner, clock)
 	, m_ym(*this, "xm_ym2151"), m_ym_enabled(0)
 {

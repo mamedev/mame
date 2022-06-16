@@ -85,7 +85,7 @@ const stream_buffer::sample_t okim6295_device::s_volume_table[16] =
 //  okim6295_device - constructor
 //-------------------------------------------------
 
-okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, OKIM6295, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this),

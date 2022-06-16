@@ -614,7 +614,7 @@ void tp84_state::tp84(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper
 	                                                         synchronization of the CPUs */
 
-	ls259_device &mainlatch(LS259(config, "mainlatch", 0)); // 3B
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3B
 	mainlatch.q_out_cb<0>().set(FUNC(tp84_state::irq_enable_w));
 	mainlatch.q_out_cb<1>().set(FUNC(tp84_state::coin_counter_w<1>));
 	mainlatch.q_out_cb<2>().set(FUNC(tp84_state::coin_counter_w<0>));

@@ -61,7 +61,7 @@ INPUT_PORTS_END
 void tr808_state::tr808(machine_config &config)
 {
 	// basic machine hardware
-	NEC_D650(config, m_maincpu, 500000); // 2us according to schematics
+	NEC_D650(config, m_maincpu, XTAL::u(500000)); // 2us according to schematics
 
 	auto &irq_clock(CLOCK(config, "irq_clock"));
 	irq_clock.set_period(attotime::from_usec(1900)); // clock rate 1.9ms

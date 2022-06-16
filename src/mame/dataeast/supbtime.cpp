@@ -344,7 +344,7 @@ void supbtime_state::supbtime(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_supbtime);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
-	DECO16IC(config, m_deco_tilegen, 0);
+	DECO16IC(config, m_deco_tilegen);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
@@ -355,7 +355,7 @@ void supbtime_state::supbtime(machine_config &config)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0);
+	DECO_SPRITE(config, m_sprgen);
 	m_sprgen->set_gfx_region(2);
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
 

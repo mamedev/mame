@@ -49,7 +49,7 @@ Shisensho II                            1993  Rev 3.34 M81  Yes
 
 DEFINE_DEVICE_TYPE(IREM_M72_AUDIO, m72_audio_device, "m72_audio", "Irem M72 Audio")
 
-m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IREM_M72_AUDIO, tag, owner, clock)
 	, device_rom_interface(mconfig, *this)
 	, m_sample_addr(0)

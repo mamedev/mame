@@ -234,7 +234,7 @@ void busicom_state::machine_reset()
 void busicom_state::busicom(machine_config &config)
 {
 	/* basic machine hardware */
-	I4004(config, m_maincpu, 750000);
+	I4004(config, m_maincpu, XTAL::u(750000));
 	m_maincpu->set_rom_map(&busicom_state::busicom_rom);
 	m_maincpu->set_ram_memory_map(&busicom_state::busicom_mem);
 	m_maincpu->set_rom_ports_map(&busicom_state::busicom_rp);

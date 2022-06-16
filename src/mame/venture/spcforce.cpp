@@ -329,7 +329,7 @@ void spcforce_state::spcforce(machine_config &config)
 	I8085A(config, m_maincpu, 8'000'000 * 2);        // 4.00 MHz???
 	m_maincpu->set_addrmap(AS_PROGRAM, &spcforce_state::main_map);
 
-	I8035(config, m_audiocpu, 6'144'000);        /* divisor ??? */
+	I8035(config, m_audiocpu, XTAL::u(6'144'000));        /* divisor ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spcforce_state::sound_map);
 	m_audiocpu->bus_in_cb().set("soundlatch", FUNC(generic_latch_8_device::read));
 	m_audiocpu->p1_out_cb().set(FUNC(spcforce_state::sn76496_latch_w));
@@ -362,15 +362,15 @@ void spcforce_state::spcforce(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	SN76496(config, m_sn[0], 2000000);
+	SN76496(config, m_sn[0], XTAL::u(2000000));
 	m_sn[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_sn[0]->ready_cb().set(FUNC(spcforce_state::write_sn_ready<0>));
 
-	SN76496(config, m_sn[1], 2000000);
+	SN76496(config, m_sn[1], XTAL::u(2000000));
 	m_sn[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_sn[1]->ready_cb().set(FUNC(spcforce_state::write_sn_ready<1>));
 
-	SN76496(config, m_sn[2], 2000000);
+	SN76496(config, m_sn[2], XTAL::u(2000000));
 	m_sn[2]->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_sn[2]->ready_cb().set(FUNC(spcforce_state::write_sn_ready<2>));
 }

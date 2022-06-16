@@ -271,7 +271,7 @@ void midxunit_state::midxunit(machine_config &config)
 	MIDXUNIT_VIDEO(config, m_video, m_maincpu, m_palette, m_gfxrom);
 
 	/* basic machine hardware */
-	TMS34020(config, m_maincpu, 40000000);
+	TMS34020(config, m_maincpu, XTAL::u(40000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &midxunit_state::main_map);
 	m_maincpu->set_halt_on_reset(false);        /* halt on reset */
 	m_maincpu->set_pixel_clock(PIXEL_CLOCK);    /* pixel clock */
@@ -291,7 +291,7 @@ void midxunit_state::midxunit(machine_config &config)
 	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
 	screen.set_palette(m_palette);
 
-	PIC16C57(config, m_pic, 625000); // need to be verified
+	PIC16C57(config, m_pic, XTAL::u(625000)); // need to be verified
 	m_pic->read_a().set([this]() { return m_pic_command; });
 	m_pic->write_b().set([this](u8 data) { m_pic_data = data; });
 	m_pic->read_c().set([this]() { return m_pic_clk ^ 1; });
@@ -308,7 +308,7 @@ void midxunit_state::midxunit(machine_config &config)
 	adc.ch6_callback().set_ioport("AN5");
 
 	/* sound hardware */
-	DCS_AUDIO_2K_UART(config, m_dcs, 0);
+	DCS_AUDIO_2K_UART(config, m_dcs);
 }
 
 

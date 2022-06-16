@@ -19,12 +19,7 @@ class zs01_device : public device_t,
 {
 public:
 	// construction/destruction
-	zs01_device( const machine_config &mconfig, const char *tag, device_t *owner)
-		: zs01_device(mconfig, tag, owner, uint32_t(0))
-	{
-	}
-
-	zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
+	zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration helpers
 	template <typename T> void set_ds2401_tag( T &&tag ) { m_ds2401.set_tag(std::forward<T>(tag)); }

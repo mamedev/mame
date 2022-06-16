@@ -46,7 +46,7 @@ void sbus_bwtwo_device::device_add_mconfig(machine_config &config)
 }
 
 
-sbus_bwtwo_device::sbus_bwtwo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sbus_bwtwo_device::sbus_bwtwo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SBUS_BWTWO, tag, owner, clock)
 	, device_sbus_card_interface(mconfig, *this)
 	, m_rom(*this, "prom")

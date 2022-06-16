@@ -17,7 +17,7 @@ class virge_pci_device : public pci_device
 {
 public:
 	template <typename T>
-	virge_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+	virge_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag)
 		: virge_pci_device(mconfig, tag, owner, clock)
 	{
 		set_screen_tag(std::forward<T>(screen_tag));
@@ -31,8 +31,8 @@ public:
 		LAW_4MB
 	};
 
-	virge_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virge_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virge_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
+	virge_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void lfb_map(address_map &map);
 	void mmio_map(address_map& map);
@@ -73,12 +73,12 @@ class virgedx_pci_device : public virge_pci_device
 {
 public:
 	template <typename T>
-	virgedx_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+	virgedx_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag)
 		: virgedx_pci_device(mconfig, tag, owner, clock)
 	{
 		set_screen_tag(std::forward<T>(screen_tag));
 	}
-	virgedx_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virgedx_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

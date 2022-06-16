@@ -400,7 +400,7 @@ void laserbas_state::laserbas(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(laserbas_state::laserbas_scanline), "screen", 0, 1);
 
 	/* TODO: clocks aren't known */
-	pit8253_device &pit0(PIT8253(config, "pit0", 0));
+	pit8253_device &pit0(PIT8253(config, "pit0"));
 	pit0.set_clk<0>(PIT_CLOCK);
 	pit0.set_clk<1>(PIT_CLOCK);
 	pit0.set_clk<2>(PIT_CLOCK);
@@ -408,7 +408,7 @@ void laserbas_state::laserbas(machine_config &config)
 	pit0.out_handler<1>().set(FUNC(laserbas_state::pit_out_w<1>));
 	pit0.out_handler<2>().set(FUNC(laserbas_state::pit_out_w<2>));
 
-	pit8253_device &pit1(PIT8253(config, "pit1", 0));
+	pit8253_device &pit1(PIT8253(config, "pit1"));
 	pit1.set_clk<0>(PIT_CLOCK);
 	pit1.set_clk<1>(PIT_CLOCK);
 	pit1.set_clk<2>(PIT_CLOCK);
@@ -417,7 +417,7 @@ void laserbas_state::laserbas(machine_config &config)
 	pit1.out_handler<2>().set(FUNC(laserbas_state::pit_out_w<5>));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(6000000, 360, 0, 256, 274, 0, 224);
+	screen.set_raw(XTAL::u(6000000), 360, 0, 256, 274, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	mc6845_device &crtc(MC6845(config, "crtc", 3000000/4)); /* unknown clock, hand tuned to get ~60 fps */
@@ -431,7 +431,7 @@ void laserbas_state::laserbas(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	for (auto &dac : m_dac)
-		DAC_4BIT_R2R(config, dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
+		DAC_4BIT_R2R(config, dac).add_route(ALL_OUTPUTS, "speaker", 0.16);
 }
 
 /*

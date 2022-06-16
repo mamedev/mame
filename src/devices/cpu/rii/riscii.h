@@ -92,7 +92,7 @@ public:
 	auto out_portk_cb() { return m_port_out_cb[9].bind(); }
 
 protected:
-	riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs);
+	riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, unsigned addrbits, unsigned pcbits, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -387,7 +387,7 @@ class epg3231_device : public riscii_series_device
 {
 public:
 	// construction/destruction
-	epg3231_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	epg3231_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides

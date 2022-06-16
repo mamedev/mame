@@ -129,7 +129,7 @@ void fruitpc_state::fruitpc_sb_conf(device_t *device)
 
 void fruitpc_state::fruitpc(machine_config &config)
 {
-	I486(config, m_maincpu, 66000000); // ST STPCD0166BTC3 66 MHz 486 CPU
+	I486(config, m_maincpu, XTAL::u(66000000)); // ST STPCD0166BTC3 66 MHz 486 CPU
 	m_maincpu->set_addrmap(AS_PROGRAM, &fruitpc_state::fruitpc_map);
 	m_maincpu->set_addrmap(AS_IO, &fruitpc_state::fruitpc_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
@@ -144,10 +144,10 @@ void fruitpc_state::fruitpc(machine_config &config)
 
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(fruitpc_state::dma8237_1_dack_w));
 
-	PCI_ROOT(config, m_pciroot, 0);
+	PCI_ROOT(config, m_pciroot);
 	// TODO: STPCD0166BTC3 host PCI
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir1_w));
@@ -161,7 +161,7 @@ void fruitpc_state::fruitpc(machine_config &config)
 	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
-	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, "isa", fruitpc_isa8_cards, "sb15", true));
+	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", "isa", fruitpc_isa8_cards, "sb15", true));
 	isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(fruitpc_sb_def));
 	isa1.set_option_machine_config("sb15", fruitpc_sb_conf);
 }

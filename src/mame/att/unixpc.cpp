@@ -412,7 +412,7 @@ void unixpc_state::unixpc(machine_config &config)
 
 	WD1010(config, m_hdc, 40_MHz_XTAL / 8);
 	m_hdc->out_intrq_callback().set(FUNC(unixpc_state::wd1010_intrq_w));
-	HARDDISK(config, m_hdr0, 0);
+	HARDDISK(config, m_hdr0);
 
 	upd7201_device &mpsc(UPD7201(config, "mpsc", 19.6608_MHz_XTAL / 8));
 	mpsc.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -420,7 +420,7 @@ void unixpc_state::unixpc(machine_config &config)
 	mpsc.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	mpsc.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	acia6850_device &kbc(ACIA6850(config, "kbc", 0));
+	acia6850_device &kbc(ACIA6850(config, "kbc"));
 	kbc.irq_handler().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	// TODO: RTC

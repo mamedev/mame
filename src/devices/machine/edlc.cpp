@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(SEEQ80C03, seeq80c03_device, "seeq80c03", "SEEQ 80C03 EDLC")
 
 static const u8 ETH_BROADCAST[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
-seeq8003_device::seeq8003_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+seeq8003_device::seeq8003_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_network_interface(mconfig, *this, 10)
 	, m_out_int(*this)
@@ -46,7 +46,7 @@ seeq8003_device::seeq8003_device(machine_config const &mconfig, device_type type
 {
 }
 
-seeq8003_device::seeq8003_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+seeq8003_device::seeq8003_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: seeq8003_device(mconfig, SEEQ8003, tag, owner, clock)
 {
 }
@@ -387,7 +387,7 @@ bool seeq8003_device::address_filter(u8 *address)
 	return false;
 }
 
-seeq80c03_device::seeq80c03_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+seeq80c03_device::seeq80c03_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: seeq8003_device(mconfig, SEEQ80C03, tag, owner, clock)
 	, m_regbank(*this, "regbank")
 {

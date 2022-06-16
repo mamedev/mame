@@ -44,7 +44,7 @@
  * (10KOhm R, 1uF C)
  * This filter may be setup just with
  *
- * FILTER_RC(config, "tag", 0).set_ac();
+ * FILTER_RC(config, "tag").set_ac();
  *
  * Default behaviour:
  *
@@ -69,7 +69,7 @@ public:
 		AC           = 4
 	};
 
-	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	filter_rc_device &set_rc(int type, double R1, double R2, double R3, double C)

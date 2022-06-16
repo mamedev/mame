@@ -14,7 +14,7 @@
 class tsconfdma_device : public device_t
 {
 public:
-	tsconfdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tsconfdma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto in_mreq_callback() { return m_in_mreq_cb.bind(); }
 	auto out_mreq_callback() { return m_out_mreq_cb.bind(); }

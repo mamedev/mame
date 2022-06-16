@@ -417,7 +417,7 @@ void kopunch_state::machine_start()
 void kopunch_state::kopunch(machine_config &config)
 {
 	// basic machine hardware
-	I8085A(config, m_maincpu, 4'000'000); // 4 MHz?
+	I8085A(config, m_maincpu, XTAL::u(4'000'000)); // 4 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &kopunch_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &kopunch_state::io_map);
 

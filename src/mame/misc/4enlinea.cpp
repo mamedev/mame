@@ -278,7 +278,7 @@ class isa8_cga_4enlinea_device : public isa8_cga_device
 {
 public:
 	// construction/destruction
-	isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t _4enlinea_io_read (offs_t offset);
 	void _4enlinea_mode_control_w(uint8_t data);
@@ -295,7 +295,7 @@ const tiny_rom_entry *isa8_cga_4enlinea_device::device_rom_region() const
 
 DEFINE_DEVICE_TYPE(ISA8_CGA_4ENLINEA, isa8_cga_4enlinea_device, "4enlinea_cga", "ISA8 CGA - 4enlinea")
 
-isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_device( mconfig, ISA8_CGA_4ENLINEA, tag, owner, clock)
 {
 }
@@ -613,11 +613,11 @@ void _4enlinea_state::_4enlinea(machine_config &config)
 	I2C_24C16(config, m_eeprom); // X24C16P
 
 	// FIXME: determine ISA bus clock
-	isa8_device &isa(ISA8(config, "isa", 0));
+	isa8_device &isa(ISA8(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 
-	ISA8_SLOT(config, "isa1", 0, "isa", _4enlinea_isa8_cards, "4enlinea", true);
+	ISA8_SLOT(config, "isa1", "isa", _4enlinea_isa8_cards, "4enlinea", true);
 
 
 /*  6845 clock is a guess, since it's a UM6845R embedded in the UM487F.
@@ -648,11 +648,11 @@ void _4enlinea_state::k7_olym(machine_config &config)
 
 	I2C_24C16(config, m_eeprom); // X24C16P
 
-	isa8_device &isa(ISA8(config, "isa", 0));
+	isa8_device &isa(ISA8(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 
-	ISA8_SLOT(config, "isa1", 0, "isa", _4enlinea_isa8_cards, "4enlinea", true); // UM487F
+	ISA8_SLOT(config, "isa1", "isa", _4enlinea_isa8_cards, "4enlinea", true); // UM487F
 
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_ay, 14.318181_MHz_XTAL / 8); // Winbond WF19054

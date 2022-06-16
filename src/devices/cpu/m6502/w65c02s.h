@@ -16,14 +16,14 @@
 
 class w65c02s_device : public m65c02_device {
 public:
-	w65c02s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	w65c02s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
 protected:
-	w65c02s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	w65c02s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read_vector(uint16_t adr) { return mintf->read_arg(adr); }
 	virtual void end_interrupt() { }

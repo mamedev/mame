@@ -175,7 +175,7 @@ void taito_type_x_state::machine_reset()
 void taito_type_x_state::taito_type_x(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM3(config, m_maincpu, 733333333); /* Wrong, much newer processors, much faster. */
+	PENTIUM3(config, m_maincpu, XTAL::u(733333333)); /* Wrong, much newer processors, much faster. */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taito_type_x_state::taito_type_x_map);
 
 	/* video hardware */

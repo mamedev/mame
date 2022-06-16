@@ -12,7 +12,7 @@
 #include "i8xc196.h"
 #include "i8xc196d.h"
 
-i8xc196_device::i8xc196_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+i8xc196_device::i8xc196_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	mcs96_device(mconfig, type, tag, owner, clock, 16, address_map_constructor(FUNC(i8xc196_device::internal_regs), this))
 {
 }

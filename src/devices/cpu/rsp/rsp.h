@@ -84,7 +84,7 @@ class rsp_device : public cpu_device
 
 public:
 	// construction/destruction
-	rsp_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	rsp_device(const machine_config &mconfig, const char *_tag, device_t *_owner, const XTAL &_clock);
 	virtual ~rsp_device() override;
 
 	void resolve_cb();

@@ -690,7 +690,7 @@ void ladybug_state::ladybug(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ladybug);
 	PALETTE(config, "palette", FUNC(ladybug_state::ladybug_palette), 4*8 + 4*16, 32);
 
-	LADYBUG_VIDEO(config, m_video, 4000000).set_gfxdecode_tag("gfxdecode");
+	LADYBUG_VIDEO(config, m_video, XTAL::u(4000000)).set_gfxdecode_tag("gfxdecode");
 
 	ls259_device &videolatch(LS259(config, "videolatch")); // L5 on video board or H3 on single board
 	videolatch.q_out_cb<0>().set(FUNC(ladybug_state::flip_screen_set)); // no other outputs used

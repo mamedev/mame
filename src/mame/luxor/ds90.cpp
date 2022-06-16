@@ -114,23 +114,23 @@ void x37_state::floppy_formats(format_registration &fr)
 void x37_state::x37(machine_config &config)
 {
 	// basic machine hardware
-	M68010(config, m_cpu, 20'000'000/2);
+	M68010(config, m_cpu, XTAL::u(20'000'000)/2);
 	m_cpu->set_addrmap(AS_PROGRAM, &x37_state::program_map);
 	m_cpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &x37_state::cpu_space_map);
 
-	NS32081(config, m_fpu, 20'000'000/2);
+	NS32081(config, m_fpu, XTAL::u(20'000'000)/2);
 
-	HD63450(config, m_dmac, 20'000'000/2, m_cpu);
+	HD63450(config, m_dmac, XTAL::u(20'000'000)/2, m_cpu);
 
-	Z8536(config, m_cio, 6000000);
-	NMC9306(config, m_nvram, 0);
-	E0516(config, E050_16_TAG, 32'768);
+	Z8536(config, m_cio, XTAL::u(6000000));
+	NMC9306(config, m_nvram);
+	E0516(config, E050_16_TAG, XTAL::u(32'768));
 
-	SCC8530N(config, m_scc0, 6000000);
-	SCC8530N(config, m_scc1, 6000000);
-	SCC8530N(config, m_scc2, 6000000);
+	SCC8530N(config, m_scc0, XTAL::u(6000000));
+	SCC8530N(config, m_scc1, XTAL::u(6000000));
+	SCC8530N(config, m_scc2, XTAL::u(6000000));
 
-	FD1797(config, m_fdc, 16'000'000/16);
+	FD1797(config, m_fdc, XTAL::u(16'000'000)/16);
 
 	FLOPPY_CONNECTOR(config, FD1797_TAG":0", x37_floppies, nullptr, x37_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, FD1797_TAG":1", x37_floppies, nullptr, x37_state::floppy_formats).enable_sound(true);
@@ -142,7 +142,7 @@ void x37_state::x37(machine_config &config)
 		.option_add_internal("scsicb", NSCSI_CB);
 
 	// video hardware
-	ABC1600_MOVER(config, ABC1600_MOVER_TAG, 0);
+	ABC1600_MOVER(config, ABC1600_MOVER_TAG);
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("x37_flop");

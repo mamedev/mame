@@ -51,7 +51,7 @@ ioport_constructor a2058_device::device_input_ports() const
 //  a2058_device - constructor
 //-------------------------------------------------
 
-a2058_device::a2058_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2058_device::a2058_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ZORRO_A2058, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_config(*this, "config"),

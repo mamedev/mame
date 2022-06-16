@@ -70,7 +70,7 @@ uint8_t kstudio_cart_interface::read(offs_t offset)
 
 DEFINE_DEVICE_TYPE(NES_KSEXPANSION_SLOT, nes_kstudio_slot_device, "nes_ks_slot", "NES Karaoke Studio Expansion Slot")
 
-nes_kstudio_slot_device::nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_kstudio_slot_device::nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_KSEXPANSION_SLOT, tag, owner, clock)
 	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<kstudio_cart_interface>(mconfig, *this)
@@ -144,7 +144,7 @@ ROM_END
 
 DEFINE_DEVICE_TYPE(NES_KSEXPANSION_ROM, nes_kstudio_rom_device, "nes_ks_rom", "NES Karaoke Studio Expansion ROM")
 
-nes_kstudio_rom_device::nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_kstudio_rom_device::nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_KSEXPANSION_ROM, tag, owner, clock)
 	, kstudio_cart_interface( mconfig, *this )
 {
@@ -181,7 +181,7 @@ uint8_t *nes_kstudio_rom_device::get_cart_base()
 DEFINE_DEVICE_TYPE(NES_KARAOKESTUDIO, nes_karaokestudio_device, "nes_karaoke", "NES Cart Bandai Karaoke Studio PCB")
 
 
-nes_karaokestudio_device::nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_karaokestudio_device::nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KARAOKESTUDIO, tag, owner, clock)
 	, m_exp_active(0)
 	, m_subslot(*this, "exp_slot")

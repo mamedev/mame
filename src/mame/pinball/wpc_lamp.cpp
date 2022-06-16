@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(WPC_LAMP, wpc_lamp_device, "wpc_lamp", "Williams Pinball Controller Lamp Control")
 
-wpc_lamp_device::wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wpc_lamp_device::wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WPC_LAMP, tag, owner, clock)
 {
 	names = nullptr;

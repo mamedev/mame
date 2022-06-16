@@ -10,7 +10,7 @@ class scmp_device : public cpu_device
 {
 public:
 	// construction/destruction
-	scmp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scmp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto flag_out() { return m_flag_out_func.bind(); }
@@ -26,7 +26,7 @@ protected:
 		SCMP_PC, SCMP_P1, SCMP_P2, SCMP_P3, SCMP_AC, SCMP_ER, SCMP_SR
 	};
 
-	scmp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	scmp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -88,7 +88,7 @@ class ins8060_device : public scmp_device
 {
 public:
 	// construction/destruction
-	ins8060_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ins8060_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }

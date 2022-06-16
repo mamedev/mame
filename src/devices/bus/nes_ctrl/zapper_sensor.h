@@ -25,7 +25,7 @@ class nes_zapper_sensor_device : public device_t
 {
 public:
 	// construction/destruction
-	nes_zapper_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_zapper_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 

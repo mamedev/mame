@@ -19,7 +19,7 @@
 class diskonchip_g3_device : public device_t, public device_nvram_interface
 {
 public:
-	diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void set_size(int _size) { m_size = _size; }
 protected:

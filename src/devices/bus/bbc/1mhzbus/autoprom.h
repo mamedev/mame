@@ -23,7 +23,7 @@ class bbc_autoprom_device :
 {
 public:
 	// construction/destruction
-	bbc_autoprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_autoprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

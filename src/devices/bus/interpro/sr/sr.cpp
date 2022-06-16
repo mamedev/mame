@@ -274,7 +274,7 @@ void interpro_bus_device::device_resolve_objects()
 	m_out_irq3_cb.resolve_safe();
 }
 
-cbus_bus_device::cbus_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cbus_bus_device::cbus_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: interpro_bus_device(mconfig, CBUS_BUS, tag, owner, clock)
 	, m_slot_count(0)
 {
@@ -285,7 +285,7 @@ void cbus_bus_device::device_start()
 {
 }
 
-cbus_slot_device::cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cbus_slot_device::cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CBUS_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_bus(*this, finder_base::DUMMY_TAG)
@@ -313,7 +313,7 @@ void device_cbus_card_interface::set_bus_device(cbus_bus_device &bus_device)
 	m_bus->install_card(*this, device().memregion(m_idprom_region), &device_cbus_card_interface::map);
 }
 
-srx_bus_device::srx_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+srx_bus_device::srx_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: interpro_bus_device(mconfig, SRX_BUS, tag, owner, clock)
 	, m_slot_count(1) // first slot is used by the system board
 {
@@ -324,7 +324,7 @@ void srx_bus_device::device_start()
 {
 }
 
-srx_slot_device::srx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+srx_slot_device::srx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SRX_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_bus(*this, finder_base::DUMMY_TAG)

@@ -66,7 +66,7 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock);
+			const XTAL &clock);
 
 	// first-time setup
 	virtual void device_start() override;
@@ -84,7 +84,7 @@ class buffered_spriteram8_device : public buffered_spriteram_device<uint8_t>
 {
 public:
 	// construction
-	buffered_spriteram8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	buffered_spriteram8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 
@@ -94,7 +94,7 @@ class buffered_spriteram16_device : public buffered_spriteram_device<uint16_t>
 {
 public:
 	// construction
-	buffered_spriteram16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	buffered_spriteram16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 
@@ -104,7 +104,7 @@ class buffered_spriteram32_device : public buffered_spriteram_device<uint32_t>
 {
 public:
 	// construction
-	buffered_spriteram32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	buffered_spriteram32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 
@@ -114,7 +114,7 @@ class buffered_spriteram64_device : public buffered_spriteram_device<uint64_t>
 {
 public:
 	// construction
-	buffered_spriteram64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	buffered_spriteram64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 

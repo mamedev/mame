@@ -74,7 +74,7 @@ void ergoline_keyboard_device::device_add_mconfig(machine_config &config)
 //  ergoline_keyboard_device - constructor
 //-------------------------------------------------
 
-ergoline_keyboard_device::ergoline_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ergoline_keyboard_device::ergoline_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ERGOLINE_KEYBOARD, tag, owner, clock),
 	device_psi_keyboard_interface(mconfig, *this)
 {

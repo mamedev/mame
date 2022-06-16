@@ -9,7 +9,7 @@
 class dp8510_device : public device_t
 {
 public:
-	dp8510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dp8510_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static const char *const BITBLT_OP[];
 	static const int FIFO_SIZE = 16;

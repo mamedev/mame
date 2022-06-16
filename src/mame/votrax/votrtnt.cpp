@@ -122,7 +122,7 @@ void votrtnt_state::machine_reset()
 	{
 		if (BIT(dips, i))
 		{
-			m_clock->set_unscaled_clock(75*speed*16);
+			m_clock->set_unscaled_clock(2.4576_MHz_XTAL / 2048 * speed);
 			return;
 		}
 		speed *= 2;
@@ -155,13 +155,13 @@ void votrtnt_state::votrtnt(machine_config &config)
 	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
 	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
 
-	CLOCK(config, m_clock, 153600);
+	CLOCK(config, m_clock, XTAL::u(153600));
 	m_clock->signal_handler().set("acia", FUNC(acia6850_device::write_txc));
 	m_clock->signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	VOTRAX_SC01(config, m_votrax, 720000); // 720kHz? needs verify
+	VOTRAX_SC01(config, m_votrax, XTAL::u(720000)); // 720kHz? needs verify
 	m_votrax->ar_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 }

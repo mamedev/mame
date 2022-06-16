@@ -19,7 +19,7 @@ void nextmo_device::map(address_map &map)
 	map(0x10, 0x17).rw(FUNC(nextmo_device::r10_r), FUNC(nextmo_device::r10_w));
 }
 
-nextmo_device::nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nextmo_device::nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NEXTMO, tag, owner, clock),
 	r4(0),
 	irq_cb(*this),

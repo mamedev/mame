@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(SAMCOUPE_MOUSE_PORT, samcoupe_mouse_port_device, "samcoupe_mo
 //  samcoupe_mouse_port_device - constructor
 //-------------------------------------------------
 
-samcoupe_mouse_port_device::samcoupe_mouse_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+samcoupe_mouse_port_device::samcoupe_mouse_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SAMCOUPE_MOUSE_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_samcoupe_mouse_interface>(mconfig, *this),
 	m_mseint_handler(*this),

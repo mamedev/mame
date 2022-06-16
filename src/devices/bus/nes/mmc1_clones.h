@@ -14,7 +14,7 @@ class nes_bmc_jy012005_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_jy012005_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_bmc_jy012005_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_m(offs_t offset, u8 data) override;
 
@@ -38,7 +38,7 @@ class nes_bmc_jy820845c_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_jy820845c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_bmc_jy820845c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_m(offs_t offset, u8 data) override;
 	virtual void write_h(offs_t offset, u8 data) override;
@@ -64,7 +64,7 @@ class nes_farid_slrom_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_farid_slrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_farid_slrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_m(offs_t offset, u8 data) override;
 
@@ -88,7 +88,7 @@ class nes_ninjaryu_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_ninjaryu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_ninjaryu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
@@ -104,7 +104,7 @@ class nes_resetsxrom_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_resetsxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_resetsxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void pcb_reset() override;
 
@@ -126,7 +126,7 @@ class nes_srpg5in1_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_srpg5in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_srpg5in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_m(offs_t offset) override;
 	virtual void write_l(offs_t offset, u8 data) override;
@@ -152,7 +152,7 @@ class nes_txc_22110_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_txc_22110_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_txc_22110_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_l(offs_t offset, u8 data) override;
 	virtual void write_h(offs_t offset, u8 data) override;

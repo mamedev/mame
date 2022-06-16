@@ -727,7 +727,7 @@ void spcking2_state::spcking2(machine_config &config)
 void spaceint_state::spaceint(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 2'000'000);        // a guess
+	Z80(config, m_maincpu, XTAL::u(2'000'000));        // a guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &spaceint_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &spaceint_state::port_map);
 	m_maincpu->set_vblank_int("screen", FUNC(spaceint_state::irq0_line_hold));

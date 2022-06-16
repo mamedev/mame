@@ -21,7 +21,7 @@ class hp9825_tape_device : public device_t
 {
 public:
 	// construction/destruction
-	hp9825_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp9825_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t tape_r(offs_t offset);
 	void tape_w(offs_t offset, uint16_t data);

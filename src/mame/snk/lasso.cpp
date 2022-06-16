@@ -497,7 +497,7 @@ void lasso_state::base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lasso_state::lasso_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(lasso_state::irq0_line_hold));
 
-	M6502(config, m_audiocpu, 600000);
+	M6502(config, m_audiocpu, XTAL::u(600000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lasso_state::lasso_audio_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -518,8 +518,8 @@ void lasso_state::base(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	SN76489(config, m_sn_1, 2000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	SN76489(config, m_sn_2, 2000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SN76489(config, m_sn_1, XTAL::u(2000000)).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SN76489(config, m_sn_2, XTAL::u(2000000)).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void lasso_state::lasso(machine_config &config)
@@ -569,7 +569,7 @@ void lasso_state::wwjgtin(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,wwjgtin)
 
 	/* sound hardware */
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 }
 
 void lasso_state::pinbo(machine_config &config)

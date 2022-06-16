@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(Z80PIO, z80pio_device, "z80pio", "Z80 PIO")
 //  z80pio_device - constructor
 //-------------------------------------------------
 
-z80pio_device::z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+z80pio_device::z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, Z80PIO, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
 	m_out_int_cb(*this),

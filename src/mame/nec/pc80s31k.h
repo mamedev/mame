@@ -25,12 +25,12 @@ class pc80s31_device : public device_t
 {
 public:
 	// construction/destruction
-	pc80s31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc80s31_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void host_map(address_map &map);
 
 protected:
-	pc80s31_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pc80s31_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
@@ -70,7 +70,7 @@ private:
 class pc80s31k_device : public pc80s31_device
 {
 public:
-	pc80s31k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc80s31k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

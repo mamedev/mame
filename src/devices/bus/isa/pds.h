@@ -17,7 +17,7 @@ class isa8_pds_device :
 		public device_isa8_card_interface
 {
 public:
-	isa8_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t ppi_r(offs_t offset);
 	void ppi_w(offs_t offset, uint8_t data);

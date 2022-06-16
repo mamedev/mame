@@ -9,7 +9,7 @@
 
 DEFINE_DEVICE_TYPE(FUUKI_VIDEO, fuukivid_device, "fuukivid", "Fuuki Video")
 
-fuukivid_device::fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+fuukivid_device::fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, FUUKI_VIDEO, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, device_video_interface(mconfig, *this)

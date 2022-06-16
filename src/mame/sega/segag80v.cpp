@@ -932,34 +932,34 @@ void segag80v_state::g80v_base(machine_config &config)
 void segag80v_state::elim2(machine_config &config)
 {
 	g80v_base(config);
-	ELIMINATOR_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	ELIMINATOR_AUDIO(config, m_g80_audio).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void segag80v_state::spacfury(machine_config &config)
 {
 	g80v_base(config);
-	SPACE_FURY_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speech", 1.0);
-	SEGA_SPEECH_BOARD(config, "speech", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SPACE_FURY_AUDIO(config, m_g80_audio).add_route(ALL_OUTPUTS, "speech", 1.0);
+	SEGA_SPEECH_BOARD(config, "speech").add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void segag80v_state::spacfurybl(machine_config &config)
 {
 	g80v_base(config);
 
-	z80_device &speechcpu(Z80(config, "speechcpu", 4000000)); // clock not verified
+	z80_device &speechcpu(Z80(config, "speechcpu", XTAL::u(4000000))); // clock not verified
 	speechcpu.set_addrmap(AS_PROGRAM, &segag80v_state::spacfurybl_speech_prg_map);
 	speechcpu.set_addrmap(AS_IO, &segag80v_state::spacfurybl_speech_io_map);
 
-	TMS5100(config, "tms5100", 640000).add_route(ALL_OUTPUTS, "speaker", 0.5); // clock not verified TODO: hook up
+	TMS5100(config, "tms5100", XTAL::u(640000)).add_route(ALL_OUTPUTS, "speaker", 0.5); // clock not verified TODO: hook up
 
-	SPACE_FURY_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SPACE_FURY_AUDIO(config, m_g80_audio).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void segag80v_state::zektor(machine_config &config)
 {
 	g80v_base(config);
-	ZEKTOR_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speech", 0.7);
-	SEGA_SPEECH_BOARD(config, "speech", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	ZEKTOR_AUDIO(config, m_g80_audio).add_route(ALL_OUTPUTS, "speech", 0.7);
+	SEGA_SPEECH_BOARD(config, "speech").add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void segag80v_state::tacscan(machine_config &config)
@@ -972,7 +972,7 @@ void segag80v_state::startrek(machine_config &config)
 {
 	g80v_base(config);
 	SEGAUSB(config, m_usb, 0, m_maincpu).add_route(ALL_OUTPUTS, "speech", 1.0);
-	SEGA_SPEECH_BOARD(config, "speech", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SEGA_SPEECH_BOARD(config, "speech").add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 

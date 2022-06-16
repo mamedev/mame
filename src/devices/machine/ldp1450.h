@@ -27,7 +27,7 @@ class sony_ldp1450_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	sony_ldp1450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sony_ldp1450_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// I/O operations TODO: both actually protected
 	void command_w(uint8_t data);

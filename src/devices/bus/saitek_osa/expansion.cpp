@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(SAITEKOSA_EXPANSION, saitekosa_expansion_device, "saitekosa_e
 //  saitekosa_expansion_device - constructor
 //-------------------------------------------------
 
-saitekosa_expansion_device::saitekosa_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+saitekosa_expansion_device::saitekosa_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SAITEKOSA_EXPANSION, tag, owner, clock),
 	device_single_card_slot_interface<device_saitekosa_expansion_interface>(mconfig, *this),
 	m_stb_handler(*this),

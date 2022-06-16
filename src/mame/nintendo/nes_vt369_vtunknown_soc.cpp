@@ -17,46 +17,46 @@ DEFINE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_DG, nes_vtunknown_soc_dg_device, "nes_vtunk
 DEFINE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_FA, nes_vtunknown_soc_fa_device, "nes_vtunknown_soc_fa", "VTxx series System on a Chip (Family Pocket)")
 
 
-nes_vt369_soc_device::nes_vt369_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+nes_vt369_soc_device::nes_vt369_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	nes_vt09_soc_device(mconfig, NES_VTUNKNOWN_SOC_CY, tag, owner, clock),
 	m_alu(*this, "alu"),
 	m_soundcpu(*this, "soundcpu")
 {
 }
 
-nes_vtunknown_soc_bt_device::nes_vtunknown_soc_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+nes_vtunknown_soc_bt_device::nes_vtunknown_soc_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	nes_vt09_soc_device(mconfig, NES_VTUNKNOWN_SOC_BT, tag, owner, clock)
 {
 }
 
 
-nes_vt369_alt_soc_device::nes_vt369_alt_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+nes_vt369_alt_soc_device::nes_vt369_alt_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock) :
 	nes_vt09_soc_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_vt369_alt_soc_device::nes_vt369_alt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+nes_vt369_alt_soc_device::nes_vt369_alt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	nes_vt369_alt_soc_device(mconfig, NES_VT369_SOC, tag, owner, clock)
 {
 }
 
-nes_vt369_alt_swap_d5_d6_soc_device::nes_vt369_alt_swap_d5_d6_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+nes_vt369_alt_swap_d5_d6_soc_device::nes_vt369_alt_swap_d5_d6_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	nes_vt369_alt_soc_device(mconfig, NES_VT369_SOC_SWAP, tag, owner, clock)
 {
 }
 
 
-nes_vtunknown_soc_dg_device::nes_vtunknown_soc_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+nes_vtunknown_soc_dg_device::nes_vtunknown_soc_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock) :
 	nes_vt09_soc_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_vtunknown_soc_dg_device::nes_vtunknown_soc_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+nes_vtunknown_soc_dg_device::nes_vtunknown_soc_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	nes_vtunknown_soc_dg_device(mconfig, NES_VTUNKNOWN_SOC_DG, tag, owner, clock)
 {
 }
 
-nes_vtunknown_soc_fa_device::nes_vtunknown_soc_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+nes_vtunknown_soc_fa_device::nes_vtunknown_soc_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	nes_vtunknown_soc_dg_device(mconfig, NES_VTUNKNOWN_SOC_FA, tag, owner, clock)
 {
 }
@@ -70,7 +70,7 @@ void nes_vt369_soc_device::device_add_mconfig(machine_config& config)
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt369_soc_device::nes_vt369_map);
 
-	VT_VT1682_ALU(config, m_alu, 0);
+	VT_VT1682_ALU(config, m_alu);
 
 	M6502(config, m_soundcpu, RP2A03_NTSC_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &nes_vt369_soc_device::vt369_sound_map);

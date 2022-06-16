@@ -223,7 +223,7 @@ void abc1600_mover_device::device_add_mconfig(machine_config &config)
 //  abc1600_mover_device - constructor
 //-------------------------------------------------
 
-abc1600_mover_device::abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc1600_mover_device::abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ABC1600_MOVER, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_BIG, 16, 18, -1, address_map_constructor(FUNC(abc1600_mover_device::mover_map), this)),

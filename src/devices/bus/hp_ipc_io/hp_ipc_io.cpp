@@ -21,12 +21,16 @@ DEFINE_DEVICE_TYPE(HP_IPC_IO_SLOT, hp_ipc_io_slot_device, "hp_ipc_io_slot", "HP 
 // +---------------------+
 // |hp_ipc_io_slot_device|
 // +---------------------+
-hp_ipc_io_slot_device::hp_ipc_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+hp_ipc_io_slot_device::hp_ipc_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, HP_IPC_IO_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_hp_ipc_io_interface>(mconfig, *this),
 	m_irq_cb_func(*this),
 	m_slot_idx(0)
 {
+	option_reset();
+	hp_ipc_io_slot_devices(*this);
+	set_default_option(nullptr);
+	set_fixed(false);
 }
 
 hp_ipc_io_slot_device::~hp_ipc_io_slot_device()

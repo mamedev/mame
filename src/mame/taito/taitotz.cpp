@@ -2635,12 +2635,12 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 void taitotz_state::taitotz(machine_config &config)
 {
 	/* IBM EMPPC603eBG-100 */
-	PPC603E(config, m_maincpu, 100000000);
+	PPC603E(config, m_maincpu, XTAL::u(100000000));
 	m_maincpu->set_bus_frequency(XTAL(66'666'700)); /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitotz_state::ppc603e_mem);
 
 	/* TMP95C063F I/O CPU */
-	TMP95C063(config, m_iocpu, 25000000);
+	TMP95C063(config, m_iocpu, XTAL::u(25000000));
 	m_iocpu->port9_read().set_ioport("INPUTS1");
 	m_iocpu->portb_read().set_ioport("INPUTS2");
 	m_iocpu->portd_read().set_ioport("INPUTS3");

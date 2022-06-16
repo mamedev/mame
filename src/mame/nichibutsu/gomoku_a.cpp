@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(GOMOKU_SOUND, gomoku_sound_device, "gomoku_sound", "Gomoku Na
 //  gomoku_sound_device - constructor
 //-------------------------------------------------
 
-gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, GOMOKU_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_sound_rom(*this, DEVICE_SELF)

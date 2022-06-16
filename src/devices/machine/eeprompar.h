@@ -69,7 +69,7 @@ private:
 class eeprom_parallel_##_lowercase##_device : public eeprom_parallel_##_baseclass##_device \
 { \
 public: \
-	eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0); \
+	eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL()); \
 }; \
 DECLARE_DEVICE_TYPE(EEPROM_##_uppercase, eeprom_parallel_##_lowercase##_device)
 

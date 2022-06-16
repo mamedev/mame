@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(ISBC_215G, isbc_215g_device, "isbc_215g", "ISBC 215G Winchester Disk Controller")
 
-isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISBC_215G, tag, owner, clock),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_dmac(*this, "u84"),
@@ -361,13 +361,13 @@ void isbc_215g_device::device_add_mconfig(machine_config &config)
 	m_dmac->set_addrmap(AS_IO, &isbc_215g_device::isbc_215g_io);
 	m_dmac->set_data_width(16);
 
-	HARDDISK(config, "drive0", 0);
-	HARDDISK(config, "drive1", 0);
+	HARDDISK(config, "drive0");
+	HARDDISK(config, "drive1");
 
-	ISBX_SLOT(config, m_sbx1, 0, isbx_cards, nullptr);
+	ISBX_SLOT(config, m_sbx1, isbx_cards, nullptr);
 	m_sbx1->mintr0().set(FUNC(isbc_215g_device::isbx_irq_00_w));
 	m_sbx1->mintr1().set(FUNC(isbc_215g_device::isbx_irq_01_w));
-	ISBX_SLOT(config, m_sbx2, 0, isbx_cards, "fdc_218a");
+	ISBX_SLOT(config, m_sbx2, isbx_cards, "fdc_218a");
 	m_sbx2->mintr0().set(FUNC(isbc_215g_device::isbx_irq_10_w));
 	m_sbx2->mintr1().set(FUNC(isbc_215g_device::isbx_irq_11_w));
 }

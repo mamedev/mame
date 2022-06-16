@@ -170,7 +170,7 @@ void cop400_cpu_device::data_128b(address_map &map)
 }
 
 
-cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t program_addr_bits, uint8_t data_addr_bits, uint8_t featuremask, uint8_t g_mask, uint8_t d_mask, uint8_t in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data)
+cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint8_t program_addr_bits, uint8_t data_addr_bits, uint8_t featuremask, uint8_t g_mask, uint8_t d_mask, uint8_t in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, program_addr_bits, 0, internal_map_program)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_addr_bits, 0, internal_map_data) // data width is really 4
@@ -247,87 +247,87 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 	}
 }
 
-cop401_cpu_device::cop401_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop401_cpu_device::cop401_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP401, tag, owner, clock, 9, 6, COP410_FEATURE, 0xf, 0xf, 0, false, false, address_map_constructor(), address_map_constructor(FUNC(cop401_cpu_device::data_32b), this))
 {
 }
 
-cop410_cpu_device::cop410_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop410_cpu_device::cop410_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP410, tag, owner, clock, 9, 6, COP410_FEATURE, 0xf, 0xf, 0, false, false, address_map_constructor(FUNC(cop410_cpu_device::program_512b), this), address_map_constructor(FUNC(cop410_cpu_device::data_32b), this))
 {
 }
 
-cop411_cpu_device::cop411_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop411_cpu_device::cop411_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP411, tag, owner, clock, 9, 6, COP410_FEATURE, 0x7, 0x3, 0, false, false, address_map_constructor(FUNC(cop411_cpu_device::program_512b), this), address_map_constructor(FUNC(cop411_cpu_device::data_32b), this))
 {
 }
 
-cop402_cpu_device::cop402_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop402_cpu_device::cop402_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP402, tag, owner, clock, 10, 6, COP420_FEATURE, 0xf, 0xf, 0xf, true, true, address_map_constructor(), address_map_constructor(FUNC(cop402_cpu_device::data_64b), this))
 {
 }
 
-cop420_cpu_device::cop420_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop420_cpu_device::cop420_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP420, tag, owner, clock, 10, 6, COP420_FEATURE, 0xf, 0xf, 0xf, true, true, address_map_constructor(FUNC(cop420_cpu_device::program_1kb), this), address_map_constructor(FUNC(cop420_cpu_device::data_64b), this))
 {
 }
 
-cop421_cpu_device::cop421_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop421_cpu_device::cop421_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP421, tag, owner, clock, 10, 6, COP420_FEATURE, 0xf, 0xf, 0, true, false, address_map_constructor(FUNC(cop421_cpu_device::program_1kb), this), address_map_constructor(FUNC(cop421_cpu_device::data_64b), this))
 {
 }
 
-cop422_cpu_device::cop422_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop422_cpu_device::cop422_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP422, tag, owner, clock, 10, 6, COP420_FEATURE, 0xe, 0xe, 0, true, false, address_map_constructor(FUNC(cop422_cpu_device::program_1kb), this), address_map_constructor(FUNC(cop422_cpu_device::data_64b), this))
 {
 }
 
-cop404l_cpu_device::cop404l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop404l_cpu_device::cop404l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP404L, tag, owner, clock, 11, 7, COP444L_FEATURE, 0xf, 0xf, 0xf, true, true, address_map_constructor(), address_map_constructor(FUNC(cop404l_cpu_device::data_128b), this))
 {
 }
 
-cop444l_cpu_device::cop444l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop444l_cpu_device::cop444l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP444L, tag, owner, clock, 11, 7, COP444L_FEATURE, 0xf, 0xf, 0xf, true, true, address_map_constructor(FUNC(cop444l_cpu_device::program_2kb), this), address_map_constructor(FUNC(cop444l_cpu_device::data_128b), this))
 {
 }
 
-cop445l_cpu_device::cop445l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop445l_cpu_device::cop445l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP445L, tag, owner, clock, 11, 7, COP444L_FEATURE, 0x7, 0x3, 0, true, false, address_map_constructor(FUNC(cop445l_cpu_device::program_2kb), this), address_map_constructor(FUNC(cop445l_cpu_device::data_128b), this))
 {
 }
 
-cop404c_cpu_device::cop404c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop404c_cpu_device::cop404c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP404C, tag, owner, clock, 11, 7, COP424C_FEATURE, 0xf, 0xf, 0xf, true, true, address_map_constructor(), address_map_constructor(FUNC(cop404c_cpu_device::data_128b), this))
 {
 }
 
-cop424c_cpu_device::cop424c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop424c_cpu_device::cop424c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP424C, tag, owner, clock, 10, 6, COP424C_FEATURE, 0xf, 0xf, 0xf, true, true, address_map_constructor(FUNC(cop424c_cpu_device::program_1kb), this), address_map_constructor(FUNC(cop424c_cpu_device::data_64b), this))
 {
 }
 
-cop425c_cpu_device::cop425c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop425c_cpu_device::cop425c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP425C, tag, owner, clock, 10, 6, COP424C_FEATURE, 0xf, 0xf, 0, true, false, address_map_constructor(FUNC(cop425c_cpu_device::program_1kb), this), address_map_constructor(FUNC(cop425c_cpu_device::data_64b), this))
 {
 }
 
-cop426c_cpu_device::cop426c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop426c_cpu_device::cop426c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP426C, tag, owner, clock, 10, 6, COP424C_FEATURE, 0xe, 0xe, 0xf, true, true, address_map_constructor(FUNC(cop426c_cpu_device::program_1kb), this), address_map_constructor(FUNC(cop426c_cpu_device::data_64b), this))
 {
 }
 
-cop444c_cpu_device::cop444c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop444c_cpu_device::cop444c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP444C, tag, owner, clock, 11, 7, COP424C_FEATURE, 0xf, 0xf, 0xf, true, true, address_map_constructor(FUNC(cop444c_cpu_device::program_2kb), this), address_map_constructor(FUNC(cop444c_cpu_device::data_128b), this))
 {
 }
 
-cop445c_cpu_device::cop445c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop445c_cpu_device::cop445c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP445C, tag, owner, clock, 11, 7, COP424C_FEATURE, 0xf, 0xf, 0, true, false, address_map_constructor(FUNC(cop445c_cpu_device::program_2kb), this), address_map_constructor(FUNC(cop445c_cpu_device::data_128b), this))
 {
 }
 
-cop446c_cpu_device::cop446c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cop446c_cpu_device::cop446c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cop400_cpu_device(mconfig, COP446C, tag, owner, clock, 11, 7, COP424C_FEATURE, 0xe, 0xe, 0xf, true, true, address_map_constructor(FUNC(cop446c_cpu_device::program_2kb),this), address_map_constructor(FUNC(cop446c_cpu_device::data_128b), this))
 {
 }

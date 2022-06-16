@@ -129,7 +129,7 @@ static char const *const token_gl[] =
 
 DEFINE_DEVICE_TYPE(SGI_GE5, sgi_ge5_device, "ge5", "SGI Geometry Engine 5")
 
-sgi_ge5_device::sgi_ge5_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+sgi_ge5_device::sgi_ge5_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, SGI_GE5, tag, owner, clock)
 	, m_code_config("code", ENDIANNESS_BIG, 64, 15, -3, address_map_constructor(FUNC(sgi_ge5_device::code_map), this))
 	, m_data_config("data", ENDIANNESS_BIG, 32, 13, -2, address_map_constructor(FUNC(sgi_ge5_device::data_map), this))

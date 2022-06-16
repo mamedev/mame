@@ -8,7 +8,7 @@
 class sp0250_device : public device_t, public device_sound_interface
 {
 public:
-	sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto drq() { return m_drq.bind(); }
 	void set_pwm_mode() { m_pwm_mode = true; }

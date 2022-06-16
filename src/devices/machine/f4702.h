@@ -28,7 +28,7 @@
 class f4702_device : public device_t, public device_execute_interface
 {
 public:
-	f4702_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	f4702_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callback configuration
 	auto s_callback() { return m_s_callback.bind(); }

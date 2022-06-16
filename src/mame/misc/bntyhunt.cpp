@@ -56,7 +56,7 @@ INPUT_PORTS_END
 void bntyhunt_state::bntyhunt(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM(config, m_maincpu, 200000000); /* Probably a Pentium or higher .. ?? Mhz*/
+	PENTIUM(config, m_maincpu, XTAL::u(200000000)); /* Probably a Pentium or higher .. ?? Mhz*/
 	m_maincpu->set_addrmap(AS_PROGRAM, &bntyhunt_state::bntyhunt_map);
 
 	/* video hardware */

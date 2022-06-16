@@ -26,7 +26,7 @@
 DEFINE_DEVICE_TYPE(NEOBOOT_PROT, neoboot_prot_device, "ngboot_prot", "Neo Geo Bootleg Protection(s)")
 
 
-neoboot_prot_device::neoboot_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neoboot_prot_device::neoboot_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NEOBOOT_PROT, tag, owner, clock)
 {
 }

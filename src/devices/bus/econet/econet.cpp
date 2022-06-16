@@ -54,7 +54,7 @@ device_econet_interface::device_econet_interface(const machine_config &mconfig, 
 //  econet_slot_device - constructor
 //-------------------------------------------------
 
-econet_slot_device::econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+econet_slot_device::econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ECONET_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_address(0), m_econet(*this, finder_base::DUMMY_TAG)
@@ -183,7 +183,7 @@ inline int econet_device::get_signal(int signal)
 //  econet_device - constructor
 //-------------------------------------------------
 
-econet_device::econet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+econet_device::econet_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ECONET, tag, owner, clock),
 	m_write_clk(*this),
 	m_write_data(*this)

@@ -399,11 +399,11 @@ void mouser_state::machine_start()
 void mouser_state::mouser(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4'000'000);   // 4 MHz ?
+	Z80(config, m_maincpu, XTAL::u(4'000'000));   // 4 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &mouser_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &mouser_state::decrypted_opcodes_map);
 
-	Z80(config, m_audiocpu, 4'000'000);  // ???
+	Z80(config, m_audiocpu, XTAL::u(4'000'000));  // ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mouser_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &mouser_state::sound_io_map);
 	m_audiocpu->set_periodic_int(FUNC(mouser_state::sound_nmi_assert), attotime::from_hz(4 * 60)); // ??? This controls the sound tempo

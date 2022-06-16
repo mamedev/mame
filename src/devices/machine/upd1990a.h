@@ -34,7 +34,7 @@ class upd1990a_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
+	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(32'768));
 
 	auto data_callback() { return m_write_data.bind(); }
 	auto tp_callback() { return m_write_tp.bind(); }
@@ -52,7 +52,7 @@ public:
 
 protected:
 	// device-level overrides
-	upd1990a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	upd1990a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	virtual void device_start() override;
 
@@ -127,7 +127,7 @@ private:
 class upd4990a_device : public upd1990a_device
 {
 public:
-	upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
+	upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(32'768));
 };
 
 

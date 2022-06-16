@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(TMP96C141, tmp96c141_device, "tmp96c141", "Toshiba TMP96C141"
 //  tmp96c141_device - constructor
 //-------------------------------------------------
 
-tmp96c141_device::tmp96c141_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tmp96c141_device::tmp96c141_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tlcs900_device(mconfig, TMP96C141, tag, owner, clock)
 {
 }

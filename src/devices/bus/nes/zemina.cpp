@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(NES_ZEMINA, nes_zemina_device, "nes_zemina", "NES Cart Zemina
 //  constructor
 //-------------------------------------------------
 
-nes_zemina_device::nes_zemina_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_zemina_device::nes_zemina_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_ZEMINA, tag, owner, clock)
 {
 }

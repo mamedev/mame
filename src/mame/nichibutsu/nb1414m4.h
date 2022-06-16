@@ -10,7 +10,7 @@
 class nb1414m4_device : public device_t, public device_video_interface
 {
 public:
-	nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void exec(uint16_t mcu_cmd, uint8_t *vram, uint16_t &scrollx, uint16_t &scrolly, tilemap_t *tilemap);
 	void vblank_trigger();

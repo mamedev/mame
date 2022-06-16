@@ -94,7 +94,7 @@ const tiny_rom_entry *buddha_device::device_rom_region() const
 //  buddha_device - constructor
 //-------------------------------------------------
 
-buddha_device::buddha_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+buddha_device::buddha_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ZORRO_BUDDHA, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_ata_0(*this, "ata_0"),

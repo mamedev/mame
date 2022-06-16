@@ -32,11 +32,11 @@ DEFINE_DEVICE_TYPE(I8245, i8245_device, "i8245", "Intel 8245")
 //  i8244_device - constructor
 //-------------------------------------------------
 
-i8244_device::i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+i8244_device::i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8244_device(mconfig, I8244, tag, owner, clock)
 { }
 
-i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -44,7 +44,7 @@ i8244_device::i8244_device(const machine_config &mconfig, device_type type, cons
 	, m_charset(*this, "cgrom")
 { }
 
-i8245_device::i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+i8245_device::i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8244_device(mconfig, I8245, tag, owner, clock)
 { }
 

@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(DMV_K208, dmv_k208_device, "dmv_k208", "K208 448K RAM expansi
 //  dmv_ram_device_base - constructor
 //-------------------------------------------------
 
-dmv_ram_device_base::dmv_ram_device_base(const machine_config &mconfig, device_type type, uint32_t size, const char *tag, device_t *owner, uint32_t clock)
+dmv_ram_device_base::dmv_ram_device_base(const machine_config &mconfig, device_type type, uint32_t size, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_dmvslot_interface(mconfig, *this)
 	, m_ram(nullptr)
@@ -45,7 +45,7 @@ dmv_ram_device_base::dmv_ram_device_base(const machine_config &mconfig, device_t
 //  dmv_k200_device - constructor
 //-------------------------------------------------
 
-dmv_k200_device::dmv_k200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k200_device::dmv_k200_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_ram_device_base(mconfig, DMV_K200, 1, tag, owner, clock)
 {
 }
@@ -54,7 +54,7 @@ dmv_k200_device::dmv_k200_device(const machine_config &mconfig, const char *tag,
 //  dmv_k202_device - constructor
 //-------------------------------------------------
 
-dmv_k202_device::dmv_k202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k202_device::dmv_k202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_ram_device_base(mconfig, DMV_K202, 3, tag, owner, clock)
 {
 }
@@ -63,7 +63,7 @@ dmv_k202_device::dmv_k202_device(const machine_config &mconfig, const char *tag,
 //  dmv_k208_device - constructor
 //-------------------------------------------------
 
-dmv_k208_device::dmv_k208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k208_device::dmv_k208_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_ram_device_base(mconfig, DMV_K208, 7, tag, owner, clock)
 {
 }

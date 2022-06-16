@@ -139,7 +139,7 @@ void vreadere_state::palette_init(palette_device &palette)
 
 void vreadere_state::vreadere(machine_config &config)
 {
-	EPG3231(config, m_maincpu, 8'000'000);
+	EPG3231(config, m_maincpu, XTAL::u(8'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vreadere_state::prog_map);
 	m_maincpu->out_portb_cb().set(FUNC(vreadere_state::portb_w));
 	m_maincpu->in_portc_cb().set(FUNC(vreadere_state::portc_r));

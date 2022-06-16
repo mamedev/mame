@@ -22,7 +22,7 @@ class ky80_device : public kc82_device
 {
 public:
 	// device type constructor
-	ky80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ky80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_execute_interface overrides

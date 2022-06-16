@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(SONYIOP_SIO2, iop_sio2_device, "iopsio2", "PlayStation 2 IOP 
 
 /*static*/ const size_t iop_sio2_device::BUFFER_SIZE = 512; // total guess based on memcard block size
 
-iop_sio2_device::iop_sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iop_sio2_device::iop_sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYIOP_SIO2, tag, owner, clock)
 	, m_intc(*this, finder_base::DUMMY_TAG)
 	, m_pad0(*this, finder_base::DUMMY_TAG)

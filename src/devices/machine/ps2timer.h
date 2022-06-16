@@ -17,13 +17,13 @@
 class ps2_timer_device : public device_t
 {
 public:
-	ps2_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool can_hold)
+	ps2_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, bool can_hold)
 		: ps2_timer_device(mconfig, tag, owner, clock)
 	{
 		m_can_hold = can_hold;
 	}
 
-	ps2_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

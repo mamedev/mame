@@ -103,7 +103,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void device_reset_after_children() override;
 
-	static constexpr uint32_t SA1110_CLOCK = 206000000;
+	static constexpr XTAL SA1110_CLOCK = XTAL::u(206000000);
 
 	void main_map(address_map &map);
 

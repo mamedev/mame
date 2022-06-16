@@ -20,10 +20,10 @@ class md_std_eeprom_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -44,7 +44,7 @@ class md_eeprom_nbajam_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -61,7 +61,7 @@ class md_eeprom_nbajamte_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -78,7 +78,7 @@ class md_eeprom_cslam_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -95,7 +95,7 @@ class md_eeprom_nflqb_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -112,7 +112,7 @@ class md_eeprom_nhlpa_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -129,7 +129,7 @@ class md_eeprom_blara_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -146,7 +146,7 @@ class md_eeprom_mode1_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_mode1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_eeprom_mode1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -185,7 +185,7 @@ class md_eeprom_nbajam_alt_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_nbajam_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_eeprom_nbajam_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint16_t read(offs_t offset) override;

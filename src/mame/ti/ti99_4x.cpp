@@ -892,7 +892,7 @@ void ti99_4x_state::driver_reset()
 void ti99_4x_state::ti99_4_common(machine_config& config)
 {
 	// CPU
-	TMS9900(config, m_cpu, 3000000);
+	TMS9900(config, m_cpu, XTAL::u(3000000));
 	m_cpu->set_addrmap(AS_PROGRAM, &ti99_4x_state::memmap);
 	m_cpu->set_addrmap(AS_IO, &ti99_4x_state::crumap);
 	m_cpu->set_addrmap(tms99xx_device::AS_SETADDRESS, &ti99_4x_state::memmap_setaddress);
@@ -901,7 +901,7 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	m_cpu->clkout_cb().set(FUNC(ti99_4x_state::clock_out));
 
 	// Programmable system interface (driven by CLKOUT)
-	TMS9901(config, m_tms9901, 0);
+	TMS9901(config, m_tms9901);
 	m_tms9901->p_out_cb(2).set(FUNC(ti99_4x_state::keyC0));
 	m_tms9901->p_out_cb(3).set(FUNC(ti99_4x_state::keyC1));
 	m_tms9901->p_out_cb(4).set(FUNC(ti99_4x_state::keyC2));
@@ -912,7 +912,7 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	m_tms9901->intreq_cb().set(FUNC(ti99_4x_state::tms9901_interrupt));
 
 	// Databus multiplexer
-	TI99_DATAMUX(config, m_datamux, 0).ready_cb().set(FUNC(ti99_4x_state::console_ready_dmux));
+	TI99_DATAMUX(config, m_datamux).ready_cb().set(FUNC(ti99_4x_state::console_ready_dmux));
 
 	// Cartridge port (aka GROMport)
 	TI99_GROMPORT(config, m_gromport, 0, ti99_gromport_options, "single");
@@ -930,8 +930,8 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 
 	// Cassette drives. Second drive is record-only.
 	SPEAKER(config, "cass_out").front_center();
-	CASSETTE(config, "cassette1", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
-	CASSETTE(config, "cassette2", 0);
+	CASSETTE(config, "cassette1").add_route(ALL_OUTPUTS, "cass_out", 0.25);
+	CASSETTE(config, "cassette2");
 
 	// GROM devices
 	TMC0430(config, TI99_GROM0_TAG, TI99_CONSOLEGROM, 0x0000, 0).ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
@@ -1109,7 +1109,7 @@ void ti99_4x_state::ti99_4ev_60hz(machine_config& config)
 	// EVPC connector
 	// This is needed for delivering the video interrupt from the
 	// EVPC expansion card into the console, after the video processor has been removed
-	TI99_EVPCCONN(config, TI99_EVPC_CONN_TAG, 0).vdpint_cb().set(FUNC(ti99_4x_state::video_interrupt_evpc_in));
+	TI99_EVPCCONN(config, TI99_EVPC_CONN_TAG).vdpint_cb().set(FUNC(ti99_4x_state::video_interrupt_evpc_in));
 
 	// Input/output port: Configure for EVPC
 	TI99_IOPORT(config, m_ioport, 0, ti99_ioport_options_evpc, "peb");

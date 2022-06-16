@@ -369,7 +369,7 @@ void mt32_state::mt32(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(mt32_state::mt32_palette), 2);
 
-	SED1200D0A(config, lcd, 0);
+	SED1200D0A(config, lcd);
 
 	TIMER(config, midi_timer).configure_generic(FUNC(mt32_state::midi_timer_cb));
 

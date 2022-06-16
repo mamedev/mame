@@ -2174,7 +2174,7 @@ void cave_state::donpachi(machine_config &config)
 	OKIM6295(config, m_oki[1], 4.224_MHz_XTAL/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 	nmk112.set_page_mask(1 << 0);    // chip #0 (music) is not paged
@@ -2604,7 +2604,7 @@ void cave_state::pwrinst2(machine_config &config)
 	OKIM6295(config, m_oki[1], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 }
@@ -2666,11 +2666,11 @@ void cave_state::sailormn(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	OKIM6295(config, m_oki[0], 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki[0], XTAL::u(2112000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_oki[0]->set_addrmap(0, &cave_state::oki_map);
 
-	OKIM6295(config, m_oki[1], 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki[1], XTAL::u(2112000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_oki[1]->set_addrmap(0, &cave_state::oki2_map);
 

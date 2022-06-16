@@ -20,7 +20,7 @@ void tms57002_device::internal_pgm(address_map &map)
 	map(0x00, 0xff).ram();
 }
 
-tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, TMS57002, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, macc(0), macc_read(0), macc_write(0), st0(0), st1(0), sti(0), txrd(0)

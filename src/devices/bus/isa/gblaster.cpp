@@ -88,7 +88,7 @@ void isa8_gblaster_device::device_add_mconfig(machine_config &config)
 //  isa8_gblaster_device - constructor
 //-------------------------------------------------
 
-isa8_gblaster_device::isa8_gblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_gblaster_device::isa8_gblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA8_GAME_BLASTER, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_saa1099_1(*this, "saa1099.1"),

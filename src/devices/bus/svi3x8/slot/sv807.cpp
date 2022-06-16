@@ -76,7 +76,7 @@ ioport_constructor sv807_device::device_input_ports() const
 //  sv807_device - constructor
 //-------------------------------------------------
 
-sv807_device::sv807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sv807_device::sv807_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SV807, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this),
 	m_switch(*this, "S"),

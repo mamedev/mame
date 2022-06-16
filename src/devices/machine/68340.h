@@ -20,7 +20,7 @@ class m68340_cpu_device : public fscpu32_device
 	friend class mc68340_timer_module_device;
 
 public:
-	m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto pa_in_callback() { return m_pa_in_cb.bind(); }
 	auto pa_out_callback() { return m_pa_out_cb.bind(); }

@@ -353,7 +353,7 @@ void apollo_csr_set_status_register(uint16_t mask, uint16_t data);
 class apollo_sio: public duart_base_device
 {
 public:
-	apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -376,7 +376,7 @@ class apollo_ni: public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
-	apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~apollo_ni();
 
 	// image-level overrides
@@ -417,7 +417,7 @@ DECLARE_DEVICE_TYPE(APOLLO_NI, apollo_ni)
 class apollo_graphics_15i : public device_t
 {
 public:
-	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~apollo_graphics_15i();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -447,7 +447,7 @@ public:
 protected:
 	required_device<screen_device> m_screen;
 
-	apollo_graphics_15i(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	apollo_graphics_15i(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -655,7 +655,7 @@ DECLARE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i)
 class apollo_graphics_19i : public apollo_graphics_15i
 {
 public:
-	apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -684,7 +684,7 @@ class apollo_stdio_device: public device_t, public device_serial_interface
 public:
 	// construction/destruction
 	apollo_stdio_device(const machine_config &mconfig, const char *tag,
-			device_t *owner, uint32_t clock);
+			device_t *owner, const XTAL &clock);
 
 	auto tx_cb() { return m_tx_w.bind(); }
 

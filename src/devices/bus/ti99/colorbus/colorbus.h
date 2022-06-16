@@ -45,7 +45,7 @@ class v9938_colorbus_device : public device_t, public device_single_card_slot_in
 {
 public:
 	template <typename U>
-	v9938_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+	v9938_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, U &&opts, const char *dflt)
 		: v9938_colorbus_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -54,7 +54,7 @@ public:
 		set_fixed(false);
 	}
 
-	v9938_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v9938_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// For the extra button (V9938 only handles 2)
 	auto extra_button_cb() { return m_extra_button.bind(); }

@@ -28,29 +28,29 @@ DEFINE_DEVICE_TYPE(AQUARIUS_RAM16P, aquarius_ram16p_device, "aquarius_ram16p", "
 //  aquarius_ram_device - constructor
 //-------------------------------------------------
 
-aquarius_ram_device::aquarius_ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t size)
+aquarius_ram_device::aquarius_ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint16_t size)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_aquarius_cartridge_interface(mconfig, *this)
 	, m_ram_size(size)
 {
 }
 
-aquarius_ram4_device::aquarius_ram4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+aquarius_ram4_device::aquarius_ram4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: aquarius_ram_device(mconfig, AQUARIUS_RAM4, tag, owner, clock, 0x1000)
 {
 }
 
-aquarius_ram16_device::aquarius_ram16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+aquarius_ram16_device::aquarius_ram16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: aquarius_ram_device(mconfig, AQUARIUS_RAM16, tag, owner, clock, 0x4000)
 {
 }
 
-aquarius_ram32_device::aquarius_ram32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+aquarius_ram32_device::aquarius_ram32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: aquarius_ram_device(mconfig, AQUARIUS_RAM32, tag, owner, clock, 0x8000)
 {
 }
 
-aquarius_ram16p_device::aquarius_ram16p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+aquarius_ram16p_device::aquarius_ram16p_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AQUARIUS_RAM16P, tag, owner, clock)
 	, device_aquarius_cartridge_interface(mconfig, *this)
 {

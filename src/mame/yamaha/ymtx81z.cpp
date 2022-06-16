@@ -155,7 +155,7 @@ void ymtx81z_state::tx81z(machine_config &config)
 
 	config.set_default_layout(layout_tx81z);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc"));
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(ymtx81z_state::lcd_pixel_update));
 

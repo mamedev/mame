@@ -19,7 +19,7 @@ INPUT_PORTS_EXTERN(m68sfdc);
 
 class m68sfdc_device : public device_t {
 public:
-	m68sfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m68sfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void write(offs_t reg, uint8_t val);
 	uint8_t read(offs_t reg);

@@ -54,13 +54,12 @@ public:
 		char const *default_bios() const { return m_default_bios; }
 		std::function<void (device_t *)> const &machine_config() const { return m_machine_config; }
 		input_device_default const *input_device_defaults() const { return m_input_device_defaults; }
-		u32 clock() const { return m_clock; }
+		XTAL clock() const { return m_clock; }
 
 		slot_option &default_bios(char const *default_bios) { m_default_bios = default_bios; return *this; }
 		template <typename Object> slot_option &machine_config(Object &&cb) { m_machine_config = std::forward<Object>(cb); return *this; }
 		slot_option &input_device_defaults(input_device_default const *dev_inp_def) { m_input_device_defaults = dev_inp_def; return *this; }
-		slot_option &clock(u32 clock) { m_clock = clock; return *this; }
-		slot_option &clock(XTAL clock) { clock.validate(std::string("Configuring slot option ") + m_name); m_clock = clock.value(); return *this; }
+		slot_option &clock(const XTAL &clock) { clock.validate(std::string("Configuring slot option ") + m_name); m_clock = clock; return *this; }
 
 	private:
 		// internal state
@@ -70,7 +69,7 @@ public:
 		char const *m_default_bios;
 		std::function<void (device_t *)> m_machine_config;
 		input_device_default const *m_input_device_defaults;
-		u32 m_clock;
+		XTAL m_clock;
 	};
 
 	virtual ~device_slot_interface();
@@ -171,12 +170,12 @@ public:
 protected:
 	device_slot_interface(machine_config const &mconfig, device_t &device);
 	virtual void interface_validity_check(validity_checker &valid) const override ATTR_COLD;
-	void set_default_clock(u32 clock) { m_default_clock = clock; }
+	void set_default_clock(const XTAL &clock) { m_default_clock = clock; }
 
 private:
 	// internal state
 	std::unordered_map<std::string, std::unique_ptr<slot_option>> m_options;
-	u32 m_default_clock;
+	XTAL m_default_clock;
 	char const *m_default_option;
 	bool m_fixed;
 	device_t *m_card_device;

@@ -85,7 +85,7 @@ mcs40_cpu_device_base::mcs40_cpu_device_base(
 		device_type type,
 		const char *tag,
 		device_t *owner,
-		u32 clock,
+		const XTAL &clock,
 		bool extended_cm,
 		unsigned rom_width,
 		unsigned stack_ptr_mask,
@@ -822,7 +822,7 @@ inline void mcs40_cpu_device_base::update_4289_f_l(u8 val)
 
 
 
-i4004_cpu_device::i4004_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+i4004_cpu_device::i4004_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: mcs40_cpu_device_base(mconfig, I4004, tag, owner, clock, false, 12U, 0x3U, 16U, 0x7U)
 {
 }
@@ -1132,7 +1132,7 @@ u8 i4004_cpu_device::do_io(u8 opr, u8 opa)
 
 
 
-i4040_cpu_device::i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+i4040_cpu_device::i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: i4004_cpu_device(mconfig, I4040, tag, owner, clock, true, 13U, 0x7U, 24U, 0xfU)
 {
 }

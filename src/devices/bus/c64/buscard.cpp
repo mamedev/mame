@@ -222,7 +222,7 @@ WRITE_LINE_MEMBER( c64_buscard_device::busy_w )
 
 void c64_buscard_device::device_add_mconfig(machine_config &config)
 {
-	I8255A(config, m_ppi, 0);
+	I8255A(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(c64_buscard_device::ppi_pa_r));
 	m_ppi->out_pa_callback().set(FUNC(c64_buscard_device::ppi_pa_w));
 	m_ppi->in_pb_callback().set_constant(0xff);
@@ -230,11 +230,11 @@ void c64_buscard_device::device_add_mconfig(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(c64_buscard_device::ppi_pc_r));
 	m_ppi->out_pc_callback().set(FUNC(c64_buscard_device::ppi_pc_w));
 
-	DS75160A(config, m_ieee1, 0);
+	DS75160A(config, m_ieee1);
 	m_ieee1->read_callback().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_ieee1->write_callback().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 
-	DS75161A(config, m_ieee2, 0);
+	DS75161A(config, m_ieee2);
 	m_ieee2->in_ren().set(IEEE488_TAG, FUNC(ieee488_device::ren_r));
 	m_ieee2->in_ifc().set(IEEE488_TAG, FUNC(ieee488_device::ifc_r));
 	m_ieee2->in_ndac().set(IEEE488_TAG, FUNC(ieee488_device::ndac_r));
@@ -252,7 +252,7 @@ void c64_buscard_device::device_add_mconfig(machine_config &config)
 	m_ieee2->out_atn().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	m_ieee2->out_srq().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
 
-	IEEE488(config, m_bus, 0);
+	IEEE488(config, m_bus);
 	ieee488_slot_device::add_cbm_defaults(config, nullptr);
 
 	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
@@ -272,7 +272,7 @@ void c64_buscard_device::device_add_mconfig(machine_config &config)
 //  c64_buscard_device - constructor
 //-------------------------------------------------
 
-c64_buscard_device::c64_buscard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_buscard_device::c64_buscard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_BUSCARD, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_ppi(*this, "u2"),

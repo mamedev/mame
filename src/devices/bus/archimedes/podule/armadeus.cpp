@@ -24,7 +24,7 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::CAPTURE; }
 
 	// construction/destruction
-	arc_armadeus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_armadeus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -71,9 +71,9 @@ const tiny_rom_entry *arc_armadeus_device::device_rom_region() const
 void arc_armadeus_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "speaker").front_center();
-	ZN428E(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	ZN428E(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	//ZN448(config, "zn448", 0);
+	//ZN448(config, "zn448");
 }
 
 
@@ -85,7 +85,7 @@ void arc_armadeus_device::device_add_mconfig(machine_config &config)
 //  arc_armadeus_device - constructor
 //-------------------------------------------------
 
-arc_armadeus_device::arc_armadeus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_armadeus_device::arc_armadeus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_ARMADEUS, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")

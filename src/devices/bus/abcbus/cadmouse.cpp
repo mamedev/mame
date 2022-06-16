@@ -140,7 +140,7 @@ void abc_cadmouse_device::device_add_mconfig(machine_config &config)
 //  abc_cadmouse_device - constructor
 //-------------------------------------------------
 
-abc_cadmouse_device::abc_cadmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+abc_cadmouse_device::abc_cadmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ABC_CADMOUSE, tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG)

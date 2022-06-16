@@ -84,7 +84,7 @@ ioport_constructor sms_light_phaser_device::device_input_ports() const
 //  sms_light_phaser_device - constructor
 //-------------------------------------------------
 
-sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SMS_LIGHT_PHASER, tag, owner, clock),
 	device_sms_control_port_interface(mconfig, *this),
 	m_lphaser_pins(*this, "CTRL_PORT"),

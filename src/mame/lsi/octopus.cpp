@@ -929,17 +929,17 @@ void octopus_state::octopus(machine_config &config)
 	m_dma2->out_dack_callback<2>().set(FUNC(octopus_state::dack6_w));
 	m_dma2->out_dack_callback<3>().set(FUNC(octopus_state::dack7_w));
 
-	PIC8259(config, m_pic1, 0);
+	PIC8259(config, m_pic1);
 	m_pic1->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic1->in_sp_callback().set_constant(1);
 	m_pic1->read_slave_ack_callback().set(FUNC(octopus_state::get_slave_ack));
 
-	PIC8259(config, m_pic2, 0);
+	PIC8259(config, m_pic2);
 	m_pic2->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir7_w));
 	m_pic2->in_sp_callback().set_constant(0);
 
 	// RTC (MC146818 via i8255 PPI)
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(octopus_state::rtc_r));
 	m_ppi->in_pb_callback().set(FUNC(octopus_state::cntl_r));
 	m_ppi->in_pc_callback().set(FUNC(octopus_state::gpo_r));
@@ -951,15 +951,15 @@ void octopus_state::octopus(machine_config &config)
 	m_rtc->irq().set(m_pic2, FUNC(pic8259_device::ir2_w));
 
 	// Keyboard UART
-	I8251(config, m_kb_uart, 0);
+	I8251(config, m_kb_uart);
 	m_kb_uart->rxrdy_handler().set("pic_slave", FUNC(pic8259_device::ir4_w));
 	m_kb_uart->dtr_handler().set(FUNC(octopus_state::spk_w));
 	m_kb_uart->rts_handler().set(FUNC(octopus_state::beep_w));
 	rs232_port_device &keyboard_port(RS232_PORT(config, "keyboard_port", keyboard, "octopus"));
 	keyboard_port.rxd_handler().set(m_kb_uart, FUNC(i8251_device::write_rxd));
-	clock_device &keyboard_clock_rx(CLOCK(config, "keyboard_clock_rx", 9600 * 64));
+	clock_device &keyboard_clock_rx(CLOCK(config, "keyboard_clock_rx", XTAL::u(9600 * 64)));
 	keyboard_clock_rx.signal_handler().set(m_kb_uart, FUNC(i8251_device::write_rxc));
-	clock_device &keyboard_clock_tx(CLOCK(config, "keyboard_clock_tx", 1200 * 64));
+	clock_device &keyboard_clock_tx(CLOCK(config, "keyboard_clock_tx", XTAL::u(1200 * 64)));
 	keyboard_clock_tx.signal_handler().set(m_kb_uart, FUNC(i8251_device::write_txc));
 
 	FD1793(config, m_fdc, 16_MHz_XTAL / 8);
@@ -969,7 +969,7 @@ void octopus_state::octopus(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", octopus_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "fd_list").set_original("octopus");
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(4.9152_MHz_XTAL / 2);  // DART channel A
 	m_pit->out_handler<0>().set(FUNC(octopus_state::serial_clock_w));  // being able to write both Rx and Tx clocks at one time would be nice
 	m_pit->set_clk<1>(4.9152_MHz_XTAL / 2);  // DART channel B

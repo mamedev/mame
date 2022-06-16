@@ -170,7 +170,7 @@ void lc8670_cpu_device::lc8670_internal_map(address_map &map)
 //  lc8670_cpu_device - constructor
 //-------------------------------------------------
 
-lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, LC8670, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 9, 0, address_map_constructor(FUNC(lc8670_cpu_device::lc8670_internal_map), this))

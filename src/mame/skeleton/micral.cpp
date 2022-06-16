@@ -432,13 +432,13 @@ void micral_state::micral(machine_config &config)
 
 	/* sound hardware */
 	//SPEAKER(config, "mono").front_center();
-	//BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	//BEEP(config, m_beep, XTAL::u(2000)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	AY31015(config, m_uart); // CDP6402
 	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(153600)));
 	uart_clock.signal_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
 	uart_clock.signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 

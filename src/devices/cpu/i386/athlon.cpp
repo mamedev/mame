@@ -7,7 +7,7 @@
 
 DEFINE_DEVICE_TYPE(ATHLONXP,    athlonxp_device,    "athlonxp",    "Amd Athlon XP")
 
-athlonxp_device::athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+athlonxp_device::athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pentium_device(mconfig, ATHLONXP, tag, owner, clock)
 	, m_data_config("mmio", ENDIANNESS_LITTLE, 32, 32, 0, 32, 12)
 	, m_opcodes_config("debugger", ENDIANNESS_LITTLE, 32, 32, 0, 32, 12)

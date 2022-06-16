@@ -44,7 +44,7 @@ INPUT_PORTS_END
 
 void slsstars_state::slsstars(machine_config &config)
 {
-	MC68HC11F1(config, m_maincpu, 8'000'000); // unknown clock
+	MC68HC11F1(config, m_maincpu, XTAL::u(8'000'000)); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &slsstars_state::mem_map);
 	m_maincpu->set_default_config(0x3f);
 

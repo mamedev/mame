@@ -789,7 +789,7 @@ void m90_state::m90(machine_config &config)
 	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
 	soundlatch.set_separate_acknowledge(true);
 
-	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline(m_soundcpu, 0);
+	RST_NEG_BUFFER(config, "soundirq").int_callback().set_inputline(m_soundcpu, 0);
 
 	IREM_M72_AUDIO(config, m_audio);
 	m_audio->set_dac_tag("dac");
@@ -799,7 +799,7 @@ void m90_state::m90(machine_config &config)
 	ymsnd.add_route(0, "speaker", 0.15);
 	ymsnd.add_route(1, "speaker", 0.15);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
 }
 
 void m90_state::hasamu(machine_config &config)
@@ -856,7 +856,7 @@ void m90_state::bbmanw(machine_config &config)
 void m90_state::bomblord(machine_config &config)
 {
 	m90(config);
-	V30(config.replace(), m_maincpu, 32000000/4);
+	V30(config.replace(), m_maincpu, XTAL::u(32000000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m90_state::bomblord_main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &m90_state::m90_main_cpu_io_map);
 
@@ -873,7 +873,7 @@ void m90_state::bomblord(machine_config &config)
 void m90_state::dynablsb(machine_config &config)
 {
 	m90(config);
-	V30(config.replace(), m_maincpu, 32000000/4);
+	V30(config.replace(), m_maincpu, XTAL::u(32000000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m90_state::dynablsb_main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &m90_state::dynablsb_main_cpu_io_map);
 

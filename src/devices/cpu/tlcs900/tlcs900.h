@@ -48,7 +48,7 @@ public:
 
 protected:
 	// construction/destruction
-	tlcs900_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	tlcs900_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -641,7 +641,7 @@ class tlcs900h_device : public tlcs900_device
 {
 protected:
 	// construction/destruction
-	tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_reset() override;

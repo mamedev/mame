@@ -39,7 +39,7 @@ void electron_fbprint_device::device_add_mconfig(machine_config &config)
 //  electron_fbprint_device - constructor
 //-------------------------------------------------
 
-electron_fbprint_device::electron_fbprint_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_fbprint_device::electron_fbprint_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_FBPRINT, tag, owner, clock)
 	, device_electron_expansion_interface(mconfig, *this)
 	, m_centronics(*this, "centronics")

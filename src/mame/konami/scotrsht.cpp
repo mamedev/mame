@@ -374,10 +374,10 @@ GFXDECODE_END
 void scotrsht_state::scotrsht(machine_config &config)
 {
 	// basic machine hardware
-	MC6809E(config, m_maincpu, 18'432'000 / 6);        // 3.072 MHz
+	MC6809E(config, m_maincpu, XTAL::u(18'432'000) / 6);        // 3.072 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &scotrsht_state::main_map);
 
-	Z80(config, m_audiocpu, 18'432'000 / 6);        // 3.072 MHz
+	Z80(config, m_audiocpu, XTAL::u(18'432'000) / 6);        // 3.072 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &scotrsht_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &scotrsht_state::sound_portmap);
 
@@ -401,7 +401,7 @@ void scotrsht_state::scotrsht(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	YM2203(config, "ymsnd", 18'432'000 / 6).add_route(ALL_OUTPUTS, "mono", 0.40);
+	YM2203(config, "ymsnd", XTAL::u(18'432'000) / 6).add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
 

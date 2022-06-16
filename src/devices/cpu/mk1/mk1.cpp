@@ -45,7 +45,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(MK1_CPU, mk1_cpu_device, "mk1_cpu", "Mark 1 CPU")
 
-mk1_cpu_device::mk1_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mk1_cpu_device::mk1_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, MK1_CPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)

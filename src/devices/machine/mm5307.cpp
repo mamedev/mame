@@ -88,7 +88,7 @@ const std::array<u16, 16> mm5307ab_device::s_divisors_x2 = {
 //  mm5307_device - constructor
 //-------------------------------------------------
 
-mm5307_device::mm5307_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const std::array<u16, 16> &divisors_x2)
+mm5307_device::mm5307_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const std::array<u16, 16> &divisors_x2)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_divisors_x2(divisors_x2)
 	, m_output_cb(*this)
@@ -104,7 +104,7 @@ mm5307_device::mm5307_device(const machine_config &mconfig, device_type type, co
 //  mm5307aa_device - constructor
 //-------------------------------------------------
 
-mm5307aa_device::mm5307aa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mm5307aa_device::mm5307aa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mm5307_device(mconfig, MM5307AA, tag, owner, clock, s_divisors_x2)
 {
 }
@@ -114,7 +114,7 @@ mm5307aa_device::mm5307aa_device(const machine_config &mconfig, const char *tag,
 //  mm5307ab_device - constructor
 //-------------------------------------------------
 
-mm5307ab_device::mm5307ab_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mm5307ab_device::mm5307ab_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mm5307_device(mconfig, MM5307AB, tag, owner, clock, s_divisors_x2)
 {
 }

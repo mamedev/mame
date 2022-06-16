@@ -172,7 +172,7 @@ void sega_billboard_device::device_add_mconfig(machine_config &config)
 //  sega_billboard_device - constructor
 //-------------------------------------------------
 
-sega_billboard_device::sega_billboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sega_billboard_device::sega_billboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SEGA_BILLBOARD, tag, owner, clock),
 	m_billcpu(*this, "billcpu"),
 	m_io(*this, "io"),

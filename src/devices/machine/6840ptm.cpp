@@ -76,7 +76,7 @@ DEFINE_DEVICE_TYPE(PTM6840, ptm6840_device, "ptm6840", "MC6840 PTM")
 //  ptm6840_device - constructor
 //-------------------------------------------------
 
-ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PTM6840, tag, owner, clock)
 	, m_external_clock{ 0.0, 0.0, 0.0 }
 	, m_out_cb(*this)

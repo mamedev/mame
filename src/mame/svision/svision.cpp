@@ -516,7 +516,7 @@ void svision_state::svision(machine_config &config)
 {
 	svision_base(config);
 
-	M65C02(config, m_maincpu, 4000000);
+	M65C02(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &svision_state::svision_mem);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -540,7 +540,7 @@ void svision_state::svisionp(machine_config &config)
 {
 	svision(config);
 
-	m_maincpu->set_clock(4430000);
+	m_maincpu->set_clock(XTAL::u(4430000));
 	m_screen->set_refresh(HZ_TO_ATTOSECONDS(50));
 	m_palette->set_init(FUNC(svision_state::svisionp_palette));
 }

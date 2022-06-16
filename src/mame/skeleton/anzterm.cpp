@@ -419,11 +419,11 @@ void anzterm_state::anzterm(machine_config &config)
 	m6809_device &maincpu(M6809(config, "maincpu", 15974400/4));
 	maincpu.set_addrmap(AS_PROGRAM, &anzterm_state::anzterm_mem);
 
-	I8214(config, "pic.ic39", 0);
-	MC6854(config, "adlc.ic16", 0);
-	MC6854(config, "adlc.1c19", 0);
-	ACIA6850(config, "acia.ic17", 0);
-	ACIA6850(config, "acia.ic18", 0);
+	I8214(config, "pic.ic39");
+	MC6854(config, "adlc.ic16");
+	MC6854(config, "adlc.1c19");
+	ACIA6850(config, "acia.ic17");
+	ACIA6850(config, "acia.ic18");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_screen_update(FUNC(anzterm_state::screen_update));

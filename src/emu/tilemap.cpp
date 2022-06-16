@@ -1659,7 +1659,7 @@ DEFINE_DEVICE_TYPE(TILEMAP, tilemap_device, "tilemap", "Tilemap")
 //  tilemap_device - constructor
 //-------------------------------------------------
 
-tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TILEMAP, tag, owner, clock)
 	, tilemap_t(static_cast<device_t &>(*this))
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)

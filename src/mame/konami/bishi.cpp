@@ -394,15 +394,15 @@ void bishi_state::bishi(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(bishi_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_8, 1, 0);
 	m_k056832->set_palette(m_palette);
 
-	K054338(config, m_k054338, 0);
+	K054338(config, m_k054338);
 	// FP 201404: any reason why this is not connected to the k055555 below?
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -67,7 +67,7 @@ INPUT_PORTS_END
 
 static constexpr attotime serial_cycle = attotime::from_usec(25);
 
-hle_ps2_mouse_device::hle_ps2_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hle_ps2_mouse_device::hle_ps2_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HLE_PS2_MOUSE, tag, owner, clock)
 	, device_pc_kbd_interface(mconfig, *this)
 	, m_port_x_axis(*this, "mouse_x_axis")

@@ -20,7 +20,7 @@ class saitekosa_maestroa_device : public device_t, public device_saitekosa_expan
 {
 public:
 	// construction/destruction
-	saitekosa_maestroa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	saitekosa_maestroa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
 

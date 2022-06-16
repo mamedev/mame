@@ -385,7 +385,7 @@ DEFINE_DEVICE_TYPE(STIC, stic_device, "stic", "AY-3-8900-1 STIC");
 //  stic_device - constructor
 //-------------------------------------------------
 
-stic_device::stic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+stic_device::stic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, STIC, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_grom(*this, "grom"),

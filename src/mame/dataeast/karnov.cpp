@@ -748,11 +748,11 @@ void karnov_state::karnov(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, 7, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
-	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 	m_palette->set_prom_region("proms");
 	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 
-	DECO_KARNOVSPRITES(config, m_spritegen, 0);
+	DECO_KARNOVSPRITES(config, m_spritegen);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
@@ -786,7 +786,7 @@ void karnov_state::karnovjbl(machine_config &config)
 	config.device_remove("mcu");
 	config.device_remove("coin");
 
-	ym3812_device &ym2(YM3812(config.replace(), "ym2", 3000000));
+	ym3812_device &ym2(YM3812(config.replace(), "ym2", XTAL::u(3000000)));
 	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }

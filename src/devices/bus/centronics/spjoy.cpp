@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(SERIAL_PORT_JOYSTICK, serial_port_joystick_device, "spjoy", "The Serial Port/Vertical Twist Joystick Interface")
 
-serial_port_joystick_device::serial_port_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+serial_port_joystick_device::serial_port_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SERIAL_PORT_JOYSTICK, tag, owner, clock)
 	, device_centronics_peripheral_interface( mconfig, *this )
 	, m_joy(*this, "joy_p%u", 1U)

@@ -20,7 +20,7 @@
 DEFINE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device, "wswan_video", "Bandai WonderSwam VDP")
 
 
-wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, WSWAN_VIDEO, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_set_irq_cb(*this)

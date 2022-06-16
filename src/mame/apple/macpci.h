@@ -18,7 +18,7 @@
 #include "machine/ncr539x.h"
 #include "sound/awacs.h"
 
-#define C7M     (7833600)
+#define C7M     XTAL::u(7833600)
 #define C15M    (C7M*2)
 
 #define MAC_SCREEN_NAME "screen"

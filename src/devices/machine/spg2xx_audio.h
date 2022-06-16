@@ -17,8 +17,8 @@
 class spg2xx_audio_device : public device_t, public device_sound_interface
 {
 public:
-	spg2xx_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	spg2xx_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg2xx_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
+	spg2xx_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	auto write_irq_callback() { return m_irq_cb.bind(); }
@@ -381,7 +381,7 @@ private:
 class spg110_audio_device : public spg2xx_audio_device
 {
 public:
-	spg110_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg110_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void audio_w(offs_t offset, uint16_t data) override;
 
@@ -395,7 +395,7 @@ public:
 class sunplus_gcm394_audio_device : public spg2xx_audio_device
 {
 public:
-	sunplus_gcm394_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sunplus_gcm394_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t control_r(offs_t offset);
 	void control_w(offs_t offset, uint16_t data);

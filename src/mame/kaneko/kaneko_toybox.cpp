@@ -373,7 +373,7 @@ static const uint8_t decryption_table_alt[0x100] = {
 
 DEFINE_DEVICE_TYPE(KANEKO_TOYBOX, kaneko_toybox_device, "kaneko_toybox", "Kaneko Toybox MCU")
 
-kaneko_toybox_device::kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kaneko_toybox_device::kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KANEKO_TOYBOX, tag, owner, clock)
 	, m_eeprom(*this, finder_base::DUMMY_TAG)
 	, m_dsw1(*this, finder_base::DUMMY_TAG)

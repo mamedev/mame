@@ -29,7 +29,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(snapshot_button);
 
 protected:
-	spectrum_d40base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_d40base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -66,10 +66,10 @@ class spectrum_d40_device :
 	public spectrum_d40base_device
 {
 public:
-	spectrum_d40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_d40_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	spectrum_d40_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_d40_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -95,7 +95,7 @@ class spectrum_d80_device :
 	public spectrum_d40_device
 {
 public:
-	spectrum_d80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_d80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -105,7 +105,7 @@ class spectrum_d80v2_device :
 	public spectrum_d40base_device
 {
 public:
-	spectrum_d80v2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_d80v2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

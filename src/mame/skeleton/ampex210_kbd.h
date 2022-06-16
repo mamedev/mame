@@ -10,7 +10,7 @@ class ampex230_keyboard_device : public device_t
 {
 public:
 	// construction/destruction
-	ampex230_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	ampex230_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callback configuration
 	auto data_out_callback() { return m_data_out_callback.bind(); }

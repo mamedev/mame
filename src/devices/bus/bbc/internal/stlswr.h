@@ -25,10 +25,10 @@ class bbc_stlswr_device :
 {
 public:
 	// construction/destruction
-	bbc_stlswr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_stlswr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	bbc_stlswr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_stlswr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -53,7 +53,7 @@ class bbc_stlswr16_device : public bbc_stlswr_device
 {
 public:
 	// construction/destruction
-	bbc_stlswr16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_stlswr16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -65,7 +65,7 @@ class bbc_stlswr32_device : public bbc_stlswr_device
 {
 public:
 	// construction/destruction
-	bbc_stlswr32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_stlswr32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -77,7 +77,7 @@ class bbc_stlswr64_device : public bbc_stlswr_device
 {
 public:
 	// construction/destruction
-	bbc_stlswr64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_stlswr64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -89,7 +89,7 @@ class bbc_stlswr128_device : public bbc_stlswr_device
 {
 public:
 	// construction/destruction
-	bbc_stlswr128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_stlswr128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

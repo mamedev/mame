@@ -26,7 +26,7 @@ class tk02_device : public device_t, public device_tatung_pipe_interface
 {
 public:
 	// construction/destruction
-	tk02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tk02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

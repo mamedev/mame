@@ -21,7 +21,7 @@ public:
 	typedef delegate<void (uint32_t *, uint32_t, int32_t)> read_delegate;
 	typedef delegate<void (uint32_t *, uint32_t, int32_t)> write_delegate;
 
-	psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	//configuration helpers
 	auto irq() { return m_irq_handler.bind(); }

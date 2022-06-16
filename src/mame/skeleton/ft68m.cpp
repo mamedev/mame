@@ -88,7 +88,7 @@ void ft68m_state::ft68m(machine_config &config)
 	M68000(config, m_maincpu, XTAL(19'660'800) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ft68m_state::mem_map);
 
-	upd7201_device& mpsc(UPD7201(config, "mpsc", 0));
+	upd7201_device& mpsc(UPD7201(config, "mpsc"));
 	mpsc.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	mpsc.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	mpsc.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));

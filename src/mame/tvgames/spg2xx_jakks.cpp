@@ -131,7 +131,7 @@ void jakks_state::base_config(machine_config& config)
 	m_maincpu->portc_in().set_ioport("P3");
 	m_maincpu->portc_out().set(FUNC(jakks_state::portc_w));
 
-	I2C_24C04(config, m_i2cmem, 0); // ?
+	I2C_24C04(config, m_i2cmem); // ?
 }
 
 void jakks_state::spg2xx_jakks(machine_config &config)

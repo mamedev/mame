@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_dmack);
 
 protected:
-	abstract_ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	abstract_ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t internal_read_cs0(offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t internal_read_cs1(offs_t offset, uint16_t mem_mask = 0xffff);
@@ -110,7 +110,7 @@ private:
 class ata_interface_device : public abstract_ata_interface_device
 {
 public:
-	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T> ata_interface_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
 	{

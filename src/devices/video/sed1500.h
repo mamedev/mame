@@ -31,7 +31,7 @@ SEG: LCD segments
 class sed1500_device : public device_t
 {
 public:
-	sed1500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sed1500_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto write_segs() { return m_write_segs.bind(); } // common number in offset, segment data in data
@@ -40,7 +40,7 @@ public:
 	u8 read(offs_t offset);
 
 protected:
-	sed1500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cmax, u8 smax);
+	sed1500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 cmax, u8 smax);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -62,19 +62,19 @@ protected:
 class sed1501_device : public sed1500_device
 {
 public:
-	sed1501_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sed1501_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class sed1502_device : public sed1500_device
 {
 public:
-	sed1502_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sed1502_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class sed1503_device : public sed1500_device
 {
 public:
-	sed1503_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sed1503_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

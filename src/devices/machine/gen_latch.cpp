@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(GENERIC_LATCH_16, generic_latch_16_device, "generic_latch_16"
 //  generic_latch_base_device - constructor
 //-------------------------------------------------
 
-generic_latch_base_device::generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+generic_latch_base_device::generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_separate_acknowledge(false),
 	m_latch_written(false),
@@ -110,7 +110,7 @@ void generic_latch_base_device::acknowledge_w(u8 data)
 //  generic_latch_8_device - constructor
 //-------------------------------------------------
 
-generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	generic_latch_base_device(mconfig, GENERIC_LATCH_8, tag, owner, clock),
 	m_latched_value(0)
 {
@@ -181,7 +181,7 @@ void generic_latch_8_device::device_start()
 //  generic_latch_16_device - constructor
 //-------------------------------------------------
 
-generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	generic_latch_base_device(mconfig, GENERIC_LATCH_16, tag, owner, clock),
 	m_latched_value(0)
 {

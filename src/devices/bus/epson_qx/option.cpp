@@ -24,7 +24,7 @@ namespace bus::epson_qx {
 //-------------------------------------------------
 //  option_bus_slot_device - constructor
 //-------------------------------------------------
-option_slot_device::option_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+option_slot_device::option_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, EPSON_QX_OPTION_BUS_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_option_expansion_interface>(mconfig, *this),
 	m_bus(*this, finder_base::DUMMY_TAG),
@@ -79,7 +79,7 @@ WRITE_LINE_MEMBER(option_slot_device::rdys_w) { (*m_bus).set_rdys_line(state, m_
 //-------------------------------------------------
 //  option_bus_device - constructor
 //-------------------------------------------------
-option_bus_device::option_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+option_bus_device::option_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, EPSON_QX_OPTION_BUS, tag, owner, clock),
 	m_iospace(*this, finder_base::DUMMY_TAG, -1),
 	m_inth1_cb(*this),

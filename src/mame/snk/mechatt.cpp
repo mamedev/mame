@@ -487,11 +487,11 @@ GFXDECODE_END
 void mechatt_state::mechatt(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mechatt_state::mechatt_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mechatt_state::irq4_line_hold));
 
-	Z80(config, m_audiocpu, 4000000); /* Accurate */
+	Z80(config, m_audiocpu, XTAL::u(4000000)); /* Accurate */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mechatt_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &mechatt_state::sounda_portmap);
 
@@ -509,7 +509,7 @@ void mechatt_state::mechatt(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	SNK_BBUSTERS_SPR(config, m_sprites, 0);
+	SNK_BBUSTERS_SPR(config, m_sprites);
 	m_sprites->set_scaletable_tag("sprites1:scale_table");
 	m_sprites->set_palette("palette");
 	m_sprites->set_spriteram_tag("spriteram1");
@@ -521,7 +521,7 @@ void mechatt_state::mechatt(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	ym2608_device &ymsnd(YM2608(config, "ymsnd", 8000000));
+	ym2608_device &ymsnd(YM2608(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "lspeaker", 0.15);
 	ymsnd.add_route(0, "rspeaker", 0.15);

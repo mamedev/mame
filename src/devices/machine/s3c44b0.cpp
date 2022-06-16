@@ -223,7 +223,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 
 DEFINE_DEVICE_TYPE(S3C44B0, s3c44b0_device, "s3c44b0", "Samsung S3C44B0 SoC")
 
-s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S3C44B0, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)

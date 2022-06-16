@@ -34,7 +34,7 @@ class okim9810_device : public device_t,
 {
 public:
 	// construction/destruction
-	okim9810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	okim9810_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t read_status();
 	void write_tmp_register(uint8_t command);

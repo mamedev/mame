@@ -76,12 +76,12 @@ DEFINE_DEVICE_TYPE(RTC72423, rtc72423_device, "rtc72423", "Epson RTC-72423 RTC")
 //  msm6242_device - constructor
 //-------------------------------------------------
 
-msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msm6242_device(mconfig, MSM6242, tag, owner, clock)
 {
 }
 
-msm6242_device::msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+msm6242_device::msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
 	, m_out_int_handler(*this)
@@ -592,7 +592,7 @@ void msm6242_device::write(offs_t offset, u8 data)
 //  rtc62421_device - constructor
 //-------------------------------------------------
 
-rtc62421_device::rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rtc62421_device::rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msm6242_device(mconfig, RTC62421, tag, owner, clock)
 {
 }
@@ -602,7 +602,7 @@ rtc62421_device::rtc62421_device(const machine_config &mconfig, const char *tag,
 //  rtc62423_device - constructor
 //-------------------------------------------------
 
-rtc62423_device::rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rtc62423_device::rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msm6242_device(mconfig, RTC62423, tag, owner, clock)
 {
 }
@@ -612,7 +612,7 @@ rtc62423_device::rtc62423_device(const machine_config &mconfig, const char *tag,
 //  rtc72421_device - constructor
 //-------------------------------------------------
 
-rtc72421_device::rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rtc72421_device::rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msm6242_device(mconfig, RTC72421, tag, owner, clock)
 {
 }
@@ -622,7 +622,7 @@ rtc72421_device::rtc72421_device(const machine_config &mconfig, const char *tag,
 //  rtc72423_device - constructor
 //-------------------------------------------------
 
-rtc72423_device::rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rtc72423_device::rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msm6242_device(mconfig, RTC72423, tag, owner, clock)
 {
 }

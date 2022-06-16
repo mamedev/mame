@@ -11,7 +11,7 @@
 class h8532_device : public h8500_device
 {
 protected:
-	h8532_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	h8532_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	void internal_map(address_map &map);
@@ -21,14 +21,14 @@ class hd6435328_device : public h8532_device
 {
 public:
 	// device type constructor
-	hd6435328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd6435328_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class hd6475328_device : public h8532_device
 {
 public:
 	// device type constructor
-	hd6475328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd6475328_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(HD6435328, hd6435328_device)

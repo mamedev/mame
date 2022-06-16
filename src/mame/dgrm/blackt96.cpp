@@ -509,7 +509,7 @@ void blackt96_state::blackt96(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
-	SNK68_SPR(config, m_sprites, 0);
+	SNK68_SPR(config, m_sprites);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
 	m_sprites->set_tile_indirect_cb(FUNC(blackt96_state::tile_callback));
 	m_sprites->set_no_partial();

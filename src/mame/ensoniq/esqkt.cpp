@@ -224,7 +224,7 @@ u16 esqkt_state::esq5506_read_adc()
 
 void esqkt_state::es5506_clock_changed(u32 data)
 {
-	m_pump->set_unscaled_clock(data);
+	m_pump->set_unscaled_clock(XTAL::u(data));
 }
 
 WRITE_LINE_MEMBER(esqkt_state::duart_irq_handler)
@@ -260,12 +260,12 @@ void esqkt_state::kt(machine_config &config)
 	auto &panel(ESQPANEL2X16_SQ1(config, "sq1panel"));
 	panel.write_tx().set(m_duart, FUNC(scn2681_device::rx_b_w));
 
-	SCN2681(config, m_duart, 4000000);
+	SCN2681(config, m_duart, XTAL::u(4000000));
 	m_duart->irq_cb().set(FUNC(esqkt_state::duart_irq_handler));
 	m_duart->a_tx_cb().set(FUNC(esqkt_state::duart_tx_a));
 	m_duart->b_tx_cb().set(FUNC(esqkt_state::duart_tx_b));
 	m_duart->outport_cb().set(FUNC(esqkt_state::duart_output));
-	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
+	m_duart->set_clocks(XTAL::u(500000), XTAL::u(500000), XTAL::u(1000000), XTAL::u(1000000));
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
@@ -325,12 +325,12 @@ void esqkt_state::ts(machine_config &config)
 	auto &panel(ESQPANEL2X40_VFX(config, "sq1panel"));
 	panel.write_tx().set(m_duart, FUNC(scn2681_device::rx_b_w));
 
-	SCN2681(config, m_duart, 4000000);
+	SCN2681(config, m_duart, XTAL::u(4000000));
 	m_duart->irq_cb().set(FUNC(esqkt_state::duart_irq_handler));
 	m_duart->a_tx_cb().set(FUNC(esqkt_state::duart_tx_a));
 	m_duart->b_tx_cb().set(FUNC(esqkt_state::duart_tx_b));
 	m_duart->outport_cb().set(FUNC(esqkt_state::duart_output));
-	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
+	m_duart->set_clocks(XTAL::u(500000), XTAL::u(500000), XTAL::u(1000000), XTAL::u(1000000));
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);

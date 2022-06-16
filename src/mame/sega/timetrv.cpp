@@ -316,11 +316,11 @@ void timetrv_state::timetrv(machine_config &config)
 	ppi2.in_pb_callback().set_ioport("DSW2");
 	ppi2.in_pc_callback().set_ioport("DSW3");
 
-	NS16450(config, m_uart, 768000); // P82050 (serial interface for Laserdisc player)
+	NS16450(config, m_uart, XTAL::u(768000)); // P82050 (serial interface for Laserdisc player)
 	m_uart->out_tx_callback().set(m_laserdisc, FUNC(pioneer_ldv4200hle_device::rx_w));
 
 	/* video hardware */
-	PIONEER_LDV4200HLE(config, m_laserdisc, 0);
+	PIONEER_LDV4200HLE(config, m_laserdisc);
 	m_laserdisc->set_overlay(256, 256, FUNC(timetrv_state::screen_update));
 	m_laserdisc->add_route(0, "mono", 0.4);
 	m_laserdisc->add_route(1, "mono", 0.4);
@@ -328,7 +328,7 @@ void timetrv_state::timetrv(machine_config &config)
 	m_laserdisc->serial_tx().set(m_uart, FUNC(ns16450_device::rx_w));
 
 	/* sound hardware */
-	DAC_1BIT(config, m_audiodac, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	DAC_1BIT(config, m_audiodac).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	SPEAKER(config, "mono").front_center();
 }

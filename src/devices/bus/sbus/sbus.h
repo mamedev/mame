@@ -23,7 +23,7 @@ class sbus_slot_device : public device_t, public device_single_card_slot_interfa
 public:
 	// construction/destruction
 	template <typename T, typename U>
-	sbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&sbus_tag, int slot, U &&opts, const char *dflt, bool fixed = false)
+	sbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&sbus_tag, int slot, U &&opts, const char *dflt, bool fixed = false)
 		: sbus_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -33,10 +33,10 @@ public:
 		m_sbus.set_tag(std::forward<T>(sbus_tag));
 		m_slot = slot;
 	}
-	sbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	sbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -58,14 +58,14 @@ class sbus_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T, typename U>
-	sbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&space_tag, int space_num)
+	sbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag, U &&space_tag, int space_num)
 		: sbus_device(mconfig, tag, owner, clock)
 	{
 		set_cpu(std::forward<T>(cpu_tag));
 		set_type1space(std::forward<U>(space_tag), space_num);
 	}
 
-	sbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration
 	template <typename T> void set_cpu(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
@@ -91,7 +91,7 @@ public:
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
-	sbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;

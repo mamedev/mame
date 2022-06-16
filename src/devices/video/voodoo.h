@@ -418,7 +418,7 @@ public:
 
 protected:
 	// internal construction
-	generic_voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo::voodoo_model model);
+	generic_voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, voodoo::voodoo_model model);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -476,14 +476,14 @@ protected:
 	static constexpr u32 TRIANGLE_SETUP_CLOCKS = 100;
 
 	// internal construction
-	voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo::voodoo_model model);
+	voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, voodoo::voodoo_model model);
 
 public:
 	// nominal clock values
-	static constexpr u32 NOMINAL_CLOCK = 50'000'000;
+	static constexpr XTAL NOMINAL_CLOCK = XTAL::u(50'000'000);
 
 	// construction
-	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		voodoo_1_device(mconfig, VOODOO_1, tag, owner, clock, voodoo::voodoo_model::VOODOO_1) { }
 
 	// destruction

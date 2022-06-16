@@ -400,7 +400,7 @@ void mz_state::mz700(machine_config &config)
 	TIMER(config, "other").configure_periodic(FUNC(mz_state::ne556_other_callback), attotime::from_hz(34.5));
 
 	/* devices */
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(XTAL(17'734'470)/20);
 	m_pit->out_handler<0>().set(FUNC(mz_state::pit_out0_changed));
 	m_pit->set_clk<1>(15611.0);

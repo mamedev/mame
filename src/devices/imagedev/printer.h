@@ -25,7 +25,7 @@ class printer_image_device : public device_t,
 {
 public:
 	// construction/destruction
-	printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto online_callback() { return m_online_cb.bind(); }
 

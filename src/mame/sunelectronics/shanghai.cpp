@@ -422,7 +422,7 @@ void shanghai_state::shanghai(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(shanghai_state::shanghai_palette)).set_format(palette_device::xBGR_444, 256);
 
-	HD63484(config, "hd63484", 0).set_addrmap(0, &shanghai_state::hd63484_map);
+	HD63484(config, "hd63484").set_addrmap(0, &shanghai_state::hd63484_map);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -456,7 +456,7 @@ void shanghai_state::shangha2(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
-	HD63484(config, "hd63484", 0).set_addrmap(0, &shanghai_state::hd63484_map);
+	HD63484(config, "hd63484").set_addrmap(0, &shanghai_state::hd63484_map);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -495,7 +495,7 @@ void shanghai_state::kothello(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
-	hd63484_device &hd63484(HD63484(config, "hd63484", 0));
+	hd63484_device &hd63484(HD63484(config, "hd63484"));
 	hd63484.set_addrmap(0, &shanghai_state::hd63484_map);
 	hd63484.set_external_skew(2);
 
@@ -509,7 +509,7 @@ void shanghai_state::kothello(machine_config &config)
 	ymsnd.port_b_read_callback().set_ioport("DSW2");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline("audiocpu", 0);
 	seibu_sound.set_rom_tag("audiocpu");
 	seibu_sound.set_rombank_tag("seibu_bank1");

@@ -72,7 +72,7 @@
 
 */
 
-k573npu_device::k573npu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+k573npu_device::k573npu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, KONAMI_573_NETWORK_PCB_UNIT, tag, owner, clock)
 {
 }

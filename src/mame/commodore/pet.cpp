@@ -1671,7 +1671,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_via->cb2_handler().set(FUNC(pet_state::via_cb2_w));
 	m_via->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set(FUNC(pet_state::pia1_pa_r));
 	m_pia1->readpb_handler().set(FUNC(pet_state::pia1_pb_r));
 	m_pia1->writepa_handler().set(FUNC(pet_state::pia1_pa_w));
@@ -1680,7 +1680,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_pia1->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_pia1->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	m_pia2->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_pia2->writepb_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 	m_pia2->ca2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
@@ -1689,7 +1689,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_pia2->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<4>));
 
 	ieee488_slot_device::add_cbm_defaults(config, default_drive);
-	IEEE488(config, m_ieee, 0);
+	IEEE488(config, m_ieee);
 	m_ieee->srq_callback().set(m_pia2, FUNC(pia6821_device::cb1_w));
 	m_ieee->atn_callback().set(m_pia2, FUNC(pia6821_device::ca1_w));
 

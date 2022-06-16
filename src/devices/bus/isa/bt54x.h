@@ -21,7 +21,7 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	bt54x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	bt54x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 
@@ -40,7 +40,7 @@ protected:
 class bt542b_device : public bt54x_device
 {
 public:
-	bt542b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	bt542b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -50,7 +50,7 @@ protected:
 class bt542bh_device : public bt54x_device
 {
 public:
-	bt542bh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	bt542bh_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -60,7 +60,7 @@ protected:
 class bt545s_device : public bt54x_device
 {
 public:
-	bt545s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	bt545s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -38,7 +38,7 @@ class i8257_device : public device_t, public device_execute_interface
 {
 public:
 	// construction/destruction
-	i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);

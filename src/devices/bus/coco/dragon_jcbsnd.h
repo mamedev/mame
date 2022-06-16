@@ -20,7 +20,7 @@ class dragon_jcbsnd_device :
 {
 public:
 	// construction/destruction
-	dragon_jcbsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dragon_jcbsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;

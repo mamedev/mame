@@ -38,18 +38,18 @@ DEFINE_DEVICE_TYPE(WY50_KEYBOARD, wy50_keyboard_device, "wy50kb", "WY-50 Keyboar
 DEFINE_DEVICE_TYPE(WY100_KEYBOARD, wy100_keyboard_device, "wy100kb", "WY-100 Keyboard")
 
 wyse_parallel_keyboard_device::wyse_parallel_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner)
-	: device_t(mconfig, type, tag, owner, 0U)
+	: device_t(mconfig, type, tag, owner)
 	, m_key_matrix(*this, "COL%u", 0U)
 	, m_address(0)
 {
 }
 
-wy50_keyboard_device::wy50_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+wy50_keyboard_device::wy50_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: wyse_parallel_keyboard_device(mconfig, WY50_KEYBOARD, tag, owner)
 {
 }
 
-wy100_keyboard_device::wy100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+wy100_keyboard_device::wy100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: wyse_parallel_keyboard_device(mconfig, WY100_KEYBOARD, tag, owner)
 {
 }

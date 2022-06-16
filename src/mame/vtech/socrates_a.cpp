@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(SOCRATES_SOUND, socrates_snd_device, "socrates_snd", "Socrate
 //  socrates_snd_device - constructor
 //-------------------------------------------------
 
-socrates_snd_device::socrates_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+socrates_snd_device::socrates_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SOCRATES_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {

@@ -18,7 +18,7 @@ class isa8_epc_mda_device : public device_t, public device_isa8_card_interface
 {
 public:
 	// construction/destruction
-	isa8_epc_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_epc_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t io_read(offs_t offset);
 	void io_write(offs_t offset, uint8_t data);
@@ -31,7 +31,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
 
 protected:
-	isa8_epc_mda_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_epc_mda_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

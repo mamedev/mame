@@ -19,10 +19,10 @@ class kc_8k_device :
 {
 public:
 	// construction/destruction
-	kc_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	kc_8k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	kc_8k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -54,7 +54,7 @@ class kc_m006_device :
 {
 public:
 	// construction/destruction
-	kc_m006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_m006_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// kcexp_interface overrides
@@ -71,7 +71,7 @@ class kc_m033_device :
 {
 public:
 	// construction/destruction
-	kc_m033_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_m033_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

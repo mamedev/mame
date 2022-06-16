@@ -36,7 +36,7 @@ public:
 	using extra_option_vector = std::vector<extra_option>;
 
 	// construction/destruction
-	ram_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	ram_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// accessors
 	u32 size() const { return m_size; }

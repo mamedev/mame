@@ -33,7 +33,7 @@ class t6963c_device : public device_t, public device_memory_interface
 
 public:
 	// construction/destruction
-	t6963c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	t6963c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// CPU read/write access
 	u8 read(offs_t offset);
@@ -86,7 +86,7 @@ class lm24014h_device : public device_t
 {
 public:
 	// construction/destruction
-	lm24014h_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	lm24014h_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// CPU read/write access
 	u8 read(offs_t offset) { return m_lcdc->read(offset); }

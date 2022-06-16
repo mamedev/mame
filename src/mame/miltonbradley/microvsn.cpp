@@ -445,14 +445,14 @@ INPUT_PORTS_END
 void microvision_state::microvision(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1100(config, m_tms1100, 0);
+	TMS1100(config, m_tms1100);
 	m_tms1100->set_output_pla(microvision_output_pla[0]);
 	m_tms1100->set_decode_micro().set(FUNC(microvision_state::tms1100_decode_micro));
 	m_tms1100->read_k().set(FUNC(microvision_state::tms1100_k_r));
 	m_tms1100->write_o().set(FUNC(microvision_state::tms1100_o_w));
 	m_tms1100->write_r().set(FUNC(microvision_state::tms1100_r_w));
 
-	I8021(config, m_i8021, 0);
+	I8021(config, m_i8021);
 	m_i8021->bus_in_cb().set(FUNC(microvision_state::i8021_p0_r));
 	m_i8021->bus_out_cb().set(FUNC(microvision_state::i8021_p0_w));
 	m_i8021->p1_out_cb().set(FUNC(microvision_state::i8021_p1_w));
@@ -478,7 +478,7 @@ void microvision_state::microvision(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_ONES_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "microvision_cart");

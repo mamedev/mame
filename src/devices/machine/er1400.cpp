@@ -39,7 +39,7 @@ DEFINE_DEVICE_TYPE(ER1400, er1400_device, "er1400", "ER1400 Serial EAROM (100x14
 //  er1400_device - constructor
 //-------------------------------------------------
 
-er1400_device::er1400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+er1400_device::er1400_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ER1400, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_default_data(*this, DEVICE_SELF)

@@ -395,8 +395,8 @@ void px4_state::ctrl1_w(uint8_t data)
 		if (VERBOSE)
 			logerror("rcv baud = %d, tra baud = %d\n", rcv_rates[baud], tra_rates[baud]);
 
-		set_rcv_rate(rcv_rates[baud]);
-		set_tra_rate(tra_rates[baud]);
+		set_rcv_rate(XTAL::u(rcv_rates[baud]));
+		set_tra_rate(XTAL::u(tra_rates[baud]));
 	}
 
 	m_ctrl1 = data;

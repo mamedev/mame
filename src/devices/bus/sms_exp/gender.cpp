@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(SMS_GENDER_ADAPTER, sms_gender_adapter_device, "sms_gender_ad
 //  sms_gender_adapter_device - constructor
 //-------------------------------------------------
 
-sms_gender_adapter_device::sms_gender_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sms_gender_adapter_device::sms_gender_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SMS_GENDER_ADAPTER, tag, owner, clock),
 	device_sms_expansion_slot_interface(mconfig, *this),
 	m_subslot(*this, "subslot")

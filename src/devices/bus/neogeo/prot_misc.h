@@ -13,7 +13,7 @@ class neoboot_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	neoboot_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	neoboot_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void cx_decrypt(uint8_t* sprrom, uint32_t sprrom_size);
 	void sx_decrypt(uint8_t* fixed, uint32_t fixed_size, int value);

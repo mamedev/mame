@@ -935,7 +935,7 @@ void fromance_state::nekkyoku(machine_config &config)
 
 	AY8910(config, "aysnd", 12000000/6).add_route(ALL_OUTPUTS, "mono", 0.15); // type not verified
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(fromance_state::fromance_adpcm_int)); /* IRQ handler */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -976,7 +976,7 @@ void fromance_state::idolmj(machine_config &config)
 
 	YM2149(config, "aysnd", 12_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(fromance_state::fromance_adpcm_int)); /* IRQ handler */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -1016,9 +1016,9 @@ void fromance_state::fromance(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 0.90);
+	YM2413(config, "ymsnd", XTAL::u(3579545)).add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(fromance_state::fromance_adpcm_int)); /* IRQ handler */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.10);

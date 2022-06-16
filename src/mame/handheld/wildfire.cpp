@@ -166,7 +166,7 @@ static const u8 wildfire_7seg_table[0x10] =
 void wildfire_state::wildfire(machine_config &config)
 {
 	// basic machine hardware
-	AMI_S2152(config, m_maincpu, 850000); // approximation - RC osc. R=?, C=?
+	AMI_S2152(config, m_maincpu, XTAL::u(850000)); // approximation - RC osc. R=?, C=?
 	m_maincpu->set_7seg_table(wildfire_7seg_table);
 	m_maincpu->read_i().set_ioport("IN.0");
 	m_maincpu->write_d().set(FUNC(wildfire_state::write_d));

@@ -35,7 +35,7 @@ device_astrocade_exp_interface::~device_astrocade_exp_interface()
 //-------------------------------------------------
 //  astrocade_exp_device - constructor
 //-------------------------------------------------
-astrocade_exp_device::astrocade_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+astrocade_exp_device::astrocade_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ASTROCADE_EXP_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_astrocade_exp_interface>(mconfig, *this),
 	m_card_mounted(false), m_card(nullptr)

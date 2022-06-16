@@ -27,7 +27,7 @@ class vt100_keyboard_device : public device_t
 {
 public:
 	// construction/destruction
-	vt100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	vt100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto signal_out_callback() { return m_signal_out_cb.bind(); }
@@ -35,7 +35,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(signal_line_w);
 
 protected:
-	vt100_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	vt100_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -74,7 +74,7 @@ class ms7002_device : public vt100_keyboard_device
 {
 public:
 	// construction/destruction
-	ms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

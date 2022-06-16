@@ -148,10 +148,10 @@ void vax11_state::vax11(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vax11_state::vax11_mem);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(vax11_state::kbd_put));
 
-	RX01(config, "rx01", 0);
+	RX01(config, "rx01");
 }
 
 ROM_START( vax785 )

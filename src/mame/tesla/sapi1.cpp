@@ -823,7 +823,7 @@ void sapi_state::sapi2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi2_mem);
 	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi2_io);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(sapi_state::kbd_put));
 }
 
@@ -853,7 +853,7 @@ void sapi_state::sapi3b(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi3b_mem);
 	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi3b_io);
 
-	mc6845_device &crtc(MC6845(config, "crtc", 1008000)); // guess
+	mc6845_device &crtc(MC6845(config, "crtc", XTAL::u(1008000))); // guess
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(6);

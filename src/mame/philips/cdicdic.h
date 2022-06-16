@@ -42,7 +42,7 @@ class cdicdic_device : public device_t
 {
 public:
 	// construction/destruction
-	cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_clock2(uint32_t clock) { m_clock2 = clock; }
 	void set_clock2(const XTAL &xtal) { set_clock2(xtal.value()); }

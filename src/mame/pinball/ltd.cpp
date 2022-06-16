@@ -561,7 +561,7 @@ void ltd3_state::ltd3(machine_config &config)
 	genpin_audio(config);
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	CLOCK(config, m_monotone, 0);
+	CLOCK(config, m_monotone);
 	m_monotone->signal_handler().set("snd", FUNC(input_merger_device::in_w<0>));
 	AY8910(config, "ay0", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.75); /* guess */
 	AY8910(config, "ay1", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.75); /* guess */
@@ -574,7 +574,7 @@ void ltd3_state::ltd3(machine_config &config)
 	m_snd_pulse->set_clear_pin_value(1);  // nc
 	m_snd_pulse->out_cb().set("snd", FUNC(input_merger_device::in_w<1>));
 
-	clock_device &irq_clock(CLOCK(config, "irq_clock", 1765));  // 680 ohm, 1uF, U117
+	clock_device &irq_clock(CLOCK(config, "irq_clock", XTAL::u(1765)));  // 680 ohm, 1uF, U117
 	irq_clock.signal_handler().set(m_irq_pulse, FUNC(ttl74123_device::a_w));
 
 	INPUT_MERGER_ALL_HIGH(config, "snd").output_handler().set("speaker", FUNC(speaker_sound_device::level_w));

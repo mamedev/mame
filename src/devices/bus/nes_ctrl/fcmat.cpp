@@ -117,7 +117,7 @@ ioport_constructor nes_taptapmat_device::device_input_ports() const
 //  constructor
 //-------------------------------------------------
 
-nes_fcmat_device::nes_fcmat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nes_fcmat_device::nes_fcmat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_mat(*this, "MAT_COL.%u", 0)
@@ -125,12 +125,12 @@ nes_fcmat_device::nes_fcmat_device(const machine_config &mconfig, device_type ty
 {
 }
 
-nes_ftrainer_device::nes_ftrainer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ftrainer_device::nes_ftrainer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_fcmat_device(mconfig, NES_FTRAINER, tag, owner, clock)
 {
 }
 
-nes_taptapmat_device::nes_taptapmat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_taptapmat_device::nes_taptapmat_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_fcmat_device(mconfig, NES_TAPTAPMAT, tag, owner, clock)
 {
 }

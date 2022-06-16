@@ -193,7 +193,7 @@ static INPUT_PORTS_START(3c505)
 	PORT_DIPSETTING(   0x01, DEF_STR(On))
 INPUT_PORTS_END
 
-isa16_3c505_device::isa16_3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+isa16_3c505_device::isa16_3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISA16_3C505, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")

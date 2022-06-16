@@ -28,7 +28,7 @@ class tipi_card_device : public device_t, public device_ti99_peribox_card_interf
 {
 
 public:
-	tipi_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tipi_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
 	void setaddress_dbin(offs_t offset, int state) override;
@@ -101,7 +101,7 @@ private:
 class tipi_attached_device : public device_t, public device_image_interface
 {
 public:
-	tipi_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tipi_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	bool is_readable()  const noexcept override           { return true; }
 	bool is_writeable() const noexcept override           { return true; }

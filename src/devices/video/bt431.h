@@ -9,7 +9,7 @@
 class bt431_device : public device_t
 {
 public:
-	bt431_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	bt431_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	enum register_number : unsigned
 	{

@@ -25,7 +25,7 @@ protected:
 	using cv_delegate = device_delegate<attoseconds_t (attotime const &)>;
 
 	// internal constructor
-	bbd_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
+	bbd_device_base(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, device_type type);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -37,7 +37,7 @@ protected:
 protected:
 	// override to convert clock to sample rate
 	stream_buffer::sample_t outputval(s32 index) const { return m_buffer[(m_curpos - index) % std::size(m_buffer)]; }
-	virtual u32 sample_rate() const { return clock(); }
+	virtual XTAL sample_rate() const { return clock(); }
 
 	sound_stream *          m_stream;
 	u32                     m_curpos;
@@ -52,7 +52,7 @@ protected:
 class mn3004_device : public bbd_device_base<512, 2>
 {
 public:
-	mn3004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mn3004_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 DECLARE_DEVICE_TYPE(MN3004, mn3004_device)
@@ -63,7 +63,7 @@ DECLARE_DEVICE_TYPE(MN3004, mn3004_device)
 class mn3005_device : public bbd_device_base<4096, 2>
 {
 public:
-	mn3005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mn3005_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 DECLARE_DEVICE_TYPE(MN3005, mn3005_device)
@@ -74,7 +74,7 @@ DECLARE_DEVICE_TYPE(MN3005, mn3005_device)
 class mn3006_device : public bbd_device_base<128, 2>
 {
 public:
-	mn3006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mn3006_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 DECLARE_DEVICE_TYPE(MN3006, mn3006_device)
@@ -85,7 +85,7 @@ DECLARE_DEVICE_TYPE(MN3006, mn3006_device)
 class mn3204p_device : public bbd_device_base<512, 2>
 {
 public:
-	mn3204p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mn3204p_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 DECLARE_DEVICE_TYPE(MN3204P, mn3204p_device)

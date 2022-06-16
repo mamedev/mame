@@ -79,7 +79,7 @@ enum submode_flags
 
 DEFINE_DEVICE_TYPE(PSXCD, psxcd_device, "psx_cd", "PSX CD-ROM")
 
-psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cdrom_image_device(mconfig, PSXCD, tag, owner, clock),
 	m_irq_handler(*this),
 	m_maincpu(*this, finder_base::DUMMY_TAG),

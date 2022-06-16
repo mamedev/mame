@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(GT913_IO_HLE, gt913_io_hle_device, "gt913_io_hle", "Casio GT913F I/O (HLE)")
 
-gt913_io_hle_device::gt913_io_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gt913_io_hle_device::gt913_io_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, GT913_IO_HLE, tag, owner, clock),
 	m_cpu(*this, DEVICE_SELF_OWNER),
 	m_cpu_io(nullptr), m_intc(nullptr), m_intc_tag(nullptr)

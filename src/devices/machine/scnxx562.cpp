@@ -129,8 +129,8 @@ DEFINE_DEVICE_TYPE(DUSCC68C562,   duscc68c562_device, "duscc68c562",   "Philips 
 //-------------------------------------------------
 void duscc_device::device_add_mconfig(machine_config &config)
 {
-	DUSCC_CHANNEL(config, CHANA_TAG, 0);
-	DUSCC_CHANNEL(config, CHANB_TAG, 0);
+	DUSCC_CHANNEL(config, CHANA_TAG);
+	DUSCC_CHANNEL(config, CHANB_TAG);
 }
 
 //**************************************************************************
@@ -140,7 +140,7 @@ void duscc_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 //  duscc_device - constructor
 //-------------------------------------------------
-duscc_device::duscc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+duscc_device::duscc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
 	, m_chanA(*this, CHANA_TAG)
@@ -174,27 +174,27 @@ duscc_device::duscc_device(const machine_config &mconfig, device_type type, cons
 		elem = 0;
 }
 
-duscc_device::duscc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+duscc_device::duscc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: duscc_device(mconfig, DUSCC, tag, owner, clock, TYPE_DUSCC)
 {
 }
 
-duscc26562_device::duscc26562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+duscc26562_device::duscc26562_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: duscc_device(mconfig, DUSCC26562, tag, owner, clock, TYPE_DUSCC26562)
 {
 }
 
-duscc26c562_device::duscc26c562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+duscc26c562_device::duscc26c562_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: duscc_device(mconfig, DUSCC26C562, tag, owner, clock, TYPE_DUSCC26C562)
 {
 }
 
-duscc68562_device::duscc68562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+duscc68562_device::duscc68562_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: duscc_device(mconfig, DUSCC68562, tag, owner, clock, TYPE_DUSCC68562)
 {
 }
 
-duscc68c562_device::duscc68c562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+duscc68c562_device::duscc68c562_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: duscc_device(mconfig, DUSCC68C562, tag, owner, clock, TYPE_DUSCC68C562)
 {
 }
@@ -556,7 +556,7 @@ void duscc_device::write(offs_t offset, uint8_t data)
 //**************************************************************************
 //  DUSCC CHANNEL
 //**************************************************************************
-duscc_channel::duscc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+duscc_channel::duscc_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DUSCC_CHANNEL, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_brg_rx_rate(0)
@@ -1968,7 +1968,7 @@ void duscc_channel::do_dusccreg_ccr_w(uint8_t data)
 	   status bit (GSR[I] or GSR[5] for Channels A and B, respectively).
 	   The counter/timer and other registers are not affected*/
 	case REG_CCR_RESET_TX: LOGINT("- Reset Tx\n");
-		set_tra_rate(0);
+		set_tra_rate(XTAL::u(0));
 		m_tx_fifo_wp = m_tx_fifo_rp = 0;
 		m_trsr &= 0x0f;
 		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
@@ -1990,7 +1990,7 @@ void duscc_channel::do_dusccreg_ccr_w(uint8_t data)
 	   will be transmitted.
 	   TODO: let all the chararcters be transmitted before shutting down shifter */
 	case REG_CCR_DISABLE_TX: LOGINT("- Disable Tx\n");
-		set_tra_rate(0);
+		set_tra_rate(XTAL::u(0));
 		m_tra = 0;
 		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_TXREADY : REG_GSR_CHAN_B_TXREADY);
 		m_uart->clear_interrupt(m_index, INT_TXREADY);
@@ -2003,7 +2003,7 @@ void duscc_channel::do_dusccreg_ccr_w(uint8_t data)
 	   GSR[O] or GSR[4] for Channels A and B, respectively). The counter/timer and other
 	   registers are not affected.*/
 	case REG_CCR_RESET_RX: LOGINT("- Reset Rx\n");
-		set_rcv_rate(0);
+		set_rcv_rate(XTAL::u(0));
 		m_rx_fifo_wp = m_rx_fifo_rp = 0;
 		m_trsr &= 0xf0;
 		m_rsr = 0;

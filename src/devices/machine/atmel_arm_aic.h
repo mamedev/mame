@@ -12,7 +12,7 @@ class arm_aic_device : public device_t
 {
 public:
 	// construction/destruction
-	arm_aic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	arm_aic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		device_t(mconfig, ARM_AIC, tag, owner, clock),
 		m_irq_out(*this)
 	{

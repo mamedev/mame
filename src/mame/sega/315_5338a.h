@@ -32,7 +32,7 @@ class sega_315_5338a_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5338a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_315_5338a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto read_callback() { return m_read_cb.bind(); }

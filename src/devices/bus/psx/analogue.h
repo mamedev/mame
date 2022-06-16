@@ -19,7 +19,7 @@ public:
 protected:
 	enum class model { JOYSTICK, DUALSHOCK };
 
-	psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, model mod);
+	psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, model mod);
 
 	virtual void device_start() override { }
 	virtual void device_reset() override;
@@ -48,13 +48,13 @@ private:
 class psx_dualshock_device : public psx_analog_controller_device
 {
 public:
-	psx_dualshock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psx_dualshock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class psx_analog_joystick_device : public psx_analog_controller_device
 {
 public:
-	psx_analog_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psx_analog_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 #endif // MAME_BUS_PSX_ANALOGUE_H

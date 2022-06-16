@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(PET_USERPORT_CB2_SOUND_DEVICE, pet_userport_cb2_sound_device,
 void pet_userport_cb2_sound_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.99);
 }
 
 //**************************************************************************
@@ -39,7 +39,7 @@ void pet_userport_cb2_sound_device::device_add_mconfig(machine_config &config)
 //  pet_userport_cb2_sound_device - constructor
 //-------------------------------------------------
 
-pet_userport_cb2_sound_device::pet_userport_cb2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pet_userport_cb2_sound_device::pet_userport_cb2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PET_USERPORT_CB2_SOUND_DEVICE, tag, owner, clock),
 	device_pet_user_port_interface(mconfig, *this),
 	m_dac(*this, "dac")

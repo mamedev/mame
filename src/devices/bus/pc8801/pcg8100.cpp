@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE(PCG8100, pcg8100_device, "pcg8100", "HAL Laboratory PCG-8100")
 
-pcg8100_device::pcg8100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pcg8100_device::pcg8100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pc8801_exp_device(mconfig, PCG8100, tag, owner, clock)
 	, m_pit(*this, "pit")
 	, m_dac1bit(*this, "dac1bit%u", 0L)
@@ -35,7 +35,7 @@ void pcg8100_device::device_add_mconfig(machine_config &config)
 {
 	constexpr XTAL pcg_clock = XTAL(31'948'800) / 8;
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(pcg_clock);
 	m_pit->out_handler<0>().set(m_dac1bit[0], FUNC(speaker_sound_device::level_w));
 	m_pit->set_clk<1>(pcg_clock);

@@ -42,7 +42,7 @@ class gottlieb_sound_p2_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	gottlieb_sound_p2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gottlieb_sound_p2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// read/write
 	void write(uint8_t data);
@@ -75,7 +75,7 @@ class gottlieb_sound_p3_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	gottlieb_sound_p3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gottlieb_sound_p3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// read/write
 	void write(uint8_t data);
@@ -106,13 +106,13 @@ class gottlieb_sound_r1_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// read/write
 	void write(u8 data);
 
 protected:
-	gottlieb_sound_r1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gottlieb_sound_r1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -138,7 +138,7 @@ class gottlieb_sound_r1_with_votrax_device : public gottlieb_sound_r1_device
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides
@@ -169,13 +169,13 @@ class gottlieb_sound_p4_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	gottlieb_sound_p4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gottlieb_sound_p4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// read/write
 	void write(u8 data);
 
 protected:
-	gottlieb_sound_p4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gottlieb_sound_p4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -231,7 +231,7 @@ class gottlieb_sound_r2_device : public gottlieb_sound_p4_device
 {
 public:
 	// construction/destruction
-	gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gottlieb_sound_r2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	void enable_cobram3_mods() { m_cobram3_mod = true; }
@@ -268,10 +268,10 @@ class gottlieb_sound_p5_device : public gottlieb_sound_p4_device
 {
 public:
 	// construction/destruction
-	gottlieb_sound_p5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gottlieb_sound_p5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
-	gottlieb_sound_p5_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gottlieb_sound_p5_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -289,7 +289,7 @@ class gottlieb_sound_p6_device : public gottlieb_sound_p5_device
 {
 public:
 	// construction/destruction
-	gottlieb_sound_p6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gottlieb_sound_p6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides
@@ -309,7 +309,7 @@ class gottlieb_sound_p7_device : public gottlieb_sound_p5_device
 {
 public:
 	// construction/destruction
-	gottlieb_sound_p7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gottlieb_sound_p7_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides

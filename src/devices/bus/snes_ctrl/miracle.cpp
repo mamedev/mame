@@ -48,7 +48,7 @@ TIMER_CALLBACK_MEMBER(snes_miracle_device::strobe_tick)
 //  snes_miracle_device - constructor
 //-------------------------------------------------
 
-snes_miracle_device::snes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+snes_miracle_device::snes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SNES_MIRACLE, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_snes_control_port_interface(mconfig, *this),
@@ -89,8 +89,8 @@ void snes_miracle_device::device_reset()
 
 	// set standard MIDI parameters
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rcv_rate(31250);
-	set_tra_rate(31250);
+	set_rcv_rate(XTAL::u(31250));
+	set_tra_rate(XTAL::u(31250));
 
 	m_xmit_read = m_xmit_write = 0;
 	m_recv_read = m_recv_write = 0;

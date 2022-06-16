@@ -88,7 +88,7 @@ const int com8116_device::divisors_16X_4_6080MHz[16] =
 //  com8116_device - constructor
 //-------------------------------------------------
 
-com8116_device::com8116_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int *divisors) :
+com8116_device::com8116_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const int *divisors) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_fx4_handler(*this),
 	m_fr_handler(*this),
@@ -97,32 +97,32 @@ com8116_device::com8116_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-com8116_device::com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+com8116_device::com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	com8116_device(mconfig, COM8116, tag, owner, clock, divisors_16X_5_0688MHz)
 {
 }
 
-com8116_003_device::com8116_003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+com8116_003_device::com8116_003_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	com8116_device(mconfig, COM8116_003, tag, owner, clock, divisors_16X_6_01835MHz)
 {
 }
 
-com5016_5_device::com5016_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+com5016_5_device::com5016_5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	com8116_device(mconfig, COM5016_5, tag, owner, clock, divisors_16X_4_9152MHz)
 {
 }
 
-com5016_013_device::com5016_013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+com5016_013_device::com5016_013_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	com8116_device(mconfig, COM5016_013, tag, owner, clock, divisors_16X_2_7648MHz)
 {
 }
 
-com8116_020_device::com8116_020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+com8116_020_device::com8116_020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	com8116_device(mconfig, COM8116_020, tag, owner, clock, divisors_16X_1_8432MHz)
 {
 }
 
-k1135ab_device::k1135ab_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+k1135ab_device::k1135ab_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	com8116_device(mconfig, K1135AB, tag, owner, clock, divisors_16X_5_0688MHz)
 {
 }

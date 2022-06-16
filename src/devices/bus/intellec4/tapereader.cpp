@@ -26,7 +26,7 @@ class imm4_90_device
 		, public bus::intellec4::device_univ_card_interface
 {
 public:
-	imm4_90_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	imm4_90_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -53,7 +53,7 @@ private:
 };
 
 
-imm4_90_device::imm4_90_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+imm4_90_device::imm4_90_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: paper_tape_reader_device(mconfig, INTELLEC4_TAPE_READER, tag, owner, clock)
 	, bus::intellec4::device_univ_card_interface(mconfig, *this)
 	, m_step_timer(nullptr)

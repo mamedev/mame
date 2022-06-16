@@ -87,7 +87,7 @@ void vtech_sdloader_device::device_add_mconfig(machine_config &config)
 {
 	vtech_memexp_device::device_add_mconfig(config);
 
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->spi_miso_callback().set(FUNC(vtech_sdloader_device::spi_miso_w));
 }
 
@@ -100,7 +100,7 @@ void vtech_sdloader_device::device_add_mconfig(machine_config &config)
 //  vtech_sdloader_device - constructor
 //-------------------------------------------------
 
-vtech_sdloader_device::vtech_sdloader_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vtech_sdloader_device::vtech_sdloader_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vtech_memexp_device(mconfig, VTECH_SDLOADER, tag, owner, clock),
 	m_sdcard(*this, "sdcard"),
 	m_dosbank(*this, "dosbank"),

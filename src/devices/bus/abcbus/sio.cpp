@@ -79,7 +79,7 @@ const tiny_rom_entry *abc_sio_device::device_rom_region() const
 void abc_sio_device::device_add_mconfig(machine_config &config)
 {
 	Z80CTC(config, m_ctc, XTAL(4'915'200));
-	Z80DART(config, m_sio, 0);
+	Z80DART(config, m_sio);
 }
 
 
@@ -92,7 +92,7 @@ void abc_sio_device::device_add_mconfig(machine_config &config)
 //  abc_sio_device - constructor
 //-------------------------------------------------
 
-abc_sio_device::abc_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+abc_sio_device::abc_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ABC_SIO, tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this),
 		m_ctc(*this, Z80CTC_TAG),

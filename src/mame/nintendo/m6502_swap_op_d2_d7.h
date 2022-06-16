@@ -18,7 +18,7 @@
 
 class m6502_swap_op_d2_d7 : public m6502_device {
 public:
-	m6502_swap_op_d2_d7(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m6502_swap_op_d2_d7(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	class mi_decrypt : public mi_default {

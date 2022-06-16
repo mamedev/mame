@@ -427,7 +427,7 @@ void ti99_2_state::ti99_224(machine_config& config)
 	screen.set_screen_update(TI992_VDC_TAG, FUNC(video992_device::screen_update));
 
 	// I/O interface circuit. No banking callback.
-	IO99224(config, m_io992, 0);
+	IO99224(config, m_io992);
 }
 
 void ti99_2_state::ti99_232(machine_config& config)
@@ -451,7 +451,7 @@ void ti99_2_state::ti99_232(machine_config& config)
 	screen.set_screen_update(TI992_VDC_TAG, FUNC(video992_device::screen_update));
 
 	// I/O interface circuit
-	IO99232(config, m_io992, 0).rombank_cb().set(FUNC(ti99_2_state::rombank_set));
+	IO99232(config, m_io992).rombank_cb().set(FUNC(ti99_2_state::rombank_set));
 }
 
 void ti99_2_state::ti99_2(machine_config& config)
@@ -473,7 +473,7 @@ void ti99_2_state::ti99_2(machine_config& config)
 	// Cassette drives
 	// There is no route from the cassette to some audio input,
 	// so we don't hear it.
-	CASSETTE(config, "cassette", 0);
+	CASSETTE(config, "cassette");
 
 	// Hexbus
 	HEXBUS(config, TI992_HEXBUS_TAG, 0, hexbus_options, nullptr);

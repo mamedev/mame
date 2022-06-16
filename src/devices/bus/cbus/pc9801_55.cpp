@@ -144,7 +144,7 @@ ioport_constructor pc9801_55_device::device_input_ports() const
 //  pc9801_55u_device - constructor
 //-------------------------------------------------
 
-pc9801_55_device::pc9801_55_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+pc9801_55_device::pc9801_55_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_scsi_bus(*this, "scsi")
@@ -152,13 +152,13 @@ pc9801_55_device::pc9801_55_device(const machine_config &mconfig, device_type ty
 {
 }
 
-pc9801_55u_device::pc9801_55u_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc9801_55u_device::pc9801_55u_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pc9801_55_device(mconfig, PC9801_55U, tag, owner, clock)
 {
 
 }
 
-pc9801_55l_device::pc9801_55l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc9801_55l_device::pc9801_55l_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pc9801_55_device(mconfig, PC9801_55L, tag, owner, clock)
 {
 

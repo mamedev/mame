@@ -44,10 +44,10 @@
 class mm76_device : public pps41_base_device
 {
 public:
-	mm76_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mm76_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	mm76_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	mm76_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -136,16 +136,16 @@ protected:
 class mm76l_device : public mm76_device
 {
 public:
-	mm76l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mm76l_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mm76e_device : public mm76_device
 {
 public:
-	mm76e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mm76e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	mm76e_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	mm76e_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	void program_1k(address_map &map);
 };
@@ -153,7 +153,7 @@ protected:
 class mm76el_device : public mm76e_device
 {
 public:
-	mm76el_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mm76el_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

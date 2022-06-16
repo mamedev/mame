@@ -99,7 +99,7 @@ void pce_cd_device::regs_map(address_map &map)
 	map(0x0f, 0x0f).w(FUNC(pce_cd_device::fade_register_w));
 }
 
-pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PCE_CD, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("io", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(pce_cd_device::regs_map), this))

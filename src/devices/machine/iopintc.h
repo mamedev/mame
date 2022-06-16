@@ -21,12 +21,12 @@ class iop_intc_device : public device_t
 public:
 	template <typename T>
 	iop_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&iop_tag)
-		: iop_intc_device(mconfig, tag, owner, (uint32_t)0)
+		: iop_intc_device(mconfig, tag, owner)
 	{
 		m_iop.set_tag(std::forward<T>(iop_tag));
 	}
 
-	iop_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iop_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~iop_intc_device() override;
 
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);

@@ -334,7 +334,7 @@ void m37732s4_device::map(address_map &map)
 // many other combinations of RAM and ROM size exist
 
 
-m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate)
+m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map_delegate)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, map_delegate)
 	, m_port_in_cb(*this)
@@ -344,40 +344,40 @@ m37710_cpu_device::m37710_cpu_device(const machine_config &mconfig, device_type 
 }
 
 
-m37702m2_device::m37702m2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m37702m2_device::m37702m2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m37702m2_device(mconfig, M37702M2, tag, owner, clock)
 {
 }
 
 
-m37702m2_device::m37702m2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+m37702m2_device::m37702m2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: m37710_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(m37702m2_device::map), this))
 {
 }
 
 
-m37702s1_device::m37702s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m37702s1_device::m37702s1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m37710_cpu_device(mconfig, M37702S1, tag, owner, clock, address_map_constructor(FUNC(m37702s1_device::map), this))
 {
 }
 
 
-m37710s4_device::m37710s4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m37710s4_device::m37710s4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m37710_cpu_device(mconfig, M37710S4, tag, owner, clock, address_map_constructor(FUNC(m37710s4_device::map), this))
 {
 }
 
-m37720s1_device::m37720s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m37720s1_device::m37720s1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m37710_cpu_device(mconfig, M37720S1, tag, owner, clock, address_map_constructor(FUNC(m37720s1_device::map), this))
 {
 }
 
-m37730s2_device::m37730s2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m37730s2_device::m37730s2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m37710_cpu_device(mconfig, M37730S2, tag, owner, clock, address_map_constructor(FUNC(m37730s2_device::map), this))
 {
 }
 
-m37732s4_device::m37732s4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m37732s4_device::m37732s4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m37710_cpu_device(mconfig, M37732S4, tag, owner, clock, address_map_constructor(FUNC(m37732s4_device::map), this))
 {
 }

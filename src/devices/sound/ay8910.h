@@ -72,7 +72,7 @@ public:
 	};
 
 	// construction/destruction
-	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	void set_flags(int flags) { m_flags = flags; }
@@ -109,7 +109,7 @@ public:
 	void write_bc1_bc2(offs_t offset, u8 data);
 
 	void set_volume(int channel,int volume);
-	void ay_set_clock(int clock);
+	void ay_set_clock(const XTAL &clock);
 
 	struct ay_ym_param
 	{
@@ -132,7 +132,7 @@ public:
 
 protected:
 	ay8910_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner,
-					u32 clock, psg_type_t psg_type, int streams, int ioports, int feature = PSG_DEFAULT);
+					const XTAL &clock, psg_type_t psg_type, int streams, int ioports, int feature = PSG_DEFAULT);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -341,7 +341,7 @@ DECLARE_DEVICE_TYPE(AY8910, ay8910_device)
 class ay8912_device : public ay8910_device
 {
 public:
-	ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(AY8912, ay8912_device)
@@ -349,7 +349,7 @@ DECLARE_DEVICE_TYPE(AY8912, ay8912_device)
 class ay8913_device : public ay8910_device
 {
 public:
-	ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(AY8913, ay8913_device)
@@ -357,7 +357,7 @@ DECLARE_DEVICE_TYPE(AY8913, ay8913_device)
 class ay8914_device : public ay8910_device
 {
 public:
-	ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// AY8914 handlers needed due to different register map
 	u8 read(offs_t offset);
@@ -369,7 +369,7 @@ DECLARE_DEVICE_TYPE(AY8914, ay8914_device)
 class ay8930_device : public ay8910_device
 {
 public:
-	ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(AY8930, ay8930_device)
@@ -377,7 +377,7 @@ DECLARE_DEVICE_TYPE(AY8930, ay8930_device)
 class ym2149_device : public ay8910_device
 {
 public:
-	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(YM2149, ym2149_device)
@@ -385,7 +385,7 @@ DECLARE_DEVICE_TYPE(YM2149, ym2149_device)
 class ym3439_device : public ay8910_device
 {
 public:
-	ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(YM3439, ym3439_device)
@@ -393,7 +393,7 @@ DECLARE_DEVICE_TYPE(YM3439, ym3439_device)
 class ymz284_device : public ay8910_device
 {
 public:
-	ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(YMZ284, ymz284_device)
@@ -401,7 +401,7 @@ DECLARE_DEVICE_TYPE(YMZ284, ymz284_device)
 class ymz294_device : public ay8910_device
 {
 public:
-	ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(YMZ294, ymz294_device)
@@ -409,7 +409,7 @@ DECLARE_DEVICE_TYPE(YMZ294, ymz294_device)
 class sunsoft_5b_sound_device : public ay8910_device
 {
 public:
-	sunsoft_5b_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sunsoft_5b_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(SUNSOFT_5B_SOUND, sunsoft_5b_sound_device)

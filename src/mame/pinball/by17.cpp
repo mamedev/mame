@@ -994,7 +994,7 @@ void by17_state::machine_reset()
 void by17_state::by17(machine_config &config)
 {
 	/* basic machine hardware */
-	M6800(config, m_maincpu, 530000);  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
+	M6800(config, m_maincpu, XTAL::u(530000));  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &by17_state::by17_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // 'F' filled causes Credit Display to be blank on first startup
@@ -1006,7 +1006,7 @@ void by17_state::by17(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia_u10, 0);
+	PIA6821(config, m_pia_u10);
 	m_pia_u10->readpa_handler().set(FUNC(by17_state::u10_a_r));
 	m_pia_u10->writepa_handler().set(FUNC(by17_state::u10_a_w));
 	m_pia_u10->readpb_handler().set(FUNC(by17_state::u10_b_r));
@@ -1020,7 +1020,7 @@ void by17_state::by17(machine_config &config)
 	TIMER(config, "timer_z_freq").configure_periodic(FUNC(by17_state::timer_z_freq), attotime::from_hz(100)); // Mains Line Frequency * 2
 	TIMER(config, m_zero_crossing_active_timer).configure_generic(FUNC(by17_state::timer_z_pulse));  // Active pulse length from Zero Crossing detector
 
-	PIA6821(config, m_pia_u11, 0);
+	PIA6821(config, m_pia_u11);
 	m_pia_u11->readpa_handler().set(FUNC(by17_state::u11_a_r));
 	m_pia_u11->writepa_handler().set(FUNC(by17_state::u11_a_w));
 	m_pia_u11->writepb_handler().set(FUNC(by17_state::u11_b_w));

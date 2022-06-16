@@ -21,12 +21,12 @@ class hp48_port_image_device :  public device_t, public device_image_interface
 public:
 	// construction/destruction
 	hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, int module, int max_size)
-		: hp48_port_image_device(mconfig, tag, owner, 0)
+		: hp48_port_image_device(mconfig, tag, owner)
 	{
 		set_port_config(module, max_size);
 	}
 
-	hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void set_port_config(int module, int max_size)
 	{

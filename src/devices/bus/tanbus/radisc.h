@@ -30,7 +30,7 @@ class tanbus_radisc_device :
 {
 public:
 	// construction/destruction
-	tanbus_radisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tanbus_radisc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static void floppy_formats(format_registration &fr);
 

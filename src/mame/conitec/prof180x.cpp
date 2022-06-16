@@ -245,7 +245,7 @@ void prof180x_state::prof180x(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 480-1);
 
 	/* devices */
-	UPD765A(config, FDC9268_TAG, 8'000'000, false, true);
+	UPD765A(config, FDC9268_TAG, XTAL::u(8'000'000), false, true);
 	FLOPPY_CONNECTOR(config, FDC9268_TAG ":0", prof180x_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, FDC9268_TAG ":1", prof180x_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);

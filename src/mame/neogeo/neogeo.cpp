@@ -1945,7 +1945,7 @@ void neogeo_base_state::neogeo_base(machine_config &config)
 	/* 4096 colors * two banks * normal and shadow */
 	PALETTE(config, m_palette, palette_device::BLACK, 4096*2*2);
 
-	NEOGEO_SPRITE_OPTIMZIED(config, m_sprgen, 0).set_screen(m_screen);
+	NEOGEO_SPRITE_OPTIMZIED(config, m_sprgen).set_screen(m_screen);
 
 	/* audio hardware */
 	INPUT_MERGER_ALL_HIGH(config, m_audionmi);
@@ -2012,7 +2012,7 @@ void mvs_led_state::mv1(machine_config &config)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	NG_MEMCARD(config, m_memcard, 0);
+	NG_MEMCARD(config, m_memcard);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2056,7 +2056,7 @@ void mvs_led_el_state::mv2f(machine_config &config)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	NG_MEMCARD(config, m_memcard, 0);
+	NG_MEMCARD(config, m_memcard);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2073,7 +2073,7 @@ void mvs_led_el_state::mv4f(machine_config &config)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	NG_MEMCARD(config, m_memcard, 0);
+	NG_MEMCARD(config, m_memcard);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2090,7 +2090,7 @@ void mvs_led_el_state::mv6f(machine_config &config)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	NG_MEMCARD(config, m_memcard, 0);
+	NG_MEMCARD(config, m_memcard);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2107,7 +2107,7 @@ void mvs_led_state::mv1_fixed(machine_config &config)
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	NG_MEMCARD(config, m_memcard, 0);
+	NG_MEMCARD(config, m_memcard);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", true);
 
@@ -2151,7 +2151,7 @@ void aes_state::aes_ntsc(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &aes_state::aes_main_map);
 
-	NG_MEMCARD(config, m_memcard, 0);
+	NG_MEMCARD(config, m_memcard);
 
 	NEOGEO_CART_SLOT(config, m_slots[0], neogeo_cart, nullptr);
 

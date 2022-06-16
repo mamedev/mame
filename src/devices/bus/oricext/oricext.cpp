@@ -7,7 +7,7 @@
 
 DEFINE_DEVICE_TYPE(ORICEXT_CONNECTOR, oricext_connector, "oricext_connector", "ORIC extension connector")
 
-oricext_connector::oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+oricext_connector::oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ORICEXT_CONNECTOR, tag, owner, clock),
 	device_single_card_slot_interface<device_oricext_interface>(mconfig, *this),
 	irq_handler(*this),

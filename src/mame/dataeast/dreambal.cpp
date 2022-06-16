@@ -313,7 +313,7 @@ void dreambal_state::machine_reset()
 void dreambal_state::dreambal(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 28000000/2);
+	M68000(config, m_maincpu, XTAL::u(28000000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dreambal_state::dreambal_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dreambal_state::irq6_line_hold)); // 5 valid too?
 
@@ -331,12 +331,12 @@ void dreambal_state::dreambal(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");  // 93lc46b
 
-	DECO104PROT(config, m_deco104, 0);
+	DECO104PROT(config, m_deco104);
 	m_deco104->port_a_cb().set_ioport("INPUTS");
 	m_deco104->port_b_cb().set_ioport("SYSTEM");
 	m_deco104->port_c_cb().set_ioport("DSW");
 
-	DECO16IC(config, m_deco_tilegen, 0);
+	DECO16IC(config, m_deco_tilegen);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
@@ -352,7 +352,7 @@ void dreambal_state::dreambal(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 9830400/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);
+	OKIM6295(config, "oki", XTAL::u(9830400)/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 

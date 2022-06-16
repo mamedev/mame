@@ -67,7 +67,7 @@ void scc2698b_device::map(address_map &map)
 #define CHANH_TAG   "chh"
 
 
-scc2698b_channel::scc2698b_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+scc2698b_channel::scc2698b_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SCC2698B_CHANNEL, tag, owner, clock),
 	device_serial_interface(mconfig, *this)
 {
@@ -352,7 +352,7 @@ void scc2698b_channel::mpi1_w(int state)
 }
 
 
-scc2698b_device::scc2698b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+scc2698b_device::scc2698b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SCC2698B, tag, owner, clock),
 	m_channel(*this, "channel_%u",1),
 	write_intr_A(*this),
@@ -746,5 +746,5 @@ attotime scc2698b_device::generate_baudrate(int block, int tx, int table_index)
 void scc2698b_device::device_add_mconfig(machine_config &config)
 {
 	for (required_device<scc2698b_channel> &channel : m_channel)
-		SCC2698B_CHANNEL(config, channel, 0);
+		SCC2698B_CHANNEL(config, channel);
 }

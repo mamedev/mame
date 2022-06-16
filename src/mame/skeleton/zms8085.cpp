@@ -343,7 +343,7 @@ void zms8085_state::zephyr(machine_config &config)
 	m_uart->write_dav_callback().set_inputline("maincpu", I8085_RST65_LINE);
 	m_uart->set_auto_rdav(true);
 
-	CLOCK(config, m_uart_clock, 153600); // should actually be configurable somehow
+	CLOCK(config, m_uart_clock, XTAL::u(153600)); // should actually be configurable somehow
 	m_uart_clock->signal_handler().set(m_uart, FUNC(ay51013_device::write_tcp));
 	m_uart_clock->signal_handler().append(m_uart, FUNC(ay51013_device::write_rcp));
 

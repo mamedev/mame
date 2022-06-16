@@ -567,7 +567,7 @@ void mac_state::add_asc(machine_config &config, asc_device::asc_type type)
 
 void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 {
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_9_w));
 	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_a_w));
@@ -591,7 +591,7 @@ void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 
 template <typename T> void mac_state::add_nubus_pds(machine_config &config, const char *slot_tag, T &&opts)
 {
-	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus_device &nubus(NUBUS(config, "pds"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(mac_state::nubus_irq_9_w));
 	nubus.out_irqa_callback().set(FUNC(mac_state::nubus_irq_a_w));
@@ -667,7 +667,7 @@ void mac_state::maciihd(machine_config &config)
 void mac_state::maciifx(machine_config &config)
 {
 	/* basic machine hardware */
-	M68030(config, m_maincpu, 40000000);
+	M68030(config, m_maincpu, XTAL::u(40000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciifx_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -798,12 +798,12 @@ void mac_state::maciici(machine_config &config)
 {
 	macii(config, false, asc_device::asc_type::ASC, true, false, true, 1);
 
-	M68030(config, m_maincpu, 25000000);
+	M68030(config, m_maincpu, XTAL::u(25000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	m_screen->set_raw(XTAL::u(25175000), 800, 0, 640, 525, 0, 480);
 	m_screen->set_size(640, 870);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbv));
@@ -817,7 +817,7 @@ void mac_state::maciici(machine_config &config)
 
 void mac_state::maciisi(machine_config &config)
 {
-	M68030(config, m_maincpu, 20000000);
+	M68030(config, m_maincpu, XTAL::u(20000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciici_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -837,7 +837,7 @@ void mac_state::maciisi(machine_config &config)
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	m_screen->set_raw(XTAL::u(25175000), 800, 0, 640, 525, 0, 480);
 	m_screen->set_size(640, 870);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbv));

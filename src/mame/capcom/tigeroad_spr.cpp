@@ -21,7 +21,7 @@
 
 DEFINE_DEVICE_TYPE(TIGEROAD_SPRITE, tigeroad_spr_device, "tigeroad_spr", "Simple Capcom (Tiger Road) Sprite")
 
-tigeroad_spr_device::tigeroad_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tigeroad_spr_device::tigeroad_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TIGEROAD_SPRITE, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, m_gfx_region(*this, DEVICE_SELF)

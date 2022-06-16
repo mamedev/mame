@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_DISK5, msx_slot_disk5_device, "msx_slot_disk5", "MSX
 DEFINE_DEVICE_TYPE(MSX_SLOT_DISK6, msx_slot_disk6_device, "msx_slot_disk6", "MSX Internal floppy type 6")
 
 
-msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_rom_device(mconfig, type, tag, owner, clock)
 	, m_floppy0(nullptr)
 	, m_floppy1(nullptr)
@@ -80,7 +80,7 @@ void msx_slot_disk_device::device_start()
 }
 
 
-msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_disk_device(mconfig, type, tag, owner, clock)
 	, m_fdc(nullptr)
 	, m_led(*this, "led0")
@@ -102,7 +102,7 @@ void msx_slot_wd_disk_device::device_start()
 }
 
 
-msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_disk_device(mconfig, type, tag, owner, clock)
 	, m_fdc(nullptr)
 {
@@ -123,7 +123,7 @@ void msx_slot_tc8566_disk_device::device_start()
 
 
 
-msx_slot_disk1_device::msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk1_device::msx_slot_disk1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK1, tag, owner, clock)
 	, m_side_control(0)
 	, m_control(0)
@@ -284,7 +284,7 @@ void msx_slot_disk1_device::write(offs_t offset, uint8_t data)
 }
 
 
-msx_slot_disk2_device::msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk2_device::msx_slot_disk2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK2, tag, owner, clock)
 	, m_control(0)
 {
@@ -421,7 +421,7 @@ void msx_slot_disk2_device::write(offs_t offset, uint8_t data)
 
 
 
-msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK3, tag, owner, clock)
 {
 }
@@ -467,7 +467,7 @@ uint8_t msx_slot_disk3_device::read(offs_t offset)
 
 
 
-msx_slot_disk4_device::msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk4_device::msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK4, tag, owner, clock)
 {
 }
@@ -519,7 +519,7 @@ uint8_t msx_slot_disk4_device::read(offs_t offset)
 
 
 
-msx_slot_disk5_device::msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk5_device::msx_slot_disk5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK5, tag, owner, clock)
 	, m_control(0)
 {
@@ -639,7 +639,7 @@ void msx_slot_disk5_device::io_write(offs_t offset, uint8_t data)
 
 
 
-msx_slot_disk6_device::msx_slot_disk6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_disk6_device::msx_slot_disk6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK6, tag, owner, clock)
 	, m_side_motor(0)
 	, m_drive_select0(0)

@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(SPG28X_IO, spg28x_io_device, "spg28x_io", "SPG280-series Syst
 #define IO_IRQ_ENABLE       m_io_regs[REG_INT_CTRL]
 #define IO_IRQ_STATUS       m_io_regs[REG_INT_CLEAR]
 
-spg2xx_io_device::spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+spg2xx_io_device::spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_porta_out(*this),
 	m_portb_out(*this),
@@ -64,12 +64,12 @@ spg2xx_io_device::spg2xx_io_device(const machine_config &mconfig, device_type ty
 {
 }
 
-spg24x_io_device::spg24x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spg24x_io_device::spg24x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	spg2xx_io_device(mconfig, SPG24X_IO, tag, owner, clock, 256)
 {
 }
 
-spg28x_io_device::spg28x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spg28x_io_device::spg28x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	spg2xx_io_device(mconfig, SPG28X_IO, tag, owner, clock, 64)
 {
 }

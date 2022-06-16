@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(AMIGA_DMAC, amiga_dmac_device, "amiga_dmac", "Amiga DMAC DMA 
 //  amiga_dmac_device - constructor
 //-------------------------------------------------
 
-amiga_dmac_device::amiga_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+amiga_dmac_device::amiga_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, AMIGA_DMAC, tag, owner, clock),
 	amiga_autoconfig(),
 	m_cfgout_handler(*this),

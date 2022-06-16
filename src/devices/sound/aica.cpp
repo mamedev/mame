@@ -1538,7 +1538,7 @@ u8 aica_device::midi_out_r()
 
 DEFINE_DEVICE_TYPE(AICA, aica_device, "aica", "Yamaha AICA")
 
-aica_device::aica_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+aica_device::aica_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AICA, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)

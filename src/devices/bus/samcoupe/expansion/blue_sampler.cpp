@@ -31,7 +31,7 @@ void sam_blue_sound_sampler_device::device_add_mconfig(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(sam_blue_sound_sampler_device::ppi_portb_w));
 	m_ppi->in_pc_callback().set(FUNC(sam_blue_sound_sampler_device::ppi_portc_r));
 
-	ZN426E(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5);
+	ZN426E(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	// TODO: ZN449E ADC
 
@@ -48,7 +48,7 @@ void sam_blue_sound_sampler_device::device_add_mconfig(machine_config &config)
 //  sam_blue_sound_sampler_device - constructor
 //-------------------------------------------------
 
-sam_blue_sound_sampler_device::sam_blue_sound_sampler_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sam_blue_sound_sampler_device::sam_blue_sound_sampler_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SAM_BLUE_SOUND_SAMPLER, tag, owner, clock),
 	device_samcoupe_expansion_interface(mconfig, *this),
 	m_ppi(*this, "ppi"),

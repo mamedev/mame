@@ -39,7 +39,7 @@ class cbm_iec_device : public device_t
 {
 public:
 	// construction/destruction
-	cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto srq_callback() { return m_write_srq.bind(); }
 	auto atn_callback() { return m_write_atn.bind(); }
@@ -124,7 +124,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	cbm_iec_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, int address, T &&opts, char const *dflt)
-		: cbm_iec_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: cbm_iec_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -132,7 +132,7 @@ public:
 		set_fixed(false);
 		set_address(address);
 	}
-	cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T> static void add(machine_config &config, T &&_bus_tag, const char *_default_drive)
 	{
@@ -142,7 +142,7 @@ public:
 		CBM_IEC_SLOT(config, "iec10", 10, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec11", 11, cbm_iec_devices, nullptr);
 
-		CBM_IEC(config, std::forward<T>(_bus_tag), 0);
+		CBM_IEC(config, std::forward<T>(_bus_tag));
 	}
 
 	void set_address(int address) { m_address = address; }

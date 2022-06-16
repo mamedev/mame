@@ -1295,7 +1295,7 @@ void videopkr_state::videopkr(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.275);
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.275);
 }
 
 

@@ -115,7 +115,7 @@ void rf5c400_device::envelope_tables::init(uint32_t clock)
 //  rf5c400_device - constructor
 //-------------------------------------------------
 
-rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RF5C400, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)

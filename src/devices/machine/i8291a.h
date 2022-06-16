@@ -17,7 +17,7 @@ class i8291a_device : public device_t
 {
 public:
 	// construction/destruction
-	i8291a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8291a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto int_write() { return m_int_write_func.bind(); }
 	auto dreq_write() { return m_dreq_write_func.bind(); }

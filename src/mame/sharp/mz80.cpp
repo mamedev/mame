@@ -309,7 +309,7 @@ void mz80_state::mz80k(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(XTAL(8'000'000)/4);
 	m_pit->out_handler<0>().set(FUNC(mz80_state::pit_out0_changed));
 	m_pit->set_clk<1>(XTAL(8'000'000)/256);

@@ -264,13 +264,13 @@ void dambustr_state::init_dambustr()
 void dambustr_state::dambustr(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 18432000/6);    /* 3.072 MHz */
+	Z80(config, m_maincpu, XTAL::u(18432000)/6);    /* 3.072 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dambustr_state::dambustr_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dambustr_state,galaxold)
 
-	TTL7474(config, "7474_9m_1", 0).output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_1_callback));
-	TTL7474(config, "7474_9m_2", 0).comp_output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_2_q_callback));
+	TTL7474(config, "7474_9m_1").output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_1_callback));
+	TTL7474(config, "7474_9m_2").comp_output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_2_q_callback));
 
 	TIMER(config, "int_timer").configure_generic(FUNC(dambustr_state::galaxold_interrupt_timer));
 

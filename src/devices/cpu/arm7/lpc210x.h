@@ -22,7 +22,7 @@
 class lpc210x_device : public arm7_cpu_device
 {
 public:
-	lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t arm_E01FC088_r();
 	uint32_t flash_r(offs_t offset);

@@ -46,7 +46,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	saturn_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const* dflt)
-		: saturn_control_port_device(mconfig, tag, owner, (uint32_t)0)
+		: saturn_control_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -54,7 +54,7 @@ public:
 		set_fixed(false);
 	}
 
-	saturn_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	saturn_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~saturn_control_port_device();
 
 	uint16_t read_direct();

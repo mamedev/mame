@@ -145,7 +145,7 @@ DEFINE_DEVICE_TYPE(TI99_PGRAM, bus::ti99::peb::pgram_device, "ti99_pgram", "PGRA
 
 namespace bus::ti99::peb {
 
-pgram_device::pgram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+pgram_device::pgram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock):
 	  device_t(mconfig, TI99_PGRAM, tag, owner, clock),
 	  device_ti99_peribox_card_interface(mconfig, *this),
 	  m_gram3(*this, GRAM3_TAG),
@@ -500,12 +500,12 @@ void pgram_device::device_add_mconfig(machine_config& config)
 	LS259(config, m_crulatch); // u14
 
 	// Bank switch
-	TTL7474(config, m_bankff, 0);
+	TTL7474(config, m_bankff);
 
 	// We allocate the space for PGRAM+
-	BUFF_RAM(config, GRAM4567_TAG, 0).set_size(128*1024);
-	BUFF_RAM(config, GRAM3_TAG, 0).set_size(32*1024);
-	BUFF_RAM(config, DSRRAM_TAG, 0).set_size(32*1024);
+	BUFF_RAM(config, GRAM4567_TAG).set_size(128*1024);
+	BUFF_RAM(config, GRAM3_TAG).set_size(32*1024);
+	BUFF_RAM(config, DSRRAM_TAG).set_size(32*1024);
 
 	// Real-time clock
 	MM58167(config, CLOCK_TAG, 32.768_kHz_XTAL);

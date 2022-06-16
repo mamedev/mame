@@ -49,7 +49,7 @@
 
 DEFINE_DEVICE_TYPE(X1_001, x1_001_device, "x1_001", "Seta X1-001 Sprites")
 
-x1_001_device::x1_001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+x1_001_device::x1_001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, X1_001, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_gfxbank_cb(*this)

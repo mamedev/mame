@@ -48,7 +48,7 @@ public:
 	static constexpr unsigned DTR   = 0x02;
 	static constexpr unsigned RI    = 0x01;
 
-	tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Callbacks
 	auto int_cb() { return m_int_cb.bind(); }

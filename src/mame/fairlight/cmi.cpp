@@ -2065,11 +2065,11 @@ void cmi_state::cmi2x(machine_config &config)
 
 	MSM5832(config, m_msm5832, 32.768_kHz_XTAL);
 
-	I8214(config, m_i8214[0], 1000000);
+	I8214(config, m_i8214[0], XTAL::u(1000000));
 	m_i8214[0]->int_wr_callback().set(FUNC(cmi_state::i8214_1_int_w));
-	I8214(config, m_i8214[1], 1000000);
+	I8214(config, m_i8214[1], XTAL::u(1000000));
 	m_i8214[1]->int_wr_callback().set(FUNC(cmi_state::i8214_2_int_w));
-	I8214(config, m_i8214[2], 1000000);
+	I8214(config, m_i8214[2], XTAL::u(1000000));
 	m_i8214[2]->int_wr_callback().set(FUNC(cmi_state::i8214_3_int_w));
 	m_i8214[2]->enlg_wr_callback().set(FUNC(cmi_state::i8214_3_enlg));
 
@@ -2088,7 +2088,7 @@ void cmi_state::cmi2x(machine_config &config)
 	PIA6821(config, m_q133_pia[1]);
 
 	PTM6840(config, m_q133_ptm, SYSTEM_CAS_CLOCK);
-	m_q133_ptm->set_external_clocks(1024, 1, 111); // Third is todo
+	m_q133_ptm->set_external_clocks(XTAL::u(1024), XTAL::u(1), XTAL::u(111)); // Third is todo
 	m_q133_ptm->irq_callback().set(m_maincpu2_irq0_merger, FUNC(input_merger_any_high_device::in_w<0>));
 
 	PIA6821(config, m_q219_pia);
@@ -2099,7 +2099,7 @@ void cmi_state::cmi2x(machine_config &config)
 	m_q219_pia->irqb_handler().set(FUNC(cmi_state::pia_q219_irqb));
 
 	PTM6840(config, m_q219_ptm, SYSTEM_CAS_CLOCK);
-	m_q219_ptm->set_external_clocks(HBLANK_FREQ.dvalue(), VBLANK_FREQ.dvalue(), SYSTEM_CAS_CLOCK.dvalue() / 2.0);
+	m_q219_ptm->set_external_clocks(HBLANK_FREQ, VBLANK_FREQ, SYSTEM_CAS_CLOCK / 2.0);
 	m_q219_ptm->irq_callback().set(FUNC(cmi_state::ptm_q219_irq));
 
 	PIA6821(config, m_cmi02_pia[0]);
@@ -2114,7 +2114,7 @@ void cmi_state::cmi2x(machine_config &config)
 	m_cmi02_pia[1]->cb2_handler().set(FUNC(cmi_state::cmi02_pia2_cb2_w));
 
 	PTM6840(config, m_cmi02_ptm, SYSTEM_CAS_CLOCK);
-	m_cmi02_ptm->set_external_clocks(0, 0, 0);
+	m_cmi02_ptm->set_external_clocks(XTAL(), XTAL(), XTAL());
 	m_cmi02_ptm->o2_callback().set(FUNC(cmi_state::cmi02_ptm_o2));
 	m_cmi02_ptm->irq_callback().set(FUNC(cmi_state::cmi02_ptm_irq));
 
@@ -2146,16 +2146,16 @@ void cmi_state::cmi2x(machine_config &config)
 	alphakeys.txd_handler().set("mkbd", FUNC(cmi_music_keyboard_device::kbd_rxd_w));
 	alphakeys.rts_handler().set("mkbd", FUNC(cmi_music_keyboard_device::kbd_cts_w));
 
-	PTM6840(config, m_cmi07_ptm, 2000000); // ptm_cmi07_config
+	PTM6840(config, m_cmi07_ptm, XTAL::u(2000000)); // ptm_cmi07_config
 	m_cmi07_ptm->irq_callback().set(FUNC(cmi_state::cmi07_irq));
 
-	PTM6840(config, m_midi_ptm[0], 0);
-	m_midi_ptm[0]->set_external_clocks(0, 384000, 0); // C1 is 0, C2 is 384kHz per schematic block diagram, C3 is CLICK SYNC IN
+	PTM6840(config, m_midi_ptm[0]);
+	m_midi_ptm[0]->set_external_clocks(XTAL(), XTAL::u(384000), XTAL()); // C1 is 0, C2 is 384kHz per schematic block diagram, C3 is CLICK SYNC IN
 	//m_midi_ptm[0]->o1_callback().set(FUNC(cmi_state::midi_ptm0_c1_w)); // TIMER 1A O/P per schematic
 	//m_midi_ptm[0]->o2_callback().set(FUNC(cmi_state::midi_ptm0_c2_w)); // CLK 2 per schematic
 	m_midi_ptm[0]->o3_callback().set(FUNC(cmi_state::midi_ptm0_c3_w));
 
-	PTM6840(config, m_midi_ptm[1], 0); // entirely clocked by PTM 0
+	PTM6840(config, m_midi_ptm[1]); // entirely clocked by PTM 0
 	//m_midi_ptm[1]->o1_callback().set(FUNC(cmi_state::midi_sync_out_1_w)); // SYNC OUT 1 per schematic
 	//m_midi_ptm[1]->o2_callback().set(FUNC(cmi_state::midi_sync_out_2_w)); // SYNC OUT 2 per schematic
 	//m_midi_ptm[1]->o3_callback().set(FUNC(cmi_state::midi_sync_out_3_w)); // SYNC OUT 3 per schematic

@@ -63,7 +63,7 @@ public:
 
 protected:
 	void vic20(machine_config &config, const char* softlist_filter);
-	void add_clocked_devices(machine_config &config, uint32_t clock);
+	void add_clocked_devices(machine_config &config, XTAL clock);
 
 private:
 	required_device<m6502_device> m_maincpu;
@@ -848,7 +848,7 @@ void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 	m_vic->poty_rd_callback().set(m_joy, FUNC(vcs_control_port_device::read_pot_y));
 	m_vic->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	PET_DATASSETTE_PORT(config, m_cassette, 0);
+	PET_DATASSETTE_PORT(config, m_cassette);
 	cbm_datassette_devices(*m_cassette);
 	m_cassette->set_default_option("c1530");
 	m_cassette->read_handler().set(m_via2, FUNC(via6522_device::write_ca1));
@@ -856,7 +856,7 @@ void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 	cbm_iec_slot_device::add(config, m_iec, "c1541");
 	m_iec->srq_callback().set(m_via2, FUNC(via6522_device::write_cb1));
 
-	VCS_CONTROL_PORT(config, m_joy, 0);
+	VCS_CONTROL_PORT(config, m_joy);
 	vcs_control_port_devices(*m_joy);
 	m_joy->set_default_option("joy");
 	m_joy->trigger_wr_callback().set(FUNC(vic20_state::write_light_pen));
@@ -890,7 +890,7 @@ void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 }
 
 
-void vic20_state::add_clocked_devices(machine_config &config, uint32_t clock)
+void vic20_state::add_clocked_devices(machine_config &config, XTAL clock)
 {
 	// basic machine hardware
 	M6502(config, m_maincpu, clock);

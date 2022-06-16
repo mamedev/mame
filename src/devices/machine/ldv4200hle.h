@@ -46,7 +46,7 @@ class pioneer_ldv4200hle_device : public laserdisc_device, public device_serial_
 {
 public:
 	// construction/destruction
-	pioneer_ldv4200hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pioneer_ldv4200hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto serial_tx() { return m_serial_tx.bind(); }
 

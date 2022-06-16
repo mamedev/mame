@@ -76,12 +76,12 @@ DEFINE_DEVICE_TYPE(DMV_K213, dmv_k213_device, "dmv_k213", "K213 RS-232 Plotter I
 //  dmv_k801_device - constructor
 //-------------------------------------------------
 
-dmv_k801_device::dmv_k801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k801_device::dmv_k801_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_k801_device(mconfig, DMV_K801, tag, owner, clock)
 {
 }
 
-dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_dmvslot_interface( mconfig, *this ),
 	m_pci(*this, "pci"),
@@ -94,13 +94,13 @@ dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type
 //  dmv_k211_device - constructor
 //-------------------------------------------------
 
-dmv_k211_device::dmv_k211_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k211_device::dmv_k211_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_k211_device(mconfig, DMV_K211, tag, owner, clock)
 {
 }
 
 
-dmv_k211_device::dmv_k211_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+dmv_k211_device::dmv_k211_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_k801_device(mconfig, type, tag, owner, clock)
 {
 }
@@ -109,7 +109,7 @@ dmv_k211_device::dmv_k211_device(const machine_config &mconfig, device_type type
 //  dmv_k212_device - constructor
 //-------------------------------------------------
 
-dmv_k212_device::dmv_k212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k212_device::dmv_k212_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_k211_device(mconfig, DMV_K212, tag, owner, clock)
 {
 }
@@ -118,7 +118,7 @@ dmv_k212_device::dmv_k212_device(const machine_config &mconfig, const char *tag,
 //  dmv_k213_device - constructor
 //-------------------------------------------------
 
-dmv_k213_device::dmv_k213_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k213_device::dmv_k213_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_k211_device(mconfig, DMV_K213, tag, owner, clock)
 {
 }

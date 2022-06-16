@@ -9,7 +9,7 @@
 
 class amiga_fdc_device : public device_t {
 public:
-	amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto index_callback() { return m_write_index.bind(); }
 	auto read_dma_callback() { return m_read_dma.bind(); }

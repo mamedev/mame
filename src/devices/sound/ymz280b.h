@@ -19,7 +19,7 @@
 class ymz280b_device : public device_t, public device_sound_interface, public device_rom_interface<24>
 {
 public:
-	ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
@@ -104,7 +104,7 @@ private:
 
 	devcb_write_line m_irq_handler;   /* IRQ callback */
 
-	double m_master_clock;            /* master clock frequency */
+	XTAL m_master_clock;            /* master clock frequency */
 	sound_stream *m_stream;           /* which stream are we using */
 	std::unique_ptr<s16[]> m_scratch;
 #if YMZ280B_MAKE_WAVS

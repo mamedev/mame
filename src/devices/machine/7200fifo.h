@@ -110,7 +110,7 @@ private:
 class idt7200_device : public fifo7200_device
 {
 public:
-	idt7200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	idt7200_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // ======================> idt7201_device
@@ -118,7 +118,7 @@ public:
 class idt7201_device : public fifo7200_device
 {
 public:
-	idt7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	idt7201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // ======================> idt7202_device
@@ -126,7 +126,7 @@ public:
 class idt7202_device : public fifo7200_device
 {
 public:
-	idt7202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	idt7202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // device type definitions

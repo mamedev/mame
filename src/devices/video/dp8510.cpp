@@ -36,7 +36,7 @@ const char *const dp8510_device::BITBLT_OP[] = {
 	"s & d", "~s ^ ~d", "d", "~s | d", "s", "s | ~d", "s | d",  "1"
 };
 
-dp8510_device::dp8510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dp8510_device::dp8510_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DP8510, tag, owner, clock)
 	, m_line_drawing(CLEAR_LINE)
 	, m_barrel_input_select(CLEAR_LINE)

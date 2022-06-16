@@ -125,7 +125,7 @@ DEFINE_DEVICE_TYPE(TI99_GROMPORT, bus::ti99::gromport::gromport_device, "grompor
 
 namespace bus::ti99::gromport {
 
-gromport_device::gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gromport_device::gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	:   device_t(mconfig, TI99_GROMPORT, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		m_connector(nullptr),
@@ -272,7 +272,7 @@ ioport_constructor gromport_device::device_input_ports() const
 
 ***************************************************************************/
 
-cartridge_connector_device::cartridge_connector_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+cartridge_connector_device::cartridge_connector_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_gromport(nullptr)
 {

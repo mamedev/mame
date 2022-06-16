@@ -104,7 +104,7 @@ public:
 	void segacd_map(address_map &map);
 	void segacd_pcm_map(address_map &map);
 protected:
-	sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -206,19 +206,19 @@ protected:
 class sega_segacd_us_device : public sega_segacd_device
 {
 public:
-	sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class sega_segacd_japan_device : public sega_segacd_device
 {
 public:
-	sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class sega_segacd_europe_device : public sega_segacd_device
 {
 public:
-	sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

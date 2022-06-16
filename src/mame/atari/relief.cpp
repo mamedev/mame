@@ -336,11 +336,11 @@ void relief_state::relief(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_relief);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
-	ATARI_VAD(config, m_vad, 0, m_screen);
+	ATARI_VAD(config, m_vad, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(relief_state::get_playfield_tile_info));
 	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(relief_state::get_playfield2_tile_info));
-	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, relief_state::s_mob_config).set_gfxdecode(m_gfxdecode);
+	ATARI_MOTION_OBJECTS(config, "vad:mob", m_screen, relief_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);

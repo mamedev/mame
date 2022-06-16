@@ -37,7 +37,7 @@ class mccs1850_device : public device_t,
 {
 public:
 	// construction/destruction
-	mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto int_wr_callback() { return int_cb.bind(); }
 	auto pse_wr_callback() { return pse_cb.bind(); }

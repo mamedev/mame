@@ -13,7 +13,7 @@ DECLARE_DEVICE_TYPE(CAT702, cat702_device)
 class cat702_device : public device_t
 {
 public:
-	cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto dataout_handler() { return m_dataout_handler.bind(); }

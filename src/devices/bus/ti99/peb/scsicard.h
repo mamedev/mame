@@ -27,7 +27,7 @@ class whtech_scsi_card_device : public device_t, public device_ti99_peribox_card
 	friend class whtscsi_pld_device;
 
 public:
-	whtech_scsi_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	whtech_scsi_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
 	void setaddress_dbin(offs_t offset, int state) override;
@@ -91,7 +91,7 @@ private:
 class whtscsi_pld_device : public device_t
 {
 public:
-	whtscsi_pld_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	whtscsi_pld_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void crureadz(offs_t offset, uint8_t *value);
 	void cruwrite(offs_t offset, uint8_t data);

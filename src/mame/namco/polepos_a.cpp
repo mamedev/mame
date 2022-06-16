@@ -207,7 +207,7 @@ DEFINE_DEVICE_TYPE(POLEPOS_SOUND, polepos_sound_device, "polepos_sound", "Pole P
 //  polepos_sound_device - constructor
 //-------------------------------------------------
 
-polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, POLEPOS_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_current_position(0),

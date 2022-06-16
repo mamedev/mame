@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(EDEVICES_VID, edevices_device, "edevices_vid", "Electronic De
 DEFINE_DEVICE_TYPE(EDEVICES_SFORCE_VID, edevices_sforce_device, "edevices_sforce_vid", "Electronic Devices Video (Steel Forces)")
 
 
-edevices_device::edevices_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+edevices_device::edevices_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_bg_videoram(*this, finder_base::DUMMY_TAG),
 	m_mlow_videoram(*this, finder_base::DUMMY_TAG),
@@ -39,12 +39,12 @@ edevices_device::edevices_device(const machine_config &mconfig, device_type type
 }
 
 
-edevices_device::edevices_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+edevices_device::edevices_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	edevices_device(mconfig, EDEVICES_VID, tag, owner, clock)
 {
 }
 
-edevices_sforce_device::edevices_sforce_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+edevices_sforce_device::edevices_sforce_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	edevices_device(mconfig, EDEVICES_SFORCE_VID, tag, owner, clock)
 {
 }

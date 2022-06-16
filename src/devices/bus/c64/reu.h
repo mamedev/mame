@@ -37,7 +37,7 @@ protected:
 	};
 
 	// construction/destruction
-	c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, int jp1, size_t ram_size);
+	c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant, int jp1, size_t ram_size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -66,7 +66,7 @@ class c64_reu1700_cartridge_device :  public c64_reu_cartridge_device
 {
 public:
 	// construction/destruction
-	c64_reu1700_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64_reu1700_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -76,7 +76,7 @@ class c64_reu1750_cartridge_device :  public c64_reu_cartridge_device
 {
 public:
 	// construction/destruction
-	c64_reu1750_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64_reu1750_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> c64_reu1700_cartridge_device
@@ -85,7 +85,7 @@ class c64_reu1764_cartridge_device :  public c64_reu_cartridge_device
 {
 public:
 	// construction/destruction
-	c64_reu1764_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64_reu1764_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

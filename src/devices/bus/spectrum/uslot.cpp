@@ -40,7 +40,7 @@ void spectrum_uslot_device::device_add_mconfig(machine_config &config)
 //  spectrum_uslot_device - constructor
 //-------------------------------------------------
 
-spectrum_uslot_device::spectrum_uslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_uslot_device::spectrum_uslot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPECTRUM_USLOT, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_exp1(*this, "exp1")

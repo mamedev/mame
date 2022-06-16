@@ -13,7 +13,7 @@
 class deco104_device : public deco_146_base_device
 {
 public:
-	deco104_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	deco104_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

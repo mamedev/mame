@@ -138,7 +138,7 @@ DEFINE_DEVICE_TYPE(SPC1000_FDD_EXP, spc1000_fdd_exp_device, "spc1000_fdd_exp", "
 //  spc1000_fdd_exp_device - constructor
 //-------------------------------------------------
 
-spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SPC1000_FDD_EXP, tag, owner, clock),
 	device_spc1000_card_interface(mconfig, *this),
 	m_cpu(*this, "fdccpu"),

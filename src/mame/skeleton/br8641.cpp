@@ -179,7 +179,7 @@ void brandt8641_state::brandt8641(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beep, XTAL::u(2000)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// Z80APIO U9
 	// Z80APIO U14

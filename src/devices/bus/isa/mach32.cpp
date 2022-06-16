@@ -25,31 +25,31 @@ DEFINE_DEVICE_TYPE(ATIMACH64_8514A, mach64_8514a_device, "mach64_8514a", "ATi ma
  */
 
 // 8514/A device
-mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mach32_8514a_device(mconfig, ATIMACH32_8514A, tag, owner, clock)
 {
 }
 
-mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: mach8_device(mconfig, type, tag, owner, clock), m_chip_ID(0), m_membounds(0)
 {
 }
 
 
 // SVGA device
-mach32_device::mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mach32_device::mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mach32_device(mconfig, ATIMACH32, tag, owner, clock)
 {
 }
 
-mach32_device::mach32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mach32_device::mach32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: ati_vga_device(mconfig, type, tag, owner, clock), m_8514a(*this,"8514a")
 {
 }
 
 void mach32_device::device_add_mconfig(machine_config &config)
 {
-	ATIMACH32_8514A(config, "8514a", 0).set_vga(DEVICE_SELF);
+	ATIMACH32_8514A(config, "8514a").set_vga(DEVICE_SELF);
 	EEPROM_93C56_16BIT(config, "ati_eeprom");
 }
 
@@ -304,31 +304,31 @@ void mach32_device::mach32_cursor_offset_w(offs_t offset, uint16_t data, uint16_
  */
 
 // 8514/A device
-mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mach64_8514a_device(mconfig, ATIMACH64_8514A, tag, owner, clock)
 {
 }
 
-mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: mach32_8514a_device(mconfig, type, tag, owner, clock)
 {
 }
 
 
 // SVGA device
-mach64_device::mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mach64_device::mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mach64_device(mconfig, ATIMACH64, tag, owner, clock)
 {
 }
 
-mach64_device::mach64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mach64_device::mach64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: mach32_device(mconfig, type, tag, owner, clock), m_8514a(*this, "8514a")
 {
 }
 
 void mach64_device::device_add_mconfig(machine_config &config)
 {
-	ATIMACH64_8514A(config, "8514a", 0).set_vga(DEVICE_SELF);
+	ATIMACH64_8514A(config, "8514a").set_vga(DEVICE_SELF);
 	EEPROM_93C56_16BIT(config, "ati_eeprom");
 }
 

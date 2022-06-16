@@ -74,7 +74,7 @@ INPUT_PORTS_END
 void gaelcopc_state::gaelcopc(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM(config, m_maincpu, 2000000000); /* Pentium4? */
+	PENTIUM(config, m_maincpu, XTAL::u(2000000000)); /* Pentium4? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelcopc_state::gaelcopc_map);
 
 	/* video hardware */

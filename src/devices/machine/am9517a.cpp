@@ -441,7 +441,7 @@ void am9517a_device::end_of_process()
 //-------------------------------------------------
 
 
-am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -460,12 +460,12 @@ am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, 
 }
 
 
-am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: am9517a_device(mconfig, AM9517A, tag, owner, clock)
 {
 }
 
-v5x_dmau_device::v5x_dmau_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+v5x_dmau_device::v5x_dmau_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: am9517a_device(mconfig, V5X_DMAU, tag, owner, clock)
 	, m_in_mem16r_cb(*this)
 	, m_out_mem16w_cb(*this)
@@ -475,7 +475,7 @@ v5x_dmau_device::v5x_dmau_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-pcxport_dmac_device::pcxport_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pcxport_dmac_device::pcxport_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: am9517a_device(mconfig, PCXPORT_DMAC, tag, owner, clock)
 {
 }
@@ -1327,7 +1327,7 @@ void pcxport_dmac_device::end_of_process()
 	m_state = STATE_SI;
 }
 
-eisa_dma_device::eisa_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+eisa_dma_device::eisa_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: am9517a_device(mconfig, EISA_DMA, tag, owner, clock)
 {
 }

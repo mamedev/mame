@@ -74,12 +74,12 @@ enum
 
 DEFINE_DEVICE_TYPE(NAND, nand_device, "nand", "NAND Flash Memory")
 
-nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nand_device(mconfig, NAND, tag, owner, clock)
 {
 }
 
-nand_device::nand_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nand_device::nand_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_page_data_size(0)
 	, m_page_total_size(0)
@@ -777,7 +777,7 @@ void nand_device::device_reset()
 
 DEFINE_DEVICE_TYPE(SMARTMEDIA, smartmedia_image_device, "smartmedia", "SmartMedia Flash card")
 
-smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nand_device(mconfig, SMARTMEDIA, tag, owner, clock)
 	, device_memcard_image_interface(mconfig, *this)
 {

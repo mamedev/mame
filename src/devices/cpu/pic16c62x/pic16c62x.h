@@ -58,7 +58,7 @@ public:
 
 protected:
 	// construction/destruction
-	pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int picmodel);
+	pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int program_width, int picmodel);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -208,14 +208,14 @@ class pic16c620_device : public pic16c62x_device
 {
 public:
 	// construction/destruction
-	pic16c620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic16c620_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class pic16c620a_device : public pic16c62x_device
 {
 public:
 	// construction/destruction
-	pic16c620a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic16c620a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 /*
@@ -223,35 +223,35 @@ class pic16cr620a_device : public pic16c62x_device
 {
 public:
     // construction/destruction
-    pic16cr620a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+    pic16cr620a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 }*/
 
 class pic16c621_device : public pic16c62x_device
 {
 public:
 	// construction/destruction
-	pic16c621_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic16c621_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class pic16c621a_device : public pic16c62x_device
 {
 public:
 	// construction/destruction
-	pic16c621a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic16c621a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class pic16c622_device : public pic16c62x_device
 {
 public:
 	// construction/destruction
-	pic16c622_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic16c622_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class pic16c622a_device : public pic16c62x_device
 {
 public:
 	// construction/destruction
-	pic16c622a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pic16c622a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

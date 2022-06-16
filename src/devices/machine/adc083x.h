@@ -50,7 +50,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( do_read );
 
 protected:
-	adc083x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t mux_bits);
+	adc083x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t mux_bits);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -84,28 +84,28 @@ private:
 class adc0831_device : public adc083x_device
 {
 public:
-	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 
 class adc0832_device : public adc083x_device
 {
 public:
-	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 
 class adc0834_device : public adc083x_device
 {
 public:
-	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 
 class adc0838_device : public adc083x_device
 {
 public:
-	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 

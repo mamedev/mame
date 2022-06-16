@@ -553,7 +553,7 @@ void microterm_f8_state::act5a(machine_config &config)
 	RIPPLE_COUNTER(config, m_blinkcount).set_stages(6);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_bell, 1760);
+	BEEP(config, m_bell, XTAL::u(1760));
 	m_bell->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

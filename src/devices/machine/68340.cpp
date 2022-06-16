@@ -221,7 +221,7 @@ void m68340_cpu_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: fscpu32_device(mconfig, tag, owner, clock, M68340, address_map_constructor(FUNC(m68340_cpu_device::m68340_internal_map), this))
 	, m_serial(*this, "serial")
 	, m_timer(*this, "timer%u", 1U)

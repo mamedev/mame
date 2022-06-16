@@ -16,7 +16,7 @@ GCMK-16X PCB, 2 ROM chips, Yamaha XE297A0 mapper chip.
 DEFINE_DEVICE_TYPE(MSX_CART_HOLY_QURAN, msx_cart_holy_quran_device, "msx_cart_holy_quran", "MSX Cartridge - Holy Quran")
 
 
-msx_cart_holy_quran_device::msx_cart_holy_quran_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_holy_quran_device::msx_cart_holy_quran_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_HOLY_QURAN, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 {

@@ -46,7 +46,7 @@ static const char *const ethernet_regname[64] =
 
 DEFINE_DEVICE_TYPE(SMC91C94, smc91c94_device, "smc91c94", "SMC91C94 Ethernet Controller")
 
-smc91c94_device::smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+smc91c94_device::smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: smc91c9x_device(mconfig, SMC91C94, tag, owner, clock, dev_type::SMC91C94)
 {
 	m_num_ebuf = 18;
@@ -54,13 +54,13 @@ smc91c94_device::smc91c94_device(const machine_config &mconfig, const char *tag,
 
 DEFINE_DEVICE_TYPE(SMC91C96, smc91c96_device, "smc91c96", "SMC91C96 Ethernet Controller")
 
-smc91c96_device::smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+smc91c96_device::smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: smc91c9x_device(mconfig, SMC91C96, tag, owner, clock, dev_type::SMC91C96)
 {
 	m_num_ebuf = 24;
 }
 
-smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dev_type device_type)
+smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, dev_type device_type)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_network_interface(mconfig, *this, 10)
 	, m_device_type(device_type)

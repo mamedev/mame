@@ -79,11 +79,11 @@ void nsg6809_state::pitchhit(machine_config &config)
 	via6522_device &via(MOS6522(config, "via", XTAL(4'000'000) / 4));
 	via.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(XTAL(1'843'200));
 	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	WATCHDOG_TIMER(config, "deadman", 0);
+	WATCHDOG_TIMER(config, "deadman");
 
 	input_merger_device &merger(INPUT_MERGER_ANY_HIGH(config, "mainirq"));
 	merger.output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);

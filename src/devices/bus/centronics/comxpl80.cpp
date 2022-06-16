@@ -65,7 +65,7 @@ const tiny_rom_entry *comx_pl80_device::device_rom_region() const
 void comx_pl80_device::device_add_mconfig(machine_config &config)
 {
 #if 0
-	m6805_device &cx005(M6805(config, CX005_TAG, 4000000)); // CX005: some kind of MC6805/MC68HC05 clone
+	m6805_device &cx005(M6805(config, CX005_TAG, XTAL::u(4000000))); // CX005: some kind of MC6805/MC68HC05 clone
 	cx005.set_disable();
 #endif
 }
@@ -113,7 +113,7 @@ ioport_constructor comx_pl80_device::device_input_ports() const
 //  comx_pl80_device - constructor
 //-------------------------------------------------
 
-comx_pl80_device::comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+comx_pl80_device::comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, COMX_PL80, tag, owner, clock),
 		device_centronics_peripheral_interface(mconfig, *this),
 		m_plotter(*this, "gfx1"),

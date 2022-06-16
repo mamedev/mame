@@ -611,7 +611,7 @@ class subwoofer_device : public device_t,
 									public device_sound_interface
 {
 public:
-	subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~subwoofer_device() {}
 
 protected:
@@ -630,7 +630,7 @@ extern const device_type SUBWOOFER;
 
 const device_type SUBWOOFER = device_creator<subwoofer_device>;
 
-subwoofer_device::subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+subwoofer_device::subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SUBWOOFER, "Subwoofer", tag, owner, clock),
 		device_sound_interface(mconfig, *this)
 {
@@ -719,7 +719,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(16000000/1024));  /* CPU slices */
 	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -758,29 +758,29 @@ void ninjaw_state::ninjaw(machine_config &config)
 	rscreen.set_screen_update(FUNC(ninjaw_state::screen_update_right));
 	rscreen.set_palette(m_tc0110pcr[2]);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(22, 0);
 	m_tc0100scn[0]->set_multiscr_xoffs(0);
 	m_tc0100scn[0]->set_multiscr_hack(0);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
-	TC0110PCR(config, m_tc0110pcr[0], 0);
+	TC0110PCR(config, m_tc0110pcr[0]);
 
-	TC0100SCN(config, m_tc0100scn[1], 0);
+	TC0100SCN(config, m_tc0100scn[1]);
 	m_tc0100scn[1]->set_offsets(22, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(2);
 	m_tc0100scn[1]->set_multiscr_hack(1);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
-	TC0110PCR(config, m_tc0110pcr[1], 0);
+	TC0110PCR(config, m_tc0110pcr[1]);
 
-	TC0100SCN(config, m_tc0100scn[2], 0);
+	TC0100SCN(config, m_tc0100scn[2]);
 	m_tc0100scn[2]->set_offsets(22, 0);
 	m_tc0100scn[2]->set_multiscr_xoffs(4);
 	m_tc0100scn[2]->set_multiscr_hack(1);
 	m_tc0100scn[2]->set_palette(m_tc0110pcr[2]);
 
-	TC0110PCR(config, m_tc0110pcr[2], 0);
+	TC0110PCR(config, m_tc0110pcr[2]);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -800,9 +800,9 @@ void ninjaw_state::ninjaw(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-//  SUBWOOFER(config, "subwoofer", 0);
+//  SUBWOOFER(config, "subwoofer");
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->set_master_tag(m_maincpu);
 	m_tc0140syt->set_slave_tag("audiocpu");
 }
@@ -825,7 +825,7 @@ void ninjaw_state::darius2(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(16000000/1024));  /* CPU slices */
 	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -864,29 +864,29 @@ void ninjaw_state::darius2(machine_config &config)
 	rscreen.set_screen_update(FUNC(ninjaw_state::screen_update_right));
 	rscreen.set_palette(m_tc0110pcr[2]);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(22, 0);
 	m_tc0100scn[0]->set_multiscr_xoffs(0);
 	m_tc0100scn[0]->set_multiscr_hack(0);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
-	TC0110PCR(config, m_tc0110pcr[0], 0);
+	TC0110PCR(config, m_tc0110pcr[0]);
 
-	TC0100SCN(config, m_tc0100scn[1], 0);
+	TC0100SCN(config, m_tc0100scn[1]);
 	m_tc0100scn[1]->set_offsets(22, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(2);
 	m_tc0100scn[1]->set_multiscr_hack(1);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
-	TC0110PCR(config, m_tc0110pcr[1], 0);
+	TC0110PCR(config, m_tc0110pcr[1]);
 
-	TC0100SCN(config, m_tc0100scn[2], 0);
+	TC0100SCN(config, m_tc0100scn[2]);
 	m_tc0100scn[2]->set_offsets(22, 0);
 	m_tc0100scn[2]->set_multiscr_xoffs(4);
 	m_tc0100scn[2]->set_multiscr_hack(1);
 	m_tc0100scn[2]->set_palette(m_tc0110pcr[2]);
 
-	TC0110PCR(config, m_tc0110pcr[2], 0);
+	TC0110PCR(config, m_tc0110pcr[2]);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -906,9 +906,9 @@ void ninjaw_state::darius2(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-//  SUBWOOFER(config, "subwoofer", 0);
+//  SUBWOOFER(config, "subwoofer");
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->set_master_tag(m_maincpu);
 	m_tc0140syt->set_slave_tag("audiocpu");
 }

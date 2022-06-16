@@ -33,7 +33,7 @@ public:
 	uint64_t internal_update(uint64_t current_time);
 
 protected:
-	h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_device<h8_device> cpu;
 	h8_intc_device *intc;
@@ -93,9 +93,9 @@ protected:
 
 class h8_adc_3337_device : public h8_adc_device {
 public:
-	h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
-		: h8_adc_3337_device(mconfig, tag, owner, 0)
+		: h8_adc_3337_device(mconfig, tag, owner)
 	{
 		set_info(intc_tag, vect);
 	}
@@ -107,9 +107,9 @@ protected:
 
 class h8_adc_3006_device : public h8_adc_device {
 public:
-	h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
-		: h8_adc_3006_device(mconfig, tag, owner, 0)
+		: h8_adc_3006_device(mconfig, tag, owner)
 	{
 		set_info(intc_tag, vect);
 	}
@@ -121,9 +121,9 @@ protected:
 
 class h8_adc_2245_device : public h8_adc_device {
 public:
-	h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
-		: h8_adc_2245_device(mconfig, tag, owner, 0)
+		: h8_adc_2245_device(mconfig, tag, owner)
 	{
 		set_info(intc_tag, vect);
 	}
@@ -135,9 +135,9 @@ protected:
 
 class h8_adc_2320_device : public h8_adc_device {
 public:
-	h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
-		: h8_adc_2320_device(mconfig, tag, owner, 0)
+		: h8_adc_2320_device(mconfig, tag, owner)
 	{
 		set_info(intc_tag, vect);
 	}
@@ -149,9 +149,9 @@ protected:
 
 class h8_adc_2357_device : public h8_adc_device {
 public:
-	h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
-		: h8_adc_2357_device(mconfig, tag, owner, 0)
+		: h8_adc_2357_device(mconfig, tag, owner)
 	{
 		set_info(intc_tag, vect);
 	}
@@ -163,9 +163,9 @@ protected:
 
 class h8_adc_2655_device : public h8_adc_device {
 public:
-	h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc_tag, int vect)
-		: h8_adc_2655_device(mconfig, tag, owner, 0)
+		: h8_adc_2655_device(mconfig, tag, owner)
 	{
 		set_info(intc_tag, vect);
 	}

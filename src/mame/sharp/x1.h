@@ -41,7 +41,7 @@ class x1_keyboard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	virtual void device_start() override;

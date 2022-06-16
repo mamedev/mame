@@ -53,12 +53,12 @@ class a2bus_echoii_device:
 {
 public:
 	// construction/destruction
-	a2bus_echoii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_echoii_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_device<tms5220_device> m_tms;
 
 protected:
-	a2bus_echoii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_echoii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -88,7 +88,7 @@ private:
 void a2bus_echoii_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "echoii").front_center();
-	tms5220_device &tms(TMS5220(config, TMS_TAG, 640000));
+	tms5220_device &tms(TMS5220(config, TMS_TAG, XTAL::u(640000)));
 	// Note the Echo II card has an R/C circuit (and sometimes a 'FREQ' potentiometer) to control the tms5220[c]'s clock frequency; 640khz is
 	//   the nominal '8khz' value according to the TMS5220 datasheet.
 	// The EchoIIb card however has a 74LS92 which divides the apple2's Q3 ((14.318/7)MHz asymmetrical) clock by 6 to produce a 681.809khz/2
@@ -107,14 +107,14 @@ void a2bus_echoii_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_echoii_device::a2bus_echoii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_echoii_device::a2bus_echoii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
-a2bus_echoii_device::a2bus_echoii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_echoii_device::a2bus_echoii_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_echoii_device(mconfig, A2BUS_ECHOII, tag, owner, clock)
 {
 }

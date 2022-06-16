@@ -10,7 +10,7 @@ class catseye_device: public device_t
 public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
-	catseye_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	catseye_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t vram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -43,7 +43,7 @@ public:
 protected:
 
 	required_shared_ptr_array<u8, 2> m_vram;
-	catseye_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	catseye_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	devcb_write8 m_int_write_func;
 	TIMER_CALLBACK_MEMBER(blink_callback);

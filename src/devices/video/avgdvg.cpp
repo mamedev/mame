@@ -26,7 +26,7 @@
  *
  *************************************/
 
-#define MASTER_CLOCK (12096000)
+#define MASTER_CLOCK XTAL::u(12096000)
 #define VGSLICE      (10000)
 #define VGVECTOR 0
 #define VGCLIP 1
@@ -1417,7 +1417,7 @@ void avg_bzone_device::device_start()
 }
 
 
-avgdvg_device_base::avgdvg_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+avgdvg_device_base::avgdvg_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_vector(*this, finder_base::DUMMY_TAG),
 	m_memspace(*this, finder_base::DUMMY_TAG, -1),
@@ -1443,46 +1443,46 @@ avgdvg_device_base::avgdvg_device_base(const machine_config &mconfig, device_typ
 {
 }
 
-dvg_device::dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+dvg_device::dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	avgdvg_device_base(mconfig, DVG, tag, owner, clock)
 {
 }
 
-avg_device::avg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+avg_device::avg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	avg_device(mconfig, AVG, tag, owner, clock)
 {
 }
 
-avg_device::avg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+avg_device::avg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	avgdvg_device_base(mconfig, type, tag, owner, clock)
 {
 }
 
-avg_tempest_device::avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+avg_tempest_device::avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	avg_device(mconfig, AVG_TEMPEST, tag, owner, clock),
 	m_colorram(*this, "colorram")
 {
 }
 
-avg_mhavoc_device::avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+avg_mhavoc_device::avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	avg_device(mconfig, AVG_MHAVOC, tag, owner, clock),
 	m_colorram(*this, "colorram"),
 	m_bank_region(*this, DEVICE_SELF)
 {
 }
 
-avg_starwars_device::avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+avg_starwars_device::avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	avg_device(mconfig, AVG_STARWARS, tag, owner, clock)
 {
 }
 
-avg_quantum_device::avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+avg_quantum_device::avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	avg_device(mconfig, AVG_QUANTUM, tag, owner, clock),
 	m_colorram(*this, "colorram")
 {
 }
 
-avg_bzone_device::avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+avg_bzone_device::avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	avg_device(mconfig, AVG_BZONE, tag, owner, clock)
 {
 }

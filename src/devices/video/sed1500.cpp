@@ -34,25 +34,25 @@ DEFINE_DEVICE_TYPE(SED1503, sed1503_device, "sed1503", "Epson SED1503 LCD Driver
 //  constructor
 //-------------------------------------------------
 
-sed1500_device::sed1500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cmax, u8 smax) :
+sed1500_device::sed1500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 cmax, u8 smax) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_cmax(cmax), m_smax(smax),
 	m_write_segs(*this)
 { }
 
-sed1500_device::sed1500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+sed1500_device::sed1500_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sed1500_device(mconfig, SED1500, tag, owner, clock, 8, 42)
 { }
 
-sed1501_device::sed1501_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+sed1501_device::sed1501_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sed1500_device(mconfig, SED1501, tag, owner, clock, 10, 40)
 { }
 
-sed1502_device::sed1502_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+sed1502_device::sed1502_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sed1500_device(mconfig, SED1502, tag, owner, clock, 16, 34)
 { }
 
-sed1503_device::sed1503_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+sed1503_device::sed1503_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sed1500_device(mconfig, SED1503, tag, owner, clock, 8+8, 42)
 { }
 

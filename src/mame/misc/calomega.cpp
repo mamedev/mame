@@ -4590,7 +4590,7 @@ void calomega_state::sys903(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
@@ -4600,7 +4600,7 @@ void calomega_state::sys903(machine_config &config)
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: unknown reads.
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
@@ -4635,7 +4635,7 @@ void calomega_state::sys903(machine_config &config)
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	// acia 0
-	ACIA6850(config, m_acia6850[0], 0);
+	ACIA6850(config, m_acia6850[0]);
 	m_acia6850[0]->irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
 	clock_device &aciabaud(CLOCK(config, "aciabaud", UART_CLOCK));
@@ -4663,7 +4663,7 @@ void calomega_state::sys903kb(machine_config &config)
 	m_kstec->t0_in_cb().set("uart", FUNC(i8251_device::txrdy_r));                                    // uart tx handshake
 	m_kstec->t1_in_cb().set([this] () { return calomega_state::m_rxrdy; });                          // uart rx handshake
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
@@ -4673,7 +4673,7 @@ void calomega_state::sys903kb(machine_config &config)
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: unknown reads.
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
@@ -4708,11 +4708,11 @@ void calomega_state::sys903kb(machine_config &config)
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	// acia 0
-	ACIA6850(config, m_acia6850[0], 0);
+	ACIA6850(config, m_acia6850[0]);
 	m_acia6850[0]->txd_handler().set("uart", FUNC(i8251_device::write_rxd));
 	m_acia6850[0]->irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	I8251(config, m_uart, 5'185'000);
+	I8251(config, m_uart, XTAL::u(5'185'000));
 	m_uart->txd_handler().set("acia6850_0", FUNC(acia6850_device::write_rxd));
 	m_uart->rxrdy_handler().set([this] (int state) { calomega_state::m_rxrdy = state;});
 

@@ -554,7 +554,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl_unknown_state::timer3 )
 
 void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &config)
 {
-	UNSP_20(config, m_maincpu, 96000000); // internal ROM uses unsp2.0 opcodes, unknown clock
+	UNSP_20(config, m_maincpu, XTAL::u(96000000)); // internal ROM uses unsp2.0 opcodes, unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpl_unknown_state::map);
 	m_maincpu->set_vectorbase(0x4010); // there is also a set of vectors for what looks to be a burn-in test at 4000, maybe external pin selects?
 
@@ -568,7 +568,7 @@ void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &conf
 	m_screen->set_palette(m_palette);
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 
 	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer), attotime::from_hz(200000)); // draw timer (pushes pixels to the display in the IRQ)
 	TIMER(config, "timer2").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer2), attotime::from_hz(1000)); // game speed?

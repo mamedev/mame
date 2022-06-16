@@ -15,7 +15,7 @@ class vt82c505_device : public device_t, public pci_device_interface
 {
 public:
 	// construction/destruction
-	vt82c505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vt82c505_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) override;

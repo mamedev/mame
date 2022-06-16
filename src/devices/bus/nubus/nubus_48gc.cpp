@@ -323,7 +323,7 @@ uint32_t jmfb_device::palette_entries() const noexcept
 //  jmfb_device - constructor
 //-------------------------------------------------
 
-jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -335,12 +335,12 @@ jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const 
 	set_screen(*this, GC48_SCREEN_NAME);
 }
 
-nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	jmfb_device(mconfig, NUBUS_MDC48, tag, owner, clock)
 {
 }
 
-nubus_824gc_device::nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_824gc_device::nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	jmfb_device(mconfig, NUBUS_MDC824, tag, owner, clock)
 {
 }

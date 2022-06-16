@@ -413,7 +413,7 @@ inline void abc77_device::key_down(int state)
 //  abc77_device - constructor
 //-------------------------------------------------
 
-abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	abc_keyboard_interface(mconfig, *this),
 	m_maincpu(*this, I8035_TAG),
@@ -428,10 +428,10 @@ abc77_device::abc77_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-abc55_device::abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc55_device::abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	abc77_device(mconfig, ABC55, tag, owner, clock) { }
 
-abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	abc77_device(mconfig, ABC77, tag, owner, clock) { }
 
 

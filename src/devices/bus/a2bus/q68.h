@@ -33,7 +33,7 @@ class a2bus_68k_device:
 	public device_a2bus_card_interface
 {
 protected:
-	a2bus_68k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_68k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -56,7 +56,7 @@ private:
 class a2bus_q68_device : public a2bus_68k_device
 {
 public:
-	a2bus_q68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_q68_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -68,7 +68,7 @@ private:
 class a2bus_q68plus_device : public a2bus_68k_device
 {
 public:
-	a2bus_q68plus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_q68plus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static auto parent_rom_device_type() { return &A2BUS_Q68; }
 

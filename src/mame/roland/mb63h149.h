@@ -21,7 +21,7 @@ class mb63h149_device : public device_t
 {
 public:
 	// device type constructor
-	mb63h149_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mb63h149_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto int_callback() { return m_int_callback.bind(); }
@@ -31,7 +31,7 @@ public:
 	void write(offs_t offset, u8 data);
 
 protected:
-	mb63h149_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	mb63h149_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-specific overrides
 	virtual void device_resolve_objects() override;
@@ -49,7 +49,7 @@ class mb63h130_device : public mb63h149_device
 {
 public:
 	// device type constructor
-	mb63h130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mb63h130_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

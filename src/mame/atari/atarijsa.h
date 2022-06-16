@@ -54,7 +54,7 @@ class atari_jsa_base_device :   public device_t,
 {
 protected:
 	// construction/destruction
-	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels);
+	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, const XTAL &clock, int channels);
 
 public:
 	// configuration
@@ -125,7 +125,7 @@ class atari_jsa_oki_base_device : public atari_jsa_base_device
 {
 protected:
 	// derived construction/destruction
-	atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels);
+	atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, const XTAL &clock, int channels);
 
 public:
 	// read/write handlers
@@ -169,7 +169,7 @@ class atari_jsa_i_device : public atari_jsa_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// read/write handlers
 	uint8_t rdio_r();
@@ -207,7 +207,7 @@ class atari_jsa_ii_device : public atari_jsa_oki_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// read/write handlers
 	uint8_t rdio_r();
@@ -228,13 +228,13 @@ class atari_jsa_iii_device : public atari_jsa_oki_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void atarijsa3_map(address_map &map);
 	void jsa3_oki1_map(address_map &map);
 protected:
 	// derived construction/destruction
-	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels);
+	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, const XTAL &clock, int channels);
 
 public:
 	// read/write handlers
@@ -255,7 +255,7 @@ class atari_jsa_iiis_device : public atari_jsa_iii_device
 {
 public:
 	// construction/destruction
-	atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void jsa3_oki2_map(address_map &map);
 protected:

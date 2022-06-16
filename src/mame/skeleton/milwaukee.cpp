@@ -62,22 +62,22 @@ void milwaukee_state::milwaukee(machine_config &config)
 	M6502(config, m_maincpu, 16_MHz_XTAL / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &milwaukee_state::mem_map);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(16_MHz_XTAL / 16 / 4); // 250 kHz
 	pit.out_handler<0>().set("pit", FUNC(pit8253_device::write_gate0)).invert();
 	pit.set_clk<1>(16_MHz_XTAL / 2 / 13 / 2048 / 5); // 60.09 Hz?
 	pit.out_handler<1>().set("pit", FUNC(pit8253_device::write_clk2)).invert();
 
-	PIA6821(config, "pia1",  0);
-	PIA6821(config, "pia2",  0);
-	ACIA6850(config, "acia2", 0);
-	MC6852(config, "ssda", 0);
+	PIA6821(config, "pia1");
+	PIA6821(config, "pia2");
+	ACIA6850(config, "acia2");
+	MC6852(config, "ssda");
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 16_MHz_XTAL / 2 / 13 / 4));
 	acia_clock.signal_handler().set("acia1", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_rxc));
 
-	acia6850_device &acia1(ACIA6850(config, "acia1", 0));
+	acia6850_device &acia1(ACIA6850(config, "acia1"));
 	acia1.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia1.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 

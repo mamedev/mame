@@ -26,7 +26,7 @@ class spectrum_protek_device :
 {
 public:
 	// construction/destruction
-	spectrum_protek_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_protek_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

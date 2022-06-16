@@ -825,9 +825,9 @@ void mastboy_state::mastboy(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SAA1099(config, "saa", 6000000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SAA1099(config, "saa", XTAL::u(6000000)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(mastboy_state::adpcm_int));  // interrupt function
 	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);      // 4KHz 4-bit
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);

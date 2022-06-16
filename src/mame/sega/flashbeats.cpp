@@ -127,7 +127,7 @@ void flashbeats_state::flashbeats(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &flashbeats_state::flashbeats_map);
 	m_maincpu->set_addrmap(AS_IO, &flashbeats_state::flashbeats_io_map);
 
-	M68000(config, m_scspcpu, 11289600);
+	M68000(config, m_scspcpu, XTAL::u(11289600));
 	m_scspcpu->set_addrmap(AS_PROGRAM, &flashbeats_state::main_scsp_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -148,7 +148,7 @@ void flashbeats_state::flashbeats(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SCSP(config, m_scsp, 22579200); // TODO : Unknown clock, divider
+	SCSP(config, m_scsp, XTAL::u(22579200)); // TODO : Unknown clock, divider
 	m_scsp->set_addrmap(0, &flashbeats_state::scsp_mem);
 	m_scsp->irq_cb().set(FUNC(flashbeats_state::scsp_irq));
 	m_scsp->add_route(0, "lspeaker", 1.0);

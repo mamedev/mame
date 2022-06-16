@@ -24,7 +24,7 @@
 
 #include "machine/timehelp.h"
 
-k573mcal_device::k573mcal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+k573mcal_device::k573mcal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	jvs_device(mconfig, KONAMI_573_MASTER_CALENDAR, tag, owner, clock),
 	m_in1(*this, "IN1"),
 	seconds(0),

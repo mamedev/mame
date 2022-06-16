@@ -45,7 +45,7 @@ void sam_sid8580_device::device_add_mconfig(machine_config &config)
 //  sam_sid_device - constructor
 //-------------------------------------------------
 
-sam_sid_device::sam_sid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+sam_sid_device::sam_sid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_samcoupe_expansion_interface(mconfig, *this),
 	m_sid(*this, "sid")
@@ -56,7 +56,7 @@ sam_sid_device::sam_sid_device(const machine_config &mconfig, device_type type, 
 //  sam_sid6581_device - constructor
 //-------------------------------------------------
 
-sam_sid6581_device::sam_sid6581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sam_sid6581_device::sam_sid6581_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sam_sid_device(mconfig, SAM_SID6581, tag, owner, clock)
 {
 }
@@ -65,7 +65,7 @@ sam_sid6581_device::sam_sid6581_device(const machine_config &mconfig, const char
 //  sam_sid8580_device - constructor
 //-------------------------------------------------
 
-sam_sid8580_device::sam_sid8580_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sam_sid8580_device::sam_sid8580_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sam_sid_device(mconfig, SAM_SID8580, tag, owner, clock)
 {
 }

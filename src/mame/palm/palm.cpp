@@ -202,7 +202,7 @@ void palm_state::palm(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 static INPUT_PORTS_START( palm )

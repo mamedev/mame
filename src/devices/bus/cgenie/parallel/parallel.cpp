@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(CG_PARALLEL_SLOT, cg_parallel_slot_device, "cg_parallel_slot"
 //  cg_parallel_slot_device - constructor
 //-------------------------------------------------
 
-cg_parallel_slot_device::cg_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cg_parallel_slot_device::cg_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CG_PARALLEL_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_cg_parallel_interface>(mconfig, *this),
 	m_cart(nullptr)

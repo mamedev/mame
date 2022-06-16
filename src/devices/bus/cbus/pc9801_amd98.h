@@ -24,7 +24,7 @@ class pc9801_amd98_device : public device_t
 {
 public:
 	// construction/destruction
-	pc9801_amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc9801_amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 

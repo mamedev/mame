@@ -462,13 +462,13 @@ class tm990_189_rs232_image_device : public device_t, public device_image_interf
 {
 public:
 	// construction/destruction
-	template <typename T> tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&tms_tag)
+	template <typename T> tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&tms_tag)
 		: tm990_189_rs232_image_device(mconfig, tag, owner, clock)
 	{
 		m_tms9902.set_tag(std::forward<T>(tms_tag));
 	}
 
-	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// image-level overrides
 	virtual bool is_readable()  const noexcept override { return true; }
@@ -495,7 +495,7 @@ protected:
 
 DEFINE_DEVICE_TYPE(TM990_189_RS232, tm990_189_rs232_image_device, "tm990_189_rs232_image", "TM990/189 RS232 port")
 
-tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TM990_189_RS232, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, m_tms9902(*this, finder_base::DUMMY_TAG)
@@ -848,7 +848,7 @@ void tm990189_state::tm990_189(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	CASSETTE(config, "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
 	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
@@ -911,7 +911,7 @@ void tm990189_state::tm990_189_v(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);   /* one two-level buzzer */
 
 	/* Devices */
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	CASSETTE(config, "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
 	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));

@@ -21,7 +21,7 @@ public:
 		AS_OFFSETS = 2
 	};
 
-	meg_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u32 prg_size);
+	meg_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 prg_size);
 
 	void prg_w(u16 address, u64 opcode);
 	void fp_w(u16 address, u16 value);
@@ -64,13 +64,13 @@ private:
 class meg_embedded_device : public meg_base_device
 {
 public:
-	meg_embedded_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44100*384);
+	meg_embedded_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(44100*384));
 };
 
 class meg_device : public meg_base_device
 {
 public:
-	meg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44100*256);
+	meg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(44100*256));
 	void map(address_map &map);
 
 private:

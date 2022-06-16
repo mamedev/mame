@@ -35,7 +35,7 @@ class ls157_device : public device_t
 {
 public:
 	// construction/destruction
-	ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto a_in_callback() { return m_a_in_cb.bind(); }
 	auto b_in_callback() { return m_b_in_cb.bind(); }
@@ -66,7 +66,7 @@ public:
 	u8 output_r();
 
 protected:
-	ls157_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mask);
+	ls157_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 mask);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -96,7 +96,7 @@ class ls157_x2_device : public ls157_device
 {
 public:
 	// construction/destruction
-	ls157_x2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	ls157_x2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // ======================> hc157_device
@@ -105,7 +105,7 @@ class hc157_device : public ls157_device
 {
 public:
 	// construction/destruction
-	hc157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	hc157_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // ======================> hct157_device
@@ -114,7 +114,7 @@ class hct157_device : public ls157_device
 {
 public:
 	// construction/destruction
-	hct157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	hct157_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 

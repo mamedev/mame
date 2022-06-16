@@ -17,7 +17,7 @@ public:
 	void set_readonly(bool is_readonly) { m_is_readonly = is_readonly; }
 
 	// construction/destruction
-	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// image-level overrides
 	virtual image_init_result call_load() override;

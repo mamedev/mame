@@ -54,10 +54,10 @@ O36 48 |  *                                             | 13 K2
 class sm500_device : public sm510_base_device
 {
 public:
-	sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
+	sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(32768));
 
 protected:
-	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	void program_1_2k(address_map &map);
 	void data_4x10x4(address_map &map);

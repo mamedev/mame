@@ -22,7 +22,7 @@ class saitekosa_sparc_device : public device_t, public device_saitekosa_expansio
 {
 public:
 	// construction/destruction
-	saitekosa_sparc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	saitekosa_sparc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// from host
 	virtual u8 data_r() override;

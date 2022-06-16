@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(CMI_ALPHANUMERIC_KEYBOARD, cmi_alphanumeric_keyboard_device, "cmi_ankbd", "Fairlight Intelligent Alphanumeric Keyboard")
 
-cmi_alphanumeric_keyboard_device::cmi_alphanumeric_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cmi_alphanumeric_keyboard_device::cmi_alphanumeric_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CMI_ALPHANUMERIC_KEYBOARD, tag, owner, clock)
 	, m_txd_handler(*this)
 	, m_rts_handler(*this)

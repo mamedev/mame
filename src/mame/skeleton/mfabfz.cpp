@@ -213,7 +213,7 @@ void mfabfz_state::mfabfz(machine_config &config)
 	uart1_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
 	uart1_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart1(I8251(config, "uart1", 0));
+	i8251_device &uart1(I8251(config, "uart1"));
 	uart1.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

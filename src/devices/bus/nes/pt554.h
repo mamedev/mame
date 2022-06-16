@@ -15,7 +15,7 @@ class nes_bandai_pt554_device : public nes_cnrom_device
 {
 public:
 	// construction/destruction
-	nes_bandai_pt554_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_bandai_pt554_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_m(offs_t offset, u8 data) override;
 

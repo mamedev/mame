@@ -39,12 +39,12 @@ DEFINE_DEVICE_TYPE(NES_HENGG_SRICH, nes_hengg_srich_device, "nes_hengg_srich", "
 DEFINE_DEVICE_TYPE(NES_HENGG_XHZS,  nes_hengg_xhzs_device,  "nes_hengg_xhzs",  "NES Cart Henggedianzi Xing He Zhan Shi PCB")
 
 
-nes_hengg_srich_device::nes_hengg_srich_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_hengg_srich_device::nes_hengg_srich_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_HENGG_SRICH, tag, owner, clock)
 {
 }
 
-nes_hengg_xhzs_device::nes_hengg_xhzs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_hengg_xhzs_device::nes_hengg_xhzs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_HENGG_XHZS, tag, owner, clock)
 {
 }

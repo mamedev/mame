@@ -270,7 +270,7 @@ void embargo_state::machine_reset()
 void embargo_state::embargo(machine_config &config)
 {
 	// basic machine hardware
-	S2650(config, m_maincpu, 625000);
+	S2650(config, m_maincpu, XTAL::u(625000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &embargo_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &embargo_state::main_io_map);
 	m_maincpu->set_addrmap(AS_DATA, &embargo_state::main_data_map);

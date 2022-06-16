@@ -42,7 +42,7 @@ void dio32_98550_device::device_add_mconfig(machine_config &config)
 		m_catseye[i]->irq_out_cb().set(FUNC(dio32_98550_device::int_w));
 	}
 
-	NEREID(config, m_nereid, 0);
+	NEREID(config, m_nereid);
 }
 
 const tiny_rom_entry *dio32_98550_device::device_rom_region() const
@@ -63,12 +63,12 @@ device_memory_interface::space_config_vector dio32_98550_device::memory_space_co
 		};
 }
 
-dio32_98550_device::dio32_98550_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dio32_98550_device::dio32_98550_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dio32_98550_device(mconfig, HPDIO_98550, tag, owner, clock)
 {
 }
 
-dio32_98550_device::dio32_98550_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dio32_98550_device::dio32_98550_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this),
 	device_memory_interface(mconfig, *this),

@@ -274,7 +274,7 @@ INPUT_PORTS_END
 void tb303_state::tb303(machine_config &config)
 {
 	// basic machine hardware
-	NEC_D650(config, m_maincpu, 454545); // LC circuit(TI S74230), 2.2us
+	NEC_D650(config, m_maincpu, XTAL::u(454545)); // LC circuit(TI S74230), 2.2us
 	m_maincpu->read_a().set(FUNC(tb303_state::input_r));
 	m_maincpu->read_b().set(FUNC(tb303_state::input_r));
 	m_maincpu->read_c().set(FUNC(tb303_state::ram_data_r));

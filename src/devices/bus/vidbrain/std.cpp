@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(VB_STD, videobrain_standard_cartridge_device, "vb_std", "Vide
 //  videobrain_standard_cartridge_device - constructor
 //-------------------------------------------------
 
-videobrain_standard_cartridge_device::videobrain_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+videobrain_standard_cartridge_device::videobrain_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VB_STD, tag, owner, clock),
 	device_videobrain_expansion_card_interface(mconfig, *this)
 {

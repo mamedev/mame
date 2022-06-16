@@ -550,7 +550,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc1000_state::ne555_tick)
 void mc1000_state::mc1000(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3579545);
+	Z80(config, m_maincpu, XTAL::u(3579545));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mc1000_state::mc1000_mem);
 	m_maincpu->set_addrmap(AS_OPCODES, &mc1000_state::mc1000_banking_mem);
 	m_maincpu->set_addrmap(AS_IO, &mc1000_state::mc1000_io);
@@ -576,7 +576,7 @@ void mc1000_state::mc1000(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay8910(AY8910(config, AY8910_TAG, 3579545/2));
+	ay8910_device &ay8910(AY8910(config, AY8910_TAG, XTAL::u(3579545)/2));
 	ay8910.set_flags(AY8910_SINGLE_OUTPUT);
 	ay8910.set_resistors_load(RES_K(2.2), 0, 0);
 	ay8910.port_b_read_callback().set(FUNC(mc1000_state::keydata_r));

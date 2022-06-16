@@ -152,7 +152,7 @@ agat_keyboard_device::agat_keyboard_device(
 		device_type type,
 		char const *tag,
 		device_t *owner,
-		u32 clock)
+		const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this,
 		"AGATKBD_ROW0", "AGATKBD_ROW1", "AGATKBD_ROW2", "AGATKBD_ROW3", "AGATKBD_ROW4", "AGATKBD_ROW5")
@@ -165,7 +165,7 @@ agat_keyboard_device::agat_keyboard_device(
 }
 
 
-agat_keyboard_device::agat_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+agat_keyboard_device::agat_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: agat_keyboard_device(mconfig, AGAT_KEYBOARD, tag, owner, clock)
 {
 }

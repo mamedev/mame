@@ -937,7 +937,7 @@ static int shift_register15(int &shift)
 //  spu_device - constructor
 //-------------------------------------------------
 
-spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu)
+spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, psxcpu_device *cpu)
 	: spu_device(mconfig, tag, owner, clock)
 {
 	cpu->spu_read().set(tag, FUNC(spu_device::read));
@@ -947,7 +947,7 @@ spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t 
 	irq_handler().set(*cpu->subdevice<psxirq_device>("irq"), FUNC(psxirq_device::intin9));
 }
 
-spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SPU, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_irq_handler(*this),

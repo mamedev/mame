@@ -71,7 +71,7 @@ void decobsmt_device::device_add_mconfig(machine_config &config)
 //  decobsmt_device - constructor
 //-------------------------------------------------
 
-decobsmt_device::decobsmt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+decobsmt_device::decobsmt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DECOBSMT, tag, owner, clock)
 	, m_ourcpu(*this, M6809_TAG)
 	, m_bsmt(*this, BSMT_TAG)

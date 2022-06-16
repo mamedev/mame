@@ -74,7 +74,7 @@ enum
 //  Constructors for basetype
 //-------------------------------------------------
 
-bq4847_device::bq4847_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock)
+bq4847_device::bq4847_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	device_rtc_interface(mconfig, *this),
@@ -92,12 +92,12 @@ bq4847_device::bq4847_device(const machine_config& mconfig, device_type type, co
 {
 }
 
-bq4847_device::bq4847_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bq4847_device::bq4847_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
 	: bq4847_device(mconfig, BQ4847, tag, owner, clock)
 {
 }
 
-bq4845_device::bq4845_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bq4845_device::bq4845_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
 	: bq4847_device(mconfig, BQ4845, tag, owner, clock)
 {
 }

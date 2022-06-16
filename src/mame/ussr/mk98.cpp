@@ -441,10 +441,10 @@ void mk98_state::mk98(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mk98_state::mk98_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(mk98pic_device::inta_cb));
 
-	pit8254_device &pit8254(PIT8254(config, "pit8254", 0));
+	pit8254_device &pit8254(PIT8254(config, "pit8254"));
 	pit8254.set_clk<0>(16000000/2/8); // FIXME unknown clock
 
-	MK98PIC(config, m_pic8259, 0);
+	MK98PIC(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));

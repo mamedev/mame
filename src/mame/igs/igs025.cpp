@@ -16,7 +16,7 @@
 #include "igs025.h"
 
 
-igs025_device::igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+igs025_device::igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IGS025, tag, owner, clock)
 	, m_execute_external(*this, DEVICE_SELF, FUNC(igs025_device::no_callback_setup))
 {

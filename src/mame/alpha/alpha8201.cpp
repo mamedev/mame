@@ -284,7 +284,7 @@ DEFINE_DEVICE_TYPE(ALPHA_8201, alpha_8201_device, "alpha8201", "ALPHA-8201")
 //  alpha_8201_device - constructor
 //-------------------------------------------------
 
-alpha_8201_device::alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+alpha_8201_device::alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ALPHA_8201, tag, owner, clock)
 	, m_mcu(*this, "mcu")
 {

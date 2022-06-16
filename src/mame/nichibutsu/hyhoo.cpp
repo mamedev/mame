@@ -223,7 +223,7 @@ INPUT_PORTS_END
 void hyhoo_state::hyhoo(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5000000);   /* 5.00 MHz ?? */
+	Z80(config, m_maincpu, XTAL::u(5000000));   /* 5.00 MHz ?? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &hyhoo_state::hyhoo_map);
 	m_maincpu->set_addrmap(AS_IO, &hyhoo_state::hyhoo_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(hyhoo_state::irq0_line_hold));
@@ -243,12 +243,12 @@ void hyhoo_state::hyhoo(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1250000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(1250000)));
 	aysnd.port_a_read_callback().set_ioport("DSWA");
 	aysnd.port_b_read_callback().set_ioport("DSWB");
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 

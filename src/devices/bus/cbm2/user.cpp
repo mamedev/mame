@@ -43,7 +43,7 @@ device_cbm2_user_port_interface::device_cbm2_user_port_interface(const machine_c
 //  cbm2_user_port_device - constructor
 //-------------------------------------------------
 
-cbm2_user_port_device::cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cbm2_user_port_device::cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CBM2_USER_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_cbm2_user_port_interface>(mconfig, *this),
 	m_write_irq(*this),

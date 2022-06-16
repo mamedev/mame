@@ -366,10 +366,10 @@ void h8_state::h8(machine_config &config)
 	BEEP(config, m_beep, H8_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* Devices */
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
-	clock_device &cassette_clock(CLOCK(config, "cassette_clock", 4800));
+	clock_device &cassette_clock(CLOCK(config, "cassette_clock", XTAL::u(4800)));
 	cassette_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	cassette_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 

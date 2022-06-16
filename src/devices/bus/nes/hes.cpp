@@ -33,7 +33,7 @@
 DEFINE_DEVICE_TYPE(NES_HES, nes_hes_device, "nes_hes", "NES Cart HES PCB")
 
 
-nes_hes_device::nes_hes_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_hes_device::nes_hes_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_HES, tag, owner, clock)
 {
 }

@@ -466,8 +466,8 @@ void mermaid_state::mermaid(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay8910[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
-	AY8910(config, m_ay8910[1], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, m_ay8910[0], XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, m_ay8910[1], XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void mermaid_state::rougien(machine_config &config)
@@ -484,7 +484,7 @@ void mermaid_state::rougien(machine_config &config)
 
 	m_palette->set_init(FUNC(mermaid_state::rougien_palette));
 
-	MSM5205(config, m_adpcm, 384000);
+	MSM5205(config, m_adpcm, XTAL::u(384000));
 	m_adpcm->vck_callback().set(FUNC(mermaid_state::rougien_adpcm_int));
 	m_adpcm->set_prescaler_selector(msm5205_device::S96_4B);
 	m_adpcm->add_route(ALL_OUTPUTS, "mono", 1.00);

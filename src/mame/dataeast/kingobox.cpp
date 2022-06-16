@@ -464,13 +464,13 @@ void kingofb_state::machine_reset()
 void kingofb_state::kingofb(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);        // 4.0 MHz
+	Z80(config, m_maincpu, XTAL::u(4000000));        // 4.0 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &kingofb_state::kingobox_map);
 
-	Z80(config, m_video_cpu, 4000000);      // 4.0 MHz
+	Z80(config, m_video_cpu, XTAL::u(4000000));      // 4.0 MHz
 	m_video_cpu->set_addrmap(AS_PROGRAM, &kingofb_state::kingobox_video_map);
 
-	Z80(config, m_sprite_cpu, 4000000);     // 4.0 MHz
+	Z80(config, m_sprite_cpu, XTAL::u(4000000));     // 4.0 MHz
 	m_sprite_cpu->set_addrmap(AS_PROGRAM, &kingofb_state::kingobox_sprite_map);
 
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate);
@@ -478,11 +478,11 @@ void kingofb_state::kingofb(machine_config &config)
 	m_nmigate->output_handler().append_inputline(m_video_cpu, INPUT_LINE_NMI);
 	m_nmigate->output_handler().append_inputline(m_sprite_cpu, INPUT_LINE_NMI);
 
-	Z80(config, m_audiocpu, 4000000);       // 4.0 MHz
+	Z80(config, m_audiocpu, XTAL::u(4000000));       // 4.0 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kingofb_state::kingobox_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kingofb_state::kingobox_sound_io_map);
 
-	CLOCK(config, "soundnmi", 6000).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	CLOCK(config, "soundnmi", XTAL::u(6000)).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); // We really need heavy synching among the processors
 
@@ -506,11 +506,11 @@ void kingofb_state::kingofb(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(1500000)));
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // 100K (R30-44 even)/200K (R31-45 odd) ladder network
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.125); // 100K (R30-44 even)/200K (R31-45 odd) ladder network
 }
 
 
@@ -518,13 +518,13 @@ void kingofb_state::kingofb(machine_config &config)
 void kingofb_state::ringking(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);        // 4.0 MHz
+	Z80(config, m_maincpu, XTAL::u(4000000));        // 4.0 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &kingofb_state::ringking_map);
 
-	Z80(config, m_video_cpu, 4000000);      // 4.0 MHz
+	Z80(config, m_video_cpu, XTAL::u(4000000));      // 4.0 MHz
 	m_video_cpu->set_addrmap(AS_PROGRAM, &kingofb_state::ringking_video_map);
 
-	Z80(config, m_sprite_cpu, 4000000);     // 4.0 MHz
+	Z80(config, m_sprite_cpu, XTAL::u(4000000));     // 4.0 MHz
 	m_sprite_cpu->set_addrmap(AS_PROGRAM, &kingofb_state::ringking_sprite_map);
 
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate);
@@ -532,11 +532,11 @@ void kingofb_state::ringking(machine_config &config)
 	m_nmigate->output_handler().append_inputline(m_video_cpu, INPUT_LINE_NMI);
 	m_nmigate->output_handler().append_inputline(m_sprite_cpu, INPUT_LINE_NMI);
 
-	Z80(config, m_audiocpu, 4000000);       // 4.0 MHz
+	Z80(config, m_audiocpu, XTAL::u(4000000));       // 4.0 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kingofb_state::kingobox_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kingofb_state::ringking_sound_io_map);
 
-	CLOCK(config, "soundnmi", 6000).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	CLOCK(config, "soundnmi", XTAL::u(6000)).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); // We really need heavy synching among the processors
 
@@ -560,11 +560,11 @@ void kingofb_state::ringking(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(1500000)));
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.125); // unknown DAC
 }
 
 

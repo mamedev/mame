@@ -23,7 +23,7 @@
 DEFINE_DEVICE_TYPE(MD_ROM_SK, md_rom_sk_device, "md_rom_sk", "MD Sonic & Knuckles")
 
 
-md_rom_sk_device::md_rom_sk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+md_rom_sk_device::md_rom_sk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_md_cart_interface(mconfig, *this)
 	, m_exp(*this, "subslot")
@@ -31,7 +31,7 @@ md_rom_sk_device::md_rom_sk_device(const machine_config &mconfig, device_type ty
 {
 }
 
-md_rom_sk_device::md_rom_sk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_sk_device::md_rom_sk_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_rom_sk_device(mconfig, MD_ROM_SK, tag, owner, clock)
 {
 }

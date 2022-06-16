@@ -25,12 +25,12 @@ class efo_zsu_device : public device_t
 {
 public:
 	// construction/destruction
-	efo_zsu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	efo_zsu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void sound_command_w(u8 data);
 
 protected:
-	efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -75,7 +75,7 @@ class efo_zsu1_device : public efo_zsu_device
 {
 public:
 	// construction/destruction
-	efo_zsu1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	efo_zsu1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 
@@ -83,7 +83,7 @@ class cedar_magnet_sound_device : public efo_zsu_device, public cedar_magnet_boa
 {
 public:
 	// construction/destruction
-	cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

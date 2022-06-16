@@ -13,7 +13,7 @@
 DEFINE_DEVICE_TYPE(CEDAR_MAGNET_SPRITE, cedar_magnet_sprite_device, "cedmag_sprite", "Cedar Sprite")
 
 
-cedar_magnet_sprite_device::cedar_magnet_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cedar_magnet_sprite_device::cedar_magnet_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CEDAR_MAGNET_SPRITE, tag, owner, clock)
 	, cedar_magnet_board_interface(mconfig, *this, "spritecpu", "ram")
 	, m_sprite_ram_bankdev(*this, "sp_sub_ram")
@@ -200,25 +200,25 @@ void cedar_magnet_sprite_device::sprite_port9c_w(u8 data)
 
 void cedar_magnet_sprite_device::device_add_mconfig(machine_config &config)
 {
-	z80_device &spritecpu(Z80(config, "spritecpu", 4000000));
+	z80_device &spritecpu(Z80(config, "spritecpu", XTAL::u(4000000)));
 	spritecpu.set_addrmap(AS_PROGRAM, &cedar_magnet_sprite_device::cedar_magnet_sprite_map);
 	spritecpu.set_addrmap(AS_IO, &cedar_magnet_sprite_device::cedar_magnet_sprite_io);
 
-	Z80PIO(config, m_pio[0], 4000000/2);
+	Z80PIO(config, m_pio[0], XTAL::u(4000000)/2);
 //  m_pio[0]->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 	m_pio[0]->in_pa_callback().set(FUNC(cedar_magnet_sprite_device::pio0_pa_r));
 	m_pio[0]->out_pa_callback().set(FUNC(cedar_magnet_sprite_device::pio0_pa_w));
 //  m_pio[0]->in_pb_callback().set(FUNC(cedar_magnet_sprite_device::pio0_pb_r));
 	m_pio[0]->out_pb_callback().set(FUNC(cedar_magnet_sprite_device::pio0_pb_w));
 
-	Z80PIO(config, m_pio[1], 4000000/2);
+	Z80PIO(config, m_pio[1], XTAL::u(4000000)/2);
 //  m_pio[1]->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 //  m_pio[1]->in_pa_callback().set(FUNC(cedar_magnet_sprite_device::pio1_pa_r));
 	m_pio[1]->out_pa_callback().set(FUNC(cedar_magnet_sprite_device::pio1_pa_w));
 //  m_pio[1]->in_pb_callback().set(FUNC(cedar_magnet_sprite_device::pio1_pb_r));
 	m_pio[1]->out_pb_callback().set(FUNC(cedar_magnet_sprite_device::pio1_pb_w));
 
-	Z80PIO(config, m_pio[2], 4000000/2);
+	Z80PIO(config, m_pio[2], XTAL::u(4000000)/2);
 //  m_pio[2]->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 //  m_pio[2]->in_pa_callback().set(FUNC(cedar_magnet_sprite_device::pio2_pa_r));
 	m_pio[2]->out_pa_callback().set(FUNC(cedar_magnet_sprite_device::pio2_pa_w));

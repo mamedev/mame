@@ -14,7 +14,7 @@
 class ks0164_device : public device_t, public device_sound_interface, public device_memory_interface, public device_serial_interface
 {
 public:
-	ks0164_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 16934400);
+	ks0164_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(16934400));
 
 	void mpu401_data_w(u8 data);
 	void mpu401_ctrl_w(u8 data);

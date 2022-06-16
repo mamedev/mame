@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(AM25S558, am25s558_device, "am25s558", "AMD Am25S558 Combinat
 //  am25s55x_device - constructor
 //-------------------------------------------------
 
-am25s55x_device::am25s55x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+am25s55x_device::am25s55x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_x_in(0)
 	, m_y_in(0)
@@ -32,13 +32,13 @@ am25s55x_device::am25s55x_device(const machine_config &mconfig, device_type type
 {
 }
 
-am25s557_device::am25s557_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+am25s557_device::am25s557_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: am25s55x_device(mconfig, AM25S557, tag, owner, clock)
 	, m_r(false)
 {
 }
 
-am25s558_device::am25s558_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+am25s558_device::am25s558_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: am25s55x_device(mconfig, AM25S558, tag, owner, clock)
 {
 }

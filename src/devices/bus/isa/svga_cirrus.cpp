@@ -36,7 +36,7 @@ void isa16_svga_cirrus_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5430_device::screen_update));
 
-	CIRRUS_GD5430(config, m_vga, 0);
+	CIRRUS_GD5430(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
 }
@@ -58,7 +58,7 @@ const tiny_rom_entry *isa16_svga_cirrus_device::device_rom_region() const
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa16_svga_cirrus_device::isa16_svga_cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa16_svga_cirrus_device::isa16_svga_cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA16_SVGA_CIRRUS, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
 	m_vga(*this, "vga")
@@ -116,7 +116,7 @@ void isa16_svga_cirrus_gd542x_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
 
-	CIRRUS_GD5428(config, m_vga, 0);
+	CIRRUS_GD5428(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
 }
@@ -138,7 +138,7 @@ const tiny_rom_entry *isa16_svga_cirrus_gd542x_device::device_rom_region() const
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa16_svga_cirrus_gd542x_device::isa16_svga_cirrus_gd542x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa16_svga_cirrus_gd542x_device::isa16_svga_cirrus_gd542x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA16_SVGA_CIRRUS_GD542X, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
 	m_vga(*this, "vga")

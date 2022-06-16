@@ -51,7 +51,7 @@ public:
 
 protected:
 	// construction/destruction
-	m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, address_map_constructor internal_map);
+	m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int addrbits, address_map_constructor internal_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -90,10 +90,10 @@ private:
 class m50740_device : public m5074x_device
 {
 public:
-	m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	m50740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	m50740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	void m50740_map(address_map &map);
@@ -102,10 +102,10 @@ private:
 class m50741_device : public m5074x_device
 {
 public:
-	m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	m50741_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	m50741_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	void m50741_map(address_map &map);
@@ -114,7 +114,7 @@ private:
 class m50753_device : public m5074x_device
 {
 public:
-	m50753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m50753_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	enum
 	{
@@ -127,7 +127,7 @@ public:
 	auto read_in_p() { return m_in_p.bind(); }
 
 protected:
-	m50753_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	m50753_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

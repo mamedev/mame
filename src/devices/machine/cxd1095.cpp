@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(CXD1095, cxd1095_device, "cxd1095", "CXD1095 I/O Expander")
 //  cxd1095_device - constructor
 //-------------------------------------------------
 
-cxd1095_device::cxd1095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cxd1095_device::cxd1095_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CXD1095, tag, owner, clock)
 	, m_input_cb(*this)
 	, m_output_cb(*this)

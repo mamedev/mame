@@ -28,13 +28,13 @@
 class xmap9_device : public device_t
 {
 public:
-	xmap9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t revision)
+	xmap9_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t revision)
 		: xmap9_device(mconfig, tag, owner, clock)
 	{
 		set_revision(revision);
 	}
 
-	xmap9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xmap9_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t read(uint32_t offset);
 	void write(uint32_t offset, uint32_t data);
@@ -79,13 +79,13 @@ class cmap_device : public device_t
 				  , public device_palette_interface
 {
 public:
-	cmap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t revision)
+	cmap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t revision)
 		: cmap_device(mconfig, tag, owner, clock)
 	{
 		set_revision(revision);
 	}
 
-	cmap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cmap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t read(uint32_t offset);
 	void write(uint32_t offset, uint32_t data);
@@ -125,7 +125,7 @@ DECLARE_DEVICE_TYPE(CMAP, cmap_device)
 class vc2_device : public device_t
 {
 public:
-	vc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vc2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t read(uint32_t offset);
 	void write(uint32_t offset, uint32_t data, uint32_t mem_mask);
@@ -221,13 +221,13 @@ DECLARE_DEVICE_TYPE(VC2, vc2_device)
 class rb2_device : public device_t
 {
 public:
-	rb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t global_mask)
+	rb2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t global_mask)
 		: rb2_device(mconfig, tag, owner, clock)
 	{
 		set_global_mask(global_mask);
 	}
 
-	rb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rb2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Getters
 	const uint32_t *rgbci(int y) const { return &m_rgbci[1344 * y]; }
@@ -290,7 +290,7 @@ class newport_base_device : public device_t
 						  , public device_gio64_card_interface
 {
 public:
-	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint64_t rex3_r(offs_t offset, uint64_t mem_mask = ~0);
 	void rex3_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
@@ -528,7 +528,7 @@ protected:
 class gio64_xl8_device : public newport_base_device
 {
 public:
-	gio64_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	gio64_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -537,7 +537,7 @@ protected:
 class gio64_xl24_device : public newport_base_device
 {
 public:
-	gio64_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	gio64_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

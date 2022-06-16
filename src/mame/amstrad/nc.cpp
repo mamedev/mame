@@ -1351,7 +1351,7 @@ INPUT_PORTS_END
 void nc_state::nc_base(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, /*6000000*/ 4606000);        /* Russell Marks says this is more accurate */
+	Z80(config, m_maincpu, XTAL::u(/*6000000*/ 4606000));        /* Russell Marks says this is more accurate */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nc_state::nc_map);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -1365,8 +1365,8 @@ void nc_state::nc_base(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper1, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
-	BEEP(config, m_beeper2, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper1).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper2).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -1376,9 +1376,9 @@ void nc_state::nc_base(machine_config &config)
 	m_centronics->set_output_latch(cent_data_out);
 
 	/* uart */
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 19200));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(19200)));
 	uart_clock.signal_handler().set(FUNC(nc_state::write_uart_clock));
 
 	/* cartridge */
@@ -1446,7 +1446,7 @@ void nc200_state::nc200(machine_config &config)
 	m_uart->rxrdy_handler().set(FUNC(nc200_state::nc200_rxrdy_callback));
 	m_uart->txrdy_handler().set(FUNC(nc200_state::nc200_txrdy_callback));
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(nc200_state::nc200_fdc_interrupt));
 	FLOPPY_CONNECTOR(config, "upd765:0", ibmpc_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", ibmpc_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);

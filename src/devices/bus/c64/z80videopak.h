@@ -28,7 +28,7 @@ class c64_z80videopak_device : public c64_cpm_cartridge_device
 {
 public:
 	// construction/destruction
-	c64_z80videopak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64_z80videopak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

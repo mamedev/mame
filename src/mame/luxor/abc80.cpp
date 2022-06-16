@@ -533,13 +533,13 @@ void abc80_state::abc80(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("abc80_cass");
 
-	ABC80_KEYBOARD(config, m_kb, 0);
+	ABC80_KEYBOARD(config, m_kb);
 	m_kb->keydown_wr_callback().set(FUNC(abc80_state::keydown_w));
 
 	ABCBUS_SLOT(config, m_bus, XTAL(11'980'800)/2/2, abc80_cards, "abcexp");
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG));
 	keyboard.set_keyboard_callback(FUNC(abc80_state::kbd_w));
 
 	QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc80_state::quickload_cb));

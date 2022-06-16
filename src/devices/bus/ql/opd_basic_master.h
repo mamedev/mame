@@ -25,7 +25,7 @@ class opd_basic_master_device : public device_t, public device_ql_expansion_card
 {
 public:
 	// construction/destruction
-	opd_basic_master_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	opd_basic_master_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

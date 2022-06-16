@@ -54,7 +54,7 @@ public:
 
 protected:
 	// construction/destruction
-	a2bus_ayboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ayboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -80,7 +80,7 @@ protected:
 class a2bus_mockingboard_device : public a2bus_ayboard_device
 {
 public:
-	a2bus_mockingboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_mockingboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void via1_out_b(u8 data) override;
 protected:
@@ -99,7 +99,7 @@ private:
 class a2bus_phasor_device : public a2bus_ayboard_device
 {
 public:
-	a2bus_phasor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_phasor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void via1_out_b(u8 data) override;
 	void via2_out_b(u8 data) override;
@@ -124,7 +124,7 @@ private:
 class a2bus_echoplus_device : public a2bus_ayboard_device
 {
 public:
-	a2bus_echoplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_echoplus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -145,13 +145,13 @@ protected:
 
 void a2bus_ayboard_device::add_common_devices(machine_config &config)
 {
-	MOS6522(config, m_via1, 1022727);
+	MOS6522(config, m_via1, XTAL::u(1022727));
 	m_via1->readpa_handler().set(FUNC(a2bus_ayboard_device::via1_in_a));
 	m_via1->writepa_handler().set(FUNC(a2bus_ayboard_device::via1_out_a));
 	m_via1->writepb_handler().set(FUNC(a2bus_ayboard_device::via1_out_b));
 	m_via1->irq_handler().set(FUNC(a2bus_ayboard_device::via1_irq_w));
 
-	MOS6522(config, m_via2, 1022727);
+	MOS6522(config, m_via2, XTAL::u(1022727));
 	m_via2->readpa_handler().set(FUNC(a2bus_ayboard_device::via2_in_a));
 	m_via2->writepa_handler().set(FUNC(a2bus_ayboard_device::via2_out_a));
 	m_via2->writepb_handler().set(FUNC(a2bus_ayboard_device::via2_out_b));
@@ -159,7 +159,7 @@ void a2bus_ayboard_device::add_common_devices(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	AY8913(config, m_ay1, 1022727);
+	AY8913(config, m_ay1, XTAL::u(1022727));
 	m_ay1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 }
 
@@ -167,7 +167,7 @@ void a2bus_ayboard_device::device_add_mconfig(machine_config &config)
 {
 	add_common_devices(config);
 
-	AY8913(config, m_ay2, 1022727);
+	AY8913(config, m_ay2, XTAL::u(1022727));
 	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 }
 
@@ -178,10 +178,10 @@ void a2bus_mockingboard_device::device_add_mconfig(machine_config &config)
 	m_via1->writepb_handler().set(FUNC(a2bus_mockingboard_device::via1_out_b));
 	m_via1->cb2_handler().set(FUNC(a2bus_mockingboard_device::write_via1_cb2));
 
-	AY8913(config, m_ay2, 1022727);
+	AY8913(config, m_ay2, XTAL::u(1022727));
 	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
-	VOTRAX_SC01(config, m_sc01, 1022727);
+	VOTRAX_SC01(config, m_sc01, XTAL::u(1022727));
 	m_sc01->ar_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_sc01->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_sc01->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -196,9 +196,9 @@ void a2bus_phasor_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "lspeaker2").front_left();
 	SPEAKER(config, "rspeaker2").front_right();
-	AY8913(config, m_ay2, 1022727);
-	AY8913(config, m_ay3, 1022727);
-	AY8913(config, m_ay4, 1022727);
+	AY8913(config, m_ay2, XTAL::u(1022727));
+	AY8913(config, m_ay3, XTAL::u(1022727));
+	AY8913(config, m_ay4, XTAL::u(1022727));
 	m_ay2->add_route(ALL_OUTPUTS, "lspeaker2", 0.5);
 	m_ay3->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 	m_ay4->add_route(ALL_OUTPUTS, "rspeaker2", 0.5);
@@ -211,11 +211,11 @@ void a2bus_echoplus_device::device_add_mconfig(machine_config &config)
 	config.device_remove(VIA2_TAG);
 	m_via1->writepb_handler().set(FUNC(a2bus_ayboard_device::via1_out_b));
 
-	AY8913(config, m_ay2, 1022727);
+	AY8913(config, m_ay2, XTAL::u(1022727));
 	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	SPEAKER(config, "echosp").front_center();
-	TMS5220(config, m_tms, 640000);
+	TMS5220(config, m_tms, XTAL::u(640000));
 	// echo+ has a TSP5220C soldered down on it
 	m_tms->add_route(ALL_OUTPUTS, "echosp", 1.0);
 }
@@ -224,7 +224,7 @@ void a2bus_echoplus_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_via1(*this, VIA1_TAG),
@@ -236,13 +236,13 @@ a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device
 {
 }
 
-a2bus_mockingboard_device::a2bus_mockingboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_mockingboard_device::a2bus_mockingboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_ayboard_device(mconfig, A2BUS_MOCKINGBOARD, tag, owner, clock),
 	m_sc01(*this, "sc01")
 {
 }
 
-a2bus_phasor_device::a2bus_phasor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_phasor_device::a2bus_phasor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_ayboard_device(mconfig, A2BUS_PHASOR, tag, owner, clock),
 	m_ay3(*this, AY3_TAG),
 	m_ay4(*this, AY4_TAG),
@@ -250,7 +250,7 @@ a2bus_phasor_device::a2bus_phasor_device(const machine_config &mconfig, const ch
 {
 }
 
-a2bus_echoplus_device::a2bus_echoplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_echoplus_device::a2bus_echoplus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_ayboard_device(mconfig, A2BUS_ECHOPLUS, tag, owner, clock),
 	m_tms(*this, E2P_TMS_TAG)
 {
@@ -628,10 +628,10 @@ void a2bus_phasor_device::set_clocks()
 	}
 	else
 	{
-		m_ay1->set_clock(1022727);
-		m_ay2->set_clock(1022727);
-		m_ay3->set_clock(1022727);
-		m_ay4->set_clock(1022727);
+		m_ay1->set_clock(XTAL::u(1022727));
+		m_ay2->set_clock(XTAL::u(1022727));
+		m_ay3->set_clock(XTAL::u(1022727));
+		m_ay4->set_clock(XTAL::u(1022727));
 	}
 }
 

@@ -526,7 +526,7 @@ void screen_device::svg_renderer::rebuild_cache()
 //  screen_device - constructor
 //-------------------------------------------------
 
-screen_device::screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+screen_device::screen_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SCREEN, tag, owner, clock)
 	, m_type(SCREEN_TYPE_RASTER)
 	, m_orientation(ROT0)

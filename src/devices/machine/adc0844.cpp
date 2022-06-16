@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(ADC0848, adc0848_device, "adc0848", "ADC0848 A/D Converter")
 //  adc0844_device - constructor
 //-------------------------------------------------
 
-adc0844_device::adc0844_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+adc0844_device::adc0844_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_intr_cb(*this),
 	m_ch1_cb(*this), m_ch2_cb(*this), m_ch3_cb(*this), m_ch4_cb(*this),
@@ -38,7 +38,7 @@ adc0844_device::adc0844_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-adc0844_device::adc0844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+adc0844_device::adc0844_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	adc0844_device(mconfig, ADC0844, tag, owner, clock)
 {
 }
@@ -47,7 +47,7 @@ adc0844_device::adc0844_device(const machine_config &mconfig, const char *tag, d
 //  adc0848_device - constructor
 //-------------------------------------------------
 
-adc0848_device::adc0848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+adc0848_device::adc0848_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	adc0844_device(mconfig, ADC0848, tag, owner, clock),
 	m_ch5_cb(*this), m_ch6_cb(*this), m_ch7_cb(*this), m_ch8_cb(*this)
 {

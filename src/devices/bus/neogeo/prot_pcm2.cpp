@@ -9,7 +9,7 @@
 DEFINE_DEVICE_TYPE(NG_PCM2_PROT, pcm2_prot_device, "ng_pcm2_prot", "Neo Geo NEOPCM2 Protection")
 
 
-pcm2_prot_device::pcm2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pcm2_prot_device::pcm2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NG_PCM2_PROT, tag, owner, clock)
 {
 }

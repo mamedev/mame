@@ -336,10 +336,10 @@ void inderp_state::init_1player()
 void inderp_state::inderp(machine_config &config)
 {
 	/* basic machine hardware */
-	M6504(config, m_maincpu, 2000000); // need to be measured
+	M6504(config, m_maincpu, XTAL::u(2000000)); // need to be measured
 	m_maincpu->set_addrmap(AS_PROGRAM, &inderp_state::mem_map);
 
-	clock_device &cpoint_clock(CLOCK(config, "cpoint_clock", 200)); // crosspoint detector
+	clock_device &cpoint_clock(CLOCK(config, "cpoint_clock", XTAL::u(200))); // crosspoint detector
 	cpoint_clock.signal_handler().set(FUNC(inderp_state::clock_tick));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

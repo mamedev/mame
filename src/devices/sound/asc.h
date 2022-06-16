@@ -36,13 +36,13 @@ public:
 		ARDBEG = 7  // Subset of ASC included in the Ardbeg ASIC (LC520)
 	};
 
-	asc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, asc_type type)
+	asc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, asc_type type)
 		: asc_device(mconfig, tag, owner, clock)
 	{
 		set_type(type);
 	}
 
-	asc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	asc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 

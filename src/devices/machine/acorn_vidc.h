@@ -49,7 +49,7 @@ public:
 	virtual bool get_dac_mode() { return false; }
 
 protected:
-	acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int dac_type);
+	acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int dac_type);
 
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
@@ -134,14 +134,14 @@ class acorn_vidc1_device : public acorn_vidc10_device
 {
 public:
 	// construction/destruction
-	acorn_vidc1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	acorn_vidc1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class acorn_vidc1a_device : public acorn_vidc10_device
 {
 public:
 	// construction/destruction
-	acorn_vidc1a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	acorn_vidc1a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition
@@ -152,7 +152,7 @@ class arm_vidc20_device : public acorn_vidc10_device
 {
 public:
 	// construction/destruction
-	arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void write_dac32(u8 channel, u16 data);
 	virtual bool get_dac_mode() override;

@@ -25,7 +25,7 @@ class rc2014_fdc9266_device : public device_t, public device_rc2014_card_interfa
 {
 public:
 	// construction/destruction
-	rc2014_fdc9266_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rc2014_fdc9266_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -42,7 +42,7 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 };
 
-rc2014_fdc9266_device::rc2014_fdc9266_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rc2014_fdc9266_device::rc2014_fdc9266_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RC2014_FDC9266, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_addr(*this, "SV1")
@@ -151,7 +151,7 @@ class rc2014_wd37c65_device : public device_t, public device_rc2014_card_interfa
 {
 public:
 	// construction/destruction
-	rc2014_wd37c65_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rc2014_wd37c65_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -169,7 +169,7 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 };
 
-rc2014_wd37c65_device::rc2014_wd37c65_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rc2014_wd37c65_device::rc2014_wd37c65_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RC2014_WD37C65, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_addr(*this, "SV1")

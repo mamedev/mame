@@ -795,7 +795,7 @@ void flstory_state::common(machine_config &config)
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
 }
 
 void flstory_state::flstory(machine_config &config)

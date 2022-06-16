@@ -32,7 +32,7 @@ private:
 
 void exorterm155_state::exorterm155(machine_config &config)
 {
-	EXORTERM155(config, m_exorterm155, 0);
+	EXORTERM155(config, m_exorterm155);
 
 	RS232_PORT(config, m_host, default_rs232_devices, nullptr);
 	m_host->dcd_handler().set(m_exorterm155, FUNC(exorterm155_device::rs232_conn_dcd_w));

@@ -31,7 +31,7 @@ class ttl153_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ttl153_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	auto za_cb() { return m_za_cb.bind(); }

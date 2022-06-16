@@ -30,7 +30,7 @@ class c8050_device : public device_t, public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t dio_r();
 	void dio_w(uint8_t data);
@@ -45,7 +45,7 @@ public:
 	void c8250lp_fdc_mem(address_map &map);
 	void sfd1001_fdc_mem(address_map &map);
 protected:
-	c8050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	c8050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -92,7 +92,7 @@ class c8250_device : public c8050_device
 {
 public:
 	// construction/destruction
-	c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -109,7 +109,7 @@ class c8250lp_device : public c8050_device
 {
 public:
 	// construction/destruction
-	c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -127,7 +127,7 @@ class sfd1001_device : public c8050_device
 {
 public:
 	// construction/destruction
-	sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

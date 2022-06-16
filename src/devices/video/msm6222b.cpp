@@ -21,20 +21,20 @@ ROM_START( msm6222b_01 )
 	ROM_LOAD( "msm6222b-01.bin", 0x0000, 0x1000, CRC(8ffa8521) SHA1(e108b520e6d20459a7bbd5958bbfa1d551a690bd) )
 ROM_END
 
-msm6222b_device::msm6222b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+msm6222b_device::msm6222b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_cgrom(*this, finder_base::DUMMY_TAG),
 	cursor_direction(false), cursor_blinking(false), two_line(false), shift_on_write(false), double_height(false), cursor_on(false), display_on(false), adc(0), shift(0)
 {
 }
 
-msm6222b_device::msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+msm6222b_device::msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	msm6222b_device(mconfig, MSM6222B, tag, owner, clock)
 {
 	m_cgrom.set_tag(*this, DEVICE_SELF);
 }
 
-msm6222b_01_device::msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+msm6222b_01_device::msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	msm6222b_device(mconfig, MSM6222B_01, tag, owner, clock)
 {
 	// load the fixed cgrom

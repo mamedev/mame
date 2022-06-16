@@ -225,13 +225,13 @@ device_memory_interface::space_config_vector arm_cpu_device::memory_space_config
 	};
 }
 
-arm_cpu_device::arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+arm_cpu_device::arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arm_cpu_device(mconfig, ARM, tag, owner, clock)
 {
 }
 
 
-arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 26, 0)
 	, m_copro_type(copro_type::UNKNOWN_CP15)

@@ -656,7 +656,7 @@ INPUT_PORTS_END
 void p1_state::poisk1(machine_config &config)
 {
 	/* basic machine hardware */
-	I8088(config, m_maincpu, 5000000);
+	I8088(config, m_maincpu, XTAL::u(5000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &p1_state::poisk1_map);
 	m_maincpu->set_addrmap(AS_IO, &p1_state::poisk1_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
@@ -683,7 +683,7 @@ void p1_state::poisk1(machine_config &config)
 	m_ppi8255n2->out_pb_callback().set(FUNC(p1_state::p1_ppi2_portb_w)); // 61h
 	m_ppi8255n2->in_pc_callback().set(FUNC(p1_state::p1_ppi2_portc_r)); // 62h and 3DAh
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
@@ -694,16 +694,16 @@ void p1_state::poisk1(machine_config &config)
 	m_isabus->iochrdy_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, m_isabus, p1_isa8_cards, "fdc", false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
-	ISA8_SLOT(config, "isa2", 0, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
-	ISA8_SLOT(config, "isa3", 0, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
-	ISA8_SLOT(config, "isa4", 0, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa1", m_isabus, p1_isa8_cards, "fdc", false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa2", m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa3", m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa4", m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// fake hsync
-	TIMER(config, "scantimer").configure_scanline(FUNC(p1_state::hsync_changed), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(p1_state::hsync_changed), "screen", 1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(15'000'000), 912,0,640, 262,0,200);

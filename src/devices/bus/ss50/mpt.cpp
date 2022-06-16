@@ -17,7 +17,7 @@
 class ss50_mpt_device : public device_t, public ss50_card_interface
 {
 public:
-	ss50_mpt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	ss50_mpt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, SS50_MPT, tag, owner, clock)
 		, ss50_card_interface(mconfig, *this)
 		, m_pia(*this, "pia")
@@ -80,7 +80,7 @@ ioport_constructor ss50_mpt_device::device_input_ports() const
 
 void ss50_mpt_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepb_handler().set(FUNC(ss50_mpt_device::pia_b_w));
 	m_pia->cb1_w(0);
 	m_pia->irqa_handler().set(FUNC(ss50_mpt_device::pia_irqa_w));

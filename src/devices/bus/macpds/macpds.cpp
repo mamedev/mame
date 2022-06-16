@@ -25,12 +25,12 @@ DEFINE_DEVICE_TYPE(MACPDS_SLOT, macpds_slot_device, "macpds_slot", "Mac 68000 Pr
 //-------------------------------------------------
 //  macpds_slot_device - constructor
 //-------------------------------------------------
-macpds_slot_device::macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+macpds_slot_device::macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	macpds_slot_device(mconfig, MACPDS_SLOT, tag, owner, clock)
 {
 }
 
-macpds_slot_device::macpds_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+macpds_slot_device::macpds_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_macpds(*this, finder_base::DUMMY_TAG)
@@ -62,12 +62,12 @@ DEFINE_DEVICE_TYPE(MACPDS, macpds_device, "macpds", "Mac 68000 Processor-Direct 
 //  macpds_device - constructor
 //-------------------------------------------------
 
-macpds_device::macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+macpds_device::macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	macpds_device(mconfig, MACPDS, tag, owner, clock)
 {
 }
 
-macpds_device::macpds_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+macpds_device::macpds_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_maincpu(*this, finder_base::DUMMY_TAG)
 {

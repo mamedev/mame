@@ -21,14 +21,14 @@ class iop_spu_device : public device_t, public device_sound_interface
 {
 public:
 	template <typename T, typename U>
-	iop_spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&iop_tag, U &&intc_tag)
+	iop_spu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&iop_tag, U &&intc_tag)
 		: iop_spu_device(mconfig, tag, owner, clock)
 	{
 		m_iop.set_tag(std::forward<T>(iop_tag));
 		m_intc.set_tag(std::forward<U>(intc_tag));
 	}
 
-	iop_spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iop_spu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~iop_spu_device() override;
 
 	uint16_t read(offs_t offset, uint16_t mem_mask = ~0);

@@ -34,7 +34,7 @@ public:
 
 protected:
 	// construction/destruction
-	bbc_cumanafdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_cumanafdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -55,7 +55,7 @@ private:
 class bbc_cumana1_device : public bbc_cumanafdc_device
 {
 public:
-	bbc_cumana1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_cumana1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -65,7 +65,7 @@ protected:
 class bbc_cumana2_device : public bbc_cumanafdc_device
 {
 public:
-	bbc_cumana2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_cumana2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

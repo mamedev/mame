@@ -268,7 +268,7 @@ void konblands_state::konblands(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(konblands_state::timer_irq), attotime::from_hz(8)); // 8 times per frame
 
 	/* video hardware */
-	PIONEER_LDV1000(config, m_laserdisc, 0);
+	PIONEER_LDV1000(config, m_laserdisc);
 	m_laserdisc->command_strobe_callback().set(FUNC(konblands_state::ld_command_strobe_cb));
 	// TODO: might be different
 	m_laserdisc->set_overlay(512, 256, FUNC(konblands_state::screen_update));

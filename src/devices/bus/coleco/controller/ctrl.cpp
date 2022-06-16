@@ -45,7 +45,7 @@ device_colecovision_control_port_interface::device_colecovision_control_port_int
 //  colecovision_control_port_device - constructor
 //-------------------------------------------------
 
-colecovision_control_port_device::colecovision_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+colecovision_control_port_device::colecovision_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COLECOVISION_CONTROL_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_colecovision_control_port_interface>(mconfig, *this),
 	m_device(nullptr),

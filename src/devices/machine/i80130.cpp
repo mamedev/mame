@@ -102,10 +102,10 @@ void i80130_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void i80130_device::device_add_mconfig(machine_config &config)
 {
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set(FUNC(i80130_device::irq_w));
 
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(0);
 	m_pit->out_handler<0>().set(FUNC(i80130_device::systick_w));
 	m_pit->set_clk<1>(0);
@@ -124,7 +124,7 @@ void i80130_device::device_add_mconfig(machine_config &config)
 //  i80130_device - constructor
 //-------------------------------------------------
 
-i80130_device::i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i80130_device::i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, I80130, tag, owner, clock),
 		m_pic(*this, "pic"),
 		m_pit(*this, "pit"),

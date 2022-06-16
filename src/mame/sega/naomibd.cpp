@@ -74,7 +74,7 @@ void naomi_board::submap(address_map &map)
 	map(0x3e, 0x3f).r(FUNC(naomi_board::boardid_r));
 }
 
-naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: naomi_g1_device(mconfig, type, tag, owner, clock),
 	eeprom(*this, finder_base::DUMMY_TAG)
 {

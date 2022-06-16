@@ -337,7 +337,7 @@ void caswin_state::caswin_palette(palette_device &palette) const
 void caswin_state::vvillage(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	Z80(config, m_maincpu, XTAL::u(4000000));         /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &caswin_state::vvillage_mem);
 	m_maincpu->set_addrmap(AS_IO, &caswin_state::vvillage_io);
 	m_maincpu->set_vblank_int("screen", FUNC(caswin_state::irq0_line_hold));
@@ -358,7 +358,7 @@ void caswin_state::vvillage(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 4000000 / 4));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(4000000) / 4));
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);

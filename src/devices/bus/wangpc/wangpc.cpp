@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(WANGPC_BUS_SLOT, wangpcbus_slot_device, "wangpcbus_slot", "Wa
 //  wangpcbus_slot_device - constructor
 //-------------------------------------------------
 
-wangpcbus_slot_device::wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wangpcbus_slot_device::wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WANGPC_BUS_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_wangpcbus_card_interface>(mconfig, *this),
 	m_bus(*this, finder_base::DUMMY_TAG),
@@ -51,7 +51,7 @@ void wangpcbus_slot_device::device_start()
 //  wangpcbus_device - constructor
 //-------------------------------------------------
 
-wangpcbus_device::wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wangpcbus_device::wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WANGPC_BUS, tag, owner, clock),
 	m_write_irq2(*this),
 	m_write_irq3(*this),

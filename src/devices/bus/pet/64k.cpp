@@ -76,7 +76,7 @@ inline void pet_64k_expansion_device::write_ram(offs_t offset, uint8_t data)
 //  pet_64k_expansion_device - constructor
 //-------------------------------------------------
 
-pet_64k_expansion_device::pet_64k_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pet_64k_expansion_device::pet_64k_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PET_64K, tag, owner, clock),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_ram(*this, "ram", 0x10000, ENDIANNESS_LITTLE),

@@ -178,7 +178,7 @@ class z80sio_channel : public device_t
 	friend class mk68564_device;
 
 public:
-	z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// read register handlers
 	uint8_t do_sioreg_rr0();
@@ -397,7 +397,7 @@ protected:
 class z80dart_channel : public z80sio_channel
 {
 public:
-	z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void enter_hunt_mode() override;
@@ -414,7 +414,7 @@ protected:
 class i8274_channel : public z80sio_channel
 {
 public:
-	i8274_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8274_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -425,7 +425,7 @@ class mk68564_channel : public z80sio_channel
 	friend class mk68564_device;
 
 public:
-	mk68564_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mk68564_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -473,7 +473,7 @@ class z80sio_device :  public device_t,
 
 public:
 	// construction/destruction
-	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_txda_callback() { return m_out_txd_cb[0].bind(); }
 	auto out_txdb_callback() { return m_out_txd_cb[1].bind(); }
@@ -526,7 +526,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { m_chanB->sync_w(state); }
 
 protected:
-	z80sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	z80sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -579,7 +579,7 @@ protected:
 class z80dart_device : public z80sio_device
 {
 public:
-	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ria_w ) { m_chanA->sync_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( rib_w ) { m_chanB->sync_w(state); }
@@ -592,12 +592,12 @@ protected:
 class i8274_device : public z80sio_device
 {
 public:
-	i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t inta_r() { return m1_r(); }
 
 protected:
-	i8274_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	i8274_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_t overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -613,13 +613,13 @@ protected:
 class upd7201_device : public i8274_device
 {
 public:
-	upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mk68564_device : public i8274_device
 {
 public:
-	mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_xtal(uint32_t clock);
 	void set_xtal(const XTAL &clock) { set_xtal(clock.value()); }

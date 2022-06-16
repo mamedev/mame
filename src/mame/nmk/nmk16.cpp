@@ -4337,7 +4337,7 @@ void nmk16_state::tharrier(machine_config &config)
 void nmk16_state::mustang(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL::u(10000000)); // 10 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustang_map);
 	set_hacky_interrupt_timing(config);
 
@@ -4353,10 +4353,10 @@ void nmk16_state::mustang(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, XTAL::u(8000000));
 	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL::u(1500000)));
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
@@ -4375,11 +4375,11 @@ void nmk16_state::mustang(machine_config &config)
 void nmk16_state::mustangb(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL::u(10000000)); // 10 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 14318180/4);
+	Z80(config, m_audiocpu, XTAL::u(14318180)/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
@@ -4395,13 +4395,13 @@ void nmk16_state::mustangb(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14318180/4));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL::u(14318180)/4));
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
+	OKIM6295(config, "oki", XTAL::u(1320000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
 	seibu_sound.set_rom_tag("audiocpu");
 	seibu_sound.set_rombank_tag("seibu_bank1");
@@ -4412,11 +4412,11 @@ void nmk16_state::mustangb(machine_config &config)
 void nmk16_state::mustangb3(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL::u(10000000)); // 10 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb3_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 14318180/4);
+	Z80(config, m_audiocpu, XTAL::u(14318180)/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb3_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tharrier_sound_io_map);
 
@@ -4435,7 +4435,7 @@ void nmk16_state::mustangb3(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL::u(1500000)));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
@@ -4506,7 +4506,7 @@ void nmk16_state::vandyke(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, XTAL::u(8000000));
 	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/8)); // verified on PCB
@@ -4528,11 +4528,11 @@ void nmk16_state::vandyke(machine_config &config)
 void nmk16_state::vandykeb(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL::u(10000000)); // 10 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::vandykeb_map);
 	set_hacky_interrupt_timing(config);
 
-	PIC16C57(config, "mcu", 12000000).set_disable(); // 3MHz
+	PIC16C57(config, "mcu", XTAL::u(12000000)).set_disable(); // 3MHz
 
 	// video hardware
 	set_hacky_screen_lowres(config);
@@ -4546,7 +4546,7 @@ void nmk16_state::vandykeb(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki[0], 16000000/16, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], XTAL::u(16000000)/16, okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.20);
 }
@@ -4620,7 +4620,7 @@ void nmk16_state::acrobatmbl(machine_config &config)
 
 	OKIM6295(config, "oki", 8_MHz_XTAL / 8, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // divider not verified
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
 	seibu_sound.set_rom_tag("audiocpu");
 	seibu_sound.set_rombank_tag("seibu_bank1");
@@ -4631,11 +4631,11 @@ void nmk16_state::acrobatmbl(machine_config &config)
 void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden sound hardware
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000);
+	M68000(config, m_maincpu, XTAL::u(10000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragonb_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 14318180/4);
+	Z80(config, m_audiocpu, XTAL::u(14318180)/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
@@ -4651,13 +4651,13 @@ void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden so
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14318180/4));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL::u(14318180)/4));
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
+	OKIM6295(config, "oki", XTAL::u(1320000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
 	seibu_sound.set_rom_tag("audiocpu");
 	seibu_sound.set_rombank_tag("seibu_bank1");
@@ -4675,7 +4675,7 @@ void nmk16_state::tdragonb3(machine_config &config)
 void nmk16_state::tdragonb2(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000);
+	M68000(config, m_maincpu, XTAL::u(10000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragonb2_map);
 	set_hacky_interrupt_timing(config);
 
@@ -4691,7 +4691,7 @@ void nmk16_state::tdragonb2(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
+	OKIM6295(config, "oki", XTAL::u(1320000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
 void nmk16_state::tdragon(machine_config &config)
@@ -4713,7 +4713,7 @@ void nmk16_state::tdragon(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, XTAL::u(8000000));
 	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/8)); // verified on PCB
@@ -4741,11 +4741,11 @@ void nmk16_state::tdragon_prot(machine_config &config)
 void nmk16_state::ssmissin(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 8000000); // 8 Mhz
+	M68000(config, m_maincpu, XTAL::u(8000000)); // 8 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::ssmissin_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 8000000/2); // 4 Mhz
+	Z80(config, m_audiocpu, XTAL::u(8000000)/2); // 4 Mhz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::ssmissin_sound_map);
 
 	// video hardware
@@ -4763,7 +4763,7 @@ void nmk16_state::ssmissin(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	OKIM6295(config, m_oki[0], 8000000/8, okim6295_device::PIN7_HIGH); // 1 Mhz, pin 7 high
+	OKIM6295(config, m_oki[0], XTAL::u(8000000)/8, okim6295_device::PIN7_HIGH); // 1 Mhz, pin 7 high
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -4771,7 +4771,7 @@ void nmk16_state::ssmissin(machine_config &config)
 void nmk16_state::strahl(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 12000000); // 12 MHz ?
+	M68000(config, m_maincpu, XTAL::u(12000000)); // 12 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::strahl_map);
 	set_hacky_interrupt_timing(config);
 
@@ -4787,21 +4787,21 @@ void nmk16_state::strahl(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, XTAL::u(8000000));
 	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL::u(1500000)));
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], XTAL::u(16000000)/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], XTAL::u(16000000)/4, okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -4832,7 +4832,7 @@ void nmk16_state::strahljbl(machine_config &config)
 
 	OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // XTAL confirmed, divisor not
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
 	seibu_sound.set_rom_tag("audiocpu");
 	seibu_sound.set_rombank_tag("seibu_bank1");
@@ -4843,7 +4843,7 @@ void nmk16_state::strahljbl(machine_config &config)
 void nmk16_state::hachamf(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL::u(10000000)); // 10 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::hachamf_map);
 	set_hacky_interrupt_timing(config);
 
@@ -4859,21 +4859,21 @@ void nmk16_state::hachamf(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, XTAL::u(8000000));
 	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL::u(1500000)));
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], XTAL::u(16000000)/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], XTAL::u(16000000)/4, okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -4888,7 +4888,7 @@ void nmk16_state::hachamf_prot(machine_config &config)
 void nmk16_state::macross(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, XTAL::u(10000000)); // 10 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross_map);
 	set_hacky_interrupt_timing(config);
 
@@ -4904,21 +4904,21 @@ void nmk16_state::macross(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, XTAL::u(8000000));
 	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL::u(1500000)));
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], XTAL::u(16000000)/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], XTAL::u(16000000)/4, okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -4942,7 +4942,7 @@ void nmk16_state::blkheart(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, XTAL::u(8000000));
 	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/8)); // verified on PCB
@@ -5005,7 +5005,7 @@ void nmk16_state::gunnailb(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::gunnailb_map);
 
-	Z80(config, m_audiocpu, 6000000); // 6 MHz ?
+	Z80(config, m_audiocpu, XTAL::u(6000000)); // 6 MHz ?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::gunnailb_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::gunnailb_sound_io_map);
 
@@ -5016,7 +5016,7 @@ void nmk16_state::gunnailb(machine_config &config)
 
 	subdevice<ym2203_device>("ymsnd")->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 
-	OKIM6295(config.replace(), m_oki[0], 12000000 / 4, okim6295_device::PIN7_LOW); // no OKI banking
+	OKIM6295(config.replace(), m_oki[0], XTAL::u(12000000) / 4, okim6295_device::PIN7_LOW); // no OKI banking
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	config.device_remove("nmk004");
@@ -5030,7 +5030,7 @@ void nmk16_state::macross2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 4000000); // Z8400B PS 4 MHz ?
+	Z80(config, m_audiocpu, XTAL::u(4000000)); // Z8400B PS 4 MHz ?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::macross2_sound_io_map);
 
@@ -5062,7 +5062,7 @@ void nmk16_state::macross2(machine_config &config)
 	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 }
@@ -5074,7 +5074,7 @@ void nmk16_state::tdragon2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragon2_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 4000000); // Z0840006PSC 4? MHz
+	Z80(config, m_audiocpu, XTAL::u(4000000)); // Z0840006PSC 4? MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::macross2_sound_io_map);
 
@@ -5106,7 +5106,7 @@ void nmk16_state::tdragon2(machine_config &config)
 	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 }
@@ -5167,7 +5167,7 @@ void nmk16_state::raphero(machine_config &config)
 	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 }
@@ -5197,7 +5197,7 @@ void nmk16_state::bjtwin(machine_config &config)
 	OKIM6295(config, m_oki[1], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // verified on PCB
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 }
@@ -5223,12 +5223,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 void nmk16_state::manybloc(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10? MHz - check
+	M68000(config, m_maincpu, XTAL::u(10000000)); // 10? MHz - check
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::manybloc_map);
 	m_maincpu->set_periodic_int(FUNC(nmk16_state::irq1_line_hold), attotime::from_hz(56)); // this needs to equal the framerate on this, rather than being double it...
 	TIMER(config, "scantimer").configure_scanline(FUNC(nmk16_state::manybloc_scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 3000000);
+	Z80(config, m_audiocpu, XTAL::u(3000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::tharrier_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tharrier_sound_io_map);
 
@@ -5257,18 +5257,18 @@ void nmk16_state::manybloc(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL::u(1500000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], XTAL::u(16000000)/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], XTAL::u(16000000)/4, okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -5278,11 +5278,11 @@ void nmk16_state::manybloc(machine_config &config)
 void nmk16_tomagic_state::tomagic(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 12000000); // 12? MHz
+	M68000(config, m_maincpu, XTAL::u(12000000)); // 12? MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_tomagic_state::tomagic_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 12000000/4); // 3 Mhz?
+	Z80(config, m_audiocpu, XTAL::u(12000000)/4); // 3 Mhz?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_tomagic_state::tomagic_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_tomagic_state::tomagic_sound_io_map);
 
@@ -5301,11 +5301,11 @@ void nmk16_tomagic_state::tomagic(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 12000000/4)); // K-666 (YM3812) 3Mhz? */
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL::u(12000000)/4)); // K-666 (YM3812) 3Mhz? */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	OKIM6295(config, m_oki[0], 12000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], XTAL::u(12000000)/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -5846,11 +5846,11 @@ void afega_state::popspops(machine_config &config)
 void afega_state::firehawk(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &afega_state::firehawk_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL::u(4000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &afega_state::firehawk_sound_cpu);
 
 	// video hardware
@@ -5869,10 +5869,10 @@ void afega_state::firehawk(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	OKIM6295(config, m_oki[0], 1000000, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[0], XTAL::u(1000000), okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, m_oki[1], 1000000, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[1], XTAL::u(1000000), okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -5886,11 +5886,11 @@ void afega_state::spec2k(machine_config &config)
 void nmk16_state::twinactn(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::twinactn_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL::u(4000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::ssmissin_sound_map);
 
 	// video hardware
@@ -5908,7 +5908,7 @@ void nmk16_state::twinactn(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	OKIM6295(config, m_oki[0], 1000000, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[0], XTAL::u(1000000), okim6295_device::PIN7_HIGH);
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }

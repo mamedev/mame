@@ -601,7 +601,7 @@ void champbas_state::champbas(machine_config &config)
 
 	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	DAC_6BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.7); // unknown DAC
+	DAC_6BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.7); // unknown DAC
 }
 
 void champbas_state::champbasj(machine_config &config)
@@ -717,7 +717,7 @@ void exctsccr_state::exctsccr(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	/* AY (melody) clock is specified by a VR (0.9 - 3.9 MHz) */
-	AY8910(config, "ay1", 1940000).add_route(ALL_OUTPUTS, "speaker", 0.08); /* VR has a factory mark and this is the value read */
+	AY8910(config, "ay1", XTAL::u(1940000)).add_route(ALL_OUTPUTS, "speaker", 0.08); /* VR has a factory mark and this is the value read */
 
 	AY8910(config, "ay2", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
@@ -725,8 +725,8 @@ void exctsccr_state::exctsccr(machine_config &config)
 
 	AY8910(config, "ay4", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
-	DAC_6BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
-	DAC_6BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	DAC_6BIT_R2R(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	DAC_6BIT_R2R(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
 }
 
 void exctsccr_state::exctscc2(machine_config &config)
@@ -786,7 +786,7 @@ void exctsccr_state::exctsccrb(machine_config &config)
 
 	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	DAC_6BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.7); // unknown DAC
+	DAC_6BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.7); // unknown DAC
 }
 
 

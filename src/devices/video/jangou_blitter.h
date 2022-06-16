@@ -17,7 +17,7 @@ class jangou_blitter_device : public device_t
 {
 public:
 	// construction/destruction
-	jangou_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	jangou_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// I/O operations
 	void blit_v1_regs(address_map &map);

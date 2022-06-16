@@ -145,12 +145,12 @@ DEFINE_DEVICE_TYPE(MIDWAY_SERIAL_PIC, midway_serial_pic_device, "midway_serial_p
 //  midway_serial_pic_device - constructor
 //-------------------------------------------------
 
-midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	midway_serial_pic_device(mconfig, MIDWAY_SERIAL_PIC, tag, owner, clock)
 {
 }
 
-midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_io_serial_digit(*this, "SERIAL_DIGIT"),
 	m_upper(0),
@@ -246,7 +246,7 @@ DEFINE_DEVICE_TYPE(MIDWAY_SERIAL_PIC_EMU, midway_serial_pic_emu_device, "midway_
 //  midway_serial_pic_emu_device - constructor
 //-------------------------------------------------
 
-midway_serial_pic_emu_device::midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+midway_serial_pic_emu_device::midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MIDWAY_SERIAL_PIC_EMU, tag, owner, clock)
 	, m_pic(*this, "pic")
 {
@@ -309,7 +309,7 @@ void midway_serial_pic_emu_device::write_c(u8 data)
 
 void midway_serial_pic_emu_device::device_add_mconfig(machine_config &config)
 {
-	PIC16C57(config, m_pic, 4000000);    /* ? Mhz */
+	PIC16C57(config, m_pic, XTAL::u(4000000));    /* ? Mhz */
 	m_pic->read_a().set([this]() { return m_command; });
 	m_pic->write_b().set([this](u8 data) { m_data_out = data; });
 	m_pic->read_c().set(FUNC(midway_serial_pic_emu_device::read_c));
@@ -338,12 +338,12 @@ DEFINE_DEVICE_TYPE(MIDWAY_SERIAL_PIC2, midway_serial_pic2_device, "midway_serial
 //  midway_serial_pic2_device - constructor
 //-------------------------------------------------
 
-midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	midway_serial_pic2_device(mconfig, MIDWAY_SERIAL_PIC2, tag, owner, clock)
 {
 }
 
-midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+midway_serial_pic2_device::midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	midway_serial_pic_device(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_latch(0),
@@ -701,7 +701,7 @@ DEFINE_DEVICE_TYPE(MIDWAY_IOASIC, midway_ioasic_device, "midway_ioasic", "Midway
 //  midway_serial_pic2_device - constructor
 //-------------------------------------------------
 
-midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	midway_serial_pic2_device(mconfig, MIDWAY_IOASIC, tag, owner, clock),
 	m_io_dips(*this, ":DIPS"),
 	m_io_system(*this, ":SYSTEM"),

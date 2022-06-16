@@ -1093,7 +1093,7 @@ eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_#
 	size(_cells, _bits); \
 	set_address_bits(_addrbits); \
 } \
-eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) \
+eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) \
 	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_##_uppercase##_##_bits##BIT, tag, owner, eeprom_serial_streaming::DISABLE) \
 { \
 	size(_cells, _bits); \

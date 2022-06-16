@@ -22,7 +22,7 @@ class c140_device : public device_t,
 					public device_rom_interface<25, 1, 0, ENDIANNESS_BIG>
 {
 public:
-	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto int1_callback() { return m_int1_callback.bind(); }
@@ -35,7 +35,7 @@ public:
 	void c140_le_w(offs_t offset, u8 data) { c140_w(offset ^ 1, data);}
 
 protected:
-	c140_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	c140_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -104,7 +104,7 @@ protected:
 class c219_device : public c140_device
 {
 public:
-	c219_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c219_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 c219_r(offs_t offset);
 	void c219_w(offs_t offset, u8 data);

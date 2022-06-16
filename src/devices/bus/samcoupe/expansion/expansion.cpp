@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(SAMCOUPE_EXPANSION, samcoupe_expansion_device, "samcoupe_expa
 //  samcoupe_expansion_device - constructor
 //-------------------------------------------------
 
-samcoupe_expansion_device::samcoupe_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+samcoupe_expansion_device::samcoupe_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SAMCOUPE_EXPANSION, tag, owner, clock),
 	device_single_card_slot_interface<device_samcoupe_expansion_interface>(mconfig, *this),
 	m_int_handler(*this),

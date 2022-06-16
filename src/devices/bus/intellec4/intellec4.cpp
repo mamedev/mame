@@ -17,7 +17,7 @@ namespace bus::intellec4 {
     SLOT DEVICE
 ***********************************************************************/
 
-univ_slot_device::univ_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+univ_slot_device::univ_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, INTELLEC4_UNIV_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_univ_card_interface>(mconfig, *this)
 	, m_bus(*this, finder_base::DUMMY_TAG)
@@ -45,7 +45,7 @@ void univ_slot_device::device_start()
     BUS DEVICE
 ***********************************************************************/
 
-univ_bus_device::univ_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+univ_bus_device::univ_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, INTELLEC4_UNIV_BUS, tag, owner, clock)
 	, m_rom_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_rom_ports_space(*this, finder_base::DUMMY_TAG, -1)

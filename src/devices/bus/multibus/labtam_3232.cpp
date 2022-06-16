@@ -20,7 +20,7 @@
 
 DEFINE_DEVICE_TYPE(LABTAM_3232, labtam_3232_device, "labtam_3232", "Labtam 3232")
 
-labtam_3232_device::labtam_3232_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+labtam_3232_device::labtam_3232_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LABTAM_3232, tag, owner, clock)
 	, device_multibus_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")

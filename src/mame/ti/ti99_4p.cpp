@@ -1043,7 +1043,7 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 {
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
-	TMS9900(config, m_cpu, 3000000);
+	TMS9900(config, m_cpu, XTAL::u(3000000));
 	m_cpu->set_addrmap(AS_PROGRAM, &ti99_4p_state::memmap);
 	m_cpu->set_addrmap(AS_IO, &ti99_4p_state::crumap);
 	m_cpu->set_addrmap(tms99xx_device::AS_SETADDRESS, &ti99_4p_state::memmap_setaddress);
@@ -1052,7 +1052,7 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	m_cpu->clkout_cb().set(FUNC(ti99_4p_state::clock_out));
 
 	// tms9901
-	TMS9901(config, m_tms9901, 0);
+	TMS9901(config, m_tms9901);
 	m_tms9901->read_cb().set(FUNC(ti99_4p_state::psi_input));
 	m_tms9901->p_out_cb(2).set(FUNC(ti99_4p_state::keyC0));
 	m_tms9901->p_out_cb(3).set(FUNC(ti99_4p_state::keyC1));
@@ -1064,7 +1064,7 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	m_tms9901->intreq_cb().set(FUNC(ti99_4p_state::tms9901_interrupt));
 
 	// Peripheral expansion box (SGCPU composition)
-	TI99_PERIBOX_SG(config, m_peribox, 0);
+	TI99_PERIBOX_SG(config, m_peribox);
 	m_peribox->inta_cb().set(FUNC(ti99_4p_state::extint));
 	m_peribox->intb_cb().set(FUNC(ti99_4p_state::notconnected));
 	m_peribox->ready_cb().set(FUNC(ti99_4p_state::ready_line));
@@ -1080,7 +1080,7 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 
 	// Cassette drives
 	SPEAKER(config, "cass_out").front_center();
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
+	CASSETTE(config, "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// Joystick port
 	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_plain, "twinjoy");

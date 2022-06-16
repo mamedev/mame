@@ -29,7 +29,7 @@
 class lz8420m_device : public z80_device
 {
 public:
-	lz8420m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	lz8420m_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

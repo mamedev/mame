@@ -81,7 +81,7 @@ enum size_code : unsigned
 	SIZE_D = 3,
 };
 
-ns32081_device::ns32081_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+ns32081_device::ns32081_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NS32081, tag, owner, clock)
 	, ns32000_slow_slave_interface(mconfig, *this)
 {

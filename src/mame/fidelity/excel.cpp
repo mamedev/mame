@@ -388,7 +388,7 @@ void excel_state::fexcel(machine_config &config)
 	M65SC02(config, m_maincpu, 12_MHz_XTAL/4); // G65SC102P-3, 12.0M ceramic resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcel_map);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
+	auto &irq_clock(CLOCK(config, "irq_clock", XTAL::u(600))); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
 	irq_clock.set_pulse_width(attotime::from_nsec(15250)); // active for 15.25us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
@@ -467,7 +467,7 @@ void excel_state::fexcelv(machine_config &config)
 	config.set_default_layout(layout_fidel_exv);
 
 	/* sound hardware */
-	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
+	S14001A(config, m_speech, XTAL::u(25000)); // R/C circuit, around 25khz
 	m_speech->ext_read().set(FUNC(excel_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }

@@ -9,7 +9,7 @@
 class mn1880_device : public cpu_device
 {
 public:
-	mn1880_device(const machine_config &config, const char *tag, device_t *owner, u32 clock);
+	mn1880_device(const machine_config &config, const char *tag, device_t *owner, const XTAL &clock);
 
 	enum {
 		MN1880_IP, MN1880_IPA, MN1880_IPB,
@@ -29,7 +29,7 @@ public:
 	};
 
 protected:
-	mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_mmu, address_map_constructor data_map);
+	mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool has_mmu, address_map_constructor data_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -235,7 +235,7 @@ private:
 class mn18801a_device : public mn1880_device
 {
 public:
-	mn18801a_device(const machine_config &config, const char *tag, device_t *owner, u32 clock);
+	mn18801a_device(const machine_config &config, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(MN1880, mn1880_device)

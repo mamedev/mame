@@ -21,12 +21,12 @@ class iop_cdvd_device : public device_t
 public:
 	template <typename T>
 	iop_cdvd_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&intc_tag)
-		: iop_cdvd_device(mconfig, tag, owner, (uint32_t)0)
+		: iop_cdvd_device(mconfig, tag, owner)
 	{
 		m_intc.set_tag(std::forward<T>(intc_tag));
 	}
 
-	iop_cdvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iop_cdvd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~iop_cdvd_device() override;
 
 	uint8_t read(offs_t offset);

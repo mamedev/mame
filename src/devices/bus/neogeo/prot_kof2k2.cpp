@@ -7,7 +7,7 @@
 DEFINE_DEVICE_TYPE(NG_KOF2002_PROT, kof2002_prot_device, "ng_kof2002_prot", "Neo Geo KoF 2002 Protection")
 
 
-kof2002_prot_device::kof2002_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kof2002_prot_device::kof2002_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NG_KOF2002_PROT, tag, owner, clock)
 {
 }

@@ -20,7 +20,7 @@
 class tv950kb_device : public device_t
 {
 public:
-	tv950kb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	tv950kb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	auto tx_cb() { return m_tx_cb.bind(); }

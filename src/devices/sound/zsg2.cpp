@@ -115,7 +115,7 @@ DEFINE_DEVICE_TYPE(ZSG2, zsg2_device, "zsg2", "ZOOM ZSG-2")
 //  zsg2_device - constructor
 //-------------------------------------------------
 
-zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ZSG2, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_mem_base(*this, DEVICE_SELF)

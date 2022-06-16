@@ -24,7 +24,7 @@ class bbc_mr8000_device : public device_t, public device_bbc_cart_interface
 {
 public:
 	// construction/destruction
-	bbc_mr8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_mr8000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -83,7 +83,7 @@ protected:
 		REG_EXT_4B_KSE = 0x01
 	};
 
-	ds17x85_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 model, u32 extram_size);
+	ds17x85_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 model, u32 extram_size);
 
 	// device-specific overrides
 	virtual void device_start() override;
@@ -113,7 +113,7 @@ class ds1685_device : public ds17x85_device
 {
 public:
 	// device type constructor
-	ds1685_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ds1685_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> ds1687_device
@@ -122,7 +122,7 @@ class ds1687_device : public ds17x85_device
 {
 public:
 	// device type constructor
-	ds1687_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ds1687_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> ds17285_device
@@ -131,7 +131,7 @@ class ds17285_device : public ds17x85_device
 {
 public:
 	// device type constructor
-	ds17285_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ds17285_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> ds17287_device
@@ -140,7 +140,7 @@ class ds17287_device : public ds17x85_device
 {
 public:
 	// device type constructor
-	ds17287_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ds17287_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> ds17485_device
@@ -149,7 +149,7 @@ class ds17485_device : public ds17x85_device
 {
 public:
 	// device type constructor
-	ds17485_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ds17485_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> ds17487_device
@@ -158,7 +158,7 @@ class ds17487_device : public ds17x85_device
 {
 public:
 	// device type constructor
-	ds17487_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ds17487_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> ds17885_device
@@ -167,7 +167,7 @@ class ds17885_device : public ds17x85_device
 {
 public:
 	// device type constructor
-	ds17885_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ds17885_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> ds17887_device
@@ -176,7 +176,7 @@ class ds17887_device : public ds17x85_device
 {
 public:
 	// device type constructor
-	ds17887_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ds17887_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type declarations

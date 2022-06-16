@@ -362,7 +362,7 @@ void i7000_state::i7000(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Programmable timer */
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 //  pit8253.set_clk<0>(XTAL(4'000'000) / 2); /* TODO: verify on PCB */
 //  pit8253.out_handler<0>().set(FUNC(i7000_state::i7000_pit_out0));
 //  pit8253.set_clk<1>(XTAL(4'000'000) / 2); /* TODO: verify on PCB */
@@ -371,7 +371,7 @@ void i7000_state::i7000(machine_config &config)
 	pit8253.out_handler<2>().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	/* Keyboard interface */
-	i8279_device &kbdc(I8279(config, "i8279", 4000000)); /* guessed value. TODO: verify on PCB */
+	i8279_device &kbdc(I8279(config, "i8279", XTAL::u(4000000))); /* guessed value. TODO: verify on PCB */
 	kbdc.out_sl_callback().set(FUNC(i7000_state::scanlines_w));         // scan SL lines
 	kbdc.in_rl_callback().set(FUNC(i7000_state::kbd_r));                // kbd RL lines
 	kbdc.in_shift_callback().set_constant(1);                           // TODO: Shift key

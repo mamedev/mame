@@ -539,12 +539,12 @@ INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
 void dmndrby_state::dderby(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	Z80(config, m_maincpu, XTAL::u(4000000));         /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dmndrby_state::memmap);
 	m_maincpu->set_vblank_int("screen", FUNC(dmndrby_state::dderby_irq));
 	m_maincpu->set_periodic_int(FUNC(dmndrby_state::dderby_timer_irq), attotime::from_hz(244/2));
 
-	Z80(config, m_audiocpu, 4000000);  /* verified on schematics */
+	Z80(config, m_audiocpu, XTAL::u(4000000));  /* verified on schematics */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dmndrby_state::dderby_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -566,7 +566,7 @@ void dmndrby_state::dderby(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "ay1", 1789750).add_route(ALL_OUTPUTS, "mono", 0.35); // frequency guessed
+	AY8910(config, "ay1", XTAL::u(1789750)).add_route(ALL_OUTPUTS, "mono", 0.35); // frequency guessed
 }
 
 

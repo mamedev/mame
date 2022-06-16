@@ -19,7 +19,7 @@ class dio32_98550_device :
 	public device_memory_interface
 {
 public:
-	dio32_98550_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dio32_98550_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t rom_r(offs_t offset, uint16_t mem_mask = ~0);
 	void rom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -38,7 +38,7 @@ protected:
 	required_device<nereid_device> m_nereid;
 	required_device_array<catseye_device, CATSEYE_COUNT> m_catseye;
 
-	dio32_98550_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	dio32_98550_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

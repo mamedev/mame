@@ -267,7 +267,7 @@ public:
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_555_t);
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_565_t);
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_565_t);
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T>
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_444_prom_t, T &&region, u32 entries)
@@ -278,11 +278,11 @@ public:
 
 	template <typename F>
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, F &&init, std::enable_if_t<init_delegate::supports_callback<F>::value, const char *> name, u32 entries = 0U, u32 indirect = 0U)
-		: palette_device(mconfig, tag, owner, 0U)
+		: palette_device(mconfig, tag, owner)
 	{ set_init(std::forward<F>(init), name).set_entries(entries, indirect); }
 	template <typename T, typename F>
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&devname, F &&init, std::enable_if_t<init_delegate::supports_callback<F>::value, const char *> name, u32 entries = 0U, u32 indirect = 0U)
-		: palette_device(mconfig, tag, owner, 0U)
+		: palette_device(mconfig, tag, owner)
 	{ set_init(std::forward<T>(devname), std::forward<F>(init), name).set_entries(entries, indirect); }
 
 	// configuration

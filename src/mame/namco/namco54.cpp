@@ -114,7 +114,7 @@ ROM_END
 
 DEFINE_DEVICE_TYPE(NAMCO_54XX, namco_54xx_device, "namco54", "Namco 54xx")
 
-namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NAMCO_54XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_discrete(*this, finder_base::DUMMY_TAG),

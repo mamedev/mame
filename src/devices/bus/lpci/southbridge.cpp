@@ -27,7 +27,7 @@
 
 void southbridge_device::device_add_mconfig(machine_config &config)
 {
-	PIT8254(config, m_pit8254, 0);
+	PIT8254(config, m_pit8254);
 	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
 	m_pit8254->out_handler<0>().set(FUNC(southbridge_device::at_pit8254_out0_changed));
 	m_pit8254->set_clk<1>(4772720/4); // DRAM refresh
@@ -68,12 +68,12 @@ void southbridge_device::device_add_mconfig(machine_config &config)
 	m_dma8237_2->out_dack_callback<2>().set(FUNC(southbridge_device::pc_dack6_w));
 	m_dma8237_2->out_dack_callback<3>().set(FUNC(southbridge_device::pc_dack7_w));
 
-	PIC8259(config, m_pic8259_master, 0);
+	PIC8259(config, m_pic8259_master);
 	m_pic8259_master->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic8259_master->in_sp_callback().set_constant(1);
 	m_pic8259_master->read_slave_ack_callback().set(FUNC(southbridge_device::get_slave_ack));
 
-	PIC8259(config, m_pic8259_slave, 0);
+	PIC8259(config, m_pic8259_slave);
 	m_pic8259_slave->out_int_callback().set(m_pic8259_master, FUNC(pic8259_device::ir2_w));
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
@@ -89,7 +89,7 @@ void southbridge_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace(":maincpu", AS_PROGRAM);
 	m_isabus->set_iospace(":maincpu", AS_IO);
 	m_isabus->irq3_callback().set("pic8259_master", FUNC(pic8259_device::ir3_w));
@@ -113,7 +113,7 @@ void southbridge_device::device_add_mconfig(machine_config &config)
 	m_isabus->iochck_callback().set(FUNC(southbridge_device::iochck_w));
 }
 
-southbridge_device::southbridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+southbridge_device::southbridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_maincpu(*this, ":maincpu"),
 	m_pic8259_master(*this, "pic8259_master"),
@@ -536,12 +536,12 @@ void southbridge_extended_device::device_add_mconfig(machine_config &config)
 	rtc.set_century_index(0x32);
 
 	// on board devices
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa_onboard, "fdcsmc", true); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa_onboard, "comat", true);
-	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa_onboard, "lpt", true);
+	ISA16_SLOT(config, "board1", "isabus", pc_isa_onboard, "fdcsmc", true); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board2", "isabus", pc_isa_onboard, "comat", true);
+	ISA16_SLOT(config, "board3", "isabus", pc_isa_onboard, "lpt", true);
 }
 
-southbridge_extended_device::southbridge_extended_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+southbridge_extended_device::southbridge_extended_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: southbridge_device(mconfig, type, tag, owner, clock),
 	m_keybc(*this, "keybc"),
 	m_ds12885(*this, "rtc"),

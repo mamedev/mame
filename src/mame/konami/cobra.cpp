@@ -502,14 +502,14 @@ class cobra_jvs : public jvs_device
 {
 public:
 	template <typename T>
-	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag, bool enable)
-		: cobra_jvs(mconfig, tag, owner, clock)
+	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, T &&jvs_host_tag, bool enable)
+		: cobra_jvs(mconfig, tag, owner)
 	{
 		host.set_tag(std::forward<T>(jvs_host_tag));
 		set_main_board(enable);
 	}
 
-	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	//DECLARE_WRITE_LINE_MEMBER(coin_1_w);
 	//DECLARE_WRITE_LINE_MEMBER(coin_2_w);
@@ -530,7 +530,7 @@ private:
 
 DEFINE_DEVICE_TYPE(COBRA_JVS, cobra_jvs, "cobra_jvs", "JVS (COBRA)")
 
-cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: jvs_device(mconfig, COBRA_JVS, tag, owner, clock),
 		m_test_port(*this, ":TEST"),
 		m_player_ports(*this, {":P1", ":P2"})
@@ -642,7 +642,7 @@ bool cobra_jvs::coin_counters(uint8_t *&buf, uint8_t count)
 class cobra_jvs_host : public jvs_host
 {
 public:
-	cobra_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cobra_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void write(uint8_t, const uint8_t *&rec_data, uint32_t &rec_size);
 
 private:
@@ -652,7 +652,7 @@ private:
 
 DEFINE_DEVICE_TYPE(COBRA_JVS_HOST, cobra_jvs_host, "cobra_jvs_host", "JVS-HOST (COBRA)")
 
-cobra_jvs_host::cobra_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cobra_jvs_host::cobra_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: jvs_host(mconfig, COBRA_JVS_HOST, tag, owner, clock)
 {
 	m_send_ptr = 0;
@@ -3234,21 +3234,21 @@ void cobra_state::machine_reset()
 void cobra_state::cobra(machine_config &config)
 {
 	/* basic machine hardware */
-	PPC603(config, m_maincpu, 100000000);      /* 603EV, 100? MHz */
+	PPC603(config, m_maincpu, XTAL::u(100000000));      /* 603EV, 100? MHz */
 	m_maincpu->set_bus_frequency(XTAL(66'666'700)); /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cobra_state::cobra_vblank));
 
-	PPC403GA(config, m_subcpu, 32000000);      /* 403GA, 33? MHz */
+	PPC403GA(config, m_subcpu, XTAL::u(32000000));      /* 403GA, 33? MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_sub_map);
 
-	PPC604(config, m_gfxcpu, 100000000);       /* 604, 100? MHz */
+	PPC604(config, m_gfxcpu, XTAL::u(100000000));       /* 604, 100? MHz */
 	m_gfxcpu->set_bus_frequency(XTAL(66'666'700));   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	m_gfxcpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_gfx_map);
 
 	config.set_maximum_quantum(attotime::from_hz(55005));
 
-	PCI_BUS_LEGACY(config, m_legacy_pci, 0, 0);
+	PCI_BUS_LEGACY(config, m_legacy_pci);
 	m_legacy_pci->set_device(0, FUNC(cobra_state::mpc106_pci_r), FUNC(cobra_state::mpc106_pci_w));
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
@@ -3275,15 +3275,15 @@ void cobra_state::cobra(machine_config &config)
 
 	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	M48T58(config, "m48t58", 0);
+	M48T58(config, "m48t58");
 
-	K001604(config, m_k001604, 0);     // on the LAN board in Racing Jam DX
+	K001604(config, m_k001604);     // on the LAN board in Racing Jam DX
 	m_k001604->set_palette(m_palette);
 
-	COBRA_JVS_HOST(config, m_jvs_host, 4000000);
-	COBRA_JVS(config, m_jvs1, 0, m_jvs_host, true);
-	COBRA_JVS(config, m_jvs2, 0, m_jvs_host, true);
-	COBRA_JVS(config, m_jvs3, 0, m_jvs_host, true);
+	COBRA_JVS_HOST(config, m_jvs_host, XTAL::u(4000000));
+	COBRA_JVS(config, m_jvs1, m_jvs_host, true);
+	COBRA_JVS(config, m_jvs2, m_jvs_host, true);
+	COBRA_JVS(config, m_jvs3, m_jvs_host, true);
 }
 
 void cobra_state::rf5c400_map(address_map& map)

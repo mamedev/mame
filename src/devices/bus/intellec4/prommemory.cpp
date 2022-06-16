@@ -95,7 +95,7 @@ class imm6_26_device
 		, public device_image_interface
 {
 public:
-	imm6_26_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	imm6_26_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -119,7 +119,7 @@ private:
 };
 
 
-imm6_26_device::imm6_26_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+imm6_26_device::imm6_26_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, INTELLEC4_PROM_MEMORY, tag, owner, clock)
 	, bus::intellec4::device_univ_card_interface(mconfig, *this)
 	, device_image_interface(mconfig, *this)

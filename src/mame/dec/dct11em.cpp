@@ -265,7 +265,7 @@ void dct11em_state::kbd_put(u8 data)
 void dct11em_state::dct11em(machine_config &config)
 {
 	/* basic machine hardware */
-	T11(config, m_maincpu, 7'500'000); // 7.5MHz XTAL
+	T11(config, m_maincpu, XTAL::u(7'500'000)); // 7.5MHz XTAL
 	m_maincpu->set_initial_mode(0x1403);  /* according to specs */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dct11em_state::mem_map);
 
@@ -277,19 +277,19 @@ void dct11em_state::dct11em(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(dct11em_state::portc_r));   // keyboard
 	m_ppi->out_pc_callback().set(FUNC(dct11em_state::portc_w));  // digits
 
-	I8251(config, m_uart, 2'457'600 / 8);
+	I8251(config, m_uart, XTAL::u(2'457'600) / 8);
 	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_uart->rxrdy_handler().set([this] (bool state) { irq_encoder(7, state); });
 	m_uart->txrdy_handler().set([this] (bool state) { irq_encoder(6, state); });
 
-	clock_device &inta_clock(CLOCK(config, "inta_clock", 614'400 / 768)); // 800Hz, from DLART pin 25
+	clock_device &inta_clock(CLOCK(config, "inta_clock", XTAL::u(614'400) / 768)); // 800Hz, from DLART pin 25
 	inta_clock.signal_handler().set([this] (bool state) { if (state) irq_encoder(10, 1); }); // Assert IRQ10
 
-	//clock_device &dlart_clock(CLOCK(config, "dlart_clock", 2'457'600 / 4)); --> to DLART CLK pin 32
+	//clock_device &dlart_clock(CLOCK(config, "dlart_clock", XTAL::u(2'457'600) / 4)); --> to DLART CLK pin 32
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 2'457'600 / 32));   // from DLART pin 34
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(2'457'600) / 32));   // from DLART pin 34
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
@@ -298,7 +298,7 @@ void dct11em_state::dct11em(machine_config &config)
 	rs232.dsr_handler().set(m_uart, FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set(m_uart, FUNC(i8251_device::write_cts));
 
-	GENERIC_TERMINAL(config, m_terminal, 0); // Main terminal for now
+	GENERIC_TERMINAL(config, m_terminal); // Main terminal for now
 	m_terminal->set_keyboard_callback(FUNC(dct11em_state::kbd_put));
 }
 

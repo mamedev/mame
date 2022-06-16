@@ -15,7 +15,7 @@ class psxcard_device :  public device_t,
 						public device_memcard_image_interface
 {
 public:
-	psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "mc"; }

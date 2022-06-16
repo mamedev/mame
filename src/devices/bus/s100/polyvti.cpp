@@ -36,7 +36,7 @@ class poly_vti_device : public device_t, public device_s100_card_interface
 
 public:
 	// construction/destruction
-	poly_vti_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	poly_vti_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -69,7 +69,7 @@ private:
 
 DEFINE_DEVICE_TYPE_PRIVATE(S100_POLY_VTI, device_s100_card_interface, poly_vti_device, "polyvti", "PolyMorphic Systems Video Terminal Interface")
 
-poly_vti_device::poly_vti_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+poly_vti_device::poly_vti_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S100_POLY_VTI, tag, owner, clock)
 	, device_s100_card_interface(mconfig, *this)
 	, m_kbdlatch(*this, "kbdlatch")
@@ -324,7 +324,7 @@ void poly_vti_device::device_add_mconfig(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_vti);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(poly_vti_device::kbd_put));
 
 	I8212(config, m_kbdlatch);

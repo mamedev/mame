@@ -15,7 +15,7 @@ class zorba_keyboard_device : public device_t
 public:
 	auto rxd_cb() { return m_rxd_cb.bind(); }
 
-	zorba_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	zorba_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	DECLARE_WRITE_LINE_MEMBER(txd_w);
 

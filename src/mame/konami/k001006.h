@@ -10,7 +10,7 @@
 class k001006_device : public device_t
 {
 public:
-	k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~k001006_device() {}
 
 	// configuration

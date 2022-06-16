@@ -42,7 +42,7 @@
 //#define VERBOSE (LOG_IRQ | LOG_BT | LOG_LCDC)
 #include "logmacro.h"
 
-st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram)
+st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram)
 	: w65c02s_device(mconfig, type, tag, owner, clock)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_bits, 0)
 	, m_in_port_cb(*this)

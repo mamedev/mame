@@ -55,7 +55,7 @@ INPUT_PORTS_END
 void matrix_state::matrix(machine_config &config)
 {
 	// basic machine hardware
-	MEDIAGX(config, m_maincpu, 233'000'000); // Cyrix MediaGX GXm-266GP
+	MEDIAGX(config, m_maincpu, XTAL::u(233'000'000)); // Cyrix MediaGX GXm-266GP
 	m_maincpu->set_addrmap(AS_PROGRAM, &matrix_state::main_map);
 
 	// video hardware, all TBD

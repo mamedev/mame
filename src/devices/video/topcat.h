@@ -8,7 +8,7 @@
 class topcat_device : public device_t
 {
 public:
-	topcat_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	topcat_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	bool has_changed() { bool ret = m_changed; m_changed = false; return ret; }
 	void set_fb_width(int _pixels) { m_fb_width = _pixels; }
 	void set_fb_height(int _pixels) { m_fb_height = _pixels; }
@@ -27,7 +27,7 @@ public:
 
 	auto irq_out_cb() { return m_int_write_func.bind(); }
 protected:
-	topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

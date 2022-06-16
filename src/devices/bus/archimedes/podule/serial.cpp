@@ -24,7 +24,7 @@ class arc_serial_device :
 {
 public:
 	// construction/destruction
-	arc_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -119,7 +119,7 @@ void arc_serial_device::device_add_mconfig(machine_config &config)
 //  arc_serial_device - constructor
 //-------------------------------------------------
 
-arc_serial_device::arc_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_serial_device::arc_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_SERIAL, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")

@@ -750,12 +750,12 @@ void hazl1500_state::hazl1500(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_db6", "cpu_db6.IN", 0);
 	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_db7", "cpu_db7.IN", 0);
 
-	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":video_out", 0).set_params("video_out", FUNC(hazl1500_state::video_out_cb));
-	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":vblank", 0).set_params("vblank", FUNC(hazl1500_state::vblank_cb));
-	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":tvinterq", 0).set_params("tvinterq", FUNC(hazl1500_state::tvinterq_cb));
+	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":video_out").set_params("video_out", FUNC(hazl1500_state::video_out_cb));
+	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":vblank").set_params("vblank", FUNC(hazl1500_state::vblank_cb));
+	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":tvinterq").set_params("tvinterq", FUNC(hazl1500_state::tvinterq_cb));
 
 	/* keyboard controller */
-	AY3600(config, m_kbdc, 0);
+	AY3600(config, m_kbdc);
 	m_kbdc->x0().set_ioport("X0");
 	m_kbdc->x1().set_ioport("X1");
 	m_kbdc->x2().set_ioport("X2");

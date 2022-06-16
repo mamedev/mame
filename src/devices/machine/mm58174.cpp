@@ -34,7 +34,7 @@ enum
 DEFINE_DEVICE_TYPE(MM58174, mm58174_device, "mm58174", "National Semiconductor MM58174 RTC")
 
 
-mm58174_device::mm58174_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mm58174_device::mm58174_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MM58174, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
 	, m_control(0)

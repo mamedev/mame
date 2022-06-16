@@ -18,7 +18,7 @@
 class ds1315_device : public device_t
 {
 public:
-	ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~ds1315_device() {}
 
 	auto read_backing() { return m_backing_read.bind(); }

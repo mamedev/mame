@@ -1717,18 +1717,18 @@ void apollo_graphics_15i::device_add_mconfig(machine_config &config)
 	config.set_default_layout(layout_apollo_15i);
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_raw(68000000, 1346, 0, 1024, 841, 0, 800);
+	m_screen->set_raw(XTAL::u(68000000), 1346, 0, 1024, 841, 0, 800);
 	m_screen->set_screen_update(FUNC(apollo_graphics_15i::screen_update));
 }
 
 DEFINE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i, "apollo_graphics_15i", "Apollo Screen")
 
-apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, uint32_t clock) :
+apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, const XTAL &clock) :
 	apollo_graphics_15i(mconfig, APOLLO_GRAPHICS, tag, owner, clock)
 {
 }
 
-apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_screen(*this, VIDEO_SCREEN_TAG)
 {
@@ -1881,13 +1881,13 @@ void apollo_graphics_19i::device_add_mconfig(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_raw(120000000, 1728, 0, 1280, 1066, 0, 1024);
+	m_screen->set_raw(XTAL::u(120000000), 1728, 0, 1280, 1066, 0, 1024);
 	m_screen->set_screen_update(FUNC(apollo_graphics_19i::screen_update));
 }
 
 DEFINE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i, "apollo_graphics_19i", "Apollo 19\" Monochrome Screen")
 
-apollo_graphics_19i::apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apollo_graphics_19i::apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	apollo_graphics_15i(mconfig, APOLLO_MONO19I, tag, owner, clock)
 {
 }

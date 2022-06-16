@@ -207,12 +207,12 @@ ioport_constructor sandy_superqmouse_512k_device::device_input_ports() const
 //  sandy_superqboard_device - constructor
 //-------------------------------------------------
 
-sandy_superqboard_device::sandy_superqboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sandy_superqboard_device::sandy_superqboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sandy_superqboard_device(mconfig, SANDY_SUPERQBOARD, tag, owner, clock, 256*1024)
 {
 }
 
-sandy_superqboard_device::sandy_superqboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int ram_size) :
+sandy_superqboard_device::sandy_superqboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int ram_size) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),
@@ -230,17 +230,17 @@ sandy_superqboard_device::sandy_superqboard_device(const machine_config &mconfig
 {
 }
 
-sandy_superqboard_512k_device::sandy_superqboard_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sandy_superqboard_512k_device::sandy_superqboard_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sandy_superqboard_device(mconfig, SANDY_SUPERQBOARD_512K, tag, owner, clock, 512*1024)
 {
 }
 
-sandy_superqmouse_device::sandy_superqmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sandy_superqmouse_device::sandy_superqmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sandy_superqboard_device(mconfig, SANDY_SUPERQMOUSE, tag, owner, clock, 256*1024)
 {
 }
 
-sandy_superqmouse_512k_device::sandy_superqmouse_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sandy_superqmouse_512k_device::sandy_superqmouse_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sandy_superqboard_device(mconfig, SANDY_SUPERQMOUSE_512K, tag, owner, clock, 512*1024)
 {
 }

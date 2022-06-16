@@ -26,7 +26,7 @@ class model1io_device : public device_t
 {
 public:
 	// construction/destruction
-	model1io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	model1io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto read_callback() { return m_read_cb.bind(); }

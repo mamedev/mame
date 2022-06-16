@@ -19,7 +19,7 @@
 class mea8000_device : public device_t, public device_sound_interface
 {
 public:
-	mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto req() { return m_write_req.bind(); }
 

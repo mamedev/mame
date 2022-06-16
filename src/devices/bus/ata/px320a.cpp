@@ -12,7 +12,7 @@
 
 DEFINE_DEVICE_TYPE(PX320A, px320a_device, "px320a", "PleXCombo PX-320A CD-RW/DVD-ROM Drive")
 
-px320a_device::px320a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+px320a_device::px320a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PX320A, tag, owner, clock)
 	, device_ata_interface(mconfig, *this)
 	, m_frcpu(*this, "frcpu")
@@ -75,7 +75,7 @@ void px320a_device::frcpu_map(address_map &map)
 
 void px320a_device::device_add_mconfig(machine_config &config)
 {
-	MB91F155A(config, m_frcpu, 16'000'000); // FR type guessed; clock unknown
+	MB91F155A(config, m_frcpu, XTAL::u(16'000'000)); // FR type guessed; clock unknown
 	m_frcpu->set_addrmap(AS_PROGRAM, &px320a_device::frcpu_map);
 }
 

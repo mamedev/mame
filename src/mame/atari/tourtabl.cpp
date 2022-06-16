@@ -173,7 +173,7 @@ void tourtabl_state::tourtabl(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	tia_ntsc_video_device &tia(TIA_NTSC_VIDEO(config, "tia_video", 0, "tia"));
+	tia_ntsc_video_device &tia(TIA_NTSC_VIDEO(config, "tia_video", "tia"));
 	tia.read_input_port_callback().set(FUNC(tourtabl_state::tourtabl_read_input_port));
 	tia.databus_contents_callback().set(FUNC(tourtabl_state::tourtabl_get_databus_contents));
 

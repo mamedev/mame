@@ -26,7 +26,7 @@ public:
 
 protected:
 	// construction/destruction
-	cpu16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map);
+	cpu16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map);
 
 	// device-level overrides
 	virtual void device_start() override;

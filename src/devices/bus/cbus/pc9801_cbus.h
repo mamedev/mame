@@ -93,14 +93,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	pc9801_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: pc9801_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: pc9801_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
 	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }

@@ -198,7 +198,7 @@ void segafruit_state::decrypt_m4001()
 
 void segafruit_state::segafruit(machine_config & config)
 {
-	Z80(config, m_maincpu, 4'000'000);
+	Z80(config, m_maincpu, XTAL::u(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &segafruit_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &segafruit_state::io_map);
 

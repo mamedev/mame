@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(BBC_ROM, bbc_rom_device, "bbc_rom", "BBC Micro Sideways ROM")
 //  bbc_rom_device - constructor
 //-------------------------------------------------
 
-bbc_rom_device::bbc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_rom_device::bbc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_ROM, tag, owner, clock)
 	, device_bbc_rom_interface(mconfig, *this)
 {

@@ -734,12 +734,12 @@ void victor9k_state::victor9k(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	HC55516(config, m_cvsd, 0);
+	HC55516(config, m_cvsd);
 	//MCFG_HC55516_DIG_OUT_CB(WRITELINE(MC6852_TAG, mc6852_device, rx_w))
 	m_cvsd->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	IEEE488(config, m_ieee488, 0);
+	IEEE488(config, m_ieee488);
 
 	m_ieee488->dav_callback().set(M6522_1_TAG, FUNC(via6522_device::write_pb0));
 	m_ieee488->eoi_callback().set(M6522_1_TAG, FUNC(via6522_device::write_pb1));
@@ -750,10 +750,10 @@ void victor9k_state::victor9k(machine_config &config)
 	m_ieee488->nrfd_callback().set(FUNC(victor9k_state::write_nfrd));
 	m_ieee488->ndac_callback().set(FUNC(victor9k_state::write_ndac));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	pit8253_device &pit(PIT8253(config, I8253_TAG, 0));
+	pit8253_device &pit(PIT8253(config, I8253_TAG));
 	pit.set_clk<0>(2500000);
 	pit.out_handler<0>().set(FUNC(victor9k_state::mux_serial_b_w));
 	pit.set_clk<1>(2500000);
@@ -810,11 +810,11 @@ void victor9k_state::victor9k(machine_config &config)
 	m_rs232b->cts_handler().set(m_upd7201, FUNC(upd7201_device::ctsb_w));
 	m_rs232b->dsr_handler().set(m_via2, FUNC(via6522_device::write_pa5));
 
-	VICTOR9K_KEYBOARD(config, m_kb, 0);
+	VICTOR9K_KEYBOARD(config, m_kb);
 	m_kb->kbrdy_handler().set(FUNC(victor9k_state::kbrdy_w));
 	m_kb->kbdata_handler().set(FUNC(victor9k_state::kbdata_w));
 
-	VICTOR_9000_FDC(config, m_fdc, 0);
+	VICTOR_9000_FDC(config, m_fdc);
 	m_fdc->irq_wr_callback().set(FUNC(victor9k_state::fdc_irq_w));
 	m_fdc->syn_wr_callback().set(I8259A_TAG, FUNC(pic8259_device::ir0_w)).invert();
 	m_fdc->lbrdy_wr_callback().set_inputline(I8088_TAG, INPUT_LINE_TEST).invert();

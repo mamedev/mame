@@ -31,13 +31,13 @@ class aha1542c_device : public device_t,
 public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 	// construction/destruction
-	aha1542c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	aha1542c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 aha1542_r(offs_t offset);
 	void aha1542_w(offs_t offset, u8 data);
 
 protected:
-	aha1542c_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	aha1542c_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	void local_latch_w(u8 data);
 
@@ -62,7 +62,7 @@ class aha1542cf_device : public aha1542c_device
 {
 public:
 	// construction/destruction
-	aha1542cf_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	aha1542cf_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -74,7 +74,7 @@ class aha1542cp_device : public aha1542c_device
 {
 public:
 	// construction/destruction
-	aha1542cp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	aha1542cp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;

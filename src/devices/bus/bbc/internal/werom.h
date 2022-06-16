@@ -27,10 +27,10 @@ class bbc_werom_device :
 {
 public:
 	// construction/destruction
-	bbc_werom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_werom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	bbc_werom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_werom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	optional_device_array<bbc_romslot_device, 16> m_rom;
 
@@ -45,7 +45,7 @@ class bbc_we12rom_device : public bbc_werom_device
 {
 public:
 	// construction/destruction
-	bbc_we12rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_we12rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -67,7 +67,7 @@ class bbc_we13rom_device : public bbc_werom_device
 {
 public:
 	// construction/destruction
-	bbc_we13rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_we13rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

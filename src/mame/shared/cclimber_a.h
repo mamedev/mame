@@ -22,7 +22,7 @@ class cclimber_audio_device : public device_t
 {
 public:
 	// construction/destruction
-	cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto &set_sample_clockdiv(u8 div) { m_sample_clockdiv = div; return *this; } // determines base sound pitch (default 2)
 

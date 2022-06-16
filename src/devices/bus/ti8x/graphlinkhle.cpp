@@ -19,7 +19,7 @@ class graph_link_hle_device
 		, public device_serial_interface
 {
 public:
-	graph_link_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	graph_link_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -75,7 +75,7 @@ void graph_link_hle_device::device_start()
 void graph_link_hle_device::device_reset()
 {
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(9600);
+	set_rate(XTAL::u(9600));
 	receive_register_reset();
 	transmit_register_reset();
 

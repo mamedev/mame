@@ -99,7 +99,7 @@ void ipc_state::ipc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ipc_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &ipc_state::io_map);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(XTAL(19'660'800) / 16);
 	pit.set_clk<1>(XTAL(19'660'800) / 16);
 	pit.set_clk<2>(XTAL(19'660'800) / 16);
@@ -108,7 +108,7 @@ void ipc_state::ipc(machine_config &config)
 	pit.out_handler<1>().set("uart2", FUNC(i8251_device::write_txc));
 	pit.out_handler<1>().append("uart2", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart1(I8251(config, "uart1", 0)); // 8 data bits, no parity, 1 stop bit, 9600 baud
+	i8251_device &uart1(I8251(config, "uart1")); // 8 data bits, no parity, 1 stop bit, 9600 baud
 	uart1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -118,7 +118,7 @@ void ipc_state::ipc(machine_config &config)
 	rs232a.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
 	rs232a.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 
-	i8251_device &uart2(I8251(config, "uart2", 0)); // 8 data bits, no parity, 2 stop bits, 2400 baud
+	i8251_device &uart2(I8251(config, "uart2")); // 8 data bits, no parity, 2 stop bits, 2400 baud
 	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));

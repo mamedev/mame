@@ -83,7 +83,7 @@ void acorn_8k_device::device_add_mconfig(machine_config &config)
 //  acorn_8k_device - constructor
 //-------------------------------------------------
 
-acorn_8k_device::acorn_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_8k_device::acorn_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACORN_8K, tag, owner, clock)
 	, device_acorn_bus_interface(mconfig, *this)
 	, m_rom(*this, "rom%u", 0)

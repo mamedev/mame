@@ -6,7 +6,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(PC9801_CD, pc9801_cd_device, "pc9801_cd", "PC9801 CD-ROM Drive")
 
-pc9801_cd_device::pc9801_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pc9801_cd_device::pc9801_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	atapi_cdrom_device(mconfig, PC9801_CD, tag, owner, clock)
 {
 }

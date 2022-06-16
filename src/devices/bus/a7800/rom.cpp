@@ -43,87 +43,87 @@ DEFINE_DEVICE_TYPE(A78_ROM_P450_SG_RAM, a78_rom_p450_sg_ram_device, "a78_p450_t6
 DEFINE_DEVICE_TYPE(A78_ROM_P450_SG9,    a78_rom_p450_sg9_device,    "a78_p450_ta",  "Atari 7800 ROM Carts w/SuperGame 9Banks + POKEY @ 0x0450")
 
 
-a78_rom_device::a78_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_device::a78_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a78_cart_interface( mconfig, *this )
 {
 }
 
-a78_rom_device::a78_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_device::a78_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_device(mconfig, A78_ROM, tag, owner, clock)
 {
 }
 
-a78_rom_pokey_device::a78_rom_pokey_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_pokey_device::a78_rom_pokey_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_device(mconfig, type, tag, owner, clock)
 	, m_pokey(*this, "pokey")
 {
 }
 
-a78_rom_pokey_device::a78_rom_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_pokey_device::a78_rom_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_pokey_device(mconfig, A78_ROM_POKEY, tag, owner, clock)
 {
 }
 
 
-a78_rom_mram_device::a78_rom_mram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_mram_device::a78_rom_mram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_device(mconfig, type, tag, owner, clock)
 {
 }
 
-a78_rom_mram_device::a78_rom_mram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_mram_device::a78_rom_mram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_mram_device(mconfig, A78_ROM_MRAM, tag, owner, clock)
 {
 }
 
-a78_rom_sg_device::a78_rom_sg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_sg_device::a78_rom_sg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_device(mconfig, type, tag, owner, clock)
 	, m_bank(0)
 {
 }
 
-a78_rom_sg_device::a78_rom_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_sg_device::a78_rom_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_sg_device(mconfig, A78_ROM_SG, tag, owner, clock)
 {
 }
 
-a78_rom_sg_pokey_device::a78_rom_sg_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_sg_pokey_device::a78_rom_sg_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_sg_device(mconfig, A78_ROM_SG_POKEY, tag, owner, clock)
 	, m_pokey(*this, "pokey")
 {
 }
 
 
-a78_rom_sg_ram_device::a78_rom_sg_ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_sg_ram_device::a78_rom_sg_ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_sg_device(mconfig, type, tag, owner, clock)
 {
 }
 
-a78_rom_sg_ram_device::a78_rom_sg_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_sg_ram_device::a78_rom_sg_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_sg_ram_device(mconfig, A78_ROM_SG_RAM, tag, owner, clock)
 {
 }
 
 
-a78_rom_sg9_device::a78_rom_sg9_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_sg9_device::a78_rom_sg9_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_sg_device(mconfig, type, tag, owner, clock)
 {
 }
 
-a78_rom_sg9_device::a78_rom_sg9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_sg9_device::a78_rom_sg9_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_sg9_device(mconfig, A78_ROM_SG9, tag, owner, clock)
 {
 }
 
 
-a78_rom_abs_device::a78_rom_abs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_abs_device::a78_rom_abs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_device(mconfig, A78_ROM_ABSOLUTE, tag, owner, clock)
 	, m_bank(0)
 {
 }
 
 
-a78_rom_act_device::a78_rom_act_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_act_device::a78_rom_act_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_device(mconfig, A78_ROM_ACTIVISION, tag, owner, clock)
 	, m_bank(0)
 {
@@ -131,25 +131,25 @@ a78_rom_act_device::a78_rom_act_device(const machine_config &mconfig, const char
 
 
 
-a78_rom_p450_device::a78_rom_p450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_p450_device::a78_rom_p450_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_device(mconfig, A78_ROM_P450, tag, owner, clock)
 	, m_pokey450(*this, "pokey450")
 {
 }
 
-a78_rom_p450_pokey_device::a78_rom_p450_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_p450_pokey_device::a78_rom_p450_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_pokey_device(mconfig, A78_ROM_P450_POKEY, tag, owner, clock)
 	, m_pokey450(*this, "pokey450")
 {
 }
 
-a78_rom_p450_sg_ram_device::a78_rom_p450_sg_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_p450_sg_ram_device::a78_rom_p450_sg_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_sg_ram_device(mconfig, A78_ROM_P450_SG_RAM, tag, owner, clock)
 	, m_pokey450(*this, "pokey450")
 {
 }
 
-a78_rom_p450_sg9_device::a78_rom_p450_sg9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_p450_sg9_device::a78_rom_p450_sg9_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_sg9_device(mconfig, A78_ROM_P450_SG9, tag, owner, clock)
 	, m_pokey450(*this, "pokey450")
 {

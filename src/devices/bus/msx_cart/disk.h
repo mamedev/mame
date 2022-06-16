@@ -23,7 +23,7 @@ public:
 	virtual void initialize_cartridge() override;
 
 protected:
-	msx_cart_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
@@ -36,7 +36,7 @@ protected:
 class msx_cart_disk_wd_device : public msx_cart_disk_device
 {
 protected:
-	msx_cart_disk_wd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_disk_wd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_device<wd_fdc_analog_device_base> m_fdc;
 };
@@ -49,7 +49,7 @@ public:
 	virtual void write_cart(offs_t offset, uint8_t data) override;
 
 protected:
-	msx_cart_disk_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_disk_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -72,7 +72,7 @@ public:
 	virtual void write_cart(offs_t offset, uint8_t data) override;
 
 protected:
-	msx_cart_disk_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_disk_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -89,7 +89,7 @@ protected:
 class msx_cart_vy0010_device : public msx_cart_disk_type1_device
 {
 public:
-	msx_cart_vy0010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_vy0010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -99,7 +99,7 @@ protected:
 class msx_cart_fsfd1_device : public msx_cart_disk_type1_device
 {
 public:
-	msx_cart_fsfd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_fsfd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -109,7 +109,7 @@ protected:
 class msx_cart_fscf351_device : public msx_cart_disk_type2_device
 {
 public:
-	msx_cart_fscf351_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_fscf351_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -119,7 +119,7 @@ protected:
 class msx_cart_disk_tc8566_device : public msx_cart_disk_device
 {
 protected:
-	msx_cart_disk_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_disk_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_device<tc8566af_device> m_fdc;
 };
@@ -128,7 +128,7 @@ protected:
 class msx_cart_fsfd1a_device : public msx_cart_disk_tc8566_device
 {
 public:
-	msx_cart_fsfd1a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_fsfd1a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

@@ -22,7 +22,7 @@
 
 DEFINE_DEVICE_TYPE(INTV_ROM_VOICE, intv_voice_device, "intv_voice", "Intellivision Intellivoice Expansion")
 
-intv_voice_device::intv_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+intv_voice_device::intv_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: intv_rom_device(mconfig, INTV_ROM_VOICE, tag, owner, clock),
 	m_speech(*this, "sp0256_speech"),
 	m_subslot(*this, "subslot"),
@@ -73,7 +73,7 @@ void intv_voice_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono_voice").front_center();
 
-	SP0256(config, m_speech, 3120000);
+	SP0256(config, m_speech, XTAL::u(3120000));
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
 	m_speech->add_route(ALL_OUTPUTS, "mono_voice", 1.00);
 

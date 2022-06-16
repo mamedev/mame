@@ -44,7 +44,7 @@ protected:
 	};
 
 
-	mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width, address_map_constructor regs_map);
+	mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int data_width, address_map_constructor regs_map);
 
 	// device-level overrides
 	virtual void device_start() override;

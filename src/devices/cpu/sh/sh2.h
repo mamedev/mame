@@ -55,7 +55,7 @@ public:
 	typedef device_delegate<void (uint32_t data)> ftcsr_read_delegate;
 
 	// construction/destruction
-	sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~sh2_device() override;
 
 	void set_is_slave(int slave) { m_is_slave = slave; }
@@ -207,7 +207,7 @@ public:
 
 	void sh7604_map(address_map &map);
 protected:
-	sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type,address_map_constructor internal_map, int addrlines);
+	sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int cpu_type,address_map_constructor internal_map, int addrlines);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -366,7 +366,7 @@ class sh2a_device : public sh2_device
 {
 public:
 	// construction/destruction
-	sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t dma_sar0_r();
 	void dma_sar0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -400,7 +400,7 @@ class sh1_device : public sh2_device
 {
 public:
 	// construction/destruction
-	sh1_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	sh1_device(const machine_config &mconfig, const char *_tag, device_t *_owner, const XTAL &_clock);
 
 	uint16_t sh7032_r(offs_t offset);
 	void sh7032_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

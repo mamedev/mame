@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(S24SPRITE, segas24_sprite_device, "segas24_sprite", "Sega Sys
 DEFINE_DEVICE_TYPE(S24MIXER,  segas24_mixer_device,  "segas24_mixer",  "Sega System 24 Mixer")
 
 
-segas24_tile_device::segas24_tile_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segas24_tile_device::segas24_tile_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S24TILE, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, char_gfx_index(0)
@@ -550,7 +550,7 @@ void segas24_tile_device::xvout_w(uint16_t data)
 	m_xvout_write_cb(data);
 }
 
-segas24_sprite_device::segas24_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segas24_sprite_device::segas24_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S24SPRITE, tag, owner, clock)
 {
 }
@@ -788,7 +788,7 @@ uint16_t segas24_sprite_device::read(offs_t offset)
 }
 
 
-segas24_mixer_device::segas24_mixer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segas24_mixer_device::segas24_mixer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S24MIXER, tag, owner, clock)
 {
 }

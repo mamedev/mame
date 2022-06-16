@@ -24,7 +24,7 @@ class seibu_crtc_device : public device_t,
 {
 public:
 	// construction/destruction
-	seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto decrypt_key_callback() { return m_decrypt_key_cb.bind(); }
 	auto layer_en_callback() { return m_layer_en_cb.bind(); }

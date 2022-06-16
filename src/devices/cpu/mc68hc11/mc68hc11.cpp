@@ -53,7 +53,7 @@ DEFINE_DEVICE_TYPE(MC68HC11K1, mc68hc11k1_device, "mc68hc11k1", "Motorola MC68HC
 DEFINE_DEVICE_TYPE(MC68HC11M0, mc68hc11m0_device, "mc68hc11m0", "Motorola MC68HC11M0")
 
 
-mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t ram_size, uint16_t reg_block_size, uint16_t rom_size, uint16_t eeprom_size, uint8_t init_value, uint8_t config_mask, uint8_t option_mask)
+mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint16_t ram_size, uint16_t reg_block_size, uint16_t rom_size, uint16_t eeprom_size, uint8_t init_value, uint8_t config_mask, uint8_t option_mask)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this, (config_mask & 0xf9) != 0)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, address_map_constructor(FUNC(mc68hc11_cpu_device::internal_map), this))
@@ -107,38 +107,38 @@ void mc68hc11_cpu_device::internal_map(address_map &map)
 	}
 }
 
-mc68hc11a1_device::mc68hc11a1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68hc11a1_device::mc68hc11a1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc68hc11_cpu_device(mconfig, MC68HC11A1, tag, owner, clock, 256, 64, 0, 512, 0x01, 0x0f, 0xfb)
 {
 }
 
-mc68hc11d0_device::mc68hc11d0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68hc11d0_device::mc68hc11d0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc68hc11_cpu_device(mconfig, MC68HC11D0, tag, owner, clock, 192, 64, 0, 0, 0x00, 0x06, 0x3b)
 {
 }
 
-mc68hc11e1_device::mc68hc11e1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68hc11e1_device::mc68hc11e1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc68hc11_cpu_device(mconfig, MC68HC11E1, tag, owner, clock, 512, 64, 0, 512, 0x01, 0x0f, 0xfb)
 {
 }
 
-mc68hc811e2_device::mc68hc811e2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68hc811e2_device::mc68hc811e2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc68hc11_cpu_device(mconfig, MC68HC811E2, tag, owner, clock, 256, 64, 0, 2048, 0x01, 0xf5, 0xfb)
 {
 }
 
-mc68hc11f1_device::mc68hc11f1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68hc11f1_device::mc68hc11f1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc68hc11_cpu_device(mconfig, MC68HC11F1, tag, owner, clock, 1024, 96, 0, 512, 0x01, 0xf5, 0xff)
 {
 	m_config &= 0x0f;
 }
 
-mc68hc11k1_device::mc68hc11k1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68hc11k1_device::mc68hc11k1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc68hc11_cpu_device(mconfig, MC68HC11K1, tag, owner, clock, 768, 128, 0, 640, 0x00, 0xbf, 0xff)
 {
 }
 
-mc68hc11m0_device::mc68hc11m0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68hc11m0_device::mc68hc11m0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc68hc11_cpu_device(mconfig, MC68HC11M0, tag, owner, clock, 1280, 256, 0, 0, 0x00, 0x06, 0xff)
 {
 }

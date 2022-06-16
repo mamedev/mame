@@ -509,7 +509,7 @@ void missb2_state::missb2(machine_config &config)
 	m_ym3526->irq_handler().set(FUNC(missb2_state::irqhandler));
 	m_ym3526->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 0.4);
 }
 

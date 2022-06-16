@@ -63,7 +63,7 @@ void wangpc_lic_device::device_add_mconfig(machine_config &config)
 //  wangpc_lic_device - constructor
 //-------------------------------------------------
 
-wangpc_lic_device::wangpc_lic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wangpc_lic_device::wangpc_lic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WANGPC_LIC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this)
 {

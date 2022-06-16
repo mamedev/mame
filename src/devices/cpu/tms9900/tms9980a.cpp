@@ -80,17 +80,17 @@
 /****************************************************************************
     Constructor
 ****************************************************************************/
-tms9980a_device::tms9980a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+tms9980a_device::tms9980a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: tms99xx_device(mconfig, type, tag, 8, 14, 11, owner, clock)
 {
 }
 
-tms9980a_device::tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9980a_device::tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9980a_device(mconfig, TMS9980A, tag, owner, clock)
 {
 }
 
-tms9981_device::tms9981_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9981_device::tms9981_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9980a_device(mconfig, TMS9981, tag, owner, clock)
 {
 }

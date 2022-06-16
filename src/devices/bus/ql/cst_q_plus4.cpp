@@ -52,7 +52,7 @@ const tiny_rom_entry *cst_q_plus4_device::device_rom_region() const
 
 void cst_q_plus4_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, MC6821_TAG, 0);
+	PIA6821(config, MC6821_TAG);
 
 	QL_EXPANSION_SLOT(config, m_exp1, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr);
 	m_exp1->extintl_wr_callback().set(FUNC(cst_q_plus4_device::exp1_extintl_w));
@@ -77,7 +77,7 @@ void cst_q_plus4_device::device_add_mconfig(machine_config &config)
 //  cst_q_plus4_device - constructor
 //-------------------------------------------------
 
-cst_q_plus4_device::cst_q_plus4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cst_q_plus4_device::cst_q_plus4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CST_Q_PLUS4, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_exp1(*this, "exp1"),

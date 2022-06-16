@@ -22,7 +22,7 @@ class ps2_dmac_device : public device_t, public device_execute_interface
 {
 public:
 	template <typename T, typename U, typename V, typename W, typename X>
-	ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&ee_tag, U &&ram_tag, V &&sif_tag, W &&gs_tag, X &&vu1_tag)
+	ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&ee_tag, U &&ram_tag, V &&sif_tag, W &&gs_tag, X &&vu1_tag)
 		: ps2_dmac_device(mconfig, tag, owner, clock)
 	{
 		m_ee.set_tag(std::forward<T>(ee_tag));
@@ -32,7 +32,7 @@ public:
 		m_vu1.set_tag(std::forward<X>(vu1_tag));
 	}
 
-	ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~ps2_dmac_device() override;
 
 	enum channel_type : uint32_t

@@ -13,13 +13,13 @@ class k054321_device : public device_t
 public:
 	template<typename T, typename U>
 	k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&left, U &&right) :
-		k054321_device(mconfig, tag, owner, 0)
+		k054321_device(mconfig, tag, owner)
 	{
 		m_left.set_tag(std::forward<T>(left));
 		m_right.set_tag(std::forward<U>(right));
 	}
 
-	k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);

@@ -29,7 +29,7 @@ INPUT_PORTS_END
 
 void powerstack_state::powerstack(machine_config &config)
 {
-//  ppc604_device &maincpu(PPC604(config, "maincpu", 300'000'000)); // PPC604E @ 300MHz
+//  ppc604_device &maincpu(PPC604(config, "maincpu", XTAL::u(300'000'000))); // PPC604E @ 300MHz
 //  maincpu.set_addrmap(AS_PROGRAM, &powerstack_state::mem_map);
 }
 

@@ -365,12 +365,12 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 
 	X2210(config, "nvram");
 
-	TTL7474(config, m_7474, 0);
+	TTL7474(config, m_7474);
 	m_7474->comp_output_cb().set_inputline(m_maincpu, MCS51_INT1_LINE).invert(); // /Q connects directly to /INT1, so we need to invert
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_buzzer, 2000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_buzzer, XTAL::u(2000)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_rs232->rxd_handler().set_inputline("maincpu", MCS51_RX_LINE);

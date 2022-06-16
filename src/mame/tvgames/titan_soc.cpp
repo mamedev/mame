@@ -125,7 +125,7 @@ void titan_soc_state::machine_reset()
 void titan_soc_state::titan_soc(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM920T(config, m_maincpu, 200000000); // type + clock unknown
+	ARM920T(config, m_maincpu, XTAL::u(200000000)); // type + clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &titan_soc_state::map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

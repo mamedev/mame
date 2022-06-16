@@ -442,7 +442,7 @@ void device_execute_interface::interface_pre_reset()
 	// enable all devices (except for disabled and unclocked devices)
 	if (disabled())
 		suspend(SUSPEND_REASON_DISABLE, true);
-	else if (device().clock() != 0)
+	else if (!device().clock().disabled())
 		resume(SUSPEND_ANY_REASON);
 }
 
@@ -486,7 +486,7 @@ void device_execute_interface::interface_post_reset()
 void device_execute_interface::interface_clock_changed(bool sync_on_new_clock_domain)
 {
 	// a clock of zero disables the device
-	if (device().clock() == 0)
+	if (device().clock().disabled())
 	{
 		suspend(SUSPEND_REASON_CLOCK, true);
 		return;
@@ -497,7 +497,7 @@ void device_execute_interface::interface_clock_changed(bool sync_on_new_clock_do
 		resume(SUSPEND_REASON_CLOCK);
 
 	// recompute cps and spc
-	m_cycles_per_second = clocks_to_cycles(device().clock());
+	m_cycles_per_second = clocks_to_cycles(device().clock().value());
 	m_attoseconds_per_cycle = HZ_TO_ATTOSECONDS(m_cycles_per_second);
 
 	// resynchronize the localtime to the clock domain when asked to
@@ -557,13 +557,13 @@ int device_execute_interface::standard_irq_callback(int irqline)
 attoseconds_t device_execute_interface::minimum_quantum() const
 {
 	// if we don't have a clock, return a huge factor
-	if (device().clock() == 0)
+	if (device().clock().disabled())
 		return ATTOSECONDS_PER_SECOND - 1;
 
 	// if we don't have the quantum time, compute it
 	attoseconds_t basetick = m_attoseconds_per_cycle;
 	if (basetick == 0)
-		basetick = HZ_TO_ATTOSECONDS(clocks_to_cycles(device().clock()));
+		basetick = HZ_TO_ATTOSECONDS(clocks_to_cycles(device().clock().value()));
 
 	// apply the minimum cycle count
 	return basetick * min_cycles();

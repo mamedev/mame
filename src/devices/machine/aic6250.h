@@ -11,7 +11,7 @@
 class aic6250_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
-	aic6250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	aic6250_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void map(address_map &map);
 
@@ -34,7 +34,7 @@ public:
 	void dma16_w(u16 data);
 
 protected:
-	aic6250_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	aic6250_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// standard device_interface overrides
 	virtual void device_start() override;
@@ -282,7 +282,7 @@ private:
 class aic6251a_device : public aic6250_device
 {
 public:
-	aic6251a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	aic6251a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(AIC6250, aic6250_device)

@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(SONYPS2_PAD, ps2_pad_device, "ps2pad", "Sony DualShock 2")
 
 /*static*/ const size_t ps2_pad_device::BUFFER_SIZE = 64; // Total guess
 
-ps2_pad_device::ps2_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ps2_pad_device::ps2_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYPS2_PAD, tag, owner, clock)
 {
 }

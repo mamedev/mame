@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(RP2C33_SOUND, rp2c33_sound_device, "rp2c33_snd", "Ricoh RP2C3
 //  rp2c33_sound_device - constructor
 //-------------------------------------------------
 
-rp2c33_sound_device::rp2c33_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rp2c33_sound_device::rp2c33_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RP2C33_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {

@@ -22,7 +22,7 @@ TODO:
 DEFINE_DEVICE_TYPE(MSX_CART_BM_012, msx_cart_bm_012_device, "msx_cart_bm_012", "MSX Cartridge - BM-012")
 
 
-msx_cart_bm_012_device::msx_cart_bm_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_bm_012_device::msx_cart_bm_012_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_BM_012, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_tmpz84c015af(*this, "tmpz84c015af")

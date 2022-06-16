@@ -13,7 +13,7 @@
 DEFINE_DEVICE_TYPE(SPG290_TIMER, spg290_timer_device, "spg290_timer", "SPG290 Timer")
 
 
-spg290_timer_device::spg290_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spg290_timer_device::spg290_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPG290_TIMER, tag, owner, clock)
 	, m_irq_cb(*this)
 	, m_enabled(false)

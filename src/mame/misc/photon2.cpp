@@ -362,13 +362,13 @@ void photon2_state::machine_start()
 void photon2_state::photon2(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3500000);        /* 3.5 MHz */
+	Z80(config, m_maincpu, XTAL::u(3500000));        /* 3.5 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &photon2_state::spectrum_mem);
 	m_maincpu->set_addrmap(AS_IO, &photon2_state::spectrum_io);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(photon2_state::spec_interrupt_hack), "screen", 0, 1);
 
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set_ioport("JOY");
 	m_ppi->in_pc_callback().set_ioport("COIN");
 	m_ppi->out_pc_callback().set(FUNC(photon2_state::misc_w));

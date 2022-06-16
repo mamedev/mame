@@ -388,11 +388,11 @@ INTERRUPT_GEN_MEMBER(konendev_state::vbl_interrupt)
 void konendev_state::konendev(machine_config &config)
 {
 	/* basic machine hardware */
-	PPC403GCX(config, m_maincpu, 32000000); // Clock unknown
+	PPC403GCX(config, m_maincpu, XTAL::u(32000000)); // Clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konendev_state::konendev_map);
 	m_maincpu->set_vblank_int("screen", FUNC(konendev_state::vbl_interrupt));
 
-	H83007(config, m_ifu, 8000000); // Clock unknown
+	H83007(config, m_ifu, XTAL::u(8000000)); // Clock unknown
 	m_ifu->set_addrmap(AS_PROGRAM, &konendev_state::ifu_map);
 
 	/* video hardware */
@@ -403,7 +403,7 @@ void konendev_state::konendev(machine_config &config)
 	screen.set_screen_update(FUNC(konendev_state::screen_update));
 	screen.set_palette("palette");
 
-	K057714(config, m_gcu, 0).set_screen("screen");
+	K057714(config, m_gcu).set_screen("screen");
 	m_gcu->irq_callback().set(FUNC(konendev_state::gcu_interrupt));
 
 	RTC62423(config, m_rtc, XTAL(32'768));
@@ -417,7 +417,7 @@ void konendev_state::konendev(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400)); // Clock unknown
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL::u(16934400))); // Clock unknown
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }

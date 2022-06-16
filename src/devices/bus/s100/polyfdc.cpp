@@ -20,7 +20,7 @@ class poly_fdc_device : public device_t, public device_s100_card_interface
 {
 public:
 	// construction/destruction
-	poly_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	poly_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
@@ -45,7 +45,7 @@ private:
 
 DEFINE_DEVICE_TYPE_PRIVATE(S100_POLY_FDC, device_s100_card_interface, poly_fdc_device, "polyfdc", "PolyMorphic Systems Disk Controller")
 
-poly_fdc_device::poly_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+poly_fdc_device::poly_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S100_POLY_FDC, tag, owner, clock)
 	, device_s100_card_interface(mconfig, *this)
 	, m_usrt(*this, "usrt")
@@ -115,7 +115,7 @@ void poly_fdc_device::pc_w(u8 data)
 
 void poly_fdc_device::device_add_mconfig(machine_config &config)
 {
-	MC6852(config, m_usrt, 0); // E generated from PDBIN+ and PWR-
+	MC6852(config, m_usrt); // E generated from PDBIN+ and PWR-
 
 	I8255(config, m_pio);
 	m_pio->out_pa_callback().set(FUNC(poly_fdc_device::pa_w));

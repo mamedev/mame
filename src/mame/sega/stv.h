@@ -191,8 +191,8 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }
 };
 
-//#define MASTER_CLOCK_352 57272720
-//#define MASTER_CLOCK_320 53693174
+//#define MASTER_CLOCK_352 XTAL::u(57272720)
+//#define MASTER_CLOCK_320 XTAL::u(53693174)
 #define CEF_1   m_vdp1_regs[0x010/2]|=0x0002
 #define CEF_0   m_vdp1_regs[0x010/2]&=~0x0002
 #define BEF_1   m_vdp1_regs[0x010/2]|=0x0001

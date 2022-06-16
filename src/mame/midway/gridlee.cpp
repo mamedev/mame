@@ -421,7 +421,7 @@ void gridlee_state::gridlee(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GRIDLEE(config, "gridlee", 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	GRIDLEE(config, "gridlee").add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(8);

@@ -64,7 +64,7 @@ DEFINE_DEVICE_TYPE(PSION_DATAPACK, datapack_device, "datapack", "Psion Datapack"
 //  datapack_device - constructor
 //-------------------------------------------------
 
-datapack_device::datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+datapack_device::datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PSION_DATAPACK, tag, owner, clock)
 	, device_memcard_image_interface(mconfig, *this)
 {

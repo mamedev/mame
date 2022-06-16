@@ -345,7 +345,7 @@ void alg_state::alg_r1(machine_config &config)
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_copper->set_ecs_mode(false);
 
-	SONY_LDP1450(config, m_laserdisc, 9600);
+	SONY_LDP1450(config, m_laserdisc, XTAL::u(9600));
 	m_laserdisc->set_screen("screen");
 	m_laserdisc->set_overlay(512*2, 262, FUNC(amiga_state::screen_update_amiga));
 	m_laserdisc->set_overlay_clip((129-8)*2, (449+8-1)*2, 44-8, 244+8-1);

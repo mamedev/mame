@@ -12,7 +12,7 @@
 class k053252_device : public device_t, public device_video_interface
 {
 public:
-	k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto int1_en() { return m_int1_en_cb.bind(); }
 	auto int2_en() { return m_int2_en_cb.bind(); }

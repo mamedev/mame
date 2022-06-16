@@ -21,7 +21,7 @@ class mach32_8514a_device : public mach8_device
 {
 public:
 	// construction/destruction
-	mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t mach32_chipid_r() { return m_chip_ID; }
 	uint16_t mach32_mem_boundary_r() { return m_membounds; }
@@ -35,7 +35,7 @@ public:
 	bool has_display_mode_changed() { if(display_mode_change) { display_mode_change = false; return true; } else return false; }
 
 protected:
-	mach32_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mach32_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -51,7 +51,7 @@ class mach32_device : public ati_vga_device
 {
 public:
 	// construction/destruction
-	mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 	required_device<mach32_8514a_device> m_8514a;  // provides accelerated 2D drawing, derived from the Mach8 device
@@ -160,7 +160,7 @@ public:
 	void mach32_cursor_offset_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
-	mach32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mach32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -194,10 +194,10 @@ class mach64_8514a_device : public mach32_8514a_device
 {
 public:
 	// construction/destruction
-	mach64_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach64_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	mach64_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mach64_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -208,13 +208,13 @@ class mach64_device : public mach32_device
 {
 public:
 	// construction/destruction
-	mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void mach64_config1_w(uint16_t data) { }  // why does the mach64 BIOS write to these, they are read only on the mach32 and earlier
 	void mach64_config2_w(uint16_t data) { }
 
 protected:
-	mach64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mach64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

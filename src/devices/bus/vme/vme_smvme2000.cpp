@@ -23,7 +23,7 @@
 
 DEFINE_DEVICE_TYPE(VME_SMVME2000, vme_smvme2000_device, "smvme2000", "Signetics SMVME2000")
 
-vme_smvme2000_device::vme_smvme2000_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+vme_smvme2000_device::vme_smvme2000_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VME_SMVME2000, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
@@ -96,7 +96,7 @@ void vme_smvme2000_device::device_add_mconfig(machine_config &config)
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set(m_pit, FUNC(pit68230_device::h3_w)); // TODO: verify destination
 
-	PIT68230(config, m_pit, 0);
+	PIT68230(config, m_pit);
 	m_pit->pc_out_callback().set(
 		[this](u8 data)
 		{

@@ -50,7 +50,7 @@ INPUT_PORTS_END
 
 void bgt_state::bgt(machine_config &config)
 {
-	I80186(config, m_maincpu, 12000000); // ?
+	I80186(config, m_maincpu, XTAL::u(12000000)); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &bgt_state::bgt_map);
 	m_maincpu->set_addrmap(AS_IO, &bgt_state::bgt_io);
 }

@@ -477,7 +477,7 @@ void mpcb828_device::device_add_mconfig(machine_config &config)
 	m_dsp->set_disable();
 	//m_dsp->set_addrmap(0, map_dynamic<2>);
 
-	BT458(config, "ramdac", 83'020'800);
+	BT458(config, "ramdac", XTAL::u(83'020'800));
 
 	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_int_callback().set(FUNC(mpcb828_device::scc_irq));
@@ -508,7 +508,7 @@ void mpcb849_device::device_add_mconfig(machine_config &config)
 	m_dsp->holda().set(FUNC(mpcb828_device::holda));
 	m_dsp->set_disable();
 
-	BT458(config, "ramdac", 0); // unconfirmed clock
+	BT458(config, "ramdac"); // unconfirmed clock
 
 	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_int_callback().set(FUNC(mpcb849_device::scc_irq));
@@ -536,9 +536,9 @@ void mpcba63_device::device_add_mconfig(machine_config &config)
 	//m_screen->set_raw(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34);
 	//m_screen->set_screen_update().set(FUNC(mpcba63_device::screen_update));
 	//m_screen->screen_vblank().set(FUNC(?, vblank));
-	//BT457(config, "ramdac0", 0); // PS045701-165
-	//BT457(config, "ramdac1", 0);
-	//BT457(config, "ramdac2", 0);
+	//BT457(config, "ramdac0"); // PS045701-165
+	//BT457(config, "ramdac1");
+	//BT457(config, "ramdac2");
 }
 
 /*
@@ -579,12 +579,12 @@ void mpcb896_device::device_add_mconfig(machine_config &config)
 	RAM(config, "sram").set_default_size("256KiB").set_default_value(0);
 	RAM(config, "vram").set_default_size("18MiB").set_default_value(0);
 
-	BT457(config, "ramdac0", 164'609'300);
-	BT457(config, "ramdac1", 164'609'300);
-	BT457(config, "ramdac2", 164'609'300);
+	BT457(config, "ramdac0", XTAL::u(164'609'300));
+	BT457(config, "ramdac1", XTAL::u(164'609'300));
+	BT457(config, "ramdac2", XTAL::u(164'609'300));
 }
 
-edge1_device_base::edge1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+edge1_device_base::edge1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_srx_card_interface(mconfig, *this)
 	, m_screen(*this, "screen")
@@ -596,13 +596,13 @@ edge1_device_base::edge1_device_base(const machine_config &mconfig, device_type 
 {
 }
 
-edge2_processor_device_base::edge2_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+edge2_processor_device_base::edge2_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_srx_card_interface(mconfig, *this)
 {
 }
 
-edge2plus_processor_device_base::edge2plus_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+edge2plus_processor_device_base::edge2plus_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_srx_card_interface(mconfig, *this)
 	, m_dsp1(*this, "dsp1")
@@ -611,13 +611,13 @@ edge2plus_processor_device_base::edge2plus_processor_device_base(const machine_c
 {
 }
 
-edge2_framebuffer_device_base::edge2_framebuffer_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+edge2_framebuffer_device_base::edge2_framebuffer_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_srx_card_interface(mconfig, *this)
 {
 }
 
-edge2plus_framebuffer_device_base::edge2plus_framebuffer_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+edge2plus_framebuffer_device_base::edge2plus_framebuffer_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_srx_card_interface(mconfig, *this)
 	, m_screen(*this, "screen")
@@ -627,32 +627,32 @@ edge2plus_framebuffer_device_base::edge2plus_framebuffer_device_base(const machi
 {
 }
 
-mpcb828_device::mpcb828_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mpcb828_device::mpcb828_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: edge1_device_base(mconfig, MPCB828, tag, owner, clock)
 {
 }
 
-mpcb849_device::mpcb849_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mpcb849_device::mpcb849_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: edge1_device_base(mconfig, MPCB849, tag, owner, clock)
 {
 }
 
-mpcb030_device::mpcb030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mpcb030_device::mpcb030_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: edge2_processor_device_base(mconfig, MPCB030, tag, owner, clock)
 {
 }
 
-mpcba63_device::mpcba63_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mpcba63_device::mpcba63_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: edge2_framebuffer_device_base(mconfig, MPCBA63, tag, owner, clock)
 {
 }
 
-msmt094_device::msmt094_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msmt094_device::msmt094_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: edge2plus_processor_device_base(mconfig, MSMT094, tag, owner, clock)
 {
 }
 
-mpcb896_device::mpcb896_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mpcb896_device::mpcb896_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: edge2plus_framebuffer_device_base(mconfig, MPCB896, tag, owner, clock)
 {
 }

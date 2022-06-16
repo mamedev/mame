@@ -9,7 +9,7 @@
 
 DEFINE_DEVICE_TYPE(TOPCAT, topcat_device, "topcat", "HP Topcat ASIC")
 
-topcat_device::topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+topcat_device::topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_int_write_func(*this),
 	m_cursor_timer(nullptr),
@@ -17,7 +17,7 @@ topcat_device::topcat_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-topcat_device::topcat_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+topcat_device::topcat_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	topcat_device(mconfig, TOPCAT, tag, owner, clock)
 {
 }

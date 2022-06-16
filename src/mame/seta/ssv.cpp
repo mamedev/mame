@@ -2631,7 +2631,7 @@ void ssv_state::drifto94(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::drifto94_map);
 
-	UPD96050(config, m_dsp, 10000000); /* TODO: correct? */
+	UPD96050(config, m_dsp, XTAL::u(10000000)); /* TODO: correct? */
 	m_dsp->set_addrmap(AS_PROGRAM, &ssv_state::dsp_prg_map);
 	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
@@ -2652,7 +2652,7 @@ void gdfs_state::gdfs(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	ADC0809(config, m_adc, 1000000); // unknown clock
+	ADC0809(config, m_adc, XTAL::u(1000000)); // unknown clock
 	m_adc->in_callback<0>().set_ioport("GUNX1");
 	m_adc->in_callback<1>().set_ioport("GUNY1");
 	m_adc->in_callback<2>().set_ioport("GUNX2");
@@ -2663,7 +2663,7 @@ void gdfs_state::gdfs(machine_config &config)
 	m_screen->set_visarea(0, (0xd5-0x2c)*2-1, 0, (0x102-0x12)-1);
 	m_screen->set_screen_update(FUNC(gdfs_state::screen_update));
 
-	ST0020_SPRITES(config, m_st0020, 0);
+	ST0020_SPRITES(config, m_st0020);
 	m_st0020->set_palette(m_palette);
 
 	m_gfxdecode->set_info(gfx_gdfs);
@@ -2805,7 +2805,7 @@ void ssv_state::stmblade(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::drifto94_map);
 
-	UPD96050(config, m_dsp, 10000000);
+	UPD96050(config, m_dsp, XTAL::u(10000000));
 	m_dsp->set_addrmap(AS_PROGRAM, &ssv_state::dsp_prg_map);
 	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
@@ -2872,7 +2872,7 @@ void sxyreact_state::sxyreact(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	UPD7001(config, m_sxyreact_adc, 1'500'000); // FIXME: runs too fast because CPU doesn't wait long enough
+	UPD7001(config, m_sxyreact_adc, XTAL::u(1'500'000)); // FIXME: runs too fast because CPU doesn't wait long enough
 	m_sxyreact_adc->a0_callback().set_ioport("PADDLE");
 	m_sxyreact_adc->dl_w(1);
 	m_sxyreact_adc->si_w(0);
@@ -2892,7 +2892,7 @@ void sxyreact_state::sxyreac2(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	UPD7001(config, m_sxyreact_adc, 1'500'000); // FIXME: runs too fast because CPU doesn't wait long enough
+	UPD7001(config, m_sxyreact_adc, XTAL::u(1'500'000)); // FIXME: runs too fast because CPU doesn't wait long enough
 	m_sxyreact_adc->a0_callback().set_ioport("PADDLE");
 
 	/* video hardware */
@@ -2921,7 +2921,7 @@ void ssv_state::twineag2(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::twineag2_map);
 
-	UPD96050(config, m_dsp, 10000000);
+	UPD96050(config, m_dsp, XTAL::u(10000000));
 	m_dsp->set_addrmap(AS_PROGRAM, &ssv_state::dsp_prg_map);
 	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
@@ -2953,7 +2953,7 @@ void ssv_state::jsk(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::jsk_map);
 
-	V810(config, "sub", 25000000).set_addrmap(AS_PROGRAM, &ssv_state::jsk_v810_mem);
+	V810(config, "sub", XTAL::u(25000000)).set_addrmap(AS_PROGRAM, &ssv_state::jsk_v810_mem);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

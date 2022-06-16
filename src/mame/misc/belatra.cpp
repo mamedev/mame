@@ -72,7 +72,7 @@ INPUT_PORTS_END
 
 void belatra_state::belatra(machine_config &config)
 {
-	ARM7(config, m_maincpu, 54000000); // guess...
+	ARM7(config, m_maincpu, XTAL::u(54000000)); // guess...
 	m_maincpu->set_addrmap(AS_PROGRAM, &belatra_state::belatra_map);
 
 	SPEAKER(config, "lspeaker").front_left();

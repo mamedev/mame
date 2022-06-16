@@ -26,7 +26,7 @@ class nascom_avc_device : public device_t, public device_nasbus_card_interface
 {
 public:
 	// construction/destruction
-	nascom_avc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nascom_avc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void control_w(uint8_t data);
 
 	uint8_t vram_r(offs_t offset);

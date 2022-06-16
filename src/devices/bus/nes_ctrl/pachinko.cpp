@@ -40,7 +40,7 @@ ioport_constructor nes_pachinko_device::device_input_ports() const
 //  nes_pachinko_device - constructor
 //-------------------------------------------------
 
-nes_pachinko_device::nes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_pachinko_device::nes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_fcpadexp_device(mconfig, NES_PACHINKO, tag, owner, clock, 0)
 	, m_trigger(*this, "TRIGGER")
 {

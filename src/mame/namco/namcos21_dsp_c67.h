@@ -27,7 +27,7 @@ public:
 		NAMCOS21_SOLVALOU,
 	};
 
-	namcos21_dsp_c67_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namcos21_dsp_c67_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// config
 	template <typename T> void set_renderer_tag(T &&tag) { m_renderer.set_tag(std::forward<T>(tag)); }

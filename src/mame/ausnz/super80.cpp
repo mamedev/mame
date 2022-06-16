@@ -721,7 +721,7 @@ void super80_state::super80(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	INPUT_BUFFER(config, "cent_status_in", 0);
+	INPUT_BUFFER(config, "cent_status_in");
 
 	/* quickload */
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)));
@@ -827,7 +827,7 @@ void super80v_state::super80v(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	INPUT_BUFFER(config, "cent_status_in", 0);
+	INPUT_BUFFER(config, "cent_status_in");
 
 	/* quickload */
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)));

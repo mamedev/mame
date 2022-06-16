@@ -31,27 +31,27 @@ DEFINE_DEVICE_TYPE(GENERIC_ROM_LINEAR,   generic_rom_linear_device,   "generic_r
 DEFINE_DEVICE_TYPE(GENERIC_ROMRAM_PLAIN, generic_romram_plain_device, "generic_romram_plain", "Generic ROM + RAM (plain mapping)")
 
 
-generic_rom_device::generic_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+generic_rom_device::generic_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock), device_generic_cart_interface(mconfig, *this)
 {
 }
 
-generic_rom_plain_device::generic_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+generic_rom_plain_device::generic_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_rom_device(mconfig, type, tag, owner, clock)
 {
 }
 
-generic_rom_plain_device::generic_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+generic_rom_plain_device::generic_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_rom_plain_device(mconfig, GENERIC_ROM_PLAIN, tag, owner, clock)
 {
 }
 
-generic_rom_linear_device::generic_rom_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+generic_rom_linear_device::generic_rom_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_rom_device(mconfig, GENERIC_ROM_LINEAR, tag, owner, clock)
 {
 }
 
-generic_romram_plain_device::generic_romram_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+generic_romram_plain_device::generic_romram_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_rom_plain_device(mconfig, GENERIC_ROMRAM_PLAIN, tag, owner, clock)
 {
 }

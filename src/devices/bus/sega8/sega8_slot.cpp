@@ -116,7 +116,7 @@ void device_sega8_cart_interface::ram_alloc(uint32_t size)
 //  sega8_cart_slot_device - constructor
 //-------------------------------------------------
 
-sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_card)
+sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool is_card)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_sega8_cart_interface>(mconfig, *this)
@@ -126,59 +126,59 @@ sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, de
 {
 }
 
-sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_cart_slot_device(mconfig, SEGA8_CART_SLOT, tag, owner, clock, false)
 {
 }
 
-sega8_card_slot_device::sega8_card_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sega8_card_slot_device::sega8_card_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_cart_slot_device(mconfig, type, tag, owner, clock, true)
 {
 }
 
-sega8_card_slot_device::sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_card_slot_device::sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_card_slot_device(mconfig, SEGA8_CARD_SLOT, tag, owner, clock)
 {
 }
 
 
-sg1000_cart_slot_device::sg1000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sg1000_cart_slot_device::sg1000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_cart_slot_device(mconfig, SG1000_CART_SLOT, tag, owner, clock)
 {
 }
 
-omv_cart_slot_device::omv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+omv_cart_slot_device::omv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_cart_slot_device(mconfig, OMV_CART_SLOT, tag, owner, clock)
 {
 }
 
-sc3000_cart_slot_device::sc3000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sc3000_cart_slot_device::sc3000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_cart_slot_device(mconfig, SC3000_CART_SLOT, tag, owner, clock)
 {
 }
 
-sg1000mk3_cart_slot_device::sg1000mk3_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sg1000mk3_cart_slot_device::sg1000mk3_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_cart_slot_device(mconfig, SG1000MK3_CART_SLOT, tag, owner, clock)
 {
 }
 
-sms_cart_slot_device::sms_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sms_cart_slot_device::sms_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_cart_slot_device(mconfig, SMS_CART_SLOT, tag, owner, clock)
 {
 }
 
-gamegear_cart_slot_device::gamegear_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gamegear_cart_slot_device::gamegear_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_cart_slot_device(mconfig, GAMEGEAR_CART_SLOT, tag, owner, clock)
 {
 }
 
 
-sms_card_slot_device::sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sms_card_slot_device::sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_card_slot_device(mconfig, SMS_CARD_SLOT, tag, owner, clock)
 {
 }
 
-sg1000_card_slot_device::sg1000_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sg1000_card_slot_device::sg1000_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_card_slot_device(mconfig, SG1000_CARD_SLOT, tag, owner, clock)
 {
 }

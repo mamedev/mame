@@ -286,7 +286,7 @@ void prophet600_state::prophet600(machine_config &config)
 	pit8253.out_handler<0>().set(FUNC(prophet600_state::pit_ch0_tick_w));
 	pit8253.out_handler<2>().set(FUNC(prophet600_state::pit_ch2_tick_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set(FUNC(prophet600_state::acia_irq_w));
 

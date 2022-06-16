@@ -49,7 +49,7 @@ DEFINE_DEVICE_TYPE(I8089_CHANNEL, i8089_channel_device, "i8089_channel", "Intel 
 //  i8089_channel_device - constructor
 //-------------------------------------------------
 
-i8089_channel_device::i8089_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i8089_channel_device::i8089_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, I8089_CHANNEL, tag, owner, clock),
 	m_write_sintr(*this),
 	m_iop(nullptr),

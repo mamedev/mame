@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(ELAN_EU3A05_SOUND, elan_eu3a05_sound_device, "elan_eu3a05soun
 #include "logmacro.h"
 
 
-elan_eu3a05_sound_device::elan_eu3a05_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+elan_eu3a05_sound_device::elan_eu3a05_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ELAN_EU3A05_SOUND, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	device_memory_interface(mconfig, *this),

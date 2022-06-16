@@ -85,7 +85,7 @@ void capcom_state::machine_reset()
 void capcom_state::capcom(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16670000); // M68306
+	M68000(config, m_maincpu, XTAL::u(16670000)); // M68306
 	m_maincpu->set_addrmap(AS_PROGRAM, &capcom_state::capcom_map);
 }
 

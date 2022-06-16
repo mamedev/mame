@@ -24,7 +24,7 @@ class ttl74145_device :  public device_t
 {
 public:
 	// construction/destruction
-	ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <std::size_t Bit> auto output_line_callback() { return m_output_line_cb[Bit].bind(); }
 

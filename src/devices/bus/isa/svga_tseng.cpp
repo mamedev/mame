@@ -35,7 +35,7 @@ void isa8_svga_et4k_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(tseng_vga_device::screen_update));
 
-	TSENG_VGA(config, m_vga, 0);
+	TSENG_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x100000);
 }
@@ -57,7 +57,7 @@ const tiny_rom_entry *isa8_svga_et4k_device::device_rom_region() const
 //  isa8_vga_device - constructor
 //-------------------------------------------------
 
-isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA8_SVGA_ET4K, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_vga(*this, "vga")

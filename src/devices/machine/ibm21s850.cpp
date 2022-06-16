@@ -23,18 +23,18 @@
 DEFINE_DEVICE_TYPE(IBM21S850, ibm21s850_device, "ibm21s850", "IBM 21S850 IEEE-1394 1-Port PHY")
 DEFINE_DEVICE_TYPE(IBM21S851, ibm21s851_device, "ibm21s851", "IBM 21S850 IEEE-1394 3-Port PHY")
 
-ibm21s85x_base_device::ibm21s85x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ibm21s85x_base_device::ibm21s85x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_reset_cb(*this)
 {
 }
 
-ibm21s850_device::ibm21s850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ibm21s850_device::ibm21s850_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ibm21s85x_base_device(mconfig, IBM21S850, tag, owner, clock)
 {
 }
 
-ibm21s851_device::ibm21s851_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ibm21s851_device::ibm21s851_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ibm21s85x_base_device(mconfig, IBM21S851, tag, owner, clock)
 {
 }

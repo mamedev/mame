@@ -47,7 +47,7 @@ void nubus_cb264_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, CB264_SCREEN_NAME, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(nubus_cb264_device::screen_update));
-	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	screen.set_raw(XTAL::u(25175000), 800, 0, 640, 525, 0, 480);
 	screen.set_size(1024, 768);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 }
@@ -69,12 +69,12 @@ const tiny_rom_entry *nubus_cb264_device::device_rom_region() const
 //  nubus_cb264_device - constructor
 //-------------------------------------------------
 
-nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	nubus_cb264_device(mconfig, NUBUS_CB264, tag, owner, clock)
 {
 }
 
-nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_cb264_device::nubus_cb264_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	m_cb264_mode(0), m_cb264_vbl_disable(0), m_cb264_toggle(0), m_count(0), m_clutoffs(0)

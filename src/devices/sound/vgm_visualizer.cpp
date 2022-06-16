@@ -52,7 +52,7 @@ DEFINE_DEVICE_TYPE(VGMVIZ, vgmviz_device, "vgmviz", "VGM Visualizer")
 //  vgmviz_device - constructor
 //-------------------------------------------------
 
-vgmviz_device::vgmviz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+vgmviz_device::vgmviz_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VGMVIZ, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_screen(*this, "screen")

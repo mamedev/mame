@@ -66,7 +66,7 @@
 class ttl74543_device : public device_t
 {
 public:
-	ttl74543_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	ttl74543_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	auto outputa_cb() { return m_output_a.bind(); }
 	auto outputb_cb() { return m_output_b.bind(); }
 

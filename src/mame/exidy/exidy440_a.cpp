@@ -66,7 +66,7 @@ void exidy440_sound_device::exidy440_audio_map(address_map &map)
 
 DEFINE_DEVICE_TYPE(EXIDY440, exidy440_sound_device, "exidy440_sound", "Exidy 440 CVSD")
 
-exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, EXIDY440, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_audiocpu(*this, "audiocpu"),
@@ -134,17 +134,17 @@ void exidy440_sound_device::device_start()
 	save_item(NAME(m_m6844_interrupt));
 	save_item(NAME(m_m6844_chain));
 
-	m_channel_frequency[0] = clock();   /* channels 0 and 1 are run by FCLK */
-	m_channel_frequency[1] = clock();
-	m_channel_frequency[2] = clock()/2; /* channels 2 and 3 are run by SCLK */
-	m_channel_frequency[3] = clock()/2;
+	m_channel_frequency[0] = clock().value();   /* channels 0 and 1 are run by FCLK */
+	m_channel_frequency[1] = clock().value();
+	m_channel_frequency[2] = clock().value()/2; /* channels 2 and 3 are run by SCLK */
+	m_channel_frequency[3] = clock().value()/2;
 
 	/* get stream channels */
 	m_stream = stream_alloc(0, 2, clock());
 
 	/* allocate the mixer buffer */
-	m_mixer_buffer_left.resize(clock()/50);
-	m_mixer_buffer_right.resize(clock()/50);
+	m_mixer_buffer_left.resize(clock().value()/50);
+	m_mixer_buffer_right.resize(clock().value()/50);
 
 	if (SOUND_LOG)
 		m_debuglog = fopen("sound.log", "w");

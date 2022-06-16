@@ -334,18 +334,18 @@ void marblmd2_state::marblmd2(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 256).set_membits(8);
 
-	ATARI_VAD(config, m_vad, 0, m_screen);
+	ATARI_VAD(config, m_vad, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	m_vad->set_xoffsets(4, 4);
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, marblmd2_state::s_mob_config).set_gfxdecode("gfxdecode");
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, marblmd2_state::s_mob_config).set_gfxdecode("gfxdecode");
 
 	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(marblmd2_state::get_playfield_tile_info));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_III(config, m_jsa, 0);
+	ATARI_JSA_III(config, m_jsa);
 	m_jsa->set_swapped_coins(true);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("600010").bit(6);

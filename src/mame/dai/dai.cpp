@@ -186,12 +186,12 @@ GFXDECODE_END
 void dai_state::dai(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 2000000);
+	I8080(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &dai_state::mem_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(dai_state::int_ack));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2000000);
 	m_pit->out_handler<0>().set(m_sound, FUNC(dai_sound_device::set_input_ch0));
 	m_pit->set_clk<1>(2000000);
@@ -226,7 +226,7 @@ void dai_state::dai(machine_config &config)
 	m_cassette->set_interface("dai_cass");
 
 	/* tms5501 */
-	TMS5501(config, m_tms5501, 2000000);
+	TMS5501(config, m_tms5501, XTAL::u(2000000));
 	m_tms5501->int_callback().set_inputline("maincpu", I8085_INTR_LINE);
 	m_tms5501->xi_callback().set(FUNC(dai_state::keyboard_r));
 	m_tms5501->xo_callback().set(FUNC(dai_state::keyboard_w));

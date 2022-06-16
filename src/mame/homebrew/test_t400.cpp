@@ -33,14 +33,14 @@ void t400_test_suite_state::port_l_w(uint8_t data)
 
 void t400_test_suite_state::test_t410(machine_config &config)
 {
-	COP410(config, m_maincpu, 1000000);
+	COP410(config, m_maincpu, XTAL::u(1000000));
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
 	m_maincpu->write_l().set(FUNC(t400_test_suite_state::port_l_w));
 }
 
 void t400_test_suite_state::test_t420(machine_config &config)
 {
-	COP420(config, m_maincpu, 1000000);
+	COP420(config, m_maincpu, XTAL::u(1000000));
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
 	m_maincpu->write_l().set(FUNC(t400_test_suite_state::port_l_w));
 }

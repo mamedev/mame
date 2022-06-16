@@ -1752,7 +1752,7 @@ void lua_engine::initialize()
 	dislot_option_type["device_shortname"] = sol::property([] (device_slot_interface::slot_option &opt) { return opt.devtype().shortname(); });
 	dislot_option_type["selectable"] = sol::property(&device_slot_interface::slot_option::selectable);
 	dislot_option_type["default_bios"] = sol::property(static_cast<char const * (device_slot_interface::slot_option::*)() const>(&device_slot_interface::slot_option::default_bios));
-	dislot_option_type["clock"] = sol::property(static_cast<u32 (device_slot_interface::slot_option::*)() const>(&device_slot_interface::slot_option::clock));
+	dislot_option_type["clock"] = sol::property([] (device_slot_interface::slot_option &opt) -> u32 { return opt.clock().value(); });
 
 
 	auto parameters_type = sol().registry().new_usertype<parameters_manager>("parameters", sol::no_constructor);

@@ -782,12 +782,12 @@ void chinagat_state::chinagat(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(3579545)));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
 	ymsnd.add_route(0, "mono", 0.80);
 	ymsnd.add_route(1, "mono", 0.80);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1065000, okim6295_device::PIN7_HIGH)); // pin 7 not verified, clock frequency estimated with recording
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1065000), okim6295_device::PIN7_HIGH)); // pin 7 not verified, clock frequency estimated with recording
 	oki.add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
@@ -804,7 +804,7 @@ void chinagat_state::saiyugoub1(machine_config &config)
 	Z80(config, m_soundcpu, XTAL(3'579'545));       /* 3.579545 MHz oscillator */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::saiyugoub1_sound_map);
 
-	i8748_device &mcu(I8748(config, "mcu", 9263750));     /* 9.263750 MHz oscillator, divided by 3*5 internally */
+	i8748_device &mcu(I8748(config, "mcu", XTAL::u(9263750)));     /* 9.263750 MHz oscillator, divided by 3*5 internally */
 	mcu.set_addrmap(AS_PROGRAM, &chinagat_state::i8748_map);
 	mcu.bus_in_cb().set(FUNC(chinagat_state::saiyugoub1_mcu_command_r));
 	//MCFG_MCS48_PORT_T0_CLK_CUSTOM(chinagat_state, saiyugoub1_m5205_clk_w)      /* Drives the clock on the m5205 at 1/8 of this frequency */
@@ -829,7 +829,7 @@ void chinagat_state::saiyugoub1(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(3579545)));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
 	ymsnd.add_route(0, "mono", 0.80);
 	ymsnd.add_route(1, "mono", 0.80);
@@ -870,14 +870,14 @@ void chinagat_state::saiyugoub2(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 3579545));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL::u(3579545)));
 	ym1.irq_handler().set_inputline(m_soundcpu, 0);
 	ym1.add_route(0, "mono", 0.50);
 	ym1.add_route(1, "mono", 0.50);
 	ym1.add_route(2, "mono", 0.50);
 	ym1.add_route(3, "mono", 0.80);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 3579545));
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL::u(3579545)));
 	ym2.add_route(0, "mono", 0.50);
 	ym2.add_route(1, "mono", 0.50);
 	ym2.add_route(2, "mono", 0.50);

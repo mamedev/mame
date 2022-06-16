@@ -54,7 +54,7 @@ DEFINE_DEVICE_TYPE(TI99_HANDSET, bus::ti99::joyport::ti99_handset_device, "ti99_
 
 namespace bus::ti99::joyport {
 
-ti99_handset_device::ti99_handset_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ti99_handset_device::ti99_handset_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99_HANDSET, tag, owner, clock)
 	, device_ti99_joyport_interface(mconfig, *this)
 	, m_joyx(*this, "JOYX%u", 0U)
@@ -506,7 +506,7 @@ INPUT_PORTS_START( joysticks )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1/*, "(2FIRE)", CODE_NONE, OSD_JOY2_FIRE, 0*/) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-ti99_twin_joystick_device::ti99_twin_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ti99_twin_joystick_device::ti99_twin_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99_JOYSTICK, tag, owner, clock), device_ti99_joyport_interface(mconfig, *this)
 	, m_joystick(0)
 	, m_joys(*this, "JOY%u", 1U)

@@ -517,11 +517,11 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 
 /* sound */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, "buzzer", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // 6-bit game extension R-2R DAC (R=10K)
+	DAC_1BIT(config, "buzzer").add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_6BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5); // 6-bit game extension R-2R DAC (R=10K)
 
 /* speech synthesis */
-	MEA8000(config, m_mea8000, 3840000).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MEA8000(config, m_mea8000, XTAL::u(3840000)).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 /* cassette */
 	CASSETTE(config, m_cassette);
@@ -541,7 +541,7 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 		m_extension->option_add("nanoreseau", NANORESEAU_TO);
 
 /* pia */
-	PIA6821(config, m_pia_sys, 0);
+	PIA6821(config, m_pia_sys);
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::to7_sys_porta_in));
 	m_pia_sys->readpb_handler().set(FUNC(thomson_state::to7_sys_portb_in));
 	m_pia_sys->writepb_handler().set(FUNC(thomson_state::to7_sys_portb_out));
@@ -550,7 +550,7 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 	m_pia_sys->irqa_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
 	m_pia_sys->irqb_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_pia_game, 0);
+	PIA6821(config, m_pia_game);
 	m_pia_game->readpa_handler().set(FUNC(thomson_state::to7_game_porta_in));
 	m_pia_game->readpb_handler().set(FUNC(thomson_state::to7_game_portb_in));
 	m_pia_game->writepb_handler().set(FUNC(thomson_state::to7_game_portb_out));
@@ -559,7 +559,7 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 	m_pia_game->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (RF 57-932) */
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
@@ -572,17 +572,17 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (CC 90-232) */
-	TO7_IO_LINE(config, "to7_io", 0);
+	TO7_IO_LINE(config, "to7_io");
 
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (MD 90-120) */
-	PIA6821(config, THOM_PIA_MODEM, 0);
+	PIA6821(config, THOM_PIA_MODEM);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set(FUNC(thomson_state::to7_modem_tx_w));
 	m_acia->irq_handler().set(FUNC(thomson_state::to7_modem_cb));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 1200)); /* 1200 bauds, might be divided by 16 */
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(1200))); /* 1200 bauds, might be divided by 16 */
 	acia_clock.signal_handler().set(FUNC(thomson_state::write_acia_clock));
 
 /* cartridge */

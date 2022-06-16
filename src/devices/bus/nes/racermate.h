@@ -12,7 +12,7 @@ class nes_racermate_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_racermate_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_racermate_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -696,7 +696,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 	m_cpu->holda_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::holda_line));
 
 	// 9901 configuration
-	TMS9901(config, m_tms9901, 0);
+	TMS9901(config, m_tms9901);
 	m_tms9901->read_cb().set(FUNC(ti99_8_state::psi_input));
 	m_tms9901->p_out_cb(0).set(FUNC(ti99_8_state::keyC0));
 	m_tms9901->p_out_cb(1).set(FUNC(ti99_8_state::keyC1));
@@ -710,7 +710,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 	m_tms9901->intreq_cb().set(FUNC(ti99_8_state::tms9901_interrupt));
 
 	// Mainboard with custom chips
-	TI99_MAINBOARD8(config, m_mainboard, 0);
+	TI99_MAINBOARD8(config, m_mainboard);
 	m_mainboard->ready_cb().set(FUNC(ti99_8_state::console_ready));
 	m_mainboard->reset_cb().set(FUNC(ti99_8_state::console_reset));
 	m_mainboard->hold_cb().set(FUNC(ti99_8_state::cpu_hold));
@@ -737,13 +737,13 @@ void ti99_8_state::ti99_8(machine_config& config)
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
-	sn76496_device& soundgen(SN76496(config, TI998_SOUNDCHIP_TAG, 3579545));
+	sn76496_device& soundgen(SN76496(config, TI998_SOUNDCHIP_TAG, XTAL::u(3579545)));
 	soundgen.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::sound_ready));
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
 	// Speech hardware
 	// Note: SPEECHROM uses its tag for referencing the region
-	SPEECHROM(config, TI998_SPEECHROM_REG, 0).set_reverse_bit_order(true);
+	SPEECHROM(config, TI998_SPEECHROM_REG).set_reverse_bit_order(true);
 	SPEAKER(config, "speech_out").front_center();
 
 	cd2501ecd_device& vsp(CD2501ECD(config, TI998_SPEECHSYN_TAG, 640000L));
@@ -753,7 +753,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 
 	// Cassette drive
 	SPEAKER(config, "cass_out").front_center();
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
+	CASSETTE(config, "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM library
 	using namespace bus::ti99::internal;

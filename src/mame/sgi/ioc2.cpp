@@ -45,12 +45,12 @@
 DEFINE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device,   "ioc2g", "SGI IOC2 (Guinness)")
 DEFINE_DEVICE_TYPE(SGI_IOC2_FULL_HOUSE, ioc2_full_house_device, "ioc2f", "SGI IOC2 (Full House)")
 
-ioc2_guinness_device::ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ioc2_guinness_device::ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ioc2_device(mconfig, SGI_IOC2_GUINNESS, tag, owner, clock)
 {
 }
 
-ioc2_full_house_device::ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ioc2_full_house_device::ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ioc2_device(mconfig, SGI_IOC2_FULL_HOUSE, tag, owner, clock)
 {
 }
@@ -70,7 +70,7 @@ ioport_constructor ioc2_device::device_input_ports() const
 void ioc2_device::device_add_mconfig(machine_config &config)
 {
 	SCC85230(config, m_scc, SCC_PCLK);
-	m_scc->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
+	m_scc->configure_channels(SCC_RXA_CLK, SCC_TXA_CLK, SCC_RXB_CLK, SCC_TXB_CLK);
 	m_scc->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtra_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsa_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_rts));
@@ -123,7 +123,7 @@ void ioc2_device::device_add_mconfig(machine_config &config)
 }
 
 
-ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_scc(*this, SCC_TAG)

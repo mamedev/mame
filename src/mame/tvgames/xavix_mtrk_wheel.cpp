@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(XAVIX_MTRK_WHEEL, xavix_mtrk_wheel_device, "xavix_mtrk_wheel", "XaviX / Radica Monster Truck Steering Wheel")
 
-xavix_mtrk_wheel_device::xavix_mtrk_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xavix_mtrk_wheel_device::xavix_mtrk_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XAVIX_MTRK_WHEEL, tag, owner, clock),
 	m_event_out_cb(*this),
 	m_in(*this, "WHEEL")

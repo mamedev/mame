@@ -65,7 +65,7 @@ device_intvecs_control_port_interface::~device_intvecs_control_port_interface()
 //  intvecs_control_port_device - constructor
 //-------------------------------------------------
 
-intvecs_control_port_device::intvecs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+intvecs_control_port_device::intvecs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, INTVECS_CONTROL_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_intvecs_control_port_interface>(mconfig, *this),
 	m_device(nullptr)
@@ -130,7 +130,7 @@ void intvecs_ctrls_device::device_add_mconfig(machine_config &config)
 }
 
 
-intvecs_ctrls_device::intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+intvecs_ctrls_device::intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ECS_CTRLS, tag, owner, clock),
 	device_intvecs_control_port_interface(mconfig, *this),
 	m_hand1(*this, "port1"),
@@ -256,7 +256,7 @@ ioport_constructor intvecs_keybd_device::device_input_ports() const
 	return INPUT_PORTS_NAME( intvecs_keybd );
 }
 
-intvecs_keybd_device::intvecs_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+intvecs_keybd_device::intvecs_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ECS_KEYBD, tag, owner, clock)
 	, device_intvecs_control_port_interface(mconfig, *this)
 	, m_keybd(*this, "ROW.%u", 0)
@@ -389,7 +389,7 @@ ioport_constructor intvecs_synth_device::device_input_ports() const
 }
 
 
-intvecs_synth_device::intvecs_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+intvecs_synth_device::intvecs_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ECS_SYNTH, tag, owner, clock),
 	device_intvecs_control_port_interface(mconfig, *this),
 	m_synth(*this, "SYNTH.%u", 0)

@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERGB,  sns_rom_sgb1_device, "sns_rom_sgb",  "SNE
 DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERGB2, sns_rom_sgb2_device, "sns_rom_sgb2", "SNES Super Game Boy 2 Cart")
 
 
-sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	sns_rom_device(mconfig, type, tag, owner, clock),
 	m_sgb_cpu(*this, "sgb_cpu"),
 	m_sgb_apu(*this, "sgb_apu"),
@@ -50,13 +50,13 @@ sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_typ
 }
 
 
-sns_rom_sgb1_device::sns_rom_sgb1_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+sns_rom_sgb1_device::sns_rom_sgb1_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	sns_rom_sgb_device(mconfig, SNS_LOROM_SUPERGB, tag, owner, clock)
 {
 }
 
 
-sns_rom_sgb2_device::sns_rom_sgb2_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+sns_rom_sgb2_device::sns_rom_sgb2_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	sns_rom_sgb_device(mconfig, SNS_LOROM_SUPERGB2, tag, owner, clock)
 {
 }
@@ -134,14 +134,14 @@ void sns_rom_sgb_device::gb_timer_callback(uint8_t data)
 
 void sns_rom_sgb1_device::device_add_mconfig(machine_config &config)
 {
-	LR35902(config, m_sgb_cpu, 4295454);   /* 4.295454 MHz */
+	LR35902(config, m_sgb_cpu, XTAL::u(4295454));   /* 4.295454 MHz */
 	m_sgb_cpu->set_addrmap(AS_PROGRAM, &sns_rom_sgb1_device::supergb_map);
 	m_sgb_cpu->timer_cb().set(FUNC(sns_rom_sgb_device::gb_timer_callback));
 	m_sgb_cpu->set_halt_bug(true);
 
 	SGB_PPU(config, m_sgb_ppu, m_sgb_cpu);
 
-	DMG_APU(config, m_sgb_apu, 4295454);
+	DMG_APU(config, m_sgb_apu, XTAL::u(4295454));
 
 	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
 	m_cartslot->set_space(m_sgb_cpu, AS_PROGRAM);

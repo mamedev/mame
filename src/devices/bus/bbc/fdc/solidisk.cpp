@@ -147,7 +147,7 @@ const tiny_rom_entry *bbc_stldfdc_1_device::device_rom_region() const
 //  bbc_stlfdc_device - constructor
 //-------------------------------------------------
 
-bbc_stlfdc_device::bbc_stlfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_stlfdc_device::bbc_stlfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_fdc_interface(mconfig, *this)
 	, m_wd1770(*this, "wd1770")
@@ -157,27 +157,27 @@ bbc_stlfdc_device::bbc_stlfdc_device(const machine_config &mconfig, device_type 
 {
 }
 
-bbc_stl1770_1_device::bbc_stl1770_1_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock)
+bbc_stl1770_1_device::bbc_stl1770_1_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock)
 	: bbc_stlfdc_device(mconfig, type, tag, owner, clock)
 {
 }
 
-bbc_stl1770_1_device::bbc_stl1770_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_stl1770_1_device::bbc_stl1770_1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_stlfdc_device(mconfig, BBC_STL1770_1, tag, owner, clock)
 {
 }
 
-bbc_stl1770_2_device::bbc_stl1770_2_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock)
+bbc_stl1770_2_device::bbc_stl1770_2_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock)
 	: bbc_stlfdc_device(mconfig, type, tag, owner, clock)
 {
 }
 
-bbc_stl1770_2_device::bbc_stl1770_2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_stl1770_2_device::bbc_stl1770_2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_stlfdc_device(mconfig, BBC_STL1770_2, tag, owner, clock)
 {
 }
 
-bbc_stldfdc_1_device::bbc_stldfdc_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_stldfdc_1_device::bbc_stldfdc_1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_stl1770_1_device(mconfig, BBC_STLDFDC_1, tag, owner, clock)
 {
 }

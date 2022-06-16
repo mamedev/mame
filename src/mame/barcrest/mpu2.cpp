@@ -76,7 +76,7 @@ INPUT_PORTS_END
 
 void mpu2_state::mpu2(machine_config &config)
 {
-	M6800(config, m_maincpu, 2000000); // ?
+	M6800(config, m_maincpu, XTAL::u(2000000)); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu2_state::mpu2_basemap);
 }
 

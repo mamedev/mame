@@ -49,7 +49,7 @@ class cassette_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~cassette_image_device();
 
 	void set_formats(const cassette_image::Format*  const *formats) { m_formats = formats; }

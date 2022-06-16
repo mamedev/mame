@@ -242,7 +242,7 @@ void koftball_state::koftball(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(256);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &koftball_state::ramdac_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_koftball);
@@ -254,7 +254,7 @@ void koftball_state::koftball(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1122000, okim6295_device::PIN7_LOW)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1122000), okim6295_device::PIN7_LOW)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 }

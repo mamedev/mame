@@ -11,7 +11,7 @@
 class rf5c296_device : public device_t
 {
 public:
-	rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	template <typename T> void set_pccard(T &&tag) { m_pccard.set_tag(std::forward<T>(tag)); }

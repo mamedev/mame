@@ -86,7 +86,7 @@ struct X1_010_CHANNEL
 
 DEFINE_DEVICE_TYPE(X1_010, x1_010_device, "x1_010", "Seta X1-010")
 
-x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, X1_010, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)

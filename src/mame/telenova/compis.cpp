@@ -755,7 +755,7 @@ void compis_state::compis(machine_config &config)
 	m_osp->delay().set(m_osp, FUNC(i80130_device::ir7_w));
 	m_osp->baud().set(FUNC(compis_state::tmr2_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(15.36_MHz_XTAL/8);
 	m_pit->out_handler<0>().set(m_mpsc, FUNC(i8274_device::rxtxcb_w));
 	m_pit->set_clk<1>(15.36_MHz_XTAL/8);
@@ -767,12 +767,12 @@ void compis_state::compis(machine_config &config)
 	m_ppi->in_pb_callback().set(FUNC(compis_state::ppi_pb_r));
 	m_ppi->out_pc_callback().set(FUNC(compis_state::ppi_pc_w));
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set(COMPIS_KEYBOARD_TAG, FUNC(compis_keyboard_device::si_w));
 	m_uart->rxrdy_handler().set(m_osp, FUNC(i80130_device::ir2_w));
 	m_uart->txrdy_handler().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
 
-	compis_keyboard_device &kb(COMPIS_KEYBOARD(config, COMPIS_KEYBOARD_TAG, 0));
+	compis_keyboard_device &kb(COMPIS_KEYBOARD(config, COMPIS_KEYBOARD_TAG));
 	kb.out_tx_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
 	I8274(config, m_mpsc, 15.36_MHz_XTAL/4);
@@ -812,11 +812,11 @@ void compis_state::compis(machine_config &config)
 
 	COMPIS_GRAPHICS_SLOT(config, m_graphics, 15.36_MHz_XTAL/2, compis_graphics_cards, "hrg");
 
-	ISBX_SLOT(config, m_isbx0, 0, isbx_cards, "fdc");
+	ISBX_SLOT(config, m_isbx0, isbx_cards, "fdc");
 	m_isbx0->mintr0().set(m_osp, FUNC(i80130_device::ir1_w));
 	m_isbx0->mintr1().set(m_osp, FUNC(i80130_device::ir0_w));
 	m_isbx0->mdrqt().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
-	ISBX_SLOT(config, m_isbx1, 0, isbx_cards, nullptr);
+	ISBX_SLOT(config, m_isbx1, isbx_cards, nullptr);
 	m_isbx1->mintr0().set(m_osp, FUNC(i80130_device::ir6_w));
 	m_isbx1->mintr1().set(m_osp, FUNC(i80130_device::ir5_w));
 	m_isbx1->mdrqt().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));

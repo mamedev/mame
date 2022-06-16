@@ -258,7 +258,7 @@ void mb86235_cpu_device::execute_set_input(int irqline, int state)
 }
 #endif
 
-mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, MB86235, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 32, -3)
 	, m_dataa_config("data_a", ENDIANNESS_LITTLE, 32, 24, -2, address_map_constructor(FUNC(mb86235_device::internal_abus), this))

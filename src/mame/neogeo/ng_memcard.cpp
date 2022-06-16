@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(NG_MEMCARD, ng_memcard_device, "ng_memcard", "NeoGeo Memory C
 //  ng_memcard_device - constructor
 //-------------------------------------------------
 
-ng_memcard_device::ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ng_memcard_device::ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NG_MEMCARD, tag, owner, clock)
 	, device_memcard_image_interface(mconfig, *this)
 {

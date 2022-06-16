@@ -88,7 +88,7 @@ uint32_t magiceyes_vr3520f_game_state::screen_update(screen_device &screen, bitm
 
 void magiceyes_vr3520f_game_state::leapfrog_didj(machine_config &config)
 {
-	ARM9(config, m_maincpu, 533000000); // 533 MHz ARM926TEJ (clocked at @ 393 MHz for the Didj?)
+	ARM9(config, m_maincpu, XTAL::u(533000000)); // 533 MHz ARM926TEJ (clocked at @ 393 MHz for the Didj?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &magiceyes_vr3520f_game_state::didj_arm9_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

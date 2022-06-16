@@ -141,7 +141,7 @@ ALLOW_SAVE_TYPE(s_dsp_device::env_state_t32);
 DEFINE_DEVICE_TYPE(S_DSP, s_dsp_device, "s_dsp", "Nintendo/Sony S-DSP")
 
 
-s_dsp_device::s_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+s_dsp_device::s_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S_DSP, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)

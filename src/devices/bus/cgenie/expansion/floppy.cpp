@@ -113,7 +113,7 @@ void cgenie_fdc_device::device_add_mconfig(machine_config &config)
 //  cgenie_fdc_device - constructor
 //-------------------------------------------------
 
-cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CGENIE_FDC, tag, owner, clock),
 	device_cg_exp_interface(mconfig, *this),
 	m_fdc(*this, "wd2793"),

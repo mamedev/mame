@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(SATURN_MULTITAP, saturn_multitap_device, "saturn_multitap", "
 //  LIVE DEVICE
 //**************************************************************************
 
-saturn_multitap_device::saturn_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+saturn_multitap_device::saturn_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SATURN_MULTITAP, tag, owner, clock)
 	, device_saturn_control_port_interface(mconfig, *this)
 	, m_subctrl_port(*this, "ctrl%u", 1U)

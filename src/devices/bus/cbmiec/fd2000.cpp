@@ -251,12 +251,12 @@ void fd4000_device::device_add_mconfig(machine_config &config)
 //  fd2000_device - constructor
 //-------------------------------------------------
 
-fd2000_device::fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+fd2000_device::fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: fd2000_device(mconfig, FD2000, tag, owner, clock)
 {
 }
 
-fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cbm_iec_interface(mconfig, *this)
 	, m_maincpu(*this, G65SC02PI2_TAG)
@@ -270,7 +270,7 @@ fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, co
 //  fd4000_device - constructor
 //-------------------------------------------------
 
-fd4000_device::fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+fd4000_device::fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: fd2000_device(mconfig, FD4000, tag, owner, clock)
 {
 	m_maincpu.set_tag(*this, R65C02P4_TAG);

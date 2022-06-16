@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(CD90_640, cd90_640_device, "cd90_640", "Thomson CD90-640 floppy drive controller")
 
-cd90_640_device::cd90_640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cd90_640_device::cd90_640_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CD90_640, tag, owner, clock),
 	thomson_extension_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),

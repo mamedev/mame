@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(BBC_DATAGEM, bbc_datagem_device, "bbc_datagem", "Gemini DataG
 //  bbc_datagem_device - constructor
 //-------------------------------------------------
 
-bbc_datagem_device::bbc_datagem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_datagem_device::bbc_datagem_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_DATAGEM, tag, owner, clock)
 	, device_bbc_rom_interface(mconfig, *this)
 	, m_bank(0)

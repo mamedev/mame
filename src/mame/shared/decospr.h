@@ -17,7 +17,7 @@ typedef device_delegate<uint16_t (uint16_t col, bool extcol)> decospr_col_cb_del
 class decospr_device : public device_t, public device_video_interface
 {
 public:
-	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }

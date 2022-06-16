@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(K056800, k056800_device, "k056800", "K056800 MIRAC")
 //  k056800_device - constructor
 //-------------------------------------------------
 
-k056800_device::k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k056800_device::k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K056800, tag, owner, clock)
 	, m_int_pending(false)
 	, m_int_enabled(false)

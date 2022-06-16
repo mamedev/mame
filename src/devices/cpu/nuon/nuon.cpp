@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(NUON,   nuon_device,   "nuon",   "Aries 3 \"Nuon\"")
 //  nuon_device - constructor
 //-------------------------------------------------
 
-nuon_device::nuon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nuon_device::nuon_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, NUON, tag, owner, clock)
 	, m_program_configs{{"program_mpe0", ENDIANNESS_BIG, 32, 32},
 						{"program_mpe1", ENDIANNESS_BIG, 32, 32},

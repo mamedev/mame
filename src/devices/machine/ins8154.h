@@ -39,7 +39,7 @@ class ins8154_device :  public device_t
 {
 public:
 	// construction/destruction
-	ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto in_a() { return m_in_a_cb.bind(); }
 	auto out_a() { return m_out_a_cb.bind(); }

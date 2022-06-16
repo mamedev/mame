@@ -1058,7 +1058,7 @@ void adam_state::adam(machine_config &config)
 	//m_psg->ready_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT).invert();
 
 	// devices
-	ADAMNET(config, m_adamnet, 0);
+	ADAMNET(config, m_adamnet);
 	ADAMNET_SLOT(config, "net1", m_adamnet, adamnet_devices, "kb");
 	ADAMNET_SLOT(config, "net2", m_adamnet, adamnet_devices, "prn");
 	ADAMNET_SLOT(config, "net3", m_adamnet, adamnet_devices, "ddp");

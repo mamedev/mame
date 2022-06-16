@@ -51,7 +51,7 @@ void midtunit_video_device::device_add_mconfig(machine_config &config)
 void midwunit_video_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &debugscreen(SCREEN(config, "debugscreen", SCREEN_TYPE_RASTER));
-	debugscreen.set_raw(8000000, 506, 101, 501, 289, 20, 274);
+	debugscreen.set_raw(XTAL::u(8000000), 506, 101, 501, 289, 20, 274);
 	debugscreen.set_screen_update(FUNC(midwunit_video_device::debug_screen_update));
 
 	PALETTE(config, m_debug_palette).set_format(palette_device::xRGB_555, 32768);

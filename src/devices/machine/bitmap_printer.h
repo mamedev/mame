@@ -24,7 +24,7 @@
 class bitmap_printer_device : public device_t
 {
 public:
-	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, int paper_width, int paper_height, int hdpi, int vdpi);
 
 	enum
@@ -65,7 +65,7 @@ public:
 	int m_ypos;
 
 protected:
-	bitmap_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bitmap_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

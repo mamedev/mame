@@ -85,7 +85,7 @@ void ppu2c0x_device::device_config_complete()
 	m_latch.set(nullptr);
 }
 
-ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal_map) :
+ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock, address_map_constructor internal_map) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -127,45 +127,45 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_security_value = 0;
 }
 
-ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ppu2c0x_device::ppu2c0x), this))
 {
 	m_paletteram_in_ppuspace = true;
 }
 
-ppu2c0x_rgb_device::ppu2c0x_rgb_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+ppu2c0x_rgb_device::ppu2c0x_rgb_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_device(mconfig, type, tag, owner, clock),
 	m_palette_data(*this, "palette")
 {
 }
 
 // NTSC NES
-ppu2c02_device::ppu2c02_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu2c02_device::ppu2c02_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_device(mconfig, PPU_2C02, tag, owner, clock)
 {
 }
 
 // Playchoice 10
-ppu2c03b_device::ppu2c03b_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu2c03b_device::ppu2c03b_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_rgb_device(mconfig, PPU_2C03B, tag, owner, clock)
 {
 }
 
 // Vs. Unisystem
-ppu2c04_device::ppu2c04_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu2c04_device::ppu2c04_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_rgb_device(mconfig, PPU_2C04, tag, owner, clock)
 {
 }
 
 // PAL NES
-ppu2c07_device::ppu2c07_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu2c07_device::ppu2c07_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_device(mconfig, PPU_2C07, tag, owner, clock)
 {
 	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
 }
 
 // PAL clones
-ppupalc_device::ppupalc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppupalc_device::ppupalc_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_device(mconfig, PPU_PALC, tag, owner, clock)
 {
 	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
@@ -174,32 +174,32 @@ ppupalc_device::ppupalc_device(const machine_config& mconfig, const char* tag, d
 
 // The PPU_2C05 variants have different protection value, set at device start, but otherwise are all the same...
 // Vs. Unisystem (Ninja Jajamaru Kun)
-ppu2c05_01_device::ppu2c05_01_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu2c05_01_device::ppu2c05_01_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_rgb_device(mconfig, PPU_2C05_01, tag, owner, clock)
 {
 	m_security_value = 0x1b;    // game (jajamaru) doesn't seem to ever actually check it
 }
 // Vs. Unisystem (Mighty Bomb Jack)
-ppu2c05_02_device::ppu2c05_02_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu2c05_02_device::ppu2c05_02_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_rgb_device(mconfig, PPU_2C05_02, tag, owner, clock)
 {
 	m_security_value = 0x3d;
 }
 // Vs. Unisystem (Gumshoe)
-ppu2c05_03_device::ppu2c05_03_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu2c05_03_device::ppu2c05_03_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_rgb_device(mconfig, PPU_2C05_03, tag, owner, clock)
 {
 	m_security_value = 0x1c;
 }
 // Vs. Unisystem (Top Gun)
-ppu2c05_04_device::ppu2c05_04_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu2c05_04_device::ppu2c05_04_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_rgb_device(mconfig, PPU_2C05_04, tag, owner, clock)
 {
 	m_security_value = 0x1b;
 }
 
 // Vs. Unisystem (Super Mario Bros. bootlegs)
-ppu2c04_clone_device::ppu2c04_clone_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu2c04_clone_device::ppu2c04_clone_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_device(mconfig, PPU_2C04C, tag, owner, clock),
 	m_palette_data(*this, "palette")
 {

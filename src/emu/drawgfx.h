@@ -539,12 +539,12 @@ public:
 	// construction/destruction
 	template <typename T>
 	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
-		: gfxdecode_device(mconfig, tag, owner, 0)
+		: gfxdecode_device(mconfig, tag, owner)
 	{
 		set_palette(std::forward<T>(palette_tag));
 		set_info(gfxinfo);
 	}
-	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_start() override {}

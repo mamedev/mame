@@ -25,7 +25,7 @@ class sam_sid_device : public device_t, public device_samcoupe_expansion_interfa
 {
 public:
 	// construction/destruction
-	sam_sid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sam_sid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// from host
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
@@ -42,7 +42,7 @@ class sam_sid6581_device : public sam_sid_device
 {
 public:
 	// construction/destruction
-	sam_sid6581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sam_sid6581_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -54,7 +54,7 @@ class sam_sid8580_device : public sam_sid_device
 {
 public:
 	// construction/destruction
-	sam_sid8580_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sam_sid8580_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

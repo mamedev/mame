@@ -483,7 +483,7 @@ void voyager_state::machine_reset()
 
 void voyager_state::voyager(machine_config &config)
 {
-	PENTIUM3(config, m_maincpu, 133000000); // actually AMD Duron CPU of unknown clock
+	PENTIUM3(config, m_maincpu, XTAL::u(133000000)); // actually AMD Duron CPU of unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &voyager_state::voyager_map);
 	m_maincpu->set_addrmap(AS_IO, &voyager_state::voyager_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
@@ -493,7 +493,7 @@ void voyager_state::voyager(machine_config &config)
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus"));
 	pcibus.set_device(0, FUNC(voyager_state::intel82439tx_pci_r), FUNC(voyager_state::intel82439tx_pci_w));
 	pcibus.set_device(7, FUNC(voyager_state::intel82371ab_pci_r), FUNC(voyager_state::intel82371ab_pci_w));
 

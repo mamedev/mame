@@ -15,12 +15,7 @@
 class light_video_device : public device_t
 {
 public:
-	light_video_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: light_video_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
-	light_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	light_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

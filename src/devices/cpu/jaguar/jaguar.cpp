@@ -149,7 +149,7 @@ DEFINE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device, "jaguargpu", "Motorola Atari
 DEFINE_DEVICE_TYPE(JAGUARDSP, jaguardsp_cpu_device, "jaguardsp", "Motorola Atari Jaguar DSP \"Jerry\"")
 
 
-jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 version, bool isdsp, address_map_constructor io_map)
+jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 version, bool isdsp, address_map_constructor io_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 24, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 32, 8, 0, io_map)
@@ -190,13 +190,13 @@ jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type 
 }
 
 
-jaguargpu_cpu_device::jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+jaguargpu_cpu_device::jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: jaguar_cpu_device(mconfig, JAGUARGPU, tag, owner, clock, 2, false, address_map_constructor(FUNC(jaguargpu_cpu_device::io_map), this))
 {
 }
 
 
-jaguardsp_cpu_device::jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+jaguardsp_cpu_device::jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: jaguar_cpu_device(mconfig, JAGUARDSP, tag, owner, clock, 2, true, address_map_constructor(FUNC(jaguardsp_cpu_device::io_map), this))
 {
 }

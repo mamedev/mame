@@ -354,11 +354,11 @@ INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
 void solomon_state::solomon(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4'000'000);   // 4.0 MHz (?????)
+	Z80(config, m_maincpu, XTAL::u(4'000'000));   // 4.0 MHz (?????)
 	m_maincpu->set_addrmap(AS_PROGRAM, &solomon_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(solomon_state::vblank_irq));
 
-	Z80(config, m_audiocpu, 3'072'000);
+	Z80(config, m_audiocpu, XTAL::u(3'072'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &solomon_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &solomon_state::sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(solomon_state::irq0_line_hold), attotime::from_hz(2*60));   // ???
@@ -381,9 +381,9 @@ void solomon_state::solomon(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
-	AY8910(config, "ay2", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
-	AY8910(config, "ay3", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.12);
+	AY8910(config, "ay1", XTAL::u(1'500'000)).add_route(ALL_OUTPUTS, "mono", 0.12);
+	AY8910(config, "ay2", XTAL::u(1'500'000)).add_route(ALL_OUTPUTS, "mono", 0.12);
+	AY8910(config, "ay3", XTAL::u(1'500'000)).add_route(ALL_OUTPUTS, "mono", 0.12);
 }
 
 /***************************************************************************

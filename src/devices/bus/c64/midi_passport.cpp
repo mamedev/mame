@@ -60,19 +60,19 @@ WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::write_acia_clock )
 
 void c64_passport_midi_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set(FUNC(c64_passport_midi_cartridge_device::acia_irq_w));
 
-	PTM6840(config, m_ptm, 1021800);
-	m_ptm->set_external_clocks(1021800.0f, 1021800.0f, 1021800.0f);
+	PTM6840(config, m_ptm, XTAL::u(1021800));
+	m_ptm->set_external_clocks(XTAL::u(1021800), XTAL::u(1021800), XTAL::u(1021800));
 	m_ptm->irq_callback().set(FUNC(c64_passport_midi_cartridge_device::ptm_irq_w));
 
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // TODO: work out if the clock should come from the 6840
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(31250*16))); // TODO: work out if the clock should come from the 6840
 	acia_clock.signal_handler().set(FUNC(c64_passport_midi_cartridge_device::write_acia_clock));
 }
 
@@ -86,7 +86,7 @@ void c64_passport_midi_cartridge_device::device_add_mconfig(machine_config &conf
 //  c64_passport_midi_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_passport_midi_cartridge_device::c64_passport_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_passport_midi_cartridge_device::c64_passport_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_MIDI_PASSPORT, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MC6850_TAG),

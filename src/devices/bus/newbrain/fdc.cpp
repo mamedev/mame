@@ -110,7 +110,7 @@ void newbrain_fdc_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &newbrain_fdc_device::newbrain_fdc_mem);
 	m_maincpu->set_addrmap(AS_IO, &newbrain_fdc_device::newbrain_fdc_io);
 
-	UPD765A(config, m_fdc, 8'000'000, false, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), false, true);
 	m_fdc->intrq_wr_callback().set(FUNC(newbrain_fdc_device::fdc_int_w));
 
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", newbrain_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
@@ -130,7 +130,7 @@ void newbrain_fdc_device::device_add_mconfig(machine_config &config)
 //  newbrain_fdc_device - constructor
 //-------------------------------------------------
 
-newbrain_fdc_device::newbrain_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+newbrain_fdc_device::newbrain_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NEWBRAIN_FDC, tag, owner, clock),
 	device_newbrain_expansion_slot_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),

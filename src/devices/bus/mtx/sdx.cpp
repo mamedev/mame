@@ -184,7 +184,7 @@ const tiny_rom_entry *mtx_sdxcpm_device::device_rom_region() const
 //  mtx_sdx_device - constructor
 //-------------------------------------------------
 
-mtx_sdx_device::mtx_sdx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mtx_sdx_device::mtx_sdx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_mtx_exp_interface(mconfig, *this)
 	, m_sdx_rom(*this, "sdx_rom")
@@ -195,12 +195,12 @@ mtx_sdx_device::mtx_sdx_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-mtx_sdxbas_device::mtx_sdxbas_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mtx_sdxbas_device::mtx_sdxbas_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mtx_sdx_device(mconfig, MTX_SDXBAS, tag, owner, clock)
 {
 }
 
-mtx_sdxcpm_device::mtx_sdxcpm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mtx_sdxcpm_device::mtx_sdxcpm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mtx_sdx_device(mconfig, MTX_SDXCPM, tag, owner, clock)
 	, m_screen(*this, "screen")
 	, m_palette(*this, "palette")

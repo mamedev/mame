@@ -916,7 +916,7 @@ void m92_state::m92(machine_config &config)
 	V35(config, m_soundcpu, XTAL(14'318'181));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m92_state::sound_map);
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	MCFG_MACHINE_RESET_OVERRIDE(m92_state,m92)
@@ -1036,7 +1036,7 @@ void m92_state::ppan(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(m92_state,ppan)
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(1000000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

@@ -195,7 +195,7 @@ static inline void mputb(uint8_t *ptr, int8_t data) { *ptr = data; }
 //  vboysnd_device - constructor
 //-------------------------------------------------
 
-vboysnd_device::vboysnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vboysnd_device::vboysnd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VBOYSND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {
@@ -207,12 +207,12 @@ vboysnd_device::vboysnd_device(const machine_config &mconfig, const char *tag, d
 
 void vboysnd_device::device_start()
 {
-	uint32_t rate = clock() / 120;
+	XTAL rate = clock() / 120;
 	// create the stream
 	m_stream = stream_alloc(0, 2, rate);
 
 	m_timer = timer_alloc(FUNC(vboysnd_device::delayed_stream_update), this);
-	m_timer->adjust(attotime::zero, 0, rate ? attotime::from_hz(rate / 4) : attotime::never);
+	m_timer->adjust(attotime::zero, 0, !rate.disabled() ? attotime::from_hz(rate.value() / 4) : attotime::never);
 
 	for (int i=0; i<2048; i++)
 		waveFreq2LenTbl[i] = ((2048 - i) * 32) / 120;
@@ -234,10 +234,10 @@ void vboysnd_device::device_start()
 
 void vboysnd_device::device_clock_changed()
 {
-	uint32_t rate = clock() / 120;
+	XTAL rate = clock() / 120;
 	m_stream->set_sample_rate(rate);
 
-	m_timer->adjust(attotime::zero, 0, rate ? attotime::from_hz(rate / 4) : attotime::never);
+	m_timer->adjust(attotime::zero, 0, !rate.disabled() ? attotime::from_hz(rate.value() / 4) : attotime::never);
 }
 
 

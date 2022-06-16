@@ -483,7 +483,7 @@ void mjsenpu_state::mjsenpu(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
+	OKIM6295(config, m_oki, XTAL::u(1000000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
 }
 
 

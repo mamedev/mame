@@ -46,7 +46,7 @@ class midway_ssio_device :  public device_t,
 {
 public:
 	// construction/destruction
-	midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 16'000'000);
+	midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = 16'000'000);
 
 	// helpers
 	void suspend_cpu();
@@ -131,7 +131,7 @@ class midway_sounds_good_device :   public device_t,
 {
 public:
 	// construction/destruction
-	midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 16'000'000);
+	midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = 16'000'000);
 
 	// read/write
 	uint8_t read();
@@ -172,7 +172,7 @@ class midway_turbo_cheap_squeak_device : public device_t,
 {
 public:
 	// construction/destruction
-	midway_turbo_cheap_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 8'000'000);
+	midway_turbo_cheap_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = 8'000'000);
 
 	// read/write
 	uint8_t read();

@@ -14,7 +14,7 @@ class nes_rex_dbz5_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read_l(offs_t offset) override;
 	virtual uint8_t read_m(offs_t offset) override { return read_l(offset); }
@@ -38,7 +38,7 @@ class nes_rex_sl1632_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 	virtual void chr_cb(int start, int bank, int source) override;

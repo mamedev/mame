@@ -27,13 +27,13 @@ class spectrum_swiftdisc_device :
 {
 public:
 	// construction/destruction
-	spectrum_swiftdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_swiftdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static void floppy_formats(format_registration &fr);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button) { m_rombank |= newval << 12; m_slot->nmi_w(newval ? ASSERT_LINE : CLEAR_LINE); }
 
 protected:
-	spectrum_swiftdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_swiftdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -75,7 +75,7 @@ class spectrum_swiftdisc2_device :
 {
 public:
 	// construction/destruction
-	spectrum_swiftdisc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_swiftdisc2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

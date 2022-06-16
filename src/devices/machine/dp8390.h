@@ -32,7 +32,7 @@ protected:
 	};
 
 	// construction/destruction
-	dp8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, TYPE varian, u32 bandwidth);
+	dp8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, TYPE varian, u32 bandwidth);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -106,13 +106,13 @@ private:
 class rtl8019a_device : public dp8390_device
 {
 public:
-	rtl8019a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rtl8019a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class dp8390d_device : public dp8390_device
 {
 public:
-	dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition

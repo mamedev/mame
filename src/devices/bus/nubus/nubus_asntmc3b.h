@@ -20,7 +20,7 @@ class nubus_mac8390_device :
 {
 protected:
 	// construction/destruction
-	nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -49,13 +49,13 @@ private:
 class nubus_asntmc3nb_device : public nubus_mac8390_device
 {
 public:
-	nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class nubus_appleenet_device : public nubus_mac8390_device
 {
 public:
-	nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 

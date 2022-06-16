@@ -87,19 +87,19 @@ void bbc_awhd_device::device_add_mconfig(machine_config &config)
 //  bbc_scsi_device - constructor
 //-------------------------------------------------
 
-bbc_scsi_device::bbc_scsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_scsi_device::bbc_scsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_scsi(*this, "scsi:7:scsicb")
 {
 }
 
-bbc_scsi_device::bbc_scsi_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bbc_scsi_device::bbc_scsi_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
 	: bbc_scsi_device(mconfig, BBC_SCSI, tag, owner, clock)
 {
 }
 
-bbc_awhd_device::bbc_awhd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_awhd_device::bbc_awhd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_scsi_device(mconfig, BBC_AWHD, tag, owner, clock)
 	, m_1mhzbus(*this, "1mhzbus")
 {

@@ -326,7 +326,7 @@ void mmd1_state::mmd1(machine_config &config)
 	m_uart->write_so_callback().set(FUNC(mmd1_state::so));
 	m_uart->set_auto_rdav(true);
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 4800));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(4800)));
 	uart_clock.signal_handler().set(FUNC(mmd1_state::kansas_w));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(mmd1_state::kansas_r), attotime::from_hz(40000));
 

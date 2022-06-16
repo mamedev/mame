@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(DECO_IRQ, deco_irq_device, "deco_irq", "Data East IRQ Control
 //  deco_irq_device - constructor
 //-------------------------------------------------
 
-deco_irq_device::deco_irq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+deco_irq_device::deco_irq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, DECO_IRQ, tag, owner, clock),
 	m_screen(*this, finder_base::DUMMY_TAG),
 	m_scanline_timer(nullptr),

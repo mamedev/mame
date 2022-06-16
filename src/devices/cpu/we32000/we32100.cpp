@@ -15,7 +15,7 @@
 // device type definitions
 DEFINE_DEVICE_TYPE(WE32100, we32100_device, "we32100", "AT&T WE32100")
 
-we32100_device::we32100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+we32100_device::we32100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, WE32100, tag, owner, clock)
 	, m_space_config("program", ENDIANNESS_BIG, 32, 32, 0)
 	, m_r{0}

@@ -136,9 +136,9 @@ WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
 	m_pic8259[0]->ir1_w(state);
 }
 
-pci_connector_device &bebox_state::add_pci_slot(machine_config &config, const char *tag, size_t index, const char *default_tag)
+pci_connector_device &bebox_state::add_pci_slot(machine_config &config, const char *tag, const char *default_tag)
 {
-	pci_connector_device &pcislot(PCI_CONNECTOR(config, tag, index));
+	pci_connector_device &pcislot(PCI_CONNECTOR(config, tag));
 	pcislot.option_add("mpc105", MPC105);
 	pcislot.option_add("cirrus", PCI_CIRRUS_SVGA);
 	pcislot.set_default_option(default_tag);
@@ -150,7 +150,7 @@ void bebox_state::bebox_peripherals(machine_config &config)
 {
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	PIT8254(config, m_pit8254, 0);
+	PIT8254(config, m_pit8254);
 	m_pit8254->set_clk<0>(4772720/4); /* heartbeat IRQ */
 	m_pit8254->set_clk<1>(4772720/4); /* dram refresh */
 	m_pit8254->set_clk<2>(4772720/4); /* pio port c pin 4, and speaker polling */
@@ -171,33 +171,33 @@ void bebox_state::bebox_peripherals(machine_config &config)
 
 	AM9517A(config, m_dma8237[1], XTAL(14'318'181)/3);
 
-	PIC8259(config, m_pic8259[0], 0);
+	PIC8259(config, m_pic8259[0]);
 	m_pic8259[0]->out_int_callback().set(FUNC(bebox_state::bebox_pic8259_master_set_int_line));
 	m_pic8259[0]->in_sp_callback().set_constant(1);
 	m_pic8259[0]->read_slave_ack_callback().set(m_pic8259[1], FUNC(pic8259_device::acknowledge));
 
-	PIC8259(config, m_pic8259[1], 0);
+	PIC8259(config, m_pic8259[1]);
 	m_pic8259[1]->out_int_callback().set(FUNC(bebox_state::bebox_pic8259_slave_set_int_line));
 	m_pic8259[1]->in_sp_callback().set_constant(0);
 
-	NS16550(config, "ns16550_0", 0);   /* TODO: Verify model */
-	NS16550(config, "ns16550_1", 0);   /* TODO: Verify model */
-	NS16550(config, "ns16550_2", 0);   /* TODO: Verify model */
-	NS16550(config, "ns16550_3", 0);   /* TODO: Verify model */
+	NS16550(config, "ns16550_0");   /* TODO: Verify model */
+	NS16550(config, "ns16550_1");   /* TODO: Verify model */
+	NS16550(config, "ns16550_2");   /* TODO: Verify model */
+	NS16550(config, "ns16550_3");   /* TODO: Verify model */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(cirrus_gd5428_device::screen_update));
 
-	CIRRUS_GD5428(config, m_vga, 0);
+	CIRRUS_GD5428(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
 
 	speaker_device &speaker(SPEAKER(config, "mono"));
 	speaker.front_center();
 
-	ym3812_device &ym3812(YM3812(config, "ym3812", 3579545));
+	ym3812_device &ym3812(YM3812(config, "ym3812", XTAL::u(3579545)));
 	ym3812.add_route(ALL_OUTPUTS, speaker, 1.0);
 
 	FUJITSU_29F016A(config, "flash");
@@ -217,17 +217,17 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	idectrl.irq_handler().set(FUNC(bebox_state::bebox_ide_interrupt));
 
 	/* pci */
-	PCI_BUS(config, m_pcibus, 0);
+	PCI_BUS(config, m_pcibus);
 	m_pcibus->set_busnum(0);
 
-	pci_connector_device &pcislot0 = add_pci_slot(config, "pcibus:0", 0, "mpc105");
+	pci_connector_device &pcislot0 = add_pci_slot(config, "pcibus:0", "mpc105");
 	pcislot0.set_option_machine_config("mpc105", [this](device_t *device) { mpc105_config(device); });
-	pci_connector_device &pcislot1 = add_pci_slot(config, "pcibus:1", 1, "cirrus");
+	pci_connector_device &pcislot1 = add_pci_slot(config, "pcibus:1", "cirrus");
 	pcislot1.set_option_machine_config("cirrus", [this](device_t *device) { cirrus_config(device); });
 
 	/*PCI_BUS_LEGACY_DEVICE(12, nullptr, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
-	SMC37C78(config, m_smc37c78, 24'000'000);
+	SMC37C78(config, m_smc37c78, XTAL::u(24'000'000));
 	m_smc37c78->intrq_wr_callback().set(FUNC(bebox_state::fdc_interrupt));
 	m_smc37c78->drq_wr_callback().set(m_dma8237[0], FUNC(am9517a_device::dreq2_w));
 
@@ -251,10 +251,10 @@ void bebox_state::bebox_peripherals(machine_config &config)
 
 void bebox_state::bebox(machine_config &config)
 {
-	PPC603(config, m_ppc[0], 66000000);  /* 66 MHz */
+	PPC603(config, m_ppc[0], XTAL::u(66000000));  /* 66 MHz */
 	m_ppc[0]->set_addrmap(AS_PROGRAM, &bebox_state::main_mem);
 
-	PPC603(config, m_ppc[1], 66000000);  /* 66 MHz */
+	PPC603(config, m_ppc[1], XTAL::u(66000000));  /* 66 MHz */
 	m_ppc[1]->set_addrmap(AS_PROGRAM, &bebox_state::slave_mem);
 
 	bebox_peripherals(config);
@@ -262,10 +262,10 @@ void bebox_state::bebox(machine_config &config)
 
 void bebox_state::bebox2(machine_config &config)
 {
-	PPC603E(config, m_ppc[0], 133000000);  /* 133 MHz */
+	PPC603E(config, m_ppc[0], XTAL::u(133000000));  /* 133 MHz */
 	m_ppc[0]->set_addrmap(AS_PROGRAM, &bebox_state::main_mem);
 
-	PPC603E(config, m_ppc[1], 133000000);  /* 133 MHz */
+	PPC603E(config, m_ppc[1], XTAL::u(133000000));  /* 133 MHz */
 	m_ppc[1]->set_addrmap(AS_PROGRAM, &bebox_state::slave_mem);
 
 	bebox_peripherals(config);

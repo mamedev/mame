@@ -18,7 +18,7 @@
 class spg2xx_video_device : public device_t
 {
 public:
-	spg2xx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spg2xx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto guny_in() { return m_guny_in.bind(); }
 	auto gunx_in() { return m_gunx_in.bind(); }
@@ -65,14 +65,14 @@ class spg24x_video_device : public spg2xx_video_device
 {
 public:
 	template <typename T, typename U>
-	spg24x_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
+	spg24x_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag, U &&screen_tag)
 		: spg24x_video_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 		m_screen.set_tag(std::forward<U>(screen_tag));
 	}
 
-	spg24x_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg24x_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(SPG24X_VIDEO, spg24x_video_device)

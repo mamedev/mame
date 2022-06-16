@@ -14,7 +14,7 @@
 class scoop_device : public device_t
 {
 public:
-	scoop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	scoop_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <unsigned Line> auto gpio_out() { return m_gpio_out[Line].bind(); }
 	template <unsigned Line> void gpio_in(int state) { gpio_in((uint16_t)Line, state); }

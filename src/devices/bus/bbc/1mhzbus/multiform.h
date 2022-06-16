@@ -28,7 +28,7 @@ class bbc_multiform_device :
 {
 public:
 	// construction/destruction
-	bbc_multiform_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_multiform_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t mem_r(offs_t offset);
 	void mem_w(offs_t offset, uint8_t data);

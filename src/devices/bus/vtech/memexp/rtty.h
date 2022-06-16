@@ -24,7 +24,7 @@ class vtech_rtty_interface_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
-	vtech_rtty_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_rtty_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

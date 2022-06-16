@@ -218,7 +218,7 @@ void master_state::master(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &master_state::main_trampoline);
 	ADDRESS_MAP_BANK(config, "mainmap").set_map(&master_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 418)); // 555 timer (22nF, 150K, 1K5), measured 418Hz
+	auto &irq_clock(CLOCK(config, "irq_clock", XTAL::u(418))); // 555 timer (22nF, 150K, 1K5), measured 418Hz
 	irq_clock.set_pulse_width(attotime::from_nsec(22870)); // active for 22.87us
 	irq_clock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 

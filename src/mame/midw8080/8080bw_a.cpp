@@ -1513,7 +1513,7 @@ static INPUT_PORTS_START( cane_audio )
 	PORT_ADJUSTER( 70, "VR3 - Shoot SFX from 555" )
 INPUT_PORTS_END
 
-cane_audio_device::cane_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+cane_audio_device::cane_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CANE_AUDIO, tag, owner, clock),
 	m_vco_timer(*this, "vco_timer"),
 	m_sn(*this, "snsnd"),

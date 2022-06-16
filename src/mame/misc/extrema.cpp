@@ -77,7 +77,7 @@ INPUT_PORTS_END
 void extrema_state::extrema(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 6000000); // guessed clock
+	Z80(config, m_maincpu, XTAL::u(6000000)); // guessed clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &extrema_state::extrema_map);
 	m_maincpu->set_addrmap(AS_IO, &extrema_state::extrema_portmap);
 }

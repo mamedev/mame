@@ -16,7 +16,7 @@ class phi_device : public device_t
 {
 public:
 	// construction/destruction
-	phi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	phi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// See ieee488.h
 	enum phi_488_signal_t
@@ -90,7 +90,7 @@ public:
 	uint8_t reg8_r(offs_t offset);
 
 protected:
-	phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

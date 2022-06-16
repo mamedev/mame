@@ -154,7 +154,7 @@ void tlcs90_device::tmp90ph44_mem(address_map &map)
 }
 
 
-tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
+tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor program_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, program_map)
 	, m_port_read_cb(*this)
@@ -163,36 +163,36 @@ tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, co
 }
 
 
-tmp90840_device::tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmp90840_device::tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tlcs90_device(mconfig, TMP90840, tag, owner, clock, address_map_constructor(FUNC(tmp90840_device::tmp90840_mem), this))
 {
 }
 
-tmp90841_device::tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmp90841_device::tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tlcs90_device(mconfig, TMP90841, tag, owner, clock, address_map_constructor(FUNC(tmp90841_device::tmp90841_mem), this))
 {
 }
 
-tmp90845_device::tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmp90845_device::tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tlcs90_device(mconfig, TMP90845, tag, owner, clock, address_map_constructor(FUNC(tmp90845_device::tmp90841_mem), this))
 {
 }
 
 
 
-tmp91640_device::tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmp91640_device::tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tlcs90_device(mconfig, TMP91640, tag, owner, clock, address_map_constructor(FUNC(tmp91640_device::tmp91640_mem), this))
 {
 }
 
 
-tmp91641_device::tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmp91641_device::tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tlcs90_device(mconfig, TMP91641, tag, owner, clock, address_map_constructor(FUNC(tmp91641_device::tmp91641_mem), this))
 {
 }
 
 
-tmp90ph44_device::tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmp90ph44_device::tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tlcs90_device(mconfig, TMP90PH44, tag, owner, clock, address_map_constructor(FUNC(tmp90ph44_device::tmp90ph44_mem), this))
 {
 }

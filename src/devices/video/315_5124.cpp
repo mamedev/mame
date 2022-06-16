@@ -248,13 +248,13 @@ void sega315_5124_device::sega315_5124(address_map &map)
 }
 
 
-sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega315_5124_device(mconfig, SEGA315_5124, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0x00, 0x0f, 4, 8, line_315_5124)
 {
 }
 
 
-sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing)
+sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -278,26 +278,26 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 }
 
 
-sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega315_5124_device(mconfig, SEGA315_5246, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0x00, 0x0f, 8, 8, line_315_5124)
 {
 }
 
 
-sega315_5246_device::sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing)
+sega315_5246_device::sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing)
 	: sega315_5124_device(mconfig, type, tag, owner, clock, cram_size, palette_offset, reg_num_mask, max_sprite_zoom_hcount, max_sprite_zoom_vcount, line_timing)
 {
 }
 
 
 // Embedded mode 4 support of the 315-5313 VDP (see 315_5313.cpp), used by Sega Genesis/Mega Drive
-sega315_5313_mode4_device::sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing)
+sega315_5313_mode4_device::sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing)
 	: sega315_5246_device(mconfig, type, tag, owner, clock, cram_size, palette_offset, reg_num_mask, max_sprite_zoom_hcount, max_sprite_zoom_vcount, line_timing)
 {
 }
 
 
-sega315_5377_device::sega315_5377_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sega315_5377_device::sega315_5377_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega315_5246_device(mconfig, SEGA315_5377, tag, owner, clock, SEGA315_5377_CRAM_SIZE, 0x10, 0x0f, 8, 8, line_315_5377)
 {
 }

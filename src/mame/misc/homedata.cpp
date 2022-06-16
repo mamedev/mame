@@ -1286,7 +1286,7 @@ void homedata_state::mrokumei(machine_config &config)
 	SN76489A(config, m_sn, 16000000/4);     // SN76489AN actually
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 }
 
 
@@ -1341,7 +1341,7 @@ void homedata_state::reikaids(machine_config &config)
 	m_ymsnd->add_route(2, "speaker", 0.25);
 	m_ymsnd->add_route(3, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 }
 
 
@@ -1354,7 +1354,7 @@ void homedata_state::pteacher(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &homedata_state::pteacher_map);
 	m_maincpu->set_vblank_int("screen", FUNC(homedata_state::homedata_irq)); /* also triggered by the blitter */
 
-	upd7807_device &audiocpu(UPD7807(config, m_audiocpu, 9000000));  /* 9MHz ? */
+	upd7807_device &audiocpu(UPD7807(config, m_audiocpu, XTAL::u(9000000)));  /* 9MHz ? */
 	audiocpu.set_addrmap(AS_PROGRAM, &homedata_state::pteacher_upd7807_map);
 	audiocpu.pa_in_cb().set(FUNC(homedata_state::pteacher_upd7807_porta_r));
 	audiocpu.pa_out_cb().set(FUNC(homedata_state::pteacher_upd7807_porta_w));
@@ -1394,7 +1394,7 @@ void homedata_state::pteacher(machine_config &config)
 	SN76489A(config, m_sn, 16000000/4);     // SN76489AN actually
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 }
 
 void homedata_state::jogakuen(machine_config &config)
@@ -1408,7 +1408,7 @@ void homedata_state::mjkinjas(machine_config &config)
 {
 	pteacher(config);
 
-	m_audiocpu->set_clock(11000000);    /* 11MHz ? */
+	m_audiocpu->set_clock(XTAL::u(11000000));    /* 11MHz ? */
 }
 
 void homedata_state::lemnangl(machine_config &config)
@@ -1563,7 +1563,7 @@ void homedata_state::mirderby(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	YM2203(config, m_ymsnd, 2000000);
+	YM2203(config, m_ymsnd, XTAL::u(2000000));
 	m_ymsnd->add_route(0, "speaker", 0.25);
 	m_ymsnd->add_route(1, "speaker", 0.25);
 	m_ymsnd->add_route(2, "speaker", 0.25);

@@ -17,7 +17,7 @@ public:
 	virtual void write_memory(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 protected:
-	linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -33,7 +33,7 @@ protected:
 class linear_flash_pccard_16mb_device : public linear_flash_pccard_device
 {
 public:
-	linear_flash_pccard_16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	linear_flash_pccard_16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -47,7 +47,7 @@ private:
 class linear_flash_pccard_32mb_device : public linear_flash_pccard_device
 {
 public:
-	linear_flash_pccard_32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	linear_flash_pccard_32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -61,7 +61,7 @@ private:
 class linear_flash_pccard_64mb_device : public linear_flash_pccard_device
 {
 public:
-	linear_flash_pccard_64mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	linear_flash_pccard_64mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

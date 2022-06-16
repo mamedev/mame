@@ -599,20 +599,20 @@ void basf7100_state::machine_reset()
 
 void basf7100_state::basf7100(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &basf7100_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &basf7100_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(basf7100_state::maincpu_irq_callback));
 
-	Z80(config, m_fdccpu, 4000000);
+	Z80(config, m_fdccpu, XTAL::u(4000000));
 	m_fdccpu->set_addrmap(AS_PROGRAM, &basf7100_state::fdc_mem_map);
 	m_fdccpu->set_addrmap(AS_IO, &basf7100_state::fdc_io_map);
 	m_fdccpu->set_irq_acknowledge_callback(FUNC(basf7100_state::fdccpu_irq_callback));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	I8251(config, m_usart[0], 0); // unknown clock
+	I8251(config, m_usart[0]); // unknown clock
 	m_usart[0]->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_usart[0]->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_usart[0]->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
@@ -626,7 +626,7 @@ void basf7100_state::basf7100(machine_config &config)
 	rs232.cts_handler().set(m_usart[0], FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set(m_usart[0], FUNC(i8251_device::write_dsr));
 
-	I8251(config, m_usart[1], 0); // unknown clock
+	I8251(config, m_usart[1]); // unknown clock
 	m_usart[1]->txd_handler().set("auxrs232", FUNC(rs232_port_device::write_txd));
 	m_usart[1]->rts_handler().set("auxrs232", FUNC(rs232_port_device::write_rts));
 	m_usart[1]->dtr_handler().set("auxrs232", FUNC(rs232_port_device::write_dtr));
@@ -688,7 +688,7 @@ void basf7100_state::basf7100(machine_config &config)
 	m_centronics->busy_handler().set(FUNC(basf7100_state::centronics_busy_w));
 
 	// floppy
-	FD1791(config, m_fdc, 1000000);
+	FD1791(config, m_fdc, XTAL::u(1000000));
 	m_fdc->intrq_wr_callback().set_inputline(m_fdccpu, INPUT_LINE_IRQ0);
 	m_fdc->drq_wr_callback().set(FUNC(basf7100_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", basf7100_floppies, "basf6106", floppy_image_device::default_mfm_floppy_formats);

@@ -154,10 +154,10 @@ void sys2900_state::sys2900(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	Z80CTC(config, "ctc", 0);
-	Z80PIO(config, "pio", 0);
-	Z80SIO(config, "sio1", 0);
-	Z80SIO(config, "sio2", 0);
+	Z80CTC(config, "ctc");
+	Z80PIO(config, "pio");
+	Z80SIO(config, "sio1");
+	Z80SIO(config, "sio2");
 }
 
 /* ROM definition */

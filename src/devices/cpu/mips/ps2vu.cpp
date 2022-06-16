@@ -23,7 +23,7 @@ sonyvu_device::sonyvu_device(
 		device_type type,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock,
+		const XTAL &clock,
 		address_map_constructor micro_cons,
 		address_map_constructor vu_cons,
 		chip_type chiptype,
@@ -54,13 +54,13 @@ sonyvu_device::sonyvu_device(
 {
 }
 
-sonyvu0_device::sonyvu0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sonyvu0_device::sonyvu0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sonyvu_device(mconfig, SONYPS2_VU0, tag, owner, clock, address_map_constructor(FUNC(sonyvu0_device::micro_map), this), address_map_constructor(FUNC(sonyvu0_device::vu_map), this), CHIP_TYPE_VU0, 0x1000)
 	, m_vu1(*this, finder_base::DUMMY_TAG)
 {
 }
 
-sonyvu1_device::sonyvu1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sonyvu1_device::sonyvu1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sonyvu_device(mconfig, SONYPS2_VU1, tag, owner, clock, address_map_constructor(FUNC(sonyvu1_device::micro_map), this), address_map_constructor(FUNC(sonyvu1_device::vu_map), this), CHIP_TYPE_VU0, 0x4000)
 	, m_gs(*this, finder_base::DUMMY_TAG)
 	, m_vif(*this, "vif")

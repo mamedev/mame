@@ -13,7 +13,7 @@
 class ladybug_video_device : public device_t
 {
 public:
-	ladybug_video_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	ladybug_video_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 

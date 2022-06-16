@@ -24,7 +24,7 @@ class at45db041_device : public device_t,
 							public device_nvram_interface
 {
 public:
-	at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER(cs_w);
 	DECLARE_WRITE_LINE_MEMBER(sck_w);
@@ -36,7 +36,7 @@ public:
 	auto so_callback() { return write_so.bind(); }
 
 protected:
-	at45db041_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	at45db041_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -101,7 +101,7 @@ protected:
 class at45db081_device : public at45db041_device
 {
 public:
-	at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int num_pages() const override { return 4096; }
@@ -116,7 +116,7 @@ protected:
 class at45db161_device : public at45db041_device
 {
 public:
-	at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int num_pages() const override { return 4096; }

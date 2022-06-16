@@ -295,7 +295,7 @@ const tiny_rom_entry *xtide_device::device_rom_region() const
 //  xtide_device - constructor
 //-------------------------------------------------
 
-xtide_device::xtide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xtide_device::xtide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISA8_XTIDE, tag, owner, clock),
 	device_isa8_card_interface( mconfig, *this ),
 	m_ata(*this, "ata"),

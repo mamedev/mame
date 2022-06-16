@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(TMS3615, tms3615_device, "tms3615", "TMS3615")
 //  tms3615_device - constructor
 //-------------------------------------------------
 
-tms3615_device::tms3615_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms3615_device::tms3615_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TMS3615, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_channel(nullptr)

@@ -1735,7 +1735,7 @@ void pc8801_state::pc8801(machine_config &config)
 	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 
 	// TODO: clock, receiver handler, DCD?
-	I8251(config, m_usart, 0);
+	I8251(config, m_usart);
 	m_usart->txd_handler().set(FUNC(pc8801_state::txdata_callback));
 	m_usart->rxrdy_handler().set(FUNC(pc8801_state::rxrdy_irq_w));
 
@@ -1851,7 +1851,7 @@ void pc8801mc_state::pc8801mc(machine_config &config)
 {
 	pc8801ma(config);
 
-	PC8801_31(config, m_cdrom_if, 0);
+	PC8801_31(config, m_cdrom_if);
 	m_cdrom_if->rom_bank_cb().set([this](bool state) { m_cdrom_bank = state; });
 }
 

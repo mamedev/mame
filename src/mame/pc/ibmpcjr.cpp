@@ -603,14 +603,14 @@ void pcjr_state::ibmpcjr(machine_config &config)
   based on bit 4(/5?) written to output port A0h. This is not
   supported yet.
  */
-	PIT8253(config, m_pit8253, 0);
+	PIT8253(config, m_pit8253);
 	m_pit8253->set_clk<0>(XTAL(14'318'181)/12);
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	m_pit8253->set_clk<1>(XTAL(14'318'181)/12);
 	m_pit8253->set_clk<2>(XTAL(14'318'181)/12);
 	m_pit8253->out_handler<2>().set(FUNC(pcjr_state::out2_changed));
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set(FUNC(pcjr_state::pic8259_set_int_line));
 
 	i8255_device &ppi(I8255(config, "ppi8255"));
@@ -632,7 +632,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	serport.cts_handler().set("ins8250", FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
-	PCVIDEO_PCJR(config, "pcvideo_pcjr", 0).set_screen("pcvideo_pcjr:screen");
+	PCVIDEO_PCJR(config, "pcvideo_pcjr").set_screen("pcvideo_pcjr:screen");
 
 	GFXDECODE(config, "gfxdecode", "pcvideo_pcjr:palette", gfx_pcjr);
 
@@ -652,7 +652,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	UPD765A(config, m_fdc, 8'000'000, false, false);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), false, false);
 
 	FLOPPY_CONNECTOR(config, "fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats, true);
 

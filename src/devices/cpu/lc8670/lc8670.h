@@ -68,7 +68,7 @@ public:
 	void xram_w(offs_t offset, uint8_t data);
 
 	// configuration helpers
-	void set_cpu_clock(clock_source source, uint32_t clock) { m_clocks[unsigned(source)] = clock; }
+	void set_cpu_clock(clock_source source, const XTAL &clock) { m_clocks[unsigned(source)] = clock; }
 	void set_cpu_clock(clock_source source, const XTAL &clock) { set_cpu_clock(source, clock.value()); }
 	template <typename T, typename U, typename V>
 	void set_clock_sources(T &&sub_clock, U &&rc_clock, V &&cf_clock)

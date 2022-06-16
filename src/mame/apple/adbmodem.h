@@ -20,12 +20,12 @@ class adbmodem_device :  public device_t
 public:
 	// construction/destruction
 	adbmodem_device(const machine_config &mconfig, const char *tag, device_t *owner, int type)
-		: adbmodem_device(mconfig, tag, owner, (uint32_t)0)
+		: adbmodem_device(mconfig, tag, owner)
 	{
 		set_type(type);
 	}
 
-	adbmodem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adbmodem_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration helpers
 	void set_type(int type) { rom_offset = type; }

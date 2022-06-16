@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(LOCOMO, locomo_device, "locomo", "Sharp LoCoMo Peripheral")
 
-locomo_device::locomo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+locomo_device::locomo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LOCOMO, tag, owner, clock)
 {
 }

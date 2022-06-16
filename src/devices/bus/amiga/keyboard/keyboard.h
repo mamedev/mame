@@ -33,14 +33,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	amiga_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: amiga_keyboard_bus_device(mconfig, tag, owner, 0)
+		: amiga_keyboard_bus_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	amiga_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	amiga_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~amiga_keyboard_bus_device();
 
 	// callbacks

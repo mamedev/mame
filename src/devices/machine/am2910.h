@@ -22,7 +22,7 @@ class am2910_device : public device_t
 {
 public:
 	// construction/destruction
-	am2910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	am2910_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER(cc_w);    // !CC
 	DECLARE_WRITE_LINE_MEMBER(ccen_w);  // !CCEN

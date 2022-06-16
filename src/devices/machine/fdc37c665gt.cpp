@@ -22,7 +22,7 @@ SMSC FDC37C665GT High Performance Multi-Mode Parallel Port Super I/O Floppy Disk
 
 DEFINE_DEVICE_TYPE(FDC37C665GT, fdc37c665gt_device, "fdc37c665gt", "FDC37C665GT")
 
-fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, upd765_family_device::mode_t floppy_mode)
+fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, upd765_family_device::mode_t floppy_mode)
 	: device_t(mconfig, FDC37C665GT, tag, owner, clock)
 	, mode(OperatingMode::Run)
 	, config_key_step(0)

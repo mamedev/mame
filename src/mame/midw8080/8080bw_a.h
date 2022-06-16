@@ -18,7 +18,7 @@
 class cane_audio_device : public device_t
 {
 public:
-	cane_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	cane_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void sh_port_1_w(u8 data);
 	void music_w(u8 data);

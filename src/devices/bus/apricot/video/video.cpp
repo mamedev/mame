@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(APRICOT_VIDEO_SLOT, apricot_video_slot_device, "apricot_video
 //  apricot_video_slot_device - constructor
 //-------------------------------------------------
 
-apricot_video_slot_device::apricot_video_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apricot_video_slot_device::apricot_video_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, APRICOT_VIDEO_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_apricot_video_interface>(mconfig, *this),
 	m_apvid_handler(*this),

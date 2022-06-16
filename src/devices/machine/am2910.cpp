@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(AM2910, am2910_device, "am2910", "AMD Am2910 Microprogram Con
 //  am2910_device - constructor
 //-------------------------------------------------
 
-am2910_device::am2910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+am2910_device::am2910_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AM2910, tag, owner, clock)
 	, m_pc(0)
 	, m_r(0)

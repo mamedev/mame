@@ -588,7 +588,7 @@ void pandoras_state::pandoras(machine_config &config)
 	aysnd.port_b_read_callback().set(FUNC(pandoras_state::portb_r));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.4);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.12); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.12); // unknown DAC
 }
 
 

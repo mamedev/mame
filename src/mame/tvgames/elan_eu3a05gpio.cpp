@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_GPIO, elan_eu3a05gpio_device, "elan_eu3a05gpio", "Elan EU3A05 GPIO")
 
-elan_eu3a05gpio_device::elan_eu3a05gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+elan_eu3a05gpio_device::elan_eu3a05gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ELAN_EU3A05_GPIO, tag, owner, clock),
 	m_write_0_callback(*this),
 	m_write_1_callback(*this),

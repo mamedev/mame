@@ -167,7 +167,7 @@ Clock mode:
 /*
     Constructor
 */
-tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 : device_t(mconfig, TMS9901, tag, owner, clock),
 	m_int_level(0),
 	m_last_level(0),

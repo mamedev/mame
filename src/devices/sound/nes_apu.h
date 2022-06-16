@@ -43,7 +43,7 @@ class nesapu_device : public device_t,
 						public device_sound_interface
 {
 public:
-	nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq() { return m_irq_handler.bind(); }
@@ -56,7 +56,7 @@ public:
 	void write(offs_t offset, u8 data);
 
 protected:
-	nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nesapu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -97,7 +97,7 @@ private:
 class apu2a03_device : public nesapu_device
 {
 public:
-	apu2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	apu2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void update_lfsr(apu_t::noise_t &chan) override;

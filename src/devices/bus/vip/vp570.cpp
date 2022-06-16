@@ -60,7 +60,7 @@ ioport_constructor vp570_device::device_input_ports() const
 //  vp570_device - constructor
 //-------------------------------------------------
 
-vp570_device::vp570_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vp570_device::vp570_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VP570, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_ram(*this, "ram", 0x1000, ENDIANNESS_LITTLE),

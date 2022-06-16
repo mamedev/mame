@@ -349,7 +349,7 @@ INPUT_PORTS_END
 void wantgman_state::wantgman(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(wantgman_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(wantgman_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(wantgman_state::plate_w));
@@ -471,7 +471,7 @@ INPUT_PORTS_END
 void bambball_state::bambball(machine_config &config)
 {
 	// basic machine hardware
-	HD38750(config, m_maincpu, 400000); // approximation
+	HD38750(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->read_r<0>().set(FUNC(bambball_state::input_r));
 	m_maincpu->write_r<1>().set(FUNC(bambball_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(bambball_state::plate_w));
@@ -618,7 +618,7 @@ INPUT_PORTS_END
 void bmboxing_state::bmboxing(machine_config &config)
 {
 	// basic machine hardware
-	HD38750(config, m_maincpu, 400000); // approximation
+	HD38750(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->read_r<0>().set(FUNC(bmboxing_state::input_r));
 	m_maincpu->write_r<1>().set(FUNC(bmboxing_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(bmboxing_state::plate_w));
@@ -749,7 +749,7 @@ INPUT_PORTS_END
 void bfriskyt_state::bfriskyt(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bfriskyt_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bfriskyt_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(bfriskyt_state::plate_w));
@@ -869,7 +869,7 @@ INPUT_PORTS_END
 void packmon_state::packmon(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(packmon_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(packmon_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(packmon_state::plate_w));
@@ -997,7 +997,7 @@ INPUT_PORTS_END
 void bzaxxon_state::bzaxxon(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 450000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(450000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bzaxxon_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bzaxxon_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(bzaxxon_state::plate_w));
@@ -1125,7 +1125,7 @@ INPUT_PORTS_END
 void zackman_state::zackman(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(zackman_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(zackman_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(zackman_state::plate_w));
@@ -1257,7 +1257,7 @@ INPUT_PORTS_END
 void bpengo_state::bpengo(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bpengo_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bpengo_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(bpengo_state::plate_w));
@@ -1387,7 +1387,7 @@ INPUT_PORTS_END
 void bbtime_state::bbtime(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bbtime_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bbtime_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(bbtime_state::plate_w));
@@ -1487,7 +1487,7 @@ INPUT_PORTS_END
 void ktparman_state::ktparman(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(ktparman_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(ktparman_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(ktparman_state::plate_w));
@@ -1591,7 +1591,7 @@ INPUT_PORTS_END
 void bdoramon_state::bdoramon(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bdoramon_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bdoramon_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(bdoramon_state::plate_w));
@@ -1709,7 +1709,7 @@ INPUT_PORTS_END
 void tkjmaru_state::tkjmaru(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(tkjmaru_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(tkjmaru_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(tkjmaru_state::plate_w));
@@ -1806,7 +1806,7 @@ INPUT_PORTS_END
 void bultrman_state::bultrman(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 350000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(350000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bultrman_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bultrman_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(bultrman_state::plate_w));
@@ -1933,7 +1933,7 @@ INPUT_PORTS_END
 void ggdman_state::ggdman(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(ggdman_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(ggdman_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(ggdman_state::plate_w));
@@ -2030,7 +2030,7 @@ INPUT_PORTS_END
 void machiman_state::machiman(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(machiman_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(machiman_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(machiman_state::plate_w));
@@ -2200,7 +2200,7 @@ INPUT_PORTS_END
 void pairmtch_state::pairmtch(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<2>().set(FUNC(pairmtch_state::plate_w));
 	m_maincpu->write_r<3>().set(FUNC(pairmtch_state::plate_w));
 	m_maincpu->read_r<4>().set(FUNC(pairmtch_state::input_r));
@@ -2210,7 +2210,7 @@ void pairmtch_state::pairmtch(machine_config &config)
 	m_maincpu->write_d().set(FUNC(pairmtch_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.2");
 
-	HD38820(config, m_audiocpu, 400000); // approximation
+	HD38820(config, m_audiocpu, XTAL::u(400000)); // approximation
 	m_audiocpu->write_r<2>().set(FUNC(pairmtch_state::sound2_w));
 	m_audiocpu->read_r<2>().set(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	m_audiocpu->write_d().set(FUNC(pairmtch_state::speaker_w));
@@ -2334,7 +2334,7 @@ INPUT_PORTS_END
 void alnattck_state::alnattck(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(alnattck_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(alnattck_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(alnattck_state::plate_w));
@@ -2473,7 +2473,7 @@ INPUT_PORTS_END
 void cdkong_state::cdkong(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(cdkong_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(cdkong_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(cdkong_state::plate_w));
@@ -2619,7 +2619,7 @@ INPUT_PORTS_END
 void cgalaxn_state::cgalaxn(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->read_r<0>().set(FUNC(cgalaxn_state::input_r));
 	m_maincpu->write_r<1>().set(FUNC(cgalaxn_state::grid_w));
 	m_maincpu->write_r<2>().set(FUNC(cgalaxn_state::grid_w));
@@ -2749,7 +2749,7 @@ INPUT_PORTS_END
 void cpacman_state::cpacman(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->read_r<0>().set(FUNC(cpacman_state::input_r));
 	m_maincpu->write_r<1>().set(FUNC(cpacman_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(cpacman_state::plate_w));
@@ -2886,7 +2886,7 @@ INPUT_PORTS_END
 void cmspacmn_state::cmspacmn(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->read_r<0>().set(FUNC(cmspacmn_state::input_r));
 	m_maincpu->write_r<1>().set(FUNC(cmspacmn_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(cmspacmn_state::plate_w));
@@ -3022,7 +3022,7 @@ INPUT_PORTS_END
 void egalaxn2_state::egalaxn2(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->read_r<0>().set(FUNC(egalaxn2_state::input_r));
 	m_maincpu->write_r<1>().set(FUNC(egalaxn2_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(egalaxn2_state::plate_w));
@@ -3240,7 +3240,7 @@ INPUT_PORTS_END
 void einvader2_state::einvader2(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 450000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(450000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(einvader2_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(einvader2_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(einvader2_state::plate_w));
@@ -3336,7 +3336,7 @@ void eturtles_state::machine_reset()
 void eturtles_state::set_clock()
 {
 	// maincpu clock is controlled by game speed knob, range is around 150kHz
-	m_maincpu->set_unscaled_clock(m_inputs[6]->read() * 1500 + 325000);
+	m_maincpu->set_unscaled_clock(XTAL::u(m_inputs[6]->read() * 1500 + 325000));
 }
 
 void eturtles_state::update_display()
@@ -3446,7 +3446,7 @@ INPUT_PORTS_END
 void eturtles_state::eturtles(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // see set_clock
+	HD38820(config, m_maincpu, XTAL::u(400000)); // see set_clock
 	m_maincpu->write_r<0>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(eturtles_state::plate_w));
@@ -3456,7 +3456,7 @@ void eturtles_state::eturtles(machine_config &config)
 	m_maincpu->write_r<6>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_d().set(FUNC(eturtles_state::grid_w));
 
-	COP411(config, m_audiocpu, 215000); // approximation
+	COP411(config, m_audiocpu, XTAL::u(215000)); // approximation
 	m_audiocpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_audiocpu->write_sk().set(FUNC(eturtles_state::speaker_w));
 	m_audiocpu->write_d().set(FUNC(eturtles_state::cop_irq_w));
@@ -3584,7 +3584,7 @@ INPUT_PORTS_END
 void estargte_state::estargte(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // see set_clock
+	HD38820(config, m_maincpu, XTAL::u(400000)); // see set_clock
 	m_maincpu->write_r<0>().set(FUNC(estargte_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(estargte_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(estargte_state::plate_w));
@@ -3594,7 +3594,7 @@ void estargte_state::estargte(machine_config &config)
 	m_maincpu->write_r<6>().set(FUNC(estargte_state::plate_w));
 	m_maincpu->write_d().set(FUNC(estargte_state::grid_w));
 
-	COP411(config, m_audiocpu, 195000); // approximation
+	COP411(config, m_audiocpu, XTAL::u(195000)); // approximation
 	m_audiocpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_audiocpu->write_sk().set(FUNC(estargte_state::speaker_w));
 	m_audiocpu->write_d().set(FUNC(estargte_state::cop_irq_w));
@@ -3725,7 +3725,7 @@ INPUT_PORTS_END
 void ghalien_state::ghalien(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(ghalien_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(ghalien_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(ghalien_state::plate_w));
@@ -3857,7 +3857,7 @@ INPUT_PORTS_END
 void gckong_state::gckong(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(gckong_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(gckong_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(gckong_state::plate_w));
@@ -3992,7 +3992,7 @@ INPUT_PORTS_END
 void gscobra_state::gscobra(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(gscobra_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(gscobra_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(gscobra_state::plate_w));
@@ -4127,7 +4127,7 @@ INPUT_PORTS_END
 void gdefender_state::gdefender(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(gdefender_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(gdefender_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(gdefender_state::plate_w));
@@ -4252,7 +4252,7 @@ INPUT_PORTS_END
 void gdigdug_state::gdigdug(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(gdigdug_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(gdigdug_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(gdigdug_state::plate_w));
@@ -4424,7 +4424,7 @@ INPUT_PORTS_END
 void mwcbaseb_state::mwcbaseb(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<1>().set(FUNC(mwcbaseb_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(mwcbaseb_state::plate_w));
 	m_maincpu->write_r<3>().set(FUNC(mwcbaseb_state::plate_w));
@@ -4568,7 +4568,7 @@ INPUT_PORTS_END
 void msthawk_state::msthawk(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(msthawk_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(msthawk_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(msthawk_state::plate_w));
@@ -4665,7 +4665,7 @@ INPUT_PORTS_END
 void pbqbert_state::pbqbert(machine_config &config)
 {
 	// basic machine hardware
-	HD38820(config, m_maincpu, 400000); // approximation
+	HD38820(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(pbqbert_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(pbqbert_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(pbqbert_state::plate_w));
@@ -4770,7 +4770,7 @@ INPUT_PORTS_END
 void puckimon_state::puckimon(machine_config &config)
 {
 	// basic machine hardware
-	HD38750(config, m_maincpu, 400000); // approximation
+	HD38750(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->read_r<0>().set_ioport("IN.0").invert();
 	m_maincpu->write_r<1>().set(FUNC(puckimon_state::grid_w));
 	m_maincpu->write_r<2>().set(FUNC(puckimon_state::grid_w));
@@ -4892,7 +4892,7 @@ INPUT_PORTS_END
 void tmtron_state::tmtron(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(tmtron_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(tmtron_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(tmtron_state::plate_w));
@@ -5022,7 +5022,7 @@ INPUT_PORTS_END
 void kingman_state::kingman(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(kingman_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(kingman_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(kingman_state::plate_w));
@@ -5147,7 +5147,7 @@ INPUT_PORTS_END
 void bombman_state::bombman(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_maincpu, 400000); // approximation
+	HD38800(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->write_r<0>().set(FUNC(bombman_state::plate_w));
 	m_maincpu->write_r<1>().set(FUNC(bombman_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(bombman_state::plate_w));
@@ -5249,7 +5249,7 @@ INPUT_PORTS_END
 void vinvader_state::vinvader(machine_config &config)
 {
 	// basic machine hardware
-	HD38750(config, m_maincpu, 300000); // approximation
+	HD38750(config, m_maincpu, XTAL::u(300000)); // approximation
 	m_maincpu->read_r<0>().set_ioport("IN.0");
 	m_maincpu->write_r<1>().set(FUNC(vinvader_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(vinvader_state::plate_w));

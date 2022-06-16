@@ -54,7 +54,7 @@
 
 DEFINE_DEVICE_TYPE(R10788, r10788_device, "r10788", "Rockwell 10788 KDC")
 
-r10788_device::r10788_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+r10788_device::r10788_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, R10788, tag, owner, clock)
 	, m_ktr(0), m_kts(0), m_kla(0), m_klb(0), m_mask_a(15), m_mask_b(15), m_ker(0)
 	, m_io_counter(0), m_scan_counter(0)

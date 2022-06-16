@@ -32,7 +32,7 @@ public:
 	typedef device_delegate<void ()> ready_callback;
 
 	// construction/destruction
-	bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration helpers
 	template <typename... T> void set_ready_callback(T &&... args) { m_ready_callback.set(std::forward<T>(args)...); }

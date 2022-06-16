@@ -36,12 +36,12 @@ public:
 	// construction/destruction
 	template <typename T>
 	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cputag)
-		: atari_sound_comm_device(mconfig, tag, owner, (u32)0)
+		: atari_sound_comm_device(mconfig, tag, owner)
 	{
 		m_sound_cpu.set_tag(std::forward<T>(cputag));
 	}
 
-	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	auto int_callback() { return m_main_int_cb.bind(); }

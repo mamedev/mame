@@ -39,7 +39,7 @@ void sam_sambus_device::device_add_mconfig(machine_config &config)
 //  sam_sambus_device - constructor
 //-------------------------------------------------
 
-sam_sambus_device::sam_sambus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sam_sambus_device::sam_sambus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SAM_SAMBUS, tag, owner, clock),
 	device_samcoupe_expansion_interface(mconfig, *this),
 	m_rtc(*this, "rtc"),

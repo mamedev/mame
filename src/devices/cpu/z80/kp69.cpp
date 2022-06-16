@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(KP69, kp69_device, "kp69", "Kawasaki Steel KP69 Interrupt Con
 //  kp69_base_device - constructor
 //-------------------------------------------------
 
-kp69_base_device::kp69_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+kp69_base_device::kp69_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
 	, m_int_callback(*this)
@@ -56,7 +56,7 @@ kp69_base_device::kp69_base_device(const machine_config &mconfig, device_type ty
 //  kp69_device - constructor
 //-------------------------------------------------
 
-kp69_device::kp69_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+kp69_device::kp69_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kp69_base_device(mconfig, KP69, tag, owner, clock)
 	, m_ivr_written(false)
 {

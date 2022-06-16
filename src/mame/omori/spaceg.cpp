@@ -507,7 +507,7 @@ INPUT_PORTS_END
 void spaceg_state::spaceg(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2500000);         /* 2.5 MHz */
+	Z80(config, m_maincpu, XTAL::u(2500000));         /* 2.5 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &spaceg_state::spaceg_map);
 
 	/* video hardware */

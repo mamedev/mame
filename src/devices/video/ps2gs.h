@@ -25,14 +25,14 @@ class ps2_gs_device : public device_t
 public:
 	template <typename T, typename U>
 
-	ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&intc_tag, U &&vu1_tag)
+	ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&intc_tag, U &&vu1_tag)
 		: ps2_gs_device(mconfig, tag, owner, clock)
 	{
 		m_intc.set_tag(std::forward<T>(intc_tag));
 		m_vu1.set_tag(std::forward<U>(vu1_tag));
 	}
 
-	ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_gs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~ps2_gs_device() override;
 
 	uint64_t priv_regs0_r(offs_t offset);

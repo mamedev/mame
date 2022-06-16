@@ -72,7 +72,7 @@ void bbc_tube_80186_device::device_add_mconfig(machine_config &config)
 	m_i80186->tmrout0_handler().set_inputline(m_i80186, INPUT_LINE_HALT).invert();
 	m_i80186->tmrout1_handler().set_inputline(m_i80186, INPUT_LINE_NMI).invert();
 
-	TUBE(config, m_ula, 0);
+	TUBE(config, m_ula);
 	m_ula->pirq_handler().set(m_i80186, FUNC(i80186_cpu_device::int0_w));
 	m_ula->drq_handler().set(m_i80186, FUNC(i80186_cpu_device::drq0_w));
 	m_ula->prst_handler().set(FUNC(bbc_tube_80186_device::prst_w));
@@ -115,7 +115,7 @@ const tiny_rom_entry *bbc_tube_pcplus_device::device_rom_region() const
 //  bbc_tube_80186_device - constructor
 //-------------------------------------------------
 
-bbc_tube_80186_device::bbc_tube_80186_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_80186_device::bbc_tube_80186_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_tube_interface(mconfig, *this)
 	, m_i80186(*this, "i80186")
@@ -125,12 +125,12 @@ bbc_tube_80186_device::bbc_tube_80186_device(const machine_config &mconfig, devi
 {
 }
 
-bbc_tube_80186_device::bbc_tube_80186_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_80186_device::bbc_tube_80186_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_80186_device(mconfig, BBC_TUBE_80186, tag, owner, clock)
 {
 }
 
-bbc_tube_pcplus_device::bbc_tube_pcplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_pcplus_device::bbc_tube_pcplus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_80186_device(mconfig, BBC_TUBE_PCPLUS, tag, owner, clock)
 {
 }

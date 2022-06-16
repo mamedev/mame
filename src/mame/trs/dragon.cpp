@@ -246,7 +246,7 @@ void dragon_state::dragon_base(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
-	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
+	pia6821_device &pia0(PIA6821(config, PIA0_TAG));
 	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
 	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
 	pia0.tspb_handler().set_constant(0xff);
@@ -255,7 +255,7 @@ void dragon_state::dragon_base(machine_config &config)
 	pia0.irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 	pia0.irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
-	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
+	pia6821_device &pia1(PIA6821(config, PIA1_TAG));
 	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
 	pia1.readpb_handler().set(FUNC(coco_state::pia1_pb_r));
 	pia1.writepa_handler().set(FUNC(coco_state::pia1_pa_w));
@@ -280,7 +280,7 @@ void dragon_state::dragon_base(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("dragon_cass");
 
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 
 	// video hardware
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
@@ -334,7 +334,7 @@ void dragon64_state::dragon64(machine_config &config)
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -408,7 +408,7 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 
 	// floppy
@@ -428,7 +428,7 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	ay8912.add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	// pia 2
-	pia6821_device &pia2(PIA6821(config, PIA2_TAG, 0));
+	pia6821_device &pia2(PIA6821(config, PIA2_TAG));
 	pia2.writepa_handler().set(FUNC(dragon_alpha_state::pia2_pa_w));
 	pia2.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<2>));
 	pia2.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<3>));

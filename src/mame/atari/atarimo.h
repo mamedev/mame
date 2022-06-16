@@ -71,14 +71,14 @@ class atari_motion_objects_device : public sprite16_device_ind16,
 public:
 	// construction/destruction
 	template <typename T>
-	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag, const atari_motion_objects_config &config)
-		: atari_motion_objects_device(mconfig, tag, owner, clock)
+	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&screen_tag, const atari_motion_objects_config &config)
+		: atari_motion_objects_device(mconfig, tag, owner)
 	{
 		set_screen(std::forward<T>(screen_tag));
 		set_config(config);
 	}
 
-	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }

@@ -148,7 +148,7 @@ void zorba_state::zorba(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 1.00); // should be horizontal frequency / 16, so depends on CRTC parameters
+	BEEP(config, m_beep, XTAL::u(800)).add_route(ALL_OUTPUTS, "mono", 1.00); // should be horizontal frequency / 16, so depends on CRTC parameters
 
 	INPUT_MERGER_ANY_HIGH(config, "irq0").output_handler().set(FUNC(zorba_state::irq_w<0>));
 	INPUT_MERGER_ANY_HIGH(config, "irq1").output_handler().set(FUNC(zorba_state::irq_w<1>));
@@ -185,13 +185,13 @@ void zorba_state::zorba(machine_config &config)
 
 	// port A - disk select etc, beeper
 	// port B - parallel interface
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->writepa_handler().set(FUNC(zorba_state::pia0_porta_w));
 	m_pia0->writepb_handler().set("parprndata", FUNC(output_latch_device::write));
 	m_pia0->cb2_handler().set("parprn", FUNC(centronics_device::write_strobe));
 
 	// IEEE488 interface
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set(m_ieee, FUNC(ieee488_device::dio_r)); // TODO: gated with PB1
 	m_pia1->writepa_handler().set(m_ieee, FUNC(ieee488_device::host_dio_w)); // TODO: gated with PB1
 	m_pia1->readpb_handler().set(FUNC(zorba_state::pia1_portb_r));
@@ -202,7 +202,7 @@ void zorba_state::zorba(machine_config &config)
 	m_pia1->irqb_handler().set("irq1", FUNC(input_merger_device::in_w<1>));
 
 	// PIT
-	pit8254_device &pit(PIT8254(config, "pit", 0));
+	pit8254_device &pit(PIT8254(config, "pit"));
 	pit.set_clk<0>(24_MHz_XTAL / 3);
 	pit.set_clk<1>(24_MHz_XTAL / 3);
 	pit.set_clk<2>(24_MHz_XTAL / 3);

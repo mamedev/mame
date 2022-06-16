@@ -8,7 +8,7 @@
 DEFINE_DEVICE_TYPE(NG_KOF98_PROT, kof98_prot_device, "ng_kof98_prot", "Neo Geo KoF 98 Protection")
 
 
-kof98_prot_device::kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+kof98_prot_device::kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NG_KOF98_PROT, tag, owner, clock),
 	m_prot_state(0)
 {

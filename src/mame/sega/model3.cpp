@@ -6167,21 +6167,21 @@ void model3_state::scsp_irq(offs_t offset, uint8_t data)
 
 void model3_state::add_cpu_66mhz(machine_config &config)
 {
-	PPC603E(config, m_maincpu, 66000000);
+	PPC603E(config, m_maincpu, XTAL::u(66000000));
 	m_maincpu->set_bus_frequency(66000000);   /* Multiplier 1, Bus = 66MHz, Core = 66MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &model3_state::model3_10_mem);
 }
 
 void model3_state::add_cpu_100mhz(machine_config &config)
 {
-	PPC603E(config, m_maincpu, 100000000);
+	PPC603E(config, m_maincpu, XTAL::u(100000000));
 	m_maincpu->set_bus_frequency(66000000);   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &model3_state::model3_mem);
 }
 
 void model3_state::add_cpu_166mhz(machine_config &config)
 {
-	PPC603R(config, m_maincpu, 166000000);
+	PPC603R(config, m_maincpu, XTAL::u(166000000));
 	m_maincpu->set_bus_frequency(66000000);   /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &model3_state::model3_mem);
 }
@@ -6197,7 +6197,7 @@ void model3_state::add_base_devices(machine_config &config)
 	NVRAM(config, "backup", nvram_device::DEFAULT_ALL_1);
 	RTC72421(config, m_rtc, XTAL(32'768)); // internal oscillator
 
-	SEGA_315_5649(config, m_io, 0);
+	SEGA_315_5649(config, m_io);
 	m_io->out_pa_callback().set(FUNC(model3_state::eeprom_w));
 	m_io->in_pb_callback().set(FUNC(model3_state::input_r));
 	m_io->in_pc_callback().set_ioport("IN2");
@@ -6236,16 +6236,16 @@ void model3_state::add_base_devices(machine_config &config)
 	scsp2.add_route(0, "lspeaker", 1.0);
 	scsp2.add_route(1, "rspeaker", 1.0);
 
-	SEGA_BILLBOARD(config, m_billboard, 0);
+	SEGA_BILLBOARD(config, m_billboard);
 
 	config.set_default_layout(layout_segabill);
 }
 
 void model3_state::add_scsi_devices(machine_config &config)
 {
-	SCSI_PORT(config, "scsi", 0);
+	SCSI_PORT(config, "scsi");
 
-	LSI53C810(config, m_lsi53c810, 0);
+	LSI53C810(config, m_lsi53c810);
 	m_lsi53c810->set_irq_callback(FUNC(model3_state::scsi_irq_callback));
 	m_lsi53c810->set_dma_callback(FUNC(model3_state::real3d_dma_callback));
 	m_lsi53c810->set_fetch_callback(FUNC(model3_state::scsi_fetch));
@@ -6256,7 +6256,7 @@ void model3_state::add_crypt_devices(machine_config &config)
 {
 	m_maincpu->set_addrmap(AS_PROGRAM, &model3_state::model3_5881_mem);
 
-	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
+	SEGA315_5881_CRYPT(config, m_cryptdevice);
 	m_cryptdevice->set_read_cb(FUNC(model3_state::crypt_read_callback));
 }
 
@@ -6299,7 +6299,7 @@ void model3_state::getbass(machine_config &config)
 	iocpu.out_p2_callback().set("ioeeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(6);
 
 	SEGA_315_5296(config, "io60", 32_MHz_XTAL);
-	SEGA_315_5649(config, "io70", 0);
+	SEGA_315_5649(config, "io70");
 
 	EEPROM_93C46_16BIT(config, "ioeeprom"); // AK93C45
 
@@ -6315,21 +6315,21 @@ void model3_state::model3_15(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_15)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_15)
 
-	M3COMM(config, "comm_board", 0);
+	M3COMM(config, "comm_board");
 }
 
 void model3_state::scud(machine_config &config)
 {
 	model3_15(config);
 
-	DSBZ80(config, m_dsbz80, 0);
+	DSBZ80(config, m_dsbz80);
 	m_dsbz80->add_route(0, "lspeaker", 1.0);
 	m_dsbz80->add_route(1, "rspeaker", 1.0);
 
-	I8251(config, m_uart, 8000000); // uPD71051
+	I8251(config, m_uart, XTAL::u(8000000)); // uPD71051
 	m_uart->txd_handler().set(m_dsbz80, FUNC(dsbz80_device::write_txd));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(500000))); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 }
@@ -6352,7 +6352,7 @@ void model3_state::model3_20(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(model3_state, model3_20)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_20)
 
-	M3COMM(config, "comm_board", 0);
+	M3COMM(config, "comm_board");
 }
 
 void model3_state::model3_20_5881(machine_config &config)
@@ -6369,7 +6369,7 @@ void model3_state::model3_21(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(model3_state, model3_21)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_21)
 
-	M3COMM(config, "comm_board", 0);
+	M3COMM(config, "comm_board");
 }
 
 void model3_state::model3_21_5881(machine_config &config)

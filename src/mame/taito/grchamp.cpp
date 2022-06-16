@@ -72,8 +72,8 @@
  *
  *************************************/
 
-#define MASTER_CLOCK        (18432000)
-#define SOUND_CLOCK         (6000000)
+#define MASTER_CLOCK        XTAL::u(18432000)
+#define SOUND_CLOCK         XTAL::u(6000000)
 
 #define PIXEL_CLOCK         (MASTER_CLOCK/3)
 

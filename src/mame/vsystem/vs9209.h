@@ -21,7 +21,7 @@ class vs9209_device : public device_t
 {
 public:
 	// construction/destruction
-	vs9209_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	vs9209_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto porta_input_cb() { return m_input_cb[0].bind(); }

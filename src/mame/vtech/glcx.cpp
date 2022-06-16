@@ -85,7 +85,7 @@ INPUT_PORTS_END
 void glcx_state::glcx(machine_config &config)
 {
 	/* basic machine hardware */
-	CR16B(config, m_maincpu, 10000000); // FIXME: determine exact type and clock
+	CR16B(config, m_maincpu, XTAL::u(10000000)); // FIXME: determine exact type and clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &glcx_state::mem_map);
 
 	/* video hardware */

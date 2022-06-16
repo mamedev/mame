@@ -89,7 +89,7 @@ R3.3/CL2 =>  |_|6         15|_|  <> R1.3
 class sm590_device : public sm510_base_device
 {
 public:
-	sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// four 4-bit R I/O ports
 	using sm510_base_device::write_r;
@@ -97,7 +97,7 @@ public:
 	template <std::size_t N> auto read_r() { return m_read_rx[N].bind(); }
 
 protected:
-	sm590_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	sm590_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	void program_512x8(address_map &map);
 	void program_768x8(address_map &map);
@@ -158,13 +158,13 @@ protected:
 class sm591_device : public sm590_device
 {
 public:
-	sm591_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sm591_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class sm595_device : public sm590_device
 {
 public:
-	sm595_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sm595_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

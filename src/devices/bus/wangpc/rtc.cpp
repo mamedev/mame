@@ -107,20 +107,20 @@ static const z80_daisy_config wangpc_rtc_daisy_chain[] =
 
 void wangpc_rtc_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_maincpu, 2000000);
+	Z80(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_daisy_config(wangpc_rtc_daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wangpc_rtc_device::wangpc_rtc_mem);
 	m_maincpu->set_addrmap(AS_IO, &wangpc_rtc_device::wangpc_rtc_io);
 
-	AM9517A(config, m_dmac, 2000000);
+	AM9517A(config, m_dmac, XTAL::u(2000000));
 
-	Z80CTC(config, m_ctc0, 2000000);
+	Z80CTC(config, m_ctc0, XTAL::u(2000000));
 	m_ctc0->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80CTC(config, m_ctc1, 2000000);
+	Z80CTC(config, m_ctc1, XTAL::u(2000000));
 	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80SIO(config, m_sio, 2000000); // SIO/0?
+	Z80SIO(config, m_sio, XTAL::u(2000000)); // SIO/0?
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 }
 
@@ -178,7 +178,7 @@ ioport_constructor wangpc_rtc_device::device_input_ports() const
 //  wangpc_rtc_device - constructor
 //-------------------------------------------------
 
-wangpc_rtc_device::wangpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wangpc_rtc_device::wangpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WANGPC_RTC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),

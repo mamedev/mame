@@ -40,7 +40,7 @@ device_electron_expansion_interface::device_electron_expansion_interface(const m
 //  electron_expansion_slot_device - constructor
 //-------------------------------------------------
 
-electron_expansion_slot_device::electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+electron_expansion_slot_device::electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ELECTRON_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_electron_expansion_interface>(mconfig, *this),
 	m_card(nullptr),

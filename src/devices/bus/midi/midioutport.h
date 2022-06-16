@@ -20,7 +20,7 @@ class midiout_port_device : public device_t,
 	public device_midi_port_interface
 {
 public:
-	midiout_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midiout_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { if (started()) m_midiout->tx(state); }
 

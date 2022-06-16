@@ -297,7 +297,7 @@ protected:
 
 public:
 	// construction/destruction
-	mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mips3_flavor flavor, endianness_t endiannes, uint32_t data_bits);
+	mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, mips3_flavor flavor, endianness_t endiannes, uint32_t data_bits);
 
 	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
 	void set_dcache_size(size_t dcache_size) { c_dcache_size = dcache_size; }
@@ -658,7 +658,7 @@ private:
 class r4000be_device : public mips3_device {
 public:
 	// construction/destruction
-	r4000be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r4000be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R4000BE, tag, owner, clock, MIPS3_TYPE_R4000, ENDIANNESS_BIG, 64)
 	{
 	}
@@ -667,7 +667,7 @@ public:
 class r4000le_device : public mips3_device {
 public:
 	// construction/destruction
-	r4000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r4000le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R4000LE, tag, owner, clock, MIPS3_TYPE_R4000, ENDIANNESS_LITTLE, 64)
 	{
 	}
@@ -676,7 +676,7 @@ public:
 class r4400be_device : public mips3_device {
 public:
 	// construction/destruction
-	r4400be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r4400be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R4400BE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_BIG, 64)
 	{
 	}
@@ -685,7 +685,7 @@ public:
 class r4400le_device : public mips3_device {
 public:
 	// construction/destruction
-	r4400le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r4400le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R4400LE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
@@ -694,7 +694,7 @@ public:
 class vr4300be_device : public mips3_device {
 public:
 	// construction/destruction
-	vr4300be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	vr4300be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, VR4300BE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_BIG, 32)
 	{
 	}
@@ -703,7 +703,7 @@ public:
 class vr4300le_device : public mips3_device {
 public:
 	// construction/destruction
-	vr4300le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	vr4300le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, VR4300LE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE, 32)
 	{
 	}
@@ -712,7 +712,7 @@ public:
 class vr4310be_device : public mips3_device {
 public:
 	// construction/destruction
-	vr4310be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	vr4310be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, VR4310BE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_BIG, 32)
 	{
 	}
@@ -721,7 +721,7 @@ public:
 class vr4310le_device : public mips3_device {
 public:
 	// construction/destruction
-	vr4310le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	vr4310le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, VR4310LE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE, 32)
 	{
 	}
@@ -730,7 +730,7 @@ public:
 class r4600be_device : public mips3_device {
 public:
 	// construction/destruction
-	r4600be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r4600be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R4600BE, tag, owner, clock, MIPS3_TYPE_R4600, ENDIANNESS_BIG, 64)
 	{
 	}
@@ -739,7 +739,7 @@ public:
 class r4600le_device : public mips3_device {
 public:
 	// construction/destruction
-	r4600le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r4600le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R4600LE, tag, owner, clock, MIPS3_TYPE_R4600, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
@@ -748,7 +748,7 @@ public:
 class r4650be_device : public mips3_device {
 public:
 	// construction/destruction
-	r4650be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r4650be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R4650BE, tag, owner, clock, MIPS3_TYPE_R4650, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
@@ -757,7 +757,7 @@ public:
 class r4650le_device : public mips3_device {
 public:
 	// construction/destruction
-	r4650le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r4650le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R4650LE, tag, owner, clock, MIPS3_TYPE_R4650, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
@@ -766,7 +766,7 @@ public:
 class r4700be_device : public mips3_device {
 public:
 	// construction/destruction
-	r4700be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r4700be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R4700BE, tag, owner, clock, MIPS3_TYPE_R4700, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
@@ -775,7 +775,7 @@ public:
 class r4700le_device : public mips3_device {
 public:
 	// construction/destruction
-	r4700le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r4700le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R4700LE, tag, owner, clock, MIPS3_TYPE_R4700, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
@@ -784,7 +784,7 @@ public:
 class tx4925be_device : public mips3_device {
 public:
 	// construction/destruction
-	tx4925be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	tx4925be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, TX4925BE, tag, owner, clock, MIPS3_TYPE_TX4925, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
@@ -793,7 +793,7 @@ public:
 class tx4925le_device : public mips3_device {
 public:
 	// construction/destruction
-	tx4925le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	tx4925le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, TX4925LE, tag, owner, clock, MIPS3_TYPE_TX4925, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
@@ -802,7 +802,7 @@ public:
 class r5000be_device : public mips3_device {
 public:
 	// construction/destruction
-	r5000be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r5000be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R5000BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG, 64)
 	{
 	}
@@ -814,7 +814,7 @@ protected:
 class r5000le_device : public mips3_device {
 public:
 	// construction/destruction
-	r5000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r5000le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R5000LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE, 32) // FIXME: Should be 64 bits, Galileo blows up though
 	{
 	}
@@ -823,7 +823,7 @@ public:
 class vr5500be_device : public mips3_device {
 public:
 	// construction/destruction
-	vr5500be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	vr5500be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, VR5500BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
@@ -832,7 +832,7 @@ public:
 class vr5500le_device : public mips3_device {
 public:
 	// construction/destruction
-	vr5500le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	vr5500le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, VR5500LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
@@ -842,13 +842,13 @@ class r5900le_device : public mips3_device {
 public:
 	// construction/destruction
 	template <typename T>
-	r5900le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&vu0_tag)
+	r5900le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&vu0_tag)
 		: r5900le_device(mconfig, tag, owner, clock)
 	{
 		m_vu0.set_tag(std::forward<T>(vu0_tag));
 	}
 
-	r5900le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	r5900le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, R5900LE, tag, owner, clock, MIPS3_TYPE_R5900, ENDIANNESS_LITTLE, 64)
 		, m_vu0(*this, finder_base::DUMMY_TAG)
 	{
@@ -907,7 +907,7 @@ protected:
 class qed5271be_device : public mips3_device {
 public:
 	// construction/destruction
-	qed5271be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	qed5271be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, QED5271BE, tag, owner, clock, MIPS3_TYPE_QED5271, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
@@ -916,7 +916,7 @@ public:
 class qed5271le_device : public mips3_device {
 public:
 	// construction/destruction
-	qed5271le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	qed5271le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, QED5271LE, tag, owner, clock, MIPS3_TYPE_QED5271, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
@@ -925,7 +925,7 @@ public:
 class rm7000be_device : public mips3_device {
 public:
 	// construction/destruction
-	rm7000be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	rm7000be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, RM7000BE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
@@ -934,7 +934,7 @@ public:
 class rm7000le_device : public mips3_device {
 public:
 	// construction/destruction
-	rm7000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	rm7000le_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: mips3_device(mconfig, RM7000LE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}

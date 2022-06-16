@@ -21,7 +21,7 @@ void gio64_cards(device_slot_interface &device)
 
 DEFINE_DEVICE_TYPE(GIO64_SLOT, gio64_slot_device, "gio64_slot", "SGI GIO64 Slot")
 
-gio64_slot_device::gio64_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, slot_type_t slot_type)
+gio64_slot_device::gio64_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, slot_type_t slot_type)
 	: device_t(mconfig, GIO64_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_gio64(*this, finder_base::DUMMY_TAG)
@@ -60,12 +60,12 @@ device_memory_interface::space_config_vector gio64_device::memory_space_config()
 	};
 }
 
-gio64_device::gio64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gio64_device::gio64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: gio64_device(mconfig, GIO64, tag, owner, clock)
 {
 }
 
-gio64_device::gio64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+gio64_device::gio64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("gio64", ENDIANNESS_BIG, 64, 32, 0)

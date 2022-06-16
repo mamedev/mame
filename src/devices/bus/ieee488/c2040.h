@@ -30,7 +30,7 @@ class c2040_device : public device_t, public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t dio_r();
 	void dio_w(uint8_t data);
@@ -43,7 +43,7 @@ public:
 	void c2040_fdc_mem(address_map &map);
 	void c2040_main_mem(address_map &map);
 protected:
-	c2040_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	c2040_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -98,7 +98,7 @@ class c3040_device :  public c2040_device
 {
 public:
 	// construction/destruction
-	c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -116,7 +116,7 @@ class c4040_device :  public c2040_device
 {
 public:
 	// construction/destruction
-	c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

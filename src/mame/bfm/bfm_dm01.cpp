@@ -57,7 +57,7 @@ Standard dm01 memorymap
 DEFINE_DEVICE_TYPE(BFM_DM01, bfm_dm01_device, "bfm_dm01", "BFM Dotmatrix 01")
 
 
-bfm_dm01_device::bfm_dm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bfm_dm01_device::bfm_dm01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, BFM_DM01, tag, owner, clock),
 	m_matrixcpu(*this, "matrix"),
 	m_data_avail(0),
@@ -268,7 +268,7 @@ INTERRUPT_GEN_MEMBER( bfm_dm01_device::nmi_line_assert )
 
 void bfm_dm01_device::device_add_mconfig(machine_config &config)
 {
-	MC6809(config, m_matrixcpu, 8000000); // MC68B09CP (clock unknown)
+	MC6809(config, m_matrixcpu, XTAL::u(8000000)); // MC68B09CP (clock unknown)
 	m_matrixcpu->set_addrmap(AS_PROGRAM, &bfm_dm01_device::bfm_dm01_memmap);
 	m_matrixcpu->set_periodic_int(FUNC(bfm_dm01_device::nmi_line_assert), attotime::from_hz(1500));          /* generate 1500 NMI's per second ?? what is the exact freq?? */
 }

@@ -140,13 +140,13 @@ INPUT_PORTS_END
 
 void mps1230_state::mps1230(machine_config &config)
 {
-	UPD7810(config, m_maincpu, 11060000);
+	UPD7810(config, m_maincpu, XTAL::u(11060000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mps1230_state::mps1230_map);
 }
 
 void mps1230_state::mps1000(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mps1230_state::mps1230_map);
 }
 

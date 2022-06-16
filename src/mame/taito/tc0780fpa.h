@@ -45,7 +45,7 @@ private:
 class tc0780fpa_device : public device_t, public device_video_interface
 {
 public:
-	tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 

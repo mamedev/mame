@@ -43,7 +43,7 @@ public:
 	typedef device_delegate<void (int entry, bool m, uint8_t ca, uint8_t cb, uint8_t cc)> color_update_delegate;
 
 	// construction/destruction
-	ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	template <typename... T> void set_color_update_callback(T &&... args) { m_color_update_cb.set(std::forward<T>(args)...); }

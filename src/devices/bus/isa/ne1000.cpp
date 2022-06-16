@@ -8,13 +8,13 @@ DEFINE_DEVICE_TYPE(NE1000, ne1000_device, "ne1000", "NE1000 Network Adapter")
 
 void ne1000_device::device_add_mconfig(machine_config &config)
 {
-	DP8390D(config, m_dp8390, 0);
+	DP8390D(config, m_dp8390);
 	m_dp8390->irq_callback().set(FUNC(ne1000_device::ne1000_irq_w));
 	m_dp8390->mem_read_callback().set(FUNC(ne1000_device::ne1000_mem_read));
 	m_dp8390->mem_write_callback().set(FUNC(ne1000_device::ne1000_mem_write));
 }
 
-ne1000_device::ne1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ne1000_device::ne1000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NE1000, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_dp8390(*this, "dp8390d"),

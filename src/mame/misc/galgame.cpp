@@ -330,7 +330,7 @@ void galaxygame_state::machine_reset()
 
 void galaxygame_state::galaxygame(machine_config &config)
 {
-	T11(config, m_maincpu, 3000000);
+	T11(config, m_maincpu, XTAL::u(3000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxygame_state::galaxygame_map);
 	m_maincpu->set_initial_mode(5 << 13);
 	m_maincpu->in_iack().set(FUNC(galaxygame_state::galaxygame_irq_callback));

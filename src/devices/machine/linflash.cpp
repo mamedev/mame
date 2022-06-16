@@ -8,7 +8,7 @@ DEFINE_DEVICE_TYPE(LINEAR_FLASH_PCCARD_32MB, linear_flash_pccard_32mb_device, "l
 DEFINE_DEVICE_TYPE(LINEAR_FLASH_PCCARD_64MB, linear_flash_pccard_64mb_device, "linearflash64mb", "Linear Flash PC Card (64MB)")
 
 
-linear_flash_pccard_device::linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+linear_flash_pccard_device::linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_pccard_interface(mconfig, *this),
 	device_memory_interface(mconfig, *this),
@@ -53,7 +53,7 @@ void linear_flash_pccard_16mb_device::linear_flash_pccard_16mb(address_map &map)
 	map(0x00c00000, 0x00ffffff).rw("4u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
 }
 
-linear_flash_pccard_16mb_device::linear_flash_pccard_16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+linear_flash_pccard_16mb_device::linear_flash_pccard_16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	linear_flash_pccard_device(mconfig, LINEAR_FLASH_PCCARD_16MB, tag, owner, clock)
 {
 	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, address_map_constructor(FUNC(linear_flash_pccard_16mb_device::linear_flash_pccard_16mb), this));
@@ -93,7 +93,7 @@ void linear_flash_pccard_32mb_device::linear_flash_pccard_32mb(address_map &map)
 	map(0x01c00000, 0x01ffffff).rw("8u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
 }
 
-linear_flash_pccard_32mb_device::linear_flash_pccard_32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+linear_flash_pccard_32mb_device::linear_flash_pccard_32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	linear_flash_pccard_device(mconfig, LINEAR_FLASH_PCCARD_32MB, tag, owner, clock)
 {
 	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, address_map_constructor(FUNC(linear_flash_pccard_32mb_device::linear_flash_pccard_32mb), this));
@@ -157,7 +157,7 @@ void linear_flash_pccard_64mb_device::linear_flash_pccard_64mb(address_map &map)
 	map(0x03c00000, 0x03ffffff).rw("16u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
 }
 
-linear_flash_pccard_64mb_device::linear_flash_pccard_64mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+linear_flash_pccard_64mb_device::linear_flash_pccard_64mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	linear_flash_pccard_device(mconfig, LINEAR_FLASH_PCCARD_64MB, tag, owner, clock)
 {
 	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, address_map_constructor(FUNC(linear_flash_pccard_64mb_device::linear_flash_pccard_64mb), this));

@@ -54,7 +54,7 @@ void device_gamate_cart_interface::rom_alloc(uint32_t size)
 //-------------------------------------------------
 //  gamate_cart_slot_device - constructor
 //-------------------------------------------------
-gamate_cart_slot_device::gamate_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gamate_cart_slot_device::gamate_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, GAMATE_CART_SLOT, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface(mconfig, *this),

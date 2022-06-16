@@ -14,7 +14,7 @@ DECLARE_DEVICE_TYPE(MSX_CART_NOMAPPER, msx_cart_nomapper_device)
 class msx_cart_nomapper_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

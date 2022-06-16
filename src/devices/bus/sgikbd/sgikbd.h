@@ -16,14 +16,14 @@ class sgi_keyboard_port_device : public device_t, public device_single_card_slot
 public:
 	template <typename T>
 	sgi_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: sgi_keyboard_port_device(mconfig, tag, owner, 0)
+		: sgi_keyboard_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	sgi_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	sgi_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~sgi_keyboard_port_device();
 
 	// configuration helpers
@@ -34,7 +34,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( rxd_r ) { return m_rxd; }
 
 protected:
-	sgi_keyboard_port_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
+	sgi_keyboard_port_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_config_complete() override;
 	virtual void device_resolve_objects() override;

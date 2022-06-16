@@ -46,7 +46,7 @@ DEFINE_DEVICE_TYPE(SONY_LDP1450, sony_ldp1450_device, "ldp1450", "Sony LDP-1450"
 //  sony_ldp1450_device - constructor
 //-------------------------------------------------
 
-sony_ldp1450_device::sony_ldp1450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sony_ldp1450_device::sony_ldp1450_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: laserdisc_device(mconfig, SONY_LDP1450, tag, owner, clock)
 {
 }

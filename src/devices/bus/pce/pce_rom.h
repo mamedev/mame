@@ -16,13 +16,13 @@ class pce_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	pce_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pce_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
 
 protected:
-	pce_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pce_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override { }
@@ -35,7 +35,7 @@ class pce_cdsys3_device : public pce_rom_device
 {
 public:
 	// construction/destruction
-	pce_cdsys3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pce_cdsys3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -49,7 +49,7 @@ class pce_populous_device : public pce_rom_device
 {
 public:
 	// construction/destruction
-	pce_populous_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pce_populous_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -63,7 +63,7 @@ class pce_sf2_device : public pce_rom_device
 {
 public:
 	// construction/destruction
-	pce_sf2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pce_sf2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -85,7 +85,7 @@ class pce_tennokoe_device : public pce_rom_device,
 {
 public:
 	// construction/destruction
-	pce_tennokoe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pce_tennokoe_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;

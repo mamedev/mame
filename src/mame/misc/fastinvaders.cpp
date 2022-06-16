@@ -638,10 +638,10 @@ void fastinvaders_state::fastinvaders(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(fastinvaders_state::scanline_timer), "screen", 0, 1);
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	I8257(config, m_dma8257, 6144100);
+	I8257(config, m_dma8257, XTAL::u(6144100));
 	m_dma8257->in_memr_cb().set(FUNC(fastinvaders_state::memory_read_byte));
 	m_dma8257->out_memw_cb().set(FUNC(fastinvaders_state::memory_write_byte));
 	m_dma8257->out_dack_cb<1>().set(FUNC(fastinvaders_state::dark_1_clr));
@@ -669,7 +669,7 @@ void fastinvaders_state::fastinvaders_8275(machine_config &config)
 	fastinvaders(config);
 	m_maincpu->set_addrmap(AS_IO, &fastinvaders_state::fastinvaders_8275_io);
 
-	I8275(config, m_crtc8275, 10000000); /* guess */ // does not configure a very useful resolution(!)
+	I8275(config, m_crtc8275, XTAL::u(10000000)); /* guess */ // does not configure a very useful resolution(!)
 	m_crtc8275->set_character_width(16);
 //  m_crtc8275->set_display_callback(FUNC(apogee_state::display_pixels));
 //  m_crtc8275->drq_wr_callback().set("dma8257", FUNC(i8257_device::dreq2_w));

@@ -33,7 +33,7 @@ void iteagle_fpga_device::ram_map(address_map &map)
 	map(0x10000, 0x1ffff).rw(FUNC(iteagle_fpga_device::e1_ram_r), FUNC(iteagle_fpga_device::e1_ram_w));
 }
 
-iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pci_device(mconfig, ITEAGLE_FPGA, tag, owner, clock),
 	m_rtc(*this, "eagle2_rtc"),
 	m_e1_nvram(*this, "eagle1_bram"),
@@ -66,7 +66,7 @@ void iteagle_fpga_device::device_add_mconfig(machine_config &config)
 
 	// RS232 serial ports
 	SCC85C30(config, m_scc1, 7.3728_MHz_XTAL);
-	m_scc1->configure_channels((7.3728_MHz_XTAL).value(), 0, (7.3728_MHz_XTAL).value(), 0);
+	m_scc1->configure_channels((7.3728_MHz_XTAL), XTAL(), 7.3728_MHz_XTAL, XTAL());
 	m_scc1->out_int_callback().set(FUNC(iteagle_fpga_device::serial_interrupt));
 	m_scc1->out_txda_callback().set(COM2_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc1->out_txdb_callback().set(COM1_TAG, FUNC(rs232_port_device::write_txd));
@@ -690,7 +690,7 @@ void iteagle_eeprom_device::device_add_mconfig(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 }
 
-iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, ITEAGLE_EEPROM, tag, owner, clock)
 	, m_sw_version(0), m_hw_version(0), m_eeprom(*this, "eeprom")
 {
@@ -818,7 +818,7 @@ void iteagle_periph_device::ctrl_map(address_map &map)
 	map(0x000, 0x0cf).rw(FUNC(iteagle_periph_device::ctrl_r), FUNC(iteagle_periph_device::ctrl_w));
 }
 
-iteagle_periph_device::iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iteagle_periph_device::iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, ITEAGLE_PERIPH, tag, owner, clock)
 	, m_rtc(*this, "eagle1_rtc")
 {

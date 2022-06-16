@@ -1165,14 +1165,14 @@ void interpro_state::ioga(machine_config &config)
 
 void interpro_state::interpro(machine_config &config)
 {
-	RAM(config, m_ram, 0);
+	RAM(config, m_ram);
 	m_ram->set_default_size("16M");
 	m_ram->set_extra_options("32M,64M,128M,256M");
 
 	// memory control gate array
 
 	// srx gate array
-	INTERPRO_SGA(config, m_sga, 0);
+	INTERPRO_SGA(config, m_sga);
 	m_sga->berr_callback().set(m_ioga, FUNC(interpro_ioga_device::bus_error));
 
 	// floppy
@@ -1185,22 +1185,22 @@ void interpro_state::interpro(machine_config &config)
 	m_rtc->irq().set(m_ioga, FUNC(interpro_ioga_device::ir9_w));
 
 	// scsi bus and devices
-	NSCSI_BUS(config, m_scsibus, 0);
+	NSCSI_BUS(config, m_scsibus);
 
-	nscsi_connector &harddisk(NSCSI_CONNECTOR(config, "scsi:0", 0));
+	nscsi_connector &harddisk(NSCSI_CONNECTOR(config, "scsi:0"));
 	interpro_scsi_devices(harddisk);
 	harddisk.set_default_option("harddisk");
 
-	nscsi_connector &cdrom(NSCSI_CONNECTOR(config, "scsi:4", 0));
+	nscsi_connector &cdrom(NSCSI_CONNECTOR(config, "scsi:4"));
 	interpro_scsi_devices(cdrom);
 	cdrom.set_default_option("cdrom");
 	cdrom.set_option_machine_config("cdrom", interpro_cdrom);
 
-	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:1", 0));
-	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:2", 0));
-	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:3", 0));
-	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:5", 0));
-	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:6", 0));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:1"));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:2"));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:3"));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:5"));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, "scsi:6"));
 
 	// ethernet
 
@@ -1223,10 +1223,10 @@ void emerald_state::emerald(machine_config &config)
 	m_maincpu->set_addrmap(2, &emerald_state::interpro_boot_map);
 	m_maincpu->set_irq_acknowledge_callback(m_ioga, FUNC(interpro_ioga_device::acknowledge_interrupt));
 
-	CAMMU_C3(config, m_i_cammu, 0);
+	CAMMU_C3(config, m_i_cammu);
 	m_i_cammu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
 
-	CAMMU_C3(config, m_d_cammu, 0);
+	CAMMU_C3(config, m_d_cammu);
 	m_d_cammu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
 	m_d_cammu->add_linked(m_i_cammu);
 
@@ -1234,7 +1234,7 @@ void emerald_state::emerald(machine_config &config)
 	m_ram->set_default_value(0);
 
 	// memory control gate array
-	INTERPRO_MCGA(config, m_mcga, 0);
+	INTERPRO_MCGA(config, m_mcga);
 
 	// floppy controller
 	I82072(config, m_fdc, 24_MHz_XTAL);
@@ -1252,7 +1252,7 @@ void emerald_state::emerald(machine_config &config)
 	interpro_serial(config);
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
+	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7"));
 	adapter.option_add_internal("host", NCR53C90A);
 	adapter.set_default_option("host");
 	adapter.set_fixed(true);
@@ -1264,12 +1264,12 @@ void emerald_state::emerald(machine_config &config)
 	m_eth->set_addrmap(0, &emerald_state::interpro_82586_map);
 
 	// i/o gate array
-	EMERALD_IOGA(config, m_ioga, 0);
+	EMERALD_IOGA(config, m_ioga);
 	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
 
 	// srx bus
-	SRX_BUS(config, m_bus, 0);
+	SRX_BUS(config, m_bus);
 	m_bus->set_main_space(m_maincpu, 0);
 	m_bus->set_io_space(m_maincpu, 1);
 
@@ -1289,10 +1289,10 @@ void turquoise_state::turquoise(machine_config &config)
 	m_maincpu->set_addrmap(2, &turquoise_state::interpro_boot_map);
 	m_maincpu->set_irq_acknowledge_callback(m_ioga, FUNC(interpro_ioga_device::acknowledge_interrupt));
 
-	CAMMU_C3(config, m_i_cammu, 0);
+	CAMMU_C3(config, m_i_cammu);
 	m_i_cammu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
 
-	CAMMU_C3(config, m_d_cammu, 0);
+	CAMMU_C3(config, m_d_cammu);
 	m_d_cammu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
 	m_d_cammu->add_linked(m_i_cammu);
 
@@ -1300,7 +1300,7 @@ void turquoise_state::turquoise(machine_config &config)
 	m_ram->set_default_value(0);
 
 	// memory control gate array
-	INTERPRO_MCGA(config, m_mcga, 0);
+	INTERPRO_MCGA(config, m_mcga);
 
 	// floppy controller
 	I82072(config, m_fdc, 24_MHz_XTAL);
@@ -1326,7 +1326,7 @@ void turquoise_state::turquoise(machine_config &config)
 	m_mse_port->state_func().set(m_ioga, FUNC(interpro_ioga_device::mouse_status_w));
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
+	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7"));
 	adapter.option_add_internal("host", NCR53C90A);
 	adapter.set_default_option("host");
 	adapter.set_fixed(true);
@@ -1338,12 +1338,12 @@ void turquoise_state::turquoise(machine_config &config)
 	m_eth->set_addrmap(0, &turquoise_state::interpro_82586_map);
 
 	// i/o gate array
-	TURQUOISE_IOGA(config, m_ioga, 0);
+	TURQUOISE_IOGA(config, m_ioga);
 	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
 
 	// cbus bus
-	CBUS_BUS(config, m_bus, 0);
+	CBUS_BUS(config, m_bus);
 	m_bus->set_main_space(m_maincpu, 0);
 	m_bus->set_io_space(m_maincpu, 1);
 
@@ -1364,11 +1364,11 @@ void sapphire_state::sapphire(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(m_ioga, FUNC(interpro_ioga_device::acknowledge_interrupt));
 
 	// FIXME: 2400/6400 should be C4T cammu?
-	CAMMU_C4I(config, m_mmu, 0);
+	CAMMU_C4I(config, m_mmu);
 	m_mmu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
 
 	// memory control gate array
-	INTERPRO_FMCC(config, m_mcga, 0);
+	INTERPRO_FMCC(config, m_mcga);
 
 	// floppy controller
 	N82077AA(config, m_fdc, 24_MHz_XTAL, n82077aa_device::mode_t::PS2);
@@ -1379,7 +1379,7 @@ void sapphire_state::sapphire(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 
 	// srx arbiter gate array
-	INTERPRO_ARBGA(config, m_arbga, 0);
+	INTERPRO_ARBGA(config, m_arbga);
 
 	// serial controllers and ports
 	SCC85230(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1387,7 +1387,7 @@ void sapphire_state::sapphire(machine_config &config)
 	interpro_serial(config);
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
+	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7"));
 	adapter.option_add_internal("host", NCR53C94);
 	adapter.set_default_option("host");
 	adapter.set_fixed(true);
@@ -1399,7 +1399,7 @@ void sapphire_state::sapphire(machine_config &config)
 	m_eth->set_addrmap(0, &sapphire_state::interpro_82596_map);
 
 	// i/o gate array
-	SAPPHIRE_IOGA(config, m_ioga, 0);
+	SAPPHIRE_IOGA(config, m_ioga);
 	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
 
@@ -1416,8 +1416,8 @@ void turquoise_state::ip2000(machine_config &config)
 	m_kbd_port->set_default_option("lle_en_us");
 	m_mse_port->set_default_option("interpro_mouse");
 
-	CBUS_SLOT(config, "slot:0", 0, m_bus, cbus_cards, "mpcb963", false);
-	CBUS_SLOT(config, "slot:1", 0, m_bus, cbus_cards, nullptr, false);
+	CBUS_SLOT(config, "slot:0", m_bus, cbus_cards, "mpcb963", false);
+	CBUS_SLOT(config, "slot:1", m_bus, cbus_cards, nullptr, false);
 
 	m_softlist->set_filter("2000");
 }
@@ -1436,7 +1436,7 @@ void cbus_sapphire_state::cbus_sapphire(machine_config &config)
 	m_mse_port->state_func().set(m_ioga, FUNC(interpro_ioga_device::mouse_status_w));
 
 	// cbus bus
-	CBUS_BUS(config, m_bus, 0);
+	CBUS_BUS(config, m_bus);
 	m_bus->set_main_space(m_maincpu, 0);
 	m_bus->set_io_space(m_maincpu, 1);
 
@@ -1451,7 +1451,7 @@ void srx_sapphire_state::srx_sapphire(machine_config &config)
 	sapphire(config);
 
 	// srx bus
-	SRX_BUS(config, m_bus, 0);
+	SRX_BUS(config, m_bus);
 	m_bus->set_main_space(m_maincpu, 0);
 	m_bus->set_io_space(m_maincpu, 1);
 
@@ -1472,8 +1472,8 @@ void cbus_sapphire_state::ip2400(machine_config &config)
 	m_kbd_port->set_default_option("lle_en_us");
 	m_mse_port->set_default_option("interpro_mouse");
 
-	CBUS_SLOT(config, "slot:0", 0, m_bus, cbus_cards, "msmt070", false);
-	CBUS_SLOT(config, "slot:1", 0, m_bus, cbus_cards, nullptr, false);
+	CBUS_SLOT(config, "slot:0", m_bus, cbus_cards, "msmt070", false);
+	CBUS_SLOT(config, "slot:1", m_bus, cbus_cards, nullptr, false);
 
 	m_softlist->set_filter("2400");
 }
@@ -1490,8 +1490,8 @@ void cbus_sapphire_state::ip2500(machine_config &config)
 	m_kbd_port->set_default_option("lle_en_us");
 	m_mse_port->set_default_option("interpro_mouse");
 
-	CBUS_SLOT(config, "slot:0", 0, m_bus, cbus_cards, "msmt070", false);
-	CBUS_SLOT(config, "slot:1", 0, m_bus, cbus_cards, nullptr, false);
+	CBUS_SLOT(config, "slot:0", m_bus, cbus_cards, "msmt070", false);
+	CBUS_SLOT(config, "slot:1", m_bus, cbus_cards, nullptr, false);
 
 	m_softlist->set_filter("2500");
 }
@@ -1507,8 +1507,8 @@ void cbus_sapphire_state::ip2700(machine_config &config)
 	m_kbd_port->set_default_option("lle_en_us");
 	m_mse_port->set_default_option("interpro_mouse");
 
-	CBUS_SLOT(config, "slot:0", 0, m_bus, cbus_cards, "msmt070", false);
-	CBUS_SLOT(config, "slot:1", 0, m_bus, cbus_cards, nullptr, false);
+	CBUS_SLOT(config, "slot:0", m_bus, cbus_cards, "msmt070", false);
+	CBUS_SLOT(config, "slot:1", m_bus, cbus_cards, nullptr, false);
 
 	m_softlist->set_filter("2700");
 }
@@ -1525,8 +1525,8 @@ void cbus_sapphire_state::ip2800(machine_config &config)
 	m_kbd_port->set_default_option("lle_en_us");
 	m_mse_port->set_default_option("interpro_mouse");
 
-	CBUS_SLOT(config, "slot:0", 0, m_bus, cbus_cards, "msmt070", false);
-	CBUS_SLOT(config, "slot:1", 0, m_bus, cbus_cards, nullptr, false);
+	CBUS_SLOT(config, "slot:0", m_bus, cbus_cards, "msmt070", false);
+	CBUS_SLOT(config, "slot:1", m_bus, cbus_cards, nullptr, false);
 
 	m_softlist->set_filter("2800");
 }
@@ -1536,10 +1536,10 @@ void emerald_state::ip6000(machine_config &config)
 	emerald(config);
 
 	// default is 6040 with EDGE-1 graphics
-	SRX_SLOT(config, "slot:1", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, "slot:2", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, "slot:3", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, "slot:4", 0, m_bus, srx_cards, "mpcb828", false);
+	SRX_SLOT(config, "slot:1", m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:2", m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:3", m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:4", m_bus, srx_cards, "mpcb828", false);
 
 	m_softlist->set_filter("6000");
 }
@@ -1552,14 +1552,14 @@ void srx_sapphire_state::ip6400(machine_config &config)
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR0);
 
 	// default is 6450 with GT II graphics
-	SRX_SLOT(config, "slot:1", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, "slot:2", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, "slot:3", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, "slot:4", 0, m_bus, srx_cards, "mpcbb68", false);
+	SRX_SLOT(config, "slot:1", m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:2", m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:3", m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:4", m_bus, srx_cards, "mpcbb68", false);
 
 	// EDGE-2 graphics (6480)
-	//SRX_SLOT(config, "slot:3", 0, m_bus, srx_cards, "mpcb030", false);
-	//SRX_SLOT(config, "slot:4", 0, m_bus, srx_cards, "mpcba63", false);
+	//SRX_SLOT(config, "slot:3", m_bus, srx_cards, "mpcb030", false);
+	//SRX_SLOT(config, "slot:4", m_bus, srx_cards, "mpcba63", false);
 
 	m_softlist->set_filter("6400");
 }
@@ -1573,10 +1573,10 @@ void srx_sapphire_state::ip6700(machine_config &config)
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
 	// default is 6780 with EDGE-2 Plus graphics
-	SRX_SLOT(config, "slot:1", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, "slot:2", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, "slot:3", 0, m_bus, srx_cards, "msmt094", false);
-	SRX_SLOT(config, "slot:4", 0, m_bus, srx_cards, "mpcb896", false);
+	SRX_SLOT(config, "slot:1", m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:2", m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:3", m_bus, srx_cards, "msmt094", false);
+	SRX_SLOT(config, "slot:4", m_bus, srx_cards, "mpcb896", false);
 
 	m_softlist->set_filter("6700");
 }
@@ -1590,10 +1590,10 @@ void srx_sapphire_state::ip6800(machine_config &config)
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
 	// default is 6880 with EDGE-2 Plus graphics
-	SRX_SLOT(config, "slot:1", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, "slot:2", 0, m_bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, "slot:3", 0, m_bus, srx_cards, "msmt094", false);
-	SRX_SLOT(config, "slot:4", 0, m_bus, srx_cards, "mpcb896", false);
+	SRX_SLOT(config, "slot:1", m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:2", m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, "slot:3", m_bus, srx_cards, "msmt094", false);
+	SRX_SLOT(config, "slot:4", m_bus, srx_cards, "mpcb896", false);
 
 	m_softlist->set_filter("6800");
 }

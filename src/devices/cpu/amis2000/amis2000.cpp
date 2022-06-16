@@ -59,15 +59,15 @@ void amis2000_base_device::data_80x4(address_map &map)
 
 
 // device definitions
-amis2000_cpu_device::amis2000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+amis2000_cpu_device::amis2000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: amis2000_base_device(mconfig, AMI_S2000, tag, owner, clock, 2, 10, 3, 13, address_map_constructor(FUNC(amis2000_cpu_device::program_1k), this), 6, address_map_constructor(FUNC(amis2000_cpu_device::data_64x4), this))
 { }
 
-amis2150_cpu_device::amis2150_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+amis2150_cpu_device::amis2150_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: amis2000_base_device(mconfig, AMI_S2150, tag, owner, clock, 3, 11, 3, 13, address_map_constructor(FUNC(amis2150_cpu_device::program_1_5k), this), 7, address_map_constructor(FUNC(amis2150_cpu_device::data_80x4), this))
 { }
 
-amis2152_cpu_device::amis2152_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+amis2152_cpu_device::amis2152_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: amis2000_base_device(mconfig, AMI_S2152, tag, owner, clock, 3, 11, 3, 13, address_map_constructor(FUNC(amis2152_cpu_device::program_1_5k), this), 7, address_map_constructor(FUNC(amis2152_cpu_device::data_80x4), this))
 { }
 

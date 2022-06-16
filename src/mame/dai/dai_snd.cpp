@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(DAI_SOUND, dai_sound_device, "dai_sound", "DAI Custom Sound")
 //  dai_sound_device - constructor
 //-------------------------------------------------
 
-dai_sound_device::dai_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dai_sound_device::dai_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DAI_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {

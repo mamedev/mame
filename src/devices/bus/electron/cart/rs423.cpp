@@ -43,7 +43,7 @@ void electron_rs423_device::device_add_mconfig(machine_config &config)
 //  electron_rs423_device - constructor
 //-------------------------------------------------
 
-electron_rs423_device::electron_rs423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_rs423_device::electron_rs423_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_RS423, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
 	, m_duart(*this, "duart")

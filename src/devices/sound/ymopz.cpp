@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(YM2414, ym2414_device, "ym2414", "YM2414 OPZ")
 //  ym2414_device - constructor
 //-------------------------------------------------
 
-ym2414_device::ym2414_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym2414_device::ym2414_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ym2414>(mconfig, tag, owner, clock, YM2414)
 {
 }

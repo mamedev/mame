@@ -73,14 +73,14 @@ INPUT_PORTS_END
 
 void e9161_state::e9161(machine_config &config)
 {
-	M68000(config, m_maincpu, 8'000'000);
+	M68000(config, m_maincpu, XTAL::u(8'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &e9161_state::mem_map);
 
-	HD63450(config, m_dmac, 8'000'000, m_maincpu);
+	HD63450(config, m_dmac, XTAL::u(8'000'000), m_maincpu);
 
-	AM8052(config, "crtc", 8'000'000);
+	AM8052(config, "crtc", XTAL::u(8'000'000));
 
-	MK68564(config, "sio", 4'000'000);
+	MK68564(config, "sio", XTAL::u(4'000'000));
 }
 
 

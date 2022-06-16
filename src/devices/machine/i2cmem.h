@@ -50,7 +50,7 @@ public:
 
 protected:
 	// construction/destruction
-	i2cmem_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int read_page_size, int write_page_size, int data_size);
+	i2cmem_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int read_page_size, int write_page_size, int data_size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -100,7 +100,7 @@ protected:
 	class i2c_##name##_device : public i2cmem_device \
 	{ \
 	public: \
-		i2c_##name##_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0); \
+		i2c_##name##_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL()); \
 	};
 
 DECLARE_I2C_DEVICE(x24c01);

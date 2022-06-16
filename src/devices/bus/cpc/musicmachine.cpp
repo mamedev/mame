@@ -25,11 +25,11 @@ void cpc_musicmachine_device::device_add_mconfig(machine_config &config)
 	m_acia->irq_handler().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::nmi_w));
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(31250*16)));
 	acia_clock.signal_handler().set(FUNC(cpc_musicmachine_device::write_acia_clock));
 
 	SPEAKER(config, "speaker").front_center();
-	ZN429E(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.2);
+	ZN429E(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	// no pass-through
 }
@@ -38,7 +38,7 @@ void cpc_musicmachine_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_musicmachine_device::cpc_musicmachine_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cpc_musicmachine_device::cpc_musicmachine_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CPC_MUSICMACHINE, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_slot(nullptr),

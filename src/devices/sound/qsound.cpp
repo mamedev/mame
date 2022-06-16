@@ -130,7 +130,7 @@ ROM_END
 //  qsound_device - constructor
 //-------------------------------------------------
 
-qsound_device::qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+qsound_device::qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, QSOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)

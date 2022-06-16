@@ -31,7 +31,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 	// construction/destruction
-	qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_external_rom(bool external_rom) { m_external_rom = external_rom; }
 	auto p1_in() { return m_in_p1_cb.bind(); }

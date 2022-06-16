@@ -57,7 +57,7 @@ void tanbus_mpvdu_device::device_add_mconfig(machine_config &config)
 //  tanbus_mpvdu_device - constructor
 //-------------------------------------------------
 
-tanbus_mpvdu_device::tanbus_mpvdu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tanbus_mpvdu_device::tanbus_mpvdu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TANBUS_MPVDU, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
 	, m_screen(*this, "screen")

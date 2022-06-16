@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(MB89371, mb89371_device, "mb89371", "MB89371 Dual Serial UART")
 
-mb89371_device::mb89371_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+mb89371_device::mb89371_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock )
 	: device_t(mconfig, MB89371, tag, owner, clock)
 {
 }

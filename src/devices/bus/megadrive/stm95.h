@@ -61,7 +61,7 @@ class md_eeprom_stm95_device : public device_t, public device_md_cart_interface
 {
 public:
 	// construction/destruction
-	md_eeprom_stm95_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_eeprom_stm95_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint16_t read(offs_t offset) override;
@@ -69,7 +69,7 @@ public:
 	virtual void write_a13(offs_t offset, uint16_t data) override;
 
 protected:
-	md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

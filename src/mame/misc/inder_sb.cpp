@@ -12,7 +12,7 @@
 DEFINE_DEVICE_TYPE(INDER_AUDIO, inder_sb_device, "indersb", "Inder 4xDAC Sound Board")
 
 
-inder_sb_device::inder_sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+inder_sb_device::inder_sb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, INDER_AUDIO, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_audiocpu(*this, "audiocpu")
@@ -151,24 +151,24 @@ void inder_sb_device::sound_io(address_map &map)
 
 void inder_sb_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_audiocpu, 8000000); // unk freq
+	Z80(config, m_audiocpu, XTAL::u(8000000)); // unk freq
 	m_audiocpu->set_daisy_config(daisy_chain);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &inder_sb_device::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &inder_sb_device::sound_io);
 
-	Z80CTC(config, m_ctc, 4000000); // unk freq
+	Z80CTC(config, m_ctc, XTAL::u(4000000)); // unk freq
 	// runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
 	m_ctc->intr_callback().set_inputline(m_audiocpu, 0);
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac0", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac3", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R(config, "dac0vol", 0).set_output_range(0, 1).add_route(0, "dac0", 1.0, DAC_INPUT_RANGE_HI).add_route(0, "dac0", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
-	DAC_8BIT_R2R(config, "dac1vol", 0).set_output_range(0, 1).add_route(0, "dac1", 1.0, DAC_INPUT_RANGE_HI).add_route(0, "dac1", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2vol", 0).set_output_range(0, 1).add_route(0, "dac2", 1.0, DAC_INPUT_RANGE_HI).add_route(0, "dac2", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
-	DAC_8BIT_R2R(config, "dac3vol", 0).set_output_range(0, 1).add_route(0, "dac3", 1.0, DAC_INPUT_RANGE_HI).add_route(0, "dac3", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac0").add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac3").add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac0vol").set_output_range(0, 1).add_route(0, "dac0", 1.0, DAC_INPUT_RANGE_HI).add_route(0, "dac0", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1vol").set_output_range(0, 1).add_route(0, "dac1", 1.0, DAC_INPUT_RANGE_HI).add_route(0, "dac1", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2vol").set_output_range(0, 1).add_route(0, "dac2", 1.0, DAC_INPUT_RANGE_HI).add_route(0, "dac2", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
+	DAC_8BIT_R2R(config, "dac3vol").set_output_range(0, 1).add_route(0, "dac3", 1.0, DAC_INPUT_RANGE_HI).add_route(0, "dac3", -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
 }
 
 

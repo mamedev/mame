@@ -676,7 +676,7 @@ void s7_state::machine_reset()
 void s7_state::s7(machine_config &config)
 {
 	/* basic machine hardware */
-	M6808(config, m_maincpu, 3580000);
+	M6808(config, m_maincpu, XTAL::u(3580000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &s7_state::main_map);
 
 	/* Video */
@@ -686,7 +686,7 @@ void s7_state::s7(machine_config &config)
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_pia21, 0);
+	PIA6821(config, m_pia21);
 	m_pia21->readpa_handler().set_constant(0xff); // PA7 unknown input
 	m_pia21->readpb_handler().set_constant(0x3f); // PB0-4 unknown inputs
 	m_pia21->writepa_handler().set(FUNC(s7_state::sound_w));
@@ -696,7 +696,7 @@ void s7_state::s7(machine_config &config)
 	m_pia21->irqa_handler().set(FUNC(s7_state::pia_irq));
 	m_pia21->irqb_handler().set(FUNC(s7_state::pia_irq));
 
-	PIA6821(config, m_pia22, 0);
+	PIA6821(config, m_pia22);
 	m_pia22->writepa_handler().set(FUNC(s7_state::sol0_w));
 	m_pia22->writepb_handler().set(FUNC(s7_state::sol1_w));
 	m_pia22->ca2_handler().set(FUNC(s7_state::pia22_ca2_w));
@@ -704,7 +704,7 @@ void s7_state::s7(machine_config &config)
 	m_pia22->irqa_handler().set(FUNC(s7_state::pia_irq));
 	m_pia22->irqb_handler().set(FUNC(s7_state::pia_irq));
 
-	PIA6821(config, m_pia24, 0);
+	PIA6821(config, m_pia24);
 	m_pia24->writepa_handler().set(FUNC(s7_state::lamp0_w));
 	m_pia24->writepb_handler().set(FUNC(s7_state::lamp1_w));
 	m_pia24->ca2_handler().set(FUNC(s7_state::pia24_ca2_w));
@@ -712,7 +712,7 @@ void s7_state::s7(machine_config &config)
 	m_pia24->irqa_handler().set(FUNC(s7_state::pia_irq));
 	m_pia24->irqb_handler().set(FUNC(s7_state::pia_irq));
 
-	PIA6821(config, m_pia28, 0);
+	PIA6821(config, m_pia28);
 	m_pia28->readpa_handler().set(FUNC(s7_state::dips_r));
 	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->writepa_handler().set(FUNC(s7_state::dig0_w));
@@ -722,7 +722,7 @@ void s7_state::s7(machine_config &config)
 	m_pia28->irqa_handler().set(FUNC(s7_state::pia_irq));
 	m_pia28->irqb_handler().set(FUNC(s7_state::pia_irq));
 
-	PIA6821(config, m_pia30, 0);
+	PIA6821(config, m_pia30);
 	m_pia30->readpa_handler().set(FUNC(s7_state::switch_r));
 	m_pia30->set_port_a_input_overrides_output_mask(0xff);
 	m_pia30->writepb_handler().set(FUNC(s7_state::switch_w));
@@ -735,7 +735,7 @@ void s7_state::s7(machine_config &config)
 
 	/* Add the soundcard */
 	SPEAKER(config, "mono").front_center();
-	WILLIAMS_S6_SOUND(config, m_s6sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S6_SOUND(config, m_s6sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

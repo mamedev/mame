@@ -13,7 +13,7 @@ public:
 	void add_device(jvs_device *dev);
 
 protected:
-	jvs_host(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	jvs_host(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

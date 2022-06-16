@@ -1337,7 +1337,7 @@ int device_usb_ohci_function_interface::execute_transfer(int endpoint, int pid, 
 
 DEFINE_DEVICE_TYPE(OHCI_USB_CONNECTOR, ohci_usb_connector, "usb_connector", "Usb Connector Abstraction");
 
-ohci_usb_connector::ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ohci_usb_connector::ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, OHCI_USB_CONNECTOR, tag, owner, clock),
 	device_single_card_slot_interface<device_usb_ohci_function_interface>(mconfig, *this)
 {
@@ -1421,7 +1421,7 @@ const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc02 = { 7
 
 DEFINE_DEVICE_TYPE(OHCI_GAME_CONTROLLER, ohci_game_controller_device, "ohci_gc", "OHCI Game Controller")
 
-ohci_game_controller_device::ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ohci_game_controller_device::ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, OHCI_GAME_CONTROLLER, tag, owner, clock),
 	device_usb_ohci_function_interface(mconfig, *this),
 	m_ThumbstickLh(*this, "ThumbstickLh"),

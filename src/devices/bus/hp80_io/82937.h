@@ -22,7 +22,7 @@ class hp82937_io_card_device : public device_t, public device_hp80_io_interface
 {
 public:
 	// construction/destruction
-	hp82937_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp82937_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~hp82937_io_card_device();
 
 protected:

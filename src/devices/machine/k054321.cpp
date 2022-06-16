@@ -57,7 +57,7 @@ void k054321_device::sound_map(address_map &map)
 	map(0x3, 0x3).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 }
 
-k054321_device::k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+k054321_device::k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, K054321, tag, owner, clock),
 	m_left(*this, finder_base::DUMMY_TAG),
 	m_right(*this, finder_base::DUMMY_TAG),

@@ -54,7 +54,7 @@ public:
 
 protected:
 	// base constructor
-	x68k_crtc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	x68k_crtc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-specific overrides
 	virtual void device_resolve_objects() override;
@@ -122,13 +122,13 @@ private:
 class vinas_device : public x68k_crtc_device
 {
 public:
-	vinas_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	vinas_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class vicon_device : public x68k_crtc_device
 {
 public:
-	vicon_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	vicon_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definitions

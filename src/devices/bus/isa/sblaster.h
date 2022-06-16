@@ -105,7 +105,7 @@ protected:
 	};
 
 	// construction/destruction
-	sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -157,7 +157,7 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 protected:
 	// construction/destruction
-	sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void drq_w(int state) override;
@@ -172,7 +172,7 @@ class isa8_sblaster1_0_device : public sb8_device
 {
 public:
 	// construction/destruction
-	isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t saa1099_16_r(offs_t offset);
 	void saa1099_1_16_w(offs_t offset, uint8_t data);
@@ -195,7 +195,7 @@ class isa8_sblaster1_5_device : public sb8_device
 {
 public:
 	// construction/destruction
-	isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -216,7 +216,7 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 protected:
 	// construction/destruction
-	sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void device_start() override;
 	virtual uint16_t dack16_r(int line) override;
 	virtual uint8_t dack_r(int line) override { return sb_device::dack_r(line); }
@@ -236,7 +236,7 @@ class isa16_sblaster16_device : public sb16_device
 {
 public:
 	// construction/destruction
-	isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -26,7 +26,7 @@ namespace bus::ti99::joyport {
 class ti99_handset_device : public device_t, public device_ti99_joyport_interface
 {
 public:
-	ti99_handset_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti99_handset_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t read_dev() override;
 	void  write_dev(uint8_t data) override;
@@ -68,7 +68,7 @@ private:
 class ti99_twin_joystick_device : public device_t, public device_ti99_joyport_interface
 {
 public:
-	ti99_twin_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti99_twin_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void device_start() override;
 
 	uint8_t read_dev() override;

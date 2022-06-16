@@ -38,14 +38,14 @@ class cg_parallel_slot_device : public device_t, public device_single_card_slot_
 public:
 	// construction/destruction
 	cg_parallel_slot_device(machine_config const &mconfig, char const *tag, device_t *owner)
-		: cg_parallel_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: cg_parallel_slot_device(mconfig, tag, owner, XTAL())
 	{
 		option_reset();
 		cg_parallel_slot_carts(*this);
 		set_default_option(nullptr);
 		set_fixed(false);
 	}
-	cg_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cg_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~cg_parallel_slot_device();
 
 	// IOA

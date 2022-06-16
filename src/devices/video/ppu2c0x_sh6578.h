@@ -14,7 +14,7 @@
 class ppu_sh6578_device : public ppu2c0x_device
 {
 public:
-	ppu_sh6578_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ppu_sh6578_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t palette_read(offs_t offset) override;
 	virtual void palette_write(offs_t offset, uint8_t data) override;
@@ -22,7 +22,7 @@ public:
 	virtual uint8_t read_extended(offs_t offset);
 
 protected:
-	ppu_sh6578_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ppu_sh6578_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	void ppu_internal_map(address_map& map);
 
@@ -48,7 +48,7 @@ private:
 class ppu_sh6578pal_device : public ppu_sh6578_device
 {
 public:
-	ppu_sh6578pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	ppu_sh6578pal_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(PPU_SH6578,    ppu_sh6578_device)

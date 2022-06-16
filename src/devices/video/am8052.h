@@ -21,7 +21,7 @@ class am8052_device : public device_t
 {
 public:
 	// device constructor
-	am8052_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	am8052_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// read/write handlers
 	void pointer_w(u16 data);

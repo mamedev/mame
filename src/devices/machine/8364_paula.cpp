@@ -44,7 +44,7 @@ DEFINE_DEVICE_TYPE(PAULA_8364, paula_8364_device, "paula_8364", "MOS 8364 \"Paul
 //  paula_8364_device - constructor
 //-------------------------------------------------
 
-paula_8364_device::paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+paula_8364_device::paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PAULA_8364, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_chipmem_r(*this)

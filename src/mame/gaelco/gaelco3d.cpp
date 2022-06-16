@@ -913,16 +913,16 @@ INPUT_PORTS_END
 void gaelco3d_state::gaelco3d(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, 15000000);
+	M68000(config, m_maincpu, XTAL::u(15000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco3d_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco3d_state::vblank_gen));
 
-	TMS32031(config, m_tms, 60000000);
+	TMS32031(config, m_tms, XTAL::u(60000000));
 	m_tms->set_addrmap(AS_PROGRAM, &gaelco3d_state::tms_map);
 	m_tms->set_mcbl_mode(true);
 	m_tms->iack().set(FUNC(gaelco3d_state::tms_iack_w));
 
-	ADSP2115(config, m_adsp, 16000000);
+	ADSP2115(config, m_adsp, XTAL::u(16000000));
 	m_adsp->sport_tx().set(FUNC(gaelco3d_state::adsp_tx_callback));
 	m_adsp->set_addrmap(AS_PROGRAM, &gaelco3d_state::adsp_program_map);
 	m_adsp->set_addrmap(AS_DATA, &gaelco3d_state::adsp_data_map);
@@ -933,7 +933,7 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 
 	TIMER(config, "adsp_timer").configure_generic(FUNC(gaelco3d_state::adsp_autobuffer_irq));
 
-	GAELCO_SERIAL(config, m_serial, 0);
+	GAELCO_SERIAL(config, m_serial);
 	m_serial->irq_handler().set(FUNC(gaelco3d_state::ser_irq));
 
 	LS259(config, m_mainlatch); // IC5 on bottom board next to EEPROM
@@ -983,11 +983,11 @@ void gaelco3d_state::gaelco3d2(machine_config &config)
 	gaelco3d(config);
 
 	// Basic machine hardware
-	M68EC020(config.replace(), m_maincpu, 25000000);
+	M68EC020(config.replace(), m_maincpu, XTAL::u(25000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco3d_state::main020_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco3d_state::vblank_gen));
 
-	m_tms->set_clock(50000000);
+	m_tms->set_clock(XTAL::u(50000000));
 
 	MCFG_MACHINE_RESET_OVERRIDE(gaelco3d_state,gaelco3d2)
 }

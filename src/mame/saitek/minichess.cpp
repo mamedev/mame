@@ -179,7 +179,7 @@ INPUT_PORTS_END
 void mini_state::smchess(machine_config &config)
 {
 	/* basic machine hardware */
-	HD44801(config, m_maincpu, 400000);
+	HD44801(config, m_maincpu, XTAL::u(400000));
 	m_maincpu->write_r<2>().set(FUNC(mini_state::seg_w<0>));
 	m_maincpu->write_r<3>().set(FUNC(mini_state::seg_w<1>));
 	m_maincpu->write_d().set(FUNC(mini_state::mux_w));

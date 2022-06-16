@@ -24,7 +24,7 @@ class wd1010_device : public device_t
 {
 public:
 	// construction/destruction
-	wd1010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd1010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_intrq_callback() { return m_out_intrq_cb.bind(); }
 	auto out_bdrq_callback() { return m_out_bdrq_cb.bind(); }

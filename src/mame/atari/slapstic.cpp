@@ -203,7 +203,7 @@
 
 DEFINE_DEVICE_TYPE(SLAPSTIC, atari_slapstic_device, "slapstic", "Atari Slapstic")
 
-atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SLAPSTIC, tag, owner, clock),
 	m_bank(*this, finder_base::DUMMY_TAG),
 	m_view(nullptr),

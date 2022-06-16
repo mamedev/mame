@@ -53,7 +53,7 @@ public:
 
 protected:
 	// construction/destruction
-	bbc_romslot_device(const machine_config &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
+	bbc_romslot_device(const machine_config &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -81,7 +81,7 @@ public:
 		m_slot_size = 0x4000;
 	}
 
-	bbc_romslot16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	bbc_romslot16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // ======================> bbc_romslot32_device
@@ -101,7 +101,7 @@ public:
 		m_slot_size = 0x8000;
 	}
 
-	bbc_romslot32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	bbc_romslot32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 

@@ -89,7 +89,7 @@ DEFINE_DEVICE_TYPE(SAM6883, sam6883_device, "sam6883", "MC6883 SAM")
 //  constructor
 //-------------------------------------------------
 
-sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SAM6883, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, sam6883_friend_device_interface(mconfig, *this, 4)

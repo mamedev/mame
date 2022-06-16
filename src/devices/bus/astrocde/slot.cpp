@@ -61,7 +61,7 @@ void device_astrocade_cart_interface::rom_alloc(uint32_t size)
 //-------------------------------------------------
 //  astrocade_cart_slot_device - constructor
 //-------------------------------------------------
-astrocade_cart_slot_device::astrocade_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+astrocade_cart_slot_device::astrocade_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ASTROCADE_CART_SLOT, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_astrocade_cart_interface>(mconfig, *this),

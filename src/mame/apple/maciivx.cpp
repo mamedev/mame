@@ -315,7 +315,7 @@ void maciivx_state::maciiv_base(machine_config &config)
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 
 	SCC85C30(config, m_scc, C7M);
-	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
+	m_scc->configure_channels(XTAL::u(3'686'400), XTAL::u(3'686'400), XTAL::u(3'686'400), XTAL::u(3'686'400));
 	m_scc->out_int_callback().set(m_vasp, FUNC(vasp_device::scc_irq_w));
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
@@ -337,7 +337,7 @@ void maciivx_state::maciiv_base(machine_config &config)
 
 	MACADB(config, m_macadb, C15M);
 
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irqc_callback().set(m_vasp, FUNC(vasp_device::slot0_irq_w));
 	nubus.out_irqd_callback().set(m_vasp, FUNC(vasp_device::slot1_irq_w));

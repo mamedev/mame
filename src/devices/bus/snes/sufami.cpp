@@ -24,14 +24,14 @@ DEFINE_DEVICE_TYPE(SNS_LOROM_SUFAMI, sns_rom_sufami_device, "sns_rom_sufami", "S
 DEFINE_DEVICE_TYPE(SNS_STROM,        sns_rom_strom_device,  "sns_strom",      "SNES Sufami Turbo Minicart")
 
 
-sns_rom_sufami_device::sns_rom_sufami_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_sufami_device::sns_rom_sufami_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_LOROM_SUFAMI, tag, owner, clock)
 	, m_slot1(*this, "st_slot1")
 	, m_slot2(*this, "st_slot2")
 {
 }
 
-sns_rom_strom_device::sns_rom_strom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_strom_device::sns_rom_strom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_STROM, tag, owner, clock)
 {
 }

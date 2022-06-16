@@ -41,7 +41,7 @@ namespace
 
 	void sys1121_state::sys1121(machine_config &config)
 	{
-		VME(config, "vme", 0);
+		VME(config, "vme");
 		VME_SLOT(config, "slot1", sys1121_vme_cards, "mvme120", 1, "vme");
 		VME_SLOT(config, "slot2", sys1121_vme_cards, nullptr, 2, "vme");
 		VME_SLOT(config, "slot3", sys1121_vme_cards, nullptr, 3, "vme");

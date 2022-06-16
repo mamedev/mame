@@ -32,7 +32,7 @@
 
 DEFINE_DEVICE_TYPE(EUROPC_KEYBOARD, europc_keyboard_device, "europc_kbd", "EURO PC Keyboard")
 
-europc_keyboard_device::europc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+europc_keyboard_device::europc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, EUROPC_KEYBOARD, tag, owner, clock)
 	, m_mcu(*this, "mcu")
 	, m_keys(*this, "COLUMN%d", 1U)

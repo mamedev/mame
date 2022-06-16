@@ -54,7 +54,7 @@ class vic20_expansion_slot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	vic20_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
+	vic20_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, T &&opts, char const *dflt)
 		: vic20_expansion_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -62,7 +62,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static void add_passthrough(machine_config &config, const char *_tag);
 

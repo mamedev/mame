@@ -36,7 +36,7 @@ class dsp32c_device : public cpu_device
 {
 public:
 	// construction/destruction
-	dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_cb() { return m_output_pins_changed.bind(); }
 

@@ -90,14 +90,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const* dflt)
-		: videobrain_expansion_slot_device(mconfig, tag, owner, 0)
+		: videobrain_expansion_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto extres_wr_callback() { return m_write_extres.bind(); }
 

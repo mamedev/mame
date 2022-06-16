@@ -596,7 +596,7 @@ void ste_video_device::shifter_pixelofs_w(uint8_t data)
 //  VIDEO
 //**************************************************************************
 
-st_video_device::st_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+st_video_device::st_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this, true)
@@ -606,12 +606,12 @@ st_video_device::st_video_device(const machine_config &mconfig, device_type type
 {
 }
 
-st_video_device::st_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+st_video_device::st_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: st_video_device(mconfig, ST_VIDEO, tag, owner, clock)
 {
 }
 
-ste_video_device::ste_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ste_video_device::ste_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: st_video_device(mconfig, STE_VIDEO, tag, owner, clock)
 {
 }

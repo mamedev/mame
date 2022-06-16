@@ -27,7 +27,7 @@ class c1526_device_base : public device_t
 {
 protected:
 	// construction/destruction
-	c1526_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	c1526_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -42,7 +42,7 @@ class c1526_device : public c1526_device_base, public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	c1526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1526_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -63,7 +63,7 @@ class c4023_device : public c1526_device_base, public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c4023_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c4023_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

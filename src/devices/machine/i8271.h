@@ -18,7 +18,7 @@ class floppy_image_device;
 class i8271_device : public device_t
 {
 public:
-	i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto intrq_wr_callback() { return intrq_cb.bind(); }
 	auto drq_wr_callback() { return drq_cb.bind(); }
@@ -32,7 +32,7 @@ public:
 
 	void ready_w(bool val);
 
-	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
+	void set_rate(const XTAL &rate); // rate in bps, to be used when the fdc is externally frequency-controlled
 
 	void set_ready_line_connected(bool ready);
 	void set_select_lines_connected(bool select);

@@ -49,12 +49,12 @@ DEFINE_DEVICE_TYPE(RTC4543, rtc4543_device, "rtc4543", "Epson R4543 RTC")
 //  rtc4543_device - constructor
 //-------------------------------------------------
 
-rtc4543_device::rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rtc4543_device::rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rtc4543_device(mconfig, RTC4543, tag, owner, clock)
 {
 }
 
-rtc4543_device::rtc4543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+rtc4543_device::rtc4543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
 	, m_data_cb(*this)
@@ -350,7 +350,7 @@ DEFINE_DEVICE_TYPE(JRC6355E, jrc6355e_device, "jrc6355e", "JRC 6355E RTC")
 //  jrc6355e_device - constructor
 //-------------------------------------------------
 
-jrc6355e_device::jrc6355e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+jrc6355e_device::jrc6355e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rtc4543_device(mconfig, JRC6355E, tag, owner, clock)
 {
 }

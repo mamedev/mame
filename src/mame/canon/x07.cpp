@@ -1500,10 +1500,10 @@ void x07_state::x07(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, "beeper").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* printer */
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 
 	TIMER(config, "blink_timer").configure_periodic(FUNC(x07_state::blink_timer), attotime::from_msec(300));
 

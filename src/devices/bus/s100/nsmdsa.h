@@ -27,7 +27,7 @@ class s100_mds_a_device : public device_t,
 {
 public:
 	// construction/destruction
-	s100_mds_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s100_mds_a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

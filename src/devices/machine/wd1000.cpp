@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(WD1000, wd1000_device, "wd1000", "Western Digital WD1000 Winc
 //  wd1000_device - constructor
 //-------------------------------------------------
 
-wd1000_device::wd1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+wd1000_device::wd1000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, WD1000, tag, owner, clock)
 	, m_intrq_cb(*this)
 	, m_drq_cb(*this)

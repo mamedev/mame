@@ -236,7 +236,7 @@ INPUT_PORTS_END
 
 void sawatte_state::sawatte(machine_config &config)
 {
-	M6502(config, m_maincpu, 4'000'000); // could be some stock SoC, type and clock unknown
+	M6502(config, m_maincpu, XTAL::u(4'000'000)); // could be some stock SoC, type and clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &sawatte_state::mem_map);
 
 	GENERIC_CARTSLOT(config, m_cartslot, generic_plain_slot, "sawatte_cart");

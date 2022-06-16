@@ -216,14 +216,14 @@ INPUT_PORTS_END
 void superga2_state::superga2(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1021800);
+	M6502(config, m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &superga2_state::superga2_map);
 
 	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
+	m_screen->set_raw(XTAL::u(1021800)*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(superga2_state::screen_update));
 	m_screen->set_palette(m_video);
 

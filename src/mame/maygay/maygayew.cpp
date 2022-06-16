@@ -136,7 +136,7 @@ INPUT_PORTS_END
 void maygayew_state::maygayew(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000); // MC68306FC16 - standard 68000 core + peripherals
+	M68000(config, m_maincpu, XTAL::u(8000000)); // MC68306FC16 - standard 68000 core + peripherals
 	m_maincpu->set_addrmap(AS_PROGRAM, &maygayew_state::maygayew_map);
 
 	SPEAKER(config, "mono").front_center();

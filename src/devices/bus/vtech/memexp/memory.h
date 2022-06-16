@@ -24,7 +24,7 @@ class vtech_laser110_16k_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
-	vtech_laser110_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_laser110_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -38,7 +38,7 @@ class vtech_laser210_16k_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
-	vtech_laser210_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_laser210_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -52,7 +52,7 @@ class vtech_laser310_16k_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
-	vtech_laser310_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_laser310_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -66,7 +66,7 @@ class vtech_laser_64k_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
-	vtech_laser_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_laser_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

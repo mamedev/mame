@@ -68,7 +68,7 @@ enum drvstatus_mask : u8
 
 DEFINE_DEVICE_TYPE(LABTAM_Z80SBC, labtam_z80sbc_device, "labtam_z80sbc", "Labtam Z80 SBC")
 
-labtam_z80sbc_device::labtam_z80sbc_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+labtam_z80sbc_device::labtam_z80sbc_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LABTAM_Z80SBC, tag, owner, clock)
 	, device_multibus_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
@@ -332,13 +332,13 @@ void labtam_z80sbc_device::device_add_mconfig(machine_config &config)
 	AM9519(config, m_uic);
 	m_uic->out_int_callback().set(m_int, FUNC(input_merger_any_high_device::in_w<3>));
 
-	WD2793(config, m_fdc, 2'000'000);
+	WD2793(config, m_fdc, XTAL::u(2'000'000));
 	m_fdc->intrq_wr_callback().set(FUNC(labtam_z80sbc_device::fdcint_w));
 	m_fdc->drq_wr_callback().set(m_dma[0], FUNC(z80dma_device::rdy_w));
 
 	// WD1002 irq -> Am9519 ireq3
 
-	AM9513(config, m_stc, 4'000'000);
+	AM9513(config, m_stc, XTAL::u(4'000'000));
 	m_stc->out4_cb().set(m_uic, FUNC(am9519_device::ireq5_w));
 
 	MM58167(config, m_rtc, 32.768_kHz_XTAL);

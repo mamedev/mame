@@ -17,7 +17,7 @@ class stfight_video_device :  public device_t
 {
 public:
 	// construction/destruction
-	stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 
 	void stfight_text_char_w(offs_t offset, uint8_t data);

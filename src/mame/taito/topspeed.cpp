@@ -579,21 +579,21 @@ void topspeed_state::topspeed(machine_config &config)
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
 	ctc.zc_callback<0>().set(FUNC(topspeed_state::z80ctc_to0));
 
-	PC080SN(config, m_pc080sn[0], 0);
+	PC080SN(config, m_pc080sn[0]);
 	m_pc080sn[0]->set_gfx_region(1);
 	m_pc080sn[0]->set_offsets(0, 8);
 	m_pc080sn[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	PC080SN(config, m_pc080sn[1], 0);
+	PC080SN(config, m_pc080sn[1]);
 	m_pc080sn[1]->set_gfx_region(1);
 	m_pc080sn[1]->set_offsets(0, 8);
 	m_pc080sn[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 
-	TC0040IOC(config, m_tc0040ioc, 0);
+	TC0040IOC(config, m_tc0040ioc);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0040ioc->read_2_callback().set_ioport("IN0");

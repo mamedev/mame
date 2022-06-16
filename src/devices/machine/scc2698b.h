@@ -15,7 +15,7 @@ class scc2698b_channel : public device_t, public device_serial_interface
 {
 	friend class scc2698b_device;
 public:
-	scc2698b_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc2698b_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void mpi0_w(int state);
 	void mpi1_w(int state);
@@ -76,7 +76,7 @@ protected:
 class scc2698b_device : public device_t
 {
 public:
-	scc2698b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc2698b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map);
 

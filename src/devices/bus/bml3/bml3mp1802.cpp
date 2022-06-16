@@ -110,7 +110,7 @@ void bml3bus_mp1802_device::bml3_mp1802_w(uint8_t data)
 //  LIVE DEVICE
 //**************************************************************************
 
-bml3bus_mp1802_device::bml3bus_mp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bml3bus_mp1802_device::bml3bus_mp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, BML3BUS_MP1802, tag, owner, clock),
 	device_bml3bus_card_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),

@@ -52,10 +52,10 @@ INPUT_PORTS_END
 
 void bitel_state::t3210(machine_config &config)
 {
-	I8031(config, m_maincpu, 12000000); // main board clocks unknown
+	I8031(config, m_maincpu, XTAL::u(12000000)); // main board clocks unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &bitel_state::prog_map);
 
-	I8742(config, "upi", 6000000).set_disable();
+	I8742(config, "upi", XTAL::u(6000000)).set_disable();
 
 	i8039_device &submcu(I8039(config, "submcu", 4.194304_MHz_XTAL));
 	submcu.set_addrmap(AS_PROGRAM, &bitel_state::sub_prog_map);
@@ -63,10 +63,10 @@ void bitel_state::t3210(machine_config &config)
 
 void bitel_state::feap90(machine_config &config)
 {
-	I8031(config, m_maincpu, 12000000); // XTAL illegible
+	I8031(config, m_maincpu, XTAL::u(12000000)); // XTAL illegible
 	m_maincpu->set_addrmap(AS_PROGRAM, &bitel_state::prog_map);
 
-	I8042AH(config, "upi", 6000000).set_disable(); // XTAL illegible
+	I8042AH(config, "upi", XTAL::u(6000000)).set_disable(); // XTAL illegible
 }
 
 ROM_START(t3210) // i8031, 8742, D80C39C // 4+2k ram onboard; 24kb in battery-backed expansion

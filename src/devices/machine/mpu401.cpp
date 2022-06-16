@@ -83,7 +83,7 @@ DEFINE_DEVICE_TYPE(MPU401, mpu401_device, "mpu401", "Roland MPU-401 I/O box")
 
 void mpu401_device::device_add_mconfig(machine_config &config)
 {
-	M6801(config, m_ourcpu, 4000000); /* 4 MHz as per schematics */
+	M6801(config, m_ourcpu, XTAL::u(4000000)); /* 4 MHz as per schematics */
 	m_ourcpu->set_addrmap(AS_PROGRAM, &mpu401_device::mpu401_map);
 	m_ourcpu->in_p1_cb().set(FUNC(mpu401_device::port1_r));
 	m_ourcpu->out_p1_cb().set(FUNC(mpu401_device::port1_w));
@@ -113,7 +113,7 @@ const tiny_rom_entry *mpu401_device::device_rom_region() const
 //  mpu401_device - constructor
 //-------------------------------------------------
 
-mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MPU401, tag, owner, clock),
 	m_ourcpu(*this, M6801_TAG),
 	write_irq(*this)

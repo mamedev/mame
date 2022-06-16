@@ -301,7 +301,7 @@ void quasar_state::machine_reset()
 void quasar_state::quasar(machine_config &config)
 {
 	/* basic machine hardware */
-	S2650(config, m_maincpu, 14318000/4);  /* 14 mhz crystal divide by 4 on board */
+	S2650(config, m_maincpu, XTAL::u(14318000)/4);  /* 14 mhz crystal divide by 4 on board */
 	m_maincpu->set_addrmap(AS_PROGRAM, &quasar_state::quasar_program);
 	m_maincpu->set_addrmap(AS_IO, &quasar_state::quasar_io);
 	m_maincpu->set_addrmap(AS_DATA, &quasar_state::quasar_data);
@@ -309,7 +309,7 @@ void quasar_state::quasar(machine_config &config)
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
-	i8035_device &soundcpu(I8035(config, "soundcpu", 6000000)); /* 6MHz crystal divide by 15 in CPU */
+	i8035_device &soundcpu(I8035(config, "soundcpu", XTAL::u(6000000))); /* 6MHz crystal divide by 15 in CPU */
 	soundcpu.set_addrmap(AS_PROGRAM, &quasar_state::sound_map);
 	soundcpu.set_addrmap(AS_IO, &quasar_state::sound_portmap);
 	soundcpu.t1_in_cb().set(FUNC(quasar_state::audio_t1_r));
@@ -329,20 +329,20 @@ void quasar_state::quasar(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quasar);
 	PALETTE(config, m_palette, FUNC(quasar_state::quasar_palette), (64 + 1) * 8 + (4 * 256), 0x500);
 
-	S2636(config, m_s2636[0], 0);
+	S2636(config, m_s2636[0]);
 	m_s2636[0]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
 
-	S2636(config, m_s2636[1], 0);
+	S2636(config, m_s2636[1]);
 	m_s2636[1]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
 
-	S2636(config, m_s2636[2], 0);
+	S2636(config, m_s2636[2]);
 	m_s2636[2]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
 
 	/* sound hardware */
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 }
 
 ROM_START( quasar )

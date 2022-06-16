@@ -145,7 +145,7 @@ enum
 	VIDSEL = 16
 };
 
-mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99_MAINBOARD8, tag, owner, clock),
 	m_A14_set(false),
 	m_pending_write(false),
@@ -1068,10 +1068,10 @@ void mainboard8_device::device_reset()
 
 void mainboard8_device::device_add_mconfig(machine_config &config)
 {
-	TI99_VAQUERRO(config, TI998_VAQUERRO_TAG, 0);
-	TI99_MOFETTA(config, TI998_MOFETTA_TAG, 0);
-	TI99_AMIGO(config, TI998_AMIGO_TAG, 0);
-	TI99_OSO(config, TI998_OSO_TAG, 0);
+	TI99_VAQUERRO(config, TI998_VAQUERRO_TAG);
+	TI99_MOFETTA(config, TI998_MOFETTA_TAG);
+	TI99_AMIGO(config, TI998_AMIGO_TAG);
+	TI99_OSO(config, TI998_OSO_TAG);
 }
 
 /***************************************************************************
@@ -1150,7 +1150,7 @@ void mainboard8_device::device_add_mconfig(machine_config &config)
 
 ***************************************************************************/
 
-vaquerro_device::vaquerro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vaquerro_device::vaquerro_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99_VAQUERRO, tag, owner, clock),
 	m_crus(ASSERT_LINE),
 	m_crugl(ASSERT_LINE),
@@ -1601,7 +1601,7 @@ enum
 	INTERNAL
 };
 
-mofetta_device::mofetta_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mofetta_device::mofetta_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99_MOFETTA, tag, owner, clock),
 	m_gotfirstword(false)
 {
@@ -1896,7 +1896,7 @@ void mofetta_device::device_reset()
 
 ***************************************************************************/
 
-amigo_device::amigo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+amigo_device::amigo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99_AMIGO, tag, owner, clock),
 	m_logical_space(true),
 	m_crus(ASSERT_LINE)
@@ -2268,7 +2268,7 @@ void amigo_device::device_reset()
 
 ****************************************************************************/
 
-oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	bus::hexbus::hexbus_chained_device(mconfig, TI99_OSO, tag, owner, clock),
 	m_int(*this),
 	m_hexbusout(*this, ":" TI998_HEXBUS_TAG),

@@ -17,7 +17,7 @@
 class a5900_cpu_device : public a5000_cpu_device
 {
 public:
-	a5900_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	a5900_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void program_512x8(address_map &map);

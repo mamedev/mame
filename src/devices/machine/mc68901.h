@@ -50,7 +50,7 @@ class mc68901_device :  public device_t
 {
 public:
 	// construction/destruction
-	mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_timer_clock(int timer_clock) { m_timer_clock = timer_clock; }
 	void set_timer_clock(const XTAL &xtal) { set_timer_clock(xtal.value()); }

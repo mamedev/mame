@@ -27,7 +27,7 @@
 
 DEFINE_DEVICE_TYPE(RTPC_IOCC, rtpc_iocc_device, "rtpc_iocc", "RT PC I/O Channel Converter/Controller")
 
-rtpc_iocc_device::rtpc_iocc_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+rtpc_iocc_device::rtpc_iocc_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RTPC_IOCC, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, rsc_bus_interface(mconfig, *this)

@@ -220,7 +220,7 @@ static void aviion88k_scsi_devices(device_slot_interface &device)
 
 void aviion88k_state::aviion_4600(machine_config &config)
 {
-	MC88100(config, m_cpu, 33'333'333);
+	MC88100(config, m_cpu, XTAL::u(33'333'333));
 	m_cpu->set_addrmap(AS_PROGRAM, &aviion88k_state::cpu_map);
 
 	INTEL_28F010(config, m_prom[0]);
@@ -237,7 +237,7 @@ void aviion88k_state::aviion_4600(machine_config &config)
 	MK48T12(config, m_novram);
 
 	// uart - keyboard interface
-	SCN2661A(config, m_uart, 0);
+	SCN2661A(config, m_uart);
 
 	// keyboard connector
 	PC_KBDC(config, m_kbdc, pc_at_keyboards, nullptr);
@@ -278,7 +278,7 @@ void aviion88k_state::aviion_4600(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", aviion88k_scsi_devices, nullptr);
 
 	// scsi host adapter (NCR53C700)
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c700", NCR53C7XX).clock(66'000'000);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c700", NCR53C7XX).clock(XTAL::u(66'000'000));
 
 	// TODO: ethernet (AM79C900)
 

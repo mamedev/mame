@@ -18,7 +18,7 @@ std::unique_ptr<util::disasm_interface> m68008fn_device::create_disassembler()
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68008);
 }
 
-m68008_device::m68008_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+m68008_device::m68008_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m68000_base_device(mconfig, tag, owner, clock, M68008, 8,20)
 {
 }
@@ -30,7 +30,7 @@ void m68008_device::device_start()
 }
 
 
-m68008fn_device::m68008fn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+m68008fn_device::m68008fn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m68000_base_device(mconfig, tag, owner, clock, M68008FN, 8,22)
 {
 }

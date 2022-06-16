@@ -673,7 +673,7 @@ void pipedrm_state::pipedrm(machine_config &config)
 	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(pipedrm_state::fromance_gga_data_w));
 
-	VSYSTEM_SPR2(config, m_spr_old, 0);
+	VSYSTEM_SPR2(config, m_spr_old);
 	m_spr_old->set_gfx_region(2);
 	m_spr_old->set_offsets(-13, -6);
 	m_spr_old->set_pritype(3);
@@ -686,7 +686,7 @@ void pipedrm_state::pipedrm(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline("sub", 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 1.0);
@@ -730,7 +730,7 @@ void hatris_state::hatris(machine_config &config)
 	// sound board.
 	//m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
-	ym2608_device &ym2608(YM2608(config, "ymsnd", 8000000));
+	ym2608_device &ym2608(YM2608(config, "ymsnd", XTAL::u(8000000)));
 	ym2608.irq_handler().set_inputline("sub", 0);
 	ym2608.add_route(0, "mono", 0.50);
 	ym2608.add_route(1, "mono", 1.0);

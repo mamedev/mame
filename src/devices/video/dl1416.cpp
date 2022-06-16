@@ -95,7 +95,7 @@ u16 const dl1416t_segments[128] = {
 class dl1414t_device : public dl1414_device
 {
 public:
-	dl1414t_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	dl1414t_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: dl1414_device(mconfig, DL1414T, tag, owner, clock)
 	{
 	}
@@ -111,7 +111,7 @@ protected:
 class dl1416b_device : public dl1416_device
 {
 public:
-	dl1416b_device(machine_config const &mconfig, const char *tag, device_t *owner, u32 clock)
+	dl1416b_device(machine_config const &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: dl1416_device(mconfig, DL1416B, tag, owner, clock)
 	{
 	}
@@ -135,7 +135,7 @@ protected:
 class dl1416t_device : public dl1416_device
 {
 public:
-	dl1416t_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	dl1416t_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: dl1416_device(mconfig, DL1416T, tag, owner, clock)
 	{
 	}
@@ -183,7 +183,7 @@ dl1414_device::dl1414_device(
 		device_type type,
 		char const *tag,
 		device_t *owner,
-		u32 clock)
+		const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_wr_in(true)
 	, m_addr_in(0x00)
@@ -199,7 +199,7 @@ dl1416_device::dl1416_device(
 		device_type type,
 		char const *tag,
 		device_t *owner,
-		u32 clock)
+		const XTAL &clock)
 	: dl1414_device(mconfig, type, tag, owner, clock)
 	, m_ce_in(true)
 	, m_ce_latch(true)

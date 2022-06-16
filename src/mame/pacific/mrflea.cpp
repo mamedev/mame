@@ -418,30 +418,30 @@ void mrflea_state::machine_reset()
 void mrflea_state::mrflea(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4'000'000); // 4 MHz?
+	Z80(config, m_maincpu, XTAL::u(4'000'000)); // 4 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &mrflea_state::master_map);
 	m_maincpu->set_addrmap(AS_IO, &mrflea_state::master_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mrflea_state::irq0_line_hold)); // NMI resets the game
 
-	Z80(config, m_subcpu, 6'000'000); // runs in IM 1, so doesn't use 8259 INTA
+	Z80(config, m_subcpu, XTAL::u(6'000'000)); // runs in IM 1, so doesn't use 8259 INTA
 	m_subcpu->set_addrmap(AS_PROGRAM, &mrflea_state::slave_map);
 	m_subcpu->set_addrmap(AS_IO, &mrflea_state::slave_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(mrflea_state::slave_interrupt), "screen", 0, 1);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	i8255_device &mainppi(I8255(config, "mainppi", 0));
+	i8255_device &mainppi(I8255(config, "mainppi"));
 	mainppi.in_pb_callback().set("subppi", FUNC(i8255_device::pb_r));
 	mainppi.out_pc_callback().set("subppi", FUNC(i8255_device::pc4_w)).bit(7); // OBFA -> STBA
 	mainppi.out_pc_callback().append("subppi", FUNC(i8255_device::pc2_w)).bit(1); // IBFB -> ACKB
 
-	i8255_device &subppi(I8255(config, "subppi", 0));
+	i8255_device &subppi(I8255(config, "subppi"));
 	subppi.in_pa_callback().set("mainppi", FUNC(i8255_device::pa_r));
 	subppi.out_pc_callback().set("mainppi", FUNC(i8255_device::pc6_w)).bit(5); // IBFA -> ACKA
 	subppi.out_pc_callback().append(m_pic, FUNC(pic8259_device::ir0_w)).bit(3); // INTRA
 	subppi.out_pc_callback().append("mainppi", FUNC(i8255_device::pc2_w)).bit(1); // OBFB -> STBB
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_subcpu, 0);
 
 	// video hardware
@@ -459,19 +459,19 @@ void mrflea_state::mrflea(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay1(AY8910(config, "ay1", 2'000'000));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL::u(2'000'000)));
 	ay1.port_a_read_callback().set_ioport("IN1");
 	ay1.port_b_read_callback().set_ioport("IN0");
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	AY8910(config, "ay2", 2'000'000).add_route(ALL_OUTPUTS, "mono", 0.25); // not used for sound?
+	AY8910(config, "ay2", XTAL::u(2'000'000)).add_route(ALL_OUTPUTS, "mono", 0.25); // not used for sound?
 
 	ay8910_device &ay3(AY8910(config, "ay3", 2'000'000));
 	ay3.port_a_read_callback().set_ioport("DSW2");
 	ay3.port_b_read_callback().set_ioport("DSW1");
 	ay3.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ay8910_device &ay4(AY8910(config, "ay4", 2'000'000));
+	ay8910_device &ay4(AY8910(config, "ay4", XTAL::u(2'000'000)));
 	ay4.port_a_read_callback().set_ioport("UNKNOWN");
 	ay4.port_b_write_callback().set(FUNC(mrflea_state::data1_w));
 	ay4.add_route(ALL_OUTPUTS, "mono", 0.25);

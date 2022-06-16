@@ -102,7 +102,7 @@ public:
 	};
 
 	// construction/destruction
-	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr u8 autovector(int level) { return 0x18 + level; }
 	void autovectors_map(address_map &map);
@@ -173,10 +173,10 @@ public:
 	void set_cpu_space(int space_id) { m_cpu_space_id = space_id; }
 
 protected:
-	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
+	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock,
 						const device_type type, u32 prg_data_width, u32 prg_address_bits);
 
-	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
+	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock,
 						const device_type type, u32 prg_data_width, u32 prg_address_bits, address_map_constructor internal_map);
 
 	int    m_has_fpu;      /* Indicates if a FPU is available (yes on 030, 040, may be on 020) */

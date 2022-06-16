@@ -393,7 +393,7 @@ void lckydraw_state::machine_reset()
 void lckydraw_state::lckydraw(machine_config &config)
 {
 	/* basic machine hardware */
-	I8035(config, m_maincpu, 6000000);
+	I8035(config, m_maincpu, XTAL::u(6000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &lckydraw_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &lckydraw_state::io_map);
 	m_maincpu->p1_out_cb().set(FUNC(lckydraw_state::p1_w));

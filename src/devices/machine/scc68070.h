@@ -46,7 +46,7 @@ enum scc68070_ocr_bits
 class scc68070_device : public scc68070_base_device
 {
 public:
-	scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto iack2_callback() { return m_iack2_callback.bind(); }
 	auto iack4_callback() { return m_iack4_callback.bind(); }

@@ -44,7 +44,7 @@ enum
 	SIZE_512
 };
 
-myarc_memory_expansion_device::myarc_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+myarc_memory_expansion_device::myarc_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock):
 	device_t(mconfig, TI99_MYARCMEM, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_ram(*this, RAM_TAG),

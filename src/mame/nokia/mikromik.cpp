@@ -445,7 +445,7 @@ void mm1_state::mm1(machine_config &config)
 	m_io->set_data_width(8);
 	m_io->set_addr_width(7);
 
-	I8212(config, m_iop, 0);
+	I8212(config, m_iop);
 	m_iop->int_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 	m_iop->di_rd_callback().set(KB_TAG, FUNC(mm1_keyboard_device::read));
 
@@ -471,7 +471,7 @@ void mm1_state::mm1(machine_config &config)
 	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(upd765_family_device::dma_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(mm1_state::dack3_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(6.144_MHz_XTAL/2/2);
 	m_pit->out_handler<0>().set(FUNC(mm1_state::itxc_w));
 	m_pit->set_clk<1>(6.144_MHz_XTAL/2/2);
@@ -498,7 +498,7 @@ void mm1_state::mm1(machine_config &config)
 	RS232_PORT(config, m_rs232c, default_rs232_devices, nullptr);
 	m_rs232c->cts_handler().set(m_mpsc, FUNC(upd7201_device::ctsb_w));
 
-	mm1_keyboard_device &kb(MM1_KEYBOARD(config, KB_TAG, 2500)); // actual KBCLK is 6.144_MHz_XTAL/2/16
+	mm1_keyboard_device &kb(MM1_KEYBOARD(config, KB_TAG, XTAL::u(2500))); // actual KBCLK is 6.144_MHz_XTAL/2/16
 	kb.kbst_wr_callback().set(m_iop, FUNC(i8212_device::stb_w));
 
 	// internal ram

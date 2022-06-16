@@ -104,12 +104,12 @@ DEFINE_DEVICE_TYPE(KC_D004_GIDE, kc_d004_gide_device, "kc_d004_gide", "D004 Flop
 //  kc_d004_device - constructor
 //-------------------------------------------------
 
-kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc_d004_device(mconfig, KC_D004, tag, owner, clock)
 {
 }
 
-kc_d004_device::kc_d004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+kc_d004_device::kc_d004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_kcexp_interface( mconfig, *this ),
 	m_cpu(*this, Z80_TAG),
@@ -364,7 +364,7 @@ WRITE_LINE_MEMBER(kc_d004_device::fdc_irq)
 //  kc_d004_gide_device - constructor
 //-------------------------------------------------
 
-kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc_d004_device(mconfig, KC_D004_GIDE, tag, owner, clock),
 	m_ata(*this, ATA_TAG), m_ata_data(0), m_lh(0)
 {

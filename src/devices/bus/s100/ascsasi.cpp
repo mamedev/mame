@@ -30,7 +30,7 @@ class asc_sasi_device : public device_t, public device_s100_card_interface
 
 public:
 	// construction/destruction
-	asc_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	asc_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -72,7 +72,7 @@ constexpr attotime asc_sasi_device::s_pulse_width; // stupid non-inline semantic
 
 DEFINE_DEVICE_TYPE_PRIVATE(S100_ASC_SASI, device_s100_card_interface, asc_sasi_device, "ascsasi", "ASC Associates SASI Host Computer Adapter")
 
-asc_sasi_device::asc_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+asc_sasi_device::asc_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S100_ASC_SASI, tag, owner, clock)
 	, device_s100_card_interface(mconfig, *this)
 	, m_sasi(*this, "sasi")

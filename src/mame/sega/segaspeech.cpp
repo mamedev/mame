@@ -27,7 +27,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SPEECH_MASTER_CLOCK 3120000
+#define SPEECH_MASTER_CLOCK XTAL::u(3120000)
 
 
 
@@ -37,7 +37,7 @@
 
 DEFINE_DEVICE_TYPE(SEGA_SPEECH_BOARD, sega_speech_device, "sega_speech_device", "Sega Speech Sound Board")
 
-sega_speech_device::sega_speech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+sega_speech_device::sega_speech_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SEGA_SPEECH_BOARD, tag, owner, clock),
 	device_mixer_interface(mconfig, *this),
 	m_speech(*this, "data"),

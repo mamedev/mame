@@ -43,7 +43,7 @@ ioport_constructor sam_onemeg_device::device_input_ports() const
 //  sam_onemeg_device - constructor
 //-------------------------------------------------
 
-sam_onemeg_device::sam_onemeg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sam_onemeg_device::sam_onemeg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SAM_ONEMEG, tag, owner, clock),
 	device_samcoupe_expansion_interface(mconfig, *this),
 	m_dip(*this, "dip"),

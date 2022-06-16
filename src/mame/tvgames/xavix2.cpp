@@ -705,7 +705,7 @@ INPUT_PORTS_END
 void xavix2_state::config(machine_config &config)
 {
 	// unknown CPU 'SSD 2002-2004 NEC 800208-51'
-	XAVIX2(config, m_maincpu, 98'000'000);
+	XAVIX2(config, m_maincpu, XTAL::u(98'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &xavix2_state::mem);
 	m_maincpu->set_vblank_int("screen", FUNC(xavix2_state::vblank_irq));
 

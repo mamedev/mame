@@ -420,7 +420,7 @@ void nsm_state::machine_reset()
 void nsm_state::nsm(machine_config &config)
 {
 	// CPU TMS9995, standard variant; no line connection
-	TMS9995(config, m_maincpu, 11052000);
+	TMS9995(config, m_maincpu, XTAL::u(11052000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &nsm_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &nsm_state::io_map);
 

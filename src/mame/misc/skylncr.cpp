@@ -1701,11 +1701,11 @@ void skylncr_state::skylncr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skylncr);
 	PALETTE(config, m_palette).set_entries(0x200);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &skylncr_state::ramdac_map);
 	ramdac.set_color_base(0);
 
-	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette));
+	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", m_palette));
 	ramdac2.set_addrmap(0, &skylncr_state::ramdac2_map);
 	ramdac2.set_color_base(0x100);
 

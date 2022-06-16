@@ -22,25 +22,25 @@ DEFINE_DEVICE_TYPE(MM5448, mm5448_device, "mm5448", "MM5448 VFD Driver")
 //  constructor
 //-------------------------------------------------
 
-mm5445_device::mm5445_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 outpins) :
+mm5445_device::mm5445_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 outpins) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_outmask((u64(1) << outpins) - 1),
 	m_write_output(*this)
 { }
 
-mm5445_device::mm5445_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+mm5445_device::mm5445_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mm5445_device(mconfig, MM5445, tag, owner, clock, 33)
 { }
 
-mm5446_device::mm5446_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+mm5446_device::mm5446_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mm5445_device(mconfig, MM5446, tag, owner, clock, 34)
 { }
 
-mm5447_device::mm5447_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+mm5447_device::mm5447_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mm5445_device(mconfig, MM5447, tag, owner, clock, 34)
 { }
 
-mm5448_device::mm5448_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+mm5448_device::mm5448_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mm5445_device(mconfig, MM5448, tag, owner, clock, 35)
 { }
 

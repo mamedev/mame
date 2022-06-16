@@ -875,7 +875,7 @@ void kurukuru_state::kurukuru(machine_config &config)
 	// latch irq vector is $ef (rst $28)
 	// timer irq vector is $f7 (rst $30)
 	// if both are asserted, the vector becomes $f7 AND $ef = $e7 (rst $20)
-	RST_NEG_BUFFER(config, m_soundirq, 0).int_callback().set_inputline(m_audiocpu, 0);
+	RST_NEG_BUFFER(config, m_soundirq).int_callback().set_inputline(m_audiocpu, 0);
 
 	ym2149_device &ym2149(YM2149(config, "ym2149", YM2149_CLOCK));
 	ym2149.port_b_read_callback().set_ioport("DSW2");

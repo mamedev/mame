@@ -17,7 +17,7 @@ a$=usr0("hello")
 DEFINE_DEVICE_TYPE(MSX_CART_EASISPEECH, msx_cart_easispeech_device, "msx_cart_easispeech", "MSX Cartridge - Easi-Speech")
 
 
-msx_cart_easispeech_device::msx_cart_easispeech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_easispeech_device::msx_cart_easispeech_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_EASISPEECH, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_speech(*this, "speech")
@@ -36,7 +36,7 @@ const tiny_rom_entry *msx_cart_easispeech_device::device_rom_region() const
 
 void msx_cart_easispeech_device::device_add_mconfig(machine_config &config)
 {
-	SP0256(config, m_speech, 3120000); // frequency unknown
+	SP0256(config, m_speech, XTAL::u(3120000)); // frequency unknown
 	m_speech->add_route(ALL_OUTPUTS, ":speaker", 1.00);
 }
 

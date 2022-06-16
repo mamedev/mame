@@ -49,7 +49,7 @@ DECLARE_DEVICE_TYPE(NEOGEO_CTHD2K3_CART, neogeo_cthd2k3_cart_device)
 class neogeo_ct2k3sp_cart_device : public neogeo_cthd2k3_cart_device
 {
 public:
-	neogeo_ct2k3sp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_ct2k3sp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type() override { return 0; }
 };
@@ -64,7 +64,7 @@ DECLARE_DEVICE_TYPE(NEOGEO_CT2K3SP_CART, neogeo_ct2k3sp_cart_device)
 class neogeo_ct2k3sa_cart_device : public neogeo_cthd2k3_cart_device
 {
 public:
-	neogeo_ct2k3sa_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_ct2k3sa_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type() override { return 0; }
 };
@@ -79,7 +79,7 @@ DECLARE_DEVICE_TYPE(NEOGEO_CT2K3SA_CART, neogeo_ct2k3sa_cart_device)
 class neogeo_matrimbl_cart_device : public neogeo_cthd2k3_cart_device
 {
 public:
-	neogeo_matrimbl_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_matrimbl_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type() override { return 2; }
 

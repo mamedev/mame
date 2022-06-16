@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(ELECTRON_SP64, electron_sp64_device, "electron_sp64", "Slogge
 //  electron_sp64_device - constructor
 //-------------------------------------------------
 
-electron_sp64_device::electron_sp64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_sp64_device::electron_sp64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_SP64, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
 	, m_page_register(0)

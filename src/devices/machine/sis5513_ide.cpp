@@ -28,7 +28,7 @@
 
 DEFINE_DEVICE_TYPE(SIS5513_IDE, sis5513_ide_device, "sis5513_ide", "SiS 5513 IDE Controller")
 
-sis5513_ide_device::sis5513_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sis5513_ide_device::sis5513_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, SIS5513_IDE, tag, owner, clock)
 	, m_ide1(*this, "ide1")
 	, m_ide2(*this, "ide2")

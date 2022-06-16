@@ -19,7 +19,7 @@
 DEFINE_DEVICE_TYPE(HYPERSCAN_CARD, hyperscan_card_device, "hyperscan_card", "Hyperscan RFID card")
 
 
-hyperscan_card_device::hyperscan_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hyperscan_card_device::hyperscan_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HYPERSCAN_CARD, tag, owner, clock)
 	, device_memcard_image_interface(mconfig, *this)
 {

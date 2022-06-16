@@ -406,14 +406,14 @@ void mpu1_state::machine_reset()
 
 void mpu1_state::mpu1(machine_config &config)
 {
-	M6800(config, m_maincpu, 1'000'000); /* On MPU1, the clock comes from a multivibrator circuit varying somewhere around 1 MHz from
+	M6800(config, m_maincpu, XTAL::u(1'000'000)); /* On MPU1, the clock comes from a multivibrator circuit varying somewhere around 1 MHz from
 	                                        board to board. This results in for example slightly different sound pitch across machines.
 	                                        I've set a stable 1 MHz clock here, which is also the case on MPU2. */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu1_state::mpu1_map);
 
 	TIMER(config, "nmi").configure_periodic(FUNC(mpu1_state::nmi), attotime::from_hz(100)); // From AC zero crossing detector
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set_ioport("IN");
 	m_pia1->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 	m_pia1->ca1_w(0);
@@ -423,7 +423,7 @@ void mpu1_state::mpu1(machine_config &config)
 	m_pia1->cb1_w(0);
 	m_pia1->cb2_handler().set(FUNC(mpu1_state::pia_lamp_w<8>));
 
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	m_pia2->readpa_handler().set(FUNC(mpu1_state::pia2_porta_r));
 	m_pia2->set_port_a_input_overrides_output_mask(0x80);
 	m_pia2->writepa_handler().set(FUNC(mpu1_state::pia2_porta_w));
@@ -438,7 +438,7 @@ void mpu1_state::mpu1(machine_config &config)
 	m_reel_speed = attotime::from_usec(2000); // Seems close enough to footage of a real machine
 
 	SPEAKER(config, "mono").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	FRUIT_SAMPLES(config, m_samples);
 }

@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(CENTRONICS_PRINTER, centronics_printer_device, "centronics_pr
 //  centronics_printer_device - constructor
 //-------------------------------------------------
 
-centronics_printer_device::centronics_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+centronics_printer_device::centronics_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CENTRONICS_PRINTER, tag, owner, clock),
 	device_centronics_peripheral_interface( mconfig, *this ),
 	m_strobe(0),
@@ -34,7 +34,7 @@ centronics_printer_device::centronics_printer_device(const machine_config &mconf
 
 void centronics_printer_device::device_add_mconfig(machine_config &config)
 {
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 	m_printer->online_callback().set(FUNC(centronics_printer_device::printer_online));
 }
 

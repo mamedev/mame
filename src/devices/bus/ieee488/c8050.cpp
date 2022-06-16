@@ -680,7 +680,7 @@ inline void c8050_device::update_ieee_signals()
 //  c8050_device - constructor
 //-------------------------------------------------
 
-c8050_device::c8050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+c8050_device::c8050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_ieee488_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),
@@ -701,7 +701,7 @@ c8050_device::c8050_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-c8050_device::c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c8050_device::c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	c8050_device(mconfig, C8050, tag, owner, clock)
 {
 }
@@ -711,7 +711,7 @@ c8050_device::c8050_device(const machine_config &mconfig, const char *tag, devic
 //  c8250_device - constructor
 //-------------------------------------------------
 
-c8250_device::c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c8250_device::c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	c8050_device(mconfig, C8250, tag, owner, clock)
 {
 }
@@ -721,7 +721,7 @@ c8250_device::c8250_device(const machine_config &mconfig, const char *tag, devic
 //  c8250lp_device - constructor
 //-------------------------------------------------
 
-c8250lp_device::c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c8250lp_device::c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	c8050_device(mconfig, C8250LP, tag, owner, clock)
 {
 }
@@ -731,7 +731,7 @@ c8250lp_device::c8250lp_device(const machine_config &mconfig, const char *tag, d
 //  sfd1001_device - constructor
 //-------------------------------------------------
 
-sfd1001_device::sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sfd1001_device::sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	c8050_device(mconfig, SFD1001, tag, owner, clock)
 {
 }

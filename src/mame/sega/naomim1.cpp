@@ -12,7 +12,7 @@ void naomi_m1_board::submap(address_map &map)
 	map(0x0a, 0x0b).r(FUNC(naomi_m1_board::actel_id_r));
 }
 
-naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: naomi_board(mconfig, NAOMI_M1_BOARD, tag, owner, clock)
 	, m_region(*this, DEVICE_SELF)
 {

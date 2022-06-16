@@ -51,7 +51,7 @@
 
 DEFINE_DEVICE_TYPE(SIS950_LPC, sis950_lpc_device, "sis950_lpc", "SiS 950 LPC Super-South Bridge")
 
-sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, SIS950_LPC, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_flash_rom(*this, finder_base::DUMMY_TAG)
@@ -121,7 +121,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	constexpr XTAL lpc_pit_clock = XTAL(14'318'181);
 
 	// confirmed 82C54
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	// heartbeat IRQ
 	m_pit->set_clk<0>(lpc_pit_clock / 12);
 	m_pit->out_handler<0>().set(FUNC(sis950_lpc_device::pit_out0));
@@ -147,7 +147,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	// TODO: ior/iow/dack callbacks
 
 	// Confirmed 82C59s
-	PIC8259(config, m_pic_master, 0);
+	PIC8259(config, m_pic_master);
 	m_pic_master->out_int_callback().set_inputline(m_host_cpu, 0);
 	m_pic_master->in_sp_callback().set_constant(1);
 	m_pic_master->read_slave_ack_callback().set(
@@ -159,7 +159,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 			return 0;
 		});
 
-	PIC8259(config, m_pic_slave, 0);
+	PIC8259(config, m_pic_slave);
 	m_pic_slave->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir2_w));
 	m_pic_slave->in_sp_callback().set_constant(0);
 

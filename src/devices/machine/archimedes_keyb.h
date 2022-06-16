@@ -25,7 +25,7 @@ class archimedes_keyboard_device : public device_t, public device_serial_interfa
 {
 public:
 	// construction/destruction
-	archimedes_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	archimedes_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto kout() { return m_kout.bind(); }
 

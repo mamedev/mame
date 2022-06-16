@@ -192,7 +192,7 @@ void smioc_device::device_add_mconfig(machine_config &config)
 //  smioc_device - constructor
 //-------------------------------------------------
 
-smioc_device::smioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+smioc_device::smioc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SMIOC, tag, owner, clock),
 	m_smioccpu(*this, I188_TAG),
 	m_dma8237(*this, "dma8237_%u", 1),

@@ -178,7 +178,7 @@ GFXDECODE_END
 void subs_state::subs(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 12096000/16);      /* clock input is the "4H" signal */
+	M6502(config, m_maincpu, XTAL::u(12096000)/16);      /* clock input is the "4H" signal */
 	m_maincpu->set_addrmap(AS_PROGRAM, &subs_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(subs_state::interrupt), attotime::from_hz(4*57));
 

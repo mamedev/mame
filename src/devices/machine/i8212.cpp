@@ -57,7 +57,7 @@ DEFINE_DEVICE_TYPE(I8212, i8212_device, "i8212", "Intel 8212 I/O Port")
 //  i8212_device - constructor
 //-------------------------------------------------
 
-i8212_device::i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i8212_device::i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, I8212, tag, owner, clock),
 	m_write_int(*this),
 	m_read_di(*this),

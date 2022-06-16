@@ -7,7 +7,7 @@
 DEFINE_DEVICE_TYPE(MSX_SLOT_MUSIC, msx_slot_music_device, "msx_slot_music", "MSX Internal MSX-MUSIC")
 
 
-msx_slot_music_device::msx_slot_music_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_music_device::msx_slot_music_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_rom_device(mconfig, MSX_SLOT_MUSIC, tag, owner, clock)
 	, m_ym2413(nullptr)
 	, m_ym2413_tag(nullptr)

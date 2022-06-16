@@ -139,7 +139,7 @@
 //  ctor
 //-------------------------------------------------
 
-gime_device::gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata)
+gime_device::gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const uint8_t *fontdata)
 	: mc6847_friend_device(mconfig, type, tag, owner, clock, fontdata, true, 263, 25+192+26+3, 8, false)
 	, sam6883_friend_device_interface(mconfig, *this, 8)
 	, m_write_irq(*this)
@@ -2215,10 +2215,10 @@ const uint8_t gime_device::lowres_font[] =
 DEFINE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device, "gime_ntsc", "TCC1014 (VC2645QC) GIME (NTSC)")
 DEFINE_DEVICE_TYPE(GIME_PAL,  gime_pal_device,  "gime_pal",  "TCC1014 (VC2645QC) GIME (PAL)")
 
-gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: gime_device(mconfig, GIME_NTSC, tag, owner, clock, lowres_font) { }
 
-gime_pal_device::gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gime_pal_device::gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: gime_device(mconfig, GIME_PAL, tag, owner, clock, lowres_font) { }
 
 template class device_finder<gime_device, false>;

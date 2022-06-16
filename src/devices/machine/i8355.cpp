@@ -87,7 +87,7 @@ inline void i8355_device::write_port(int port, u8 data)
 //  i8355_device - constructor
 //-------------------------------------------------
 
-i8355_device::i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+i8355_device::i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, I8355, tag, owner, clock),
 		m_in_pa_cb(*this),
 		m_out_pa_cb(*this),

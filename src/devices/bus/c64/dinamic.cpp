@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(C64_DINAMIC, c64_dinamic_cartridge_device, "c64_dinamic", "C6
 //  c64_dinamic_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_dinamic_cartridge_device::c64_dinamic_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_dinamic_cartridge_device::c64_dinamic_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_DINAMIC, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)

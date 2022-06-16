@@ -23,11 +23,11 @@ class wave_device : public device_t, public device_sound_interface
 public:
 	template <typename T>
 	wave_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cassette_tag)
-		: wave_device(mconfig, tag, owner, uint32_t(0))
+		: wave_device(mconfig, tag, owner)
 	{
 		m_cass.set_tag(std::forward<T>(cassette_tag));
 	}
-	wave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	wave_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T> void set_cassette_tag(T &&cassette_tag) { m_cass.set_tag(std::forward<T>(cassette_tag)); }
 

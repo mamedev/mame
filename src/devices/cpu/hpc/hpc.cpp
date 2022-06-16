@@ -65,7 +65,7 @@ std::unique_ptr<util::disasm_interface> hpc46104_device::create_disassembler()
 }
 
 
-hpc_device::hpc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
+hpc_device::hpc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0, map)
 	, m_program(nullptr)
@@ -75,12 +75,12 @@ hpc_device::hpc_device(const machine_config &mconfig, device_type type, const ch
 {
 }
 
-hpc46003_device::hpc46003_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hpc46003_device::hpc46003_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hpc_device(mconfig, HPC46003, tag, owner, clock, address_map_constructor(FUNC(hpc46003_device::internal_map), this))
 {
 }
 
-hpc46104_device::hpc46104_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hpc46104_device::hpc46104_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hpc_device(mconfig, HPC46104, tag, owner, clock, address_map_constructor(FUNC(hpc46104_device::internal_map), this))
 {
 }

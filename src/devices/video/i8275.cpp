@@ -98,7 +98,7 @@ DEFINE_DEVICE_TYPE(I8276, i8276_device, "i8276", "Intel 8276 CRTC")
 //  i8275_device - constructor
 //-------------------------------------------------
 
-i8275_device::i8275_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+i8275_device::i8275_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_write_irq(*this),
@@ -129,12 +129,12 @@ i8275_device::i8275_device(const machine_config &mconfig, device_type type, cons
 	memset(m_param, 0x00, sizeof(m_param));
 }
 
-i8275_device::i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i8275_device::i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i8275_device(mconfig, I8275, tag, owner, clock)
 {
 }
 
-i8276_device::i8276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i8276_device::i8276_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i8275_device(mconfig, I8276, tag, owner, clock)
 {
 }

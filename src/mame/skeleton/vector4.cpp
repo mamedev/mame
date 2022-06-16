@@ -137,12 +137,12 @@ void vector4_state::machine_reset()
 void vector4_state::vector4(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5'100'000);   // manual says 5.1MHz (8088 uses this frequency too)
+	Z80(config, m_maincpu, XTAL::u(5'100'000));   // manual says 5.1MHz (8088 uses this frequency too)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vector4_state::vector4_mem);
 	m_maincpu->set_addrmap(AS_IO, &vector4_state::vector4_io);
 
 	/* video hardware */
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(153600)));
 	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart0", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart0", FUNC(i8251_device::write_rxc));
@@ -152,9 +152,9 @@ void vector4_state::vector4(machine_config &config)
 	uart_clock.signal_handler().append("uart3", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart3", FUNC(i8251_device::write_rxc));
 
-	I8251(config, "uart0", 0);
+	I8251(config, "uart0");
 
-	i8251_device &uart1(I8251(config, "uart1", 0));
+	i8251_device &uart1(I8251(config, "uart1"));
 	uart1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -164,7 +164,7 @@ void vector4_state::vector4(machine_config &config)
 	rs232a.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
 	rs232a.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 
-	i8251_device &uart2(I8251(config, "uart2", 0));
+	i8251_device &uart2(I8251(config, "uart2"));
 	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
@@ -174,7 +174,7 @@ void vector4_state::vector4(machine_config &config)
 	rs232b.dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
 	rs232b.cts_handler().set("uart2", FUNC(i8251_device::write_cts));
 
-	i8251_device &uart3(I8251(config, "uart3", 0));
+	i8251_device &uart3(I8251(config, "uart3"));
 	uart3.txd_handler().set("rs232c", FUNC(rs232_port_device::write_txd));
 	uart3.dtr_handler().set("rs232c", FUNC(rs232_port_device::write_dtr));
 	uart3.rts_handler().set("rs232c", FUNC(rs232_port_device::write_rts));
@@ -185,7 +185,7 @@ void vector4_state::vector4(machine_config &config)
 	rs232c.cts_handler().set("uart3", FUNC(i8251_device::write_cts));
 
 	I8255A(config, "ppi");
-	PIT8253(config, "pit", 0);
+	PIT8253(config, "pit");
 }
 
 /* ROM definition */

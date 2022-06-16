@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(SEGA_315_5296, sega_315_5296_device, "315_5296", "Sega 315-52
 //  sega_315_5296_device - constructor
 //-------------------------------------------------
 
-sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sega_315_5296_device::sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SEGA_315_5296, tag, owner, clock),
 	m_in_port_cb(*this),
 	m_out_port_cb(*this),

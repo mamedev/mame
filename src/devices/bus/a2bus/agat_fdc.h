@@ -32,7 +32,7 @@ class a2bus_agat_fdc_device:
 {
 public:
 	// construction/destruction
-	a2bus_agat_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_agat_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t d14_i_b();
 	uint8_t d15_i_a();
@@ -45,7 +45,7 @@ public:
 
 protected:
 	// construction/destruction
-	a2bus_agat_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_agat_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

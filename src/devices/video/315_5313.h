@@ -16,13 +16,13 @@ public:
 	static constexpr unsigned PALETTE_PER_FRAME = 64 * 313 * 2; // 313 total scanlines for PAL systems, *2 for interlaced
 
 	template <typename T>
-	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag)
+	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag)
 		: sega315_5313_device(mconfig, tag, owner, clock)
 	{
 		m_cpu68k.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	typedef device_delegate<void (int x, u32 priority, u32 &lineptr)> md_32x_scanline_delegate;
 	typedef device_delegate<void (int scanline, int irq6)> md_32x_interrupt_delegate;

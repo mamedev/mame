@@ -56,9 +56,9 @@ class tatung_pipe_device : public device_t, public device_single_card_slot_inter
 	friend class device_tatung_pipe_interface;
 public:
 	// construction/destruction
-	tatung_pipe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tatung_pipe_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	template <typename T>
-	tatung_pipe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	tatung_pipe_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: tatung_pipe_device(mconfig, tag, owner, clock)
 	{
 		option_reset();

@@ -443,7 +443,7 @@ void badlands_state::badlands(machine_config &config)
 
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32).set_info_callback(FUNC(badlands_state::get_playfield_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, badlands_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, badlands_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

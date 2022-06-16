@@ -65,7 +65,7 @@ static const uint8_t track_SD[][2] = {
 
 DEFINE_DEVICE_TYPE(MICROPOLIS, micropolis_device, "micropolis", "Micropolis FDC")
 
-micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MICROPOLIS, tag, owner, clock),
 	m_read_dden(*this),
 	m_write_intrq(*this),

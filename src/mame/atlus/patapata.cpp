@@ -299,7 +299,7 @@ void patapata_state::patapata(machine_config &config)
 
 	OKIM6295(config, "oki2", 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // not verified
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0)); // or 212? difficult to read (maybe 212 is 2* 112?)
+	nmk112_device &nmk112(NMK112(config, "nmk112")); // or 212? difficult to read (maybe 212 is 2* 112?)
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 }

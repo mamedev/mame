@@ -24,7 +24,7 @@ class saitekosa_maestro_device : public device_t, public device_saitekosa_expans
 {
 public:
 	// construction/destruction
-	saitekosa_maestro_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	saitekosa_maestro_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
 
@@ -34,7 +34,7 @@ public:
 	virtual void ack_w(int state) override;
 
 protected:
-	saitekosa_maestro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	saitekosa_maestro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -68,7 +68,7 @@ protected:
 class saitekosa_analyst_device : public saitekosa_maestro_device
 {
 public:
-	saitekosa_analyst_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	saitekosa_analyst_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 

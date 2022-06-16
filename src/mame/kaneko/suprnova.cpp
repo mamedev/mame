@@ -795,7 +795,7 @@ void skns_state::skns(machine_config &config)
 	PALETTE(config, m_palette).set_entries(32768);
 	GFXDECODE(config, m_gfxdecode, m_palette, skns_bg);
 
-	SKNS_SPRITE(config, m_spritegen, 0);
+	SKNS_SPRITE(config, m_spritegen);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

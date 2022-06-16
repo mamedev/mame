@@ -157,338 +157,338 @@ ioport_constructor nes_bmc_kc885_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_NITRA, tag, owner, clock)
 {
 }
 
-nes_bmw8544_device::nes_bmw8544_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmw8544_device::nes_bmw8544_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMW8544, tag, owner, clock), m_reg(0)
 {
 }
 
-nes_fs6_device::nes_fs6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_fs6_device::nes_fs6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_FS6, tag, owner, clock)
 {
 }
 
-nes_sbros11_device::nes_sbros11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_sbros11_device::nes_sbros11_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_SBROS11, tag, owner, clock)
 {
 }
 
-nes_malisb_device::nes_malisb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_malisb_device::nes_malisb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_MALISB, tag, owner, clock)
 {
 }
 
-nes_family4646_device::nes_family4646_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_family4646_device::nes_family4646_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_FAMILY4646, tag, owner, clock)
 {
 }
 
-nes_pikay2k_device::nes_pikay2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_pikay2k_device::nes_pikay2k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_PIKAY2K, tag, owner, clock)
 {
 }
 
-nes_8237_device::nes_8237_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 board)
+nes_8237_device::nes_8237_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 board)
 	: nes_txrom_device(mconfig, type, tag, owner, clock), m_board(board)
 {
 }
 
-nes_8237_device::nes_8237_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_8237_device::nes_8237_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_8237_device(mconfig, NES_8237, tag, owner, clock, 0)
 {
 }
 
-nes_8237a_device::nes_8237a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_8237a_device::nes_8237a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_8237_device(mconfig, NES_8237A, tag, owner, clock, 1)
 {
 }
 
-nes_158b_device::nes_158b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_158b_device::nes_158b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_8237_device(mconfig, NES_158B, tag, owner, clock, 0)
 {
 }
 
-nes_kasing_device::nes_kasing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nes_kasing_device::nes_kasing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, type, tag, owner, clock), m_mmc3_mode(true)
 {
 }
 
-nes_kasing_device::nes_kasing_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_kasing_device::nes_kasing_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_kasing_device(mconfig, NES_KASING, tag, owner, clock)
 {
 }
 
-nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 board)
+nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 board)
 	: nes_kasing_device(mconfig, type, tag, owner, clock), m_board(board)
 {
 }
 
-nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sglionk_device(mconfig, NES_SG_LIONK, tag, owner, clock, 0)
 {
 }
 
-nes_sgboog_device::nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_sgboog_device::nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sglionk_device(mconfig, NES_SG_BOOG, tag, owner, clock, 1)
 {
 }
 
-nes_kay_device::nes_kay_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_kay_device::nes_kay_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_KAY, tag, owner, clock), m_low_reg(0)
 {
 }
 
-nes_h2288_device::nes_h2288_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_h2288_device::nes_h2288_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_H2288, tag, owner, clock), m_mmc3_mode(true)
 {
 }
 
-nes_6035052_device::nes_6035052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_6035052_device::nes_6035052_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_6035052, tag, owner, clock), m_prot(0)
 {
 }
 
-nes_txc_tw_device::nes_txc_tw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_txc_tw_device::nes_txc_tw_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_TXC_TW, tag, owner, clock)
 {
 }
 
-nes_kof97_device::nes_kof97_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_kof97_device::nes_kof97_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_KOF97, tag, owner, clock)
 {
 }
 
-nes_kof96_device::nes_kof96_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_kof96_device::nes_kof96_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_KOF96, tag, owner, clock), m_mmc3_mode(true)
 {
 }
 
-nes_sf3_device::nes_sf3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sf3_device::nes_sf3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_SF3, tag, owner, clock)
 {
 }
 
-nes_cocoma_device::nes_cocoma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_cocoma_device::nes_cocoma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_COCOMA, tag, owner, clock)
 {
 }
 
-nes_gouder_device::nes_gouder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_gouder_device::nes_gouder_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_GOUDER, tag, owner, clock)
 {
 }
 
-nes_sa9602b_device::nes_sa9602b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sa9602b_device::nes_sa9602b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_SA9602B, tag, owner, clock), m_reg(0), m_prg_chip(0)
 {
 }
 
-nes_sachen_shero_device::nes_sachen_shero_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_sachen_shero_device::nes_sachen_shero_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_SACHEN_SHERO, tag, owner, clock)
 	, m_jumper(*this, "JUMPER")
 	, m_reg(0)
 {
 }
 
-nes_sachen_zgdh_device::nes_sachen_zgdh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_sachen_zgdh_device::nes_sachen_zgdh_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_SACHEN_ZGDH, tag, owner, clock), m_reg(0)
 {
 }
 
-nes_a9746_device::nes_a9746_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_a9746_device::nes_a9746_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_A9746, tag, owner, clock)
 {
 }
 
-nes_a88s1_device::nes_a88s1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_a88s1_device::nes_a88s1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_A88S1, tag, owner, clock)
 {
 }
 
-nes_bmc_el86xc_device::nes_bmc_el86xc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_el86xc_device::nes_bmc_el86xc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_EL86XC, tag, owner, clock)
 {
 }
 
-nes_fk23c_device::nes_fk23c_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_fk23c_device::nes_fk23c_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, type, tag, owner, clock), m_mmc_cmd1(0)
 {
 }
 
-nes_fk23c_device::nes_fk23c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_fk23c_device::nes_fk23c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_fk23c_device(mconfig, NES_FK23C, tag, owner, clock)
 {
 }
 
-nes_fk23ca_device::nes_fk23ca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_fk23ca_device::nes_fk23ca_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_fk23c_device(mconfig, NES_FK23CA, tag, owner, clock)
 {
 }
 
-nes_nt639_device::nes_nt639_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_nt639_device::nes_nt639_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_NT639, tag, owner, clock)
 {
 }
 
-nes_resettxrom_device::nes_resettxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_resettxrom_device::nes_resettxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_RESETTXROM, tag, owner, clock), m_count(-1)
 {
 }
 
-nes_s24in1sc03_device::nes_s24in1sc03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_s24in1sc03_device::nes_s24in1sc03_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_S24IN1SC03, tag, owner, clock)
 {
 }
 
-nes_tech9in1_device::nes_tech9in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_tech9in1_device::nes_tech9in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_TECHLINE9IN1, tag, owner, clock)
 {
 }
 
-nes_bmc_5in1_device::nes_bmc_5in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_5in1_device::nes_bmc_5in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_5IN1, tag, owner, clock)
 	, m_jumper(*this, "JUMPER")
 {
 }
 
-nes_bmc_8in1_device::nes_bmc_8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_8in1_device::nes_bmc_8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_8IN1, tag, owner, clock)
 {
 }
 
-nes_bmc_15in1_device::nes_bmc_15in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_15in1_device::nes_bmc_15in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_15IN1, tag, owner, clock), m_jumper(0)
 {
 }
 
-nes_bmc_sbig7_device::nes_bmc_sbig7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_bmc_sbig7_device::nes_bmc_sbig7_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_SBIG7, tag, owner, clock)
 {
 }
 
-nes_bmc_hik8_device::nes_bmc_hik8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nes_bmc_hik8_device::nes_bmc_hik8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, type, tag, owner, clock), m_count(0)
 {
 }
 
-nes_bmc_hik8_device::nes_bmc_hik8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_hik8_device::nes_bmc_hik8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_bmc_hik8_device(mconfig, NES_BMC_HIK8, tag, owner, clock)
 {
 }
 
-nes_bmc_jy208_device::nes_bmc_jy208_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_jy208_device::nes_bmc_jy208_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_bmc_hik8_device(mconfig, NES_BMC_JY208, tag, owner, clock)
 {
 }
 
-nes_bmc_jy302_device::nes_bmc_jy302_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_jy302_device::nes_bmc_jy302_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_bmc_hik8_device(mconfig, NES_BMC_JY302, tag, owner, clock)
 {
 }
 
-nes_bmc_kc885_device::nes_bmc_kc885_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_kc885_device::nes_bmc_kc885_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_bmc_hik8_device(mconfig, NES_BMC_KC885, tag, owner, clock)
 	, m_jumper(*this, "JUMPER")
 {
 }
 
-nes_bmc_sfc12_device::nes_bmc_sfc12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_sfc12_device::nes_bmc_sfc12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_bmc_hik8_device(mconfig, NES_BMC_SFC12, tag, owner, clock)
 {
 }
 
-nes_bmc_hik4_device::nes_bmc_hik4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_hik4_device::nes_bmc_hik4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_HIK4, tag, owner, clock), m_mmc3_mode(true)
 {
 }
 
-nes_bmc_f15_device::nes_bmc_f15_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_f15_device::nes_bmc_f15_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_F15, tag, owner, clock)
 {
 }
 
-nes_bmc_f600_device::nes_bmc_f600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_f600_device::nes_bmc_f600_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txsrom_device(mconfig, NES_BMC_F600, tag, owner, clock)
 	, m_jumper(*this, "JUMPER")
 	, m_reg(0)
 {
 }
 
-nes_bmc_gn45_device::nes_bmc_gn45_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_gn45_device::nes_bmc_gn45_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_GN45, tag, owner, clock), m_lock(false)
 {
 }
 
-nes_bmc_gold7in1_device::nes_bmc_gold7in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_gold7in1_device::nes_bmc_gold7in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_GOLD7IN1, tag, owner, clock), m_lock(false)
 {
 }
 
-nes_bmc_k3006_device::nes_bmc_k3006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_k3006_device::nes_bmc_k3006_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_K3006, tag, owner, clock)
 {
 }
 
-nes_bmc_k3033_device::nes_bmc_k3033_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_k3033_device::nes_bmc_k3033_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_K3033, tag, owner, clock), m_mmc3_mode(false)
 {
 }
 
-nes_bmc_l6in1_device::nes_bmc_l6in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_l6in1_device::nes_bmc_l6in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_L6IN1, tag, owner, clock), m_reg(0)
 {
 }
 
-nes_bmc_00202650_device::nes_bmc_00202650_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_00202650_device::nes_bmc_00202650_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_00202650, tag, owner, clock), m_mmc3_mode(false)
 {
 }
 
-nes_bmc_411120c_device::nes_bmc_411120c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_411120c_device::nes_bmc_411120c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_411120C, tag, owner, clock), m_reg(0)
 {
 }
 
-nes_bmc_810305c_device::nes_bmc_810305c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_810305c_device::nes_bmc_810305c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txsrom_device(mconfig, NES_BMC_810305C, tag, owner, clock), m_outer(0)
 {
 }
 
-nes_bmc_820720c_device::nes_bmc_820720c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_820720c_device::nes_bmc_820720c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_820720C, tag, owner, clock), m_reg(0)
 {
 }
 
-nes_bmc_830118c_device::nes_bmc_830118c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_830118c_device::nes_bmc_830118c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_830118C, tag, owner, clock)
 {
 }
 
-nes_bmc_830832c_device::nes_bmc_830832c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_830832c_device::nes_bmc_830832c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_830832C, tag, owner, clock)
 {
 }
 
-nes_bmc_yy841101c_device::nes_bmc_yy841101c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_yy841101c_device::nes_bmc_yy841101c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_YY841101C, tag, owner, clock)
 {
 }
 
-nes_bmc_yy841155c_device::nes_bmc_yy841155c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_yy841155c_device::nes_bmc_yy841155c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_BMC_YY841155C, tag, owner, clock)
 {
 }
 
-nes_pjoy84_device::nes_pjoy84_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_pjoy84_device::nes_pjoy84_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_PJOY84, tag, owner, clock)
 {
 }
 
-nes_smd133_device::nes_smd133_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_smd133_device::nes_smd133_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_SMD133, tag, owner, clock)
 {
 }

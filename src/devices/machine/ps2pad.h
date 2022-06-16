@@ -17,12 +17,7 @@
 class ps2_pad_device : public device_t
 {
 public:
-	ps2_pad_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: ps2_pad_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
-	ps2_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~ps2_pad_device() override;
 
 	void recv_fifo_push(uint8_t data); // TODO: Turn me into a bus interface!

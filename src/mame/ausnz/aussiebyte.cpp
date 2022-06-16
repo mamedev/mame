@@ -154,7 +154,7 @@ void aussiebyte_state::port17_w(u8 data)
 3 WIEN: WD2797 Double density select. */
 void aussiebyte_state::port18_w(u8 data)
 {
-	m_fdc->set_unscaled_clock(BIT(data, 2) ? 1e6 : 2e6);
+	m_fdc->set_unscaled_clock(BIT(data, 2) ? XTAL::u(1e6) : XTAL::u(2e6));
 	m_fdc->dden_w(BIT(data, 3));
 }
 
@@ -517,7 +517,7 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-	VOTRAX_SC01(config, m_votrax, 720000); // 720kHz? needs verify
+	VOTRAX_SC01(config, m_votrax, XTAL::u(720000)); // 720kHz? needs verify
 	m_votrax->ar_callback().set([this] (bool state) { m_port28 = state ? 0 : 1; });
 	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 

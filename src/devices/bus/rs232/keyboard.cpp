@@ -14,12 +14,12 @@ INPUT_PORTS_START(serial_keyboard)
 INPUT_PORTS_END
 } // anonymous namespace
 
-serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: serial_keyboard_device(mconfig, SERIAL_KEYBOARD, tag, owner, clock)
 {
 }
 
-serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_keyboard_device(mconfig, type, tag, owner, clock)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_rs232_port_interface(mconfig, *this)

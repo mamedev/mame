@@ -151,7 +151,7 @@ void risc_state::mrisc(machine_config &config)
 	const attotime irq_period = attotime::from_hz(10_MHz_XTAL / 0x4000);
 	m_maincpu->set_periodic_int(FUNC(risc_state::irq0_line_hold), irq_period);
 
-	CHESSMACHINE(config, m_chessm, 14'000'000); // Mephisto manual says 14MHz (no XTAL)
+	CHESSMACHINE(config, m_chessm, XTAL::u(14'000'000)); // Mephisto manual says 14MHz (no XTAL)
 	config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

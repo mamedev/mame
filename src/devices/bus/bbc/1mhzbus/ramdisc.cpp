@@ -86,7 +86,7 @@ const tiny_rom_entry *bbc_ramdisc_device::device_rom_region() const
 //  bbc_ramdisc_device - constructor
 //-------------------------------------------------
 
-bbc_ramdisc_device::bbc_ramdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_ramdisc_device::bbc_ramdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_RAMDISC, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_1mhzbus(*this, "1mhzbus")

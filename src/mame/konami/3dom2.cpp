@@ -209,7 +209,7 @@ static void write_m2_reg(uint32_t &reg, uint32_t data, m2_reg_wmode mode)
 //  m2_bda_device - constructor
 //-------------------------------------------------
 
-m2_bda_device::m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m2_bda_device::m2_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, M2_BDA, tag, owner, clock),
 	m_cpu1(*this, finder_base::DUMMY_TAG),
 	m_cpu2(*this, finder_base::DUMMY_TAG),
@@ -486,7 +486,7 @@ void m2_bda_device::configure_ppc_address_map(address_space &space)
 //  m2_powerbus_device - constructor
 //-------------------------------------------------
 
-m2_powerbus_device::m2_powerbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m2_powerbus_device::m2_powerbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, M2_POWERBUS, tag, owner, clock),
 	m_int_handler(*this)
 {
@@ -621,7 +621,7 @@ void m2_powerbus_device::update_interrupts()
 //  m2_memctl_device - constructor
 //-------------------------------------------------
 
-m2_memctl_device::m2_memctl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m2_memctl_device::m2_memctl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, M2_MEMCTL, tag, owner, clock),
 		m_gpio_in(*this),
 		m_gpio_out(*this)
@@ -785,7 +785,7 @@ void m2_memctl_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 //  m2_vdu_device - constructor
 //-------------------------------------------------
 
-m2_vdu_device::m2_vdu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m2_vdu_device::m2_vdu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, M2_VDU, tag, owner, clock),
 	m_screen(*this, finder_base::DUMMY_TAG),
 	m_vint0_int_handler(*this),
@@ -1392,7 +1392,7 @@ void m2_vdu_device::set_vint_timer(uint32_t id)
 //  m2_ctrlport_device - constructor
 //-------------------------------------------------
 
-m2_ctrlport_device::m2_ctrlport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m2_ctrlport_device::m2_ctrlport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, M2_CTRLPORT, tag, owner, clock)
 {
 
@@ -1474,7 +1474,7 @@ void m2_ctrlport_device::write(offs_t offset, uint32_t data)
 //  m2_cde_device - constructor
 //-------------------------------------------------
 
-m2_cde_device::m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m2_cde_device::m2_cde_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, M2_CDE, tag, owner, clock),
 	m_cpu1(*this, finder_base::DUMMY_TAG),
 	m_bda(*this, finder_base::DUMMY_TAG),
@@ -1981,7 +1981,7 @@ TIMER_CALLBACK_MEMBER(m2_cde_device::next_dma)
 //  m2_mpeg_device - constructor
 //-------------------------------------------------
 
-m2_mpeg_device::m2_mpeg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m2_mpeg_device::m2_mpeg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, M2_MPEG, tag, owner, clock)
 {
 }

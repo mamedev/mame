@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(PC8801_23, pc8801_23_device, "pc8801_23", "NEC PC-8801-23 \"Sound Board II\"")
 
-pc8801_23_device::pc8801_23_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc8801_23_device::pc8801_23_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pc8801_exp_device(mconfig, PC8801_23, tag, owner, clock)
 	, m_opna(*this, "opna")
 {

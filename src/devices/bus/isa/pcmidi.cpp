@@ -65,7 +65,7 @@ DEFINE_DEVICE_TYPE(ISA8_PCMIDI, isa8_pcmidi_device, "isa_pcmidi", "Music Quest P
 //  isa8_pcmidi_device - constructor
 //-------------------------------------------------
 
-isa8_pcmidi_device::isa8_pcmidi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+isa8_pcmidi_device::isa8_pcmidi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISA8_PCMIDI, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_mpu(*this, "mpu")

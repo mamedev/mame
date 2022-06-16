@@ -57,7 +57,7 @@ const tiny_rom_entry *compis_keyboard_device::device_rom_region() const
 
 void compis_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	I8748(config, m_maincpu, 2016000); // XTAL(4'032'000)/2 ???
+	I8748(config, m_maincpu, XTAL::u(2016000)); // XTAL(4'032'000)/2 ???
 	m_maincpu->bus_in_cb().set(FUNC(compis_keyboard_device::bus_r));
 	m_maincpu->bus_out_cb().set(FUNC(compis_keyboard_device::bus_w));
 	m_maincpu->p1_in_cb().set(FUNC(compis_keyboard_device::p1_r));
@@ -221,7 +221,7 @@ ioport_constructor compis_keyboard_device::device_input_ports() const
 //  compis_keyboard_device - constructor
 //-------------------------------------------------
 
-compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, COMPIS_KEYBOARD, tag, owner, clock),
 		m_maincpu(*this, I8748_TAG),
 		m_speaker(*this, SPEAKER_TAG),

@@ -35,12 +35,12 @@ public:
 	};
 
 	// construction/destruction
-	okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, pin7_state pin7)
+	okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, pin7_state pin7)
 		: okim6295_device(mconfig, tag, owner, clock)
 	{
 		config_pin7(pin7);
 	}
-	okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration helpers
 	void config_pin7(pin7_state pin7) { assert(!started()); m_pin7_state = pin7; }

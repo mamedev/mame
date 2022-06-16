@@ -49,7 +49,7 @@ DEFINE_DEVICE_TYPE(CRT, crt_device, "crt", "CRT Video")
 //  crt_device - constructor
 //-------------------------------------------------
 
-crt_device::crt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+crt_device::crt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CRT, tag, owner, clock),
 		m_list(nullptr),
 		m_list_head(nullptr),

@@ -596,7 +596,7 @@ void goldngam_state::base(machine_config &config)
 	M68000(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldngam_state::swisspkr_map);
 
-	PTM6840(config, m_ptm, 2'000'000);
+	PTM6840(config, m_ptm, XTAL::u(2'000'000));
 	m_ptm->irq_callback().set_inputline("maincpu", M68K_IRQ_2);
 
 	/* video hardware */
@@ -620,7 +620,7 @@ void goldngam_state::swisspkr(machine_config &config)
 {
 	base(config);
 
-	ACIA6850(config, "acia", 0).irq_handler().set_inputline("maincpu", M68K_IRQ_4);
+	ACIA6850(config, "acia").irq_handler().set_inputline("maincpu", M68K_IRQ_4);
 	AY8912(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
@@ -634,10 +634,10 @@ void goldngam_state::moviecrd(machine_config &config)
 
 	m_ptm->irq_callback().set_inputline("maincpu", M68K_IRQ_1);
 
-	MC68681(config, m_duart[0], 3'686'400);
+	MC68681(config, m_duart[0], XTAL::u(3'686'400));
 	m_duart[0]->irq_cb().set_inputline("maincpu", MOVIECRD_DUART1_IRQ);
 
-	MC68681(config, m_duart[1], 3'686'400);
+	MC68681(config, m_duart[1], XTAL::u(3'686'400));
 	m_duart[1]->irq_cb().set_inputline("maincpu", MOVIECRD_DUART2_IRQ);
 
 	YM2149(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);

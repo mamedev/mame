@@ -144,10 +144,10 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* gate array */
-	e05a30_device &e05a30(E05A30(config, m_e05a30, 0));
+	e05a30_device &e05a30(E05A30(config, m_e05a30));
 	e05a30.printhead().set(FUNC(epson_lx810l_device::printhead));
 	e05a30.pf_stepper().set(FUNC(epson_lx810l_device::pf_stepper));
 	e05a30.cr_stepper().set(FUNC(epson_lx810l_device::cr_stepper));
@@ -284,12 +284,12 @@ INPUT_CHANGED_MEMBER(epson_lx810l_device::reset_printer)
 //  epson_lx810l_device - constructor
 //-------------------------------------------------
 
-epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	epson_lx810l_device(mconfig, EPSON_LX810L, tag, owner, clock)
 {
 }
 
-epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -315,7 +315,7 @@ epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, device_t
 {
 }
 
-epson_ap2000_device::epson_ap2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+epson_ap2000_device::epson_ap2000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: epson_lx810l_device(mconfig, EPSON_AP2000, tag, owner, clock)
 { }
 

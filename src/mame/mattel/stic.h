@@ -61,7 +61,7 @@ public:
 	static constexpr unsigned   SCREEN_HEIGHT           = (OVERSCAN_TOP_HEIGHT + (BACKTAB_HEIGHT * CARD_HEIGHT) + OVERSCAN_BOTTOM_HEIGHT) * Y_SCALE;
 
 	// construction/destruction
-	stic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	stic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~stic_device();
 
 	uint16_t read(offs_t offset);

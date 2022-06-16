@@ -92,14 +92,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	a800_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: a800_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: a800_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~a800_cart_slot_device();
 
 	// image-level overrides
@@ -124,7 +124,7 @@ public:
 	void write_d5xx(offs_t offset, uint8_t data);
 
 protected:
-	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -146,14 +146,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	a5200_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: a5200_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: a5200_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~a5200_cart_slot_device();
 
 	virtual const char *file_extensions() const noexcept override { return "bin,rom,car,a52"; }
@@ -170,14 +170,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	xegs_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: xegs_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: xegs_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	xegs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xegs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~xegs_cart_slot_device();
 
 	virtual const char *file_extensions() const noexcept override { return "bin,rom,car"; }

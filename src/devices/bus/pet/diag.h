@@ -25,7 +25,7 @@ class pet_userport_diagnostic_connector_device : public device_t, public device_
 {
 public:
 	// construction/destruction
-	pet_userport_diagnostic_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pet_userport_diagnostic_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_pet_user_port_interface overrides
 	virtual DECLARE_WRITE_LINE_MEMBER( input_2 ) override { output_b(state); }

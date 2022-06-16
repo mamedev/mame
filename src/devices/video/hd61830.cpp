@@ -75,7 +75,7 @@ static constexpr int MODE_DISPLAY_ON       = 0x20;
 //  hd61830_device - constructor
 //-------------------------------------------------
 
-hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, HD61830, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),

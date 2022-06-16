@@ -33,7 +33,7 @@ class trs80m2_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto clock_wr_callback() { return m_write_clock.bind(); }
 

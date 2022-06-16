@@ -691,14 +691,14 @@ INPUT_PORTS_END
 
 void cliffhgr_state::cliffhgr(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000);       /* 4MHz */
+	Z80(config, m_maincpu, XTAL::u(4000000));       /* 4MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cliffhgr_state::mainmem);
 	m_maincpu->set_addrmap(AS_IO, &cliffhgr_state::mainport);
 
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIONEER_PR8210(config, m_laserdisc, 0);
+	PIONEER_PR8210(config, m_laserdisc);
 	m_laserdisc->set_overlay(tms9928a_device::TOTAL_HORZ, tms9928a_device::TOTAL_VERT_NTSC, "tms9928a", FUNC(tms9928a_device::screen_update));
 	m_laserdisc->set_overlay_clip(tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START+32*8+12-1, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC+24*8+12-1);
 	m_laserdisc->add_route(0, "lspeaker", 1.0);

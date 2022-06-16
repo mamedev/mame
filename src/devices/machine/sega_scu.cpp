@@ -145,7 +145,7 @@ void sega_scu_device::regs_map(address_map &map)
 //  sega_scu_device - constructor
 //-------------------------------------------------
 
-sega_scu_device::sega_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_scu_device::sega_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA_SCU, tag, owner, clock),
 	m_scudsp(*this, "scudsp"),
 	m_hostcpu(*this, finder_base::DUMMY_TAG)

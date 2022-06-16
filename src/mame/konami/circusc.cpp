@@ -586,7 +586,7 @@ WRITE_LINE_MEMBER(circusc_state::vblank_irq)
 void circusc_state::circusc(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI1(config, m_maincpu, 2'048'000);        // 2 MHz?
+	KONAMI1(config, m_maincpu, XTAL::u(2'048'000));        // 2 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &circusc_state::main_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2C
@@ -624,7 +624,7 @@ void circusc_state::circusc(machine_config &config)
 
 	SN76496(config, m_sn[1], XTAL(14'318'181) / 8).add_route(0, "fltdisc", 1.0, 1);
 
-	DAC_8BIT_R2R(config, "dac", 0).set_output_range(0, 1).add_route(0, "fltdisc", 1.0, 2); // ls374.7g + r44+r45+r47+r48+r50+r56+r57+r58+r59 (20k) + r46+r49+r51+r52+r53+r54+r55 (10k) + upc324.3h
+	DAC_8BIT_R2R(config, "dac").set_output_range(0, 1).add_route(0, "fltdisc", 1.0, 2); // ls374.7g + r44+r45+r47+r48+r50+r56+r57+r58+r59 (20k) + r46+r49+r51+r52+r53+r54+r55 (10k) + upc324.3h
 
 	DISCRETE(config, m_discrete, circusc_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }

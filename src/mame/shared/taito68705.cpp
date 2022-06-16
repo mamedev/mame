@@ -177,12 +177,12 @@ void taito68705_mcu_device_base::latch_control(u8 data, u8 &value, unsigned host
 }
 
 
-taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: taito68705_mcu_device(mconfig, TAITO68705_MCU, tag, owner, clock)
 {
 }
 
-taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: taito68705_mcu_device_base(mconfig, type, tag, owner, clock)
 	, m_aux_out_cb(*this)
 	, m_aux_strobe_cb(*this)
@@ -261,7 +261,7 @@ void taito68705_mcu_device::mcu_portb_w(offs_t offset, u8 data, u8 mem_mask)
 
 /* The Tiger-Heli interface has some extensions, handle them here */
 
-taito68705_mcu_tiger_device::taito68705_mcu_tiger_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+taito68705_mcu_tiger_device::taito68705_mcu_tiger_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: taito68705_mcu_device(mconfig, TAITO68705_MCU_TIGER, tag, owner, clock)
 {
 }

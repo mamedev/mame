@@ -34,7 +34,7 @@ pin     desc
 class lc7582_device : public device_t
 {
 public:
-	lc7582_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	lc7582_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto write_segs() { return m_write_segs.bind(); } // S pins, COM1/COM2 in offset

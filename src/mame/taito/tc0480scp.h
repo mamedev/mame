@@ -16,7 +16,7 @@ enum
 class tc0480scp_device : public device_t, public device_gfx_interface
 {
 public:
-	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_gfxlayout(int gfxlayout) { m_gfxlayout = gfxlayout; }

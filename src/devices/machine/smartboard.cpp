@@ -67,7 +67,7 @@ DEFINE_DEVICE_TYPE(TASC_SB30, tasc_sb30_device, "tasc_sb30", "Tasc SmartBoard SB
 //  tasc_sb30_device - constructor
 //-------------------------------------------------
 
-tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TASC_SB30, tag, owner, clock)
 	, m_board(*this, "board")
 	, m_out_leds(*this, "sb30_led_%u.%u", 0U, 0U)

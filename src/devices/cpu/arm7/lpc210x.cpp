@@ -41,7 +41,7 @@ void lpc210x_device::lpc2103_map(address_map &map)
 }
 
 
-lpc210x_device::lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lpc210x_device::lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arm7_cpu_device(mconfig, LPC2103, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(lpc210x_device::lpc2103_map), this))
 	, m_vic(*this, "vic")
@@ -256,7 +256,7 @@ void lpc210x_device::write_timer(int timer, int offset, uint32_t data, uint32_t 
 
 void lpc210x_device::device_add_mconfig(machine_config &config)
 {
-	PL190_VIC(config, m_vic, 0);
+	PL190_VIC(config, m_vic);
 	m_vic->out_irq_cb().set_inputline(*this, ARM7_IRQ_LINE);
 	m_vic->out_fiq_cb().set_inputline(*this, ARM7_FIRQ_LINE);
 }

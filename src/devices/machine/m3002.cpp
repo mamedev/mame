@@ -34,7 +34,7 @@ ALLOW_SAVE_TYPE(m3002_device::mux_state);
 //  m3002_device - constructor
 //-------------------------------------------------
 
-m3002_device::m3002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+m3002_device::m3002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, device_rtc_interface(mconfig, *this)
@@ -48,7 +48,7 @@ m3002_device::m3002_device(const machine_config &mconfig, device_type type, cons
 	std::fill_n(&m_ram[0], 0x10, 0);
 }
 
-m3002_device::m3002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+m3002_device::m3002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m3002_device(mconfig, M3002, tag, owner, clock)
 {
 }
@@ -58,7 +58,7 @@ m3002_device::m3002_device(const machine_config &mconfig, const char *tag, devic
 //  m3000_device - constructor
 //-------------------------------------------------
 
-m3000_device::m3000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+m3000_device::m3000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m3002_device(mconfig, M3000, tag, owner, clock)
 {
 }

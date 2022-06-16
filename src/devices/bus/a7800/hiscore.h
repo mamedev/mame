@@ -15,7 +15,7 @@ class a78_hiscore_device : public a78_rom_device
 {
 public:
 	// construction/destruction
-	a78_hiscore_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a78_hiscore_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_04xx(offs_t offset) override;

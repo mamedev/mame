@@ -298,9 +298,9 @@ void smondialb_state::smondialb(machine_config &config)
 	m_board->set_delay(attotime::from_msec(250));
 
 	/* video hardware */
-	PCF2112(config, m_lcd[0], 50); // frequency guessed
+	PCF2112(config, m_lcd[0], XTAL::u(50)); // frequency guessed
 	m_lcd[0]->write_segs().set(FUNC(smondialb_state::lcd_output_w<0>));
-	PCF2112(config, m_lcd[1], 50); // "
+	PCF2112(config, m_lcd[1], XTAL::u(50)); // "
 	m_lcd[1]->write_segs().set(FUNC(smondialb_state::lcd_output_w<1>));
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(8, 6);

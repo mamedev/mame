@@ -117,7 +117,7 @@ const stream_buffer::sample_t tt5665_device::s_volume_table[16] =
 //  tt5665_device - constructor
 //-------------------------------------------------
 
-tt5665_device::tt5665_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tt5665_device::tt5665_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TT5665, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)

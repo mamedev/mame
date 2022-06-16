@@ -27,7 +27,7 @@ class nes_rob_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_rob_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_rob_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

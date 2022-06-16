@@ -43,7 +43,7 @@ ioport_constructor nes_konamihs_device::device_input_ports() const
 //  nes_konamihs_device - constructor
 //-------------------------------------------------
 
-nes_konamihs_device::nes_konamihs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_konamihs_device::nes_konamihs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_KONAMIHS, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_ipt(*this, "P%u", 1)

@@ -11,7 +11,7 @@
 class sgi_ge5_device : public cpu_device
 {
 public:
-	sgi_ge5_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	sgi_ge5_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// host interface
 	auto out_int() { return m_int_cb.bind(); }

@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(O2_ROM_VOICE, o2_voice_device, "o2_voice", "Odyssey 2 The Voi
 //  o2_voice_device - constructor
 //-------------------------------------------------
 
-o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, O2_ROM_VOICE, tag, owner, clock),
 	device_o2_cart_interface(mconfig, *this),
 	m_speech(*this, "speech"),

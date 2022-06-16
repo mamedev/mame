@@ -9,7 +9,7 @@
 class elan_eu3a14sys_device : public elan_eu3a05commonsys_device, public device_memory_interface
 {
 public:
-	elan_eu3a14sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	elan_eu3a14sys_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t dma_trigger_r();
 	void dma_trigger_w(uint8_t data);

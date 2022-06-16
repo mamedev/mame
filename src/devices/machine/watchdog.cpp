@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(WATCHDOG_TIMER, watchdog_timer_device, "watchdog", "Watchdog 
 //  watchdog_timer_device - constructor
 //-------------------------------------------------
 
-watchdog_timer_device::watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+watchdog_timer_device::watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, WATCHDOG_TIMER, tag, owner, clock)
 	, m_vblank_count(0)
 	, m_time(attotime::zero)

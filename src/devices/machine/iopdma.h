@@ -23,7 +23,7 @@ class iop_dma_device : public device_t, public device_execute_interface
 {
 public:
 	template <typename T, typename U, typename V, typename W, typename X>
-	iop_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&intc_tag, U &&ram_tag, V &&sif_tag, W &&spu_tag, X &&sio2_tag)
+	iop_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&intc_tag, U &&ram_tag, V &&sif_tag, W &&spu_tag, X &&sio2_tag)
 		: iop_dma_device(mconfig, tag, owner, clock)
 	{
 		m_intc.set_tag(std::forward<T>(intc_tag));
@@ -33,7 +33,7 @@ public:
 		m_sio2.set_tag(std::forward<X>(sio2_tag));
 	}
 
-	iop_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iop_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~iop_dma_device() override;
 
 	uint32_t bank0_r(offs_t offset, uint32_t mem_mask = ~0);

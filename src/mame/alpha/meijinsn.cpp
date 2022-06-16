@@ -352,11 +352,11 @@ void meijinsn_state::machine_reset()
 void meijinsn_state::meijinsn(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 9000000);
+	M68000(config, m_maincpu, XTAL::u(9000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &meijinsn_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(meijinsn_state::interrupt), "screen", 0, 1);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 4000000));
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL::u(4000000)));
 	audiocpu.set_addrmap(AS_PROGRAM, &meijinsn_state::sound_map);
 	audiocpu.set_addrmap(AS_IO, &meijinsn_state::sound_io_map);
 	audiocpu.set_periodic_int(FUNC(meijinsn_state::irq0_line_hold), attotime::from_hz(160*60));
@@ -378,7 +378,7 @@ void meijinsn_state::meijinsn(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(2000000)));
 	aysnd.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.75);
 }

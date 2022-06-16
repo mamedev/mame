@@ -52,7 +52,7 @@
 
 DEFINE_DEVICE_TYPE(RA17XX, ra17xx_device, "ra17xx", "Rockwell A17xx")
 
-ra17xx_device::ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ra17xx_device::ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RA17XX, tag, owner, clock)
 	, m_enable(false)
 	, m_iord(*this)

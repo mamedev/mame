@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A14_VID, elan_eu3a14vid_device, "elan_eu3a14vid", "Elan EU3A14 Video")
 
-elan_eu3a14vid_device::elan_eu3a14vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+elan_eu3a14vid_device::elan_eu3a14vid_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: elan_eu3a05commonvid_device(mconfig, ELAN_EU3A14_VID, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),

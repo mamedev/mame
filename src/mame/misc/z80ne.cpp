@@ -1368,7 +1368,7 @@ void z80ne_state::z80ne(machine_config &config)
 
 	AY31015(config, m_uart);
 
-	CLOCK(config, m_uart_clock, 4800);
+	CLOCK(config, m_uart_clock, XTAL::u(4800));
 	m_uart_clock->signal_handler().set(FUNC(z80ne_state::lx385_uart_tx_clock_w));
 	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
@@ -1392,7 +1392,7 @@ void z80ne_state::z80ne(machine_config &config)
 
 void z80net_state::lx387(machine_config &config)
 {
-	KR2376_ST(config, m_lx387_kr2376, 50000);
+	KR2376_ST(config, m_lx387_kr2376, XTAL::u(50000));
 	m_lx387_kr2376->x<0>().set_ioport("X0");
 	m_lx387_kr2376->x<1>().set_ioport("X1");
 	m_lx387_kr2376->x<2>().set_ioport("X2");
@@ -1437,7 +1437,7 @@ void z80netb_state::z80netb(machine_config &config)
 
 	AY31015(config, m_uart);
 
-	CLOCK(config, m_uart_clock, 4800);
+	CLOCK(config, m_uart_clock, XTAL::u(4800));
 	m_uart_clock->signal_handler().set(FUNC(z80netb_state::lx385_uart_tx_clock_w));
 	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 
@@ -1479,7 +1479,7 @@ void z80netf_state::z80netf(machine_config &config)
 
 	AY31015(config, m_uart);
 
-	CLOCK(config, m_uart_clock, 4800);
+	CLOCK(config, m_uart_clock, XTAL::u(4800));
 	m_uart_clock->signal_handler().set(FUNC(z80netf_state::lx385_uart_tx_clock_w));
 	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
 

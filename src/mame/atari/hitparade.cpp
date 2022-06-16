@@ -183,7 +183,7 @@ INPUT_PORTS_END
 void hitpar_state::hitpar(machine_config &config)
 {
 	// basic machine hardware
-	TMS1300(config, m_maincpu, 350000); // guessed
+	TMS1300(config, m_maincpu, XTAL::u(350000)); // guessed
 	m_maincpu->read_k().set(FUNC(hitpar_state::read_k));
 	m_maincpu->write_r().set(FUNC(hitpar_state::write_r));
 	m_maincpu->write_o().set(FUNC(hitpar_state::write_o));

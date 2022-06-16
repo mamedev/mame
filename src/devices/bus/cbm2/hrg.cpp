@@ -97,7 +97,7 @@ void cbm2_hrg_a_device::device_add_mconfig(machine_config &config)
 	screen.set_refresh_hz(25);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	EF9365(config, m_gdc, 1750000);
+	EF9365(config, m_gdc, XTAL::u(1750000));
 	m_gdc->set_screen(SCREEN_TAG);
 	m_gdc->set_addrmap(0, &cbm2_hrg_a_device::hrg_a_map);
 	m_gdc->set_palette_tag("palette");
@@ -114,7 +114,7 @@ void cbm2_hrg_b_device::device_add_mconfig(machine_config &config)
 	screen.set_refresh_hz(50);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	EF9365(config, m_gdc, 1750000); //EF9366
+	EF9365(config, m_gdc, XTAL::u(1750000)); //EF9366
 	m_gdc->set_screen(SCREEN_TAG);
 	m_gdc->set_addrmap(0, &cbm2_hrg_b_device::hrg_b_map);
 	m_gdc->set_palette_tag("palette");
@@ -132,7 +132,7 @@ void cbm2_hrg_b_device::device_add_mconfig(machine_config &config)
 //  cbm2_hrg_device - constructor
 //-------------------------------------------------
 
-cbm2_hrg_device::cbm2_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+cbm2_hrg_device::cbm2_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_cbm2_expansion_card_interface(mconfig, *this),
 	m_gdc(*this, EF9366_TAG),
@@ -140,12 +140,12 @@ cbm2_hrg_device::cbm2_hrg_device(const machine_config &mconfig, device_type type
 {
 }
 
-cbm2_hrg_a_device::cbm2_hrg_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cbm2_hrg_a_device::cbm2_hrg_a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cbm2_hrg_device(mconfig, CBM2_HRG_A, tag, owner, clock)
 {
 }
 
-cbm2_hrg_b_device::cbm2_hrg_b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cbm2_hrg_b_device::cbm2_hrg_b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cbm2_hrg_device(mconfig, CBM2_HRG_B, tag, owner, clock)
 {
 }

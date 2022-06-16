@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(PCD8544, pcd8544_device, "pcd8544_device", "Philips PCD8544 L
 //  pcd8544_device - constructor
 //-------------------------------------------------
 
-pcd8544_device::pcd8544_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pcd8544_device::pcd8544_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PCD8544, tag, owner, clock),
 	m_screen_update_cb(*this)
 {

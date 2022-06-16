@@ -63,7 +63,7 @@ ioport_constructor dragon_msx2_device::device_input_ports() const
 //  dragon_msx2_device - constructor
 //-------------------------------------------------
 
-dragon_msx2_device::dragon_msx2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dragon_msx2_device::dragon_msx2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DRAGON_MSX2, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this )
 	, m_ym2413(*this, "ym2413")

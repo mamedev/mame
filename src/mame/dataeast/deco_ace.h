@@ -23,7 +23,7 @@
 class deco_ace_device : public device_t, public device_video_interface, public device_palette_interface
 {
 public:
-	deco_ace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	deco_ace_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t buffered_palette_r(offs_t offset);
 	uint16_t buffered_palette16_r(offs_t offset);

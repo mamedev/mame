@@ -232,7 +232,7 @@ fixedfreq_device::fixedfreq_device(
 		device_type type,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock)
+		const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this, false)
 	, m_enable(*this, "ENABLE")
@@ -248,7 +248,7 @@ fixedfreq_device::fixedfreq_device(
 		const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock)
+		const XTAL &clock)
 	: fixedfreq_device(mconfig, FIXFREQ, tag, owner, clock)
 {
 }
@@ -273,7 +273,7 @@ void fixedfreq_device::device_config_complete()
 	if (!screen().refresh_attoseconds())
 	{
 		screen().set_raw(
-				m_monitor.m_monitor_clock, m_monitor.htotal(), 0,
+				XTAL::u(m_monitor.m_monitor_clock), m_monitor.htotal(), 0,
 				m_monitor.htotal(), m_monitor.vtotal(), 0,
 				m_monitor.vtotal());
 	}

@@ -135,11 +135,11 @@ void bartop52_state::a5200(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bartop52_state::a5200_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(bartop52_state::bartop_interrupt), "screen", 0, 1);
 
-	ATARI_GTIA(config, m_gtia, 0);
+	ATARI_GTIA(config, m_gtia);
 	m_gtia->set_region(GTIA_NTSC);
 	m_gtia->trigger_callback().set_ioport("djoy_b");
 
-	ATARI_ANTIC(config, m_antic, 0);
+	ATARI_ANTIC(config, m_antic);
 	m_antic->set_gtia_tag(m_gtia);
 
 	/* video hardware */

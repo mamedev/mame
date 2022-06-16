@@ -81,8 +81,8 @@ class isa8_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	template <typename T, typename U>
-	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&isa_tag, U &&opts, const char *dflt, bool fixed)
-		: isa8_slot_device(mconfig, tag, owner, clock)
+	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&isa_tag, U &&opts, const char *dflt, bool fixed)
+		: isa8_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -90,10 +90,10 @@ public:
 		set_fixed(fixed);
 		m_isa_bus.set_tag(std::forward<T>(isa_tag));
 	}
-	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
-	isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -120,7 +120,7 @@ public:
 	};
 
 	// construction/destruction
-	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration
 	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
@@ -206,7 +206,7 @@ public:
 	const address_space_config m_mem_config, m_io_config, m_mem16_config, m_io16_config;
 
 protected:
-	isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	template<typename R, typename W> void install_space(int spacenum, offs_t start, offs_t end, R rhandler, W whandler);
 
@@ -286,8 +286,8 @@ class isa16_slot_device : public isa8_slot_device
 public:
 	// construction/destruction
 	template <typename T, typename U>
-	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&isa_tag, U &&opts, const char *dflt, bool fixed)
-		: isa16_slot_device(mconfig, tag, owner, clock)
+	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&isa_tag, U &&opts, const char *dflt, bool fixed)
+		: isa16_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -295,7 +295,7 @@ public:
 		set_fixed(fixed);
 		m_isa_bus.set_tag(std::forward<T>(isa_tag));
 	}
-	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides
@@ -311,7 +311,7 @@ class isa16_device : public isa8_device
 {
 public:
 	// construction/destruction
-	isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq10_callback() { return m_out_irq10_cb.bind(); }
 	auto irq11_callback() { return m_out_irq11_cb.bind(); }

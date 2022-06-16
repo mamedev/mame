@@ -128,7 +128,7 @@ void tilemap038_device::vram_8x8_map(address_map &map)
 
 DEFINE_DEVICE_TYPE(TMAP038, tilemap038_device, "tmap038", "038 Tilemap generator")
 
-tilemap038_device::tilemap038_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tilemap038_device::tilemap038_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TMAP038, tag, owner, clock)
 	, m_vram_8x8(*this, "vram_8x8")
 	, m_vram_16x16(*this, "vram_16x16")

@@ -22,7 +22,7 @@ class pcf8593_device :  public device_t,
 						public device_nvram_interface
 {
 public:
-	pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	DECLARE_WRITE_LINE_MEMBER(scl_w);
 	DECLARE_WRITE_LINE_MEMBER(sda_w);

@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(SONYIOP_SPU, iop_spu_device, "iopspu", "PlayStation 2 IOP SPU")
 
-iop_spu_device::iop_spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iop_spu_device::iop_spu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYIOP_SPU, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_iop(*this, finder_base::DUMMY_TAG)

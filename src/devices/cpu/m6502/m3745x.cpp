@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(M37450, m37450_device, "m37450", "Mitsubishi M37450")
 //-------------------------------------------------
 //  m3745x_device - constructor
 //-------------------------------------------------
-m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
+m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map) :
 	m740_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 	m_read_p(*this),
@@ -393,12 +393,12 @@ void m37450_device::m37450_map(address_map &map)
 	map(0x0100, 0x01ff).ram();
 }
 
-m37450_device::m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m37450_device::m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m37450_device(mconfig, M37450, tag, owner, clock)
 {
 }
 
-m37450_device::m37450_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+m37450_device::m37450_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	m3745x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(m37450_device::m37450_map), this))
 {
 }

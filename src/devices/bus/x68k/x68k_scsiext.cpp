@@ -54,7 +54,7 @@ void x68k_scsiext_device::device_add_mconfig(machine_config &config)
 	m_spc->drq_cb().set(FUNC(x68k_scsiext_device::drq_w));
 }
 
-x68k_scsiext_device::x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+x68k_scsiext_device::x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, X68K_SCSIEXT, tag, owner, clock)
 	, device_x68k_expansion_card_interface(mconfig, *this)
 	, m_slot(nullptr),

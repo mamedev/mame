@@ -26,7 +26,7 @@ class sente6vb_device : public device_t
 	static constexpr uint32_t POLY17_ADD = 0x18000;
 
 public:
-	sente6vb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sente6vb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto send_cb() { return m_send_cb.bind(); }
 	auto clock_out_cb() { return m_clock_out_cb.bind(); }

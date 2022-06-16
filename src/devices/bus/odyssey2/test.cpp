@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(O2_ROM_TEST, o2_test_device, "o2_test", "Videopac Service Tes
 //  o2_test_device - constructor
 //-------------------------------------------------
 
-o2_test_device::o2_test_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+o2_test_device::o2_test_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, O2_ROM_TEST, tag, owner, clock),
 	device_o2_cart_interface(mconfig, *this),
 	m_digit_out(*this, "tc_digit")

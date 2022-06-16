@@ -24,7 +24,7 @@ class mm1_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	mm1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto kbst_wr_callback() { return m_write_kbst.bind(); }
 

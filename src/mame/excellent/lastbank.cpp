@@ -423,9 +423,9 @@ void lastbank_state::lastbank(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch1");
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
+	OKIM6295(config, m_oki, XTAL::u(1000000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	ES8712(config, m_essnd, 0);
+	ES8712(config, m_essnd);
 	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
 	m_essnd->set_msm_tag("msm");
 

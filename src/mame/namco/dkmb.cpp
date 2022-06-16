@@ -121,10 +121,10 @@ INPUT_PORTS_END
 
 void dkmb_state::dkmb(machine_config &config)
 {
-	PPC603R(config, m_maincpu, 75'000'000); // Actually MPC603RRX266LC
+	PPC603R(config, m_maincpu, XTAL::u(75'000'000)); // Actually MPC603RRX266LC
 	m_maincpu->set_addrmap(AS_PROGRAM, &dkmb_state::main_map);
 
-	PIC16C56(config, "pic", 4'000'000);  // Actually PIC12C508, clock not verified
+	PIC16C56(config, "pic", XTAL::u(4'000'000));  // Actually PIC12C508, clock not verified
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));  // wrong
 	screen.set_refresh_hz(60);

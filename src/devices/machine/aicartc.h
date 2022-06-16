@@ -18,7 +18,7 @@ class aicartc_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	aicartc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	aicartc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// I/O operations
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

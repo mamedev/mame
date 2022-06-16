@@ -352,7 +352,7 @@ void meritum_state::meritum1(machine_config &config)
 
 	INPUT_MERGER_ALL_HIGH(config, "nmigate").output_handler().set("mainpit", FUNC(pit8253_device::write_gate2)).invert();
 
-	pit8253_device &pit(PIT8253(config, "mainpit", 0));
+	pit8253_device &pit(PIT8253(config, "mainpit"));
 	pit.set_clk<0>(10_MHz_XTAL / 5); // 2 MHz
 	pit.set_clk<1>(10_MHz_XTAL / 10); // 1 MHz
 	pit.set_clk<2>(10_MHz_XTAL / 4); // same as CPU clock
@@ -374,7 +374,7 @@ void meritum_state::meritum1(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	PIT8253(config, "audiopit", 0); // optional audio interface
+	PIT8253(config, "audiopit"); // optional audio interface
 
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -405,7 +405,7 @@ void meritum_state::meritum2(machine_config &config)
 	meritum1(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &meritum_state::mem_map2);
 	m_maincpu->set_addrmap(AS_IO, &meritum_state::io_map2);
-	I8255(config, "flopppi", 0); // floppy disk interface
+	I8255(config, "flopppi"); // floppy disk interface
 	m_screen->set_screen_update(FUNC(meritum_state::screen_update_meritum2));
 	SOFTWARE_LIST(config.replace(), "quik_list").set_original("trs80_quik").set_filter("M2");
 }

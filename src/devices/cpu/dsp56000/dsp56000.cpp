@@ -24,7 +24,7 @@
 DEFINE_DEVICE_TYPE(DSP56000, dsp56000_device, "dsp56000", "Motorola DSP56000")
 DEFINE_DEVICE_TYPE(DSP56001, dsp56001_device, "dsp56001", "Motorola DSP56001")
 
-dsp56000_device_base::dsp56000_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+dsp56000_device_base::dsp56000_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_p_config("p", ENDIANNESS_BIG, 32, 16, -2)
 	, m_x_config("x", ENDIANNESS_BIG, 32, 16, -2)
@@ -33,12 +33,12 @@ dsp56000_device_base::dsp56000_device_base(machine_config const &mconfig, device
 {
 }
 
-dsp56000_device::dsp56000_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+dsp56000_device::dsp56000_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: dsp56000_device_base(mconfig, DSP56000, tag, owner, clock)
 {
 }
 
-dsp56001_device::dsp56001_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+dsp56001_device::dsp56001_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: dsp56000_device_base(mconfig, DSP56001, tag, owner, clock)
 {
 }

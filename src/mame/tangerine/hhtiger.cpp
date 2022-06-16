@@ -539,7 +539,7 @@ void hhtiger_state::hhtiger(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

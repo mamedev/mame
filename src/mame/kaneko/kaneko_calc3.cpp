@@ -31,7 +31,7 @@
 
 DEFINE_DEVICE_TYPE(KANEKO_CALC3, kaneko_calc3_device, "kaneko_calc3", "Kaneko CALC3 MCU")
 
-kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KANEKO_CALC3, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_eeprom(*this, finder_base::DUMMY_TAG)

@@ -180,7 +180,7 @@ void ch2001_state::ch2001(machine_config &config)
 	Z80(config, m_maincpu, 8_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ch2001_state::main_map);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 568)); // 555 timer (20nF, 100K+33K, 1K2), measured 568Hz
+	auto &irq_clock(CLOCK(config, "irq_clock", XTAL::u(568))); // 555 timer (20nF, 100K+33K, 1K2), measured 568Hz
 	irq_clock.set_pulse_width(attotime::from_nsec(16600)); // active for 16.6us
 	irq_clock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 

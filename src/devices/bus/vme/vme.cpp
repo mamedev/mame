@@ -101,12 +101,12 @@ DEFINE_DEVICE_TYPE(VME_SLOT, vme_slot_device, "vme_slot", "VME slot")
 //-------------------------------------------------
 //  vme_slot_device - constructor
 //-------------------------------------------------
-vme_slot_device::vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_slot_device::vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vme_slot_device(mconfig, VME_SLOT, tag, owner, clock)
 {
 }
 
-vme_slot_device::vme_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vme_slot_device::vme_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_vme(*this, finder_base::DUMMY_TAG)
@@ -203,12 +203,12 @@ void vme_device::use_owner_spaces()
 	m_allocspaces = false;
 }
 
-vme_device::vme_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_device::vme_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vme_device(mconfig, VME, tag, owner, clock)
 {
 }
 
-vme_device::vme_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vme_device::vme_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_a32_config("a32", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor())

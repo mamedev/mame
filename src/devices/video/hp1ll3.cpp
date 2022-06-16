@@ -280,7 +280,7 @@ DEFINE_DEVICE_TYPE(HP1LL3, hp1ll3_device, "hp1ll3", "Hewlett-Packard 1LL3-0005 G
 //  hp1ll3_device - constructor
 //-------------------------------------------------
 
-hp1ll3_device::hp1ll3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp1ll3_device::hp1ll3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HP1LL3, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_vram_size(16)

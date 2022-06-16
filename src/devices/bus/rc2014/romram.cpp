@@ -21,7 +21,7 @@ class rom_ram_512k_device : public device_t, public device_rc2014_card_interface
 {
 public:
 	// construction/destruction
-	rom_ram_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rom_ram_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -43,7 +43,7 @@ private:
 	required_device<sst_39sf040_device> m_flash;
 };
 
-rom_ram_512k_device::rom_ram_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rom_ram_512k_device::rom_ram_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RC2014_ROM_RAM_512, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_page_reg{0,0,0,0}
@@ -163,7 +163,7 @@ class sc119_device : public device_t, public device_rc2014_rc80_card_interface
 {
 public:
 	// construction/destruction
-	sc119_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sc119_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -176,7 +176,7 @@ private:
 	required_device<sst_39sf040_device> m_flash;
 };
 
-sc119_device::sc119_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sc119_device::sc119_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RC2014_SC119, tag, owner, clock)
 	, device_rc2014_rc80_card_interface(mconfig, *this)
 	, m_ram(nullptr)

@@ -103,7 +103,7 @@ class electron_expansion_slot_device : public device_t, public device_single_car
 public:
 	// construction/destruction
 	template <typename T>
-	electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: electron_expansion_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -111,7 +111,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto irq_handler() { return m_irq_handler.bind(); }

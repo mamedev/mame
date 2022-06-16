@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(NICHISND, nichisnd_device, "nichisnd", "Nichibutsu Sound Devi
 //  nichisnd_device - constructor
 //-------------------------------------------------
 
-nichisnd_device::nichisnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nichisnd_device::nichisnd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NICHISND, tag, owner, clock),
 	m_soundlatch(*this, "soundlatch"),
 	m_sound_rom(*this, "audiorom"),
@@ -81,7 +81,7 @@ static const z80_daisy_config daisy_chain[] =
 
 void nichisnd_device::device_add_mconfig(machine_config &config)
 {
-	tmpz84c011_device& audiocpu(TMPZ84C011(config, "audiocpu", 8000000)); /* TMPZ84C011, 8.00 MHz */
+	tmpz84c011_device& audiocpu(TMPZ84C011(config, "audiocpu", XTAL::u(8000000))); /* TMPZ84C011, 8.00 MHz */
 	audiocpu.set_daisy_config(daisy_chain);
 	audiocpu.set_addrmap(AS_PROGRAM, &nichisnd_device::nichisnd_map);
 	audiocpu.set_addrmap(AS_IO, &nichisnd_device::nichisnd_io_map);
@@ -97,10 +97,10 @@ void nichisnd_device::device_add_mconfig(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3812(config, "ymsnd", 4000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	YM3812(config, "ymsnd", XTAL::u(4000000)).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.37); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.37); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 0.37); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 0.37); // unknown DAC
 }
 
 

@@ -1058,7 +1058,7 @@ void kingdrby_state::cowrace(machine_config &config)
 	m_gfxdecode->set_info(gfx_cowrace);
 	m_palette->set_init(FUNC(kingdrby_state::kingdrby_palette));
 
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80); // clock frequency & pin 7 not verified
 
 	ym2203_device &aysnd(YM2203(config.replace(), "aysnd", 3000000));
 	aysnd.port_a_read_callback().set(FUNC(kingdrby_state::sound_cmd_r));

@@ -18,13 +18,13 @@ class k033906_device :  public device_t
 public:
 	// construction/destruction
 	template <typename T>
-	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&voodoo_tag)
-		: k033906_device(mconfig, tag, owner, clock)
+	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&voodoo_tag)
+		: k033906_device(mconfig, tag, owner)
 	{
 		m_voodoo.set_tag(std::forward<T>(voodoo_tag));
 	}
 
-	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	u32 read(offs_t offset);
 	void write(offs_t offset, u32 data);

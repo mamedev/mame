@@ -26,7 +26,7 @@ class wafadrive_image_device : public microtape_image_device
 {
 public:
 	// construction/destruction
-	wafadrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	wafadrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~wafadrive_image_device();
 
 	// image-level overrides

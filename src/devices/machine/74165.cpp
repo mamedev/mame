@@ -36,7 +36,7 @@ void ttl165_device::device_add_mconfig(machine_config &config)
 //  ttl153_device - constructor
 //-------------------------------------------------
 
-ttl165_device::ttl165_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ttl165_device::ttl165_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TTL165, tag, owner, clock),
 	m_timer(*this, "timer"),
 	m_data_cb(*this), m_qh_cb(*this),

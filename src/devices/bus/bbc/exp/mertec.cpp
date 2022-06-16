@@ -79,7 +79,7 @@ void bbc_mertec_device::device_add_mconfig(machine_config &config)
 //  bbc_mertec_device - constructor
 //-------------------------------------------------
 
-bbc_mertec_device::bbc_mertec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_mertec_device::bbc_mertec_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_MERTEC, tag, owner, clock)
 	, device_bbc_exp_interface(mconfig, *this)
 	, m_pia(*this, "pia")

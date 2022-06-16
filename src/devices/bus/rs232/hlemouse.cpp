@@ -343,7 +343,7 @@ void hle_msft_mouse_device::transmit_extensions(uint8_t btn_val, uint8_t btn_sen
 //  Logitech 3-button mouse
 //**************************************************
 
-hle_logitech_mouse_device::hle_logitech_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+hle_logitech_mouse_device::hle_logitech_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: hle_msmouse_device_base(mconfig, LOGITECH_HLE_SERIAL_MOUSE, tag, owner, clock)
 {
 }

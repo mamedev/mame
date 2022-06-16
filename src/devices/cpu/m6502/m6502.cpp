@@ -15,17 +15,17 @@
 DEFINE_DEVICE_TYPE(M6502, m6502_device, "m6502", "MOS Technology 6502")
 DEFINE_DEVICE_TYPE(M6512, m6512_device, "m6512", "MOS Technology 6512")
 
-m6502_device::m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m6502_device::m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m6502_device(mconfig, M6502, tag, owner, clock)
 {
 }
 
-m6512_device::m6512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m6512_device::m6512_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m6502_device(mconfig, M6512, tag, owner, clock)
 {
 }
 
-m6502_device::m6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+m6502_device::m6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	sync_w(*this),
 	program_config("program", ENDIANNESS_LITTLE, 8, 16),
@@ -565,7 +565,7 @@ void m6502_device::mi_default14::write(uint16_t adr, uint8_t val)
 	program14.write_byte(adr, val);
 }
 
-m6502_mcu_device::m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+m6502_mcu_device::m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	m6502_device(mconfig, type, tag, owner, clock)
 {
 }

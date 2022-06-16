@@ -34,7 +34,7 @@ class microdrive_image_device : public microtape_image_device
 {
 public:
 	// construction/destruction
-	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~microdrive_image_device();
 
 	auto comms_out_wr_callback() { return m_write_comms_out.bind(); }

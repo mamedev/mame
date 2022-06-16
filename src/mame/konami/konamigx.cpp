@@ -506,7 +506,7 @@ void konamigx_state::eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void konamigx_state::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// TODO: derive from reported PCB XTALs
-	const uint32_t pixclock[4] = { 6'000'000, 8'000'000, 12'000'000, 16'000'000 };
+	const XTAL pixclock[4] = { XTAL::u(6'000'000), XTAL::u(8'000'000), XTAL::u(12'000'000), XTAL::u(16'000'000) };
 	//logerror("write %x to control register (mask=%x)\n", data, mem_mask);
 
 	// known controls:
@@ -1682,7 +1682,7 @@ void konamigx_state::konamigx(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
+	m_screen->set_raw(XTAL::u(8000000), 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
 	/* These parameters are actual value written to the CCU.
 	tbyahhoo attract mode desync is caused by another matter. */
 
@@ -1696,18 +1696,18 @@ void konamigx_state::konamigx(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(konamigx_state::type2_tile_callback));
 	m_k056832->set_config(K056832_BPP_5, 0, 0);
 	m_k056832->set_palette(m_palette);
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
-	K054338(config, m_k054338, 0, m_k055555);
+	K054338(config, m_k054338, m_k055555);
 	m_k054338->set_screen(m_screen);
 	m_k054338->set_alpha_invert(1);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(konamigx_state::type2_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX, -26, -23);
 	m_k055673->set_screen(m_screen);
@@ -1821,7 +1821,7 @@ void konamigx_state::opengolf(machine_config &config)
 {
 	konamigx(config);
 
-	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
+	m_screen->set_raw(XTAL::u(8000000), 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
 	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_opengolf);
@@ -1839,7 +1839,7 @@ void konamigx_state::opengolf(machine_config &config)
 void konamigx_state::racinfrc(machine_config &config)
 {
 	konamigx(config);
-	//m_screen->set_raw(6000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
+	//m_screen->set_raw(XTAL::u(6000000), 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
 	//m_screen->set_visarea(32, 32+384-1, 16, 16+224-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_racinfrc);
@@ -1854,7 +1854,7 @@ void konamigx_state::racinfrc(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::racinfrc_map);
 
-	adc0834_device &adc(ADC0834(config, "adc0834", 0));
+	adc0834_device &adc(ADC0834(config, "adc0834"));
 	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
 }
 
@@ -1889,7 +1889,7 @@ void konamigx_state::gxtype3(machine_config &config)
 
 	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
 	screen2.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
-	screen2.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
+	screen2.set_raw(XTAL::u(6000000), 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
 	screen2.set_size(1024, 1024);
 	screen2.set_visarea(0, 576-1, 16, 32*8-1-16);
 	screen2.set_screen_update(FUNC(konamigx_state::screen_update_konamigx_right));
@@ -1911,7 +1911,7 @@ void konamigx_state::gxtype4(machine_config &config)
 
 	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
 	screen2.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
-	screen2.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
+	screen2.set_raw(XTAL::u(6000000), 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
 	screen2.set_size(1024, 1024);
 	screen2.set_visarea(0, 384-1, 16, 32*8-1-16);
 	screen2.set_screen_update(FUNC(konamigx_state::screen_update_konamigx_right));

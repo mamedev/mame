@@ -47,7 +47,7 @@ void bbc_beebopl_device::device_add_mconfig(machine_config &config)
 //  bbc_beebopl_device - constructor
 //-------------------------------------------------
 
-bbc_beebopl_device::bbc_beebopl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_beebopl_device::bbc_beebopl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_BEEBOPL, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_1mhzbus(*this, "1mhzbus")

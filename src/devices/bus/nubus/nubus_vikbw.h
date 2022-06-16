@@ -19,10 +19,10 @@ class nubus_vikbw_device :
 {
 public:
 	// construction/destruction
-	nubus_vikbw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_vikbw_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	nubus_vikbw_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nubus_vikbw_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

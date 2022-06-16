@@ -86,7 +86,7 @@ WRITE_LINE_MEMBER( sandy_super_disk_device::busy_w )
 
 void sandy_super_disk_device::device_add_mconfig(machine_config &config)
 {
-	WD1772(config, m_fdc, 8000000);
+	WD1772(config, m_fdc, XTAL::u(8000000));
 	FLOPPY_CONNECTOR(config, m_floppy0, sandy_super_disk_floppies, "35dd", sandy_super_disk_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy1, sandy_super_disk_floppies, nullptr, sandy_super_disk_device::floppy_formats);
 
@@ -106,7 +106,7 @@ void sandy_super_disk_device::device_add_mconfig(machine_config &config)
 //  sandy_super_disk_device - constructor
 //-------------------------------------------------
 
-sandy_super_disk_device::sandy_super_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sandy_super_disk_device::sandy_super_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SANDY_SUPER_DISK, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1772_TAG),

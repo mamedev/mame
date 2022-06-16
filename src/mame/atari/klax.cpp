@@ -214,7 +214,7 @@ void klax_state::klax_base(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 32);
 	m_playfield_tilemap->set_info_callback(FUNC(klax_state::get_playfield_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, klax_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, klax_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -265,12 +265,12 @@ void klax_bootleg_state::klax5bl(machine_config &config)
 	m_mob->set_origin(8, 7); // sprites are offset in bootlegs
 	m_gfxdecode->set_info(gfx_klax5bl);
 
-	MSM5205(config, m_msm[0], 384000); // clock speed / prescaler not verified
+	MSM5205(config, m_msm[0], XTAL::u(384000)); // clock speed / prescaler not verified
 	m_msm[0]->vck_callback().set(FUNC(klax_bootleg_state::m5205_int1));
 	m_msm[0]->set_prescaler_selector(msm5205_device::S64_4B); /* ? */
 	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MSM5205(config, m_msm[1], 384000);
+	MSM5205(config, m_msm[1], XTAL::u(384000));
 	m_msm[1]->set_prescaler_selector(msm5205_device::S64_4B);
 	m_msm[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
 }

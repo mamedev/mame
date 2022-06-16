@@ -861,8 +861,8 @@ void segag80r_state::astrob(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	ASTRO_BLASTER_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speech", 1.0);
-	SEGA_SPEECH_BOARD(config, "speech", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	ASTRO_BLASTER_AUDIO(config, m_g80_audio).add_route(ALL_OUTPUTS, "speech", 1.0);
+	SEGA_SPEECH_BOARD(config, "speech").add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -916,7 +916,7 @@ void segag80r_state::monsterb(machine_config &config)
 	m_palette->set_entries(64 + 64);
 
 	/* sound boards */
-	MONSTERB_SOUND(config, m_soundbrd, 0);
+	MONSTERB_SOUND(config, m_soundbrd);
 }
 
 void segag80r_state::monster2(machine_config &config)

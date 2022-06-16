@@ -619,17 +619,17 @@ void vendetta_state::vendetta(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_tile_callback(FUNC(vendetta_state::vendetta_tile_callback));
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246);
 	m_k053246->set_sprite_callback(FUNC(vendetta_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, 6);
 	m_k053246->set_palette(m_palette);
 
-	K053251(config, m_k053251, 0);
-	K054000(config, m_k054000, 0);
+	K053251(config, m_k053251);
+	K054000(config, m_k054000);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -656,13 +656,13 @@ void vendetta_state::esckids(machine_config &config)
 	config.device_remove("k054000");
 	config.device_remove("k052109");
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_tile_callback(FUNC(vendetta_state::esckids_tile_callback));
 
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 101, 6);
 
-	K053252(config, "k053252", 6000000).set_offsets(12*8, 1*8);
+	K053252(config, "k053252", XTAL::u(6000000)).set_offsets(12*8, 1*8);
 }
 
 

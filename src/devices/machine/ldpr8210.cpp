@@ -168,12 +168,12 @@ ROM_END
 //  pioneer_pr8210_device - constructor
 //-------------------------------------------------
 
-pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pioneer_pr8210_device(mconfig, PIONEER_PR8210, tag, owner, clock)
 {
 }
 
-pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: laserdisc_device(mconfig, type, tag, owner, clock),
 		m_audio1(*this, "pr8210_audio1"),
 		m_audio2(*this, "pr8210_audio2"),
@@ -884,7 +884,7 @@ ROM_END
 // simutrek_special_device - constructor
 //-------------------------------------------------
 
-simutrek_special_device::simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+simutrek_special_device::simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pioneer_pr8210_device(mconfig, SIMUTREK_SPECIAL, tag, owner, clock),
 		m_i8748_cpu(*this, "simutrek"),
 		m_audio_squelch(0),

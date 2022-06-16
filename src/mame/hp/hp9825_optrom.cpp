@@ -39,12 +39,7 @@ constexpr std::array<struct optrom_region , 8> region_tab =
 // +--------------------+
 // |hp9825_optrom_device|
 // +--------------------+
-hp9825_optrom_device::hp9825_optrom_device(machine_config const &mconfig, char const *tag, device_t *owner)
-	: hp9825_optrom_device(mconfig, tag, owner, (uint32_t)0)
-{
-}
-
-hp9825_optrom_device::hp9825_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp9825_optrom_device::hp9825_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HP9825_OPTROM, tag, owner, clock)
 	, device_rom_image_interface(mconfig, *this)
 	, m_rom_limit(0xffffU)

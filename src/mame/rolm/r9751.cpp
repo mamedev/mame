@@ -968,7 +968,7 @@ void r9751_state::scsi_devices(device_slot_interface &device)
 
 void r9751_state::wd33c93(device_t *device)
 {
-	device->set_clock(10000000);
+	device->set_clock(XTAL::u(10000000));
 	//  downcast<wd33c93a_device *>(device)->irq_cb().set(*this, FUNC(r9751_state::scsi_irq_w));
 	//  downcast<wd33c93a_device *>(device)->drq_cb().set(*this, FUNC(r9751_state::scsi_drq_w));
 }
@@ -976,21 +976,21 @@ void r9751_state::wd33c93(device_t *device)
 void r9751_state::r9751(machine_config &config)
 {
 	/* basic machine hardware */
-	M68030(config, m_maincpu, 20000000);
+	M68030(config, m_maincpu, XTAL::u(20000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &r9751_state::r9751_mem);
 	config.set_maximum_quantum(attotime::from_hz(1000));
 
 	/* i/o hardware */
-	SMIOC(config, m_smioc, 0);
+	SMIOC(config, m_smioc);
 	m_smioc->m68k_r_callback().set(FUNC(r9751_state::smioc_dma_r));
 	m_smioc->m68k_w_callback().set(FUNC(r9751_state::smioc_dma_w));
 
 	/* disk hardware */
-	PDC(config, m_pdc, 0);
+	PDC(config, m_pdc);
 	m_pdc->m68k_r_callback().set(FUNC(r9751_state::pdc_dma_r));
 	m_pdc->m68k_w_callback().set(FUNC(r9751_state::pdc_dma_w));
 
-	NSCSI_BUS(config, "scsi", 0);
+	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);

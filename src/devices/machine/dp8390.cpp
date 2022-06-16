@@ -9,17 +9,17 @@
 DEFINE_DEVICE_TYPE(DP8390D,  dp8390d_device,  "dp8390d",  "DP8390D NIC")
 DEFINE_DEVICE_TYPE(RTL8019A, rtl8019a_device, "rtl8019a", "RTL8019A Ethernet Controller")
 
-dp8390d_device::dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dp8390d_device::dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dp8390_device(mconfig, DP8390D, tag, owner, clock, TYPE::DP8390D, 10.0f)
 {
 }
 
-rtl8019a_device::rtl8019a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rtl8019a_device::rtl8019a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dp8390_device(mconfig, RTL8019A, tag, owner, clock, TYPE::RTL8019A, 10.0f)
 {
 }
 
-dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, TYPE variant, u32 bandwidth)
+dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, TYPE variant, u32 bandwidth)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_network_interface(mconfig, *this, bandwidth)
 	, m_variant(variant)

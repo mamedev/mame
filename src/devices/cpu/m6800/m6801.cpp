@@ -309,12 +309,12 @@ DEFINE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device, "hd6303r", "Hitachi HD6303R")
 DEFINE_DEVICE_TYPE(HD6303X, hd6303x_cpu_device, "hd6303x", "Hitachi HD6303X")
 DEFINE_DEVICE_TYPE(HD6303Y, hd6303y_cpu_device, "hd6303y", "Hitachi HD6303Y")
 
-m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m6801_cpu_device(mconfig, M6801, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor())
 {
 }
 
-m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal)
+m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal)
 	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, internal)
 	, m_in_port_func(*this)
 	, m_out_port_func(*this)
@@ -324,37 +324,37 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type ty
 {
 }
 
-m6803_cpu_device::m6803_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m6803_cpu_device::m6803_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m6801_cpu_device(mconfig, M6803, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(m6803_cpu_device::m6803_mem), this))
 {
 }
 
-m6803e_cpu_device::m6803e_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m6803e_cpu_device::m6803e_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m6801_cpu_device(mconfig, M6803E, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(m6803e_cpu_device::m6803_mem), this))
 {
 }
 
-hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: m6801_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701)
 {
 }
 
-hd6301v1_cpu_device::hd6301v1_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd6301v1_cpu_device::hd6301v1_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hd6301_cpu_device(mconfig, HD6301V1, tag, owner, clock)
 {
 }
 
-hd63701v0_cpu_device::hd63701v0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd63701v0_cpu_device::hd63701v0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hd6301_cpu_device(mconfig, HD63701V0, tag, owner, clock)
 {
 }
 
-hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hd6301_cpu_device(mconfig, HD6303R, tag, owner, clock)
 {
 }
 
-hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: hd6301_cpu_device(mconfig, type, tag, owner, clock)
 	, m_in_portx_func(*this)
 	, m_out_portx_func(*this)
@@ -362,37 +362,37 @@ hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_typ
 	m_sclk_divider = 16;
 }
 
-hd6301x0_cpu_device::hd6301x0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd6301x0_cpu_device::hd6301x0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hd6301x_cpu_device(mconfig, HD6301X0, tag, owner, clock)
 {
 }
 
-hd63701x0_cpu_device::hd63701x0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd63701x0_cpu_device::hd63701x0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hd6301x_cpu_device(mconfig, HD63701X0, tag, owner, clock)
 {
 }
 
-hd6303x_cpu_device::hd6303x_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd6303x_cpu_device::hd6303x_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hd6301x_cpu_device(mconfig, HD6303X, tag, owner, clock)
 {
 }
 
-hd6301y_cpu_device::hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+hd6301y_cpu_device::hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: hd6301x_cpu_device(mconfig, type, tag, owner, clock)
 {
 }
 
-hd6301y0_cpu_device::hd6301y0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd6301y0_cpu_device::hd6301y0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hd6301y_cpu_device(mconfig, HD6301Y0, tag, owner, clock)
 {
 }
 
-hd63701y0_cpu_device::hd63701y0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd63701y0_cpu_device::hd63701y0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hd6301y_cpu_device(mconfig, HD63701Y0, tag, owner, clock)
 {
 }
 
-hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hd6301y_cpu_device(mconfig, HD6303Y, tag, owner, clock)
 {
 }

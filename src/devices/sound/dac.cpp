@@ -65,7 +65,7 @@ stream_buffer::sample_t dac_mapper_ones_complement(u32 input, u8 bits)
 //  dac_device_base - constructor
 //-------------------------------------------------
 
-dac_device_base::dac_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
+dac_device_base::dac_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr),

@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(UPD7002, upd7002_device, "upd7002", "uPD7002 ADC")
 
-upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UPD7002, tag, owner, clock)
 	, m_status(0)
 	, m_data1(0)

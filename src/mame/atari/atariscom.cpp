@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(ATARI_SOUND_COMM, atari_sound_comm_device, "atariscom", "Atar
 //  atari_sound_comm_device - constructor
 //-------------------------------------------------
 
-atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ATARI_SOUND_COMM, tag, owner, clock)
 	, m_main_int_cb(*this)
 	, m_sound_cpu(*this, finder_base::DUMMY_TAG)

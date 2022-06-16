@@ -7,7 +7,7 @@
 
 DEFINE_DEVICE_TYPE(RF5C296, rf5c296_device, "rf5c296", "RF5C296 PC Card controller")
 
-rf5c296_device::rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rf5c296_device::rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RF5C296, tag, owner, clock)
 	, m_rf5c296_reg(0)
 	, m_pccard(*this, finder_base::DUMMY_TAG)

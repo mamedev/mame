@@ -31,7 +31,7 @@ class apricot_keyboard_hle_device : public device_t,
 {
 public:
 	// construction/destruction
-	apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// from host
 	virtual void out_w(int state) override;

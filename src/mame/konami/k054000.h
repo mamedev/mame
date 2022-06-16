@@ -9,7 +9,7 @@
 class k054000_device : public device_t
 {
 public:
-	k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~k054000_device() {}
 
 	void map(address_map &map);

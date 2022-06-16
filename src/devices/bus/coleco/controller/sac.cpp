@@ -102,7 +102,7 @@ ioport_constructor coleco_super_action_controller_device::device_input_ports() c
 //  coleco_super_action_controller_device - constructor
 //-------------------------------------------------
 
-coleco_super_action_controller_device::coleco_super_action_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+coleco_super_action_controller_device::coleco_super_action_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COLECO_SUPER_ACTION_CONTROLLER, tag, owner, clock),
 	device_colecovision_control_port_interface(mconfig, *this),
 	m_io_common0(*this, "COMMON0"),

@@ -26,12 +26,12 @@
 
 DEFINE_DEVICE_TYPE(IDE_CONTROLLER, ide_controller_device, "idectrl", "IDE Controller (16-bit)")
 
-ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ide_controller_device(mconfig, IDE_CONTROLLER, tag, owner, clock)
 {
 }
 
-ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	abstract_ata_interface_device(mconfig, type, tag, owner, clock)
 {
 }
@@ -88,12 +88,12 @@ void ide_controller_device::write_cs1(offs_t offset, uint16_t data, uint16_t mem
 
 DEFINE_DEVICE_TYPE(IDE_CONTROLLER_32, ide_controller_32_device, "idectrl32", "IDE Controller (32-bit)")
 
-ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ide_controller_32_device(mconfig, IDE_CONTROLLER_32, tag, owner, clock)
 {
 }
 
-ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	abstract_ata_interface_device(mconfig, type, tag, owner, clock)
 {
 }
@@ -220,7 +220,7 @@ void ide_controller_32_device::write_cs1(offs_t offset, uint32_t data, uint32_t 
 
 DEFINE_DEVICE_TYPE(BUS_MASTER_IDE_CONTROLLER, bus_master_ide_controller_device, "idectrl32bm", "Bus Master IDE Controller")
 
-bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ide_controller_32_device(mconfig, BUS_MASTER_IDE_CONTROLLER, tag, owner, clock),
 	m_dma_space(*this, finder_base::DUMMY_TAG, -1, 32),
 	m_dma_address(0),

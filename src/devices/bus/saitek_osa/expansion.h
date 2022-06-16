@@ -48,7 +48,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	saitekosa_expansion_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts) :
-		saitekosa_expansion_device(mconfig, tag, owner, u32(0))
+		saitekosa_expansion_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -56,7 +56,7 @@ public:
 		set_fixed(false);
 	}
 
-	saitekosa_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	saitekosa_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~saitekosa_expansion_device();
 
 	// callbacks

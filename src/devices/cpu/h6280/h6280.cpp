@@ -167,7 +167,7 @@ DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "Hudson Soft HuC6280")
 //  h6280_device - constructor
 //-------------------------------------------------
 
-h6280_device::h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+h6280_device::h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, H6280, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 21, 0, 16, 0, address_map_constructor(FUNC(h6280_device::internal_map), this))

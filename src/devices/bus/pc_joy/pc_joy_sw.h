@@ -9,7 +9,7 @@ class pc_mssw_pad_device :  public device_t,
 							public device_pc_joy_interface
 {
 public:
-	pc_mssw_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_mssw_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual uint8_t btn() override { return m_state; }

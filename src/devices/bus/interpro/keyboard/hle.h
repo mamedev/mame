@@ -25,7 +25,7 @@ public:
 
 protected:
 	// constructor/destructor
-	hle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	hle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -105,7 +105,7 @@ private:
 class hle_en_us_device : public hle_device_base
 {
 public:
-	hle_en_us_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	hle_en_us_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 

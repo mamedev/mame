@@ -20,7 +20,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	// construction/destruction
-	sbus_cgthree_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sbus_cgthree_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides

@@ -16,7 +16,7 @@
 
 DEFINE_DEVICE_TYPE(E05A03, e05a03_device, "e05a03", "Epson E05A03 Gate Array")
 
-e05a03_device::e05a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+e05a03_device::e05a03_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, E05A03, tag, owner, clock),
 	m_write_nlq_lp(*this),
 	m_write_pe_lp(*this),

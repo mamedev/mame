@@ -60,7 +60,7 @@ class ay3600_device : public device_t
 {
 public:
 	// construction/destruction
-	ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// public interface
 	uint16_t b_r();

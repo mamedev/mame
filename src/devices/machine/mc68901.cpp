@@ -345,7 +345,7 @@ void mc68901_device::gpio_output()
 //  mc68901_device - constructor
 //-------------------------------------------------
 
-mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MC68901, tag, owner, clock),
 		m_timer_clock(0),
 		m_out_irq_cb(*this),

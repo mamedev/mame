@@ -250,7 +250,7 @@ GFXDECODE_END
 void plan80_state::plan80(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 2048000);
+	I8080(config, m_maincpu, XTAL::u(2048000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &plan80_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &plan80_state::io_map);
 

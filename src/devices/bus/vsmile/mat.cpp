@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(VSMILE_MAT, vsmile_mat_device, "vsmile_mat", "V.Smile Gym Mat
 //    V.Smile gym mat
 //**************************************************************************
 
-vsmile_mat_device::vsmile_mat_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+vsmile_mat_device::vsmile_mat_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: vsmile_pad_device(mconfig, VSMILE_MAT, tag, owner, clock)
 	, m_io_joy(*this, "JOY")
 	, m_io_colors(*this, "COLORS")

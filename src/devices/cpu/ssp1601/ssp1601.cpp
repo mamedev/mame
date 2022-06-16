@@ -192,7 +192,7 @@
 DEFINE_DEVICE_TYPE(SSP1601, ssp1601_device, "ssp1601", "Samsung SSP1601")
 
 
-ssp1601_device::ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ssp1601_device::ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, SSP1601, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 4, 0)

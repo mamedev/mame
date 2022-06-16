@@ -21,7 +21,7 @@ public:
 
 	typedef device_delegate<void (uint8_t *data, int length)> out_frame_delegate;
 
-	mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto out_irq_cb()  { return m_out_irq_cb.bind(); }
 	auto out_rdsr_cb() { return m_out_rdsr_cb.bind(); }

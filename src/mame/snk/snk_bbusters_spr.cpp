@@ -23,7 +23,7 @@
 
 DEFINE_DEVICE_TYPE(SNK_BBUSTERS_SPR, snk_bbusters_spr_device, "snk_bbusters_spr", "SNK Beast Busters Sprites")
 
-snk_bbusters_spr_device::snk_bbusters_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+snk_bbusters_spr_device::snk_bbusters_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SNK_BBUSTERS_SPR, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo)
 	, m_scale_table(*this, finder_base::DUMMY_TAG)

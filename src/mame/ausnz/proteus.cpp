@@ -353,13 +353,13 @@ void proteus_state::proteus(machine_config &config)
 	m_adlc->out_irq_cb().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	PTM6840(config, m_ptm, 4_MHz_XTAL / 2);
-	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->set_external_clocks(XTAL(), XTAL(), XTAL());
 	m_ptm->o2_callback().set(FUNC(proteus_state::ptm_o2_callback));
 	m_ptm->o3_callback().set(FUNC(proteus_state::ptm_o3_callback));
 	m_ptm->irq_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* parallel port */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	//m_pia->readpb_handler().set(FUNC(proteus_state::pia_pb_r));
 	//m_pia->writepa_handler().set(FUNC(proteus_state::pia_pa_w));
 	//m_pia->writepb_handler().set(FUNC(proteus_state::pia_pb_w));
@@ -373,7 +373,7 @@ void proteus_state::proteus(machine_config &config)
 	parallel.set_output_latch(cent_data_out);
 
 	/* terminal port */
-	ACIA6850(config, m_acia[0], 0);
+	ACIA6850(config, m_acia[0]);
 	m_acia[0]->txd_handler().set("terminal", FUNC(rs232_port_device::write_txd));
 	m_acia[0]->rts_handler().set("terminal", FUNC(rs232_port_device::write_rts));
 	m_acia[0]->irq_handler().set("irqs", FUNC(input_merger_device::in_w<4>));
@@ -387,7 +387,7 @@ void proteus_state::proteus(machine_config &config)
 	acia0_clock.signal_handler().append(m_acia[0], FUNC(acia6850_device::write_rxc));
 
 	/* printer port */
-	ACIA6850(config, m_acia[1], 0);
+	ACIA6850(config, m_acia[1]);
 	m_acia[1]->txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
 	m_acia[1]->rts_handler().set("printer", FUNC(rs232_port_device::write_rts));
 	m_acia[1]->irq_handler().set("irqs", FUNC(input_merger_device::in_w<5>));
@@ -401,7 +401,7 @@ void proteus_state::proteus(machine_config &config)
 	acia1_clock.signal_handler().append(m_acia[1], FUNC(acia6850_device::write_rxc));
 
 	/* modem port */
-	ACIA6850(config, m_acia[2], 0);
+	ACIA6850(config, m_acia[2]);
 	m_acia[2]->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
 	m_acia[2]->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
 	m_acia[2]->irq_handler().set("irqs", FUNC(input_merger_device::in_w<6>));

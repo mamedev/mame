@@ -57,7 +57,7 @@ class plus4_expansion_slot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	plus4_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
+	plus4_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, T &&opts, char const *dflt)
 		: plus4_expansion_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -65,7 +65,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_wr_callback() { return m_write_irq.bind(); }
 	auto cd_rd_callback() { return m_read_dma_cd.bind(); }
@@ -81,7 +81,7 @@ public:
 	void dma_cd_w(offs_t offset, uint8_t data) { m_write_dma_cd(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( aec_w ) { m_write_aec(state); }
-	int phi2() { return clock(); }
+	XTAL phi2() { return clock(); }
 
 protected:
 	// device-level overrides

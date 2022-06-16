@@ -482,7 +482,7 @@ void flyball_state::flyball(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	NETLIST_SOUND(config, "sound_nl", 48000)
+	NETLIST_SOUND(config, "sound_nl", XTAL::u(48000))
 		.set_source(NETLIST_NAME(flyball))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 

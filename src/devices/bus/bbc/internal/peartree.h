@@ -25,10 +25,10 @@ class bbc_mr3000_device :
 {
 public:
 	// construction/destruction
-	bbc_mr3000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_mr3000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	bbc_mr3000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_mr3000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -51,7 +51,7 @@ class bbc_mr4200_device : public bbc_mr3000_device
 {
 public:
 	// construction/destruction
-	bbc_mr4200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_mr4200_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -70,10 +70,10 @@ class bbc_mr4300_device :
 {
 public:
 	// construction/destruction
-	bbc_mr4300_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_mr4300_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	bbc_mr4300_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_mr4300_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -98,7 +98,7 @@ class bbc_mr4800_device : public bbc_mr4300_device
 {
 public:
 	// construction/destruction
-	bbc_mr4800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_mr4800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

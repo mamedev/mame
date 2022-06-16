@@ -118,7 +118,7 @@ const tiny_rom_entry *acorn_vdu80_device::device_rom_region() const
 //  acorn_vdu80_device - constructor
 //-------------------------------------------------
 
-acorn_vdu80_device::acorn_vdu80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_vdu80_device::acorn_vdu80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACORN_VDU80, tag, owner, clock)
 	, device_acorn_bus_interface(mconfig, *this)
 	, m_chargen(*this, "chargen")

@@ -166,7 +166,7 @@ const uint8_t i80286_cpu_device::m_i80286_timing[] =
 
 DEFINE_DEVICE_TYPE(I80286, i80286_cpu_device, "i80286", "Intel 80286")
 
-i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8086_common_cpu_device(mconfig, I80286, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 16, 24, 0)

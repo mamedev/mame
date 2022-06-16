@@ -729,12 +729,12 @@ void limenko_state::limenko(machine_config &config)
 
 void limenko_state::spotty(machine_config &config)
 {
-	GMS30C2232(config, m_maincpu, 20000000);   /* 20 MHz, no internal multiplier */
+	GMS30C2232(config, m_maincpu, XTAL::u(20000000));   /* 20 MHz, no internal multiplier */
 	m_maincpu->set_addrmap(AS_PROGRAM, &limenko_state::spotty_map);
 	m_maincpu->set_addrmap(AS_IO, &limenko_state::spotty_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(limenko_state::irq0_line_hold));
 
-	at89c4051_device &audiocpu(AT89C4051(config, "audiocpu", 4000000));
+	at89c4051_device &audiocpu(AT89C4051(config, "audiocpu", XTAL::u(4000000)));
 	audiocpu.port_in_cb<1>().set(FUNC(limenko_state::audiocpu_p1_r));
 	audiocpu.port_out_cb<1>().set(FUNC(limenko_state::audiocpu_p1_w));
 	audiocpu.port_in_cb<3>().set(FUNC(limenko_state::audiocpu_p3_r));

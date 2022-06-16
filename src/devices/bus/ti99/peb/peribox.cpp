@@ -243,7 +243,7 @@ namespace bus::ti99::peb {
 /*
     Constructor called from subclasses.
 */
-peribox_device::peribox_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
+peribox_device::peribox_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock):
 	bus::ti99::internal::ioport_attached_device(mconfig, type, tag, owner, clock),
 	m_slot1_inta(*this),
 	m_slot1_intb(*this),
@@ -268,7 +268,7 @@ peribox_device::peribox_device(const machine_config &mconfig, device_type type, 
 	for (int i=2; i <= 8; i++) m_slot[i] = nullptr;
 }
 
-peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: peribox_device(mconfig, TI99_PERIBOX, tag, owner, clock)
 {
 	// The address prefix represents a set of pull-up resistors for the
@@ -522,7 +522,7 @@ void peribox_device::device_add_mconfig(machine_config &config)
     A variant of the box used for the TI-99/4A with EVPC.
 *****************************************************************************/
 
-peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: peribox_device(mconfig, TI99_PERIBOX_EV, tag, owner, clock)
 {
 	m_address_prefix = 0x70000;
@@ -569,7 +569,7 @@ void peribox_ev_device::device_add_mconfig(machine_config &config)
     A variant of the box used for the Geneve.
 *****************************************************************************/
 
-peribox_gen_device::peribox_gen_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
+peribox_gen_device::peribox_gen_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock):
 	peribox_device(mconfig, type, tag, owner, clock)
 {
 	// The Geneve sits in slot 1; there is no prefix here - it can control
@@ -578,12 +578,12 @@ peribox_gen_device::peribox_gen_device(const machine_config &mconfig, device_typ
 	m_address_prefix = 0x00000;
 }
 
-peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: peribox_gen_device(mconfig, TI99_PERIBOX_GEN, tag, owner, clock)
 {
 }
 
-peribox_genmod_device::peribox_genmod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+peribox_genmod_device::peribox_genmod_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: peribox_gen_device(mconfig, TI99_PERIBOX_GENMOD, tag, owner, clock)
 {
 }
@@ -638,7 +638,7 @@ void peribox_genmod_device::device_add_mconfig(machine_config &config)
     A variant of the box used for the SGCPU (aka TI-99/4P).
 *****************************************************************************/
 
-peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 : peribox_device(mconfig, TI99_PERIBOX_SG, tag, owner, clock)
 {
 	// The SGCPU card contains pull-up registers for the AMA/AMB/AMC lines
@@ -685,7 +685,7 @@ void peribox_sg_device::device_add_mconfig(machine_config &config)
     Implementation of a slot within the box.
 ****************************************************************************/
 
-peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_PERIBOX_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_ti99_peribox_card_interface>(mconfig, *this),
 	m_card(nullptr),

@@ -44,7 +44,7 @@ class mb87013_device : public device_t
 {
 public:
 	// device type constructor
-	mb87013_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mb87013_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 

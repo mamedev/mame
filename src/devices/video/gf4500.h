@@ -17,7 +17,7 @@
 class gf4500_device : public device_t
 {
 public:
-	gf4500_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gf4500_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 
 	uint32_t read(offs_t offset);

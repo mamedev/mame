@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(SGI_HPC1, hpc1_device, "hpc1", "SGI HPC1")
 /*static*/ const XTAL hpc1_device::SCC_RXB_CLK = 3.6864_MHz_XTAL; // Needs verification
 /*static*/ const XTAL hpc1_device::SCC_TXB_CLK = XTAL(0);
 
-hpc1_device::hpc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hpc1_device::hpc1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SGI_HPC1, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_eeprom(*this, finder_base::DUMMY_TAG)
@@ -129,7 +129,7 @@ void hpc1_device::scsi_devices(device_slot_interface &device)
 
 void hpc1_device::wd33c93(device_t *device)
 {
-	device->set_clock(10000000);
+	device->set_clock(XTAL::u(10000000));
 	downcast<wd33c93_device *>(device)->irq_cb().set(*this, FUNC(hpc1_device::scsi_irq));
 	downcast<wd33c93_device *>(device)->drq_cb().set(*this, FUNC(hpc1_device::scsi_drq));
 }
@@ -137,12 +137,12 @@ void hpc1_device::wd33c93(device_t *device)
 void hpc1_device::device_add_mconfig(machine_config &config)
 {
 	SCC85C30(config, m_scc[0], SCC_PCLK);
-	m_scc[0]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
+	m_scc[0]->configure_channels(SCC_RXA_CLK, SCC_TXA_CLK, SCC_RXB_CLK, SCC_TXB_CLK);
 	m_scc[0]->out_int_callback().set(FUNC(hpc1_device::duart0_int_w));
 	m_scc[0]->out_txda_callback().set("keyboard", FUNC(sgi_keyboard_port_device::write_txd));
 
 	SCC85C30(config, m_scc[1], SCC_PCLK);
-	m_scc[1]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
+	m_scc[1]->configure_channels(SCC_RXA_CLK, SCC_TXA_CLK, SCC_RXB_CLK, SCC_TXB_CLK);
 	m_scc[1]->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc[1]->out_dtra_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_scc[1]->out_rtsa_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_rts));
@@ -152,7 +152,7 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 	m_scc[1]->out_int_callback().set(FUNC(hpc1_device::duart1_int_w));
 
 	SCC85C30(config, m_scc[2], SCC_PCLK);
-	m_scc[2]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
+	m_scc[2]->configure_channels(SCC_RXA_CLK, SCC_TXA_CLK, SCC_RXB_CLK, SCC_TXB_CLK);
 	m_scc[2]->out_int_callback().set(FUNC(hpc1_device::duart2_int_w));
 
 	SGIKBD_PORT(config, "keyboard", default_sgi_keyboard_devices, "hlekbd").rxd_handler().set(m_scc[0], FUNC(z80scc_device::rxa_w));
@@ -173,7 +173,7 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 	rs232b.dcd_handler().set(m_scc[1], FUNC(scc85c30_device::dcdb_w));
 	rs232b.rxd_handler().set(m_scc[1], FUNC(scc85c30_device::rxb_w));
 
-	NSCSI_BUS(config, "scsibus", 0);
+	NSCSI_BUS(config, "scsibus");
 	NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93)
 		.machine_config([this](device_t *device) { wd33c93(device); });
 	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk", false);
@@ -186,7 +186,7 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 
 	DP8573(config, m_rtc);
 
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(1000000);
 	m_pit->set_clk<1>(1000000);
 	m_pit->set_clk<2>(1000000);

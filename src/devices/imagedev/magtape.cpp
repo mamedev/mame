@@ -18,13 +18,13 @@
 #include "softlist_dev.h"
 
 
-magtape_image_device::magtape_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+magtape_image_device::magtape_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 {
 }
 
-microtape_image_device::microtape_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+microtape_image_device::microtape_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: magtape_image_device(mconfig, type, tag, owner, clock)
 {
 }

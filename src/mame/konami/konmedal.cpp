@@ -832,7 +832,7 @@ void konmedal_state::tsukande(machine_config &config)
 	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xRGB_444, 256);
 	//m_palette->enable_shadows();
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette(m_palette);
@@ -875,7 +875,7 @@ void konmedal_state::ddboy(machine_config &config)
 	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xRGB_444, 256);
 	//m_palette->enable_shadows();
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette(m_palette);
@@ -1015,7 +1015,7 @@ void konmedal_state::shuriboy(machine_config &config)
 //  m_palette->enable_shadows();
 //  m_palette->enable_hilights();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback));

@@ -23,7 +23,7 @@ public:
 		WS=1
 	};
 
-	tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// IRQ callback function, active low, i.e. state=0
 	auto irq_cb() { return m_irq_handler.bind(); }
@@ -65,7 +65,7 @@ public:
 	READ_LINE_MEMBER( intq_r );
 
 protected:
-	tms5220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
+	tms5220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -249,28 +249,28 @@ private:
 class tms5220c_device : public tms5220_device
 {
 public:
-	tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class cd2501e_device : public tms5220_device
 {
 public:
-	cd2501e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cd2501e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms5200_device : public tms5220_device
 {
 public:
-	tms5200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms5200_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class cd2501ecd_device : public tms5220_device
 {
 public:
-	cd2501ecd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cd2501ecd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

@@ -520,14 +520,14 @@ TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )
 
 void sliver_state::sliver(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sliver_state::sliver_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sliver_state::irq4_line_hold));
 
 	TIMER(config, "obj_actel").configure_periodic(FUNC(sliver_state::obj_irq_cb), attotime::from_hz(60)); /* unknown clock, causes "obj actel ready error" without this */
 	// irq 2 valid but not used?
 
-	I8051(config, m_audiocpu, 8000000);
+	I8051(config, m_audiocpu, XTAL::u(8000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sliver_state::soundmem_prg);
 	m_audiocpu->set_addrmap(AS_IO, &sliver_state::soundmem_io);
 	m_audiocpu->port_out_cb<1>().set(FUNC(sliver_state::oki_setbank));
@@ -540,7 +540,7 @@ void sliver_state::sliver(machine_config &config)
 	m_screen->set_screen_update(FUNC(sliver_state::screen_update));
 
 	PALETTE(config, "palette").set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &sliver_state::ramdac_map);
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -548,7 +548,7 @@ void sliver_state::sliver(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH));
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1000000), okim6295_device::PIN7_HIGH));
 	oki.set_addrmap(0, &sliver_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.6);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.6);

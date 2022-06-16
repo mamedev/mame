@@ -75,7 +75,7 @@ void cowtipping_state::cowtipping(machine_config &config)
 	MC68328(config, m_maincpu, 32.768_kHz_XTAL * 506);        // 16.580608 MHz, multiplier unknown, to be adjusted
 	m_maincpu->set_addrmap(AS_PROGRAM, &cowtipping_state::main_map);
 
-	PIC16C56(config, "pic", 4000000);  // Actually PIC12C508/P, clock not verified
+	PIC16C56(config, "pic", XTAL::u(4000000));  // Actually PIC12C508/P, clock not verified
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));  // wrong
 	screen.set_refresh_hz(60);

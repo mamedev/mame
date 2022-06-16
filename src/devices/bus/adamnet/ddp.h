@@ -29,7 +29,7 @@ class adam_digital_data_pack_device :  public device_t,
 {
 public:
 	// construction/destruction
-	adam_digital_data_pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adam_digital_data_pack_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

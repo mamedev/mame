@@ -2009,7 +2009,7 @@ MACHINE_RESET_MEMBER(tmnt_state,common)
 void tmnt_state::cuebrick(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000);    /* 8 MHz */
+	M68000(config, m_maincpu, XTAL::u(8000000));    /* 8 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::cuebrick_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::tmnt_interrupt));
 
@@ -2036,12 +2036,12 @@ void tmnt_state::cuebrick(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,cuebrick)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::cuebrick_tile_callback));
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback));
@@ -2086,12 +2086,12 @@ void tmnt_state::mia(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,mia)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::mia_tile_callback));
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback));
@@ -2149,12 +2149,12 @@ void tmnt_state::tmnt(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,tmnt)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback));
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::tmnt_sprite_callback));
@@ -2188,7 +2188,7 @@ void tmnt_state::tmntucbl(machine_config &config)
 
 	M68705R3(config, "mcu", XTAL(4'000'000)).set_disable(); // not dumped
 
-	MSM5205(config, "msm", 384'000).add_route(ALL_OUTPUTS, "mono", 0.5); // TODO: hook up, frequency unknown
+	MSM5205(config, "msm", XTAL::u(384'000)).add_route(ALL_OUTPUTS, "mono", 0.5); // TODO: hook up, frequency unknown
 
 	config.device_remove("k007232");
 }
@@ -2222,17 +2222,17 @@ void tmnt_state::punkshot(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback));
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::punkshot_sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2273,16 +2273,16 @@ void tmnt_state::lgtnfght(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback));
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2329,17 +2329,17 @@ void tmnt_state::blswhstl(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state, blswhstl)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::blswhstl_tile_callback));
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt_state::blswhstl_sprite_callback));
 
-	K053251(config, m_k053251, 0);
-	K054000(config, m_k054000, 0);
+	K053251(config, m_k053251);
+	K054000(config, m_k054000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2394,20 +2394,20 @@ void glfgreat_state::glfgreat(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(glfgreat_state,glfgreat)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(glfgreat_state::tmnt_tile_callback));
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(glfgreat_state::lgtnfght_sprite_callback));
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_wrap(1);
 	m_k053936->set_offsets(85, 0);
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2432,7 +2432,7 @@ void prmrsocr_state::prmrsocr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &prmrsocr_state::prmrsocr_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(prmrsocr_state::lgtnfght_interrupt));
 
-	Z80(config, m_audiocpu, 8000000);  /* ? */
+	Z80(config, m_audiocpu, XTAL::u(8000000));  /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &prmrsocr_state::prmrsocr_audio_map);
 	/* NMIs are generated by the 054539 */
 
@@ -2460,19 +2460,19 @@ void prmrsocr_state::prmrsocr(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(prmrsocr_state,prmrsocr)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(prmrsocr_state::tmnt_tile_callback));
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(prmrsocr_state::prmrsocr_sprite_callback));
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_offsets(85, 1);
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2493,7 +2493,7 @@ void tmnt_state::tmnt2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::tmnt2_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
 
-	Z80(config, m_audiocpu, 8000000);
+	Z80(config, m_audiocpu, XTAL::u(8000000));
 	/* 8 MHz; clock is correct, but there's 1 cycle wait for ROM/RAM access. */
 	/* Access speed of ROM/RAM used on the machine is 150ns, without the wait, they cannot run on 8MHz. */
 	/* We are not emulating the wait state, so the ROM test ends at 02 instead of 00. */
@@ -2522,16 +2522,16 @@ void tmnt_state::tmnt2(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback));
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2551,7 +2551,7 @@ void tmnt_state::ssriders(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::ssriders_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
 
-	Z80(config, m_audiocpu, 8000000);
+	Z80(config, m_audiocpu, XTAL::u(8000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::ssriders_audio_map);
 	/* NMIs are generated by the 053260 */
 
@@ -2577,16 +2577,16 @@ void tmnt_state::ssriders(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback));
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2602,7 +2602,7 @@ void tmnt_state::ssriders(machine_config &config)
 void tmnt_state::sunsetbl(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);
+	M68000(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::sunsetbl_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::irq4_line_hold));
 
@@ -2626,22 +2626,22 @@ void tmnt_state::sunsetbl(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::ssbl_tile_callback));
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -2649,7 +2649,7 @@ void tmnt_state::sunsetbl(machine_config &config)
 void tmnt_state::thndrx2(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);   /* 12 MHz */
+	M68000(config, m_maincpu, XTAL::u(12000000));   /* 12 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::thndrx2_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
 
@@ -2674,18 +2674,18 @@ void tmnt_state::thndrx2(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback));
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::thndrx2_sprite_callback));
 
-	K053251(config, m_k053251, 0);
-	K054000(config, m_k054000, 0);
+	K053251(config, m_k053251);
+	K054000(config, m_k054000);
 
 	/* sound hardware */
 	// NB: game defaults in mono

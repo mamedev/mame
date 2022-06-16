@@ -25,7 +25,7 @@ class isa8_lpt_device : public device_t,
 {
 public:
 	// construction/destruction
-	isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	bool is_primary() { return m_is_primary; }
 

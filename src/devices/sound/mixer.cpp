@@ -14,7 +14,7 @@ DEFINE_DEVICE_TYPE(MIXER, mixer_device, "mixer", "Generic Audio Mixer")
 //  mixer_device - constructor
 //-------------------------------------------------
 
-mixer_device::mixer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mixer_device::mixer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MIXER, tag, owner, clock),
 	device_mixer_interface(mconfig, *this)
 {

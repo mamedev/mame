@@ -85,7 +85,7 @@ const tiny_rom_entry *bbc_udm_device::device_rom_region() const
 //  bbc_udm_device - constructor
 //-------------------------------------------------
 
-bbc_udm_device::bbc_udm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_udm_device::bbc_udm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_UDM, tag, owner, clock)
 	, device_bbc_fdc_interface(mconfig, *this)
 	, m_fdc(*this, "wd2793")

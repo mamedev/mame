@@ -36,7 +36,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_symphony_twelve_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		coco_symphony_twelve_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 			: device_t(mconfig, COCO_SYM12, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
 			, m_pia(*this, "s12_pia")
@@ -72,7 +72,7 @@ namespace
 
 	void coco_symphony_twelve_device::device_add_mconfig(machine_config &config)
 	{
-		pia6821_device &pia(PIA6821(config, "s12_pia", 0));
+		pia6821_device &pia(PIA6821(config, "s12_pia"));
 		pia.writepa_handler().set(*this, FUNC(coco_symphony_twelve_device::write_porta));
 		pia.readpa_handler().set(*this, FUNC(coco_symphony_twelve_device::read_porta));
 		pia.writepb_handler().set(*this, FUNC(coco_symphony_twelve_device::write_portb));

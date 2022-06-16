@@ -183,7 +183,7 @@ void whouse_testcons_state::whousetc(machine_config &config)
 
 	I8155(config, "i8155", 6.144_MHz_XTAL);
 
-	I8255(config, "i8255", 0);
+	I8255(config, "i8255");
 
 	DL1416B(config, m_dsp[0], u32(0));
 	m_dsp[0]->update().set(FUNC(whouse_testcons_state::update_dsp<0>));

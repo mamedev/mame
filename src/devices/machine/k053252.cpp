@@ -65,7 +65,7 @@ TODO:
 
 DEFINE_DEVICE_TYPE(K053252, k053252_device, "k053252", "K053252 Timing/Interrupt Controller")
 
-k053252_device::k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k053252_device::k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K053252, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_int1_en_cb(*this)

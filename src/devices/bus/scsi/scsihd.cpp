@@ -12,12 +12,12 @@
 // device type definition
 DEFINE_DEVICE_TYPE(SCSIHD, scsihd_device, "scsihd", "SCSI HD")
 
-scsihd_device::scsihd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scsihd_device::scsihd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scsihd_device(mconfig, SCSIHD, tag, owner, clock)
 {
 }
 
-scsihd_device::scsihd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+scsihd_device::scsihd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	scsihle_device(mconfig, type, tag, owner, clock)
 {
 }

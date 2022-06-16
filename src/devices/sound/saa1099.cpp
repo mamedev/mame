@@ -136,7 +136,7 @@ DEFINE_DEVICE_TYPE(SAA1099, saa1099_device, "saa1099", "Philips SAA1099")
 //  saa1099_device - constructor
 //-------------------------------------------------
 
-saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SAA1099, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)

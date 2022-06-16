@@ -476,7 +476,7 @@ DEFINE_DEVICE_TYPE(ACCLAIM_RAX, acclaim_rax_device, "rax_audio", "Acclaim RAX")
 //  acclaim_rax_device - constructor
 //-------------------------------------------------
 
-acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACCLAIM_RAX, tag, owner, clock)
 	, m_cpu(*this, "adsp")
 	, m_dmadac(*this, { "dacl", "dacr" })

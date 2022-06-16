@@ -8,7 +8,7 @@
 
 DEFINE_DEVICE_TYPE(BL_HANDHELDS_MENUCONTROL, bl_handhelds_menucontrol_device, "blhandheldmenu", "BaoBaoLong Handhelds Menu Controller")
 
-bl_handhelds_menucontrol_device::bl_handhelds_menucontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bl_handhelds_menucontrol_device::bl_handhelds_menucontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, BL_HANDHELDS_MENUCONTROL, tag, owner, clock),
 	m_is_unsp_type_hack(false)
 {

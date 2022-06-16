@@ -59,7 +59,7 @@ DEVICE_INPUT_DEFAULTS_END
 void genpc_state::pcmda(machine_config &config)
 {
 	/* basic machine hardware */
-	I8088(config, m_maincpu, 4772720);
+	I8088(config, m_maincpu, XTAL::u(4772720));
 	m_maincpu->set_addrmap(AS_PROGRAM, &genpc_state::pc8_map);
 	m_maincpu->set_addrmap(AS_IO, &genpc_state::pc8_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
@@ -71,12 +71,12 @@ void genpc_state::pcmda(machine_config &config)
 	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "mda", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "com", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "hdc", false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, "adlib", false);
-	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, "mda", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa4", "mb:isa", pc_isa8_cards, "hdc", false);
+	ISA8_SLOT(config, "isa5", "mb:isa", pc_isa8_cards, "adlib", false);
+	ISA8_SLOT(config, "isa6", "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));

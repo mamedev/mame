@@ -73,12 +73,12 @@ void mie_device::device_add_mconfig(machine_config &config)
 	cpu->set_irq_acknowledge_callback(FUNC(mie_device::irq_callback));
 }
 
-mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: jvs_host(mconfig, MIE_JVS, tag, owner, clock)
 {
 }
 
-mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: maple_device(mconfig, MIE, tag, owner, clock)
 	, cpu(*this, "mie")
 	, jvs(*this, finder_base::DUMMY_TAG)

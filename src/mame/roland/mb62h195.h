@@ -21,7 +21,7 @@ class mb62h195_device : public device_t
 {
 public:
 	// device type constructor
-	mb62h195_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	mb62h195_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	auto lc_callback() { return m_lc_callback.bind(); }

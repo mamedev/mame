@@ -99,7 +99,7 @@ INPUT_PORTS_END
 void m119_state::m119(machine_config &config)
 {
 	// basic machine hardware
-	SH3LE(config, m_maincpu, 60'000'000); // HD6417708S, according to the datasheet operation frequency is 60 MHz.
+	SH3LE(config, m_maincpu, XTAL::u(60'000'000)); // HD6417708S, according to the datasheet operation frequency is 60 MHz.
 	m_maincpu->set_addrmap(AS_PROGRAM, &m119_state::program_map);
 //  m_maincpu->set_vblank_int("screen", FUNC(m119_state::irq2_line_hold));
 
@@ -117,7 +117,7 @@ void m119_state::m119(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", 16'934'400)); // internal?
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL::u(16'934'400))); // internal?
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }

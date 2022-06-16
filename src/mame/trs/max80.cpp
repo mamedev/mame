@@ -480,7 +480,7 @@ void max80_state::max80(machine_config &config)
 	m_pio->out_pa_callback().set(FUNC(max80_state::pio_pa_w));
 	m_pio->out_pb_callback().set(FUNC(max80_state::pio_pb_w));
 
-	COM8116(config, m_brg, 5'068'800);   // A few gates wired up as an oscillator. Frequency guessed.
+	COM8116(config, m_brg, XTAL::u(5'068'800));   // A few gates wired up as an oscillator. Frequency guessed.
 	m_brg->fr_handler().set(m_uart, FUNC(z80sio_device::rxca_w));
 	m_brg->ft_handler().set(m_uart, FUNC(z80sio_device::rxcb_w));
 
@@ -490,7 +490,7 @@ void max80_state::max80(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beep, XTAL::u(800)).add_route(ALL_OUTPUTS, "mono", 0.50);
 	TIMER(config, m_beep_timer).configure_generic(FUNC(max80_state::beep_timer));
 }
 

@@ -74,7 +74,7 @@ const tiny_rom_entry *tanbus_tandos_device::device_rom_region() const
 //  tanbus_tandos_device - constructor
 //-------------------------------------------------
 
-tanbus_tandos_device::tanbus_tandos_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tanbus_tandos_device::tanbus_tandos_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TANBUS_TANDOS, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
 	, m_dos_rom(*this, "dos_rom")

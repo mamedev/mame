@@ -45,7 +45,7 @@ INPUT_PORTS_END
 
 void acr20_state::acr20(machine_config &config)
 {
-	TMP96C141(config, m_maincpu, 10'000'000); // clock unknown
+	TMP96C141(config, m_maincpu, XTAL::u(10'000'000)); // clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &acr20_state::mem_map);
 }
 

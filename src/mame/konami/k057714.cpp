@@ -27,7 +27,7 @@
 
 DEFINE_DEVICE_TYPE(K057714, k057714_device, "k057714", "k057714_device GCU")
 
-k057714_device::k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k057714_device::k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K057714, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_irq(*this)

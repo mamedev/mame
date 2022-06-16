@@ -168,7 +168,7 @@ protected:
 	static constexpr unsigned ICACHE_ENTRIES = 0x400;
 	static constexpr unsigned DCACHE_ENTRIES = 0x100;
 
-	psxcpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	psxcpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -325,42 +325,42 @@ class cxd8530aq_device : public psxcpu_device
 {
 public:
 	// construction/destruction
-	cxd8530aq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8530aq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class cxd8530bq_device : public psxcpu_device
 {
 public:
 	// construction/destruction
-	cxd8530bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8530bq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class cxd8530cq_device : public psxcpu_device
 {
 public:
 	// construction/destruction
-	cxd8530cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8530cq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class cxd8661r_device : public psxcpu_device
 {
 public:
 	// construction/destruction
-	cxd8661r_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8661r_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class cxd8606bq_device : public psxcpu_device
 {
 public:
 	// construction/destruction
-	cxd8606bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8606bq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class cxd8606cq_device : public psxcpu_device
 {
 public:
 	// construction/destruction
-	cxd8606cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8606cq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition

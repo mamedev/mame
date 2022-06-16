@@ -190,18 +190,18 @@ void vta2000_state::vta2000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vta2000_state::io_map);
 	m_maincpu->in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
 
-	PIT8253(config, m_mainpit, 0);
+	PIT8253(config, m_mainpit);
 	m_mainpit->set_clk<0>(500'000);
 	m_mainpit->out_handler<0>().set(FUNC(vta2000_state::speaker_w));
 
-	pic8259_device &pic(PIC8259(config, "pic", 0));
+	pic8259_device &pic(PIC8259(config, "pic"));
 	pic.in_sp_callback().set_constant(0);
 	pic.out_int_callback().set_inputline(m_maincpu, 0);
 
 	i8251_device &usart(I8251(config, "usart", XTAL(4'000'000) / 4));
 	usart.rxrdy_handler().set("pic", FUNC(pic8259_device::ir4_w));
 
-	pit8253_device &brgpit(PIT8253(config, "brgpit", 0));
+	pit8253_device &brgpit(PIT8253(config, "brgpit"));
 	brgpit.set_clk<0>(1'228'800); // maybe
 	brgpit.set_clk<1>(1'228'800);
 	brgpit.out_handler<0>().set("usart", FUNC(i8251_device::write_rxc));

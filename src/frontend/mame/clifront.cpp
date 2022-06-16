@@ -766,7 +766,7 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 			printf("   %*s%-*s %s", depth * 2, "", 30 - depth * 2, tag, device->name());
 
 			// add more information
-			uint32_t clock = device->clock();
+			uint32_t clock = device->clock().value();
 			if (clock >= 1000000000)
 				printf(" @ %d.%02d GHz\n", clock / 1000000000, (clock / 10000000) % 100);
 			else if (clock >= 1000000)
@@ -974,7 +974,7 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 			if (included(type.shortname()))
 			{
 				// audit the ROMs in this set
-				device_t *const dev = config.device_add("_tmp", type, 0);
+				device_t *const dev = config.device_add("_tmp", type);
 				media_auditor::summary summary = auditor.audit_device(*dev, AUDIT_VALIDATE_FAST);
 
 				print_summary(
@@ -1620,7 +1620,7 @@ template <typename T> void cli_frontend::apply_device_action(const std::vector<s
 			},
 			[&action, &config] (device_type type, bool first)
 			{
-				device_t *const dev = config.device_add("_tmp", type, 0);
+				device_t *const dev = config.device_add("_tmp", type);
 				action(*dev, "device", first);
 				config.device_remove("_tmp");
 			});

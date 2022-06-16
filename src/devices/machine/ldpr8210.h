@@ -38,13 +38,13 @@ class pioneer_pr8210_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// input and output
 	void control_w(uint8_t data);
 
 protected:
-	pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -139,7 +139,7 @@ class simutrek_special_device : public pioneer_pr8210_device
 {
 public:
 	// construction/destruction
-	simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// input and output
 	void data_w(uint8_t data);

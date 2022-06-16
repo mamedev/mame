@@ -133,27 +133,27 @@ DEFINE_DEVICE_TYPE(I80188, i80188_cpu_device, "i80188", "Intel 80188")
 DEFINE_DEVICE_TYPE(AM186EM, am186em_device, "am186em", "AMD Am186EM")
 DEFINE_DEVICE_TYPE(AM188EM, am188em_device, "am188em", "AMD Am188EM")
 
-i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80186_cpu_device(mconfig, I80186, tag, owner, clock, 16)
 {
 }
 
-i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80186_cpu_device(mconfig, I80188, tag, owner, clock, 8)
 {
 }
 
-am186em_device::am186em_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+am186em_device::am186em_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80186_cpu_device(mconfig, AM186EM, tag, owner, clock, 16)
 {
 }
 
-am188em_device::am188em_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+am188em_device::am188em_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80186_cpu_device(mconfig, AM188EM, tag, owner, clock, 8)
 {
 }
 
-i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size)
+i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int data_bus_size)
 	: i8086_common_cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, data_bus_size, 20, 0)

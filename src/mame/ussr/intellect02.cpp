@@ -213,7 +213,7 @@ INPUT_PORTS_END
 void intel02_state::intel02(machine_config &config)
 {
 	// basic machine hardware
-	I8080A(config, m_maincpu, 1500000); // measured (no XTAL)
+	I8080A(config, m_maincpu, XTAL::u(1500000)); // measured (no XTAL)
 	m_maincpu->set_addrmap(AS_PROGRAM, &intel02_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &intel02_state::main_io);
 
@@ -231,7 +231,7 @@ void intel02_state::intel02(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	BEEP(config, m_beeper, 3640); // measured, from RC circuit
+	BEEP(config, m_beeper, XTAL::u(3640)); // measured, from RC circuit
 	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	// cartridge

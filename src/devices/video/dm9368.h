@@ -36,7 +36,7 @@ public:
 	auto rbo_cb() { return m_rbo_cb.bind(); }
 
 	// construction/destruction
-	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void a_w(u8 data);
 

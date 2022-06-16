@@ -66,7 +66,7 @@ public:
 	/* CONSTANT DEFINITIONS */
 
 	/* exact 1.79 MHz clock freq (of the Atari 800 that is) */
-	static constexpr unsigned FREQ_17_EXACT = 1789790;
+	static constexpr auto FREQ_17_EXACT = XTAL::u(1789790);
 
 	enum
 	{
@@ -124,7 +124,7 @@ public:
 	};
 
 	// construction/destruction
-	pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <unsigned N> auto pot_r() { return m_pot_r_cb[N].bind(); }
 	auto allpot_r() { return m_allpot_r_cb.bind(); }

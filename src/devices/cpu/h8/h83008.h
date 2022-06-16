@@ -27,7 +27,7 @@
 
 class h83008_device : public h8h_device {
 public:
-	h83008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h83008_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_mode_a20() { mode_a20 = true; }
 	void set_mode_a24() { mode_a20 = false; }

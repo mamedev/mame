@@ -21,7 +21,7 @@ in the April 1978 issue of Electronics Today International (Australia).
 
 DEFINE_DEVICE_TYPE(S100_DG640, dg640_device, "dg640", "DG640 VDU")
 
-dg640_device::dg640_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dg640_device::dg640_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S100_DG640, tag, owner, clock)
 	, device_s100_card_interface(mconfig, *this)
 	, m_p_chargen(*this, "chargen")

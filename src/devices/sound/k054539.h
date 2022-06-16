@@ -33,7 +33,7 @@ public:
 	using apan_delegate = device_delegate<void (double left, double right)>;
 
 	// construction/destruction
-	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto timer_handler() { return m_timer_handler.bind(); }

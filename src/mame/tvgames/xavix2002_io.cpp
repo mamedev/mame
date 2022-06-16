@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(XAVIX2002IO, xavix2002_io_device, "xavix2002io", "XaviX 2002 IO")
 
-xavix2002_io_device::xavix2002_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xavix2002_io_device::xavix2002_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XAVIX2002IO, tag, owner, clock)
 	, m_in0_cb(*this)
 	, m_in1_cb(*this)

@@ -71,7 +71,7 @@ public:
 		set_fixed(false);
 	}
 
-	spectrum_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	spectrum_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callbacks
 	auto irq_handler() { return m_irq_handler.bind(); }

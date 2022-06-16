@@ -33,7 +33,7 @@ BP1/BP2: backplane drivers (LCD commons)
 class pcf2100_device : public device_t
 {
 public:
-	pcf2100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pcf2100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto write_segs() { return m_write_segs.bind(); }
@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dlen_w) { m_dlen = (state) ? 1 : 0; }
 
 protected:
-	pcf2100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bpmax, u8 smax);
+	pcf2100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 bpmax, u8 smax);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -71,19 +71,19 @@ protected:
 class pcf2110_device : public pcf2100_device
 {
 public:
-	pcf2110_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pcf2110_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class pcf2111_device : public pcf2100_device
 {
 public:
-	pcf2111_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pcf2111_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class pcf2112_device : public pcf2100_device
 {
 public:
-	pcf2112_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pcf2112_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

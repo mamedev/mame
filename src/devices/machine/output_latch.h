@@ -9,7 +9,7 @@
 class output_latch_device : public device_t
 {
 public:
-	output_latch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	output_latch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <unsigned Bit> auto bit_handler() { return m_bit_handlers[Bit].bind(); }
 

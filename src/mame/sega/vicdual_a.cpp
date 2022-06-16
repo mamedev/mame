@@ -307,7 +307,7 @@ void vicdual_state::invho2_audio_w(uint8_t data)
  *
  *************************************/
 
-vicdual_audio_device_base::vicdual_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale) :
+vicdual_audio_device_base::vicdual_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_mixer_interface(mconfig, *this),
 	m_input_line(*this, "sound_nl:in_%u", 0),
@@ -319,7 +319,7 @@ vicdual_audio_device_base::vicdual_audio_device_base(const machine_config &mconf
 
 void vicdual_audio_device_base::device_add_mconfig(machine_config &config)
 {
-	NETLIST_SOUND(config, "sound_nl", 48000)
+	NETLIST_SOUND(config, "sound_nl", XTAL::u(48000))
 		.set_source(m_netlist)
 		.add_route(ALL_OUTPUTS, *this, 1.0);
 
@@ -368,7 +368,7 @@ void vicdual_audio_device_base::write(u8 value)
 
 DEFINE_DEVICE_TYPE(BORDERLINE_AUDIO, borderline_audio_device, "borderline_audio", "Borderline Sound Board")
 
-borderline_audio_device::borderline_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+borderline_audio_device::borderline_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vicdual_audio_device_base(mconfig, BORDERLINE_AUDIO, tag, owner, clock, 0xff, NETLIST_NAME(brdrline), 1.0)
 {
 }
@@ -383,7 +383,7 @@ borderline_audio_device::borderline_audio_device(const machine_config &mconfig, 
 
 DEFINE_DEVICE_TYPE(FROGS_AUDIO, frogs_audio_device, "frogs_audio", "Frogs Sound Board")
 
-frogs_audio_device::frogs_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+frogs_audio_device::frogs_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vicdual_audio_device_base(mconfig, FROGS_AUDIO, tag, owner, clock, 0xff, NETLIST_NAME(frogs), 1.0)
 {
 }

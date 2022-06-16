@@ -9,7 +9,7 @@
 
 class mga2064w_device : public pci_device {
 public:
-	mga2064w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mga2064w_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

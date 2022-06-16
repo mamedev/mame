@@ -81,7 +81,7 @@ INPUT_PORTS_END
 
 void vtech_innotab_state::vtech_innotab(machine_config& config)
 {
-	ARM9(config, m_maincpu, 240000000); // unknown ARM type
+	ARM9(config, m_maincpu, XTAL::u(240000000)); // unknown ARM type
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

@@ -35,7 +35,7 @@ public:
 	typedef device_delegate<void (timer_device &, s32)> expired_delegate;
 
 	// construction/destruction
-	timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration helpers
 	template <typename... T> void configure_generic(T &&... args)

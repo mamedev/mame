@@ -26,7 +26,7 @@ void naomi_g1_device::amap(address_map &map)
 	map(0xf8, 0xfb).r(FUNC(naomi_g1_device::sb_gdlend_r));
 }
 
-naomi_g1_device::naomi_g1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+naomi_g1_device::naomi_g1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, irq_cb(*this)
 	, ext_irq_cb(*this)

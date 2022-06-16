@@ -750,7 +750,7 @@ void segahang_state::shared_base(machine_config &config)
 	m_adc->vin_callback().set(FUNC(segahang_state::analog_r));
 
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
-	SEGAIC16_ROAD(config, m_segaic16road, 0);
+	SEGAIC16_ROAD(config, m_segaic16road);
 
 	// video hardware
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segahang);
@@ -768,7 +768,7 @@ void segahang_state::hangon_base(machine_config &config)
 {
 	shared_base(config);
 	// video hardware
-	SEGA_HANGON_SPRITES(config, m_sprites, 0);
+	SEGA_HANGON_SPRITES(config, m_sprites);
 }
 
 void segahang_state::sharrier_base(machine_config &config)
@@ -782,7 +782,7 @@ void segahang_state::sharrier_base(machine_config &config)
 	m_subcpu->set_clock(MASTER_CLOCK_10MHz);
 
 	// video hardware
-	SEGA_SHARRIER_SPRITES(config, m_sprites, 0);
+	SEGA_SHARRIER_SPRITES(config, m_sprites);
 	m_palette->set_entries(2048*2);
 }
 
@@ -911,8 +911,8 @@ void segahang_state::shangupb(machine_config &config)
 	sound_board_2151(config);
 
 	// not sure about these speeds, but at 6MHz, the road is not updated fast enough
-	m_maincpu->set_clock(10000000);
-	m_subcpu->set_clock(10000000);
+	m_maincpu->set_clock(XTAL::u(10000000));
+	m_subcpu->set_clock(XTAL::u(10000000));
 }
 
 void segahang_state::shangonro(machine_config &config)
@@ -930,7 +930,7 @@ void segahang_state::sharrier(machine_config &config)
 
 	m_maincpu->remove_vblank_int();
 
-	I8751(config, m_mcu, 8000000);
+	I8751(config, m_mcu, XTAL::u(8000000));
 	m_mcu->set_addrmap(AS_IO, &segahang_state::mcu_io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(segahang_state::i8751_p1_w));
 

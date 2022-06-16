@@ -28,14 +28,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	dmvcart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: dmvcart_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: dmvcart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~dmvcart_slot_device();
 
 	auto prog_read() { return m_prog_read_cb.bind(); }

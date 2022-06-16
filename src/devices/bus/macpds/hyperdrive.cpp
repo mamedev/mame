@@ -106,7 +106,7 @@ DEFINE_DEVICE_TYPE(PDS_HYPERDRIVE, macpds_hyperdrive_device, "pds_hyper", "GCC H
 
 void macpds_hyperdrive_device::device_add_mconfig(machine_config &config)
 {
-		WD2010(config, m_hdc, 5000000);
+		WD2010(config, m_hdc, XTAL::u(5000000));
  //       m_hdc->out_bcr_callback().set(FUNC(macpds_hyperdrive_device::clct_w));
 		m_hdc->in_bcs_callback().set(FUNC(macpds_hyperdrive_device::hdd_r));
 		m_hdc->out_bcs_callback().set(FUNC(macpds_hyperdrive_device::hdd_w));
@@ -116,7 +116,7 @@ void macpds_hyperdrive_device::device_add_mconfig(machine_config &config)
 		m_hdc->in_tk000_callback().set_constant(1);
 		m_hdc->in_sc_callback().set_constant(1);
 
-		HARDDISK(config, "hard0", 0);
+		HARDDISK(config, "hard0");
 }
 
 //-------------------------------------------------
@@ -136,12 +136,12 @@ const tiny_rom_entry *macpds_hyperdrive_device::device_rom_region() const
 //  macpds_hyperdrive_device - constructor
 //-------------------------------------------------
 
-macpds_hyperdrive_device::macpds_hyperdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+macpds_hyperdrive_device::macpds_hyperdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	macpds_hyperdrive_device(mconfig, PDS_HYPERDRIVE, tag, owner, clock)
 {
 }
 
-macpds_hyperdrive_device::macpds_hyperdrive_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+macpds_hyperdrive_device::macpds_hyperdrive_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_macpds_card_interface(mconfig, *this),
 	m_hdc(*this, "wd2010")

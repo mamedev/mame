@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(NCR5385, ncr5385_device, "ncr5385", "NCR 5385E SCSI Controller")
 
-ncr5385_device::ncr5385_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ncr5385_device::ncr5385_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NCR5385, tag, owner, clock)
 	, m_int(*this)
 {

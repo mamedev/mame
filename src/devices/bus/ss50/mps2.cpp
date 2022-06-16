@@ -24,7 +24,7 @@ class ss50_mps2_device : public device_t, public ss50_card_interface
 {
 public:
 	// construction/destruction
-	ss50_mps2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	ss50_mps2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, SS50_MPS2, tag, owner, clock)
 		, ss50_card_interface(mconfig, *this)
 		, m_acia_upper(*this, "acia_upper")
@@ -130,7 +130,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void ss50_mps2_device::device_add_mconfig(machine_config &config)
 {
-	ACIA6850(config, m_acia_upper, 0);
+	ACIA6850(config, m_acia_upper);
 	m_acia_upper->txd_handler().set("rs232_upper", FUNC(rs232_port_device::write_txd));
 	m_acia_upper->rts_handler().set("rs232_upper", FUNC(rs232_port_device::write_rts));
 	m_acia_upper->irq_handler().set("irq", FUNC(input_merger_device::in_w<0>));
@@ -141,7 +141,7 @@ void ss50_mps2_device::device_add_mconfig(machine_config &config)
 	rs232_upper.dcd_handler().set(m_acia_upper, FUNC(acia6850_device::write_dcd));
 	rs232_upper.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal_upper));
 
-	ACIA6850(config, m_acia_lower, 0);
+	ACIA6850(config, m_acia_lower);
 	m_acia_lower->txd_handler().set("rs232_lower", FUNC(rs232_port_device::write_txd));
 	m_acia_lower->rts_handler().set("rs232_lower", FUNC(rs232_port_device::write_rts));
 	m_acia_lower->irq_handler().set("irq", FUNC(input_merger_device::in_w<1>));

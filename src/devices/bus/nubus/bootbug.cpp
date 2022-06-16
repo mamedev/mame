@@ -78,12 +78,12 @@ const tiny_rom_entry *nubus_bootbug_device::device_rom_region() const
 //  nubus_bootbug_device - constructor
 //-------------------------------------------------
 
-nubus_bootbug_device::nubus_bootbug_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_bootbug_device::nubus_bootbug_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	nubus_bootbug_device(mconfig, NUBUS_BOOTBUG, tag, owner, clock)
 {
 }
 
-nubus_bootbug_device::nubus_bootbug_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_bootbug_device::nubus_bootbug_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	m_uart(*this, "uart_0")

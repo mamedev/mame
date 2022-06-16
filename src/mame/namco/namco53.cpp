@@ -127,7 +127,7 @@ ROM_END
 
 DEFINE_DEVICE_TYPE(NAMCO_53XX, namco_53xx_device, "namco53", "Namco 53xx")
 
-namco_53xx_device::namco_53xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+namco_53xx_device::namco_53xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NAMCO_53XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_portO(0),

@@ -575,7 +575,7 @@ void seicupbl_state::cupsocbl(machine_config &config)
 	screen.set_screen_update(FUNC(seicupbl_state::screen_update));
 	screen.set_palette(m_palette);
 
-	//seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	//seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
 	//crtc.layer_en_callback().set(FUNC(seicupbl_state::tilemap_enable_w));
 	//crtc.layer_scroll_callback().set(FUNC(seicupbl_state::tile_scroll_w));
 	//crtc.reg_1a_callback().set(FUNC(seicupbl_state::tile_vreg_1a_w));

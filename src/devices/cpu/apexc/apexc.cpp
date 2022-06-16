@@ -337,7 +337,7 @@ DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APE(X)C")
 #define DELAY(n)    {m_icount -= (n); m_current_word = (m_current_word + (n)) & 0x1f;}
 
 
-apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, APEXC, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 15, 0)
 	, m_tape_read_cb(*this)

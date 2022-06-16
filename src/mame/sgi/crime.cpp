@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(SGI_CRIME, crime_device, "sgicrime", "SGI CRIME")
 
-crime_device::crime_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+crime_device::crime_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SGI_CRIME, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 {

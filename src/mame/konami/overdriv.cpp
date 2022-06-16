@@ -471,26 +471,26 @@ void overdriv_state::overdriv(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246);
 	m_k053246->set_sprite_callback(FUNC(overdriv_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 77, 22);
 	m_k053246->set_palette("palette");
 
-	K051316(config, m_k051316_1, 0);
+	K051316(config, m_k051316_1);
 	m_k051316_1->set_palette("palette");
 	m_k051316_1->set_offsets(14, -1);
 	m_k051316_1->set_wrap(1);
 	m_k051316_1->set_zoom_callback(FUNC(overdriv_state::zoom_callback_1));
 
-	K051316(config, m_k051316_2, 0);
+	K051316(config, m_k051316_2);
 	m_k051316_2->set_palette("palette");
 	m_k051316_2->set_offsets(15, 1);
 	m_k051316_2->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
-	K053250(config, "k053250_1", 0, "palette", m_screen, 0, 0);
-	K053250(config, "k053250_2", 0, "palette", m_screen, 0, 0);
+	K053250(config, "k053250_1", "palette", m_screen, 0, 0);
+	K053250(config, "k053250_2", "palette", m_screen, 0, 0);
 
 	K053252(config, m_k053252, XTAL(24'000'000)/4);
 	m_k053252->set_offsets(13*8, 2*8);

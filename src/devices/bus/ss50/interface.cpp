@@ -103,7 +103,7 @@ DEFINE_DEVICE_TYPE(SS50_INTERFACE, ss50_interface_port_device, "ss50_interface",
 //  ss50_interface_port_device - construction
 //-------------------------------------------------
 
-ss50_interface_port_device::ss50_interface_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+ss50_interface_port_device::ss50_interface_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SS50_INTERFACE, tag, owner, clock),
 	device_single_card_slot_interface<ss50_card_interface>(mconfig, *this),
 	m_irq_cb(*this),

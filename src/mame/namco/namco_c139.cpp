@@ -47,7 +47,7 @@ void namco_c139_device::regs_map(address_map &map)
 //  namco_c139_device - constructor
 //-------------------------------------------------
 
-namco_c139_device::namco_c139_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco_c139_device::namco_c139_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NAMCO_C139, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("data", ENDIANNESS_BIG, 16, 14, 0, address_map_constructor(FUNC(namco_c139_device::data_map), this))

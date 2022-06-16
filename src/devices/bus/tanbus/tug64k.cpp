@@ -83,7 +83,7 @@ ioport_constructor tanbus_tug64k_device::device_input_ports() const
 //  tanbus_tug64k_device - constructor
 //-------------------------------------------------
 
-tanbus_tug64k_device::tanbus_tug64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tanbus_tug64k_device::tanbus_tug64k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TANBUS_TUG64K, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
 	, m_dsw(*this, "SW%u", 1)

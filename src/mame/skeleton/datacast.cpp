@@ -192,7 +192,7 @@ void datacast_state::datacast(machine_config &config)
 	m_screen->set_raw(6_MHz_XTAL, 768, 0, 480, 312, 0, 250);
 	m_screen->set_screen_update("saa5240", FUNC(saa5240a_device::screen_update));
 
-	MM74C923(config, m_kb, 0);
+	MM74C923(config, m_kb);
 	m_kb->x1_rd_callback().set_ioport("X1");
 	m_kb->x2_rd_callback().set_ioport("X2");
 	m_kb->x3_rd_callback().set_ioport("X3");
@@ -203,7 +203,7 @@ void datacast_state::datacast(machine_config &config)
 	SAA5240A(config, m_cct, 6_MHz_XTAL);
 	m_cct->set_addrmap(0, &datacast_state::saa5240_map);
 
-	//SAA5250(config, m_saa5250, 0);
+	//SAA5250(config, m_saa5250);
 	//m_saa5250->set_addrmap(0, &datacast_state::saa5250_map); // 2K RAM
 
 	I2C_PCF8582(config, m_i2cmem).set_e0(1);
@@ -217,7 +217,7 @@ void datacast_state::datacast(machine_config &config)
 	input_merger_device &usartint(INPUT_MERGER_ANY_HIGH(config, "usartint"));
 	usartint.output_handler().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
-	I8251(config, m_usart[0], 0);
+	I8251(config, m_usart[0]);
 	m_usart[0]->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
 	m_usart[0]->dtr_handler().set("modem", FUNC(rs232_port_device::write_dtr));
 	m_usart[0]->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
@@ -228,7 +228,7 @@ void datacast_state::datacast(machine_config &config)
 	modem.rxd_handler().set(m_usart[0], FUNC(i8251_device::write_rxd));
 	modem.dsr_handler().set(m_usart[0], FUNC(i8251_device::write_dsr));
 
-	I8251(config, m_usart[1], 0);
+	I8251(config, m_usart[1]);
 	m_usart[1]->txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
 	m_usart[1]->dtr_handler().set("printer", FUNC(rs232_port_device::write_dtr));
 	m_usart[1]->rts_handler().set("printer", FUNC(rs232_port_device::write_rts));
@@ -241,7 +241,7 @@ void datacast_state::datacast(machine_config &config)
 
 	// Teletext data is extracted from video signal by SAA5231.
 	// Use bitbanger to read a T42 teletext stream.
-	BITBANGER(config, m_ttd, 0);
+	BITBANGER(config, m_ttd);
 }
 
 

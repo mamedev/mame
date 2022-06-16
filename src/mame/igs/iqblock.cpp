@@ -342,7 +342,7 @@ GFXDECODE_END
 void iqblock_state::iqblock(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2); /* 6 MHz */
+	Z80(config, m_maincpu, XTAL::u(12000000)/2); /* 6 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &iqblock_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &iqblock_state::main_portmap);
 	TIMER(config, "scantimer").configure_scanline(FUNC(iqblock_state::irq), "screen", 0, 1);
@@ -368,7 +368,7 @@ void iqblock_state::iqblock(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", 3'579'545).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM2413(config, "ymsnd", XTAL::u(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

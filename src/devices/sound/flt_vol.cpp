@@ -11,7 +11,7 @@ DEFINE_DEVICE_TYPE(FILTER_VOLUME, filter_volume_device, "filter_volume", "Volume
 //  filter_volume_device - constructor
 //-------------------------------------------------
 
-filter_volume_device::filter_volume_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+filter_volume_device::filter_volume_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, FILTER_VOLUME, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr),

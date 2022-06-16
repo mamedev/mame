@@ -466,17 +466,17 @@ void deco_ld_state::machine_start()
 void deco_ld_state::rblaster(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 8000000/2);
+	M6502(config, m_maincpu, XTAL::u(8000000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_ld_state::rblaster_map);
 	m_maincpu->set_vblank_int("screen", FUNC(deco_ld_state::irq0_line_hold));
 
-	M6502(config, m_audiocpu, 8000000/2);
+	M6502(config, m_audiocpu, XTAL::u(8000000)/2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &deco_ld_state::rblaster_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(deco_ld_state::sound_interrupt), attotime::from_hz(640));
 
 //  config.set_maximum_quantum(attotime::from_hz(6000));
 
-	SONY_LDP1000(config, m_laserdisc, 0);
+	SONY_LDP1000(config, m_laserdisc);
 	m_laserdisc->set_overlay(256, 256, FUNC(deco_ld_state::screen_update_rblaster));
 	//m_laserdisc->set_overlay_clip(0, 256-1, 8, 240-1);
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
@@ -487,7 +487,7 @@ void deco_ld_state::rblaster(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rblaster);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x800);
 
-	//ACIA6850(config, m_acia, 0);
+	//ACIA6850(config, m_acia);
 	//m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1000_device::write));
 	//m_acia->rxd_handler().set("laserdisc", FUNC(sony_ldp1000_device::read));
 
@@ -499,9 +499,9 @@ void deco_ld_state::rblaster(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	AY8910(config, "ay1", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	AY8910(config, "ay2", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 }
 
 /***************************************************************************

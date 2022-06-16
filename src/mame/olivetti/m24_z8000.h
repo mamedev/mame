@@ -14,7 +14,7 @@
 class m24_z8000_device :  public device_t
 {
 public:
-	m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto halt_callback() { return m_halt_out.bind(); }
 

@@ -136,7 +136,7 @@ void arm_iomd_device::map(address_map &map)
 
 }
 
-arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_vidc(*this, finder_base::DUMMY_TAG)
@@ -157,7 +157,7 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type
 {
 }
 
-arm_iomd_device::arm_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+arm_iomd_device::arm_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arm_iomd_device(mconfig, ARM_IOMD, tag, owner, clock)
 {
 	m_id = 0xd4e7;
@@ -204,7 +204,7 @@ void arm7500fe_iomd_device::map(address_map &map)
 
 }
 
-arm7500fe_iomd_device::arm7500fe_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arm7500fe_iomd_device::arm7500fe_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arm_iomd_device(mconfig, ARM7500FE_IOMD, tag, owner, clock)
 	, m_iolines_read_cb(*this)
 	, m_iolines_write_cb(*this)

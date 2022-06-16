@@ -27,7 +27,7 @@
 DEFINE_DEVICE_TYPE(S2650, s2650_device, "s2650", "Signetics 2650")
 
 
-s2650_device::s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s2650_device::s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, S2650, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 15)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 8)

@@ -18,7 +18,7 @@
 class imds2ioc_device : public device_t
 {
 public:
-	imds2ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	imds2ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto master_intr_cb() { return m_master_intr_cb.bind(); }
 	auto parallel_int_cb() { return m_parallel_int_cb.bind(); }

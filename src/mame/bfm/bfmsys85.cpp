@@ -414,10 +414,10 @@ void bfmsys85_state::bfmsys85(machine_config &config)
 
 	MSC1937(config, m_vfd);
 
-	ACIA6850(config, m_acia6850_0, 0);
+	ACIA6850(config, m_acia6850_0);
 	m_acia6850_0->txd_handler().set(FUNC(bfmsys85_state::sys85_data_w));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(31250*16))); // What are the correct ACIA clocks ?
 	acia_clock.signal_handler().set(FUNC(bfmsys85_state::write_acia_clock));
 
 	SPEAKER(config, "mono").front_center();
@@ -434,7 +434,7 @@ void bfmsys85_state::bfmsys85(machine_config &config)
 	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[3]->optic_handler().set(FUNC(bfmsys85_state::reel_optic_cb<3>));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 
 	config.set_default_layout(layout_bfmsys85);
 }

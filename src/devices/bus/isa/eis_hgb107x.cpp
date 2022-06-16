@@ -174,12 +174,12 @@ const tiny_rom_entry *isa8_epc_mda_device::device_rom_region() const
 //-------------------------------------------------
 //  isa8_epc_mda_device - constructor
 //-------------------------------------------------
-isa8_epc_mda_device::isa8_epc_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_epc_mda_device::isa8_epc_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_epc_mda_device(mconfig, ISA8_EPC_MDA, tag, owner, clock)
 {
 }
 
-isa8_epc_mda_device::isa8_epc_mda_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_epc_mda_device::isa8_epc_mda_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_NAME),

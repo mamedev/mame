@@ -52,7 +52,7 @@ const u16 gt913_sound_device::volume_ramp[17] =
 	0x8000
 };
 
-gt913_sound_device::gt913_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+gt913_sound_device::gt913_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, GT913_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)

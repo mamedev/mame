@@ -23,12 +23,12 @@ class ps2_intc_device : public device_t
 public:
 	template <typename T>
 	ps2_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&ee_tag)
-		: ps2_intc_device(mconfig, tag, owner, (uint32_t)0)
+		: ps2_intc_device(mconfig, tag, owner)
 	{
 		m_ee.set_tag(std::forward<T>(ee_tag));
 	}
 
-	ps2_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~ps2_intc_device() override;
 
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);

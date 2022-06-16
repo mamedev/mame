@@ -848,10 +848,10 @@ void atarigt_state::atarigt(machine_config &config)
 	m_screen->set_screen_update(FUNC(atarigt_state::screen_update_atarigt));
 	m_screen->screen_vblank().set(FUNC(atarigt_state::video_int_write_line));
 
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc);
 
 	/* sound hardware */
-	ATARI_CAGE(config, m_cage, 0);
+	ATARI_CAGE(config, m_cage);
 	m_cage->irq_handler().set(FUNC(atarigt_state::cage_irq_callback));
 }
 

@@ -64,7 +64,7 @@ device_ieee488_interface::~device_ieee488_interface()
 //  ieee488_slot_device - constructor
 //-------------------------------------------------
 
-ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, IEEE488_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_address(0)
@@ -95,7 +95,7 @@ void ieee488_slot_device::device_start()
 
 void ieee488_slot_device::add_cbm_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot)
 {
-	ieee488_slot_device &slot(IEEE488_SLOT(config, _tag, 0));
+	ieee488_slot_device &slot(IEEE488_SLOT(config, _tag));
 	cbm_ieee488_devices(slot);
 	slot.set_default_option(_def_slot);
 	slot.set_address(_address);
@@ -109,7 +109,7 @@ void ieee488_slot_device::add_cbm_slot(machine_config &config, const char *_tag,
 //  ieee488_device - constructor
 //-------------------------------------------------
 
-ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, IEEE488, tag, owner, clock),
 	m_write_eoi(*this),
 	m_write_dav(*this),

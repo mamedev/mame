@@ -55,7 +55,7 @@ void tms5501_device::io_map(address_map &map)
 //  tms5501_device - constructor
 //-------------------------------------------------
 
-tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TMS5501, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_write_int(*this),

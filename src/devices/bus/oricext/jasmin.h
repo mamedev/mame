@@ -15,7 +15,7 @@ DECLARE_DEVICE_TYPE(ORIC_JASMIN, oric_jasmin_device)
 class oric_jasmin_device : public device_t, public device_oricext_interface
 {
 public:
-	oric_jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	oric_jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~oric_jasmin_device();
 
 	DECLARE_INPUT_CHANGED_MEMBER(boot_pressed);

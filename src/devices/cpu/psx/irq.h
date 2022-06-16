@@ -18,7 +18,7 @@ DECLARE_DEVICE_TYPE(PSX_IRQ, psxirq_device)
 class psxirq_device : public device_t
 {
 public:
-	psxirq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psxirq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq() { return m_irq_handler.bind(); }

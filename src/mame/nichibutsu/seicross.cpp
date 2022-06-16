@@ -413,7 +413,7 @@ void seicross_state::no_nvram(machine_config &config)
 	aysnd.port_b_write_callback().set(FUNC(seicross_state::portB_w));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.12); // unknown DAC
+	DAC_4BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.12); // unknown DAC
 }
 
 

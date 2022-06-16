@@ -117,7 +117,7 @@ void a2232_device::device_add_mconfig(machine_config &config)
 //  a2232_device - constructor
 //-------------------------------------------------
 
-a2232_device::a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2232_device::a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ZORRO_A2232, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_iocpu(*this, "iocpu"),

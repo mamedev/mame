@@ -291,7 +291,7 @@ void zrt80_state::zrt80(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beep, XTAL::u(800)).add_route(ALL_OUTPUTS, "mono", 0.50);
 	TIMER(config, m_beep_timer).configure_generic(FUNC(zrt80_state::beep_timer));
 
 	/* Devices */
@@ -301,10 +301,10 @@ void zrt80_state::zrt80(machine_config &config)
 	m_crtc->set_char_width(8); /*?*/
 	m_crtc->set_update_row_callback(FUNC(zrt80_state::crtc_update_row));
 
-	INS8250(config, m_8250, 2457600);
+	INS8250(config, m_8250, XTAL::u(2457600));
 	m_8250->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(zrt80_state::kbd_put));
 }
 

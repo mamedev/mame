@@ -15,7 +15,7 @@ public:
 	template <typename T> void set_decrypted_tag(T &&decrypted_tag) { m_decrypted.set_tag(std::forward<T>(decrypted_tag)); }
 
 protected:
-	segacrp2_z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	segacrp2_z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void decrypt() = 0;
@@ -29,7 +29,7 @@ protected:
 class nec_315_5136_device : public segacrp2_z80_device
 {
 public:
-	nec_315_5136_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	nec_315_5136_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual void decrypt() override;
 };
@@ -37,7 +37,7 @@ protected:
 class sega_315_5179_device : public segacrp2_z80_device
 {
 public:
-	sega_315_5179_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	sega_315_5179_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual void decrypt() override;
 };
@@ -46,7 +46,7 @@ protected:
 class sega_315_5178_device : public segacrp2_z80_device
 {
 public:
-	sega_315_5178_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	sega_315_5178_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual void decrypt() override;
 };
@@ -54,7 +54,7 @@ protected:
 class sega_315_5177_device : public segacrp2_z80_device
 {
 public:
-	sega_315_5177_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	sega_315_5177_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual void decrypt() override;
 };
@@ -62,7 +62,7 @@ protected:
 class sega_315_5176_device : public segacrp2_z80_device
 {
 public:
-	sega_315_5176_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	sega_315_5176_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual void decrypt() override;
 };
@@ -70,7 +70,7 @@ protected:
 class sega_315_5162_device : public segacrp2_z80_device
 {
 public:
-	sega_315_5162_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	sega_315_5162_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual void decrypt() override;
 };
@@ -78,7 +78,7 @@ protected:
 class sega_317_0004_device : public segacrp2_z80_device
 {
 public:
-	sega_317_0004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	sega_317_0004_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual void decrypt() override;
 };
@@ -87,7 +87,7 @@ protected:
 class sega_317_0005_device : public segacrp2_z80_device
 {
 public:
-	sega_317_0005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	sega_317_0005_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual void decrypt() override;
 };
@@ -96,7 +96,7 @@ protected:
 class sega_317_0006_device : public segacrp2_z80_device
 {
 public:
-	sega_317_0006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	sega_317_0006_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual void decrypt() override;
 };
@@ -104,7 +104,7 @@ protected:
 class sega_317_0007_device : public segacrp2_z80_device
 {
 public:
-	sega_317_0007_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	sega_317_0007_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual void decrypt() override;
 };

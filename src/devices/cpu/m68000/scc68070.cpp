@@ -11,7 +11,7 @@ std::unique_ptr<util::disasm_interface> scc68070_base_device::create_disassemble
 }
 
 
-scc68070_base_device::scc68070_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
+scc68070_base_device::scc68070_base_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock,
 						const device_type type, address_map_constructor internal_map)
 	: m68000_base_device(mconfig, tag, owner, clock, type, 16,32, internal_map)
 {

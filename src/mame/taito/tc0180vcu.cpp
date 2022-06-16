@@ -49,7 +49,7 @@ void tc0180vcu_device::tc0180vcu_memrw(address_map &map)
 
 DEFINE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device, "tc0180vcu", "Taito TC0180VCU")
 
-tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TC0180VCU, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	device_video_interface(mconfig, *this),

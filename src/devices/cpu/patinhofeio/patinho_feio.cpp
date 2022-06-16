@@ -56,7 +56,7 @@ void patinho_feio_cpu_device::prog_8bit(address_map &map)
 	map(0x0000, 0x0fff).ram().share("internalram");
 }
 
-patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, PATO_FEIO_CPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(patinho_feio_cpu_device::prog_8bit), this))
 	, m_update_panel_cb(*this)

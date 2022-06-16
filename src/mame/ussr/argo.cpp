@@ -468,7 +468,7 @@ void argo_state::machine_start()
 void argo_state::argo(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3500000); // unknown frequency
+	Z80(config, m_maincpu, XTAL::u(3500000)); // unknown frequency
 	m_maincpu->set_addrmap(AS_PROGRAM, &argo_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &argo_state::io_map);
 
@@ -491,12 +491,12 @@ void argo_state::argo(machine_config &config)
 	TIMER(config, "kansas_r").configure_periodic(FUNC(argo_state::kansas_r), attotime::from_hz(38400));
 
 	/* Devices */
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set([this] (bool state) { m_txd = state; });
 	m_uart->txempty_handler().set([this] (bool state) { m_txe = state; });
 	m_uart->rts_handler().set([this] (bool state) { m_rts = state; });
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(1689600); // this gives the 2400Hz required by the cassette
 	m_pit->out_handler<0>().set(FUNC(argo_state::z0_w));
 	m_pit->set_clk<1>(0);

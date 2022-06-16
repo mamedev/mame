@@ -12,7 +12,7 @@ class bl_handhelds_menucontrol_device : public device_t
 {
 public:
 	// construction/destruction
-	bl_handhelds_menucontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bl_handhelds_menucontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// the chip is the same between systems, but there's some logic not fully understood that is causing off-by-1 errors on some calcs
 	void set_is_unsp_type_hack() { m_is_unsp_type_hack = true; }

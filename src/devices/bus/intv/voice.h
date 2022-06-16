@@ -14,7 +14,7 @@ class intv_voice_device : public intv_rom_device
 {
 public:
 	// construction/destruction
-	intv_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	intv_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	// actual IntelliVoice access

@@ -86,7 +86,7 @@
 DEFINE_DEVICE_TYPE(PPS4,   pps4_device,   "pps4",   "Rockwell PPS4-4")
 DEFINE_DEVICE_TYPE(PPS4_2, pps4_2_device, "pps4_2", "Rockwell PPS-4/2")
 
-pps4_device::pps4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+pps4_device::pps4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 12)  // 4bit RAM
@@ -99,12 +99,12 @@ pps4_device::pps4_device(const machine_config &mconfig, device_type type, const 
 {
 }
 
-pps4_device::pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pps4_device::pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pps4_device(mconfig, PPS4, tag, owner, clock)
 {
 }
 
-pps4_2_device::pps4_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pps4_2_device::pps4_2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pps4_device(mconfig, PPS4_2, tag, owner, clock)
 {
 }

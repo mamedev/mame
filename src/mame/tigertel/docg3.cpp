@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(DISKONCHIP_G3, diskonchip_g3_device, "diskonchip_g3", "DiskOn
 //  diskonchip_g3_device - constructor
 //-------------------------------------------------
 
-diskonchip_g3_device::diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+diskonchip_g3_device::diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DISKONCHIP_G3, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 {

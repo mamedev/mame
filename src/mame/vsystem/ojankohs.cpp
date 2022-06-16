@@ -708,7 +708,7 @@ void ojankohs_state::machine_reset()
 void ojankohs_state::ojankohs(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 12'000'000 / 2);     // 6.00 MHz ?
+	Z80(config, m_maincpu, XTAL::u(12'000'000) / 2);     // 6.00 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &ojankohs_state::map);
 	m_maincpu->set_addrmap(AS_IO, &ojankohs_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ojankohs_state::irq0_line_hold));
@@ -732,12 +732,12 @@ void ojankohs_state::ojankohs(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2149_device &aysnd(YM2149(config, "aysnd", 12'000'000 / 6));
+	ym2149_device &aysnd(YM2149(config, "aysnd", XTAL::u(12'000'000) / 6));
 	aysnd.port_a_read_callback().set(FUNC(ojankohs_state::dipsw1_r));
 	aysnd.port_b_read_callback().set(FUNC(ojankohs_state::dipsw2_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MSM5205(config, m_msm, 384'000);
+	MSM5205(config, m_msm, XTAL::u(384'000));
 	m_msm->vck_legacy_callback().set(FUNC(ojankohs_state::adpcm_int));     // IRQ handler
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // 8 KHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -746,7 +746,7 @@ void ojankohs_state::ojankohs(machine_config &config)
 void ojankoy_state::ojankoy(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 12'000'000 / 2);     // 6.00 MHz ?
+	Z80(config, m_maincpu, XTAL::u(12'000'000) / 2);     // 6.00 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &ojankoy_state::map);
 	m_maincpu->set_addrmap(AS_IO, &ojankoy_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ojankoy_state::irq0_line_hold));
@@ -768,12 +768,12 @@ void ojankoy_state::ojankoy(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 12'000'000 / 8));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(12'000'000) / 8));
 	aysnd.port_a_read_callback().set_ioport("dsw1");
 	aysnd.port_b_read_callback().set_ioport("dsw2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MSM5205(config, m_msm, 384'000);
+	MSM5205(config, m_msm, XTAL::u(384'000));
 	m_msm->vck_legacy_callback().set(FUNC(ojankoy_state::adpcm_int));     // IRQ handler
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // 8 KHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -782,7 +782,7 @@ void ojankoy_state::ojankoy(machine_config &config)
 void ccasino_state::ccasino(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 12'000'000 / 2);     // 6.00 MHz ?
+	Z80(config, m_maincpu, XTAL::u(12'000'000) / 2);     // 6.00 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &ccasino_state::map);
 	m_maincpu->set_addrmap(AS_IO, &ccasino_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ccasino_state::irq0_line_hold));
@@ -807,12 +807,12 @@ void ccasino_state::ccasino(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 12'000'000 / 8));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(12'000'000) / 8));
 	aysnd.port_a_read_callback().set_ioport("dsw1");
 	aysnd.port_b_read_callback().set_ioport("dsw2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MSM5205(config, m_msm, 384'000);
+	MSM5205(config, m_msm, XTAL::u(384'000));
 	m_msm->vck_legacy_callback().set(FUNC(ccasino_state::adpcm_int));     // IRQ handler
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // 8 KHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);

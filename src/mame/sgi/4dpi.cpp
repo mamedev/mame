@@ -676,7 +676,7 @@ void pi4d2x_state::common(machine_config &config)
 		{
 			wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
 
-			wd33c93.set_clock(10000000);
+			wd33c93.set_clock(XTAL::u(10000000));
 			wd33c93.irq_cb().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_SCSI>)).invert();
 			wd33c93.drq_cb().set(*this, FUNC(pi4d2x_state::scsi_drq));
 		});
@@ -829,7 +829,7 @@ void pi4d3x_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, nullptr, false);
 
-	SEEQ8003(config, m_enet, 0);
+	SEEQ8003(config, m_enet);
 	m_enet->out_int_cb().set(&pi4d3x_state::lio_interrupt<0, 3>, "lio0.3");
 
 	input_merger_device &duart_int(INPUT_MERGER_ANY_HIGH(config, "duart_int"));
@@ -856,7 +856,7 @@ void pi4d3x_state::common(machine_config &config)
 
 	// duart 1: serial ports
 	SCC85C30(config, m_duart[1], 10_MHz_XTAL); // Z8513010VSC ESCC
-	m_duart[1]->configure_channels(3'686'400, 0, 3'686'400, 0);
+	m_duart[1]->configure_channels(XTAL::u(3'686'400), XTAL(), XTAL::u(3'686'400), XTAL());
 	m_duart[1]->out_int_callback().set(duart_int, FUNC(input_merger_device::in_w<1>));
 
 	// serial port 1

@@ -62,7 +62,7 @@ void isa8_mpu401_device::device_add_mconfig(machine_config &config)
 //  isa8_adlib_device - constructor
 //-------------------------------------------------
 
-isa8_mpu401_device::isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+isa8_mpu401_device::isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISA8_MPU401, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_mpu401(*this, MPU_CORE_TAG)

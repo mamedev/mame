@@ -206,7 +206,7 @@ ioport_constructor digilog_kbd_device::device_input_ports() const
 //  digilog_kbd_device - constructor
 //-------------------------------------------------
 
-digilog_kbd_device::digilog_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+digilog_kbd_device::digilog_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, DIGILOG_KBD, tag, owner, clock),
 	m_mcu(*this, "mcu"),
 	m_keys(*this, "row_%x", 0U),

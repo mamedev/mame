@@ -72,13 +72,13 @@ INPUT_PORTS_END
 void alphasmart3k_state::alphasmart3k(machine_config &config)
 {
 	// Basic machine hardware
-	MC68328(config, m_maincpu, 16'000'000); // MC68EZ328PU16V, clock unverified
+	MC68328(config, m_maincpu, XTAL::u(16'000'000)); // MC68EZ328PU16V, clock unverified
 
 	// Values from AlphaSmart 2000, not confirmed for AlphaSmart 3000
 	// AlphaSmart 3000 uses a Data Image CM4040 LCD display
-	KS0066_F05(config, m_lcdc0, 0);
+	KS0066_F05(config, m_lcdc0);
 	m_lcdc0->set_lcd_size(2, 40);
-	KS0066_F05(config, m_lcdc1, 0);
+	KS0066_F05(config, m_lcdc1);
 	m_lcdc1->set_lcd_size(2, 40);
 
 	RAM(config, RAM_TAG).set_default_size("256K");

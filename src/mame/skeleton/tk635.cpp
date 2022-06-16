@@ -187,7 +187,7 @@ void tk635_state::machine_reset()
 
 void tk635_state::tk635(machine_config &config)
 {
-	I80188(config, m_maincpu, 25000000);
+	I80188(config, m_maincpu, XTAL::u(25000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tk635_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &tk635_state::io_map);
 

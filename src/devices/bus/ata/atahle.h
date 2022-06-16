@@ -31,7 +31,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) override;
 
 protected:
-	ata_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ata_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

@@ -54,7 +54,7 @@ namespace bus::ti99::peb {
 
 // ----------------------------------
 
-myarc_fdc_device::myarc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+myarc_fdc_device::myarc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock):
 	  device_t(mconfig, TI99_DDCC1, tag, owner, clock),
 	  device_ti99_peribox_card_interface(mconfig, *this),
 	  m_wdc(nullptr),
@@ -456,7 +456,7 @@ void myarc_fdc_device::device_add_mconfig(machine_config& config)
 	RAM(config, BUFFER_TAG).set_default_size("2k").set_default_value(0);
 
 	// PAL circuit
-	DDCC1_PAL(config, PAL_TAG, 0);
+	DDCC1_PAL(config, PAL_TAG);
 
 	// Floppy drives
 	FLOPPY_CONNECTOR(config, "0", myarc_ddcc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
@@ -479,7 +479,7 @@ const tiny_rom_entry *myarc_fdc_device::device_rom_region() const
 //    PAL circuit on the DDCC-1 board
 // ========================================================================
 
-ddcc1_pal_device::ddcc1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ddcc1_pal_device::ddcc1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	:  device_t(mconfig, DDCC1_PAL, tag, owner, clock),
 	   m_board(nullptr)
 {

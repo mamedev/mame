@@ -113,7 +113,7 @@ const tiny_rom_entry *abc_super_smartaid_device::device_rom_region() const
 //  abc_super_smartaid_device - constructor
 //-------------------------------------------------
 
-abc_super_smartaid_device::abc_super_smartaid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc_super_smartaid_device::abc_super_smartaid_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ABC_SUPER_SMARTAID, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),

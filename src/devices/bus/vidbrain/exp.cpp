@@ -79,7 +79,7 @@ uint8_t* device_videobrain_expansion_card_interface::videobrain_ram_pointer(runn
 //  videobrain_expansion_slot_device - constructor
 //-------------------------------------------------
 
-videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VIDEOBRAIN_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_videobrain_expansion_card_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),

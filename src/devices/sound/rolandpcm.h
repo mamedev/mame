@@ -10,7 +10,7 @@
 class mb87419_mb87420_device : public device_t, public device_sound_interface, public device_rom_interface<22>
 {
 public:
-	mb87419_mb87420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb87419_mb87420_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto int_callback() { return m_int_callback.bind(); }
 

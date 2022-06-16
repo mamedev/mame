@@ -22,7 +22,7 @@ class psx_gamebooster_device :
 {
 public:
 	// construction/destruction
-	psx_gamebooster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psx_gamebooster_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// psx_parallel_interface implementation
 	virtual uint16_t exp_r(offs_t offset, uint16_t mem_mask = ~0) override;

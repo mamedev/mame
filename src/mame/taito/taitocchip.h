@@ -14,7 +14,7 @@ class taito_cchip_device :  public device_t
 {
 public:
 	// construction/destruction
-	taito_cchip_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	taito_cchip_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto in_pa_callback()  { return m_in_pa_cb.bind(); }
 	auto in_pb_callback()  { return m_in_pb_cb.bind(); }

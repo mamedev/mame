@@ -17,10 +17,10 @@
 class tms0970_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
+	tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
 	// overrides
 	virtual void device_reset() override;
@@ -35,7 +35,7 @@ protected:
 class tms0950_cpu_device : public tms0970_cpu_device
 {
 public:
-	tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// overrides
@@ -49,7 +49,7 @@ protected:
 class tms1990_cpu_device : public tms0970_cpu_device
 {
 public:
-	tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

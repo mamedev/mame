@@ -2826,7 +2826,7 @@ GFXDECODE_END
 void towns_state::towns_base(machine_config &config)
 {
 	/* basic machine hardware */
-	I386(config, m_maincpu, 16000000);
+	I386(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
 	m_maincpu->set_addrmap(AS_IO, &towns_state::towns_1g_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
@@ -2850,20 +2850,20 @@ void towns_state::towns_base(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym3438_device &fm(YM3438(config, "fm", 16000000 / 2)); // actual clock speed unknown
+	ym3438_device &fm(YM3438(config, "fm", XTAL::u(16000000) / 2)); // actual clock speed unknown
 	fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
 	fm.add_route(0, "lspeaker", 1.00);
 	fm.add_route(1, "rspeaker", 1.00);
 
 /*
     // Later model uses YMF276 for FM
-    ymf276_device &fm(YMF276(config, "fm", 16000000 / 2)); // actual clock speed unknown
+    ymf276_device &fm(YMF276(config, "fm", XTAL::u(16000000) / 2)); // actual clock speed unknown
     fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
     fm.add_route(0, "lspeaker", 1.00);
     fm.add_route(1, "rspeaker", 1.00);
 */
 
-	rf5c68_device &pcm(RF5C68(config, "pcm", 16000000 / 2));  // actual clock speed unknown
+	rf5c68_device &pcm(RF5C68(config, "pcm", XTAL::u(16000000) / 2));  // actual clock speed unknown
 	pcm.set_end_callback(FUNC(towns_state::towns_pcm_irq));
 	pcm.set_addrmap(0, &towns_state::pcm_mem);
 	pcm.add_route(0, "lspeaker", 1.00);
@@ -2876,7 +2876,7 @@ void towns_state::towns_base(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_speaker->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(307200);
 	m_pit->out_handler<0>().set(FUNC(towns_state::towns_pit_out0_changed));
 	m_pit->set_clk<1>(307200);
@@ -2884,22 +2884,22 @@ void towns_state::towns_base(machine_config &config)
 	m_pit->set_clk<2>(307200);
 	m_pit->out_handler<2>().set(FUNC(towns_state::pit_out2_changed));
 
-	pit8253_device &pit2(PIT8253(config, "pit2", 0));
+	pit8253_device &pit2(PIT8253(config, "pit2"));
 	pit2.set_clk<0>(307200); // reserved
 	pit2.set_clk<1>(1228800); // RS-232
 	pit2.out_handler<1>().set(FUNC(towns_state::pit2_out1_changed));
 	pit2.set_clk<2>(307200); // reserved
 
-	PIC8259(config, m_pic_master, 0);
+	PIC8259(config, m_pic_master);
 	m_pic_master->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic_master->in_sp_callback().set_constant(1);
 	m_pic_master->read_slave_ack_callback().set(FUNC(towns_state::get_slave_ack));
 
-	PIC8259(config, m_pic_slave, 0);
+	PIC8259(config, m_pic_slave);
 	m_pic_slave->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir7_w));
 	m_pic_slave->in_sp_callback().set_constant(0);
 
-	MB8877(config, m_fdc, 8'000'000 / 4);  // clock unknown
+	MB8877(config, m_fdc, XTAL::u(8'000'000) / 4);  // clock unknown
 	m_fdc->intrq_wr_callback().set(FUNC(towns_state::mb8877a_irq_w));
 	m_fdc->drq_wr_callback().set(FUNC(towns_state::mb8877a_drq_w));
 	FLOPPY_CONNECTOR(config, m_flop[0], towns_floppies, "35hd", towns_state::floppy_formats);
@@ -2908,25 +2908,25 @@ void towns_state::towns_base(machine_config &config)
 	SOFTWARE_LIST(config, "fd_list_cracked").set_original("fmtowns_flop_cracked");
 	SOFTWARE_LIST(config, "fd_list_misc").set_original("fmtowns_flop_misc");
 
-	CDROM(config, m_cdrom, 0).set_interface("fmt_cdrom");
+	CDROM(config, m_cdrom).set_interface("fmt_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("fmtowns_cd");
 
-	UPD71071(config, m_dma[0], 0);
+	UPD71071(config, m_dma[0]);
 	m_dma[0]->set_cpu_tag("maincpu");
-	m_dma[0]->set_clock(4000000);
+	m_dma[0]->set_clock(XTAL::u(4000000));
 	m_dma[0]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
 	m_dma[0]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
 	m_dma[0]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
-	UPD71071(config, m_dma[1], 0);
+	UPD71071(config, m_dma[1]);
 	m_dma[1]->set_cpu_tag("maincpu");
-	m_dma[1]->set_clock(4000000);
+	m_dma[1]->set_clock(XTAL::u(4000000));
 	m_dma[1]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
 	m_dma[1]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
 	m_dma[1]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
 
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
 
-	I8251(config, m_i8251, 0);
+	I8251(config, m_i8251);
 	m_i8251->rxrdy_handler().set(FUNC(towns_state::towns_rxrdy_irq));
 	m_i8251->txrdy_handler().set(FUNC(towns_state::towns_txrdy_irq));
 	m_i8251->syndet_handler().set(FUNC(towns_state::towns_syndet_irq));
@@ -2939,7 +2939,7 @@ void towns_state::towns_base(machine_config &config)
 	rs232c.dsr_handler().set(m_i8251, FUNC(i8251_device::write_dsr));
 	rs232c.cts_handler().set(m_i8251, FUNC(i8251_device::write_cts));
 
-	FMT_ICMEM(config, m_icmemcard, 0);
+	FMT_ICMEM(config, m_icmemcard);
 
 	/* First-generation models: 1 MB onboard, 3 SIMM slots with 1 or 2 MB each, except slot 1 (limited to 1 MB).
 	   Model 2 comes with a 1 MB SIMM preinstalled on slot 1, Model 1 doesn't. */
@@ -2974,20 +2974,20 @@ void towns16_state::townsux(machine_config &config)
 {
 	towns_base(config);
 
-	I386SX(config.replace(), m_maincpu, 16000000);
+	I386SX(config.replace(), m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns16_state::ux_mem);
 	m_maincpu->set_addrmap(AS_IO, &towns16_state::townsux_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
 	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
 	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
 	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
 
-	FMSCSI(config, m_scsi, 0);
+	FMSCSI(config, m_scsi);
 	m_scsi->set_scsi_port("scsi");
 	m_scsi->irq_handler().set(FUNC(towns16_state::towns_scsi_irq));
 	m_scsi->drq_handler().set(FUNC(towns16_state::towns_scsi_drq));
@@ -3007,20 +3007,20 @@ void towns_state::townssj(machine_config &config)
 {
 	towns_base(config);
 
-	I486(config.replace(), m_maincpu, 66000000);
+	I486(config.replace(), m_maincpu, XTAL::u(66000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
 	m_maincpu->set_addrmap(AS_IO, &towns_state::towns2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
 	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
 	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
 	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
 
-	FMSCSI(config, m_scsi, 0);
+	FMSCSI(config, m_scsi);
 	m_scsi->set_scsi_port("scsi");
 	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
 	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
@@ -3039,7 +3039,7 @@ void towns_state::townssj(machine_config &config)
 void towns_state::townshr(machine_config &config)
 {
 	townssj(config);
-	I486(config.replace(), m_maincpu, 20000000);
+	I486(config.replace(), m_maincpu, XTAL::u(20000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
 	m_maincpu->set_addrmap(AS_IO, &towns_state::towns2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
@@ -3060,7 +3060,7 @@ void towns_state::townsmx(machine_config &config)
 void towns_state::townsftv(machine_config &config)
 {
 	townssj(config);
-	I486(config.replace(), m_maincpu, 33000000);
+	I486(config.replace(), m_maincpu, XTAL::u(33000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
 	m_maincpu->set_addrmap(AS_IO, &towns_state::towns2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
@@ -3074,7 +3074,7 @@ void marty_state::marty(machine_config &config)
 {
 	towns_base(config);
 
-	I386SX(config.replace(), m_maincpu, 16000000);
+	I386SX(config.replace(), m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &marty_state::marty_mem);
 	m_maincpu->set_addrmap(AS_IO, &marty_state::towns16_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));

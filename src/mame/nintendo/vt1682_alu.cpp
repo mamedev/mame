@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(VT_VT1682_ALU, vrt_vt1682_alu_device, "vt1682alu", "VRT VT1682 ALU")
 
-vrt_vt1682_alu_device::vrt_vt1682_alu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vrt_vt1682_alu_device::vrt_vt1682_alu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VT_VT1682_ALU, tag, owner, clock)
 {
 }

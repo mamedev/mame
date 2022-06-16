@@ -15,7 +15,7 @@ class sega_315_5881_crypt_device :  public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t ready_r();
 	void subkey_le_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

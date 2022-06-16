@@ -210,7 +210,7 @@ void mc68328_device::cpu_space_map(address_map &map)
 }
 
 
-mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m68000_device(mconfig, tag, owner, clock, MC68328, 16, 24, address_map_constructor(FUNC(mc68328_device::internal_map), this))
 	, m_rtc(nullptr), m_pwm(nullptr)
 	, m_out_port_a_cb(*this)

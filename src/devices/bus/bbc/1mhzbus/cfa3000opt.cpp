@@ -77,7 +77,7 @@ ioport_constructor cfa3000_opt_device::device_input_ports() const
 //  cfa3000_opt_device - constructor
 //-------------------------------------------------
 
-cfa3000_opt_device::cfa3000_opt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cfa3000_opt_device::cfa3000_opt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CFA3000_OPT, tag, owner, clock),
 	device_bbc_1mhzbus_interface(mconfig, *this),
 	m_opt(*this, "OPT")

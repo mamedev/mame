@@ -11,7 +11,7 @@
 
 class konami1_device : public m6809_base_device {
 public:
-	konami1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konami1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_encryption_boundary(uint16_t adr);
 

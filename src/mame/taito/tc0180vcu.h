@@ -11,7 +11,7 @@
 class tc0180vcu_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
-	tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_fb_colorbase(int color) { m_fb_color_base = color * 16; }

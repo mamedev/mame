@@ -36,16 +36,7 @@ class einstein_userport_device : public device_t, public device_single_card_slot
 {
 public:
 	// construction/destruction
-	einstein_userport_device(machine_config const &mconfig, char const *tag, device_t *owner)
-		: einstein_userport_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		einstein_userport_cards(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
-	}
-
-	einstein_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	einstein_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~einstein_userport_device();
 
 	// callbacks

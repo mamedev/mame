@@ -24,7 +24,7 @@
 
 DEFINE_DEVICE_TYPE(ETNA, etna_device, "etna", "Psion 5mx ETNA")
 
-etna_device::etna_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+etna_device::etna_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ETNA, tag, owner, clock)
 	, m_eeprom_data_out(*this)
 {

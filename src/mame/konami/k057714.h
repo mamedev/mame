@@ -10,7 +10,7 @@ class k057714_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
-	k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_callback() { return m_irq.bind(); }
 

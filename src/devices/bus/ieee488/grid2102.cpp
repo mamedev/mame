@@ -65,7 +65,7 @@ uint8_t grid2101_hdd_device::identify_response[56] = {
 };
 
 
-grid210x_device::grid210x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int bus_addr, uint8_t *identify_response, attotime read_delay)
+grid210x_device::grid210x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int bus_addr, uint8_t *identify_response, attotime read_delay)
 	: device_t(mconfig, type, tag, owner, clock),
 	  device_ieee488_interface(mconfig, *this),
 	  device_image_interface(mconfig, *this),
@@ -298,18 +298,18 @@ void grid210x_device::ieee488_ren(int state) {
 	LOG("grid210x_device ren state set to %d\n", state);
 }
 
-grid2101_hdd_device::grid2101_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+grid2101_hdd_device::grid2101_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: grid210x_device(mconfig, GRID2101_HDD, tag, owner, clock, 4, identify_response, attotime::from_usec(150))
 {
 
 }
 
-grid2101_floppy_device::grid2101_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : grid210x_device(mconfig, GRID2101_FLOPPY, tag, owner, clock, 5, identify_response)
+grid2101_floppy_device::grid2101_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : grid210x_device(mconfig, GRID2101_FLOPPY, tag, owner, clock, 5, identify_response)
 {
 
 }
 
-grid2102_device::grid2102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : grid210x_device(mconfig, GRID2102, tag, owner, clock, 6, identify_response)
+grid2102_device::grid2102_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : grid210x_device(mconfig, GRID2102, tag, owner, clock, 6, identify_response)
 {
 
 }

@@ -21,7 +21,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<void (u32)> clock_update_delegate;
+typedef device_delegate<void (const XTAL &)> clock_update_delegate;
 
 
 //**************************************************************************

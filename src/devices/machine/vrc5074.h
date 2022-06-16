@@ -15,13 +15,13 @@
 class vrc5074_device : public pci_host_device {
 public:
 	template <typename T>
-	vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag)
 		: vrc5074_device(mconfig, tag, owner, clock)
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
 
-	vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	required_device<ns16550_device> m_uart;
 
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -19,7 +19,7 @@ class taitoio_yoke_device : public device_t
 {
 public:
 	// construction/destruction
-	taitoio_yoke_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	taitoio_yoke_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// I/O operations
 	u16 throttle_r();

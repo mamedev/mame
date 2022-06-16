@@ -646,7 +646,7 @@ INTERRUPT_GEN_MEMBER(ttchamp_state::irq)/* right? */
 void ttchamp_state::ttchamp(machine_config &config)
 {
 	/* basic machine hardware */
-	V30(config, m_maincpu, 8000000);
+	V30(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ttchamp_state::ttchamp_map);
 	m_maincpu->set_addrmap(AS_IO, &ttchamp_state::ttchamp_io);
 	m_maincpu->set_vblank_int("screen", FUNC(ttchamp_state::irq));

@@ -72,7 +72,7 @@ const tiny_rom_entry *c8050_fdc_device::device_rom_region() const
 //  c8050_fdc_device - constructor
 //-------------------------------------------------
 
-c8050_fdc_device::c8050_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c8050_fdc_device::c8050_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C8050_FDC, tag, owner, clock),
 	m_write_sync(*this),
 	m_write_ready(*this),

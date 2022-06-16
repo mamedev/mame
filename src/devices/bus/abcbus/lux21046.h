@@ -53,10 +53,10 @@ class luxor_55_21046_device :  public device_t,
 {
 public:
 	// construction/destruction
-	luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -127,7 +127,7 @@ class abc830_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -142,7 +142,7 @@ class abc832_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -157,7 +157,7 @@ class abc834_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -172,7 +172,7 @@ class abc838_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -187,7 +187,7 @@ class abc850_floppy_device :  public luxor_55_21046_device
 {
 public:
 	// construction/destruction
-	abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

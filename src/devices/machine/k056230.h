@@ -15,7 +15,7 @@ class k056230_device : public device_t
 {
 public:
 	// construction/destruction
-	k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 

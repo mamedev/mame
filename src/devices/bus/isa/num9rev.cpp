@@ -76,7 +76,7 @@ void isa8_number_9_rev_device::device_add_mconfig(machine_config &config)
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa8_number_9_rev_device::isa8_number_9_rev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_number_9_rev_device::isa8_number_9_rev_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA8_NUM_9_REV, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_upd7220(*this, "upd7220"),

@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(ACS8600_ICS, acs8600_ics_device, "acs8600_ics", "Altos ACS8600 Intelligent Serial Concentrator")
 
-acs8600_ics_device::acs8600_ics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+acs8600_ics_device::acs8600_ics_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ACS8600_ICS, tag, owner, clock),
 	m_icscpu(*this, "icscpu"),
 	m_out_irq1_func(*this),

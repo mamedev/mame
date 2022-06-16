@@ -75,7 +75,7 @@ enum nec_irqs {
 DEFINE_DEVICE_TYPE(V30MZ, v30mz_cpu_device, "v30mz", "NEC V30MZ")
 
 
-v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, V30MZ, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)

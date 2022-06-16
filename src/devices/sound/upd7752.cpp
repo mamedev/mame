@@ -43,7 +43,7 @@ void upd7752_device::upd7752_ram(address_map &map)
 //  upd7752_device - constructor
 //-------------------------------------------------
 
-upd7752_device::upd7752_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+upd7752_device::upd7752_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UPD7752, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this), m_stream(nullptr),

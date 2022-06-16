@@ -20,7 +20,7 @@ class midiin_port_device : public device_t,
 	public device_midi_port_interface
 {
 public:
-	midiin_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midiin_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

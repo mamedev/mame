@@ -1834,7 +1834,7 @@ void cps2_state::cps2comm(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_comm_map);
 
-	CAPCOM_CPS2_COMM(config, m_comm, 0U);
+	CAPCOM_CPS2_COMM(config, m_comm);
 }
 
 

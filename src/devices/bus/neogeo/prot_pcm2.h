@@ -14,7 +14,7 @@ class pcm2_prot_device : public device_t
 {
 public:
 	// construction/destruction
-	pcm2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pcm2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void decrypt(uint8_t* ymrom, uint32_t ymsize, int value);
 	void swap(uint8_t* ymrom, uint32_t ymsize, int value);

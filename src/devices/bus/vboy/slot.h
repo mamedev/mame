@@ -89,14 +89,14 @@ class vboy_cart_slot_device :
 public:
 	template <typename T>
 	vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt) :
-		vboy_cart_slot_device(mconfig, tag, owner, 0U)
+		vboy_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0U);
+	vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	auto intcro() { return m_intcro.bind(); }

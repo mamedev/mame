@@ -20,7 +20,7 @@
 #define TIME_FULL_STROKE_SEEK               (attotime::from_usec(13000))
 #define TIME_AVERAGE_ROTATIONAL_LATENCY     (attotime::from_usec(1300))
 
-ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: ata_hle_device(mconfig, type, tag, owner, clock),
 	m_can_identify_device(0),
 	m_num_cylinders(0),
@@ -796,12 +796,12 @@ DEFINE_DEVICE_TYPE(IDE_HARDDISK, ide_hdd_device, "idehd", "IDE Hard Disk")
 //  ide_hdd_device - constructor
 //-------------------------------------------------
 
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ide_hdd_device::ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ide_hdd_device(mconfig, IDE_HARDDISK, tag, owner, clock)
 {
 }
 
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: ata_mass_storage_device(mconfig, type, tag, owner, clock),
 	m_image(*this, "image")
 {

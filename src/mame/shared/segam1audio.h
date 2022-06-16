@@ -24,7 +24,7 @@ class segam1audio_device : public device_t
 {
 public:
 	// construction/destruction
-	segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto rxd_handler() { return m_rxd_handler.bind(); }

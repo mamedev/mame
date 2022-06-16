@@ -127,38 +127,38 @@ void abc856_device::device_add_mconfig(machine_config &config)
 //  abc890_device - constructor
 //-------------------------------------------------
 
-abc890_device::abc890_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+abc890_device::abc890_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this)
 {
 }
 
-abc890_device::abc890_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc890_device::abc890_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	abc890_device(mconfig, ABC890, tag, owner, clock)
 {
 }
 
-abc_expansion_unit_device::abc_expansion_unit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc_expansion_unit_device::abc_expansion_unit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	abc890_device(mconfig, ABC_EXPANSION_UNIT, tag, owner, clock)
 {
 }
 
-abc894_device::abc894_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc894_device::abc894_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	abc890_device(mconfig, ABC894, tag, owner, clock)
 {
 }
 
-abc850_device::abc850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc850_device::abc850_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	abc890_device(mconfig, ABC850, tag, owner, clock)
 {
 }
 
-abc852_device::abc852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc852_device::abc852_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	abc890_device(mconfig, ABC852, tag, owner, clock)
 {
 }
 
-abc856_device::abc856_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc856_device::abc856_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	abc890_device(mconfig, ABC856, tag, owner, clock)
 {
 }

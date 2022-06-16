@@ -84,7 +84,7 @@ public:
 		SPEAKER_SOUND(config, m_speaker);
 		m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-		CLOCK(config, m_ne555, 8589).signal_handler().set(FUNC(z80clock_state::ne555));
+		CLOCK(config, m_ne555, XTAL::u(8589)).signal_handler().set(FUNC(z80clock_state::ne555));
 		m_ne555->set_clock_scale(0.0f);
 		m_ne555->set_duty_cycle(2/3.0f);
 

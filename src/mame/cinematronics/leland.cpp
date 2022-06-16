@@ -1143,22 +1143,22 @@ void leland_state::leland(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	// only one of the AY sockets is populated
-	AY8910(config, m_ay8910, 10000000/6);
+	AY8910(config, m_ay8910, XTAL::u(10000000)/6);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8910->set_resistors_load(1000, 0, 0);
 	m_ay8910->port_a_read_callback().set(FUNC(leland_state::sound_port_r));
 	m_ay8910->port_a_write_callback().set(FUNC(leland_state::sound_port_w));
 	m_ay8910->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-//  AY8912(config, m_ay8912, 10000000/6);
+//  AY8912(config, m_ay8912, XTAL::u(10000000)/6);
 //  m_ay8912->set_flags(AY8910_SINGLE_OUTPUT);
 //  m_ay8912->set_resistors_load(1000, 0, 0);
 //  m_ay8912->port_a_read_callback().set(FUNC(leland_state::sound_port_r));
 //  m_ay8912->port_a_write_callback().set(FUNC(leland_state::sound_port_w));
 //  m_ay8912->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	DAC_8BIT_BINARY_WEIGHTED(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.0625); // ls374.u79 + r17-r23 (24k,12k,6.2k,3k,1.5k,750,390,180)
-	DAC_8BIT_BINARY_WEIGHTED(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.0625); // ls374.u88 + r27-r34 (24k,12k,6.2k,3k,1.5k,750,390,180)
+	DAC_8BIT_BINARY_WEIGHTED(config, m_dac[0]).add_route(ALL_OUTPUTS, "speaker", 0.0625); // ls374.u79 + r17-r23 (24k,12k,6.2k,3k,1.5k,750,390,180)
+	DAC_8BIT_BINARY_WEIGHTED(config, m_dac[1]).add_route(ALL_OUTPUTS, "speaker", 0.0625); // ls374.u88 + r27-r34 (24k,12k,6.2k,3k,1.5k,750,390,180)
 }
 
 
@@ -1170,7 +1170,7 @@ void redline_state::redline(machine_config &config)
 	m_master->set_addrmap(AS_IO, &redline_state::master_redline_map_io);
 
 	/* sound hardware */
-	REDLINE_80186(config, m_sound, 0).set_master_cpu_tag(m_master);
+	REDLINE_80186(config, m_sound).set_master_cpu_tag(m_master);
 }
 
 
@@ -1179,7 +1179,7 @@ void redline_state::quarterb(machine_config &config)
 	redline(config);
 
 	/* sound hardware */
-	LELAND_80186(config.replace(), m_sound, 0).set_master_cpu_tag(m_master);
+	LELAND_80186(config.replace(), m_sound).set_master_cpu_tag(m_master);
 }
 
 
@@ -1195,11 +1195,11 @@ void redline_state::lelandi(machine_config &config)
 void ataxx_state::ataxx(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_master, 6000000);
+	Z80(config, m_master, XTAL::u(6000000));
 	m_master->set_addrmap(AS_PROGRAM, &ataxx_state::master_map_program_2);
 	m_master->set_addrmap(AS_IO, &ataxx_state::master_map_io_2);
 
-	Z80(config, m_slave, 6000000);
+	Z80(config, m_slave, XTAL::u(6000000));
 	m_slave->set_addrmap(AS_PROGRAM, &ataxx_state::slave_map_program);
 	m_slave->set_addrmap(AS_IO, &ataxx_state::slave_map_io_2);
 
@@ -1211,7 +1211,7 @@ void ataxx_state::ataxx(machine_config &config)
 	ataxx_video(config);
 
 	/* sound hardware */
-	ATAXX_80186(config, m_sound, 0).set_master_cpu_tag(m_master);
+	ATAXX_80186(config, m_sound).set_master_cpu_tag(m_master);
 }
 
 
@@ -1219,7 +1219,7 @@ void ataxx_state::wsf(machine_config &config)
 {
 	ataxx(config);
 
-	WSF_80186(config.replace(), m_sound, 0).set_master_cpu_tag(m_master);
+	WSF_80186(config.replace(), m_sound).set_master_cpu_tag(m_master);
 }
 
 void ataxx_state::asylum(machine_config &config)

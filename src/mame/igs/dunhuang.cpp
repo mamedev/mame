@@ -808,7 +808,7 @@ void dunhuang_state::machine_reset()
 void dunhuang_state::dunhuang(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);
+	Z80(config, m_maincpu, XTAL::u(12000000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dunhuang_state::dunhuang_map);
 	m_maincpu->set_addrmap(AS_IO, &dunhuang_state::dunhuang_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dunhuang_state::irq0_line_hold));
@@ -827,20 +827,20 @@ void dunhuang_state::dunhuang(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dunhuang);
 	PALETTE(config, m_palette).set_entries(0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &dunhuang_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
+	YM2413(config, "ymsnd", XTAL::u(3579545)).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	ay8910_device &ay8910(AY8910(config, "ay8910", 12000000/8));
+	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL::u(12000000)/8));
 	ay8910.port_b_read_callback().set(FUNC(dunhuang_state::dsw_r));
 	ay8910.port_a_write_callback().set(FUNC(dunhuang_state::input_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	OKIM6295(config, "oki", 12000000/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
+	OKIM6295(config, "oki", XTAL::u(12000000)/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 

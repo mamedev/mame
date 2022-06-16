@@ -35,7 +35,7 @@ void vic20_megacart_device::device_add_mconfig(machine_config &config)
 //  vic20_megacart_device - constructor
 //-------------------------------------------------
 
-vic20_megacart_device::vic20_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vic20_megacart_device::vic20_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VIC20_MEGACART, tag, owner, clock)
 	, device_vic20_expansion_card_interface(mconfig, *this)
 	, device_nvram_interface(mconfig, *this)

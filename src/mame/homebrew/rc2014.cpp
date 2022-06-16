@@ -33,7 +33,7 @@ public:
 	//
 	void rc2014(machine_config &config)
 	{
-		RC2014_BUS(config, m_bus, 0);
+		RC2014_BUS(config, m_bus);
 		RC2014_SLOT(config, "bus:1", m_bus, rc2014_bus_modules, "z80");
 		RC2014_SLOT(config, "bus:2", m_bus, rc2014_bus_modules, "clock");
 		RC2014_SLOT(config, "bus:3", m_bus, rc2014_bus_modules, "ram32k");
@@ -46,7 +46,7 @@ public:
 	//
 	void rc2014bp5(machine_config &config)
 	{
-		RC2014_BUS(config, m_bus, 0);
+		RC2014_BUS(config, m_bus);
 		RC2014_SLOT(config, "bus:1", m_bus, rc2014_bus_modules, nullptr);
 		RC2014_SLOT(config, "bus:2", m_bus, rc2014_bus_modules, nullptr);
 		RC2014_SLOT(config, "bus:3", m_bus, rc2014_bus_modules, nullptr);
@@ -69,7 +69,7 @@ public:
 	//
 	void rc2014cl2(machine_config &config)
 	{
-		RC2014_BUS(config, m_bus, 0);
+		RC2014_BUS(config, m_bus);
 		RC2014_SLOT(config, "bus:1", m_bus, rc2014_bus_modules, "z80");
 		RC2014_SLOT(config, "bus:2", m_bus, rc2014_bus_modules, "clock");
 		RC2014_SLOT(config, "bus:3", m_bus, rc2014_bus_modules, "ram32k");
@@ -95,7 +95,7 @@ public:
 	//
 	void rc2014zed(machine_config &config)
 	{
-		RC2014_BUS(config, m_bus, 0);
+		RC2014_BUS(config, m_bus);
 		RC2014_SLOT(config, "bus:1", m_bus, rc2014_bus_modules, "z80_21_40p");
 		RC2014_SLOT(config, "bus:2", m_bus, rc2014_bus_modules, "dual_clk_40p");
 		RC2014_SLOT(config, "bus:3", m_bus, rc2014_bus_modules, "rom_ram");
@@ -111,7 +111,7 @@ public:
 	//
 	void rc2014bp8(machine_config &config)
 	{
-		RC2014_BUS(config, m_bus, 0);
+		RC2014_BUS(config, m_bus);
 		RC2014_SLOT(config, "bus:1", m_bus, rc2014_bus_modules, nullptr);
 		RC2014_SLOT(config, "bus:2", m_bus, rc2014_bus_modules, nullptr);
 		RC2014_SLOT(config, "bus:3", m_bus, rc2014_bus_modules, nullptr);
@@ -127,7 +127,7 @@ public:
 	//
 	void sc133(machine_config &config)
 	{
-		RC2014_BUS(config, m_bus, 0);
+		RC2014_BUS(config, m_bus);
 		RC2014_SLOT(config, "bus:1", m_bus, rc2014_bus_modules, nullptr);
 		RC2014_SLOT(config, "bus:2", m_bus, rc2014_bus_modules, nullptr);
 		RC2014_SLOT(config, "bus:3", m_bus, rc2014_bus_modules, nullptr);
@@ -186,7 +186,7 @@ public:
 	//
 	void rc2014pro(machine_config &config)
 	{
-		RC2014_EXT_BUS(config, m_bus, 0);
+		RC2014_EXT_BUS(config, m_bus);
 		RC2014_EXT_SLOT(config, "bus:1", m_bus, rc2014_ext_bus_modules, "z80_21");
 		RC2014_EXT_SLOT(config, "bus:2", m_bus, rc2014_ext_bus_modules, "dual_clk");
 		RC2014_EXT_SLOT(config, "bus:3", m_bus, rc2014_ext_bus_modules, "ram64k");
@@ -213,7 +213,7 @@ public:
 	//
 	void rc2014zedp(machine_config &config)
 	{
-		RC2014_EXT_BUS(config, m_bus, 0);
+		RC2014_EXT_BUS(config, m_bus);
 		RC2014_EXT_SLOT(config, "bus:1", m_bus, rc2014_ext_bus_modules, "z80_21");
 		RC2014_EXT_SLOT(config, "bus:2", m_bus, rc2014_ext_bus_modules, "dual_clk");
 		RC2014_EXT_SLOT(config, "bus:3", m_bus, rc2014_ext_bus_modules, "rom_ram");
@@ -233,7 +233,7 @@ public:
 	//
 	void rc2014bppro(machine_config &config)
 	{
-		RC2014_EXT_BUS(config, m_bus, 0);
+		RC2014_EXT_BUS(config, m_bus);
 		RC2014_EXT_SLOT(config, "bus:1", m_bus, rc2014_ext_bus_modules, nullptr);
 		RC2014_EXT_SLOT(config, "bus:2", m_bus, rc2014_ext_bus_modules, nullptr);
 		RC2014_EXT_SLOT(config, "bus:3", m_bus, rc2014_ext_bus_modules, nullptr);
@@ -280,7 +280,7 @@ public:
 	//
 	void rc2014mini(machine_config &config)
 	{
-		RC2014_BUS(config, m_bus, 0);
+		RC2014_BUS(config, m_bus);
 		RC2014_SLOT(config, "board", m_bus, rc2014_mini_bus_modules, "mini", true);
 		RC2014_SLOT(config, "bus:1", m_bus, rc2014_mini_bus_modules, nullptr);
 	}
@@ -290,7 +290,7 @@ public:
 	//
 	void rc2014minicpm(machine_config &config)
 	{
-		RC2014_BUS(config, m_bus, 0);
+		RC2014_BUS(config, m_bus);
 		RC2014_SLOT(config, "board", m_bus, rc2014_mini_bus_modules, "mini", true).set_option_device_input_defaults("mini", DEVICE_INPUT_DEFAULTS_NAME(mini_cpm));
 		RC2014_SLOT(config, "bus:1", m_bus, rc2014_mini_bus_modules, "mini_cpm", true);
 	}
@@ -303,7 +303,7 @@ public:
 	//
 	void rc2014micro(machine_config &config)
 	{
-		RC2014_BUS(config, m_bus, 0);
+		RC2014_BUS(config, m_bus);
 		RC2014_SLOT(config, "board", m_bus, rc2014_bus_modules, "micro", true);
 	}
 private:
@@ -336,7 +336,7 @@ public:
 	//
 	void sc105(machine_config &config)
 	{
-		RC2014_RC80_BUS(config, m_bus, 0);
+		RC2014_RC80_BUS(config, m_bus);
 		RC2014_RC80_SLOT(config, "bus:1", m_bus, rc2014_rc80_bus_modules, nullptr);
 		RC2014_RC80_SLOT(config, "bus:2", m_bus, rc2014_rc80_bus_modules, nullptr);
 		RC2014_RC80_SLOT(config, "bus:3", m_bus, rc2014_rc80_bus_modules, nullptr);
@@ -355,7 +355,7 @@ public:
 	//
 	void sc112(machine_config &config)
 	{
-		RC2014_RC80_BUS(config, m_bus, 0);
+		RC2014_RC80_BUS(config, m_bus);
 		RC2014_RC80_SLOT(config, "bus:1", m_bus, rc2014_rc80_bus_modules, nullptr);
 		RC2014_RC80_SLOT(config, "bus:2", m_bus, rc2014_rc80_bus_modules, nullptr);
 		RC2014_RC80_SLOT(config, "bus:3", m_bus, rc2014_rc80_bus_modules, nullptr);
@@ -373,7 +373,7 @@ public:
 	//
 	void sc116(machine_config &config)
 	{
-		RC2014_RC80_BUS(config, m_bus, 0);
+		RC2014_RC80_BUS(config, m_bus);
 		RC2014_RC80_SLOT(config, "bus:1", m_bus, rc2014_rc80_bus_modules, nullptr);
 		RC2014_RC80_SLOT(config, "bus:2", m_bus, rc2014_rc80_bus_modules, nullptr);
 		RC2014_RC80_SLOT(config, "bus:3", m_bus, rc2014_rc80_bus_modules, nullptr);
@@ -389,7 +389,7 @@ public:
 	//
 	void sc203(machine_config &config)
 	{
-		RC2014_RC80_BUS(config, m_bus, 0);
+		RC2014_RC80_BUS(config, m_bus);
 		RC2014_RC80_SLOT(config, "bus:1", m_bus, rc2014_rc80_bus_modules, "sc111");
 		RC2014_RC80_SLOT(config, "bus:2", m_bus, rc2014_rc80_bus_modules, "sc119");
 		RC2014_RC80_SLOT(config, "bus:3", m_bus, rc2014_rc80_bus_modules, nullptr);

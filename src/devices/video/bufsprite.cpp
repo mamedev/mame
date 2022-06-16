@@ -29,7 +29,7 @@ buffered_spriteram_device<Type>::buffered_spriteram_device(
 		device_type type,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock)
+		const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_spriteram(*this, DEVICE_SELF)
 {
@@ -48,28 +48,28 @@ void buffered_spriteram_device<Type>::device_start()
 
 
 
-buffered_spriteram8_device::buffered_spriteram8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+buffered_spriteram8_device::buffered_spriteram8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: buffered_spriteram_device<u8>(mconfig, BUFFERED_SPRITERAM8, tag, owner, clock)
 {
 }
 
 
 
-buffered_spriteram16_device::buffered_spriteram16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+buffered_spriteram16_device::buffered_spriteram16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: buffered_spriteram_device<u16>(mconfig, BUFFERED_SPRITERAM16, tag, owner, clock)
 {
 }
 
 
 
-buffered_spriteram32_device::buffered_spriteram32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+buffered_spriteram32_device::buffered_spriteram32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: buffered_spriteram_device<u32>(mconfig, BUFFERED_SPRITERAM32, tag, owner, clock)
 {
 }
 
 
 
-buffered_spriteram64_device::buffered_spriteram64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+buffered_spriteram64_device::buffered_spriteram64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: buffered_spriteram_device<u64>(mconfig, BUFFERED_SPRITERAM64, tag, owner, clock)
 {
 }

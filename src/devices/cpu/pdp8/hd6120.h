@@ -68,7 +68,7 @@ public:
 	};
 
 	// device type constructor
-	hd6120_device(const machine_config &config, const char *tag, device_t *owner, u32 clock);
+	hd6120_device(const machine_config &config, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callback configuration
 	auto lxmar_callback() { return m_lxmar_callback.bind(); }

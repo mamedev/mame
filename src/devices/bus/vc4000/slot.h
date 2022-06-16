@@ -59,14 +59,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const *dflt)
-		: vc4000_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: vc4000_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~vc4000_cart_slot_device();
 
 	// image-level overrides
@@ -111,14 +111,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const *dflt)
-		: h21_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: h21_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~h21_cart_slot_device();
 
 	virtual const char *image_interface() const noexcept override { return "h21_cart"; }

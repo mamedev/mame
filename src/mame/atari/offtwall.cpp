@@ -350,10 +350,10 @@ void offtwall_state::offtwall(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_offtwall);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
-	ATARI_VAD(config, m_vad, 0, "screen");
+	ATARI_VAD(config, m_vad, "screen");
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(offtwall_state::get_playfield_tile_info));
-	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, "screen", offtwall_state::s_mob_config).set_gfxdecode("gfxdecode");
+	ATARI_MOTION_OBJECTS(config, "vad:mob", "screen", offtwall_state::s_mob_config).set_gfxdecode("gfxdecode");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
@@ -366,7 +366,7 @@ void offtwall_state::offtwall(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_III(config, m_jsa, 0);
+	ATARI_JSA_III(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260010").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);

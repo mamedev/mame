@@ -12,7 +12,7 @@
 class i82875p_host_device : public pci_host_device {
 public:
 	template <typename T>
-	i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id, T &&cpu_tag, int ram_size)
+	i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t subdevice_id, T &&cpu_tag, int ram_size)
 		: i82875p_host_device(mconfig, tag, owner, clock)
 	{
 		set_ids_host(0x80862578, 0x02, subdevice_id);
@@ -20,7 +20,7 @@ public:
 		set_ram_size(ram_size);
 	}
 
-	i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_size(int ram_size);
@@ -97,7 +97,7 @@ private:
 
 class i82875p_agp_device : public agp_bridge_device {
 public:
-	i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -106,12 +106,12 @@ protected:
 
 class i82875p_overflow_device : public pci_device {
 public:
-	i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id)
+	i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t subdevice_id)
 		: i82875p_overflow_device(mconfig, tag, owner, clock)
 	{
 		set_ids(0x8086257e, 0x02, 0x088000, subdevice_id);
 	}
-	i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	uint8_t dram_row_boundary_r(offs_t offset);

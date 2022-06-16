@@ -849,20 +849,20 @@ void wgp_state::machine_start()
 void wgp_state::wgp(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);    /* 12 MHz ??? */
+	M68000(config, m_maincpu, XTAL::u(12000000));    /* 12 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &wgp_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(wgp_state::irq4_line_hold));
 
 	Z80(config, m_audiocpu, 16000000/4);    /* 4 MHz ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wgp_state::z80_sound_map);
 
-	M68000(config, m_subcpu, 12000000);     /* 12 MHz ??? */
+	M68000(config, m_subcpu, XTAL::u(12000000));     /* 12 MHz ??? */
 	m_subcpu->set_addrmap(AS_PROGRAM, &wgp_state::cpu2_map);
 	m_subcpu->set_vblank_int("screen", FUNC(wgp_state::cpub_interrupt));
 
 	config.set_maximum_quantum(attotime::from_hz(30000));
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -891,7 +891,7 @@ void wgp_state::wgp(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wgp);
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette(m_palette);
 
 	/* sound hardware */
@@ -905,7 +905,7 @@ void wgp_state::wgp(machine_config &config)
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->set_master_tag(m_subcpu);
 	m_tc0140syt->set_slave_tag(m_audiocpu);
 }

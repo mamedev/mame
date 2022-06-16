@@ -148,7 +148,7 @@ INPUT_PORTS_END
 
 void leapfrog_leappad_state::leapfrog_leappad(machine_config &config)
 {
-	I8032(config, m_maincpu, 96000000/10); //  LeapPad Leapfrog 05-9-01 FS80A363  (which exact type is it?)
+	I8032(config, m_maincpu, XTAL::u(96000000)/10); //  LeapPad Leapfrog 05-9-01 FS80A363  (which exact type is it?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_leappad_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &leapfrog_leappad_state::ext_map);
 
@@ -163,7 +163,7 @@ void leapfrog_leappad_state::leapfrog_leappad(machine_config &config)
 
 void leapfrog_leappad_state::leapfrog_mfleappad(machine_config &config)
 {
-	I8032(config, m_maincpu, 96000000/10); //  LeapPad Leapfrog 05-9-01 FS80A363  (which exact type is it?)
+	I8032(config, m_maincpu, XTAL::u(96000000)/10); //  LeapPad Leapfrog 05-9-01 FS80A363  (which exact type is it?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_leappad_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &leapfrog_leappad_state::ext_map);
 
@@ -178,7 +178,7 @@ void leapfrog_leappad_state::leapfrog_mfleappad(machine_config &config)
 
 void leapfrog_leappad_state::leapfrog_ltleappad(machine_config &config)
 {
-	I8032(config, m_maincpu, 96000000/10); // (which exact type is it?)
+	I8032(config, m_maincpu, XTAL::u(96000000)/10); // (which exact type is it?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_leappad_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &leapfrog_leappad_state::ext_map);
 

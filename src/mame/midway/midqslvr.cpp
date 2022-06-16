@@ -649,14 +649,14 @@ void midqslvr_state::machine_reset()
 
 void midqslvr_state::midqslvr(machine_config &config)
 {
-	PENTIUM2(config, m_maincpu, 333000000); //Verified this Celeron to be Pentium II based.
+	PENTIUM2(config, m_maincpu, XTAL::u(333000000)); //Verified this Celeron to be Pentium II based.
 	m_maincpu->set_addrmap(AS_PROGRAM, &midqslvr_state::midqslvr_map);
 	m_maincpu->set_addrmap(AS_IO, &midqslvr_state::midqslvr_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus"));
 	pcibus.set_device( 0, FUNC(midqslvr_state::intel82439tx_pci_r), FUNC(midqslvr_state::intel82439tx_pci_w));
 	pcibus.set_device(31, FUNC(midqslvr_state::intel82371ab_pci_r), FUNC(midqslvr_state::intel82371ab_pci_w));
 
@@ -669,14 +669,14 @@ void midqslvr_state::midqslvr(machine_config &config)
 
 void midqslvr_state::graphite(machine_config &config) //Todo: The entire Pro133A chipset :).
 {
-	PENTIUM3(config, m_maincpu, 733000000); //Verified
+	PENTIUM3(config, m_maincpu, XTAL::u(733000000)); //Verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &midqslvr_state::midqslvr_map);
 	m_maincpu->set_addrmap(AS_IO, &midqslvr_state::midqslvr_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus"));
 	pcibus.set_device( 0, FUNC(midqslvr_state::intel82439tx_pci_r), FUNC(midqslvr_state::intel82439tx_pci_w));
 	pcibus.set_device(31, FUNC(midqslvr_state::intel82371ab_pci_r), FUNC(midqslvr_state::intel82371ab_pci_w));
 

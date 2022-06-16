@@ -744,8 +744,8 @@ void tsamurai_state::tsamurai(machine_config &config)
 
 	AY8910(config,"aysnd", XTAL(24'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.1);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
 }
 
 
@@ -787,7 +787,7 @@ void vsgongf_state::vsgongf(machine_config &config)
 
 	AY8910(config,"aysnd", XTAL(24'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.1);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
 }
 
 
@@ -836,8 +836,8 @@ void m660_state::m660(machine_config &config)
 
 	AY8910(config,"aysnd", XTAL(24'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.1);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
 }
 
 

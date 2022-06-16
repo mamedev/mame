@@ -31,7 +31,7 @@ class epson_lx810l_device : public device_t, public device_centronics_peripheral
 {
 public:
 	// construction/destruction
-	epson_lx810l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	epson_lx810l_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	/* Centronics stuff */
 	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override { m_e05a30->centronics_input_strobe(state); }
@@ -52,7 +52,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_printer);
 
 protected:
-	epson_lx810l_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	epson_lx810l_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -152,7 +152,7 @@ class epson_ap2000_device : public epson_lx810l_device
 {
 public:
 	// construction/destruction
-	epson_ap2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	epson_ap2000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

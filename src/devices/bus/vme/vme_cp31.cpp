@@ -176,7 +176,7 @@ void vme_cp31_card_device::device_add_mconfig(machine_config &config)
 	m_rtc->out_int_handler().set(m_pit1, FUNC(pit68230_device::h2_w));
 
 	// H1 is SYSFAIL and H3 is ACFAIL
-	PIT68230(config, m_pit1, 8064000); // via c33_txt
+	PIT68230(config, m_pit1, XTAL::u(8064000)); // via c33_txt
 	m_pit1->pa_in_callback().set_ioport("SA1");
 	m_pit1->pb_out_callback().set(*this, FUNC(vme_cp31_card_device::pit1_pb_w));
 	m_pit1->pc_in_callback().set(*this, FUNC(vme_cp31_card_device::pit1_pc_r));
@@ -184,7 +184,7 @@ void vme_cp31_card_device::device_add_mconfig(machine_config &config)
 	m_pit1->timer_irq_callback().set(m_bim, FUNC(bim68153_device::int2_w));
 	m_pit1->port_irq_callback().set(m_bim, FUNC(bim68153_device::int3_w));
 
-	PIT68230(config, m_pit2, 8064000); // via c33_txt
+	PIT68230(config, m_pit2, XTAL::u(8064000)); // via c33_txt
 	m_pit2->port_irq_callback().set(m_pit1, FUNC(pit68230_device::h4_w));
 }
 
@@ -264,7 +264,7 @@ void vme_cp31_card_device::set_bus_error(uint32_t address, bool rw, uint32_t mem
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
 }
 
-vme_cp31_card_device::vme_cp31_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vme_cp31_card_device::vme_cp31_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
@@ -281,7 +281,7 @@ vme_cp31_card_device::vme_cp31_card_device(const machine_config &mconfig, device
 
 //
 
-vme_cp31_card_device::vme_cp31_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_cp31_card_device::vme_cp31_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vme_cp31_card_device(mconfig, VME_CP31, tag, owner, clock)
 {
 }

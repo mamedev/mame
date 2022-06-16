@@ -557,7 +557,7 @@ void excel68k_state::fex68k(machine_config &config)
 	M68000(config, m_maincpu, 12_MHz_XTAL); // HD68HC000P12
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68k_map);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), ideal is 600Hz (measured 580Hz, 604Hz, 632Hz)
+	auto &irq_clock(CLOCK(config, "irq_clock", XTAL::u(600))); // 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), ideal is 600Hz (measured 580Hz, 604Hz, 632Hz)
 	irq_clock.set_pulse_width(attotime::from_nsec(1525)); // active for 1.525us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M68K_IRQ_2);
 

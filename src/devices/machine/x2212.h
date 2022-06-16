@@ -38,7 +38,7 @@ class x2212_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
-	x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// some systems (like many early Atari games) wire up the /STORE signal
 	// to fire on power-down, effectively creating an "auto-save" functionality
@@ -52,7 +52,7 @@ public:
 	void recall(int state);
 
 protected:
-	x2212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int size_data);
+	x2212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int size_data);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -84,7 +84,7 @@ private:
 class x2210_device : public x2212_device
 {
 public:
-	x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 

@@ -180,9 +180,9 @@ public:
 		m_current_device = &device;
 		return token(*this, device);
 	}
-	device_t *device_add(const char *tag, device_type type, u32 clock);
+	device_t *device_add(const char *tag, device_type type, const XTAL &clock = XTAL());
 	template <typename Creator>
-	device_t *device_add(const char *tag, Creator &&type, u32 clock)
+	device_t *device_add(const char *tag, Creator &&type, const XTAL &clock = XTAL())
 	{
 		return device_add(tag, device_type(type), clock);
 	}
@@ -196,15 +196,9 @@ public:
 		add_device(std::move(device), owner.second);
 		return &result;
 	}
-	template <typename Creator, typename... Params>
-	auto device_add(const char *tag, Creator &&type, XTAL clock, Params &&... args)
-	{
-		clock.validate(std::string("Instantiating device ") + tag);
-		return device_add(tag, std::forward<Creator>(type), clock.value(), std::forward<Params>(args)...);
-	}
-	device_t *device_replace(const char *tag, device_type type, u32 clock);
+	device_t *device_replace(const char *tag, device_type type, const XTAL &clock = XTAL());
 	template <typename Creator>
-	device_t *device_replace(const char *tag, Creator &&type, u32 clock)
+	device_t *device_replace(const char *tag, Creator &&type, const XTAL &clock = XTAL())
 	{
 		return device_replace(tag, device_type(type), clock);
 	}
@@ -217,12 +211,6 @@ public:
 		assert(type.type() == typeid(result));
 		replace_device(std::move(device), *std::get<1>(existing), std::get<2>(existing));
 		return &result;
-	}
-	template <typename Creator, typename... Params>
-	auto device_replace(const char *tag, Creator &&type, XTAL clock, Params &&... args)
-	{
-		clock.validate(std::string("Replacing device ") + tag);
-		return device_replace(tag, std::forward<Creator>(type), clock.value(), std::forward<Params>(args)...);
 	}
 	device_t *device_remove(const char *tag);
 

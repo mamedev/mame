@@ -1380,7 +1380,7 @@ void spg2xx_game_senspeed_state::senspeed(machine_config &config)
 	    02B 1
 	    A7J4565E
 	*/
-	I2C_24C01(config, "i2cmem", 0); // saves 0x80 bytes, but loading fails?
+	I2C_24C01(config, "i2cmem"); // saves 0x80 bytes, but loading fails?
 }
 
 
@@ -1491,7 +1491,7 @@ void spg2xx_game_tmntmutm_state::tmntmutm(machine_config &config)
 	m_maincpu->guny_in().set(FUNC(spg2xx_game_tmntmutm_state::guny_r));
 	m_maincpu->gunx_in().set(FUNC(spg2xx_game_tmntmutm_state::gunx_r));
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 uint16_t spg2xx_game_albkickb_state::portb_r(offs_t offset, uint16_t mem_mask)
@@ -1595,7 +1595,7 @@ void spg2xx_game_swclone_state::swclone(machine_config &config)
 	m_maincpu->guny_in().set(FUNC(spg2xx_game_swclone_state::base_guny_r));
 	m_maincpu->gunx_in().set(FUNC(spg2xx_game_swclone_state::base_gunx_r));
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 
@@ -1656,7 +1656,7 @@ void spg2xx_game_dreamlss_state::dreamlss(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_dreamlss_state::portb_w));
 	m_maincpu->portc_out().set(FUNC(spg2xx_game_dreamlss_state::portc_w));
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 void spg2xx_game_gssytts_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)

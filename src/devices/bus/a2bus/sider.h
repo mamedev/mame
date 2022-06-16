@@ -27,7 +27,7 @@ class a2bus_sider_device:
 	public device_a2bus_card_interface
 {
 protected:
-	a2bus_sider_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_sider_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -53,14 +53,14 @@ private:
 class a2bus_sider2card_device: public a2bus_sider_device
 {
 public:
-	a2bus_sider2card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_sider2card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class a2bus_sider1card_device: public a2bus_sider_device
 {
 public:
-	a2bus_sider1card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_sider1card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 

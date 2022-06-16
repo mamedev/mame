@@ -17,7 +17,7 @@
 class tms0270_cpu_device : public tms0980_cpu_device
 {
 public:
-	tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// overrides

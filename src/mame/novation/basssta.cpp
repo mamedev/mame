@@ -79,7 +79,7 @@ INPUT_PORTS_END
 
 void basssta_state::bassstr(machine_config &config)
 {
-	MN1880(config, m_maincpu, 8000000); // type and clock unknown (custom silkscreen; might be MN18P83220)
+	MN1880(config, m_maincpu, XTAL::u(8000000)); // type and clock unknown (custom silkscreen; might be MN18P83220)
 	m_maincpu->set_addrmap(AS_PROGRAM, &basssta_state::bassstr_prog);
 	m_maincpu->set_addrmap(AS_DATA, &basssta_state::bassstr_data);
 
@@ -88,7 +88,7 @@ void basssta_state::bassstr(machine_config &config)
 
 void basssta_state::sbasssta(machine_config &config)
 {
-	MN1880(config, m_maincpu, 8000000); // type and clock unknown (custom silkscreen)
+	MN1880(config, m_maincpu, XTAL::u(8000000)); // type and clock unknown (custom silkscreen)
 	m_maincpu->set_addrmap(AS_PROGRAM, &basssta_state::sbasssta_prog);
 	m_maincpu->set_addrmap(AS_DATA, &basssta_state::sbasssta_data);
 

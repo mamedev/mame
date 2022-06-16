@@ -23,7 +23,7 @@ class rf5c400_device : public device_t,
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; } // unemulated and/or unverified effects and envelopes
 
-	rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t rf5c400_r(offs_t offset, uint16_t mem_mask = ~0);
 	void rf5c400_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

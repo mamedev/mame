@@ -272,7 +272,7 @@ void ts816_state::ts816(machine_config &config)
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(ts816_state::kbd_put));
 
 	//z80sio_device& sio0(Z80SIO(config, "sio0", XTAL(16'000'000) / 4));

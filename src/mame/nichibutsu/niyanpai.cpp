@@ -705,7 +705,7 @@ void niyanpai_state::niyanpai(machine_config &config)
 	PALETTE(config, m_palette).set_entries(256*3);
 
 	/* sound hardware */
-	NICHISND(config, "nichisnd", 0);
+	NICHISND(config, "nichisnd");
 }
 
 void niyanpai_state::musobana(machine_config &config)

@@ -60,7 +60,7 @@ ioport_constructor electron_sndexp_device::device_input_ports() const
 //  electron_sndexp_device - constructor
 //-------------------------------------------------
 
-electron_sndexp_device::electron_sndexp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_sndexp_device::electron_sndexp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_SNDEXP, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
 	, m_sn(*this, "sn76489")

@@ -11,7 +11,7 @@
 DEFINE_DEVICE_TYPE(MSX_SLOT_FS4600, msx_slot_fs4600_device, "msx_slot_fs4600", "MSX Internal FS4600 Firmware")
 
 
-msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_SLOT_FS4600, tag, owner, clock)
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_nvram(*this, "nvram")

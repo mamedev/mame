@@ -324,7 +324,7 @@ void carnival_state::carnivalb_audio(machine_config &config)
 	m_audiocpu->p1_out_cb().set(FUNC(carnival_state::carnivalb_music_port_1_w));
 	m_audiocpu->p2_out_cb().set(FUNC(carnival_state::carnivalb_music_port_2_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(XTAL(3'579'545)/3);
 	m_pit->set_clk<1>(XTAL(3'579'545)/3);
 	m_pit->set_clk<2>(XTAL(3'579'545)/3);
@@ -1215,7 +1215,7 @@ void vicdual_state::frogs(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	FROGS_AUDIO(config, m_vicdual_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	FROGS_AUDIO(config, m_vicdual_sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -3062,7 +3062,7 @@ void tranqgun_state::tranqgun(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	BORDERLINE_AUDIO(config, m_vicdual_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	BORDERLINE_AUDIO(config, m_vicdual_sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void tranqgun_state::brdrlinet(machine_config &config)
@@ -3081,7 +3081,7 @@ void vicdual_state::brdrline(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	BORDERLINE_AUDIO(config, m_vicdual_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	BORDERLINE_AUDIO(config, m_vicdual_sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -3448,13 +3448,13 @@ void nsub_state::nsub(machine_config &config)
 	m_screen->set_raw(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART);
 	m_screen->set_screen_update(FUNC(nsub_state::screen_update_color));
 
-	S97269PB(config, m_s97269pb, 0);
+	S97269PB(config, m_s97269pb);
 
 	MCFG_MACHINE_START_OVERRIDE(nsub_state, nsub)
 	MCFG_MACHINE_RESET_OVERRIDE(nsub_state, nsub)
 
 	/* audio hardware */
-	S97271P(config, m_s97271p, 0);
+	S97271P(config, m_s97271p);
 }
 
 

@@ -24,7 +24,7 @@ class k053260_device : public device_t,
 					   public device_rom_interface<21>
 {
 public:
-	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 main_read(offs_t offset);
 	void main_write(offs_t offset, u8 data);

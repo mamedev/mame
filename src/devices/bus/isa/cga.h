@@ -29,7 +29,7 @@ class isa8_cga_device :
 public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 	// construction/destruction
-	isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 	template<bool blink, bool si, bool comp, bool alt, int width> MC6845_UPDATE_ROW( cga_text );
@@ -39,7 +39,7 @@ public:
 	MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row );
 
 protected:
-	isa8_cga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_device<mc6845_device> m_crtc;
 	required_ioport m_cga_config;
@@ -103,9 +103,9 @@ class isa8_cga_superimpose_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_superimpose_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_superimpose_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
-	isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition
@@ -119,7 +119,7 @@ class isa8_cga_poisk2_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_poisk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_poisk2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -135,7 +135,7 @@ class isa8_cga_pc1512_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -177,7 +177,7 @@ class isa8_wyse700_device :
 {
 public:
 	// construction/destruction
-	isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -208,7 +208,7 @@ class isa8_ec1841_0002_device :
 {
 public:
 	// construction/destruction
-	isa8_ec1841_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_ec1841_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -234,7 +234,7 @@ class isa8_cga_iskr1030m_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_iskr1030m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_iskr1030m_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
@@ -248,7 +248,7 @@ class isa8_cga_iskr1031_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_iskr1031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_iskr1031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
@@ -262,7 +262,7 @@ class isa8_cga_mc1502_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -279,7 +279,7 @@ class isa8_cga_m24_device :
 {
 public:
 	// construction/destruction
-	isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual uint8_t io_read(offs_t offset) override;
 	virtual void io_write(offs_t offset, uint8_t data) override;
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
@@ -287,7 +287,7 @@ public:
 	MC6845_RECONFIGURE(reconfigure);
 
 protected:
-	isa8_cga_m24_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_m24_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void device_reset() override;
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -302,7 +302,7 @@ class isa8_cga_cportiii_device :
 		public isa8_cga_m24_device
 {
 public:
-	isa8_cga_cportiii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_cga_cportiii_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	uint8_t port_13c6_r();
 	void port_13c6_w(uint8_t data);
 	uint8_t port_23c6_r();

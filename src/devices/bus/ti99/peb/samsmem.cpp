@@ -34,7 +34,7 @@ namespace bus::ti99::peb {
 
 #define SAMS_CRU_BASE 0x1e00
 
-sams_memory_expansion_device::sams_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sams_memory_expansion_device::sams_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_SAMSMEM, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_ram(*this, RAM_TAG),

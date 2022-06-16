@@ -541,10 +541,10 @@ void amusco_state::amusco(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &amusco_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(PIT_CLOCK0);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(PIT_CLOCK1);
@@ -560,14 +560,14 @@ void amusco_state::amusco(machine_config &config)
 	ppi_inputs.in_pb_callback().set_ioport("IN1");
 	ppi_inputs.in_pc_callback().set_ioport("IN2");
 
-	i8155_device &i8155a(I8155(config, "lpt_interface", 0));
+	i8155_device &i8155a(I8155(config, "lpt_interface"));
 	i8155a.out_pa_callback().set(FUNC(amusco_state::lpt_data_w));
 	i8155a.in_pb_callback().set(FUNC(amusco_state::lpt_status_r));
 	// Port C uses ALT 3 mode, which MAME does not currently emulate
 
 	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
-	i8155_device &i8155b(I8155(config, "rtc_interface", 0));
+	i8155_device &i8155b(I8155(config, "rtc_interface"));
 	i8155b.out_pa_callback().set(FUNC(amusco_state::rtc_control_w));
 	i8155b.in_pc_callback().set(m_rtc, FUNC(msm5832_device::data_r));
 	i8155b.out_pc_callback().set(m_rtc, FUNC(msm5832_device::data_w));

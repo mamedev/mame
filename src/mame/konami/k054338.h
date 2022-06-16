@@ -27,13 +27,13 @@ class k054338_device : public device_t,
 						public device_video_interface
 {
 public:
-	template <typename T> k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&mixer_tag)
-		: k054338_device(mconfig, tag, owner, clock)
+	template <typename T> k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&mixer_tag)
+		: k054338_device(mconfig, tag, owner)
 	{
 		m_k055555.set_tag(std::forward<T>(mixer_tag));
 	}
 
-	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	void set_alpha_invert(int alpha_inv) { m_alpha_inv = alpha_inv; }

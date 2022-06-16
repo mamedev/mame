@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(SATURN_SEGATAP, saturn_segatap_device, "saturn_segatap", "sat
 //  LIVE DEVICE
 //**************************************************************************
 
-saturn_segatap_device::saturn_segatap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+saturn_segatap_device::saturn_segatap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SATURN_SEGATAP, tag, owner, clock)
 	, device_saturn_control_port_interface(mconfig, *this)
 	, m_subctrl_port(*this, "ctrl%u", 1U)

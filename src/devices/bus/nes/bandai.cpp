@@ -56,47 +56,47 @@ DEFINE_DEVICE_TYPE(NES_LZ93D50_24C02, nes_lz93d50_24c02_device, "nes_lz93d50_ep2
 DEFINE_DEVICE_TYPE(NES_FJUMP2,        nes_fjump2_device,        "nes_fjump2",      "NES Cart Bandai Famicom Jump II PCB")
 
 
-nes_oekakids_device::nes_oekakids_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_oekakids_device::nes_oekakids_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_OEKAKIDS, tag, owner, clock), m_reg(0), m_latch(0)
 {
 }
 
-nes_fcg_device::nes_fcg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_fcg_device::nes_fcg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
 
-nes_fcg_device::nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_fcg_device::nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_fcg_device(mconfig, NES_FCG, tag, owner, clock)
 {
 }
 
-nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_fcg_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_lz93d50_device(mconfig, NES_LZ93D50, tag, owner, clock)
 {
 }
 
-nes_lz93d50_24c01_device::nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_lz93d50_24c01_device::nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_lz93d50_device(mconfig, type, tag, owner, clock), m_i2cmem(*this, "i2cmem"), m_i2c_dir(0)
 {
 }
 
-nes_lz93d50_24c01_device::nes_lz93d50_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_lz93d50_24c01_device::nes_lz93d50_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_lz93d50_24c01_device(mconfig, NES_LZ93D50_24C01, tag, owner, clock)
 {
 }
 
-nes_lz93d50_24c02_device::nes_lz93d50_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_lz93d50_24c02_device::nes_lz93d50_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_lz93d50_24c01_device(mconfig, NES_LZ93D50_24C02, tag, owner, clock)
 {
 }
 
-nes_fjump2_device::nes_fjump2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_fjump2_device::nes_fjump2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_lz93d50_device(mconfig, NES_FJUMP2, tag, owner, clock)
 {
 }

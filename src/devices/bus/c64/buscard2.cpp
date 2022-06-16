@@ -105,11 +105,11 @@ WRITE_LINE_MEMBER( c64_buscard2_device::busy_w )
 
 void c64_buscard2_device::device_add_mconfig(machine_config &config)
 {
-	RIOT6532(config, m_riot, 0);
+	RIOT6532(config, m_riot);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 
-	IEEE488(config, m_bus, 0);
+	IEEE488(config, m_bus);
 	ieee488_slot_device::add_cbm_defaults(config, nullptr);
 
 	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
@@ -129,7 +129,7 @@ void c64_buscard2_device::device_add_mconfig(machine_config &config)
 //  c64_buscard2_device - constructor
 //-------------------------------------------------
 
-c64_buscard2_device::c64_buscard2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_buscard2_device::c64_buscard2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_BUSCARD2, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_riot(*this, "riot"),

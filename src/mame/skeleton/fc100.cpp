@@ -548,7 +548,7 @@ void fc100_state::fc100(machine_config &config)
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL(4'915'200)/16/16)); // gives 19200
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));

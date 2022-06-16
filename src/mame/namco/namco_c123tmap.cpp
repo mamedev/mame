@@ -30,7 +30,7 @@ GFXDECODE_END
 
 DEFINE_DEVICE_TYPE(NAMCO_C123TMAP, namco_c123tmap_device, "namco_c123tmap", "Namco C123 (4x + 2x Tilemaps)")
 
-namco_c123tmap_device::namco_c123tmap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+namco_c123tmap_device::namco_c123tmap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NAMCO_C123TMAP, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_color_base(0),

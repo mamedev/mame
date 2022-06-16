@@ -23,7 +23,7 @@
 #include <algorithm>
 
 
-#define OUTPUT_RATE     (48000)
+#define OUTPUT_RATE     48000
 
 
 // device type definition
@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(REDBARON, redbaron_sound_device, "redbaron_custom", "Red Baro
 //  redbaron_sound_device - constructor
 //-------------------------------------------------
 
-redbaron_sound_device::redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+redbaron_sound_device::redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, REDBARON, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_vol_lookup(nullptr),
@@ -99,7 +99,7 @@ void redbaron_sound_device::device_start()
 		m_vol_crash[i] = 32767 * r0 / (r0 + r1);
 	}
 
-	m_channel = stream_alloc(0, 1, OUTPUT_RATE);
+	m_channel = stream_alloc(0, 1, XTAL::u(OUTPUT_RATE));
 
 	save_item(NAME(m_latch));
 	save_item(NAME(m_poly_counter));

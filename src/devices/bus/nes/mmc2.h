@@ -14,7 +14,7 @@ class nes_pxrom_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_pxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_pxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void pxrom_write(offs_t offset, uint8_t data);
 	virtual void write_h(offs_t offset, uint8_t data) override { pxrom_write(offset, data); }
@@ -23,7 +23,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_pxrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_pxrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -39,7 +39,7 @@ class nes_fxrom_device : public nes_pxrom_device
 {
 public:
 	// construction/destruction
-	nes_fxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_fxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 

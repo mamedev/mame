@@ -52,14 +52,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	imi7000_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: imi7000_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: imi7000_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	imi7000_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	imi7000_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -75,7 +75,7 @@ class imi7000_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	imi7000_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	imi7000_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T, typename U, typename V, typename W>
 	void set_slot_default_options(T &&def1, U &&def2, V &&def3, W &&def4)

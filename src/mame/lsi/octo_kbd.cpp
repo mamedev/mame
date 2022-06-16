@@ -6,8 +6,8 @@
 #include "machine/keyboard.ipp"
 
 
-octopus_keyboard_device::octopus_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-	: buffered_rs232_device(mconfig, OCTOPUS_KEYBOARD, tag, owner, 0)
+octopus_keyboard_device::octopus_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
+	: buffered_rs232_device(mconfig, OCTOPUS_KEYBOARD, tag, owner)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF")
 {
 }
@@ -231,8 +231,8 @@ void octopus_keyboard_device::device_reset()
 	buffered_rs232_device::device_reset();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rcv_rate(1200);
-	set_tra_rate(9600);
+	set_rcv_rate(XTAL::u(1200));
+	set_tra_rate(XTAL::u(9600));
 	receive_register_reset();
 	transmit_register_reset();
 

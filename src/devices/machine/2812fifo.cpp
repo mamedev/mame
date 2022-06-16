@@ -32,7 +32,7 @@
 DEFINE_DEVICE_TYPE(FIFO2812, fifo2812_device, "fifo2812", "2812 32x8 FIFO Memory");
 
 
-fifo2812_device::fifo2812_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+fifo2812_device::fifo2812_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, FIFO2812, tag, owner, clock),
 	m_q_cb(*this),
 	m_ir_cb(*this),

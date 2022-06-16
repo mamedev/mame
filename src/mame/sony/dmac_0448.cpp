@@ -21,7 +21,7 @@
 
 DEFINE_DEVICE_TYPE(DMAC_0448, dmac_0448_device, "dmac_0448", "Sony DMA Controller 0448")
 
-dmac_0448_device::dmac_0448_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+dmac_0448_device::dmac_0448_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DMAC_0448, tag, owner, clock)
 	, m_bus(*this, finder_base::DUMMY_TAG, -1, 32)
 	, m_out_int(*this)

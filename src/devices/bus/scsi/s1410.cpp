@@ -186,7 +186,7 @@ void s1410_device::device_add_mconfig(machine_config &config)
 //  s1410_device - constructor
 //-------------------------------------------------
 
-s1410_device::s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s1410_device::s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scsihd_device(mconfig, S1410, tag, owner, clock)
 {
 }

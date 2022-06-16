@@ -131,7 +131,7 @@ DEFINE_DEVICE_TYPE(EMERALD_IOGA, emerald_ioga_device, "ioga_e", "I/O Gate Array 
 DEFINE_DEVICE_TYPE(TURQUOISE_IOGA, turquoise_ioga_device, "ioga_t", "I/O Gate Array (Turquoise)")
 DEFINE_DEVICE_TYPE(SAPPHIRE_IOGA, sapphire_ioga_device, "ioga_s", "I/O Gate Array (Sapphire)")
 
-interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_memory_space(*this, finder_base::DUMMY_TAG, -1, 32)
 	, m_out_nmi_func(*this)
@@ -152,17 +152,17 @@ interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device
 {
 }
 
-emerald_ioga_device::emerald_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+emerald_ioga_device::emerald_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: interpro_ioga_device(mconfig, EMERALD_IOGA, tag, owner, clock)
 {
 }
 
-turquoise_ioga_device::turquoise_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+turquoise_ioga_device::turquoise_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: interpro_ioga_device(mconfig, TURQUOISE_IOGA, tag, owner, clock)
 {
 }
 
-sapphire_ioga_device::sapphire_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sapphire_ioga_device::sapphire_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: interpro_ioga_device(mconfig, SAPPHIRE_IOGA, tag, owner, clock)
 {
 	std::fill(std::begin(m_swicr), std::end(m_swicr), 0);

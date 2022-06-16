@@ -101,7 +101,7 @@ void nes_disksys_device::unload_proc(device_image_interface &image)
 DEFINE_DEVICE_TYPE(NES_DISKSYS, nes_disksys_device, "fc_disksys", "FC RAM Expansion + Disk System PCB")
 
 
-nes_disksys_device::nes_disksys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_disksys_device::nes_disksys_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_DISKSYS, tag, owner, clock)
 	, m_2c33_rom(*this, "drive")
 	, m_fds_data(nullptr)

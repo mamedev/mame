@@ -2672,12 +2672,12 @@ void viper_state::machine_reset()
 void viper_state::viper(machine_config &config)
 {
 	/* basic machine hardware */
-	MPC8240(config, m_maincpu, 166666666); // Unknown
+	MPC8240(config, m_maincpu, XTAL::u(166666666)); // Unknown
 	m_maincpu->set_bus_frequency(100000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_map);
 	m_maincpu->set_vblank_int("screen", FUNC(viper_state::viper_vblank));
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus"));
 	pcibus.set_device( 0, FUNC(viper_state::mpc8240_pci_r), FUNC(viper_state::mpc8240_pci_w));
 	pcibus.set_device(12, FUNC(viper_state::voodoo3_pci_r), FUNC(viper_state::voodoo3_pci_w));
 
@@ -2701,7 +2701,7 @@ void viper_state::viper(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(65536);
 
-	TIMER(config, "ds2430_timer2", 0);
+	TIMER(config, "ds2430_timer2");
 	//TIMER(config, "ds2430_timer2").configure_generic(timer_device::expired_delegate());
 
 	/* sound hardware */
@@ -2710,7 +2710,7 @@ void viper_state::viper(machine_config &config)
 	DMADAC(config, "dacl").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	DMADAC(config, "dacr").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	M48T58(config, "m48t58", 0);
+	M48T58(config, "m48t58");
 
 	// Each IRQ3 will update the data buffers with 256 samples, and the playback rate is always 44100hz.
 	// The frequency is picked such that the DMADAC buffer should never overflow or underflow.
@@ -2734,7 +2734,7 @@ void viper_state::viper_omz(machine_config &config)
 {
 	viper(config);
 
-	upd784031_device &omz3dcpu(UPD784031(config, "omz3dcpu", 12000000));
+	upd784031_device &omz3dcpu(UPD784031(config, "omz3dcpu", XTAL::u(12000000)));
 	omz3dcpu.set_addrmap(AS_PROGRAM, &viper_state::omz3d_map);
 }
 

@@ -771,7 +771,7 @@ void mz3500_state::machine_reset()
 		elem->get_device()->set_rpm(300);
 	}
 
-	m_fdc->set_rate(250000);
+	m_fdc->set_rate(XTAL::u(250000));
 
 	m_beeper->set_state(0);
 }
@@ -812,7 +812,7 @@ void mz3500_state::mz3500(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(mz3500_state::mz3500_pb_w));
 	ppi.out_pc_callback().set(FUNC(mz3500_state::mz3500_pc_w));
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_master, INPUT_LINE_IRQ0);
 	FLOPPY_CONNECTOR(config, "upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
@@ -843,7 +843,7 @@ void mz3500_state::mz3500(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
+	BEEP(config, m_beeper, XTAL::u(2400)).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 

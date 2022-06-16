@@ -26,7 +26,7 @@ public:
 	template <typename T> void set_68k_tag(T &&tag) { m_68k.set_tag(std::forward<T>(tag)); }
 
 
-	lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t get_segacd_irq_mask() const { return segacd_irq_mask; }
 

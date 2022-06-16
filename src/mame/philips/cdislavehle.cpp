@@ -399,7 +399,7 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 //  cdislave_hle_device - constructor
 //-------------------------------------------------
 
-cdislave_hle_device::cdislave_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cdislave_hle_device::cdislave_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CDI_SLAVE_HLE, tag, owner, clock)
 	, m_int_callback(*this)
 	, m_dmadac(*this, ":dac%u", 1U)

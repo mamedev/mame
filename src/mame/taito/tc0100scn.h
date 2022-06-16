@@ -66,7 +66,7 @@ public:
 	int bottomlayer();
 
 protected:
-	tc0100scn_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	tc0100scn_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -113,7 +113,7 @@ private:
 class tc0100scn_device : public tc0100scn_base_device
 {
 public:
-	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -128,7 +128,7 @@ private:
 class tc0620scc_device : public tc0100scn_base_device
 {
 public:
-	tc0620scc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0620scc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

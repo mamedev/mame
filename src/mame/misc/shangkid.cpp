@@ -407,7 +407,7 @@ void chinhero_state::chinhero(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 
 	AY8910(config, m_aysnd, XTAL(18'432'000) / 12); // verified on pcb
 	m_aysnd->port_a_write_callback().set(FUNC(chinhero_state::ay8910_porta_w));
@@ -464,7 +464,7 @@ void dynamski_state::portmap(address_map &map)
 void dynamski_state::dynamski(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 3000000); // ?
+	Z80(config, m_maincpu, XTAL::u(3000000)); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynamski_state::prgmap);
 	m_maincpu->set_addrmap(AS_IO, &dynamski_state::portmap);
 
@@ -489,7 +489,7 @@ void dynamski_state::dynamski(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	AY8910(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.1);
+	AY8910(config, "aysnd", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "speaker", 0.1);
 }
 
 /***************************************************************************************/

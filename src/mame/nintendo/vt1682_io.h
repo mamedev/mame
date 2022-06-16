@@ -12,7 +12,7 @@ class vrt_vt1682_io_device : public device_t
 {
 public:
 	// construction/destruction
-	vrt_vt1682_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vrt_vt1682_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto porta_out() { return m_porta_out.bind(); }
 	auto portb_out() { return m_portb_out.bind(); }

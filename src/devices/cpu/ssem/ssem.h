@@ -22,7 +22,7 @@ class ssem_device : public cpu_device
 {
 public:
 	// construction/destruction
-	ssem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ssem_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

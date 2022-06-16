@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(VT83C461, vt83c461_device, "vt83c461", "VIA VT83C461 IDE Controller")
 
-vt83c461_device::vt83c461_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vt83c461_device::vt83c461_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ide_controller_32_device(mconfig, VT83C461, tag, owner, clock),
 	m_config_unknown(0),
 	m_config_register_num(0)

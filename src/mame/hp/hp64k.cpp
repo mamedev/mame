@@ -1375,7 +1375,7 @@ static void hp64k_floppies(device_slot_interface &device)
 
 void hp64k_state::hp64k(machine_config &config)
 {
-	HP_5061_3011(config, m_cpu, 6250000);
+	HP_5061_3011(config, m_cpu, XTAL::u(6250000));
 	m_cpu->set_rw_cycles(6 , 6);
 	m_cpu->set_relative_mode(true);
 	m_cpu->set_addrmap(AS_PROGRAM, &hp64k_state::cpu_mem_map);
@@ -1389,7 +1389,7 @@ void hp64k_state::hp64k(machine_config &config)
 	TIMER(config, "linesync_timer").configure_periodic(FUNC(hp64k_state::hp64k_line_sync), attotime::from_hz(50));
 
 	// Clock = 25 MHz / 9 * (112/114)
-	I8275(config, m_crtc, 2729045);
+	I8275(config, m_crtc, XTAL::u(2729045));
 	m_crtc->set_screen("screen");
 	m_crtc->set_character_width(9);
 	m_crtc->set_display_callback(FUNC(hp64k_state::crtc_display_pixels));
@@ -1411,7 +1411,7 @@ void hp64k_state::hp64k(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", hp64k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats, true);
 	FLOPPY_CONNECTOR(config, "fdc:1", hp64k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats, true);
 
-	TTL74123(config, m_ss0, 0);
+	TTL74123(config, m_ss0);
 	m_ss0->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_ss0->set_resistor_value(RES_K(68.1));
 	// Warning! Duration formula is not correct for LS123, actual capacitor is 10 uF
@@ -1420,7 +1420,7 @@ void hp64k_state::hp64k(machine_config &config)
 	m_ss0->set_clear_pin_value(1);
 	m_ss0->out_cb().set(FUNC(hp64k_state::hp64k_floppy0_rdy));
 
-	TTL74123(config, m_ss1, 0);
+	TTL74123(config, m_ss1);
 	m_ss1->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_ss1->set_resistor_value(RES_K(68.1));
 	m_ss1->set_capacitor_value(CAP_U(16));
@@ -1429,14 +1429,14 @@ void hp64k_state::hp64k(machine_config &config)
 	m_ss1->out_cb().set(FUNC(hp64k_state::hp64k_floppy1_rdy));
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 2500).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beeper, XTAL::u(2500)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	TIMER(config, m_beep_timer).configure_generic(FUNC(hp64k_state::hp64k_beeper_off));
 
 	COM8116(config, m_baud_rate, 5.0688_MHz_XTAL);
 	m_baud_rate->fr_handler().set(FUNC(hp64k_state::hp64k_baud_clk_w));
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->rxrdy_handler().set(FUNC(hp64k_state::hp64k_rxrdy_w));
 	m_uart->txrdy_handler().set(FUNC(hp64k_state::hp64k_txrdy_w));
 	m_uart->txd_handler().set(FUNC(hp64k_state::hp64k_txd_w));
@@ -1448,7 +1448,7 @@ void hp64k_state::hp64k(machine_config &config)
 	m_rs232->dcd_handler().set(FUNC(hp64k_state::hp64k_rs232_dcd_w));
 	m_rs232->cts_handler().set(FUNC(hp64k_state::hp64k_rs232_cts_w));
 
-	PHI(config, m_phi, 0);
+	PHI(config, m_phi);
 	m_phi->int_write_cb().set(FUNC(hp64k_state::hp64k_phi_int_w));
 	m_phi->dmarq_write_cb().set(m_cpu, FUNC(hp_5061_3011_cpu_device::halt_w));
 	m_phi->sys_cntrl_read_cb().set(FUNC(hp64k_state::hp64k_phi_sys_ctrl_r));

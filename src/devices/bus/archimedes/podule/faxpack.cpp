@@ -25,7 +25,7 @@ class arc_faxpack_device :
 {
 public:
 	// construction/destruction
-	arc_faxpack_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_faxpack_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::CAPTURE; }
 
@@ -108,7 +108,7 @@ void arc_faxpack_device::device_add_mconfig(machine_config &config)
 //  arc_faxpack_device - constructor
 //-------------------------------------------------
 
-arc_faxpack_device::arc_faxpack_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_faxpack_device::arc_faxpack_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_FAXPACK, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_mcu(*this, "mcu")

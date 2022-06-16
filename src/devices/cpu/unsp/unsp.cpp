@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(UNSP_20, unsp_20_device, "unsp_20", "SunPlus u'nSP (ISA 2.0)"
 /* size of the execution code cache */
 #define CACHE_SIZE                      (64 * 1024 * 1024)
 
-unsp_device::unsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
+unsp_device::unsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_core(nullptr)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 23, -1, internal)
@@ -63,21 +63,21 @@ unsp_device::unsp_device(const machine_config &mconfig, device_type type, const 
 	m_numregs = 8;
 }
 
-unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: unsp_device(mconfig, UNSP, tag, owner, clock, address_map_constructor())
 {
 	m_iso = 10;
 	m_numregs = 8;
 }
 
-unsp_11_device::unsp_11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+unsp_11_device::unsp_11_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: unsp_device(mconfig, UNSP_11, tag, owner, clock, address_map_constructor())
 {
 	m_iso = 11;
 	m_numregs = 8;
 }
 
-unsp_11_device::unsp_11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
+unsp_11_device::unsp_11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal)
 	: unsp_device(mconfig, type, tag, owner, clock, internal)
 {
 	m_iso = 11;
@@ -85,28 +85,28 @@ unsp_11_device::unsp_11_device(const machine_config &mconfig, device_type type, 
 }
 
 
-unsp_12_device::unsp_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+unsp_12_device::unsp_12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: unsp_11_device(mconfig, UNSP_12, tag, owner, clock, address_map_constructor())
 {
 	m_iso = 12;
 	m_numregs = 8;
 }
 
-unsp_12_device::unsp_12_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
+unsp_12_device::unsp_12_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal)
 	: unsp_11_device(mconfig, type, tag, owner, clock, internal)
 {
 	m_iso = 12;
 	m_numregs = 8;
 }
 
-unsp_20_device::unsp_20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+unsp_20_device::unsp_20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: unsp_12_device(mconfig, UNSP_20, tag, owner, clock, address_map_constructor())
 {
 	m_iso = 20;
 	m_numregs = 16;
 }
 
-unsp_20_device::unsp_20_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
+unsp_20_device::unsp_20_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal)
 	: unsp_12_device(mconfig, type, tag, owner, clock, internal)
 {
 	m_iso = 20;

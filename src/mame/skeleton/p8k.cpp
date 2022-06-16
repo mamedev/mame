@@ -63,7 +63,7 @@
 class p8k_16_daisy_device : public device_t, public z80_daisy_chain_interface
 {
 public:
-	p8k_16_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	p8k_16_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	uint16_t viack_r() {
 		device_z80daisy_interface *intf = daisy_get_irq_device();
 		return intf ? intf->z80daisy_irq_ack() : 0;
@@ -75,7 +75,7 @@ protected:
 
 DEFINE_DEVICE_TYPE(P8K_16_DAISY, p8k_16_daisy_device, "p8k_16_daisy", "P8000 16-bit daisy chain device")
 
-p8k_16_daisy_device::p8k_16_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+p8k_16_daisy_device::p8k_16_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, P8K_16_DAISY, tag, owner, clock)
 	, z80_daisy_chain_interface(mconfig, *this) {}
 
@@ -434,17 +434,17 @@ void p8k_state::p8k(machine_config &config)
 	dma.in_iorq_callback().set(FUNC(p8k_state::io_read_byte));
 	dma.out_iorq_callback().set(FUNC(p8k_state::io_write_byte));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 307200));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(307200)));
 	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txcb_w));
 	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxcb_w));
 
-	z80ctc_device& ctc0(Z80CTC(config, "ctc0", 1229000));    /* 1.22MHz clock */
+	z80ctc_device& ctc0(Z80CTC(config, "ctc0", XTAL::u(1229000)));    /* 1.22MHz clock */
 	// to implement: callbacks!
 	// manual states the callbacks should go to
 	// Baud Gen 3, FDC, System-Kanal
 	ctc0.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	z80ctc_device& ctc1(Z80CTC(config, "ctc1", 1229000));    /* 1.22MHz clock */
+	z80ctc_device& ctc1(Z80CTC(config, "ctc1", XTAL::u(1229000)));    /* 1.22MHz clock */
 	// to implement: callbacks!
 	// manual states the callbacks should go to
 	// Baud Gen 0, Baud Gen 1, Baud Gen 2,
@@ -463,13 +463,13 @@ void p8k_state::p8k(machine_config &config)
 	z80sio_device& sio1(Z80SIO(config, "sio1", 16_MHz_XTAL / 4));
 	sio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	z80pio_device& pio0(Z80PIO(config, "pio0", 1229000));
+	z80pio_device& pio0(Z80PIO(config, "pio0", XTAL::u(1229000)));
 	pio0.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	z80pio_device& pio1(Z80PIO(config, "pio1", 1229000));
+	z80pio_device& pio1(Z80PIO(config, "pio1", XTAL::u(1229000)));
 	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80PIO(config, m_pio2, 1229000);
+	Z80PIO(config, m_pio2, XTAL::u(1229000));
 	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio2->in_pa_callback().set_ioport("DSW");
 
@@ -481,7 +481,7 @@ void p8k_state::p8k(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	BEEP(config, "beeper", 3250).add_route(ALL_OUTPUTS, "mono", 0.5);
+	BEEP(config, "beeper", XTAL::u(3250)).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void p8k_state::p8k_16(machine_config &config)
@@ -493,10 +493,10 @@ void p8k_state::p8k_16(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &p8k_state::p8k_16_iomap);
 	maincpu.viack().set("p8k_16_daisy", FUNC(p8k_16_daisy_device::viack_r));
 
-	P8K_16_DAISY(config, m_daisy, 0);
+	P8K_16_DAISY(config, m_daisy);
 	m_daisy->set_daisy_config(p8k_16_daisy_chain);
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 307200));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(307200)));
 	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txcb_w));
 	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxcb_w));
 
@@ -531,7 +531,7 @@ void p8k_state::p8k_16(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 3250).add_route(ALL_OUTPUTS, "mono", 0.5);
+	BEEP(config, "beeper", XTAL::u(3250)).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 /* ROM definition */

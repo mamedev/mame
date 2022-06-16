@@ -13,7 +13,7 @@ class sega_837_14438_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_837_14438_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_837_14438_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:

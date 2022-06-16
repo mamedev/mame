@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(MB63H114, mb63h114_device, "mb63h114", "Roland MB63H114 Multi
 //  mb63h114_device - constructor
 //-------------------------------------------------
 
-mb63h114_device::mb63h114_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mb63h114_device::mb63h114_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MB63H114, tag, owner, clock)
 {
 }

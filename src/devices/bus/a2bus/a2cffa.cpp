@@ -45,7 +45,7 @@ class a2bus_cffa2000_device:
 {
 protected:
 	// construction/destruction
-	a2bus_cffa2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_cffa2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -73,7 +73,7 @@ private:
 class a2bus_cffa2_device : public a2bus_cffa2000_device, public device_nvram_interface
 {
 public:
-	a2bus_cffa2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_cffa2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_config_nvram_interface overrides
@@ -85,7 +85,7 @@ protected:
 class a2bus_cffa2_6502_device : public a2bus_cffa2000_device, public device_nvram_interface
 {
 public:
-	a2bus_cffa2_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_cffa2_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
@@ -130,7 +130,7 @@ const tiny_rom_entry *a2bus_cffa2_6502_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_cffa2000_device::a2bus_cffa2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_cffa2000_device::a2bus_cffa2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ata(*this, CFFA2_ATA_TAG),
@@ -139,13 +139,13 @@ a2bus_cffa2000_device::a2bus_cffa2000_device(const machine_config &mconfig, devi
 {
 }
 
-a2bus_cffa2_device::a2bus_cffa2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_cffa2_device::a2bus_cffa2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, tag, owner, clock),
 	device_nvram_interface(mconfig, *this)
 {
 }
 
-a2bus_cffa2_6502_device::a2bus_cffa2_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_cffa2_6502_device::a2bus_cffa2_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_cffa2000_device(mconfig, A2BUS_CFFA2_6502, tag, owner, clock),
 	device_nvram_interface(mconfig, *this)
 {

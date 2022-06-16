@@ -347,7 +347,7 @@ void lc80_state::machine_start()
 void lc80_state::lc80(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 900000); // UD880D
+	Z80(config, m_maincpu, XTAL::u(900000)); // UD880D
 	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80_mem);
 	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
 	m_maincpu->halt_cb().set(FUNC(lc80_state::halt_w));
@@ -363,19 +363,19 @@ void lc80_state::lc80(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	Z80CTC(config, m_ctc, 900000);
+	Z80CTC(config, m_ctc, XTAL::u(900000));
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
 	m_ctc->zc_callback<1>().set(FUNC(lc80_state::ctc_z1_w));
 	m_ctc->zc_callback<2>().set(FUNC(lc80_state::ctc_z2_w));
 
-	Z80PIO(config, m_pio[0], 900000);
+	Z80PIO(config, m_pio[0], XTAL::u(900000));
 	m_pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio[0]->out_pa_callback().set(FUNC(lc80_state::pio1_pa_w));
 	m_pio[0]->in_pb_callback().set(FUNC(lc80_state::pio1_pb_r));
 	m_pio[0]->out_pb_callback().set(FUNC(lc80_state::pio1_pb_w));
 
-	Z80PIO(config, m_pio[1], 900000);
+	Z80PIO(config, m_pio[1], XTAL::u(900000));
 	m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio[1]->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
 

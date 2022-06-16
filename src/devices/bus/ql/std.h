@@ -25,7 +25,7 @@ class ql_standard_rom_cartridge_device : public device_t, public device_ql_rom_c
 {
 public:
 	// construction/destruction
-	ql_standard_rom_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ql_standard_rom_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -30,7 +30,7 @@ public:
 	static constexpr unsigned HEIGHT  = 100;
 
 	// construction/destruction
-	hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint8_t reg_idx_r();
 	void reg_idx_w(uint8_t data);

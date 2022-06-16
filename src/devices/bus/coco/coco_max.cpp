@@ -47,7 +47,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_pak_max_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+		coco_pak_max_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	protected:
 		// device-level overrides
@@ -80,7 +80,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_MAX, device_cococart_interface, coco_pak_max
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
-coco_pak_max_device::coco_pak_max_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_pak_max_device::coco_pak_max_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, COCO_PAK_MAX, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_mouse_x(*this, COCOMAX_X_TAG)

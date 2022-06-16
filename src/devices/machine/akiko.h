@@ -31,7 +31,7 @@
 class akiko_device : public device_t
 {
 public:
-	akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto mem_r_callback() { return m_mem_r.bind(); }

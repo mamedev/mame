@@ -422,7 +422,7 @@ void fireone_state::fireone(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	NETLIST_SOUND(config, "sound_nl", 48000)
+	NETLIST_SOUND(config, "sound_nl", XTAL::u(48000))
 		.set_source(NETLIST_NAME(fireone))
 		.add_route(0, "lspeaker", 1.0)
 		.add_route(1, "rspeaker", 1.0);
@@ -458,7 +458,7 @@ void starfire_state::starfire(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	NETLIST_CPU(config, "sound_nl", netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(starfire));
+	NETLIST_CPU(config, "sound_nl").set_source(NETLIST_NAME(starfire));
 
 	NETLIST_LOGIC_INPUT(config, "sound_nl:size", "SIZE.IN", 0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:sexplo", "SEXPLO.IN", 0);
@@ -477,11 +477,11 @@ void starfire_state::starfire(machine_config &config)
 	NETLIST_ANALOG_INPUT(config, "sound_nl:lohvol", "R15.DIAL");
 	NETLIST_ANALOG_INPUT(config, "sound_nl:mainvol", "R21.DIAL");
 
-	NETLIST_ANALOG_OUTPUT(config, "sound_nl:tieon1", 0).set_params("TIEON1", FUNC(starfire_state::tieon1_cb));
-	NETLIST_ANALOG_OUTPUT(config, "sound_nl:laseron1", 0).set_params("LASERON1", FUNC(starfire_state::laseron1_cb));
-	NETLIST_ANALOG_OUTPUT(config, "sound_nl:output", 0).set_params("OUTPUT", FUNC(starfire_state::sound_out_cb));
+	NETLIST_ANALOG_OUTPUT(config, "sound_nl:tieon1").set_params("TIEON1", FUNC(starfire_state::tieon1_cb));
+	NETLIST_ANALOG_OUTPUT(config, "sound_nl:laseron1").set_params("LASERON1", FUNC(starfire_state::laseron1_cb));
+	NETLIST_ANALOG_OUTPUT(config, "sound_nl:output").set_params("OUTPUT", FUNC(starfire_state::sound_out_cb));
 
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5); // Not actually a DAC, just here to receive output.
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.5); // Not actually a DAC, just here to receive output.
 }
 
 

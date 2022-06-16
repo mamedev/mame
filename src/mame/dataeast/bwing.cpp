@@ -365,13 +365,13 @@ void bwing_state::bwing_postload()
 void bwing_state::bwing(machine_config &config)
 {
 	// basic machine hardware
-	MC6809E(config, m_maincpu, 2000000);
+	MC6809E(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &bwing_state::bwp1_map);
 
-	MC6809E(config, m_subcpu, 2000000);
+	MC6809E(config, m_subcpu, XTAL::u(2000000));
 	m_subcpu->set_addrmap(AS_PROGRAM, &bwing_state::bwp2_map);
 
-	DECO16(config, m_audiocpu, 2000000);
+	DECO16(config, m_audiocpu, XTAL::u(2000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bwing_state::bwp3_map);
 	m_audiocpu->set_addrmap(AS_IO, &bwing_state::bwp3_io_map);
 	m_audiocpu->set_periodic_int(FUNC(bwing_state::bwp3_interrupt), attotime::from_hz(1000));
@@ -403,7 +403,7 @@ void bwing_state::bwing(machine_config &config)
 
 	AY8912(config, "ay2", XTAL(24'000'000) / 2 / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC08(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
+	DAC08(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.1);
 }
 
 //****************************************************************************

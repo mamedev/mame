@@ -651,15 +651,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 
 void kongambl_state::kongambl(machine_config &config)
 {
-	M68EC020(config, m_maincpu, 25000000);
+	M68EC020(config, m_maincpu, XTAL::u(25000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &kongambl_state::kongambl_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(kongambl_state::kongambl_vblank), "screen", 0, 1);
 
-	m68000_device &sndcpu(M68000(config, "sndcpu", 16000000));
+	m68000_device &sndcpu(M68000(config, "sndcpu", XTAL::u(16000000)));
 	sndcpu.set_addrmap(AS_PROGRAM, &kongambl_state::kongamaud_map);
 	sndcpu.set_periodic_int(FUNC(kongambl_state::irq2_line_hold), attotime::from_hz(480));
 
-	K053252(config, m_k053252, 25000000);
+	K053252(config, m_k053252, XTAL::u(25000000));
 	m_k053252->set_offsets(0, 16); // TBD
 	m_k053252->int1_ack().set(FUNC(kongambl_state::vblank_irq_ack_w));
 	m_k053252->int2_ack().set(FUNC(kongambl_state::hblank_irq_ack_w));
@@ -668,15 +668,15 @@ void kongambl_state::kongambl(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(25000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223); // fake, they'll be changed by CCU anyway, TBD
+	m_screen->set_raw(XTAL::u(25000000), 288+16+32+48, 0, 287, 224+16+8+16, 0, 223); // fake, they'll be changed by CCU anyway, TBD
 	m_screen->set_screen_update(FUNC(kongambl_state::screen_update_kongambl));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(kongambl_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_LE2, -48+1, -23);
 	m_k055673->set_palette(m_palette);
@@ -685,7 +685,7 @@ void kongambl_state::kongambl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tasman);
 #endif
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(kongambl_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_8TASMAN, 0, 0);
 	m_k056832->set_palette(m_palette);

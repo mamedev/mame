@@ -16,7 +16,7 @@ class sega_315_5838_comp_device :  public device_t,
 {
 public:
 	// construction/destruction
-	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t data_r();
 

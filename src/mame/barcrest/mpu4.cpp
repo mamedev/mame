@@ -1316,16 +1316,13 @@ void mpu4_state::ic3ss_w(offs_t offset, uint8_t data)
 		m_t3l = data;
 	}
 
-	float num = (1720000/((m_t3l + 1)*(m_t3h + 1)));
+	XTAL num = XTAL::u(1720000)/((m_t3l + 1)*(m_t3h + 1));
 	float denom1 = ((m_t3h *(m_t3l + 1)+ 1)/(2*(m_t1 + 1)));
 
 	int denom2 = denom1 + 0.5f;//need to round up, this gives same precision as chip
-	int freq=num*denom2;
+	XTAL freq=num*denom2;
 
-	if (freq)
-	{
-		m_msm6376->set_unscaled_clock(freq);
-	}
+	m_msm6376->set_unscaled_clock(freq);
 }
 
 /* input ports for MPU4 board */
@@ -2291,13 +2288,13 @@ void mpu4_state::mpu4_common(machine_config &config)
 	MSC1937(config, m_vfd);
 	/* 6840 PTM */
 	PTM6840(config, m_6840ptm, MPU4_MASTER_CLOCK / 4);
-	m_6840ptm->set_external_clocks(0, 0, 0);
+	m_6840ptm->set_external_clocks(XTAL(), XTAL(), XTAL());
 	m_6840ptm->o1_callback().set(FUNC(mpu4_state::ic2_o1_callback));
 	m_6840ptm->o2_callback().set(FUNC(mpu4_state::ic2_o2_callback));
 	m_6840ptm->o3_callback().set(FUNC(mpu4_state::ic2_o3_callback));
 	m_6840ptm->irq_callback().set(FUNC(mpu4_state::cpu0_irq));
 
-	PIA6821(config, m_pia3, 0);
+	PIA6821(config, m_pia3);
 	m_pia3->writepa_handler().set(FUNC(mpu4_state::pia_ic3_porta_w));
 	m_pia3->writepb_handler().set(FUNC(mpu4_state::pia_ic3_portb_w));
 	m_pia3->ca2_handler().set(FUNC(mpu4_state::pia_ic3_ca2_w));
@@ -2305,7 +2302,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia3->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia3->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	PIA6821(config, m_pia4, 0);
+	PIA6821(config, m_pia4);
 	m_pia4->readpb_handler().set(FUNC(mpu4_state::pia_ic4_portb_r));
 	m_pia4->writepa_handler().set(FUNC(mpu4_state::pia_ic4_porta_w));
 	m_pia4->writepb_handler().set(FUNC(mpu4_state::pia_ic4_portb_w));
@@ -2314,7 +2311,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia4->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia4->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	PIA6821(config, m_pia5, 0);
+	PIA6821(config, m_pia5);
 	m_pia5->readpa_handler().set(FUNC(mpu4_state::pia_ic5_porta_r));
 	m_pia5->readpb_handler().set(FUNC(mpu4_state::pia_ic5_portb_r));
 	m_pia5->writepa_handler().set(FUNC(mpu4_state::pia_ic5_porta_w));
@@ -2325,7 +2322,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia5->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia5->set_port_a_input_overrides_output_mask(0x40); // needed for m4madhse
 
-	PIA6821(config, m_pia6, 0);
+	PIA6821(config, m_pia6);
 	m_pia6->writepa_handler().set(FUNC(mpu4_state::pia_ic6_porta_w));
 	m_pia6->writepb_handler().set(FUNC(mpu4_state::pia_ic6_portb_w));
 	m_pia6->ca2_handler().set(FUNC(mpu4_state::pia_ic6_ca2_w));
@@ -2333,7 +2330,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia6->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia6->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	PIA6821(config, m_pia7, 0);
+	PIA6821(config, m_pia7);
 	m_pia7->readpb_handler().set(FUNC(mpu4_state::pia_ic7_portb_r));
 	m_pia7->writepa_handler().set(FUNC(mpu4_state::pia_ic7_porta_w));
 	m_pia7->writepb_handler().set(FUNC(mpu4_state::pia_ic7_portb_w));
@@ -2342,7 +2339,7 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia7->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia7->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	PIA6821(config, m_pia8, 0);
+	PIA6821(config, m_pia8);
 	m_pia8->readpa_handler().set(FUNC(mpu4_state::pia_ic8_porta_r));
 	m_pia8->writepb_handler().set(FUNC(mpu4_state::pia_ic8_portb_w));
 	m_pia8->ca2_handler().set(FUNC(mpu4_state::pia_ic8_ca2_w));
@@ -2350,9 +2347,9 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia8->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia8->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 
-	BACTA_DATALOGGER(config, m_dataport, 0);
+	BACTA_DATALOGGER(config, m_dataport);
 	m_dataport->rxd_handler().set(FUNC(mpu4_state::dataport_rxd));
 
 	HOPPER(config, m_hopper1, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
@@ -2361,12 +2358,12 @@ void mpu4_state::mpu4_common(machine_config &config)
 void mpu4_state::mpu4_common2(machine_config &config)
 {
 	PTM6840(config, m_ptm_ic3ss, MPU4_MASTER_CLOCK / 4);
-	m_ptm_ic3ss->set_external_clocks(0, 0, 0);
+	m_ptm_ic3ss->set_external_clocks(XTAL(), XTAL(), XTAL());
 	m_ptm_ic3ss->o1_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c2));
 	m_ptm_ic3ss->o2_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_c1));
 	m_ptm_ic3ss->o3_callback().set("ptm_ic3ss", FUNC(ptm6840_device::set_g1));
 
-	PIA6821(config, m_pia_ic4ss, 0);
+	PIA6821(config, m_pia_ic4ss);
 	m_pia_ic4ss->readpb_handler().set(FUNC(mpu4_state::pia_gb_portb_r));
 	m_pia_ic4ss->writepa_handler().set(FUNC(mpu4_state::pia_gb_porta_w));
 	m_pia_ic4ss->writepb_handler().set(FUNC(mpu4_state::pia_gb_portb_w));
@@ -2430,7 +2427,7 @@ void mpu4_state::mod2_cheatchr_f(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(nullptr);
@@ -2453,7 +2450,7 @@ void mpu4_state::mod4oki_f(machine_config &config)
 
 	mpu4_common2(config);
 
-	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	OKIM6376(config, m_msm6376, XTAL::u(128000));     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -2471,7 +2468,7 @@ void mpu4_state::mod4oki_cheatchr_f(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(nullptr);

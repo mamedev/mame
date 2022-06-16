@@ -17,7 +17,7 @@
 
 class rp2a03_core_device : public m6502_device {
 public:
-	rp2a03_core_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rp2a03_core_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -25,7 +25,7 @@ public:
 	virtual void do_exec_partial() override;
 
 protected:
-	rp2a03_core_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	rp2a03_core_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 #define O(o) void o ## _full(); void o ## _partial()
 
@@ -43,7 +43,7 @@ private:
 
 class rp2a03_device : public rp2a03_core_device, public device_mixer_interface {
 public:
-	rp2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rp2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t psg1_4014_r();
 	uint8_t psg1_4015_r();
@@ -53,7 +53,7 @@ public:
 	void rp2a03_map(address_map &map);
 
 protected:
-	rp2a03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	rp2a03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_device<nesapu_device> m_apu;
 
@@ -66,7 +66,7 @@ protected:
 class rp2a03g_device : public rp2a03_device
 {
 public:
-	rp2a03g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rp2a03g_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

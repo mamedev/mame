@@ -44,14 +44,14 @@ class a8sio_device : public device_t, public device_single_card_slot_interface<d
 public:
 	// construction/destruction
 	a8sio_device(machine_config const &mconfig, char const *tag, device_t *owner, char const *dflt)
-		: a8sio_device(mconfig, tag, owner, (uint32_t)0)
+		: a8sio_device(mconfig, tag, owner)
 	{
 		option_reset();
 		a8sio_cards(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	a8sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a8sio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration
 	auto clock_in() { return m_out_clock_in_cb.bind(); }
@@ -73,7 +73,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( interrupt_w ); // pin 13
 
 protected:
-	a8sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a8sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;

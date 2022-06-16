@@ -21,7 +21,7 @@ class hp9825_optrom_device : public device_t,
 public:
 	// construction/destruction
 	hp9825_optrom_device(machine_config const &mconfig, char const *tag, device_t *owner);
-	hp9825_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp9825_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~hp9825_optrom_device();
 
 	void set_rom_limit(offs_t rom_limit) { m_rom_limit = rom_limit; }

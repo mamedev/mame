@@ -24,7 +24,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(DSD4432, dsd4432_device, "dsd4432", "DSD A4432 Floppy Disk Interface")
 
-dsd4432_device::dsd4432_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dsd4432_device::dsd4432_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DSD4432, tag, owner, clock)
 	, device_qbus_card_interface(mconfig, *this)
 	, m_bootstrap(*this, "bootstrap")

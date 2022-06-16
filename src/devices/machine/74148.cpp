@@ -47,7 +47,7 @@
 DEFINE_DEVICE_TYPE(TTL74148, ttl74148_device, "74148", "74148 TTL")
 
 
-ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TTL74148, tag, owner, clock)
 	, m_output_cb(*this)
 	, m_enable_input(0)

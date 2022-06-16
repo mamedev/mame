@@ -17,7 +17,7 @@ void geforce_7600gs_device::map3(address_map &map)
 {
 }
 
-geforce_7600gs_device::geforce_7600gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+geforce_7600gs_device::geforce_7600gs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, GEFORCE_7600GS, tag, owner, clock)
 {
 }

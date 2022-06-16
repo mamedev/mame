@@ -43,7 +43,7 @@
     twice their number. Accordingly, the TMS9900 has a CRU bitmask 0x0fff.
 ****************************************************************************/
 
-ti990_10_device::ti990_10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ti990_10_device::ti990_10_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, TI990_10, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, 16, 21),
 		m_io_config("cru", ENDIANNESS_BIG, 8, 12),

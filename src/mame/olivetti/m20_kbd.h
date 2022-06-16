@@ -9,7 +9,7 @@
 class m20_keyboard_device : public buffered_rs232_device<16U>, protected device_matrix_keyboard_interface<9U>
 {
 public:
-	m20_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m20_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:

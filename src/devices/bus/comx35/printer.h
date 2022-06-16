@@ -27,7 +27,7 @@ class comx_prn_device : public device_t, public device_comx_expansion_card_inter
 {
 public:
 	// construction/destruction
-	comx_prn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	comx_prn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

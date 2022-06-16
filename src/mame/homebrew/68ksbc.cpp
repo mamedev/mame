@@ -65,10 +65,10 @@ INPUT_PORTS_END
 
 void c68ksbc_state::c68ksbc(machine_config &config)
 {
-	M68000(config, m_maincpu, 8000000); // text says 8MHz, schematic says 10MHz
+	M68000(config, m_maincpu, XTAL::u(8000000)); // text says 8MHz, schematic says 10MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &c68ksbc_state::mem_map);
 
-	acia6850_device &acia(ACIA6850(config, "acia", 0));
+	acia6850_device &acia(ACIA6850(config, "acia"));
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
@@ -76,7 +76,7 @@ void c68ksbc_state::c68ksbc(machine_config &config)
 	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
 	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(153600)));
 	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 }

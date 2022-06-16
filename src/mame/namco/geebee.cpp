@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE(GEEBEE_SOUND, geebee_sound_device, "geebee_sound", "Gee Bee Custom Sound")
 
-geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, GEEBEE_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_decay(nullptr),

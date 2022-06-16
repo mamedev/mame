@@ -246,7 +246,7 @@ void shine_state::machine_start()
 void shine_state::shine(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 2000000); // 2MHz ??
+	M6502(config, m_maincpu, XTAL::u(2000000)); // 2MHz ??
 	m_maincpu->set_addrmap(AS_PROGRAM, &shine_state::shine_mem);
 
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline("maincpu", M6502_IRQ_LINE);
@@ -267,18 +267,18 @@ void shine_state::shine(machine_config &config)
 	m_ram->set_default_size("32K");
 	m_ram->set_extra_options("16K");
 
-	MOS6522(config, m_via[0], 1000000);
+	MOS6522(config, m_via[0], XTAL::u(1000000));
 	m_via[0]->readpa_handler().set(FUNC(shine_state::via0_pa_r));
 	m_via[0]->writepb_handler().set(FUNC(shine_state::via0_pb_w));
 	m_via[0]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 	m_via[0]->cb2_handler().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	MOS6522(config, m_via[1], 1000000);
+	MOS6522(config, m_via[1], XTAL::u(1000000));
 	m_via[1]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 
-	FD1771(config, m_fdc, 1000000);
+	FD1771(config, m_fdc, XTAL::u(1000000));
 
 	FLOPPY_CONNECTOR(config, m_floppy[0], "525qd", FLOPPY_525_QD, true, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], "525qd", FLOPPY_525_QD, false, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);

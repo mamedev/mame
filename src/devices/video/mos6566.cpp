@@ -559,12 +559,12 @@ inline void mos6566_device::draw_multi( uint16_t p, uint8_t c0, uint8_t c1, uint
 //  mos6566_device - constructor
 //-------------------------------------------------
 
-mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6566_device(mconfig, MOS6566, tag, owner, clock, TYPE_6566)
 {
 }
 
-mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
@@ -584,42 +584,42 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-mos6567_device::mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6567_device::mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6567_device(mconfig, MOS6567, tag, owner, clock, TYPE_6567)
 {
 }
 
-mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant)
 	: mos6566_device(mconfig, type, tag, owner, clock, variant)
 {
 }
 
-mos8562_device::mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos8562_device::mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6567_device(mconfig, MOS8562, tag, owner, clock, TYPE_8562)
 {
 }
 
-mos8564_device::mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos8564_device::mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6567_device(mconfig, MOS8564, tag, owner, clock, TYPE_8564)
 {
 }
 
-mos6569_device::mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6569_device::mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6569_device(mconfig, MOS6569, tag, owner, clock, TYPE_6569)
 {
 }
 
-mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant)
 	: mos6566_device(mconfig, type, tag, owner, clock, variant)
 {
 }
 
-mos8565_device::mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos8565_device::mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6569_device(mconfig, MOS8565, tag, owner, clock, TYPE_8565)
 {
 }
 
-mos8566_device::mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos8566_device::mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6569_device(mconfig, MOS8566, tag, owner, clock, TYPE_8566)
 {
 }
@@ -2741,7 +2741,7 @@ void mos6566_device::write(offs_t offset, uint8_t data)
 		{
 			if (BIT(m_reg[offset], 0) != BIT(data, 0))
 			{
-				m_cpu->set_unscaled_clock(clock() << BIT(data, 0));
+				m_cpu->set_unscaled_clock(clock() * (BIT(data, 0) ? 2 : 1));
 			}
 
 			m_reg[offset] = data | 0xfc;

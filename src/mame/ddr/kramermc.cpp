@@ -242,11 +242,11 @@ uint32_t kramermc_state::screen_update_kramermc(screen_device &screen, bitmap_in
 void kramermc_state::kramermc(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 1500000);
+	Z80(config, m_maincpu, XTAL::u(1500000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &kramermc_state::kramermc_mem);
 	m_maincpu->set_addrmap(AS_IO, &kramermc_state::kramermc_io);
 
-	z80pio_device& pio(Z80PIO(config, "pio", 1500000));
+	z80pio_device& pio(Z80PIO(config, "pio", XTAL::u(1500000)));
 	pio.in_pa_callback().set(FUNC(kramermc_state::port_a_r));
 	pio.out_pa_callback().set(FUNC(kramermc_state::port_a_w));
 	pio.in_pb_callback().set(FUNC(kramermc_state::port_b_r));

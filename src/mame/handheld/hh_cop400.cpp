@@ -216,7 +216,7 @@ INPUT_PORTS_END
 void ctstein_state::ctstein(machine_config &config)
 {
 	// basic machine hardware
-	COP421(config, m_maincpu, 850000); // approximation - RC osc. R=12K, C=100pF
+	COP421(config, m_maincpu, XTAL::u(850000)); // approximation - RC osc. R=12K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_g().set(FUNC(ctstein_state::write_g));
 	m_maincpu->write_l().set(FUNC(ctstein_state::write_l));
@@ -364,7 +364,7 @@ INPUT_PORTS_END
 void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 {
 	// basic machine hardware
-	COP420(config, m_maincpu, 1000000); // approximation - RC osc. R=43K, C=101pF
+	COP420(config, m_maincpu, XTAL::u(1000000)); // approximation - RC osc. R=43K, C=101pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(h2hbaskbc_state::write_d));
 	m_maincpu->write_g().set(FUNC(h2hbaskbc_state::write_g));
@@ -498,7 +498,7 @@ INPUT_PORTS_END
 void einvaderc_state::einvaderc(machine_config &config)
 {
 	// basic machine hardware
-	COP444L(config, m_maincpu, 850000); // approximation - RC osc. R=47K, C=100pF
+	COP444L(config, m_maincpu, XTAL::u(850000)); // approximation - RC osc. R=47K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->read_in().set_ioport("IN.0");
 	m_maincpu->write_d().set(FUNC(einvaderc_state::write_d));
@@ -628,7 +628,7 @@ INPUT_PORTS_END
 void unkeinv_state::unkeinv(machine_config &config)
 {
 	// basic machine hardware
-	COP421(config, m_maincpu, 850000); // frequency guessed
+	COP421(config, m_maincpu, XTAL::u(850000)); // frequency guessed
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_g().set(FUNC(unkeinv_state::write_g));
 	m_maincpu->write_d().set(FUNC(unkeinv_state::write_d));
@@ -786,7 +786,7 @@ INPUT_PORTS_END
 void lchicken_state::lchicken(machine_config &config)
 {
 	// basic machine hardware
-	COP421(config, m_maincpu, 850000); // approximation - RC osc. R=12K, C=100pF
+	COP421(config, m_maincpu, XTAL::u(850000)); // approximation - RC osc. R=12K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_l().set(FUNC(lchicken_state::write_l));
 	m_maincpu->write_d().set(FUNC(lchicken_state::write_d));
@@ -912,7 +912,7 @@ INPUT_PORTS_END
 void funjacks_state::funjacks(machine_config &config)
 {
 	// basic machine hardware
-	COP410(config, m_maincpu, 850000); // approximation - RC osc. R=47K, C=56pF
+	COP410(config, m_maincpu, XTAL::u(850000)); // approximation - RC osc. R=47K, C=56pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funjacks_state::write_d));
 	m_maincpu->write_l().set(FUNC(funjacks_state::write_l));
@@ -1014,7 +1014,7 @@ INPUT_PORTS_END
 void funrlgl_state::funrlgl(machine_config &config)
 {
 	// basic machine hardware
-	COP410(config, m_maincpu, 800000); // approximation - RC osc. R=51K, C=91pF
+	COP410(config, m_maincpu, XTAL::u(800000)); // approximation - RC osc. R=51K, C=91pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funrlgl_state::write_d));
 	m_maincpu->write_l().set(FUNC(funrlgl_state::write_l));
@@ -1137,7 +1137,7 @@ INPUT_PORTS_END
 void funtag_state::funtag(machine_config &config)
 {
 	// basic machine hardware
-	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=47K, C=91pF
+	COP410(config, m_maincpu, XTAL::u(1000000)); // approximation - RC osc. R=47K, C=91pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(funtag_state::write_d));
 	m_maincpu->write_l().set(FUNC(funtag_state::write_l));
@@ -1302,7 +1302,7 @@ INPUT_PORTS_END
 void mbaskb2_state::mbaskb2(machine_config &config)
 {
 	// basic machine hardware
-	COP420(config, m_maincpu, 500000); // approximation
+	COP420(config, m_maincpu, XTAL::u(500000)); // approximation
 	m_maincpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_SYNC_INPUT, false); // guessed
 	m_maincpu->write_g().set(FUNC(mbaskb2_state::main_write_g));
 	m_maincpu->write_l().set(FUNC(mbaskb2_state::shared_write_l));
@@ -1310,7 +1310,7 @@ void mbaskb2_state::mbaskb2(machine_config &config)
 	m_maincpu->read_l_tristate().set_constant(0x80);
 	m_maincpu->read_si().set(m_subcpu, FUNC(cop400_cpu_device::so_r));
 
-	COP420(config, m_subcpu, 500000); // same as maincpu
+	COP420(config, m_subcpu, XTAL::u(500000)); // same as maincpu
 	m_subcpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_SYNC_INPUT, false); // guessed
 	m_subcpu->write_d().set(FUNC(mbaskb2_state::sub_write_d));
 	m_subcpu->write_g().set(FUNC(mbaskb2_state::sub_write_g));
@@ -1441,7 +1441,7 @@ INPUT_PORTS_END
 void lafootb_state::lafootb(machine_config &config)
 {
 	// basic machine hardware
-	COP421(config, m_maincpu, 900000); // approximation - RC osc. R=51K, C=100pF
+	COP421(config, m_maincpu, XTAL::u(900000)); // approximation - RC osc. R=51K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_l().set(FUNC(lafootb_state::write_l));
 	m_maincpu->write_d().set(FUNC(lafootb_state::write_d));
@@ -1595,7 +1595,7 @@ INPUT_PORTS_END
 void mdallas_state::mdallas(machine_config &config)
 {
 	// basic machine hardware
-	COP444L(config, m_maincpu, 900000); // approximation - RC osc. R=57K, C=101pF
+	COP444L(config, m_maincpu, XTAL::u(900000)); // approximation - RC osc. R=57K, C=101pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_l().set(FUNC(mdallas_state::write_l));
 	m_maincpu->write_d().set(FUNC(mdallas_state::write_d));
@@ -1689,7 +1689,7 @@ INPUT_PORTS_END
 void plus1_state::plus1(machine_config &config)
 {
 	// basic machine hardware
-	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=51K, C=100pF
+	COP410(config, m_maincpu, XTAL::u(1000000)); // approximation - RC osc. R=51K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(plus1_state::write_d));
 	m_maincpu->read_g().set_ioport("IN.0");
@@ -1825,7 +1825,7 @@ INPUT_PORTS_END
 void lightfgt_state::lightfgt(machine_config &config)
 {
 	// basic machine hardware
-	COP421(config, m_maincpu, 950000); // approximation - RC osc. R=82K, C=56pF
+	COP421(config, m_maincpu, XTAL::u(950000)); // approximation - RC osc. R=82K, C=56pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_so().set(FUNC(lightfgt_state::write_so));
 	m_maincpu->write_d().set(FUNC(lightfgt_state::write_d));
@@ -1978,7 +1978,7 @@ INPUT_PORTS_END
 void bship82_state::bship82(machine_config &config)
 {
 	// basic machine hardware
-	COP420(config, m_maincpu, 750000); // approximation - RC osc. R=14K, C=100pF
+	COP420(config, m_maincpu, XTAL::u(750000)); // approximation - RC osc. R=14K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(bship82_state::write_d));
 	m_maincpu->write_g().set(FUNC(bship82_state::write_g));
@@ -2119,7 +2119,7 @@ INPUT_PORTS_END
 void qkracer_state::qkracer(machine_config &config)
 {
 	// basic machine hardware
-	COP420(config, m_maincpu, 950000); // approximation - RC osc. R=47K, C=100pF
+	COP420(config, m_maincpu, XTAL::u(950000)); // approximation - RC osc. R=47K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(qkracer_state::write_d));
 	m_maincpu->write_g().set(FUNC(qkracer_state::write_g));
@@ -2334,7 +2334,7 @@ INPUT_PORTS_END
 void scat_state::scat(machine_config &config)
 {
 	// basic machine hardware
-	COP404L(config, m_maincpu, 1500000); // R/C OSC via MM74C14N
+	COP404L(config, m_maincpu, XTAL::u(1500000)); // R/C OSC via MM74C14N
 	m_maincpu->set_config(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &scat_state::main_map);
 	m_maincpu->write_d().set(FUNC(scat_state::write_d));
@@ -2435,7 +2435,7 @@ INPUT_PORTS_END
 void vidchal_state::vidchal(machine_config &config)
 {
 	// basic machine hardware
-	COP420(config, m_maincpu, 900000); // approximation
+	COP420(config, m_maincpu, XTAL::u(900000)); // approximation
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(vidchal_state::write_d));
 	m_maincpu->write_g().set("dac", FUNC(dac_byte_interface::data_w));

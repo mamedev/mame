@@ -2085,18 +2085,18 @@ DEFINE_DEVICE_TYPE(TMS5200,   tms5200_device,   "tms5200",   "TMS5200")
 DEFINE_DEVICE_TYPE(CD2501ECD, cd2501ecd_device, "cd2501ecd", "CD2501ECD")
 
 
-tms5220c_device::tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms5220c_device::tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5220_device(mconfig, TMS5220C, tag, owner, clock, TMS5220_IS_5220C)
 {
 }
 
 
-tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5220_device(mconfig, TMS5220, tag, owner, clock, TMS5220_IS_5220)
 {
 }
 
-tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant)
+tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int variant)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_variant(variant)
@@ -2112,19 +2112,19 @@ tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, 
 }
 
 
-cd2501e_device::cd2501e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cd2501e_device::cd2501e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5220_device(mconfig, CD2501E, tag, owner, clock, TMS5220_IS_CD2501E)
 {
 }
 
 
-tms5200_device::tms5200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms5200_device::tms5200_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5220_device(mconfig, TMS5200, tag, owner, clock, TMS5220_IS_5200)
 {
 }
 
 
-cd2501ecd_device::cd2501ecd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cd2501ecd_device::cd2501ecd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5220_device(mconfig, CD2501ECD, tag, owner, clock, TMS5220_IS_CD2501ECD)
 {
 }

@@ -18,7 +18,7 @@ class watchdog_timer_device : public device_t
 {
 public:
 	// construction/destruction
-	watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration helpers
 	template <typename T> void set_vblank_count(T &&screen_tag, int32_t count) { m_screen.set_tag(std::forward<T>(screen_tag)); m_vblank_count = count; }

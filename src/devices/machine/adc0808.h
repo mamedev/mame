@@ -45,7 +45,7 @@ class adc0808_device : public device_t
 {
 public:
 	// construction/destruction
-	adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto eoc_callback() { return m_eoc_cb.bind(); }
 	auto eoc_ff_callback() { return m_eoc_ff_cb.bind(); }
@@ -61,7 +61,7 @@ public:
 	void address_data_start_w(u8 data); // start and ale connected, address to the data bus
 
 protected:
-	adc0808_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	adc0808_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -95,13 +95,13 @@ private:
 class adc0809_device : public adc0808_device
 {
 public:
-	adc0809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0809_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class m58990_device : public adc0808_device
 {
 public:
-	m58990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m58990_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

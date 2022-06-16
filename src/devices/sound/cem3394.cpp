@@ -129,7 +129,7 @@ DEFINE_DEVICE_TYPE(CEM3394, cem3394_device, "cem3394", "CEM3394 Synthesizer Voic
 //  cem3394_device - constructor
 //-------------------------------------------------
 
-cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CEM3394, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr),

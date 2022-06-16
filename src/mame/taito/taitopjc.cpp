@@ -829,12 +829,12 @@ INTERRUPT_GEN_MEMBER(taitopjc_state::taitopjc_vbi)
 
 void taitopjc_state::taitopjc(machine_config &config)
 {
-	PPC603E(config, m_maincpu, 100000000);
+	PPC603E(config, m_maincpu, XTAL::u(100000000));
 	m_maincpu->set_bus_frequency(XTAL(66'666'700)); /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitopjc_state::ppc603e_mem);
 
 	/* TMP95C063F I/O CPU */
-	TMP95C063(config, m_iocpu, 25000000);
+	TMP95C063(config, m_iocpu, XTAL::u(25000000));
 	m_iocpu->port5_read().set_ioport("INPUTS1");
 	m_iocpu->portd_read().set_ioport("INPUTS2");
 	m_iocpu->porte_read().set_ioport("INPUTS3");
@@ -846,12 +846,12 @@ void taitopjc_state::taitopjc(machine_config &config)
 	m_iocpu->set_vblank_int("screen", FUNC(taitopjc_state::taitopjc_vbi));
 
 	/* TMS320C53 DSP */
-	TMS32053(config, m_dsp, 40000000);
+	TMS32053(config, m_dsp, XTAL::u(40000000));
 	m_dsp->set_addrmap(AS_PROGRAM, &taitopjc_state::tms_program_map);
 	m_dsp->set_addrmap(AS_DATA, &taitopjc_state::tms_data_map);
 	m_dsp->set_addrmap(AS_IO, &taitopjc_state::tms_io_map);
 
-	MN1020012A(config, m_soundcpu, 10000000); /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
+	MN1020012A(config, m_soundcpu, XTAL::u(10000000)); /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &taitopjc_state::mn10200_map);
 
 	config.set_maximum_quantum(attotime::from_hz(200000));
@@ -869,7 +869,7 @@ void taitopjc_state::taitopjc(machine_config &config)
 	PALETTE(config, m_palette).set_entries(32768);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	TC0780FPA(config, m_tc0780fpa, 0);
+	TC0780FPA(config, m_tc0780fpa);
 }
 
 

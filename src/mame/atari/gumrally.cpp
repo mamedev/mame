@@ -105,7 +105,7 @@ INPUT_PORTS_END
 void gumrally_state::gumrally(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 14'318'000); // clock not verified
+	M68000(config, m_maincpu, XTAL::u(14'318'000)); // clock not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &gumrally_state::prg_map);
 
 	EEPROM_2816(config, "eeprom");
@@ -116,9 +116,9 @@ void gumrally_state::gumrally(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM2149(config, "ym", 14'318'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.3); // clock not verified
+	YM2149(config, "ym", XTAL::u(14'318'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.3); // clock not verified
 
-	OKIM6295(config, "oki", 14'318'000 / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // clock and pin not verified
+	OKIM6295(config, "oki", XTAL::u(14'318'000) / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // clock and pin not verified
 }
 
 

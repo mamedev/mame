@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "pc9801_snd.h"
 
-pc9801_snd_device::pc9801_snd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+pc9801_snd_device::pc9801_snd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 {
 }

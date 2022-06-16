@@ -12,7 +12,7 @@
 
 DEFINE_DEVICE_TYPE(TTL74543, ttl74543_device, "ttl74543", "Octal Registered Transceiver")
 
-ttl74543_device::ttl74543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ttl74543_device::ttl74543_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TTL74543, tag, owner, clock),
 	m_output_a(*this),
 	m_output_b(*this),

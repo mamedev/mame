@@ -27,7 +27,7 @@ public:
 	typedef device_delegate<void (bitmap_ind16 &bitmap, u8 line, u8 pos, u8 y, u8 x, int state)> pixel_update_delegate;
 
 	// construction/destruction
-	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// static configuration helpers
 	void set_lcd_size(int lines, int chars) { m_lines = lines; m_chars = chars; }
@@ -53,7 +53,7 @@ public:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -146,7 +146,7 @@ class sed1278_0b_device :  public hd44780_device
 {
 public:
 	// construction/destruction
-	sed1278_0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sed1278_0b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> ks0066_f05_device
@@ -155,7 +155,7 @@ class ks0066_f05_device :  public hd44780_device
 {
 public:
 	// construction/destruction
-	ks0066_f05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ks0066_f05_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition

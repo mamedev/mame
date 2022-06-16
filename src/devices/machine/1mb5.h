@@ -17,7 +17,7 @@ class hp_1mb5_device : public device_t
 {
 public:
 	// construction/destruction
-	hp_1mb5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp_1mb5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// static configuration helpers
 	auto irl_handler() { return m_irl_handler.bind(); }

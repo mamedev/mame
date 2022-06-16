@@ -13,7 +13,7 @@ class athlonxp_device : public pentium_device
 {
 public:
 	// construction/destruction
-	athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void opcode_cpuid() override;

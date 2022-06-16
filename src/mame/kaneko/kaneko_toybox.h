@@ -19,7 +19,7 @@ public:
 
 	template <typename T, typename U, typename V, typename W>
 	kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&eeprom_tag, U &&dsw_tag, V &&mcuram_tag, W &&mcudata_tag)
-		: kaneko_toybox_device(mconfig, tag, owner, (uint32_t)0)
+		: kaneko_toybox_device(mconfig, tag, owner)
 	{
 		m_eeprom.set_tag(std::forward<T>(eeprom_tag));
 		m_dsw1.set_tag(std::forward<U>(dsw_tag));
@@ -27,7 +27,7 @@ public:
 		m_mcudata.set_tag(std::forward<W>(mcudata_tag));
 	}
 
-	kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void set_table(int tabletype) { m_tabletype = tabletype; }
 	void set_game_type(int gametype) { m_gametype = gametype; }

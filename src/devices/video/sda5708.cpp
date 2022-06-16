@@ -58,7 +58,7 @@ DEFINE_DEVICE_TYPE(SDA5708,         sda5708_device,   "sda5708",         "SDA570
 //  sda5708_device - constructor
 //-------------------------------------------------
 
-sda5708_device::sda5708_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sda5708_device::sda5708_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SDA5708, tag, owner, clock)
 	, m_dots(*this, "Dot_%u%u%u", 1U, 1U, 1U)
 	, m_serial(0)

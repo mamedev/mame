@@ -13,7 +13,7 @@ class k007342_device : public device_t
 public:
 	using tile_delegate = device_delegate<void (int layer, int bank, int *code, int *color, int *flags)>;
 
-	k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	//  configuration
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }

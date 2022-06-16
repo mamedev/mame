@@ -117,7 +117,7 @@ class coco_fdc_device_base : public coco_family_fdc_device_base
 {
 protected:
 	// construction/destruction
-	coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	enum class rtc_type
 	{
@@ -202,7 +202,7 @@ void coco_fdc_device_base::device_add_mconfig(machine_config &config)
 
 	MSM6242(config, m_disto_msm6242, 32.768_kHz_XTAL);
 
-	DS1315(config, CLOUD9_TAG, 0);
+	DS1315(config, CLOUD9_TAG);
 
 	RAM(config, "cachebuffer").set_default_size("256").set_default_value(0);
 }
@@ -264,7 +264,7 @@ memory_region *coco_family_fdc_device_base::get_cart_memregion()
 //  coco_fdc_device_base - constructor
 //-------------------------------------------------
 
-coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: coco_family_fdc_device_base(mconfig, type, tag, owner, clock)
 	, m_wd17xx(*this, WD_TAG)
 	, m_ds1315(*this, CLOUD9_TAG)
@@ -639,7 +639,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 			: coco_fdc_device_base(mconfig, COCO_FDC, tag, owner, clock)
 		{
 		}
@@ -676,7 +676,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 			: coco_fdc_device_base(mconfig, COCO_FDC_V11, tag, owner, clock)
 		{
 		}
@@ -711,7 +711,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 			: coco_fdc_device_base(mconfig, COCO3_HDB1, tag, owner, clock)
 		{
 		}
@@ -745,7 +745,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco2_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		coco2_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 			: coco_fdc_device_base(mconfig, COCO2_HDB1, tag, owner, clock)
 		{
 		}
@@ -781,7 +781,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		cp450_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		cp450_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 			: coco_fdc_device_base(mconfig, CP450_FDC, tag, owner, clock)
 		{
 		}
@@ -815,7 +815,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		cd6809_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		cd6809_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 			: coco_fdc_device_base(mconfig, CD6809_FDC, tag, owner, clock)
 		{
 		}

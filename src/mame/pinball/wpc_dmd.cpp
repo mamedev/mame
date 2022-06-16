@@ -19,7 +19,7 @@ void wpc_dmd_device::registers(address_map &map)
 }
 
 
-wpc_dmd_device::wpc_dmd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wpc_dmd_device::wpc_dmd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WPC_DMD, tag, owner, clock),
 	scanline_cb(*this),
 	dmd0(*this, ":dmd0"),

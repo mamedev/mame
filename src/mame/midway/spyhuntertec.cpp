@@ -677,7 +677,7 @@ void spyhuntertec_state::spyhuntertec(machine_config &config)
 // 2 XTALs: one 20MHz, other one near maincpu ?MHz
 
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000); // NEC D780C-2 (rated 6MHz)
+	Z80(config, m_maincpu, XTAL::u(4000000)); // NEC D780C-2 (rated 6MHz)
 	m_maincpu->set_addrmap(AS_PROGRAM, &spyhuntertec_state::spyhuntertec_map);
 	m_maincpu->set_addrmap(AS_IO, &spyhuntertec_state::spyhuntertec_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(spyhuntertec_state::irq0_line_hold));
@@ -696,7 +696,7 @@ void spyhuntertec_state::spyhuntertec(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spyhuntertec);
 	PALETTE(config, m_palette).set_entries(64+4); // FUNC(spyhuntertec_state::spyhunt)
 
-	Z80(config, m_audiocpu, 4000000); // SGS Z8400B1 (rated 2.5MHz?)
+	Z80(config, m_audiocpu, XTAL::u(4000000)); // SGS Z8400B1 (rated 2.5MHz?)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spyhuntertec_state::spyhuntertec_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &spyhuntertec_state::spyhuntertec_sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(spyhuntertec_state::irq0_line_assert), attotime::from_hz(1000));

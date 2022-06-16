@@ -35,7 +35,7 @@ class atari_sac_device : public atari_jsa_base_device
 {
 public:
 	// construction/destruction
-	atari_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	atari_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device level overrides

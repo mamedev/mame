@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "mcs96.h"
 
-mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width, address_map_constructor regs_map) :
+mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int data_width, address_map_constructor regs_map) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	program_config("program", ENDIANNESS_LITTLE, data_width, 16),
 	regs_config("register", ENDIANNESS_LITTLE, 16, 8, 0, regs_map),

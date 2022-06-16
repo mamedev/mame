@@ -29,10 +29,10 @@ class dmv_k230_device :
 {
 public:
 	// construction/destruction
-	dmv_k230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dmv_k230_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	dmv_k230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	dmv_k230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -72,7 +72,7 @@ class dmv_k231_device :
 {
 public:
 	// construction/destruction
-	dmv_k231_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dmv_k231_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -86,7 +86,7 @@ class dmv_k234_device :
 {
 public:
 	// construction/destruction
-	dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -118,7 +118,7 @@ class dmv_k235_device :
 {
 public:
 	// construction/destruction
-	dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

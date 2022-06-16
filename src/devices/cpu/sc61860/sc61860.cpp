@@ -47,7 +47,7 @@
 DEFINE_DEVICE_TYPE(SC61860, sc61860_device, "sc61860", "Sharp SC61860")
 
 
-sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, SC61860, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_reset(*this)

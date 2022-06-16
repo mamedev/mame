@@ -26,7 +26,7 @@ class victor_9000_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	victor_9000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	victor_9000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto kbrdy_handler() { return m_kbrdy_cb.bind(); }
 	auto kbdata_handler() { return m_kbdata_cb.bind(); }

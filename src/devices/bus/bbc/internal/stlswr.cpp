@@ -94,29 +94,29 @@ const tiny_rom_entry *bbc_stlswr_device::device_rom_region() const
 //  bbc_stlswr_device - constructor
 //-------------------------------------------------
 
-bbc_stlswr_device::bbc_stlswr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_stlswr_device::bbc_stlswr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_internal_interface(mconfig, *this)
 	, m_rom(*this, "romslot%u", 0U)
 {
 }
 
-bbc_stlswr16_device::bbc_stlswr16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_stlswr16_device::bbc_stlswr16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_stlswr_device(mconfig, BBC_STLSWR16, tag, owner, clock)
 {
 }
 
-bbc_stlswr32_device::bbc_stlswr32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_stlswr32_device::bbc_stlswr32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_stlswr_device(mconfig, BBC_STLSWR32, tag, owner, clock)
 {
 }
 
-bbc_stlswr64_device::bbc_stlswr64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_stlswr64_device::bbc_stlswr64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_stlswr_device(mconfig, BBC_STLSWR64, tag, owner, clock)
 {
 }
 
-bbc_stlswr128_device::bbc_stlswr128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_stlswr128_device::bbc_stlswr128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_stlswr_device(mconfig, BBC_STLSWR128, tag, owner, clock)
 {
 }

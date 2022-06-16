@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(MB14241, mb14241_device, "mb14241", "MB14241 Data Shifter")
 
-mb14241_device::mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mb14241_device::mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MB14241, tag, owner, clock), m_shift_data(0), m_shift_count(0)
 {
 }

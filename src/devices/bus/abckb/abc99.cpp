@@ -178,7 +178,7 @@ void abc99_device::device_add_mconfig(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
@@ -470,7 +470,7 @@ void abc99_device::key_down(int state)
 //  abc99_device - constructor
 //-------------------------------------------------
 
-abc99_device::abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc99_device::abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ABC99, tag, owner, clock),
 	abc_keyboard_interface(mconfig, *this), m_serial_timer(nullptr), m_mouse_timer(nullptr),
 	m_maincpu(*this, I8035_Z2_TAG),

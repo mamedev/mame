@@ -128,7 +128,7 @@ actually used, since the priority is taken from the external ports.
 
 DEFINE_DEVICE_TYPE(K053251, k053251_device, "k053251", "K053251 Priority Encoder")
 
-k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K053251, tag, owner, clock),
 	//m_dirty_tmap[5],
 	//m_ram[16],

@@ -72,7 +72,7 @@ const tiny_rom_entry *abc_uni800_device::device_rom_region() const
 //  abc_uni800_device - constructor
 //-------------------------------------------------
 
-abc_uni800_device::abc_uni800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+abc_uni800_device::abc_uni800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ABC_UNI800, tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this)
 {

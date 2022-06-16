@@ -26,7 +26,7 @@ class colecovision_megacart_cartridge_device : public device_t,
 {
 public:
 	// construction/destruction
-	colecovision_megacart_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	colecovision_megacart_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides

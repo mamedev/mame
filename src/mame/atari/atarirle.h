@@ -70,13 +70,13 @@ class atari_rle_objects_device : public device_t,
 {
 public:
 	// construction/destruction
-	atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, const atari_rle_objects_config &config)
-		: atari_rle_objects_device(mconfig, tag, owner, clock)
+	atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, const atari_rle_objects_config &config)
+		: atari_rle_objects_device(mconfig, tag, owner)
 	{
 		set_config(config);
 	}
 
-	atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	void set_config(const atari_rle_objects_config &config) { static_cast<atari_rle_objects_config &>(*this) = config; }

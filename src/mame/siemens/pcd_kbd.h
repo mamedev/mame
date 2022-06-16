@@ -9,7 +9,7 @@
 class pcd_keyboard_device : public device_t
 {
 public:
-	pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_tx_handler() { return m_out_tx_handler.bind(); }
 

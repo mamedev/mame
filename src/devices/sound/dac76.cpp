@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(DAC76, dac76_device, "dac76", "PMI DAC-76 COMDAC")
 //  dac76_device - constructor
 //-------------------------------------------------
 
-dac76_device::dac76_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dac76_device::dac76_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, DAC76, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr),

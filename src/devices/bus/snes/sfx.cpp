@@ -18,18 +18,18 @@ DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERFX1, sns_rom_superfx1_device, "sns_rom_superfx
 DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERFX2, sns_rom_superfx2_device, "sns_rom_superfx2", "SNES Cart (LoROM) + SuperFX 2")
 
 
-sns_rom_superfx_device::sns_rom_superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_superfx_device::sns_rom_superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, type, tag, owner, clock)
 	, m_superfx(*this, "superfx")
 {
 }
 
-sns_rom_superfx1_device::sns_rom_superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_superfx1_device::sns_rom_superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_superfx_device(mconfig, SNS_LOROM_SUPERFX1, tag, owner, clock)
 {
 }
 
-sns_rom_superfx2_device::sns_rom_superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_superfx2_device::sns_rom_superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_superfx_device(mconfig, SNS_LOROM_SUPERFX2, tag, owner, clock)
 {
 }

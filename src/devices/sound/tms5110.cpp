@@ -1433,12 +1433,12 @@ DEFINE_DEVICE_TYPE(TMS5110A, tms5110a_device, "tms5110a", "TMS5110A")
 DEFINE_DEVICE_TYPE(M58817,   m58817_device,   "m58817",   "M58817")
 
 
-tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5110_device(mconfig, TMS5110, tag, owner, clock, TMS5110_IS_TMS5110A)
 {
 }
 
-tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant)
+tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int variant)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_table(*this, DEVICE_SELF)
@@ -1452,49 +1452,49 @@ tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, 
 }
 
 
-tms5100_device::tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms5100_device::tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5110_device(mconfig, TMS5100, tag, owner, clock, TMS5110_IS_TMC0281)
 {
 }
 
 
-tmc0281_device::tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmc0281_device::tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5110_device(mconfig, TMC0281, tag, owner, clock, TMS5110_IS_TMC0281)
 {
 }
 
 
-tms5100a_device::tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms5100a_device::tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5110_device(mconfig, TMS5100A, tag, owner, clock, TMS5110_IS_TMC0281D)
 {
 }
 
 
-tmc0281d_device::tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmc0281d_device::tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5110_device(mconfig, TMC0281D, tag, owner, clock, TMS5110_IS_TMC0281D)
 {
 }
 
 
-cd2801_device::cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cd2801_device::cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5110_device(mconfig, CD2801, tag, owner, clock, TMS5110_IS_CD2801)
 {
 }
 
 
-cd2802_device::cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cd2802_device::cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5110_device(mconfig, CD2802, tag, owner, clock, TMS5110_IS_CD2802)
 {
 }
 
 
-tms5110a_device::tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms5110a_device::tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5110_device(mconfig, TMS5110A, tag, owner, clock, TMS5110_IS_TMS5110A)
 {
 }
 
 
-m58817_device::m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m58817_device::m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms5110_device(mconfig, M58817, tag, owner, clock, TMS5110_IS_M58817)
 {
 }
@@ -1502,7 +1502,7 @@ m58817_device::m58817_device(const machine_config &mconfig, const char *tag, dev
 
 DEFINE_DEVICE_TYPE(TMSPROM, tmsprom_device, "tmsprom", "TMSPROM")
 
-tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TMSPROM, tag, owner, clock),
 		m_rom(*this, DEVICE_SELF),
 		m_prom(*this, finder_base::DUMMY_TAG),

@@ -99,7 +99,7 @@ void orion_state::orion_floppy_formats(format_registration &fr)
 /* Machine driver */
 void orion_state::orion128(machine_config &config)
 {
-	I8080(config, m_maincpu, 2000000);
+	I8080(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &orion_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &orion_state::io_map);
 
@@ -168,7 +168,7 @@ void orion_state::orion128ms(machine_config &config)
 
 void orion_z80_state::orionz80(machine_config &config)
 {
-	Z80(config, m_maincpu, 2500000);
+	Z80(config, m_maincpu, XTAL::u(2500000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &orion_z80_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &orion_z80_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(orion_z80_state::orionz80_interrupt));
@@ -200,7 +200,7 @@ void orion_z80_state::orionz80(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	auto &ay8912(AY8912(config, "ay8912", 1773400));
+	auto &ay8912(AY8912(config, "ay8912", XTAL::u(1773400)));
 	ay8912.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	CASSETTE(config, m_cassette);
@@ -244,7 +244,7 @@ void orion_z80_state::orionz80ms(machine_config &config)
 
 void orion_pro_state::orionpro(machine_config &config)
 {
-	Z80(config, m_maincpu, 5000000);
+	Z80(config, m_maincpu, XTAL::u(5000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &orion_pro_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &orion_pro_state::io_map);
 
@@ -272,7 +272,7 @@ void orion_pro_state::orionpro(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
-	auto &ay8912(AY8912(config, "ay8912", 1773400));
+	auto &ay8912(AY8912(config, "ay8912", XTAL::u(1773400)));
 	ay8912.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	CASSETTE(config, m_cassette);

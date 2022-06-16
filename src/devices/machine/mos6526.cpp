@@ -587,7 +587,7 @@ void mos6526_device::synchronize()
 //  mos6526_device - constructor
 //-------------------------------------------------
 
-mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -604,17 +604,17 @@ mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6526_device(mconfig, MOS6526, tag, owner, clock, TYPE_6526)
 { }
 
-mos6526a_device::mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6526a_device::mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6526_device(mconfig, MOS6526A, tag, owner, clock, TYPE_6526A) { }
 
-mos8520_device::mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos8520_device::mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6526_device(mconfig, MOS8520, tag, owner, clock, TYPE_8520) { }
 
-mos5710_device::mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos5710_device::mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6526_device(mconfig, MOS5710, tag, owner, clock, TYPE_5710) { }
 
 

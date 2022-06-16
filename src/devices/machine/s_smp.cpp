@@ -57,7 +57,7 @@ void s_smp_device::internal_map(address_map &map)
 DEFINE_DEVICE_TYPE(S_SMP, s_smp_device, "s_smp", "Nintendo/Sony S-SMP")
 
 
-s_smp_device::s_smp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+s_smp_device::s_smp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spc700_device(mconfig, S_SMP, tag, owner, clock, address_map_constructor(FUNC(s_smp_device::internal_map), this))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16)
 	, m_ipl_region(*this, "sound_ipl")

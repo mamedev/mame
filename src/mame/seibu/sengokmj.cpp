@@ -605,7 +605,7 @@ void sengokmj_state::sengokmj(machine_config &config)
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(sengokmj_state::vblank_irq));
 
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
 	crtc.layer_en_callback().set(FUNC(sengokmj_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(sengokmj_state::layer_scroll_w));
 
@@ -619,10 +619,10 @@ void sengokmj_state::sengokmj(machine_config &config)
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW));
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1320000), okim6295_device::PIN7_LOW));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline("audiocpu", 0);
 	seibu_sound.set_rom_tag("audiocpu");
 	seibu_sound.set_rombank_tag("seibu_bank1");

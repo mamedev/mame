@@ -28,7 +28,7 @@
 DEFINE_DEVICE_TYPE(I82371SB, i82371sb_device, "i82371sb", "Intel 82371SB")
 
 
-i82371sb_device::i82371sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i82371sb_device::i82371sb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: southbridge_device(mconfig, I82371SB, tag, owner, clock)
 	, pci_device_interface( mconfig, *this )
 	, m_smi_callback(*this)

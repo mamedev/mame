@@ -41,7 +41,7 @@
 
 DEFINE_DEVICE_TYPE(K054000, k054000_device, "k054000", "K054000 Protection")
 
-k054000_device::k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k054000_device::k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K054000, tag, owner, clock)
 {
 }

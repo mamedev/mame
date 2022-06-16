@@ -253,9 +253,9 @@ void dinaris_state::dice(machine_config &config)
 
 	// Sound
 	SPEAKER(config, "speaker").front_center();
-	SPECIMX_SND(config, "custom", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SPECIMX_SND(config, "custom").add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(XTAL(8'000'000) / 4);
 	m_pit->out_handler<0>().set("custom", FUNC(specimx_sound_device::set_input_ch0));
 	m_pit->set_clk<1>(XTAL(8'000'000) / 4);

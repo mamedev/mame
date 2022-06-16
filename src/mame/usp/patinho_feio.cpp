@@ -245,7 +245,7 @@ void patinho_feio_state::patinho_feio(machine_config &config)
 {
 	/* basic machine hardware */
 	/* CPU @ approx. 500 kHz (memory cycle time is 2usec) */
-	PATO_FEIO_CPU(config, m_maincpu, 500000);
+	PATO_FEIO_CPU(config, m_maincpu, XTAL::u(500000));
 	m_maincpu->rc_read().set_ioport("RC");
 	m_maincpu->buttons_read().set_ioport("BUTTONS");
 	m_maincpu->set_update_panel_cb(FUNC(patinho_feio_state::update_panel));
@@ -275,11 +275,11 @@ void patinho_feio_state::patinho_feio(machine_config &config)
 //  m_maincpu->iodev_read<14>().set(FUNC(patinho_feio_state::papertapereader_data_r));
 
 	/* DECWRITER */
-	TELEPRINTER(config, m_decwriter, 0);
+	TELEPRINTER(config, m_decwriter);
 	m_decwriter->set_keyboard_callback(FUNC(patinho_feio_state::decwriter_kbd_input));
 
 	/* Teletype */
-	TELEPRINTER(config, m_tty, 1);
+	TELEPRINTER(config, m_tty, XTAL::u(1));
 	m_tty->set_keyboard_callback(FUNC(patinho_feio_state::teletype_kbd_input));
 
 	/* punched tape */

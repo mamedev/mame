@@ -106,7 +106,7 @@ GFXDECODE_MEMBER( k051316_device::gfxinfo4_ram )
 GFXDECODE_END
 
 
-k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K051316, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo)
 	, m_zoom_rom(*this, DEVICE_SELF)

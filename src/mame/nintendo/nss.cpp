@@ -847,13 +847,13 @@ void nss_state::nss(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	/* nss hardware */
-	Z80(config, m_bioscpu, 4000000);
+	Z80(config, m_bioscpu, XTAL::u(4000000));
 	m_bioscpu->set_addrmap(AS_PROGRAM, &nss_state::bios_map);
 	m_bioscpu->set_addrmap(AS_IO, &nss_state::bios_io_map);
 
 	M50458(config, m_m50458, 4000000, "osd"); /* TODO: correct clock */
 	S3520CF(config, m_s3520cf); /* RTC */
-	RP5H01(config, m_rp5h01, 0);
+	RP5H01(config, m_rp5h01);
 	M6M80011AP(config, "m6m80011ap");
 
 	/* sound hardware */

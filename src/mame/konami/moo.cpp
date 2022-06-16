@@ -527,19 +527,19 @@ void moo_state::moo(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246);
 	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48+1, 23);
 	m_k053246->set_palette("palette");
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette("palette");
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
-	K054338(config, m_k054338, 0);
+	K054338(config, m_k054338);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -557,7 +557,7 @@ void moo_state::moo(machine_config &config)
 void moo_state::moobl(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16100000);
+	M68000(config, m_maincpu, XTAL::u(16100000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &moo_state::moobl_map);
 	m_maincpu->set_vblank_int("screen", FUNC(moo_state::moobl_interrupt));
 
@@ -581,25 +581,25 @@ void moo_state::moobl(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246);
 	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48+1, 23);
 	m_k053246->set_palette("palette");
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette("palette");
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
-	K054338(config, m_k054338, 0);
+	K054338(config, m_k054338);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(1056000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -610,7 +610,7 @@ void moo_state::bucky(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &moo_state::bucky_map);
 
-	K054000(config, "k054000", 0);
+	K054000(config, "k054000");
 
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48, 23);
 

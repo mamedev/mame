@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(C64_SUPER_GAMES, c64_super_games_cartridge_device, "c64_super
 //  c64_super_games_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_super_games_cartridge_device::c64_super_games_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_super_games_cartridge_device::c64_super_games_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_SUPER_GAMES, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)

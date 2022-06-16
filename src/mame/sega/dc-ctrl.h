@@ -12,7 +12,7 @@ class dc_common_device : public maple_device
 {
 public:
 	// construction/destruction
-	dc_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	dc_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <uint8_t Which, typename T>
 	void set_port_tag(T &&port_tag) { port[Which].set_tag(std::forward<T>(port_tag)); }
@@ -53,14 +53,14 @@ class dc_controller_device : public dc_common_device
 public:
 	// construction/destruction
 	template <typename T>
-	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&host_tag, int host_port)
+	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&host_tag, int host_port)
 		: dc_controller_device(mconfig, tag, owner, clock)
 	{
 		host.set_tag(std::forward<T>(host_tag));
 		set_host_port(host_port);
 	}
 
-	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	void fixed_status(uint32_t *dest) override;
@@ -74,14 +74,14 @@ class dc_keyboard_device : public dc_common_device
 public:
 	// construction/destruction
 	template <typename T>
-	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&host_tag, int host_port)
+	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&host_tag, int host_port)
 		: dc_keyboard_device(mconfig, tag, owner, clock)
 	{
 		host.set_tag(std::forward<T>(host_tag));
 		set_host_port(host_port);
 	}
 
-	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 //protected:
 

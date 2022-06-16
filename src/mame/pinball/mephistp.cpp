@@ -247,7 +247,7 @@ void mephisto_state::mephisto(machine_config &config)
 	m_aysnd->port_b_read_callback().set(FUNC(mephisto_state::ay8910_inputs_r));
 	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	DAC08(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5);
+	DAC08(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 

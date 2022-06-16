@@ -256,7 +256,7 @@ void pdc_device::device_add_mconfig(machine_config &config)
 	//config.m_perfect_cpu_quantum = subtag(M6502_TAG);
 
 	/* Floppy Disk Controller - uPD765a - NEC D765AC-2 */
-	UPD765A(config, m_fdc, 4'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(4'000'000), true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pdc_device::fdc_irq));
 	m_fdc->drq_wr_callback().set(m_dma8237, FUNC(am9517a_device::dreq0_w)); //.invert();
 
@@ -279,7 +279,7 @@ void pdc_device::device_add_mconfig(machine_config &config)
 
 	/* Hard Disk Controller - HDC9224 */
 	// TODO: connect the HDC lines
-	HDC9224(config, HDC_TAG, 0);
+	HDC9224(config, HDC_TAG);
 	MFM_HD_CONNECTOR(config, "h1", pdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
 
 }
@@ -297,7 +297,7 @@ ioport_constructor pdc_device::device_input_ports() const
 //  pdc_device - constructor
 //-------------------------------------------------
 
-pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PDC, tag, owner, clock),
 	m_pdccpu(*this, Z80_TAG),
 	m_dma8237(*this, FDCDMA_TAG),
@@ -347,7 +347,7 @@ void pdc_device::device_reset()
 	/* Reset CPU */
 	m_pdccpu->reset();
 
-	m_fdc->set_rate(500000) ;
+	m_fdc->set_rate(XTAL::u(500000)) ;
 }
 
 //-------------------------------------------------

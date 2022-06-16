@@ -120,7 +120,7 @@ ioport_constructor bbc_tracker_device::device_input_ports() const
 //  bbc_pointer_device - constructor
 //-------------------------------------------------
 
-bbc_pointer_device::bbc_pointer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_pointer_device::bbc_pointer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_userport_interface(mconfig, *this)
 	, m_pointer_x(*this, "POINTER_X")
@@ -129,17 +129,17 @@ bbc_pointer_device::bbc_pointer_device(const machine_config &mconfig, device_typ
 {
 }
 
-bbc_amxmouse_device::bbc_amxmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_amxmouse_device::bbc_amxmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_pointer_device(mconfig, BBC_AMXMOUSE, tag, owner, clock)
 {
 }
 
-bbc_m512mouse_device::bbc_m512mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_m512mouse_device::bbc_m512mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_pointer_device(mconfig, BBC_M512MOUSE, tag, owner, clock)
 {
 }
 
-bbc_tracker_device::bbc_tracker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tracker_device::bbc_tracker_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_pointer_device(mconfig, BBC_TRACKER, tag, owner, clock)
 {
 }

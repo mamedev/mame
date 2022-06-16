@@ -10,11 +10,11 @@ class spc700_device : public cpu_device
 {
 public:
 	// construction/destruction
-	spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// construction/destruction
-	spc700_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map = address_map_constructor());
+	spc700_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map = address_map_constructor());
 
 	// device-level overrides
 	virtual void device_start() override;

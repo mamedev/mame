@@ -21,7 +21,7 @@ class msx_slot_cartridge_device : public device_t
 {
 public:
 	// construction/destruction
-	msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_out);
 
 protected:
-	msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -60,7 +60,7 @@ class msx_slot_yamaha_expansion_device : public msx_slot_cartridge_device
 {
 public:
 	// construction/destruction
-	msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const char *image_interface() const noexcept override { return "msx_yamaha_60pin"; }
 	virtual const char *image_type_name() const noexcept override { return "cartridge60pin"; }

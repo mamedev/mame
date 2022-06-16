@@ -243,7 +243,7 @@ void namco_06xx_device::set_nmi(int state)
 
 DEFINE_DEVICE_TYPE(NAMCO_06XX, namco_06xx_device, "namco06", "Namco 06xx")
 
-namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NAMCO_06XX, tag, owner, clock)
 	, m_control(0)
 	, m_next_timer_state(false)

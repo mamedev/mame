@@ -25,7 +25,7 @@ public:
 
 
 	// construction/destruction
-	huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto next_pixel_data() { return m_next_pixel_data_cb.bind(); }
 	auto time_til_next_event() { return m_time_til_next_event_cb.bind(); }

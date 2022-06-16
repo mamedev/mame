@@ -289,7 +289,7 @@ void dg680_state::dg680(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_r").configure_periodic(FUNC(dg680_state::kansas_r), attotime::from_hz(40000));
 
-	CLOCK(config, m_clock, 4'800); // 300 baud x 16(divider) = 4800
+	CLOCK(config, m_clock, XTAL::u(4'800)); // 300 baud x 16(divider) = 4800
 	m_clock->signal_handler().set(FUNC(dg680_state::kansas_w));
 	m_clock->signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
 	m_clock->signal_handler().append(m_ctc, FUNC(z80ctc_device::trg3));
@@ -301,13 +301,13 @@ void dg680_state::dg680(machine_config &config)
 	maincpu.set_daisy_config(dg680_daisy_chain);
 
 	/* Keyboard */
-	generic_keyboard_device &keyb(GENERIC_KEYBOARD(config, "keyb", 0));
+	generic_keyboard_device &keyb(GENERIC_KEYBOARD(config, "keyb"));
 	keyb.set_keyboard_callback(FUNC(dg680_state::kbd_put));
 
 	/* Devices */
 	Z80CTC(config, m_ctc, XTAL(8'000'000) / 4);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_ctc->set_clk<0>(200);
+	m_ctc->set_clk<0>(XTAL::u(200));
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 
 	Z80PIO(config, m_pio, XTAL(8'000'000) / 4);

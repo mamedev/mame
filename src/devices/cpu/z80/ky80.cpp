@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(KY80, ky80_device, "ky80", "Taxan KY-80")
 //  ky80_device - constructor
 //-------------------------------------------------
 
-ky80_device::ky80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ky80_device::ky80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc82_device(mconfig, KY80, tag, owner, clock,
 					address_map_constructor(FUNC(ky80_device::internal_ram), this),
 					address_map_constructor(FUNC(ky80_device::internal_io), this))

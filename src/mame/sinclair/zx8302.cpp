@@ -129,7 +129,7 @@ inline void zx8302_device::transmit_ipc_data()
 //  zx8302_device - constructor
 //-------------------------------------------------
 
-zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ZX8302, tag, owner, clock),
 		device_serial_interface(mconfig, *this),
 		m_rtc_clock(0),

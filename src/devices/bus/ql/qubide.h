@@ -26,7 +26,7 @@ class qubide_device : public device_t, public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction
-	qubide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	qubide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

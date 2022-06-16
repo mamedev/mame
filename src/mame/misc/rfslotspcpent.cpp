@@ -229,7 +229,7 @@ void rfslotspcpent_state::machine_reset()
 void rfslotspcpent_state::rfslotspcpent(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM4(config, m_maincpu, 100000000); // Actually an Intel Celeron 575 1M cache, 2,00 GHz
+	PENTIUM4(config, m_maincpu, XTAL::u(100000000)); // Actually an Intel Celeron 575 1M cache, 2,00 GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &rfslotspcpent_state::rfslotspcpent_map);
 
 	// Video hardware

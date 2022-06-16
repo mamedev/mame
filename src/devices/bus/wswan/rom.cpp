@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(WS_ROM_EEPROM, ws_rom_eeprom_device, "ws_eeprom", "Wonderswan
 DEFINE_DEVICE_TYPE(WS_ROM_WWITCH, ws_wwitch_device,     "ws_wwitch", "WonderWitch")
 
 
-ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_ws_cart_interface(mconfig, *this),
 	m_base20(0),
@@ -46,31 +46,31 @@ ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-ws_rom_device::ws_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+ws_rom_device::ws_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ws_rom_device(mconfig, WS_ROM_STD, tag, owner, clock)
 {
 }
 
-ws_rom_sram_device::ws_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+ws_rom_sram_device::ws_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ws_rom_device(mconfig, WS_ROM_SRAM, tag, owner, clock),
 	m_nvram_base(0)
 {
 }
 
-ws_rom_sram_device::ws_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+ws_rom_sram_device::ws_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	ws_rom_device(mconfig, type, tag, owner, clock),
 	m_nvram_base(0)
 {
 }
 
-ws_rom_eeprom_device::ws_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+ws_rom_eeprom_device::ws_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ws_rom_device(mconfig, WS_ROM_EEPROM, tag, owner, clock),
 	m_eeprom_mode(0), m_eeprom_address(0), m_eeprom_command(0), m_eeprom_start(0), m_eeprom_write_enabled(0)
 {
 }
 
 
-ws_wwitch_device::ws_wwitch_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+ws_wwitch_device::ws_wwitch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ws_rom_sram_device(mconfig, WS_ROM_WWITCH, tag, owner, clock)
 {
 }

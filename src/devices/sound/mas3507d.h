@@ -13,7 +13,7 @@ class mas3507d_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto mpeg_frame_sync_cb() { return cb_mpeg_frame_sync.bind(); }
 	auto demand_cb() { return cb_demand.bind(); }

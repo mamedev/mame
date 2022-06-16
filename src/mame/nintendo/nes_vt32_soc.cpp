@@ -10,17 +10,17 @@
 DEFINE_DEVICE_TYPE(NES_VT32_SOC,     nes_vt32_soc_device,     "nes_vt32_soc", "VT32 series System on a Chip (FP) (NTSC)")
 DEFINE_DEVICE_TYPE(NES_VT32_SOC_PAL, nes_vt32_soc_pal_device, "nes_vt32_soc_pal", "VT32 series System on a Chip (FP) (PAL)")
 
-nes_vt32_soc_device::nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+nes_vt32_soc_device::nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock) :
 	nes_vt09_soc_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_vt32_soc_device::nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+nes_vt32_soc_device::nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	nes_vt32_soc_device(mconfig, NES_VT32_SOC, tag, owner, clock)
 {
 }
 
-nes_vt32_soc_pal_device::nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+nes_vt32_soc_pal_device::nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	nes_vt32_soc_device(mconfig, NES_VT32_SOC_PAL, tag, owner, clock)
 {
 }

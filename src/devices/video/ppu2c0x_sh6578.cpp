@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(PPU_SH6578, ppu_sh6578_device, "ppu_sh6578", "SH6578 PPU (NTSC)")
 DEFINE_DEVICE_TYPE(PPU_SH6578PAL, ppu_sh6578pal_device, "ppu_sh6578pal", "SH6578 PPU (PAL)")
 
-ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu2c0x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(ppu_sh6578_device::ppu_internal_map), this))
 {
 	m_paletteram_in_ppuspace = false;
@@ -26,12 +26,12 @@ ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, device_type 
 	m_global_refresh_mask = 0xffff;
 }
 
-ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu_sh6578_device::ppu_sh6578_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu_sh6578_device(mconfig, PPU_SH6578, tag, owner, clock)
 {
 }
 
-ppu_sh6578pal_device::ppu_sh6578pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu_sh6578pal_device::ppu_sh6578pal_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	ppu_sh6578_device(mconfig, PPU_SH6578PAL, tag, owner, clock)
 {
 	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;

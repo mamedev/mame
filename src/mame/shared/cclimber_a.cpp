@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(CCLIMBER_AUDIO, cclimber_audio_device, "cclimber_audio", "Cra
 //  cclimber_audio_device: Constructor
 //-------------------------------------------------
 
-cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CCLIMBER_AUDIO, tag, owner, clock),
 	m_dac(*this, "dac"),
 	m_volume(*this, "volume"),

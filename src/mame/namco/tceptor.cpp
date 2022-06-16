@@ -333,7 +333,7 @@ void tceptor_state::tceptor(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	adc0809_device &adc(ADC0809(config, "adc", 1000000)); // unknown clock (needs to >640khz or the wait loop is too fast)
+	adc0809_device &adc(ADC0809(config, "adc", XTAL::u(1000000))); // unknown clock (needs to >640khz or the wait loop is too fast)
 	adc.in_callback<0>().set_constant(0); // unknown
 	adc.in_callback<1>().set_ioport("PEDAL");
 	adc.in_callback<2>().set_ioport("STICKX");
@@ -368,7 +368,7 @@ void tceptor_state::tceptor(machine_config &config)
 	m_cus30->add_route(0, "lspeaker", 0.40);
 	m_cus30->add_route(1, "rspeaker", 0.40);
 
-	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
+	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac")); // unknown DAC
 	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.4);
 	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.4);
 }

@@ -799,7 +799,7 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 	M68000(config, m_maincpu, XTAL(42'000'000) / 4); // 68000 @10.50MHz (42/4)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmcpokr_state::bmcpokr_mem);
 
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(bmcpokr_state::interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(bmcpokr_state::interrupt), "screen", 0, 1);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh(HZ_TO_ATTOSECONDS(58.935));    // HSync - 15.440kHz, VSync - 58.935Hz
@@ -811,14 +811,14 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &bmcpokr_state::ramdac_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bmcpokr);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_hopper, 0);
+	TICKET_DISPENSER(config, m_hopper);
 	m_hopper->set_period(attotime::from_msec(10));
 	m_hopper->set_senses(TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW, false);    // hopper stuck low if too slow
 

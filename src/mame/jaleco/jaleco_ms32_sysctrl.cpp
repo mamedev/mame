@@ -56,7 +56,7 @@ DEFINE_DEVICE_TYPE(JALECO_MS32_SYSCTRL, jaleco_ms32_sysctrl_device, "jaleco_ms32
 //  jaleco_ms32_sysctrl_device - constructor
 //-------------------------------------------------
 
-jaleco_ms32_sysctrl_device::jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+jaleco_ms32_sysctrl_device::jaleco_ms32_sysctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, JALECO_MS32_SYSCTRL, tag, owner, clock)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_flip_screen_cb(*this)
@@ -221,7 +221,7 @@ static constexpr u16 clamp_to_12bits_neg(u16 raw_data)
 // CRTC
 // ============================================================================
 
-inline u32 jaleco_ms32_sysctrl_device::get_dotclock_frequency()
+inline XTAL jaleco_ms32_sysctrl_device::get_dotclock_frequency()
 {
 	const u8 dot_divider = m_dotclock_setting & 1 ? 6 : 8;
 	return clock() / dot_divider;
@@ -237,7 +237,7 @@ inline void jaleco_ms32_sysctrl_device::crtc_refresh_screen_params()
 	rectangle visarea;
 	const u16 htotal = m_crtc.horz_blank + m_crtc.horz_display;
 	const u16 vtotal = crtc_vtotal();
-	const attoseconds_t refresh = HZ_TO_ATTOSECONDS(get_dotclock_frequency()) * htotal * vtotal;
+	const attoseconds_t refresh = HZ_TO_ATTOSECONDS(get_dotclock_frequency().value()) * htotal * vtotal;
 	visarea.set(0, m_crtc.horz_display - 1, 0, m_crtc.vert_display - 1);
 	logerror("%s: CRTC setup total: %d x %d display: %d x %d\n", this->tag(), htotal, vtotal, m_crtc.horz_display, m_crtc.vert_display);
 	m_screen->configure(htotal, vtotal, visarea, refresh);

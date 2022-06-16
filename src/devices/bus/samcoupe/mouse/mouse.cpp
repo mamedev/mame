@@ -48,7 +48,7 @@ ioport_constructor sam_mouse_device::device_input_ports() const
 //  sam_mouse_device - constructor
 //-------------------------------------------------
 
-sam_mouse_device::sam_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sam_mouse_device::sam_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SAM_MOUSE, tag, owner, clock),
 	device_samcoupe_mouse_interface(mconfig, *this),
 	m_io_buttons(*this, "buttons"),

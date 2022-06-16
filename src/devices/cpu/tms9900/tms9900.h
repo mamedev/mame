@@ -64,7 +64,7 @@ public:
 protected:
 	tms99xx_device(const machine_config &mconfig, device_type type,
 				const char *tag, int data_width, int prg_addr_bits, int cru_addr_bits,
-				device_t *owner, uint32_t clock);
+				device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void        device_start() override;
@@ -386,7 +386,7 @@ private:
 class tms9900_device : public tms99xx_device
 {
 public:
-	tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

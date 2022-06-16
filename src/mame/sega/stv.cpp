@@ -1126,10 +1126,10 @@ void stv_state::stv(machine_config &config)
 	m_slave->set_is_slave(1);
 	TIMER(config, "slave_scantimer").configure_scanline(FUNC(stv_state::saturn_slave_scanline), "screen", 0, 1);
 
-	M68000(config, m_audiocpu, 11289600); //11.2896 MHz
+	M68000(config, m_audiocpu, XTAL::u(11289600)); //11.2896 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &stv_state::sound_mem);
 
-	SEGA_SCU(config, m_scu, 0);
+	SEGA_SCU(config, m_scu);
 	m_scu->set_hostcpu(m_maincpu);
 
 	SMPC_HLE(config, m_smpc_hle, XTAL(4'000'000));
@@ -1164,14 +1164,14 @@ void stv_state::stv(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SCSP(config, m_scsp, 22579200); // TODO : Unknown clock, divider
+	SCSP(config, m_scsp, XTAL::u(22579200)); // TODO : Unknown clock, divider
 	m_scsp->set_addrmap(0, &stv_state::scsp_mem);
 	m_scsp->irq_cb().set(FUNC(saturn_state::scsp_irq));
 	m_scsp->main_irq_cb().set(m_scu, FUNC(sega_scu_device::sound_req_w));
 	m_scsp->add_route(0, "lspeaker", 1.0);
 	m_scsp->add_route(1, "rspeaker", 1.0);
 
-	SEGA_BILLBOARD(config, m_billboard, 0);
+	SEGA_BILLBOARD(config, m_billboard);
 
 	config.set_default_layout(layout_segabill);
 }
@@ -1179,7 +1179,7 @@ void stv_state::stv(machine_config &config)
 void stv_state::stv_5881(machine_config &config)
 {
 	stv(config);
-	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
+	SEGA315_5881_CRYPT(config, m_cryptdevice);
 	m_cryptdevice->set_read_cb(FUNC(stv_state::crypt_read_callback));
 }
 
@@ -1214,7 +1214,7 @@ void stv_state::stvcd(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stv_state::stvcd_mem);
 	m_slave->set_addrmap(AS_PROGRAM, &stv_state::stvcd_mem);
 
-	stvcd_device &stvcd(STVCD(config, "stvcd", 0));
+	stvcd_device &stvcd(STVCD(config, "stvcd"));
 	stvcd.add_route(0, "scsp", 1.0, 0);
 	stvcd.add_route(1, "scsp", 1.0, 1);
 }
@@ -1229,7 +1229,7 @@ void stv_state::stv_5838(machine_config &config)
 {
 	stv(config);
 
-	SEGA315_5838_COMP(config, m_5838crypt, 0);
+	SEGA315_5838_COMP(config, m_5838crypt);
 	m_5838crypt->set_addrmap(0, &stv_state::sega5838_map);
 }
 
@@ -1252,7 +1252,7 @@ void stv_state::batmanfr_sound_comms_w(offs_t offset, uint32_t data, uint32_t me
 void stv_state::batmanfr(machine_config &config)
 {
 	stv(config);
-	ACCLAIM_RAX(config, "rax", 0);
+	ACCLAIM_RAX(config, "rax");
 }
 
 void stv_state::shienryu(machine_config &config)

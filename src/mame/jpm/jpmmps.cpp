@@ -287,7 +287,7 @@ void jpmmps_state::jpmmps(machine_config &config)
 	SN76489(config, m_psg, SOUND_CLOCK);
 	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	METERS(config, m_meters, 0).set_number(9); // TODO: meters.cpp sets a max of 8
+	METERS(config, m_meters).set_number(9); // TODO: meters.cpp sets a max of 8
 
 	config.set_default_layout(layout_jpmmps);
 }

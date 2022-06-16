@@ -814,7 +814,7 @@ void squale_state::squale(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &squale_state::squale_mem);
 
 	/* Cartridge pia */
-	PIA6821(config, m_pia_u72, 0);
+	PIA6821(config, m_pia_u72);
 	m_pia_u72->readpa_handler().set(FUNC(squale_state::pia_u72_porta_r));
 	m_pia_u72->readpb_handler().set(FUNC(squale_state::pia_u72_portb_r));
 	m_pia_u72->writepa_handler().set(FUNC(squale_state::pia_u72_porta_w));
@@ -823,7 +823,7 @@ void squale_state::squale(machine_config &config)
 	m_pia_u72->cb2_handler().set(FUNC(squale_state::pia_u72_cb2_w));
 
 	/* Keyboard pia */
-	PIA6821(config, m_pia_u75, 0);
+	PIA6821(config, m_pia_u75);
 	m_pia_u75->readpa_handler().set(FUNC(squale_state::pia_u75_porta_r));
 	m_pia_u75->readpb_handler().set(FUNC(squale_state::pia_u75_portb_r));
 	m_pia_u75->writepa_handler().set(FUNC(squale_state::pia_u75_porta_w));
@@ -840,7 +840,7 @@ void squale_state::squale(machine_config &config)
 	m_ay8910->port_b_write_callback().set(FUNC(squale_state::ay_portb_w));
 	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 
 	/* screen */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

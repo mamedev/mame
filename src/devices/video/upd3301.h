@@ -61,7 +61,7 @@ public:
 	typedef device_delegate<std::array<u16, 80> (const std::array<u8, 41> attr_row, u8 gfx_mode, int y, u8 attr_fifo_size, u8 row_size)> fetch_attribute_delegate;
 
 	// construction/destruction
-	upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_character_width(int value) { m_width = value; }
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }

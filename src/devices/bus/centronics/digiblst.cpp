@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(CENTRONICS_DIGIBLASTER, centronics_digiblaster_device, "cpcdi
 //  centronics_digiblaster_device - constructor
 //-------------------------------------------------
 
-centronics_digiblaster_device::centronics_digiblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+centronics_digiblaster_device::centronics_digiblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CENTRONICS_DIGIBLASTER, tag, owner, clock),
 	device_centronics_peripheral_interface( mconfig, *this ),
 	m_dac(*this, "dac"),
@@ -41,7 +41,7 @@ void centronics_digiblaster_device::device_add_mconfig(machine_config &config)
 {
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 }
 
 void centronics_digiblaster_device::device_start()

@@ -10,7 +10,7 @@ class m6m80011ap_device :   public device_t,
 {
 public:
 	// construction/destruction
-	m6m80011ap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768); /* TODO: frequency */
+	m6m80011ap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = 32'768); /* TODO: frequency */
 
 	// I/O operations
 	DECLARE_READ_LINE_MEMBER( read_bit );

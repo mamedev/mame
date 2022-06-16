@@ -62,7 +62,7 @@ ALLOW_SAVE_TYPE(dp8344_device::inst_state);
 //  dp8344_device - constructor
 //-------------------------------------------------
 
-dp8344_device::dp8344_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+dp8344_device::dp8344_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_inst_config("instruction", ENDIANNESS_LITTLE, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -118,7 +118,7 @@ dp8344_device::dp8344_device(const machine_config &mconfig, device_type type, co
 //  dp8344a_device - constructor
 //-------------------------------------------------
 
-dp8344a_device::dp8344a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dp8344a_device::dp8344a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dp8344_device(mconfig, DP8344A, tag, owner, clock)
 {
 }
@@ -128,7 +128,7 @@ dp8344a_device::dp8344a_device(const machine_config &mconfig, const char *tag, d
 //  dp8344b_device - constructor
 //-------------------------------------------------
 
-dp8344b_device::dp8344b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dp8344b_device::dp8344b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dp8344_device(mconfig, DP8344B, tag, owner, clock)
 {
 	// TODO: emulate differences between DP8344A and DP8344B

@@ -32,7 +32,7 @@ inline void ATTR_PRINTF( 3, 4 ) ds1205_device::verboselog( int n_level, const ch
 // device type definition
 DEFINE_DEVICE_TYPE(DS1205, ds1205_device, "ds1205", "DS1205")
 
-ds1205_device::ds1205_device( const machine_config &mconfig, const char *tag, device_t *owner, u32 clock )
+ds1205_device::ds1205_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock )
 	: device_t(mconfig, DS1205, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_region(*this, DEVICE_SELF),

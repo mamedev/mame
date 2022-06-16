@@ -16,7 +16,7 @@
 
 DEFINE_DEVICE_TYPE(VT_VT1682_UIO, vrt_vt1682_uio_device, "vt1682uio", "VRT VT1682 UIO")
 
-vrt_vt1682_uio_device::vrt_vt1682_uio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vrt_vt1682_uio_device::vrt_vt1682_uio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VT_VT1682_UIO, tag, owner, clock),
 	m_porta_out(*this),
 	m_porta_in(*this),

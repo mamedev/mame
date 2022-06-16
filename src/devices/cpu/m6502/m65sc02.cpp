@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(M65SC02, m65sc02_device, "m65sc02", "GTE G65SC02")
 
-m65sc02_device::m65sc02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m65sc02_device::m65sc02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	r65c02_device(mconfig, M65SC02, tag, owner, clock)
 {
 }

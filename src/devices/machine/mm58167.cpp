@@ -52,7 +52,7 @@ typedef enum
 //  mm58167_device - constructor
 //-------------------------------------------------
 
-mm58167_device::mm58167_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mm58167_device::mm58167_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MM58167, tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		m_irq_w(*this)

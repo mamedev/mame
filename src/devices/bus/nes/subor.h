@@ -18,7 +18,7 @@ class nes_subor0_device :
 {
 public:
 	// construction/destruction
-	nes_subor0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_subor0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 
@@ -39,7 +39,7 @@ class nes_subor1_device :
 {
 public:
 	// construction/destruction
-	nes_subor1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_subor1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 
@@ -60,7 +60,7 @@ class nes_subor2_device :
 {
 public:
 	// construction/destruction
-	nes_subor2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_subor2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t nt_r(offs_t offset) override;
 	virtual void write_l(offs_t offset, uint8_t data) override;

@@ -157,13 +157,13 @@ void mod8_state::kbd_put(u8 data)
 void mod8_state::mod8(machine_config &config)
 {
 	/* basic machine hardware */
-	I8008(config, m_maincpu, 800000);
+	I8008(config, m_maincpu, XTAL::u(800000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mod8_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mod8_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(mod8_state::mod8_irq_callback));
 
 	/* video hardware */
-	TELEPRINTER(config, m_teleprinter, 0);
+	TELEPRINTER(config, m_teleprinter);
 	m_teleprinter->set_keyboard_callback(FUNC(mod8_state::kbd_put));
 }
 

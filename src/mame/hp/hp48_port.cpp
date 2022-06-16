@@ -106,7 +106,7 @@ void hp48_port_image_device::device_start()
 	unfill_port();
 }
 
-hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HP48_PORT, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, m_port_size(0)

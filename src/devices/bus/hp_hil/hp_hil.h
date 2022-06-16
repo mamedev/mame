@@ -89,7 +89,7 @@ public:
 	// construction/destruction
 	template <typename T, typename U>
 	hp_hil_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&mlc_tag, U &&opts, const char *dflt)
-		: hp_hil_slot_device(mconfig, tag, owner, 0)
+		: hp_hil_slot_device(mconfig, tag, owner)
 	{
 		m_mlc.set_tag(std::forward<T>(mlc_tag));
 		option_reset();
@@ -97,7 +97,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	hp_hil_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp_hil_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides
@@ -116,7 +116,7 @@ class hp_hil_mlc_device : public device_t
 {
 public:
 	// construction/destruction
-	hp_hil_mlc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp_hil_mlc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~hp_hil_mlc_device() { m_device_list.detach_all(); }
 
 	auto int_callback() { return int_cb.bind(); }

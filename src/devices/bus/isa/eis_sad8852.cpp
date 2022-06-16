@@ -208,7 +208,7 @@ void isa16_sad8852_device::device_add_mconfig(machine_config &config)
 	I8274(config, "terminal", XTAL(12'000'000) / 3); // Needs verification
 }
 
-isa16_sad8852_device::isa16_sad8852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa16_sad8852_device::isa16_sad8852_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA16_SAD8852, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_sw1(*this, "SW1")

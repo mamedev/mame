@@ -888,7 +888,7 @@ void applix_state::applix(machine_config &config)
 	subcpu.set_addrmap(AS_PROGRAM, &applix_state::sub_mem);
 	subcpu.set_addrmap(AS_IO, &applix_state::sub_io);
 
-	i8051_device &kbdcpu(I8051(config, "kbdcpu", 11060250));
+	i8051_device &kbdcpu(I8051(config, "kbdcpu", XTAL::u(11060250)));
 	kbdcpu.set_addrmap(AS_PROGRAM, &applix_state::keytronic_pc3270_program);
 	kbdcpu.set_addrmap(AS_IO, &applix_state::keytronic_pc3270_io);
 	kbdcpu.port_in_cb<1>().set(FUNC(applix_state::p1_read));
@@ -910,8 +910,8 @@ void applix_state::applix(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DAC0800(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
-	DAC0800(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
+	DAC0800(config, "ldac").add_route(ALL_OUTPUTS, "lspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
+	DAC0800(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
 
 	/* Devices */
 	MC6845(config, m_crtc, 30_MHz_XTAL / 16); // MC6545 @ 1.875 MHz

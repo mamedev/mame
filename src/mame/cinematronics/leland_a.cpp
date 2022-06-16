@@ -146,14 +146,14 @@ void leland_80186_sound_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	for (int i = 0; i < 6; i++)
 	{
-		AD7524(config, m_dac[i], 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // 74hc374.u31..6 + ad7524.u46..51
-		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i], 0).set_output_range(0, 1); // 74hc374.u17..22 + rX2-rX9 (24k,12k,6.2k,3k,1.5k,750,360,160) where X is 0..5
+		AD7524(config, m_dac[i]).add_route(ALL_OUTPUTS, "speaker", 0.2); // 74hc374.u31..6 + ad7524.u46..51
+		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i]).set_output_range(0, 1); // 74hc374.u17..22 + rX2-rX9 (24k,12k,6.2k,3k,1.5k,750,360,160) where X is 0..5
 		m_dacvol[i]->add_route(0, m_dac[i], 1.0, DAC_INPUT_RANGE_HI);
 		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_INPUT_RANGE_LO);
 	}
-	AD7533(config, "dac9", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // ad7533.u64
+	AD7533(config, "dac9").add_route(ALL_OUTPUTS, "speaker", 1.0); // ad7533.u64
 
-	PIT8254(config, m_pit[0], 0);
+	PIT8254(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(4000000);
 	m_pit[0]->out_handler<0>().set(m_audiocpu, FUNC(i80186_cpu_device::drq0_w));
 	m_pit[0]->set_clk<1>(4000000);
@@ -161,7 +161,7 @@ void leland_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_pit[0]->set_clk<2>(4000000);
 	m_pit[0]->out_handler<2>().set(FUNC(leland_80186_sound_device::pit0_2_w));
 
-	PIT8254(config, m_pit[1], 0);
+	PIT8254(config, m_pit[1]);
 	m_pit[1]->set_clk<0>(4000000);
 	m_pit[1]->out_handler<0>().set(FUNC(leland_80186_sound_device::pit1_0_w));
 	m_pit[1]->set_clk<1>(4000000);
@@ -182,13 +182,13 @@ void redline_80186_sound_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	for (int i = 0; i < 8; i++)
 	{
-		AD7524(config, m_dac[i], 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
-		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i], 0).set_output_range(0, 1);
+		AD7524(config, m_dac[i]).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
+		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i]).set_output_range(0, 1);
 		m_dacvol[i]->add_route(0, m_dac[i], 1.0, DAC_INPUT_RANGE_HI);
 		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
 	}
 
-	PIT8254(config, m_pit[0], 0);
+	PIT8254(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(7000000);
 	m_pit[0]->out_handler<0>().set(m_audiocpu, FUNC(i80186_cpu_device::drq0_w));
 	m_pit[0]->set_clk<1>(7000000);
@@ -196,14 +196,14 @@ void redline_80186_sound_device::device_add_mconfig(machine_config &config)
 	m_pit[0]->set_clk<2>(7000000);
 	m_pit[0]->out_handler<2>().set(FUNC(leland_80186_sound_device::pit0_2_w));
 
-	PIT8254(config, m_pit[1], 0);
+	PIT8254(config, m_pit[1]);
 	m_pit[1]->set_clk<0>(7000000);
 	m_pit[1]->out_handler<0>().set(FUNC(leland_80186_sound_device::pit1_0_w));
 	m_pit[1]->set_clk<1>(7000000);
 	m_pit[1]->out_handler<1>().set(FUNC(leland_80186_sound_device::pit1_1_w));
 	m_pit[1]->set_clk<2>(7000000);
 
-	PIT8254(config, m_pit[2], 0);
+	PIT8254(config, m_pit[2]);
 	m_pit[2]->set_clk<0>(7000000);
 	m_pit[2]->out_handler<0>().set(FUNC(leland_80186_sound_device::pit1_2_w));
 	m_pit[2]->set_clk<1>(7000000);
@@ -223,14 +223,14 @@ void ataxx_80186_sound_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	for (int i = 0; i < 4; i++)
 	{
-		AD7524(config, m_dac[i], 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
-		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i], 0).set_output_range(0, 1); // unknown DAC
+		AD7524(config, m_dac[i]).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
+		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i]).set_output_range(0, 1); // unknown DAC
 		m_dacvol[i]->add_route(0, m_dac[i], 1.0, DAC_INPUT_RANGE_HI);
 		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_INPUT_RANGE_LO);
 	}
-	AD7533(config, "dac9", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	AD7533(config, "dac9").add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 
-	PIT8254(config, m_pit[0], 0);
+	PIT8254(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(4000000);
 	m_pit[0]->out_handler<0>().set(m_audiocpu, FUNC(i80186_cpu_device::drq0_w));
 	m_pit[0]->set_clk<1>(4000000);
@@ -253,19 +253,19 @@ void wsf_80186_sound_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	for (int i = 0; i < 4; i++)
 	{
-		AD7524(config, m_dac[i], 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
-		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i], 0).set_output_range(0, 1); // unknown DAC
+		AD7524(config, m_dac[i]).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
+		DAC_8BIT_BINARY_WEIGHTED(config, m_dacvol[i]).set_output_range(0, 1); // unknown DAC
 		m_dacvol[i]->add_route(0, m_dac[i], 1.0, DAC_INPUT_RANGE_HI);
 		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
 	}
-	AD7533(config, "dac9", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	AD7533(config, "dac9").add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 
 	/* sound hardware */
-	YM2151(config, m_ymsnd, 4000000);
+	YM2151(config, m_ymsnd, XTAL::u(4000000));
 	m_ymsnd->add_route(0, "speaker", 0.40);
 	m_ymsnd->add_route(1, "speaker", 0.40);
 
-	PIT8254(config, m_pit[0], 0);
+	PIT8254(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(4000000);
 	m_pit[0]->out_handler<0>().set(m_audiocpu, FUNC(i80186_cpu_device::drq0_w));
 	m_pit[0]->set_clk<1>(4000000);
@@ -343,13 +343,13 @@ void leland_80186_sound_device::device_reset()
 
 DEFINE_DEVICE_TYPE(LELAND_80186, leland_80186_sound_device, "leland_80186_sound", "80186 DAC (Leland)")
 
-leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: leland_80186_sound_device(mconfig, LELAND_80186, tag, owner, clock)
 {
 	m_type = TYPE_LELAND;
 }
 
-leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_soundlatch(*this, "soundlatch")
 	, m_dac(*this, "dac%u", 1U)
@@ -365,7 +365,7 @@ leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconf
 
 DEFINE_DEVICE_TYPE(REDLINE_80186, redline_80186_sound_device, "redline_80186_sound", "80186 DAC (Redline Racer)")
 
-redline_80186_sound_device::redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+redline_80186_sound_device::redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: leland_80186_sound_device(mconfig, REDLINE_80186, tag, owner, clock)
 {
 	m_type = TYPE_REDLINE;
@@ -373,7 +373,7 @@ redline_80186_sound_device::redline_80186_sound_device(const machine_config &mco
 
 DEFINE_DEVICE_TYPE(ATAXX_80186, ataxx_80186_sound_device, "ataxx_80186_sound", "80186 DAC (Ataxx)")
 
-ataxx_80186_sound_device::ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ataxx_80186_sound_device::ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: leland_80186_sound_device(mconfig, ATAXX_80186, tag, owner, clock)
 {
 	m_type = TYPE_ATAXX;
@@ -381,7 +381,7 @@ ataxx_80186_sound_device::ataxx_80186_sound_device(const machine_config &mconfig
 
 DEFINE_DEVICE_TYPE(WSF_80186, wsf_80186_sound_device, "wsf_80186_sound", "80186 DAC (WSF)")
 
-wsf_80186_sound_device::wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+wsf_80186_sound_device::wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: leland_80186_sound_device(mconfig, WSF_80186, tag, owner, clock)
 {
 	m_type = TYPE_WSF;

@@ -321,7 +321,7 @@ DECLARE_DEVICE_TYPE(TURRETT_HARDDISK, turrett_hdd)
 class turrett_hdd : public ide_hdd_device
 {
 public:
-	turrett_hdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	turrett_hdd(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: ide_hdd_device(mconfig, TURRETT_HARDDISK, tag, owner, clock)
 	{
 	}
@@ -365,7 +365,7 @@ void turrett_state::turrett(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: Likely not correct. Refresh rate empirically determined
 	// to ensure in-sync streaming sound
-	m_screen->set_raw(4000000, 512, 0, 336, 259, 0, 244);
+	m_screen->set_raw(XTAL::u(4000000), 512, 0, 336, 259, 0, 244);
 	m_screen->set_screen_update(FUNC(turrett_state::screen_update));
 	m_screen->set_palette("palette");
 

@@ -34,7 +34,7 @@ namespace {
 // device type definitions
 DEFINE_DEVICE_TYPE(HP98036_IO_CARD, hp98036_io_card_device, "hp98036", "HP98036 card")
 
-hp98036_io_card_device::hp98036_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp98036_io_card_device::hp98036_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HP98036_IO_CARD, tag, owner, clock)
 	, device_hp9845_io_interface(mconfig, *this)
 	, m_uart(*this, "uart")
@@ -159,7 +159,7 @@ void hp98036_io_card_device::reg_w(address_space &space, offs_t offset, uint16_t
 
 void hp98036_io_card_device::device_add_mconfig(machine_config &config)
 {
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set(FUNC(hp98036_io_card_device::txd_w));
 	m_uart->dtr_handler().set(FUNC(hp98036_io_card_device::dtr_w));
 	m_uart->rts_handler().set(FUNC(hp98036_io_card_device::rts_w));

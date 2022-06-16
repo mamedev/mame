@@ -63,7 +63,7 @@ device_sms_control_port_interface::~device_sms_control_port_interface()
 //  sms_control_port_device - constructor
 //-------------------------------------------------
 
-sms_control_port_device::sms_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sms_control_port_device::sms_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SMS_CONTROL_PORT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_screen(*this, finder_base::DUMMY_TAG),

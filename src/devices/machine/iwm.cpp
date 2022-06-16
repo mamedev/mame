@@ -21,7 +21,7 @@
 
 DEFINE_DEVICE_TYPE(IWM, iwm_device, "iwm", "Apple IWM floppy controller")
 
-iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock) :
+iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t q3_clock) :
 	applefdintf_device(mconfig, IWM, tag, owner, clock),
 	m_floppy(nullptr),
 	m_q3_clock(q3_clock)

@@ -49,7 +49,7 @@ const tiny_rom_entry *kempston_disk_interface_device::device_rom_region() const
 //  kempston_disk_interface_device - constructor
 //-------------------------------------------------
 
-kempston_disk_interface_device::kempston_disk_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+kempston_disk_interface_device::kempston_disk_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, KEMPSTON_DISK_INTERFACE, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this)
 {

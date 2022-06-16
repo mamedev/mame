@@ -63,7 +63,7 @@ COM8 3F0-3F7 ON  : ON  :  : ON
 
 DEFINE_DEVICE_TYPE(MICROTOUCH, microtouch_device, "microtouch", "Microtouch Touchscreen")
 
-microtouch_device::microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+microtouch_device::microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MICROTOUCH, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_rx_buffer_ptr(0), m_tx_buffer_num(0), m_tx_buffer_ptr(0), m_reset_done(0), m_format(0), m_mode(0), m_last_touch_state(0),

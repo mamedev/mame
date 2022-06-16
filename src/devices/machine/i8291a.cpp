@@ -37,7 +37,7 @@ ALLOW_SAVE_TYPE(i8291a_device::source_handshake_state);
 ALLOW_SAVE_TYPE(i8291a_device::acceptor_handshake_state);
 
 i8291a_device::i8291a_device(const machine_config &mconfig, const char *tag,
-		device_t *owner, uint32_t clock) :
+		device_t *owner, const XTAL &clock) :
 		device_t{mconfig, I8291A, tag, owner, clock},
 		m_int_write_func{*this},
 		m_dreq_write_func{*this},

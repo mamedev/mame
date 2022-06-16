@@ -163,7 +163,7 @@ enum
 	RTC52
 };
 
-nouspikel_ide_card_device::nouspikel_ide_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nouspikel_ide_card_device::nouspikel_ide_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_IDE, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_rtc65(*this, CLOCK65_TAG),
@@ -621,10 +621,10 @@ WRITE_LINE_MEMBER(nouspikel_ide_card_device::resetdr_callback)
 void nouspikel_ide_card_device::device_add_mconfig(machine_config &config)
 {
 	// Choice of RTC chips
-	RTC65271(config, m_rtc65, 0);
-	BQ4847(config, m_rtc47, 0);
-	BQ4842(config, m_rtc42, 0);
-	BQ4852(config, m_rtc52, 0);
+	RTC65271(config, m_rtc65);
+	BQ4847(config, m_rtc47);
+	BQ4842(config, m_rtc42);
+	BQ4852(config, m_rtc52);
 
 	m_rtc65->interrupt_cb().set(FUNC(nouspikel_ide_card_device::rtc_int_callback<RTC65>)).invert();
 	m_rtc47->int_handler().set(FUNC(nouspikel_ide_card_device::rtc_int_callback<RTC47>));
@@ -634,18 +634,18 @@ void nouspikel_ide_card_device::device_add_mconfig(machine_config &config)
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
 	m_ata->irq_handler().set(FUNC(nouspikel_ide_card_device::ide_interrupt_callback));
 
-	TTL74543(config, m_latch0_7, 0);
+	TTL74543(config, m_latch0_7);
 	m_latch0_7->set_ceab_pin_value(0);
 	m_latch0_7->set_ceba_pin_value(0);
 
-	TTL74543(config, m_latch8_15, 0);
+	TTL74543(config, m_latch8_15);
 	m_latch8_15->set_ceab_pin_value(0);
 	m_latch8_15->set_ceba_pin_value(0);
 
 	LS259(config, m_crulatch);
 	m_crulatch->q_out_cb<7>().set(FUNC(nouspikel_ide_card_device::resetdr_callback));
 
-	BUFF_RAM(config, RAM512_TAG, 0).set_size(512*1024);
+	BUFF_RAM(config, RAM512_TAG).set_size(512*1024);
 }
 
 void nouspikel_ide_card_device::device_start()

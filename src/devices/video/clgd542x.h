@@ -16,7 +16,7 @@ class cirrus_gd5428_device :  public svga_device
 {
 public:
 	// construction/destruction
-	cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t port_03c0_r(offs_t offset) override;
 	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
@@ -30,7 +30,7 @@ public:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 protected:
-	cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -111,7 +111,7 @@ private:
 class cirrus_gd5430_device :  public cirrus_gd5428_device
 {
 public:
-	cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -120,7 +120,7 @@ protected:
 class cirrus_gd5446_device :  public cirrus_gd5428_device
 {
 public:
-	cirrus_gd5446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cirrus_gd5446_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

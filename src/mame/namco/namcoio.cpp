@@ -122,7 +122,7 @@ DEFINE_DEVICE_TYPE(NAMCO_56XX, namco56xx_device, "namco56", "Namco 56xx I/O")
 DEFINE_DEVICE_TYPE(NAMCO_58XX, namco58xx_device, "namco58", "Namco 58xx I/O")
 DEFINE_DEVICE_TYPE(NAMCO_59XX, namco59xx_device, "namco59", "Namco 59xx I/O")
 
-namcoio_device::namcoio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int device_type)
+namcoio_device::namcoio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int device_type)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_in_cb(*this)
 	, m_out_cb(*this)
@@ -130,17 +130,17 @@ namcoio_device::namcoio_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-namco56xx_device::namco56xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco56xx_device::namco56xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: namcoio_device(mconfig, NAMCO_56XX, tag, owner, clock, TYPE_NAMCO56XX)
 {
 }
 
-namco58xx_device::namco58xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco58xx_device::namco58xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: namcoio_device(mconfig, NAMCO_58XX, tag, owner, clock, TYPE_NAMCO58XX)
 {
 }
 
-namco59xx_device::namco59xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco59xx_device::namco59xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: namcoio_device(mconfig, NAMCO_59XX, tag, owner, clock, TYPE_NAMCO59XX)
 {
 }

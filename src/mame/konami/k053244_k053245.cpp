@@ -81,7 +81,7 @@ GFXDECODE_MEMBER( k05324x_device::gfxinfo_6bpp )
 GFXDECODE_END
 
 
-k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, K053244, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(nullptr),

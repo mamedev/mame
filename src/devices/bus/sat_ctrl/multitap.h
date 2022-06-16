@@ -23,7 +23,7 @@ class saturn_multitap_device : public device_t, public device_saturn_control_por
 {
 public:
 	// construction/destruction
-	saturn_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

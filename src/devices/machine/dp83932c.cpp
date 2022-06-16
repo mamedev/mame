@@ -64,7 +64,7 @@ static u16 const regmask[] =
 	0xffff,  0xffff,  0xffff,  0xffff,  0xffff,  0xffff,  0xffff,  0xf017,
 };
 
-dp83932c_device::dp83932c_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+dp83932c_device::dp83932c_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DP83932C, tag, owner, clock)
 	, device_network_interface(mconfig, *this, 10)
 	, m_bus(*this, finder_base::DUMMY_TAG, 0)

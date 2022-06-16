@@ -76,7 +76,7 @@ public:
 	};
 
 	// construction/destruction
-	z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~z8002_device();
 
 	auto segtack() { return m_iack_in[0].bind(); }
@@ -87,7 +87,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mi_w) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
 
 protected:
-	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int vecmult);
+	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int addrbits, int vecmult);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -706,7 +706,7 @@ class z8001_device : public z8002_device
 {
 public:
 	// construction/destruction
-	z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// z8002_device overrides

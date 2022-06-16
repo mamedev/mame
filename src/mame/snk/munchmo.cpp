@@ -556,7 +556,7 @@ void munchmo_state::mnchmobl(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &munchmo_state::sound_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(munchmo_state::generic_irq_ack)); // IORQ clears flip-flop at 1-7H
 
-	LS259(config, m_mainlatch, 0); // 12E
+	LS259(config, m_mainlatch); // 12E
 	m_mainlatch->q_out_cb<0>().set(FUNC(munchmo_state::palette_bank_0_w)); // BCL0 2-11E
 	m_mainlatch->q_out_cb<1>().set(FUNC(munchmo_state::palette_bank_1_w)); // BCL1 2-11E
 	m_mainlatch->q_out_cb<2>().set_nop(); // CL2 2-11E

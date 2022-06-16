@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(SONYPS2_GIF, ps2_gif_device, "ps2gif", "Playstation 2 GIF")
 
-ps2_gif_device::ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ps2_gif_device::ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYPS2_GIF, tag, owner, clock)
 	, device_execute_interface(mconfig, *this)
 	, m_gs(*this, finder_base::DUMMY_TAG)

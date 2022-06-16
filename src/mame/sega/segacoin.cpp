@@ -127,16 +127,16 @@ INPUT_PORTS_END
 void segacoin_state::westdrm(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000); // clock frequency unknown
+	Z80(config, m_maincpu, XTAL::u(8000000)); // clock frequency unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &segacoin_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &segacoin_state::main_portmap);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<2>(1000000); // clock frequency unknown
 
-	SEGA_315_5338A(config, "io", 0);
+	SEGA_315_5338A(config, "io");
 
-	Z80(config, m_audiocpu, 8000000); // clock frequency unknown
+	Z80(config, m_audiocpu, XTAL::u(8000000)); // clock frequency unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &segacoin_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &segacoin_state::sound_portmap);
 
@@ -145,15 +145,15 @@ void segacoin_state::westdrm(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym3438_device &ym0(YM3438(config, "ym0", 8000000)); // clock frequency unknown
+	ym3438_device &ym0(YM3438(config, "ym0", XTAL::u(8000000))); // clock frequency unknown
 	ym0.add_route(0, "mono", 0.40);
 	ym0.add_route(1, "mono", 0.40);
 
-	ym3438_device &ym1(YM3438(config, "ym1", 8000000)); // clock frequency unknown
+	ym3438_device &ym1(YM3438(config, "ym1", XTAL::u(8000000))); // clock frequency unknown
 	ym1.add_route(0, "mono", 0.40);
 	ym1.add_route(1, "mono", 0.40);
 
-	ym3438_device &ym2(YM3438(config, "ym2", 8000000)); // clock frequency unknown
+	ym3438_device &ym2(YM3438(config, "ym2", XTAL::u(8000000))); // clock frequency unknown
 	ym2.add_route(0, "mono", 0.40);
 	ym2.add_route(1, "mono", 0.40);
 }

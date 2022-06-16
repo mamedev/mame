@@ -36,7 +36,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		coco_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 			: device_t(mconfig, COCO_RS232, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
 			, m_eprom(*this, "eprom")
@@ -90,7 +90,7 @@ IMPLEMENTATION
 
 void coco_rs232_device::device_add_mconfig(machine_config &config)
 {
-	MOS6551(config, m_uart, 0);
+	MOS6551(config, m_uart);
 	m_uart->set_xtal(1.8432_MHz_XTAL);
 	m_uart->irq_handler().set(FUNC(coco_rs232_device::uart_irq_w));
 	m_uart->txd_handler().set(PORT_TAG, FUNC(rs232_port_device::write_txd));

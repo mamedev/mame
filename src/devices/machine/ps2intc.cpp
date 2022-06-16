@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(SONYPS2_INTC, ps2_intc_device, "ps2intc", "PlayStation 2 EE INTC")
 
-ps2_intc_device::ps2_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ps2_intc_device::ps2_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYPS2_INTC, tag, owner, clock)
 	, m_ee(*this, finder_base::DUMMY_TAG)
 {

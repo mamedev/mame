@@ -39,7 +39,7 @@ static void pc_hd_floppies(device_slot_interface &device)
 }
 
 
-isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_fdc(*this, "fdc")
@@ -77,7 +77,7 @@ void isa8_fdc_device::eop_w(int state)
 }
 
 
-isa8_upd765_fdc_device::isa8_upd765_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+isa8_upd765_fdc_device::isa8_upd765_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: isa8_fdc_device(mconfig, type, tag, owner, clock)
 	, dor(0x00)
 {
@@ -179,17 +179,17 @@ void isa8_upd765_fdc_device::check_drq()
 }
 
 
-isa8_fdc_xt_device::isa8_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_xt_device(mconfig, ISA8_FDC_XT, tag, owner, clock)
+isa8_fdc_xt_device::isa8_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : isa8_fdc_xt_device(mconfig, ISA8_FDC_XT, tag, owner, clock)
 {
 }
 
-isa8_fdc_xt_device::isa8_fdc_xt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : isa8_upd765_fdc_device(mconfig, type, tag, owner, clock)
+isa8_fdc_xt_device::isa8_fdc_xt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) : isa8_upd765_fdc_device(mconfig, type, tag, owner, clock)
 {
 }
 
 void isa8_fdc_xt_device::device_add_mconfig(machine_config &config)
 {
-	upd765a_device &upd765a(UPD765A(config, m_fdc, 8'000'000, false, false));
+	upd765a_device &upd765a(UPD765A(config, m_fdc, XTAL::u(8'000'000), false, false));
 	upd765a.intrq_wr_callback().set(FUNC(isa8_fdc_xt_device::fdc_irq_w));
 	upd765a.drq_wr_callback().set(FUNC(isa8_fdc_xt_device::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats).enable_sound(true);
@@ -222,13 +222,13 @@ void isa8_fdc_xt_device::dor_fifo_w(uint8_t data)
 }
 
 
-isa8_fdc_at_device::isa8_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_upd765_fdc_device(mconfig, ISA8_FDC_AT, tag, owner, clock)
+isa8_fdc_at_device::isa8_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : isa8_upd765_fdc_device(mconfig, ISA8_FDC_AT, tag, owner, clock)
 {
 }
 
 void isa8_fdc_at_device::device_add_mconfig(machine_config &config)
 {
-	upd765a_device &upd765a(UPD765A(config, m_fdc, 8'000'000, false, false));
+	upd765a_device &upd765a(UPD765A(config, m_fdc, XTAL::u(8'000'000), false, false));
 	upd765a.intrq_wr_callback().set(FUNC(isa8_fdc_at_device::fdc_irq_w));
 	upd765a.drq_wr_callback().set(FUNC(isa8_fdc_at_device::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
@@ -252,13 +252,13 @@ void isa8_fdc_at_device::device_start()
 	isa8_upd765_fdc_device::device_start();
 }
 
-isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_SMC, tag, owner, clock)
+isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : isa8_fdc_device(mconfig, ISA8_FDC_SMC, tag, owner, clock)
 {
 }
 
 void isa8_fdc_smc_device::device_add_mconfig(machine_config &config)
 {
-	smc37c78_device &smc(SMC37C78(config, m_fdc, 24'000'000));
+	smc37c78_device &smc(SMC37C78(config, m_fdc, XTAL::u(24'000'000)));
 	smc.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	smc.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
@@ -272,13 +272,13 @@ void isa8_fdc_smc_device::device_start()
 	m_isa->set_dma_channel(2, this, true);
 }
 
-isa8_fdc_ps2_device::isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_PS2, tag, owner, clock)
+isa8_fdc_ps2_device::isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : isa8_fdc_device(mconfig, ISA8_FDC_PS2, tag, owner, clock)
 {
 }
 
 void isa8_fdc_ps2_device::device_add_mconfig(machine_config &config)
 {
-	n82077aa_device &n82077aa(N82077AA(config, m_fdc, 24'000'000));
+	n82077aa_device &n82077aa(N82077AA(config, m_fdc, XTAL::u(24'000'000)));
 	n82077aa.set_mode(n82077aa_device::mode_t::PS2);
 	n82077aa.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	n82077aa.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
@@ -293,13 +293,13 @@ void isa8_fdc_ps2_device::device_start()
 	m_isa->set_dma_channel(2, this, true);
 }
 
-isa8_fdc_superio_device::isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_SUPERIO, tag, owner, clock)
+isa8_fdc_superio_device::isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : isa8_fdc_device(mconfig, ISA8_FDC_SUPERIO, tag, owner, clock)
 {
 }
 
 void isa8_fdc_superio_device::device_add_mconfig(machine_config &config)
 {
-	pc_fdc_superio_device &superio(PC_FDC_SUPERIO(config, m_fdc, 24'000'000));
+	pc_fdc_superio_device &superio(PC_FDC_SUPERIO(config, m_fdc, XTAL::u(24'000'000)));
 	superio.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	superio.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats).enable_sound(true);
@@ -313,7 +313,7 @@ void isa8_fdc_superio_device::device_start()
 	m_isa->set_dma_channel(2, this, true);
 }
 
-isa8_ec1841_0003_device::isa8_ec1841_0003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+isa8_ec1841_0003_device::isa8_ec1841_0003_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: isa8_fdc_xt_device(mconfig, ISA8_EC1841_0003, tag, owner, clock)
 	, m_bus_mouse(*this, "bus_mouse")
 {
@@ -334,7 +334,7 @@ void isa8_ec1841_0003_device::device_add_mconfig(machine_config &config)
 {
 	isa8_fdc_xt_device::device_add_mconfig(config);
 
-	BUS_MOUSE(config, "bus_mouse", 0).extint_callback().set(FUNC(isa8_ec1841_0003_device::aux_irq_w));
+	BUS_MOUSE(config, "bus_mouse").extint_callback().set(FUNC(isa8_ec1841_0003_device::aux_irq_w));
 }
 
 

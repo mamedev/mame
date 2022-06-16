@@ -604,13 +604,13 @@ void gal3_state::gal3(machine_config &config)
 	m68000_device &sound_cpu(M68000(config, "sound_cpu", 49152000/4)); // ??
 	sound_cpu.set_addrmap(AS_PROGRAM, &gal3_state::sound_cpu_map);
 
-	m68000_device &psn_b1_cpu(M68000(config, "psn_b1_cpu", 12000000)); // ??
+	m68000_device &psn_b1_cpu(M68000(config, "psn_b1_cpu", XTAL::u(12000000))); // ??
 	psn_b1_cpu.set_addrmap(AS_PROGRAM, &gal3_state::psn_b1_cpu_map);
 /*
-    m68000_device &psn_b2_cpu(M68000(config, "psn_b2_cpu", 12000000)); // ??
+    m68000_device &psn_b2_cpu(M68000(config, "psn_b2_cpu", XTAL::u(12000000))); // ??
     psn_b2_cpu.set_addrmap(AS_PROGRAM, &gal3_state::psn_b1_cpu_map);
 
-    m68000_device &psn_b3_cpu(M68000(config, "psn_b3_cpu", 12000000)); // ??
+    m68000_device &psn_b3_cpu(M68000(config, "psn_b3_cpu", XTAL::u(12000000))); // ??
     psn_b3_cpu.set_addrmap(AS_PROGRAM, &gal3_state::psn_b1_cpu_map);
 */
 	config.set_maximum_quantum(attotime::from_hz(60*8000)); /* 8000 CPU slices per frame */
@@ -630,7 +630,7 @@ void gal3_state::gal3(machine_config &config)
 	PALETTE(config, m_palette[0]).set_format(palette_device::xBRG_888, 0x10000/2);
 	m_palette[0]->set_membits(16);
 
-	NAMCO_C355SPR(config, m_c355spr[0], 0);
+	NAMCO_C355SPR(config, m_c355spr[0]);
 	m_c355spr[0]->set_screen("lscreen");
 	m_c355spr[0]->set_palette(m_palette[0]);
 	m_c355spr[0]->set_scroll_offsets(0x26, 0x19);
@@ -639,12 +639,12 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[0]->set_color_base(0x1000); // TODO : verify palette offset
 	m_c355spr[0]->set_external_prifill(true);
 
-	NAMCOS21_3D(config, m_namcos21_3d[0], 0);
+	NAMCOS21_3D(config, m_namcos21_3d[0]);
 	m_namcos21_3d[0]->set_zz_shift_mult(11, 0x200);
 	m_namcos21_3d[0]->set_depth_reverse(false);
 	m_namcos21_3d[0]->set_framebuffer_size(496,480);
 
-	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[0], 0);
+	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[0]);
 	m_namcos21_dsp_c67[0]->set_renderer_tag("namcos21_3d_1");
 
 	// video chain 2
@@ -660,7 +660,7 @@ void gal3_state::gal3(machine_config &config)
 	PALETTE(config, m_palette[1]).set_format(palette_device::xBRG_888, 0x10000/2);
 	m_palette[1]->set_membits(16);
 
-	NAMCO_C355SPR(config, m_c355spr[1], 0);
+	NAMCO_C355SPR(config, m_c355spr[1]);
 	m_c355spr[1]->set_screen("rscreen");
 	m_c355spr[1]->set_palette(m_palette[1]);
 	m_c355spr[1]->set_scroll_offsets(0x26, 0x19);
@@ -669,12 +669,12 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[1]->set_color_base(0x1000); // TODO : verify palette offset
 	m_c355spr[1]->set_external_prifill(true);
 
-	NAMCOS21_3D(config, m_namcos21_3d[1], 0);
+	NAMCOS21_3D(config, m_namcos21_3d[1]);
 	m_namcos21_3d[1]->set_zz_shift_mult(11, 0x200);
 	m_namcos21_3d[1]->set_depth_reverse(false);
 	m_namcos21_3d[1]->set_framebuffer_size(496,480);
 
-	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[1], 0);
+	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[1]);
 	m_namcos21_dsp_c67[1]->set_renderer_tag("namcos21_3d_2");
 
 

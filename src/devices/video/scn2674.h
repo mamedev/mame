@@ -28,7 +28,7 @@ public:
 
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 
-	scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -40,7 +40,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extend_addressing);
+	scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool extend_addressing);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -138,7 +138,7 @@ protected:
 class scn2672_device : public scn2674_device
 {
 public:
-	scn2672_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scn2672_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void write_init_regs(uint8_t data) override;

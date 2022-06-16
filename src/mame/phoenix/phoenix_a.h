@@ -12,7 +12,7 @@
 class phoenix_sound_device : public device_t, public device_sound_interface
 {
 public:
-	phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void control_a_w(uint8_t data);
 	void control_b_w(uint8_t data);

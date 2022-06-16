@@ -212,7 +212,7 @@ void mzr8105_state::mzr8105(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mzr8105_state::mzr8105_mem);
-	VME(config, "vme", 0).use_owner_spaces();
+	VME(config, "vme").use_owner_spaces();
 	VME_SLOT(config, "slot1", mzr8105_vme_cards, "mzr8300", 1, "vme");
 }
 

@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE(KP64, kp64_device, "kp64", "Kawasaki Steel KP64 Timer/Counter
 //  kp64_device - constructor
 //-------------------------------------------------
 
-kp64_device::kp64_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+kp64_device::kp64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KP64, tag, owner, clock)
 	, m_out_callback(*this)
 	, m_count_timer(nullptr)

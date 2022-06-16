@@ -39,7 +39,7 @@ public:
 	// TODO: callbacks and configuration thereof
 
 protected:
-	upd78k3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor mem_map, address_map_constructor sfr_map);
+	upd78k3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor mem_map, address_map_constructor sfr_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -96,10 +96,10 @@ class upd78312_device : public upd78k3_device
 {
 public:
 	// device type constructor
-	upd78312_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd78312_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	upd78312_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map);
+	upd78312_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map);
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -122,7 +122,7 @@ class upd78310_device : public upd78312_device
 {
 public:
 	// device type constructor
-	upd78310_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd78310_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type declarations

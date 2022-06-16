@@ -26,7 +26,7 @@ class vic1011_device : public device_t, public device_pet_user_port_interface
 {
 public:
 	// construction/destruction
-	vic1011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vic1011_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_pet_user_port_interface overrides
 	virtual DECLARE_WRITE_LINE_MEMBER( input_d ) override;

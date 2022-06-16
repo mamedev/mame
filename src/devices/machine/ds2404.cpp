@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(DS2404, ds2404_device, "ds2404", "DS2404 EconoRAM Time Chip")
 //  ds2404_device - constructor
 //-------------------------------------------------
 
-ds2404_device::ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ds2404_device::ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DS2404, tag, owner, clock),
 		device_nvram_interface(mconfig, *this), m_tick_timer(nullptr), m_ref_year(0), m_ref_month(0), m_ref_day(0),
 		m_address(0),

@@ -120,7 +120,7 @@ DEFINE_DEVICE_TYPE(M3COMM, m3comm_device, "m3comm", "Model 3 Communication Board
 
 void m3comm_device::device_add_mconfig(machine_config &config)
 {
-	M68000(config, m_commcpu, 10000000); // random
+	M68000(config, m_commcpu, XTAL::u(10000000)); // random
 	m_commcpu->set_addrmap(AS_PROGRAM, &m3comm_device::m3comm_mem);
 
 	RAM(config, RAM_TAG).set_default_size("128K");
@@ -134,7 +134,7 @@ void m3comm_device::device_add_mconfig(machine_config &config)
 //  m3comm_device - constructor
 //-------------------------------------------------
 
-m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, M3COMM, tag, owner, clock),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
 	m_line_tx(OPEN_FLAG_READ),

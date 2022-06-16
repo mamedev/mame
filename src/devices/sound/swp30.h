@@ -14,7 +14,7 @@
 class swp30_device : public device_t, public device_sound_interface, public device_rom_interface<25+2, 2, 0, ENDIANNESS_LITTLE>
 {
 public:
-	swp30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 33868800);
+	swp30_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(33868800));
 
 	void map(address_map &map);
 

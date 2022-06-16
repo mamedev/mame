@@ -24,7 +24,7 @@ class isbc202_device : public cpu_device,
 {
 public:
 	// Construction/destruction
-	isbc202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	isbc202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~isbc202_device();
 
 	// Access to I/O space by CPU

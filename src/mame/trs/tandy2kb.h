@@ -32,7 +32,7 @@ class tandy2k_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto clock_wr_callback() { return m_write_clock.bind(); }
 	auto data_wr_callback() { return m_write_data.bind(); }

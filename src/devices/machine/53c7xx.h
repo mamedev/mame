@@ -20,7 +20,7 @@ class ncr53c7xx_device : public nscsi_device, public nscsi_slot_card_interface, 
 {
 public:
 	// construction/destruction
-	ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// static configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }

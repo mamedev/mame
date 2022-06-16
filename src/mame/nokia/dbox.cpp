@@ -608,7 +608,7 @@ INPUT_PORTS_END
 
 void dbox_state::dbox(machine_config &config)
 {
-	M68340(config, m_maincpu, 0);       // The 68340 has an internal VCO as clock source, hence need no CPU clock
+	M68340(config, m_maincpu);       // The 68340 has an internal VCO as clock source, hence need no CPU clock
 	m_maincpu->set_crystal(XTAL(32'768)); // The dbox uses the VCO and has a crystal as VCO reference and to synthesize internal clocks from
 	m_maincpu->set_addrmap(AS_PROGRAM, &dbox_state::dbox_map);
 	m_maincpu->pa_out_callback().set(FUNC(dbox_state::write_pa));
@@ -630,7 +630,7 @@ void dbox_state::dbox(machine_config &config)
 	AMD_29F800B_16BIT(config, "flash1");
 
 	/* LED Matrix Display */
-	SDA5708(config, m_display, 0);
+	SDA5708(config, m_display);
 	config.set_default_layout(layout_sda5708);
 
 	/* IP16 74256 8 bit latch */

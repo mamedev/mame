@@ -34,7 +34,7 @@ class ds1302_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( sclk_w );
@@ -42,7 +42,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( io_r );
 
 protected:
-	ds1302_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t ram_size);
+	ds1302_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint8_t ram_size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -88,7 +88,7 @@ class ds1202_device : public ds1302_device
 {
 public:
 	// construction/destruction
-	ds1202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds1202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

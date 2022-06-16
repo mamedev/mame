@@ -23,7 +23,7 @@ class electron_romp144_device :
 {
 public:
 	// construction/destruction
-	electron_romp144_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	electron_romp144_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

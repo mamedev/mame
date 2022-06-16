@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(TI99_FORTI, bus::ti99::peb::forti_device, "ti99_forti", "FORT
 
 namespace bus::ti99::peb {
 
-forti_device::forti_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+forti_device::forti_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock):
 	  device_t(mconfig, TI99_FORTI, tag, owner, clock),
 	  device_ti99_peribox_card_interface(mconfig, *this),
 	  m_generator1(*this, FORTI_GEN1_TAG),

@@ -36,7 +36,7 @@
 DEFINE_DEVICE_TYPE(I82371AB, i82371ab_device, "i82371ab", "Intel 82371AB")
 
 
-i82371ab_device::i82371ab_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i82371ab_device::i82371ab_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: southbridge_extended_device(mconfig, I82371AB, tag, owner, clock)
 	, pci_device_interface(mconfig, *this)
 {

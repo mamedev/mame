@@ -206,7 +206,7 @@ grid_keyboard_device::grid_keyboard_device(
 		device_type type,
 		char const *tag,
 		device_t *owner,
-		u32 clock)
+		const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "GRIDKBD_ROW0", "GRIDKBD_ROW1", "GRIDKBD_ROW2", "GRIDKBD_ROW3")
 	, m_config(*this, "GRIDKBD_CFG")
@@ -217,7 +217,7 @@ grid_keyboard_device::grid_keyboard_device(
 }
 
 
-grid_keyboard_device::grid_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+grid_keyboard_device::grid_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: grid_keyboard_device(mconfig, GRID_KEYBOARD, tag, owner, clock)
 {
 }

@@ -109,7 +109,7 @@ void s100_djdma_device::device_add_mconfig(machine_config &config)
 //  s100_djdma_device - constructor
 //-------------------------------------------------
 
-s100_djdma_device::s100_djdma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+s100_djdma_device::s100_djdma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S100_DJDMA, tag, owner, clock)
 	, device_s100_card_interface(mconfig, *this)
 	, m_diskcpu(*this, Z80_TAG)

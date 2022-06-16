@@ -291,7 +291,7 @@ INPUT_PORTS_END
 
 void xtheball_state::xtheball(machine_config &config)
 {
-	TMS34010(config, m_maincpu, 40000000);
+	TMS34010(config, m_maincpu, XTAL::u(40000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &xtheball_state::main_map);
 	m_maincpu->set_halt_on_reset(false);
 	m_maincpu->set_pixel_clock(10000000);
@@ -323,13 +323,13 @@ void xtheball_state::xtheball(machine_config &config)
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(10000000, 640, 114, 626, 257, 24, 248);
+	screen.set_raw(XTAL::u(10000000), 640, 114, 626, 257, 24, 248);
 	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	ZN428E(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	ZN428E(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 

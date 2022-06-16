@@ -20,7 +20,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 	// construction/destruction
-	votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto ar_callback() { return m_ar_cb.bind(); }
 

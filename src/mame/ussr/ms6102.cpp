@@ -315,7 +315,7 @@ void ms6102_state::ms6102(machine_config &config)
 	I8214(config, m_pic, XTAL(18'432'000) / 9);
 	m_pic->int_wr_callback().set(FUNC(ms6102_state::irq_w));
 
-	KR1601RR1(config, m_earom, 0);
+	KR1601RR1(config, m_earom);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -351,17 +351,17 @@ void ms6102_state::ms6102(machine_config &config)
 	ie5.set_stages(2);
 	ie5.count_out_cb().set(FUNC(ms6102_state::kbd_uart_clock_w));
 
-	MS7002(config, m_keyboard, 0).signal_out_callback().set(m_kbd_uart, FUNC(ay31015_device::write_si));
+	MS7002(config, m_keyboard).signal_out_callback().set(m_kbd_uart, FUNC(ay31015_device::write_si));
 
 	// serial connection to host
-	I8251(config, m_i8251, 0);
+	I8251(config, m_i8251);
 	m_i8251->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_i8251->rxrdy_handler().set(FUNC(ms6102_state::irq<3>));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
 	m_rs232->rxd_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
 
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 	pit8253.set_clk<0>(XTAL(16'400'000) / 9);
 	pit8253.out_handler<0>().set(m_i8251, FUNC(i8251_device::write_txc));
 	pit8253.set_clk<1>(XTAL(16'400'000) / 9);

@@ -40,7 +40,7 @@ public:
 	static constexpr u8 STATUS_MEMR   = 0x80;
 
 	// construction/destruction
-	i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// CLK rate callback (8085A only)
 	template <typename... T> void set_clk_out(T &&... args) { m_clk_out_func.set(std::forward<T>(args)...); }
@@ -61,7 +61,7 @@ public:
 	auto out_sod_func() { return m_out_sod_func.bind(); }
 
 protected:
-	i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int cputype);
+	i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int cputype);
 
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -181,7 +181,7 @@ class i8080_cpu_device : public i8085a_cpu_device
 {
 public:
 	// construction/destruction
-	i8080_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	i8080_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual u32 execute_input_lines() const noexcept override { return 1; }
@@ -194,7 +194,7 @@ class i8080a_cpu_device : public i8085a_cpu_device
 {
 public:
 	// construction/destruction
-	i8080a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	i8080a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual u32 execute_input_lines() const noexcept override { return 1; }

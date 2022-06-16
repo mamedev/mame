@@ -18,7 +18,7 @@
 class ay31015_device : public device_t
 {
 public:
-	ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void set_auto_rdav(bool auto_rdav) { m_auto_rdav = auto_rdav; }
 
@@ -101,7 +101,7 @@ protected:
 		PREP_TIME
 	};
 
-	ay31015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ay31015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -157,7 +157,7 @@ protected:
 class ay51013_device : public ay31015_device
 {
 public:
-	ay51013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ay51013_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void internal_reset() override;

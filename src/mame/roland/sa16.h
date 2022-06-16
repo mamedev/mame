@@ -30,7 +30,7 @@ public:
 
 protected:
 	// base type constructor
-	sa16_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	sa16_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-specific overrides
 	virtual void device_resolve_objects() override;
@@ -51,7 +51,7 @@ class rf5c36_device : public sa16_base_device
 {
 public:
 	// device type constructor
-	rf5c36_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rf5c36_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> sa16_device
@@ -60,7 +60,7 @@ class sa16_device : public sa16_base_device
 {
 public:
 	// device type constructor
-	sa16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sa16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type declarations

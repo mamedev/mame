@@ -22,7 +22,7 @@ class x68k_midi_device : public device_t,
 {
 public:
 	// construction/destruction
-	x68k_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	x68k_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;

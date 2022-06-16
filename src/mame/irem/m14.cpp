@@ -417,7 +417,7 @@ void m14_state::machine_reset()
 void m14_state::m14(machine_config &config)
 {
 	/* basic machine hardware */
-	I8085A(config, m_maincpu, 6000000); //guess: 6 Mhz internally divided by 2
+	I8085A(config, m_maincpu, XTAL::u(6000000)); //guess: 6 Mhz internally divided by 2
 	m_maincpu->set_addrmap(AS_PROGRAM, &m14_state::m14_map);
 	m_maincpu->set_addrmap(AS_IO, &m14_state::m14_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(m14_state::m14_irq));

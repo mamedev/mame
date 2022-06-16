@@ -915,12 +915,12 @@ INPUT_PORTS_END
 
 void magictg_state::magictg(machine_config &config)
 {
-	R5000BE(config, m_mips, 200000000); // exact model 79RV5000-200BS272 rated for 200MHz, clock not measured
+	R5000BE(config, m_mips, XTAL::u(200000000)); // exact model 79RV5000-200BS272 rated for 200MHz, clock not measured
 	//m_mips->set_icache_size(16384); /* TODO: Unknown */
 	//m_mips->set_dcache_size(16384); /* TODO: Unknown */
 	m_mips->set_addrmap(AS_PROGRAM, &magictg_state::magictg_map);
 
-	ADSP2181(config, m_adsp, 16000000);
+	ADSP2181(config, m_adsp, XTAL::u(16000000));
 	m_adsp->set_addrmap(AS_PROGRAM, &magictg_state::adsp_program_map);
 	m_adsp->set_addrmap(AS_DATA, &magictg_state::adsp_data_map);
 	m_adsp->set_addrmap(AS_IO, &magictg_state::adsp_io_map);
@@ -931,7 +931,7 @@ void magictg_state::magictg(machine_config &config)
 	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus"));
 	pcibus.set_device(0, FUNC(magictg_state::pci_dev0_r), FUNC(magictg_state::pci_dev0_w));
 	pcibus.set_device(7, FUNC(magictg_state::voodoo_0_pci_r), FUNC(magictg_state::voodoo_0_pci_w));
 

@@ -37,7 +37,7 @@
 
 DEFINE_DEVICE_TYPE(UTS_KEYBOARD, uts_keyboard_port_device, "uts_kbd", "UTS Keyboard Port")
 
-uts_keyboard_port_device::uts_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+uts_keyboard_port_device::uts_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UTS_KEYBOARD, tag, owner, clock)
 	, device_single_card_slot_interface<device_uts_keyboard_interface>(mconfig, *this)
 	, m_rxd_callback(*this)

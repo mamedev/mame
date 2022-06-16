@@ -27,7 +27,7 @@ protected:
 		SD_TYPE_HC
 	};
 
-	spi_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spi_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -82,13 +82,13 @@ private:
 class spi_sdcard_sdhc_device : public spi_sdcard_device
 {
 public:
-	spi_sdcard_sdhc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spi_sdcard_sdhc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class spi_sdcard_sdv2_device : public spi_sdcard_device
 {
 public:
-	spi_sdcard_sdv2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spi_sdcard_sdv2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(SPI_SDCARD, spi_sdcard_sdhc_device)

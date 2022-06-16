@@ -121,7 +121,7 @@ DEFINE_DEVICE_TYPE(SOUND_VRENDER0, vr0sound_device, "vr0sound", "MagicEyes VRend
 //  vr0sound_device - constructor
 //-------------------------------------------------
 
-vr0sound_device::vr0sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+vr0sound_device::vr0sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SOUND_VRENDER0, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)

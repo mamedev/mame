@@ -27,10 +27,10 @@ SM512: can't be bothered to draw one here, it's 80 pins QFP, a lot of LCD segmen
 class sm511_device : public sm510_base_device
 {
 public:
-	sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
+	sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(32768));
 
 protected:
-	sm511_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	sm511_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	void program_4k(address_map &map);
 	void data_96_32x4(address_map &map);
@@ -50,7 +50,7 @@ protected:
 class sm512_device : public sm511_device
 {
 public:
-	sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
+	sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(32768));
 
 protected:
 	void data_80_48x4(address_map &map);

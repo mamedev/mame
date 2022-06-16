@@ -46,7 +46,7 @@ ROM_END
 //  psx_gamebooster_device - constructor
 //-------------------------------------------------
 
-psx_gamebooster_device::psx_gamebooster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+psx_gamebooster_device::psx_gamebooster_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PSX_GAMEBOOSTER, tag, owner, clock)
 	, psx_parallel_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)

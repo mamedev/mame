@@ -563,7 +563,7 @@ void hotchili_state::hotchili(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 	m_screen->set_palette(m_palette);
 
-	X1_001(config, m_spritegen, 16'000'000, m_palette, gfx_hotchili);
+	X1_001(config, m_spritegen, XTAL::u(16'000'000), m_palette, gfx_hotchili);
 	m_spritegen->set_fg_yoffsets( -0x12, 0x0e );
 	m_spritegen->set_bg_yoffsets( 0x1, -0x1 );
 

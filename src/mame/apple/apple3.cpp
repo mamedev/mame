@@ -77,7 +77,7 @@ void apple3_state::apple3(machine_config &config)
 	PALETTE(config, m_palette, FUNC(apple3_state::palette_init), 32);
 
 	/* keyboard controller */
-	AY3600(config, m_ay3600, 0);
+	AY3600(config, m_ay3600);
 	m_ay3600->x0().set_ioport("X0");
 	m_ay3600->x1().set_ioport("X1");
 	m_ay3600->x2().set_ioport("X2");
@@ -92,7 +92,7 @@ void apple3_state::apple3(machine_config &config)
 	m_ay3600->data_ready().set(FUNC(apple3_state::ay3600_data_ready_w));
 
 	/* slot bus */
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple3_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple3_state::a2bus_nmi_w));
@@ -104,7 +104,7 @@ void apple3_state::apple3(machine_config &config)
 	A2BUS_SLOT(config, "sl4", m_a2bus, apple3_cards, nullptr);
 
 	/* fdc */
-	APPLEIII_FDC(config, m_fdc, 1021800*2);
+	APPLEIII_FDC(config, m_fdc, XTAL::u(1021800)*2);
 	FLOPPY_CONNECTOR(config, "0", a3_floppies, "525", apple3_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "1", a3_floppies, "525", apple3_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "2", a3_floppies, "525", apple3_state::floppy_formats);
@@ -114,7 +114,7 @@ void apple3_state::apple3(machine_config &config)
 	SOFTWARE_LIST(config, "flop525_list").set_original("apple3");
 
 	/* acia */
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(XTAL(1'843'200)); // HACK: The schematic shows an external clock generator but using a XTAL is faster to emulate.
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -147,8 +147,8 @@ void apple3_state::apple3(machine_config &config)
 
 	/* sound */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_bell, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
+	DAC_1BIT(config, m_bell).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_6BIT_BINARY_WEIGHTED(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125); // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
 
 	TIMER(config, "c040").configure_periodic(FUNC(apple3_state::apple3_c040_tick), attotime::from_hz(2000));
 

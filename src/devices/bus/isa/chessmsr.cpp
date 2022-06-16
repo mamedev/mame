@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(ISA8_CHESSMSR, isa8_chessmsr_device, "isa_chessmsr", "The Che
 //  constructor
 //-------------------------------------------------
 
-isa8_chessmsr_device::isa8_chessmsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_chessmsr_device::isa8_chessmsr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA8_CHESSMSR, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),

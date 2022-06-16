@@ -26,12 +26,12 @@ public:
 	typedef device_delegate<void (int function, int reg, uint32_t data, uint32_t mem_mask)> pci_bus_legacy_write_delegate;
 
 	// construction/destruction
-	pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t busnum)
-		: pci_bus_legacy_device(mconfig, tag, owner, clock)
+	pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t busnum)
+		: pci_bus_legacy_device(mconfig, tag, owner)
 	{
 		set_busnum(busnum);
 	}
-	pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

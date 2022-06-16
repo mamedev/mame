@@ -103,24 +103,24 @@ const tiny_rom_entry *bbc_ariesb32_device::device_rom_region() const
 //  bbc_aries_device - constructor
 //-------------------------------------------------
 
-bbc_ariesb12_device::bbc_ariesb12_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_ariesb12_device::bbc_ariesb12_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_internal_interface(mconfig, *this)
 	, m_rom(*this, "romslot%u", 0U)
 {
 }
 
-bbc_ariesb12_device::bbc_ariesb12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_ariesb12_device::bbc_ariesb12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_ariesb12_device(mconfig, BBC_ARIESB12, tag, owner, clock)
 {
 }
 
-bbc_ariesb20_device::bbc_ariesb20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_ariesb20_device::bbc_ariesb20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_ariesb12_device(mconfig, BBC_ARIESB20, tag, owner, clock)
 {
 }
 
-bbc_ariesb32_device::bbc_ariesb32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_ariesb32_device::bbc_ariesb32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_ariesb12_device(mconfig, BBC_ARIESB32, tag, owner, clock)
 	, m_aries_rom(*this, "aries_rom")
 {

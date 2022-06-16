@@ -22,7 +22,7 @@ public:
 		FINAL_GAIN
 	};
 
-	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_vco_zero_freq(double freq) { m_vco_zero_freq = freq; }
 	void set_filter_zero_freq(double freq) { m_filter_zero_freq = freq; }

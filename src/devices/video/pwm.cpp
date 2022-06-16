@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(PWM_DISPLAY, pwm_display_device, "pwm_display", "PWM Display"
 //  constructor
 //-------------------------------------------------
 
-pwm_display_device::pwm_display_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+pwm_display_device::pwm_display_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PWM_DISPLAY, tag, owner, clock),
 	m_out_x(*this, "%u.%u", 0U, 0U),
 	m_out_a(*this, "%u.a", 0U),

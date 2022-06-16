@@ -158,9 +158,9 @@ class abcbus_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	template <typename T>
-	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: abcbus_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();

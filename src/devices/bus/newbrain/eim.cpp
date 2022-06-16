@@ -77,7 +77,7 @@ void newbrain_eim_device::device_add_mconfig(machine_config &config)
 
 	TIMER(config, "z80ctc_c2").configure_periodic(FUNC(newbrain_eim_device::ctc_c2_tick), attotime::from_hz(XTAL(16'000'000)/4/13));
 
-	adc0809_device &adc(ADC0809(config, ADC0809_TAG, 500000));
+	adc0809_device &adc(ADC0809(config, ADC0809_TAG, XTAL::u(500000)));
 	adc.eoc_callback().set(FUNC(newbrain_eim_device::adc_eoc_w));
 	adc.in_callback<0>().set_constant(0);
 	adc.in_callback<1>().set_constant(0);
@@ -88,7 +88,7 @@ void newbrain_eim_device::device_add_mconfig(machine_config &config)
 	adc.in_callback<6>().set_constant(0);
 	adc.in_callback<7>().set_constant(0);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set(FUNC(newbrain_eim_device::acia_interrupt));
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
@@ -108,7 +108,7 @@ void newbrain_eim_device::device_add_mconfig(machine_config &config)
 //  newbrain_eim_device - constructor
 //-------------------------------------------------
 
-newbrain_eim_device::newbrain_eim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+newbrain_eim_device::newbrain_eim_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NEWBRAIN_EIM, tag, owner, clock),
 	device_newbrain_expansion_slot_interface(mconfig, *this),
 	m_ctc(*this, Z80CTC_TAG),

@@ -39,7 +39,7 @@ public:
 	static constexpr unsigned VISIBLE_LINES   = 9;
 
 	// construction/destruction
-	mb88303_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb88303_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto vow_callback() { return m_write_vow.bind(); }
 	auto vobn_callback() { return m_write_vobn.bind(); }

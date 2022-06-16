@@ -567,16 +567,16 @@ static const z80_daisy_config senjyo_daisy_chain[] =
 void senjyo_state::senjyo(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);   /* 4 MHz? */
+	Z80(config, m_maincpu, XTAL::u(4000000));   /* 4 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
 	m_maincpu->set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
 
-	z80_device& sub(Z80(config, "sub", 2000000));   /* 2 MHz? */
+	z80_device& sub(Z80(config, "sub", XTAL::u(2000000)));   /* 2 MHz? */
 	sub.set_daisy_config(senjyo_daisy_chain);
 	sub.set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_sound_map);
 	sub.set_addrmap(AS_IO, &senjyo_state::senjyo_sound_io_map);
 
-	Z80PIO(config, m_pio, 2000000);
+	Z80PIO(config, m_pio, XTAL::u(2000000));
 	m_pio->out_int_callback().set_inputline("sub", INPUT_LINE_IRQ0);
 	m_pio->in_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 
@@ -601,9 +601,9 @@ void senjyo_state::senjyo(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	SN76496(config, "sn1", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	SN76496(config, "sn2", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	SN76496(config, "sn3", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	SN76496(config, "sn1", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	SN76496(config, "sn2", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	SN76496(config, "sn3", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(m_pio, FUNC(z80pio_device::strobe_a)).invert();

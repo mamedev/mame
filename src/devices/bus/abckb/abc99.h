@@ -29,7 +29,7 @@ class abc99_device :  public device_t,
 {
 public:
 	// construction/destruction
-	abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );
 

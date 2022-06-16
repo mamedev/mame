@@ -43,7 +43,7 @@ const tiny_rom_entry *cpc_hd20_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_hd20_device::cpc_hd20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cpc_hd20_device::cpc_hd20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CPC_HD20, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_hdc(*this, "hdc")

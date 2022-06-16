@@ -175,7 +175,7 @@ void gizmondo_state::init_gizmondo()
 
 void gizmondo_state::gizmondo(machine_config &config)
 {
-	ARM9(config, m_maincpu, 40000000);
+	ARM9(config, m_maincpu, XTAL::u(40000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &gizmondo_state::gizmondo_map);
 
 	PALETTE(config, "palette").set_entries(32768);
@@ -187,9 +187,9 @@ void gizmondo_state::gizmondo(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_screen_update("gf4500", FUNC(gf4500_device::screen_update));
 
-	GF4500(config, m_gf4500, 0);
+	GF4500(config, m_gf4500);
 
-	S3C2440(config, m_s3c2440, 12000000);
+	S3C2440(config, m_s3c2440, XTAL::u(12000000));
 	m_s3c2440->set_palette_tag("palette");
 	m_s3c2440->set_screen_tag("screen");
 	m_s3c2440->gpio_port_r_callback().set(FUNC(gizmondo_state::s3c2440_gpio_port_r));

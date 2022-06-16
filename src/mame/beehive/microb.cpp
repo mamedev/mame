@@ -304,7 +304,7 @@ void microb_state::microb(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "usartint").output_handler().set_inputline(m_maincpu, I8085_RST55_LINE);
 
-	I8257(config, m_dmac, 2'000'000);
+	I8257(config, m_dmac, XTAL::u(2'000'000));
 	m_dmac->out_hrq_cb().set(FUNC(microb_state::dmac_hrq_w));
 	m_dmac->in_memr_cb().set(FUNC(microb_state::dmac_mem_r));
 	m_dmac->out_memw_cb().set(FUNC(microb_state::dmac_mem_w));
@@ -313,11 +313,11 @@ void microb_state::microb(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_raw(1'620'000 * 8, 800, 0, 640, 324, 0, 300);
-	//screen.set_raw(1'620'000 * 8, 800, 0, 640, 270, 0, 250);
+	screen.set_raw(XTAL::u(1'620'000) * 8, 800, 0, 640, 324, 0, 300);
+	//screen.set_raw(XTAL::u(1'620'000) * 8, 800, 0, 640, 270, 0, 250);
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 
-	i8275_device &crtc(I8275(config, "crtc", 1'620'000));
+	i8275_device &crtc(I8275(config, "crtc", XTAL::u(1'620'000)));
 	crtc.set_screen("screen");
 	crtc.set_character_width(8);
 	crtc.set_display_callback(FUNC(microb_state::draw_character));
@@ -345,9 +345,9 @@ void microb_state::microb(machine_config &config)
 	pit2.out_handler<2>().set(m_usart[1], FUNC(i8251_device::write_txc));
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.5);
+	BEEP(config, m_beep, XTAL::u(1000)).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	I8251(config, m_usart[0], 0);
+	I8251(config, m_usart[0]);
 	m_usart[0]->txd_handler().set(m_rs232[0], FUNC(rs232_port_device::write_txd));
 	m_usart[0]->dtr_handler().set(m_rs232[0], FUNC(rs232_port_device::write_dtr));
 	m_usart[0]->rts_handler().set(m_rs232[0], FUNC(rs232_port_device::write_rts));
@@ -359,7 +359,7 @@ void microb_state::microb(machine_config &config)
 	m_rs232[0]->dsr_handler().set(m_usart[0], FUNC(i8251_device::write_dsr));
 	m_rs232[0]->cts_handler().set(m_usart[0], FUNC(i8251_device::write_cts));
 
-	I8251(config, m_usart[1], 0);
+	I8251(config, m_usart[1]);
 	m_usart[1]->txd_handler().set(m_rs232[1], FUNC(rs232_port_device::write_txd));
 	m_usart[1]->dtr_handler().set(m_rs232[1], FUNC(rs232_port_device::write_dtr));
 	m_usart[1]->rts_handler().set(m_rs232[1], FUNC(rs232_port_device::write_rts));

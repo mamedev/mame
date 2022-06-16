@@ -447,8 +447,8 @@ void supercrd_state::supercrd(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-//  I8255(config, "ppi8255_0", 0);
-//  I8255(config, "ppi8255_1", 0);
+//  I8255(config, "ppi8255_0");
+//  I8255(config, "ppi8255_1");
 
 	// video hardware
 

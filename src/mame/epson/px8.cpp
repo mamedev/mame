@@ -755,7 +755,7 @@ void px8_state::px8(machine_config &config)
 	slave.set_disable();
 
 	/* sub CPU (uPD7508) */
-//  upd7508_device &sub(UPD7508(config, UPD7508_TAG, 200000)); /* 200 kHz */
+//  upd7508_device &sub(UPD7508(config, UPD7508_TAG, XTAL::u(200000))); /* 200 kHz */
 //  sub.set_addrmap(AS_IO, &px8_state::px8_sub_io);
 //  sub.set_disable();
 

@@ -11,7 +11,7 @@
 DEFINE_DEVICE_TYPE(INDER_VIDEO, inder_vid_device, "indervd", "Inder / Dinamic TMS Video")
 
 
-inder_vid_device::inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+inder_vid_device::inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, INDER_VIDEO, tag, owner, clock),
 /*  device_video_interface(mconfig, *this, false), */
 		m_vram(*this, "vram"),
@@ -113,7 +113,7 @@ void inder_vid_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &inder_vid_device::ramdac_map);
 	ramdac.set_split_read(1);
 }

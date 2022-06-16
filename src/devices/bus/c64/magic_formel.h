@@ -27,7 +27,7 @@ class c64_magic_formel_cartridge_device : public device_t,
 {
 public:
 	// construction/destruction
-	c64_magic_formel_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64_magic_formel_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER( freeze );
 

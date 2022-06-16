@@ -720,7 +720,7 @@ void hp3478a_state::hp3478a(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	ADDRESS_MAP_BANK(config, m_iobank, 0);
+	ADDRESS_MAP_BANK(config, m_iobank);
 	m_iobank->set_map(&hp3478a_state::io_bank);
 	m_iobank->set_data_width(8);
 	m_iobank->set_addr_width(18);

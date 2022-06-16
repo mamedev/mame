@@ -207,7 +207,7 @@ void jonos_state::jonos(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_jonos);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(jonos_state::kbd_put));
 }
 

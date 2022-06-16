@@ -29,12 +29,12 @@ DEFINE_DEVICE_TYPE(BACTA_DATALOGGER, bacta_datalogger_device, "bacta_datalogger"
 //  bacta_datalogger_device - constructor
 //-------------------------------------------------
 
-bacta_datalogger_device::bacta_datalogger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bacta_datalogger_device::bacta_datalogger_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	bacta_datalogger_device(mconfig, BACTA_DATALOGGER, tag, owner, clock)
 {
 }
 
-bacta_datalogger_device::bacta_datalogger_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+bacta_datalogger_device::bacta_datalogger_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, BACTA_DATALOGGER, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_rxd_handler(*this),
@@ -57,9 +57,9 @@ void bacta_datalogger_device::device_reset()
 
 	set_data_frame(startbits, databits, parity, stopbits);
 
-	set_tra_rate(1200);
+	set_tra_rate(XTAL::u(1200));
 
-	set_rcv_rate(1200);
+	set_rcv_rate(XTAL::u(1200));
 
 	output_rxd(1);
 }
@@ -70,7 +70,7 @@ void bacta_datalogger_device::tx_queue()
 	{
 		if (m_output_char != 255)
 		{
-			set_tra_rate(1200);
+			set_tra_rate(XTAL::u(1200));
 			transmit_register_setup(m_output_char);
 			m_output_char = 255;
 		}

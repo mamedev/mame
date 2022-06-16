@@ -17,7 +17,7 @@
 class mc6846_device : public device_t
 {
 public:
-	mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_port() { return m_out_port_cb.bind(); }
 	auto in_port() { return m_in_port_cb.bind(); }

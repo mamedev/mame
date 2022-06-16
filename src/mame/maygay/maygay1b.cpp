@@ -717,7 +717,7 @@ void maygay1b_state::maygay_m1(machine_config &config)
 	MC6809(config, m_maincpu, M1_MASTER_CLOCK/2); // claimed to be 4 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &maygay1b_state::m1_memmap);
 
-	I80C51(config, m_mcu, 2000000); //  EP840034.A-P-80C51AVW
+	I80C51(config, m_mcu, XTAL::u(2000000)); //  EP840034.A-P-80C51AVW
 	m_mcu->port_in_cb<0>().set(FUNC(maygay1b_state::mcu_port0_r));
 	m_mcu->port_out_cb<0>().set(FUNC(maygay1b_state::mcu_port0_w));
 	m_mcu->port_out_cb<1>().set(FUNC(maygay1b_state::mcu_port1_w));
@@ -729,7 +729,7 @@ void maygay1b_state::maygay_m1(machine_config &config)
 	m_duart68681->irq_cb().set(FUNC(maygay1b_state::duart_irq_handler));
 	m_duart68681->inport_cb().set(FUNC(maygay1b_state::m1_duart_r));
 
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set(FUNC(maygay1b_state::m1_pia_porta_w));
 	pia.writepb_handler().set(FUNC(maygay1b_state::m1_pia_portb_w));
 
@@ -755,7 +755,7 @@ void maygay1b_state::maygay_m1(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	OKIM6376(config, m_msm6376, 102400); //? Seems to work well with samples, but unconfirmed
+	OKIM6376(config, m_msm6376, XTAL::u(102400)); //? Seems to work well with samples, but unconfirmed
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
@@ -786,7 +786,7 @@ void maygay1b_state::maygay_m1(machine_config &config)
 	REEL(config, m_reels[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reels[5]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<5>));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

@@ -42,7 +42,7 @@ namespace bus::ti99::peb {
 
 /****************************************************************************/
 
-ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_SPEECH, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_vsp(*this, "vsp"),
@@ -154,7 +154,7 @@ ROM_END
 
 void ti_speech_synthesizer_device::device_add_mconfig(machine_config& config)
 {
-	SPEECHROM(config, "vsm", 0).set_reverse_bit_order(true);
+	SPEECHROM(config, "vsm").set_reverse_bit_order(true);
 	SPEAKER(config, "speech_out").front_center();
 	CD2501E(config, m_vsp, 640000L);
 	m_vsp->set_speechrom_tag("vsm");

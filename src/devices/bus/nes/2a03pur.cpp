@@ -34,7 +34,7 @@
 DEFINE_DEVICE_TYPE(NES_2A03PURITANS, nes_2a03pur_device, "nes_2a03pur", "NES Cart 2A03 Puritans Album PCB")
 
 
-nes_2a03pur_device::nes_2a03pur_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_2a03pur_device::nes_2a03pur_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_2A03PURITANS, tag, owner, clock)
 {
 }

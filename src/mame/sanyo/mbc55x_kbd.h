@@ -25,7 +25,7 @@ class mbc55x_keyboard_device : public device_t, public device_matrix_keyboard_in
 
 public:
 	// construction/destruction
-	mbc55x_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	mbc55x_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	auto txd_callback() { return m_txd_callback.bind(); }

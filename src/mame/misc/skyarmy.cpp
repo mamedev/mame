@@ -323,7 +323,7 @@ GFXDECODE_END
 
 void skyarmy_state::skyarmy(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &skyarmy_state::skyarmy_map);
 	m_maincpu->set_addrmap(AS_IO, &skyarmy_state::skyarmy_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(skyarmy_state::irq0_line_hold));
@@ -350,8 +350,8 @@ void skyarmy_state::skyarmy(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, "ay0", 2500000).add_route(ALL_OUTPUTS, "mono", 0.15);
-	AY8910(config, "ay1", 2500000).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay0", XTAL::u(2500000)).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay1", XTAL::u(2500000)).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 

@@ -188,10 +188,10 @@ GFXDECODE_END
 void tryout_state::tryout(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 2000000);     // ?
+	M6502(config, m_maincpu, XTAL::u(2000000));     // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &tryout_state::main_cpu);
 
-	M6502(config, m_audiocpu, 1500000);    // ?
+	M6502(config, m_audiocpu, XTAL::u(1500000));    // ?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tryout_state::sound_cpu);
 	m_audiocpu->set_periodic_int(FUNC(tryout_state::nmi_line_pulse), attotime::from_hz(1000)); // controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video
 
@@ -213,7 +213,7 @@ void tryout_state::tryout(machine_config &config)
 	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
 	soundlatch.data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 
-	YM2203(config, "ymsnd", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	YM2203(config, "ymsnd", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 ROM_START( tryout )

@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(HLCD0438, hlcd0438_device, "hlcd0438", "Hughes HLCD 0438 LCD 
 //  constructor
 //-------------------------------------------------
 
-hlcd0438_device::hlcd0438_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+hlcd0438_device::hlcd0438_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, HLCD0438, tag, owner, clock),
 	m_write_segs(*this), m_write_data(*this)
 {

@@ -25,7 +25,7 @@ class f4431_kbd_device :  public device_t
 {
 public:
 	// construction/destruction
-	f4431_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	f4431_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callbacks
 	auto tx_handler() { return m_tx_handler.bind(); }

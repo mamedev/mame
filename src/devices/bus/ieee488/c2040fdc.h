@@ -28,7 +28,7 @@ class c2040_fdc_device :  public device_t
 {
 public:
 	// construction/destruction
-	c2040_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c2040_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto sync_wr_callback() { return m_write_sync.bind(); }
 	auto ready_wr_callback() { return m_write_ready.bind(); }

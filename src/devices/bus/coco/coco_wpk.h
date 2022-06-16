@@ -24,11 +24,11 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	// construction/destruction
-	coco_wpk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	coco_wpk_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// construction/destruction
-	coco_wpk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	coco_wpk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -58,7 +58,7 @@ class coco_wpk2_device : public coco_wpk_device
 {
 public:
 	// construction/destruction
-	coco_wpk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	coco_wpk2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -76,7 +76,7 @@ class coco_wpkrs_device : public coco_wpk_device
 {
 public:
 	// construction/destruction
-	coco_wpkrs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	coco_wpkrs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

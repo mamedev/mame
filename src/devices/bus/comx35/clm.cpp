@@ -165,7 +165,7 @@ void comx_clm_device::device_add_mconfig(machine_config &config)
 //  comx_clm_device - constructor
 //-------------------------------------------------
 
-comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COMX_CLM, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	device_gfx_interface(mconfig, *this, nullptr, "palette"),

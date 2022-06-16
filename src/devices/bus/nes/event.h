@@ -15,7 +15,7 @@ class nes_event_device : public nes_sxrom_device
 {
 public:
 	// construction/destruction
-	nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void pcb_reset() override;
 
@@ -45,7 +45,7 @@ class nes_event2_device : public nes_tqrom_device
 {
 public:
 	// construction/destruction
-	nes_event2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_event2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_l(offs_t offset) override;
 	virtual void write_l(offs_t offset, u8 data) override;

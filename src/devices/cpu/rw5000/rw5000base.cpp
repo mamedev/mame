@@ -24,7 +24,7 @@ It is similar, but too many differences to emulate in this device, probably.
 #include "rw5000base.h"
 
 
-rw5000_base_device::rw5000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+rw5000_base_device::rw5000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, prgwidth, 0, program),
 	m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),

@@ -76,7 +76,7 @@
 class k055555_device : public device_t
 {
 public:
-	k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~k055555_device() { }
 
 	void K055555_write_reg(uint8_t regnum, uint8_t regdat);

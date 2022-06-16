@@ -675,7 +675,7 @@ void fp1100_state::fp1100(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 950) // guess
+	BEEP(config, "beeper", XTAL::u(950)) // guess
 			.add_route(ALL_OUTPUTS, "mono", 0.50); // inside the keyboard
 
 	/* CRTC */

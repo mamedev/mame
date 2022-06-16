@@ -12,13 +12,13 @@ class hd63450_device : public device_t
 {
 public:
 	template <typename T>
-	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cputag)
+	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cputag)
 		: hd63450_device(mconfig, tag, owner, clock)
 	{
 		set_cpu_tag(std::forward<T>(cputag));
 	}
 
-	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_callback() { return m_irq_callback.bind(); }
 	auto dma_end() { return m_dma_end.bind(); }

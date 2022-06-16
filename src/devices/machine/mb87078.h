@@ -14,7 +14,7 @@
 class mb87078_device : public device_t
 {
 public:
-	mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto gain_changed() { return m_gain_changed_cb.bind(); }
 

@@ -17,7 +17,7 @@ class namco_c116_device :
 {
 public:
 	//construction/destruction
-	namco_c116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	namco_c116_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	void enable_shadows() { m_enable_shadows = true; }

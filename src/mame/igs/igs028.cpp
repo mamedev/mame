@@ -11,7 +11,7 @@
 #include "igs028.h"
 
 
-igs028_device::igs028_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+igs028_device::igs028_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IGS028, tag, owner, clock)
 {
 }

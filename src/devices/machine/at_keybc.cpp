@@ -282,7 +282,7 @@ WRITE_LINE_MEMBER(at_kbc_device_base::kbd_data_w)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::set_kbd_data_in), this), state);
 }
 
-at_kbc_device_base::at_kbc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+at_kbc_device_base::at_kbc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_mcu(*this, "mcu")
 	, m_hot_res_cb(*this), m_gate_a20_cb(*this), m_kbd_irq_cb(*this)
@@ -381,7 +381,7 @@ TIMER_CALLBACK_MEMBER(at_kbc_device_base::set_kbd_data_in)
 //  PC/AT KEYBOARD CONTROLLER DEVICE
 //**************************************************************************
 
-at_keyboard_controller_device::at_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+at_keyboard_controller_device::at_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: at_kbc_device_base(mconfig, AT_KEYBOARD_CONTROLLER, tag, owner, clock)
 {
 }
@@ -452,7 +452,7 @@ WRITE_LINE_MEMBER(ps2_keyboard_controller_device::aux_data_w)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ps2_keyboard_controller_device::set_aux_data_in), this), state);
 }
 
-ps2_keyboard_controller_device::ps2_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+ps2_keyboard_controller_device::ps2_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: at_kbc_device_base(mconfig, PS2_KEYBOARD_CONTROLLER, tag, owner, clock)
 	, m_aux_irq_cb(*this)
 	, m_aux_clk_cb(*this), m_aux_data_cb(*this)

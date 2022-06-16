@@ -163,7 +163,7 @@ INPUT_PORTS_END
 //  isa8_adlib_device - constructor
 //-------------------------------------------------
 
-isa8_babyblue2_device::isa8_babyblue2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+isa8_babyblue2_device::isa8_babyblue2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISA8_BABYBLUE2, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_z80(*this, "z80cpu")

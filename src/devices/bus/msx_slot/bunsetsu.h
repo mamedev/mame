@@ -15,7 +15,7 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_BUNSETSU, msx_slot_bunsetsu_device)
 class msx_slot_bunsetsu_device : public msx_slot_rom_device
 {
 public:
-	msx_slot_bunsetsu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_bunsetsu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	void set_bunsetsu_region_tag(const char *tag) { m_bunsetsu_region.set_tag(tag); }

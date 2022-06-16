@@ -29,7 +29,7 @@ class sandy_super_disk_device : public device_t, public device_ql_expansion_card
 {
 public:
 	// construction/destruction
-	sandy_super_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sandy_super_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -105,7 +105,7 @@ void pockchalv1_state::machine_reset()
 void pockchalv1_state::pockchalv1(machine_config &config)
 {
 	/* basic machine hardware */
-	TMP90845(config, m_maincpu, 8000000);         /* ? MHz */
+	TMP90845(config, m_maincpu, XTAL::u(8000000));         /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pockchalv1_state::pockchalv1_map);
 //  m_maincpu->->set_vblank_int("screen", FUNC(pockchalv1_state::irq0_line_hold));
 

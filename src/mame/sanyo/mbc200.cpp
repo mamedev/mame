@@ -338,7 +338,7 @@ void mbc200_state::mbc200(machine_config &config)
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.50); // frequency unknown
+	BEEP(config, m_beep, XTAL::u(1000)).add_route(ALL_OUTPUTS, "mono", 0.50); // frequency unknown
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	I8255(config, "ppi_1").out_pc_callback().set(FUNC(mbc200_state::p1_portc_w));
@@ -348,16 +348,16 @@ void mbc200_state::mbc200(machine_config &config)
 	m_ppi_m->out_pa_callback().set(FUNC(mbc200_state::pm_porta_w));
 	m_ppi_m->out_pb_callback().set(FUNC(mbc200_state::pm_portb_w));
 
-	I8251(config, "uart1", 0); // INS8251N
+	I8251(config, "uart1"); // INS8251N
 
-	I8251(config, "uart2", 0); // INS8251A
+	I8251(config, "uart2"); // INS8251A
 
 	MB8876(config, m_fdc, 8_MHz_XTAL / 8); // guess
 	FLOPPY_CONNECTOR(config, "fdc:0", mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* Keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(mbc200_state::kbd_put));
 
 	/* software lists */

@@ -55,7 +55,7 @@ device_z88cart_interface::~device_z88cart_interface()
 //-------------------------------------------------
 //  z88cart_slot_device - constructor
 //-------------------------------------------------
-z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, Z88CART_SLOT, tag, owner, clock)
 	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_z88cart_interface>(mconfig, *this)

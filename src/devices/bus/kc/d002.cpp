@@ -82,7 +82,7 @@ DEFINE_DEVICE_TYPE(KC_D002, kc_d002_device, "kc_d002", "D002 Bus Driver")
 //  kc_d002_device - constructor
 //-------------------------------------------------
 
-kc_d002_device::kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kc_d002_device::kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KC_D002, tag, owner, clock)
 	, device_kcexp_interface(mconfig, *this)
 	, m_slot(nullptr)

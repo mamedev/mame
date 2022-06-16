@@ -54,7 +54,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	svi_expander_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts)
-		: svi_expander_device(mconfig, tag, owner, uint32_t(0))
+		: svi_expander_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -62,7 +62,7 @@ public:
 		set_fixed(false);
 	}
 
-	svi_expander_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	svi_expander_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~svi_expander_device();
 
 	// callbacks

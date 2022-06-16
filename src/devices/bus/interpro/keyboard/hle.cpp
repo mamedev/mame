@@ -254,7 +254,7 @@ INPUT_PORTS_END
 
 } // anonymous namespace
 
-hle_device_base::hle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+hle_device_base::hle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_interpro_keyboard_port_interface(mconfig, *this)
@@ -429,7 +429,7 @@ void hle_device_base::received_byte(u8 byte)
 	}
 }
 
-hle_en_us_device::hle_en_us_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+hle_en_us_device::hle_en_us_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: hle_device_base(mconfig, INTERPRO_HLE_EN_US_KEYBOARD, tag, owner, clock),
 	m_modifiers(*this, "modifiers")
 {

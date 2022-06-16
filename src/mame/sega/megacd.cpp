@@ -280,10 +280,10 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 	m_scdcpu->set_addrmap(AS_PROGRAM, &sega_segacd_device::segacd_map);
 	m_scdcpu->set_irq_acknowledge_callback(FUNC(sega_segacd_device::segacd_sub_int_callback));
 
-	LC89510(config, "cdc", 0); // cd controller
+	LC89510(config, "cdc"); // cd controller
 
 	// temporary until things are cleaned up
-	LC89510_TEMP(config, m_lc89510_temp, 0); // cd controller
+	LC89510_TEMP(config, m_lc89510_temp); // cd controller
 	m_lc89510_temp->set_cdc_do_dma_callback(FUNC(sega_segacd_device::SegaCD_CDC_Do_DMA)); // hack
 	m_lc89510_temp->set_cdrom_tag("^cdrom");
 	m_lc89510_temp->set_68k_tag(m_scdcpu);
@@ -304,7 +304,7 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 }
 
 
-sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfx_segacd)
 	, device_video_interface(mconfig, *this, false)
@@ -324,17 +324,17 @@ sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_typ
 {
 }
 
-sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_US, tag, owner, clock)
 {
 }
 
-sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_JAPAN, tag, owner, clock)
 {
 }
 
-sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_EUROPE, tag, owner, clock)
 {
 }

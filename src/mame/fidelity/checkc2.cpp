@@ -208,7 +208,7 @@ INPUT_PORTS_END
 void cr_state::cr(machine_config &config)
 {
 	/* basic machine hardware */
-	NEC_D546(config, m_maincpu, 400000); // approximation
+	NEC_D546(config, m_maincpu, XTAL::u(400000)); // approximation
 	m_maincpu->read_a().set(FUNC(cr_state::input_r));
 	m_maincpu->read_b().set(FUNC(cr_state::ram_r));
 	m_maincpu->write_c().set(FUNC(cr_state::ram_w));

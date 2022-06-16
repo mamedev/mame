@@ -27,7 +27,7 @@ class sc499_ctape_image_device : public microtape_image_device
 {
 public:
 	// construction/destruction
-	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -56,7 +56,7 @@ class sc499_device: public device_t, public device_isa8_card_interface
 {
 public:
 	// construction/destruction
-	sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	required_ioport m_iobase;

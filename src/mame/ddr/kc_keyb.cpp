@@ -435,7 +435,7 @@ INPUT_PORTS_END
 //-------------------------------------------------
 //  kc_keyboard_device - constructor
 //-------------------------------------------------
-kc_keyboard_device::kc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+kc_keyboard_device::kc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, KC_KEYBOARD, tag, owner, clock),
 	m_write_out(*this)
 {

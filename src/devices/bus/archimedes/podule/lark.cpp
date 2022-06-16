@@ -25,7 +25,7 @@ class arc_lark_device :
 {
 public:
 	// construction/destruction
-	arc_lark_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_lark_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::CAPTURE; }
 
@@ -122,7 +122,7 @@ const tiny_rom_entry *arc_lark_device::device_rom_region() const
 
 void arc_lark_device::device_add_mconfig(machine_config &config)
 {
-	AD1848(config, m_ad1848, 0);
+	AD1848(config, m_ad1848);
 	//m_ad1848->irq().set([this](int state) { set_irq(IRQ_AD1848, state); }); // not used/connected?
 	m_ad1848->drq().set(FUNC(arc_lark_device::playback_drq));
 
@@ -152,7 +152,7 @@ void arc_lark_device::device_add_mconfig(machine_config &config)
 //  arc_lark_device - constructor
 //-------------------------------------------------
 
-arc_lark_device::arc_lark_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_lark_device::arc_lark_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_LARK, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")

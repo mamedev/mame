@@ -486,7 +486,7 @@ void a7150_state::a7150(machine_config &config)
 	i8087.irq().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// IFSP port on processor card
@@ -495,7 +495,7 @@ void a7150_state::a7150(machine_config &config)
 //  ppi.out_pb_callback().set("cent_data_out", output_latch_device::write));
 	ppi.out_pc_callback().set(FUNC(a7150_state::ppi_c_w));
 
-	PIT8253(config, m_pit8253, 0);
+	PIT8253(config, m_pit8253);
 	m_pit8253->set_clk<0>(14.7456_MHz_XTAL / 4);
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 	m_pit8253->set_clk<1>(14.7456_MHz_XTAL / 4);
@@ -504,7 +504,7 @@ void a7150_state::a7150(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "uart_irq").output_handler().set(m_pic8259, FUNC(pic8259_device::ir4_w));
 
-	I8251(config, m_uart8251, 0);
+	I8251(config, m_uart8251);
 	m_uart8251->txd_handler().set(FUNC(a7150_state::ifss_write_txd));
 	m_uart8251->dtr_handler().set(FUNC(a7150_state::ifss_write_dtr));
 	m_uart8251->rts_handler().set(FUNC(a7150_state::ifss_loopback_w));
@@ -518,7 +518,7 @@ void a7150_state::a7150(machine_config &config)
 	m_rs232->dsr_handler().set(m_uart8251, FUNC(i8251_device::write_dsr));
 	m_rs232->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(kbd_rs232_defaults));
 
-	ISBC_215G(config, "isbc_215g", 0, 0x4a, m_maincpu).irq_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
+	ISBC_215G(config, "isbc_215g", 0x4a, m_maincpu).irq_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
 	// KGS K7070 graphics terminal controlling ABG K7072 framebuffer
 	Z80(config, m_gfxcpu, XTAL(16'000'000) / 4);
@@ -526,7 +526,7 @@ void a7150_state::a7150(machine_config &config)
 	m_gfxcpu->set_addrmap(AS_IO, &a7150_state::k7070_cpu_io);
 	m_gfxcpu->set_daisy_config(k7070_daisy_chain);
 
-	ADDRESS_MAP_BANK(config, m_video_bankdev, 0);
+	ADDRESS_MAP_BANK(config, m_video_bankdev);
 	m_video_bankdev->set_map(&a7150_state::k7070_cpu_banked);
 	m_video_bankdev->set_endianness(ENDIANNESS_BIG);
 	m_video_bankdev->set_addr_width(18);

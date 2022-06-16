@@ -28,7 +28,7 @@ class ef9345_device :   public device_t,
 {
 public:
 	// construction/destruction
-	ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
@@ -47,7 +47,7 @@ protected:
 	};
 
 	// pass-through constructor
-	ef9345_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, EF9345_MODE variant);
+	ef9345_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, EF9345_MODE variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -124,7 +124,7 @@ private:
 class ts9347_device : public ef9345_device
 {
 public:
-	ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition

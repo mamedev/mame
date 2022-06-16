@@ -117,11 +117,11 @@ void ms9540_state::kbd_put(u8 data)
 void ms9540_state::ms9540(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000); // unknown clock
+	M68000(config, m_maincpu, XTAL::u(8000000)); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms9540_state::mem_map);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(ms9540_state::kbd_put));
 }
 

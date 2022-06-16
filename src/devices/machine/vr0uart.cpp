@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(VRENDER0_UART, vr0uart_device, "vr0uart", "MagicEyes VRender0
 //  vr0uart_device - constructor
 //-------------------------------------------------
 
-vr0uart_device::vr0uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vr0uart_device::vr0uart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VRENDER0_UART, tag, owner, clock),
 	  device_serial_interface(mconfig, *this)
 {
@@ -102,8 +102,8 @@ void vr0uart_device::update_serial_config()
 	}
 	else
 	{
-		set_rcv_rate(0);
-		set_tra_rate(0);
+		set_rcv_rate(XTAL::u(0));
+		set_tra_rate(XTAL::u(0));
 	}
 }
 

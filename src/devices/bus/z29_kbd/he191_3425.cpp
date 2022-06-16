@@ -20,7 +20,7 @@
 
 DEFINE_DEVICE_TYPE(HE191_3425, he191_3425_device, "he191_3425", "Heath HE 191-3425 Keyboard")
 
-he191_3425_device::he191_3425_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+he191_3425_device::he191_3425_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HE191_3425, tag, owner, clock)
 	, device_z29_keyboard_interface(mconfig, *this)
 	, m_mcu(*this, "mcu")
@@ -224,7 +224,7 @@ void he191_3425_device::device_add_mconfig(machine_config &config)
 	mcu.t1_in_cb().set(FUNC(he191_3425_device::mcu_t1_r));
 
 	SPEAKER(config, "speaker").front_center();
-	BEEP(config, m_buzzer, 1'000'000'000 / PERIOD_OF_555_ASTABLE_NSEC(RES_R(510), RES_R(510), CAP_U(1)));
+	BEEP(config, m_buzzer, XTAL::u(1'000'000'000) / PERIOD_OF_555_ASTABLE_NSEC(RES_R(510), RES_R(510), CAP_U(1)));
 	m_buzzer->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 

@@ -43,7 +43,7 @@ enum {
 
 class h8_dma_device : public device_t {
 public:
-	h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint8_t dmawer_r();
 	void dmawer_w(uint8_t data);
@@ -88,7 +88,7 @@ public:
 		MODE16_MEM_DACK
 	};
 
-	h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner,
 			const char *intc, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8,
 			int v9 = h8_dma_channel_device::NONE,
@@ -98,7 +98,7 @@ public:
 			int vd = h8_dma_channel_device::NONE,
 			int ve = h8_dma_channel_device::NONE,
 			int vf = h8_dma_channel_device::NONE)
-		: h8_dma_channel_device(mconfig, tag, owner, 0)
+		: h8_dma_channel_device(mconfig, tag, owner)
 	{
 		set_info(intc, irq_base, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, va, vb, vc, vd, ve, vf);
 	}

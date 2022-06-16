@@ -58,7 +58,7 @@ public:
 		F_ZC1  = 0x80000000
 	};
 
-	mb86233_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb86233_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void stall() { m_stall = true; }
 
@@ -68,7 +68,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gpio3_w);
 
 protected:
-	mb86233_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mb86233_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -134,7 +134,7 @@ private:
 class mb86234_device : public mb86233_device
 {
 public:
-	mb86234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb86234_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

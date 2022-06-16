@@ -15,7 +15,7 @@ class nes_sunsoft_1_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sunsoft_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_sunsoft_1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_m(offs_t offset, uint8_t data) override;
 
@@ -29,7 +29,7 @@ class nes_sunsoft_2_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sunsoft_2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_sunsoft_2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 
@@ -43,7 +43,7 @@ class nes_sunsoft_3_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sunsoft_3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_sunsoft_3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 
@@ -69,7 +69,7 @@ class nes_sunsoft_4_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sunsoft_4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_sunsoft_4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_m(offs_t offset) override;
 	virtual void write_m(offs_t offset, u8 data) override;
@@ -79,7 +79,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_sunsoft_4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_sunsoft_4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -99,7 +99,7 @@ class nes_sunsoft_fme7_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_sunsoft_fme7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_sunsoft_fme7_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read_m(offs_t offset) override;
 	virtual void write_m(offs_t offset, uint8_t data) override;
@@ -109,7 +109,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_sunsoft_fme7_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_sunsoft_fme7_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -133,7 +133,7 @@ class nes_sunsoft_5_device : public nes_sunsoft_fme7_device
 {
 public:
 	// construction/destruction
-	nes_sunsoft_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_sunsoft_5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 

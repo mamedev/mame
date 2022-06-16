@@ -465,7 +465,7 @@ static const floppy_interface vtech2_floppy_interface =
 void vtech2_state::laser350(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3694700);        /* 3.694700 MHz */
+	Z80(config, m_maincpu, XTAL::u(3694700));        /* 3.694700 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &vtech2_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &vtech2_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vtech2_state::irq0_line_hold));

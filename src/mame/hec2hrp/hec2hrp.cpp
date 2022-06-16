@@ -412,7 +412,7 @@ void hec2hrp_state::interact_common(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("interact");
 
 	/* printer */
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 }
 
 void hec2hrp_state::interact(machine_config &config)
@@ -483,7 +483,7 @@ void hec2hrp_state::hec2hr(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("interact_cass");
 
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("80K").set_default_value(0x00);
@@ -501,7 +501,7 @@ void hec2hrp_state::hec2hrx(machine_config &config)
 	m_disc2cpu->set_addrmap(AS_PROGRAM, &hec2hrp_state::hecdisc2_mem);
 	m_disc2cpu->set_addrmap(AS_IO, &hec2hrp_state::hecdisc2_io);
 
-	UPD765A(config, m_upd_fdc, 8'000'000, false, true);
+	UPD765A(config, m_upd_fdc, XTAL::u(8'000'000), false, true);
 	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
 	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
 

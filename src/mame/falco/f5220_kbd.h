@@ -24,7 +24,7 @@ class f5220_kbd_device :  public device_t, protected device_matrix_keyboard_inte
 {
 public:
 	// construction/destruction
-	f5220_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	f5220_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callbacks
 	auto int_handler() { return m_int_handler.bind(); }

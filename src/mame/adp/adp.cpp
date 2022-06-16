@@ -541,7 +541,7 @@ void adp_state::fstation_hd63484_map(address_map &map)
 
 void adp_state::quickjac(machine_config &config)
 {
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::quickjac_mem);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &adp_state::fc7_map);
 
@@ -550,7 +550,7 @@ void adp_state::quickjac(machine_config &config)
 	m_duart->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
 	m_duart->inport_cb().set_ioport("DSW1");
 
-	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_duart, FUNC(mc68681_device::rx_a_w));
+	MICROTOUCH(config, m_microtouch, XTAL::u(9600)).stx().set(m_duart, FUNC(mc68681_device::rx_a_w));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
@@ -567,10 +567,10 @@ void adp_state::quickjac(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(adp_state::adp_palette), 0x10);
 
-	HD63484(config, m_acrtc, 0).set_addrmap(0, &adp_state::adp_hd63484_map);
+	HD63484(config, m_acrtc).set_addrmap(0, &adp_state::adp_hd63484_map);
 
 	SPEAKER(config, "mono").front_center();
-	ym2149_device &aysnd(YM2149(config, "aysnd", 3686400/2));
+	ym2149_device &aysnd(YM2149(config, "aysnd", XTAL::u(3686400)/2));
 	aysnd.port_a_read_callback().set_ioport("PA");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -606,7 +606,7 @@ void adp_state::funland(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::funland_mem);
 
 	PALETTE(config.replace(), m_palette, palette_device::BLACK, 0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &adp_state::ramdac_map);
 
 	m_acrtc->set_addrmap(0, &adp_state::fstation_hd63484_map);

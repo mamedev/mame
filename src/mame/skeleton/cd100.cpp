@@ -237,7 +237,7 @@ void cd100_state::cd100b(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 6264/62256 + same battery as RTC
 
-	RTC72421(config, "rtc", 32768).out_int_handler().set_inputline(m_maincpu, Z180_INPUT_LINE_IRQ2);
+	RTC72421(config, "rtc", XTAL::u(32768)).out_int_handler().set_inputline(m_maincpu, Z180_INPUT_LINE_IRQ2);
 
 	M6803(config, m_mechcpu, 4.9152_MHz_XTAL);
 	m_mechcpu->set_addrmap(AS_PROGRAM, &cd100_state::mc6803_map);

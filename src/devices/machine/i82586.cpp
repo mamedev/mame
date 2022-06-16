@@ -108,7 +108,7 @@ CFG_PARAMS[] =
 	{ "transmit on no crs",         "disabled",                            0,  8, 0x08, 3, false },
 };
 
-i82586_base_device::i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth, u8 addrwidth)
+i82586_base_device::i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, endianness_t endian, u8 datawidth, u8 addrwidth)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_network_interface(mconfig, *this, 10)
@@ -128,32 +128,32 @@ i82586_base_device::i82586_base_device(const machine_config &mconfig, device_typ
 {
 }
 
-i82586_device::i82586_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i82586_device::i82586_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i82586_base_device(mconfig, I82586, tag, owner, clock, ENDIANNESS_LITTLE, 16, 24)
 {
 }
 
-i82596_device::i82596_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth)
+i82596_device::i82596_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, endianness_t endian, u8 datawidth)
 	: i82586_base_device(mconfig, type, tag, owner, clock, endian, datawidth, 32)
 {
 }
 
-i82596_le16_device::i82596_le16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i82596_le16_device::i82596_le16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i82596_device(mconfig, I82596_LE16, tag, owner, clock, ENDIANNESS_LITTLE, 16)
 {
 }
 
-i82596_be16_device::i82596_be16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i82596_be16_device::i82596_be16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i82596_device(mconfig, I82596_BE16, tag, owner, clock, ENDIANNESS_BIG, 16)
 {
 }
 
-i82596_le32_device::i82596_le32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i82596_le32_device::i82596_le32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i82596_device(mconfig, I82596_LE32, tag, owner, clock, ENDIANNESS_LITTLE, 32)
 {
 }
 
-i82596_be32_device::i82596_be32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i82596_be32_device::i82596_be32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i82596_device(mconfig, I82596_BE32, tag, owner, clock, ENDIANNESS_BIG, 32)
 {
 }

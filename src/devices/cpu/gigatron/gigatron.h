@@ -28,7 +28,7 @@ class gigatron_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	auto outx_cb() { return m_outx_cb.bind(); }
 	auto out_cb() { return m_out_cb.bind(); }
 	auto ir_cb() { return m_ir_cb.bind(); }

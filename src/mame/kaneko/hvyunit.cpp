@@ -651,7 +651,7 @@ void hvyunit_state::hvyunit(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hvyunit);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
+	KANEKO_PANDORA(config, m_pandora);
 	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */

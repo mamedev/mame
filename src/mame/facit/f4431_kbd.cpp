@@ -238,7 +238,7 @@ ioport_constructor f4431_kbd_device::device_input_ports() const
 //  f4431_kbd_device - constructor
 //-------------------------------------------------
 
-f4431_kbd_device::f4431_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+f4431_kbd_device::f4431_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, F4431_KBD, tag, owner, clock),
 	m_mcu(*this, "mcu"),
 	m_speaker(*this, "speaker"),

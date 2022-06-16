@@ -56,7 +56,7 @@ DEFINE_DEVICE_TYPE(SK1100_LINK_CABLE, sk1100_link_cable_device, "sk1100_link_cab
 //  sk1100_link_cable_device - constructor
 //-------------------------------------------------
 
-sk1100_link_cable_device::sk1100_link_cable_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+sk1100_link_cable_device::sk1100_link_cable_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SK1100_LINK_CABLE, tag, owner, clock),
 	device_sk1100_printer_port_interface(mconfig, *this),
 	m_stream(*this, "stream"),
@@ -113,7 +113,7 @@ void sk1100_link_cable_device::device_reset()
 
 void sk1100_link_cable_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config, m_stream, 0);
+	BITBANGER(config, m_stream);
 }
 
 TIMER_CALLBACK_MEMBER(sk1100_link_cable_device::update_queue)

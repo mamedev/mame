@@ -18,7 +18,7 @@ class applepic_device : public device_t
 {
 public:
 	// construction/destruction
-	applepic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	applepic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callback configuration
 	auto prd_callback() { return m_prd_callback.bind(); }

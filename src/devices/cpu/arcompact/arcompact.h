@@ -70,7 +70,7 @@ class arcompact_device : public cpu_device
 {
 public:
 	// construction/destruction
-	arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t arcompact_auxreg002_LPSTART_r();
 	void arcompact_auxreg002_LPSTART_w(uint32_t data);

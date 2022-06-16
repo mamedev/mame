@@ -2898,7 +2898,7 @@ void subsino_state::dinofmly(machine_config &config)
 
 	PALETTE(config.replace(), m_palette).set_entries(0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino_state::ramdac_map);
 }
 
@@ -2976,7 +2976,7 @@ void subsino_state::stbsub(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x100);
 	//PALETTE(config, m_palette, FUNC(subsino_state::_3proms_palette), 0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino_state::ramdac_map);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,stbsub)

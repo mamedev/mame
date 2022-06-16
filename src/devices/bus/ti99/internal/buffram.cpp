@@ -23,7 +23,7 @@ namespace bus::ti99::internal {
 
 // ========== Buffered SRAM ============
 
-buffered_ram_device::buffered_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+buffered_ram_device::buffered_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	:  device_t(mconfig, BUFF_RAM, tag, owner, clock),
 	   device_nvram_interface(mconfig, *this),
 	   m_size(0),

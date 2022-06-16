@@ -15,7 +15,7 @@
 class st0016_device : public device_t, public device_sound_interface, public device_memory_interface
 {
 public:
-	st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 snd_r(offs_t offset);
 	void snd_w(offs_t offset, u8 data);

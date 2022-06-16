@@ -107,7 +107,7 @@ void pgm3_state::machine_reset()
 void pgm3_state::pgm3(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM9(config, m_maincpu, 800000000); // wrong, see notes at top of driver
+	ARM9(config, m_maincpu, XTAL::u(800000000)); // wrong, see notes at top of driver
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm3_state::pgm3_map);
 	m_maincpu->set_disable();
 

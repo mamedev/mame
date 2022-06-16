@@ -357,7 +357,7 @@ void go2000_state::go2000(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, 0);
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, "dac", 0).add_route(0, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(0, "speaker", 0.25); // unknown DAC
 }
 
 ROM_START( go2000 )

@@ -15,7 +15,7 @@ class lh5810_device : public device_t
 {
 public:
 	// construction/destruction
-	lh5810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	lh5810_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto porta_r() { return m_porta_r_cb.bind(); }
 	auto porta_w() { return m_porta_w_cb.bind(); }

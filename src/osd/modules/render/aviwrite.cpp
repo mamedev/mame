@@ -69,12 +69,12 @@ void avi_write::begin_avi_recording(std::string_view name)
 	info.video_depth = 24;
 
 	info.audio_format = 0;
-	info.audio_timescale = m_machine.sample_rate();
+	info.audio_timescale = m_machine.sample_rate().value();
 	info.audio_sampletime = 1;
 	info.audio_numsamples = 0;
 	info.audio_channels = 2;
 	info.audio_samplebits = 16;
-	info.audio_samplerate = m_machine.sample_rate();
+	info.audio_samplerate = m_machine.sample_rate().value();
 
 	// compute the frame time
 	m_frame_period = attotime::from_seconds(1000) / info.video_timescale;

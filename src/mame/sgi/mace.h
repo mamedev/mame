@@ -18,12 +18,12 @@ class mace_device : public device_t
 public:
 	template <typename T>
 	mace_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
-		: mace_device(mconfig, tag, owner, (uint32_t)0)
+		: mace_device(mconfig, tag, owner)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	mace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mace_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto rtc_read_callback() { return m_rtc_read_callback.bind(); }
 	auto rtc_write_callback() { return m_rtc_write_callback.bind(); }

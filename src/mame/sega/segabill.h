@@ -22,7 +22,7 @@ class sega_billboard_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_billboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_billboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);

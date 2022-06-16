@@ -18,7 +18,7 @@
 
 class msm6222b_device : public device_t {
 public:
-	msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void control_w(uint8_t data);
 	uint8_t control_r();
@@ -29,7 +29,7 @@ public:
 	const uint8_t *render();
 
 protected:
-	msm6222b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msm6222b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 
@@ -49,7 +49,7 @@ private:
 
 class msm6222b_01_device : public msm6222b_device {
 public:
-	msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

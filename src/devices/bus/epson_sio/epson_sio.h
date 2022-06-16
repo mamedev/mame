@@ -26,7 +26,7 @@ class epson_sio_device : public device_t, public device_single_card_slot_interfa
 public:
 	// construction/destruction
 	epson_sio_device(machine_config const &mconfig, char const *tag, device_t *owner, char const *dflt)
-		: epson_sio_device(mconfig, tag, owner, (uint32_t)0)
+		: epson_sio_device(mconfig, tag, owner)
 	{
 		option_reset();
 		epson_sio_devices(*this);
@@ -34,7 +34,7 @@ public:
 		set_fixed(false);
 	}
 
-	epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~epson_sio_device();
 
 	// callbacks

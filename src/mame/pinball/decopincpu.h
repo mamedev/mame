@@ -29,13 +29,13 @@ class decocpu_type1_device : public device_t
 {
 public:
 	template <typename T>
-	decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpuregion_tag)
+	decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpuregion_tag)
 		: decocpu_type1_device(mconfig, tag, owner, clock)
 	{
 		set_cpuregion(std::forward<T>(cpuregion_tag));
 	}
 
-	decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto display_read_callback() { return m_read_display.bind(); }
@@ -54,7 +54,7 @@ public:
 protected:
 	void solenoid0_w(u8 data);
 
-	decocpu_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	decocpu_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -119,17 +119,17 @@ class decocpu_type2_device : public decocpu_type1_device
 {
 public:
 	template <typename T>
-	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpuregion_tag)
+	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpuregion_tag)
 		: decocpu_type2_device(mconfig, tag, owner, clock)
 	{
 		set_cpuregion(std::forward<T>(cpuregion_tag));
 	}
 
-	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void decocpu2_map(address_map &map);
 protected:
-	decocpu_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	decocpu_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -140,16 +140,16 @@ class decocpu_type3_device : public decocpu_type2_device
 {
 public:
 	template <typename T>
-	decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpuregion_tag)
+	decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpuregion_tag)
 		: decocpu_type3_device(mconfig, tag, owner, clock)
 	{
 		set_cpuregion(std::forward<T>(cpuregion_tag));
 	}
 
-	decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	decocpu_type3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	decocpu_type3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// overrides
 	virtual void device_start() override;
@@ -159,13 +159,13 @@ class decocpu_type3b_device : public decocpu_type3_device
 {
 public:
 	template <typename T>
-	decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpuregion_tag)
+	decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpuregion_tag)
 		: decocpu_type3b_device(mconfig, tag, owner, clock)
 	{
 		set_cpuregion(std::forward<T>(cpuregion_tag));
 	}
 
-	decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// overrides

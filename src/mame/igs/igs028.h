@@ -10,7 +10,7 @@
 class igs028_device : public device_t
 {
 public:
-	igs028_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	igs028_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t* m_sharedprotram = nullptr;
 

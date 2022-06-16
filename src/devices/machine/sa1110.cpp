@@ -35,7 +35,7 @@
 
 DEFINE_DEVICE_TYPE(SA1110_PERIPHERALS, sa1110_periphs_device, "sa1110_periphs", "Intel XScale SA1110 Peripherals")
 
-sa1110_periphs_device::sa1110_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sa1110_periphs_device::sa1110_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SA1110_PERIPHERALS, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)

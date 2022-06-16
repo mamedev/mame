@@ -92,7 +92,7 @@ INPUT_PORTS_END
 //-------------------------------------------------
 //  multifont_device - constructor
 //-------------------------------------------------
-multifont_device::multifont_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+multifont_device::multifont_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, EPSON_QX_OPTION_MULTIFONT, tag, owner, clock),
 	device_option_expansion_interface(mconfig, *this),
 	m_mcu(*this, "mcu"),

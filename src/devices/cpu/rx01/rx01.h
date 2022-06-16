@@ -38,7 +38,7 @@ public:
 	};
 
 	// device type constructor
-	rx01_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rx01_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callback configuration
 	auto error_callback() { return m_interface_callback[0].bind(); }

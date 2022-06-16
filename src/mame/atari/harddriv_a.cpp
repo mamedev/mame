@@ -27,7 +27,7 @@
 
 DEFINE_DEVICE_TYPE(HARDDRIV_SOUND_BOARD, harddriv_sound_board_device, "harddriv_sound", "Hard Drivin' Sound Board")
 
-harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, HARDDRIV_SOUND_BOARD, tag, owner, clock),
 	m_soundcpu(*this, "soundcpu"),
 	m_latch(*this, "latch"),
@@ -436,7 +436,7 @@ void harddriv_sound_board_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_soundcpu, 16_MHz_XTAL/2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &harddriv_sound_board_device::driversnd_68k_map);
 
-	LS259(config, m_latch, 0); // 80R
+	LS259(config, m_latch); // 80R
 	m_latch->q_out_cb<0>().set(FUNC(harddriv_sound_board_device::speech_write_w)); // SPWR - 5220 write strobe
 	m_latch->q_out_cb<1>().set(FUNC(harddriv_sound_board_device::speech_reset_w)); // SPRES - 5220 hard reset
 	m_latch->q_out_cb<2>().set(FUNC(harddriv_sound_board_device::speech_rate_w)); // SPRATE
@@ -453,5 +453,5 @@ void harddriv_sound_board_device::device_add_mconfig(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	AM6012(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // ls374d.75e + ls374d.90e + am6012
+	AM6012(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5); // ls374d.75e + ls374d.90e + am6012
 }

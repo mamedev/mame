@@ -682,7 +682,7 @@ class funcube_touchscreen_device : public device_t,
 									public device_serial_interface
 {
 public:
-	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 	auto tx_cb() { return m_tx_cb.bind(); }
@@ -720,7 +720,7 @@ static INPUT_PORTS_START( funcube_touchscreen )
 	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_Y ) PORT_MINMAX(0,0x46+1) PORT_CROSSHAIR(Y, -(0xf0-8.0)/0xf0*0x047/0x46, -1.0/0x46, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(5) PORT_REVERSE
 INPUT_PORTS_END
 
-funcube_touchscreen_device::funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+funcube_touchscreen_device::funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, FUNCUBE_TOUCHSCREEN, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_tx_cb(*this),
@@ -738,7 +738,7 @@ ioport_constructor funcube_touchscreen_device::device_input_ports() const
 void funcube_touchscreen_device::device_start()
 {
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_tra_rate(9600);
+	set_tra_rate(XTAL::u(9600));
 	m_button_state = 0x00;
 	emu_timer *tm = timer_alloc(FUNC(funcube_touchscreen_device::read_buttons), this);
 	tm->adjust(attotime::from_ticks(1, clock()), 0, attotime::from_ticks(1, clock()));
@@ -2442,7 +2442,7 @@ void staraudi_state::staraudi(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &staraudi_state::staraudi_map);
 
 	SHARP_LH28F016S_16BIT(config, "flash");
-	UPD4992(config, m_rtc, 32'768);
+	UPD4992(config, m_rtc, XTAL::u(32'768));
 
 	// video hardware
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
@@ -2507,9 +2507,9 @@ void funcube_state::funcube(machine_config &config)
 	m_sub->set_addrmap(AS_PROGRAM, &funcube_state::funcube_sub_map);
 	m_sub->set_addrmap(AS_IO, &funcube_state::funcube_sub_io);
 
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", m_maincpu);
 
-	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(":sub:sci1", FUNC(h8_sci_device::rx_w));
+	FUNCUBE_TOUCHSCREEN(config, "touchscreen", XTAL::u(200)).tx_cb().set(":sub:sci1", FUNC(h8_sci_device::rx_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

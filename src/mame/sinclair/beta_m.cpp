@@ -27,7 +27,7 @@ BUGS:
 
 DEFINE_DEVICE_TYPE(BETA_DISK, beta_disk_device, "betadisk", "Beta Disk Interface")
 
-beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BETA_DISK, tag, owner, clock)
 	, m_betadisk_active(0)
 	, m_wd179x(*this, "wd179x")

@@ -58,7 +58,7 @@ DEFINE_DEVICE_TYPE(IREMGA20, iremga20_device, "iremga20", "Irem GA20")
 //  iremga20_device - constructor
 //-------------------------------------------------
 
-iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, IREMGA20, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	device_rom_interface(mconfig, *this),

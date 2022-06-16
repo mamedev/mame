@@ -81,12 +81,12 @@ DEFINE_DEVICE_TYPE(C219, c219_device, "c219", "Namco C219")
 //  c140_device - constructor
 //-------------------------------------------------
 
-c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c140_device(mconfig, C140, tag, owner, clock)
 {
 }
 
-c140_device::c140_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+c140_device::c140_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
@@ -101,7 +101,7 @@ c140_device::c140_device(const machine_config &mconfig, device_type type, const 
 	std::fill(std::begin(m_pcmtbl), std::end(m_pcmtbl), 0);
 }
 
-c219_device::c219_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c219_device::c219_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c140_device(mconfig, C219, tag, owner, clock)
 {
 	// TODO: unknown address bus bits

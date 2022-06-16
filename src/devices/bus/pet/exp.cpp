@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(PET_EXPANSION_SLOT, pet_expansion_slot_device, "pet_expansion
 //  pet_expansion_slot_device - constructor
 //-------------------------------------------------
 
-pet_expansion_slot_device::pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pet_expansion_slot_device::pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PET_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_pet_expansion_card_interface>(mconfig, *this),
 	m_card(nullptr),

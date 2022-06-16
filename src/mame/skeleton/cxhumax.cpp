@@ -1044,12 +1044,12 @@ void cxhumax_state::machine_reset()
 
 void cxhumax_state::cxhumax(machine_config &config)
 {
-	ARM920T(config, m_maincpu, 180000000); // CX24175 (RevC up?)
+	ARM920T(config, m_maincpu, XTAL::u(180000000)); // CX24175 (RevC up?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cxhumax_state::cxhumax_map);
 
 
 	INTEL_28F320J3D(config, "flash");
-	I2C_24C64(config, "eeprom", 0); // 24LC64
+	I2C_24C64(config, "eeprom"); // 24LC64
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1061,7 +1061,7 @@ void cxhumax_state::cxhumax(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 }
 
 ROM_START( hxhdci2k )

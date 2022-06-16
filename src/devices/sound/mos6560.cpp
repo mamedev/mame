@@ -680,7 +680,7 @@ void mos6560_device::mos6560_colorram_map(address_map &map)
 		map(0x000, 0x3ff).ram();
 }
 
-mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
@@ -693,17 +693,17 @@ mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6560_device(mconfig, MOS6560, tag, owner, clock, TYPE_6560)
 {
 }
 
-mos6561_device::mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6561_device::mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6560_device(mconfig, MOS6561, tag, owner, clock, TYPE_6561)
 {
 }
 
-mos656x_attack_ufo_device::mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos656x_attack_ufo_device::mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6560_device(mconfig, MOS656X_ATTACK_UFO, tag, owner, clock, TYPE_ATTACK_UFO)
 {
 }

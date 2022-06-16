@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(TVC_SOUND, tvc_sound_device, "tvc_sound", "TVC 64 Custom Soun
 //  tvc_sound_device - constructor
 //-------------------------------------------------
 
-tvc_sound_device::tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tvc_sound_device::tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TVC_SOUND, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_write_sndint(*this)

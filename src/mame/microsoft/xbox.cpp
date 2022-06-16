@@ -174,7 +174,7 @@ void xbox_state::xbox(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OHCI_GAME_CONTROLLER(config, "ohci_gamepad", 0);
+	OHCI_GAME_CONTROLLER(config, "ohci_gamepad");
 }
 
 

@@ -655,12 +655,12 @@ void tempest_state::tempest(machine_config &config)
 	screen.set_visarea(0, 580, 0, 570);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	AVG_TEMPEST(config, m_avg, 0);
+	AVG_TEMPEST(config, m_avg);
 	m_avg->set_vector("vector");
 	m_avg->set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
 	/* Drivers */
-	MATHBOX(config, m_mathbox, 0);
+	MATHBOX(config, m_mathbox);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

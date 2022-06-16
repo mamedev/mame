@@ -23,14 +23,14 @@ class ps2_gif_device : public device_t, public device_execute_interface
 {
 public:
 	template <typename T, typename U>
-	ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gs_tag, U &&vu1_tag)
+	ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&gs_tag, U &&vu1_tag)
 		: ps2_gif_device(mconfig, tag, owner, clock)
 	{
 		m_gs.set_tag(std::forward<T>(gs_tag));
 		m_vu1.set_tag(std::forward<U>(vu1_tag));
 	}
 
-	ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_gif_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~ps2_gif_device() override;
 
 	uint32_t read(offs_t offset);

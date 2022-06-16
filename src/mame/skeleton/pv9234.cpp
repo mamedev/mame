@@ -152,7 +152,7 @@ uint32_t pv9234_state::screen_update_pv9234(screen_device &screen, bitmap_ind16 
 void pv9234_state::pv9234(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM7(config, m_maincpu, 4915000); //probably a more powerful clone.
+	ARM7(config, m_maincpu, XTAL::u(4915000)); //probably a more powerful clone.
 	m_maincpu->set_addrmap(AS_PROGRAM, &pv9234_state::pv9234_map);
 
 	/* video hardware */

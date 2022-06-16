@@ -73,12 +73,12 @@ i8251_device::i8251_device(
 {
 }
 
-i8251_device::i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8251_device::i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8251_device(mconfig, I8251, tag, owner, clock)
 {
 }
 
-v5x_scu_device::v5x_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+v5x_scu_device::v5x_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8251_device(mconfig, V5X_SCU, tag, owner, clock)
 {
 }

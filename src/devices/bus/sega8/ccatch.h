@@ -14,7 +14,7 @@ class sega8_cardcatch_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_cardcatch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_cardcatch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;

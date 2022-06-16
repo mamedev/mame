@@ -39,7 +39,7 @@ protected:
 		cpu21s
 	};
 
-	vme_fccpu20_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, fc_board_t board_id);
+	vme_fccpu20_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, fc_board_t board_id);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -92,10 +92,10 @@ private:
 class vme_fccpu20_card_device : public vme_fccpu20_device
 {
 public :
-	vme_fccpu20_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_fccpu20_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	vme_fccpu20_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	vme_fccpu20_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu20)
 	{ }
 
@@ -106,10 +106,10 @@ protected:
 class vme_fccpu21s_card_device : public vme_fccpu20_device
 {
 public :
-	vme_fccpu21s_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_fccpu21s_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	vme_fccpu21s_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	vme_fccpu21s_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu21s)
 	{ }
 
@@ -120,10 +120,10 @@ protected:
 class vme_fccpu21_card_device : public vme_fccpu20_device
 {
 public :
-	vme_fccpu21_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_fccpu21_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	vme_fccpu21_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	vme_fccpu21_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu21)
 	{ }
 
@@ -134,10 +134,10 @@ protected:
 class vme_fccpu21a_card_device : public vme_fccpu20_device
 {
 public :
-	vme_fccpu21a_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_fccpu21a_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	vme_fccpu21a_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	vme_fccpu21a_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu21a)
 	{ }
 
@@ -148,10 +148,10 @@ protected:
 class vme_fccpu21ya_card_device : public vme_fccpu20_device
 {
 public :
-	vme_fccpu21ya_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_fccpu21ya_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	vme_fccpu21ya_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	vme_fccpu21ya_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu21ya)
 	{ }
 
@@ -162,10 +162,10 @@ protected:
 class vme_fccpu21b_card_device : public vme_fccpu20_device
 {
 public :
-	vme_fccpu21b_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_fccpu21b_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	vme_fccpu21b_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	vme_fccpu21b_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu21b)
 	{ }
 
@@ -176,10 +176,10 @@ protected:
 class vme_fccpu21yb_card_device : public vme_fccpu20_device
 {
 public :
-	vme_fccpu21yb_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_fccpu21yb_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	vme_fccpu21yb_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	vme_fccpu21yb_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu21yb)
 	{ }
 

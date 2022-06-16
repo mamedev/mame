@@ -71,7 +71,7 @@ constexpr unsigned HP_NANO_IE_DC   = 7;   // DC line used as interrupt enable/ma
 class hp_nanoprocessor_device : public cpu_device
 {
 public:
-	hp_nanoprocessor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp_nanoprocessor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// DC changed callback
 	// The callback receives a 8-bit word holding the state of all DC lines.

@@ -29,7 +29,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	ss50_interface_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: ss50_interface_port_device(mconfig, tag, owner, 0)
+		: ss50_interface_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -37,7 +37,7 @@ public:
 		set_fixed(false);
 	}
 
-	ss50_interface_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	ss50_interface_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// static configuration
 	auto irq_cb() { return m_irq_cb.bind(); }

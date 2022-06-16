@@ -24,7 +24,7 @@ public:
 	virtual void set_swapped(bool swapped) { m_swap = swapped ? 3 : 0; }
 
 protected:
-	ims_cvc_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	ims_cvc_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -96,7 +96,7 @@ protected:
 class g300_device : public ims_cvc_device
 {
 public:
-	g300_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	g300_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 
@@ -115,7 +115,7 @@ private:
 class g332_device : public ims_cvc_device
 {
 public:
-	g332_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	g332_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 
@@ -168,7 +168,7 @@ public:
 	};
 
 protected:
-	g332_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	g332_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device_t overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -220,7 +220,7 @@ private:
 class g364_device : public g332_device
 {
 public:
-	g364_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	g364_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual void set_swapped(bool swapped) override { m_swap = swapped ? 7 : 0; }
 };

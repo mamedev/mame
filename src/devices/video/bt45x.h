@@ -45,7 +45,7 @@ public:
 	virtual void map(address_map &map);
 
 protected:
-	bt45x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);
+	bt45x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const u32 palette_colors, const u32 overlay_colors);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -80,7 +80,7 @@ protected:
 class bt45x_rgb_device_base : public bt45x_device_base, public device_palette_interface
 {
 protected:
-	bt45x_rgb_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);
+	bt45x_rgb_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const u32 palette_colors, const u32 overlay_colors);
 
 	virtual void device_start() override;
 
@@ -107,7 +107,7 @@ public:
 	}
 
 protected:
-	bt45x_mono_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);
+	bt45x_mono_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const u32 palette_colors, const u32 overlay_colors);
 
 	virtual void device_start() override;
 
@@ -122,7 +122,7 @@ protected:
 class bt451_device : public bt45x_rgb_device_base
 {
 public:
-	bt451_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt451_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	/*
@@ -135,7 +135,7 @@ protected:
 class bt453_device : public bt45x_rgb_device_base
 {
 public:
-	bt453_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt453_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 };
@@ -143,7 +143,7 @@ public:
 class bt454_device : public bt45x_rgb_device_base
 {
 public:
-	bt454_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt454_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 };
@@ -151,7 +151,7 @@ public:
 class bt455_device : public bt45x_mono_device_base
 {
 public:
-	bt455_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt455_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 };
@@ -159,7 +159,7 @@ public:
 class bt457_device : public bt45x_mono_device_base
 {
 public:
-	bt457_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt457_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual u8 palette_r(address_space &space) override;
@@ -173,16 +173,16 @@ protected:
 class bt458_device : public bt45x_rgb_device_base
 {
 public:
-	bt458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt458_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	bt458_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bt458_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class bt467_device : public bt458_device
 {
 public:
-	bt467_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt467_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(BT451, bt451_device)

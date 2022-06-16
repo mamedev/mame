@@ -158,12 +158,12 @@ void gscpm_state::gscpm(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("16K"); // This shadows the ROM
 
-	Z80SIO(config, m_sio, 0);
+	Z80SIO(config, m_sio);
 	m_sio->out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_sio->out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_sio->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0); // Connect interrupt pin to our Z80 INT line
 
-	clock_device &sio_clock(CLOCK(config, "sio_clock", 7'372'800));
+	clock_device &sio_clock(CLOCK(config, "sio_clock", XTAL::u(7'372'800)));
 	sio_clock.signal_handler().set("sio", FUNC(z80sio_device::txca_w));
 	sio_clock.signal_handler().append("sio", FUNC(z80sio_device::rxca_w));
 	sio_clock.signal_handler().append("sio", FUNC(z80sio_device::txcb_w));

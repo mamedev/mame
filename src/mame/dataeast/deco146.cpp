@@ -1305,7 +1305,7 @@ u8 deco_146_base_device::soundlatch_r()
 	return m_soundlatch;
 }
 
-deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+deco_146_base_device::deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	m_port_a_r(*this),
 	m_port_b_r(*this),
@@ -1412,7 +1412,7 @@ u16 deco_146_base_device::read_data_getloc(u16 address, int& location)
 DEFINE_DEVICE_TYPE(DECO146PROT, deco146_device, "deco146", "DECO 146 Protection")
 
 
-deco146_device::deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+deco146_device::deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: deco_146_base_device(mconfig, DECO146PROT, tag, owner, clock)
 {
 	m_bankswitch_swap_read_address = 0x78;

@@ -65,20 +65,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// special sample-rate values
-constexpr u32 SAMPLE_RATE_INVALID = 0xffffffff;
-constexpr u32 SAMPLE_RATE_INPUT_ADAPTIVE = 0xfffffffe;
-constexpr u32 SAMPLE_RATE_OUTPUT_ADAPTIVE = 0xfffffffd;
-
-// anything below this sample rate is effectively treated as "off"
-constexpr u32 SAMPLE_RATE_MINIMUM = 50;
-
-
-
-//**************************************************************************
 //  DEBUGGING
 //**************************************************************************
 
@@ -119,7 +105,7 @@ public:
 
 private:
 	// constructor/destructor
-	stream_buffer(u32 sample_rate = 48000);
+	stream_buffer(const XTAL &sample_rate = XTAL());
 	~stream_buffer();
 
 	// disable copying of stream_buffers directly
@@ -127,10 +113,10 @@ private:
 	stream_buffer &operator=(stream_buffer const &rhs) = delete;
 
 	// return the current sample rate
-	u32 sample_rate() const { return m_sample_rate; }
+	XTAL sample_rate() const { return m_sample_rate; }
 
 	// set a new sample rate
-	void set_sample_rate(u32 rate, bool resample);
+	void set_sample_rate(const XTAL &rate, bool resample);
 
 	// return the current sample period in attoseconds
 	attoseconds_t sample_period_attoseconds() const { return m_sample_attos; }
@@ -148,7 +134,7 @@ private:
 
 	// return the effective buffer size; currently it is a full second of audio
 	// at the current sample rate, but this maybe change in the future
-	u32 size() const { return m_sample_rate; }
+	u32 size() const { return m_sample_rate.value(); }
 
 	// read the sample at the given index (clamped); should be valid in all cases
 	sample_t get(s32 index) const
@@ -202,7 +188,7 @@ private:
 	// internal state
 	u32 m_end_second;                     // current full second of the buffer end
 	u32 m_end_sample;                     // current sample number within the final second
-	u32 m_sample_rate;                    // sample rate of the data in the buffer
+	XTAL m_sample_rate;                   // sample rate of the data in the buffer
 	attoseconds_t m_sample_attos;         // pre-computed attoseconds per sample
 	std::vector<sample_t> m_buffer;       // vector of actual buffer data
 
@@ -288,7 +274,7 @@ public:
 	sample_t gain() const { return m_gain; }
 
 	// return the sample rate of the data
-	u32 sample_rate() const { return m_buffer->sample_rate(); }
+	XTAL sample_rate() const { return m_buffer->sample_rate(); }
 
 	// return the sample period (in attoseconds) of the data
 	attoseconds_t sample_period_attoseconds() const { return m_buffer->sample_period_attoseconds(); }
@@ -492,7 +478,7 @@ public:
 	attotime end_time() const { return m_buffer.end_time(); }
 	u32 index() const { return m_index; }
 	stream_buffer::sample_t gain() const { return m_gain; }
-	u32 buffer_sample_rate() const { return m_buffer.sample_rate(); }
+	XTAL buffer_sample_rate() const { return m_buffer.sample_rate(); }
 
 	// simple setters
 	void set_gain(float gain) { m_gain = gain; }
@@ -501,7 +487,7 @@ public:
 	std::string name() const;
 
 	// handle a changing sample rate
-	void sample_rate_changed(u32 rate) { m_buffer.set_sample_rate(rate, true); }
+	void sample_rate_changed(const XTAL &rate) { m_buffer.set_sample_rate(rate, true); }
 
 	// return an output view covering a time period
 	write_stream_view view(attotime start, attotime end) { return write_stream_view(m_buffer, start, end); }
@@ -563,7 +549,7 @@ public:
 	read_stream_view update(attotime start, attotime end);
 
 	// tell inputs to apply sample rate changes
-	void apply_sample_rate_changes(u32 updatenum, u32 downstream_rate);
+	void apply_sample_rate_changes(u32 updatenum, const XTAL &downstream_rate);
 
 private:
 	// internal state
@@ -596,7 +582,15 @@ enum sound_stream_flags : u32
 
 	// specify that input streams should not be resampled; stream update handler
 	// must be able to accommodate multiple strams of differing input rates
-	STREAM_DISABLE_INPUT_RESAMPLING = 0x02
+	STREAM_DISABLE_INPUT_RESAMPLING = 0x02,
+
+	// specify that the input frequency should be set to the connected
+	// source frequency
+	SAMPLE_RATE_INPUT_ADAPTIVE = 0x04,
+
+	// specify that the output frequency should be set to the connected
+	// sink frequency
+	SAMPLE_RATE_OUTPUT_ADAPTIVE = 0x08,
 };
 
 
@@ -607,11 +601,11 @@ class sound_stream
 	friend class sound_manager;
 
 	// private common constructopr
-	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, sound_stream_flags flags);
+	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, const XTAL &sample_rate, u32 flags);
 
 public:
 	// construction/destruction
-	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags = STREAM_DEFAULT_FLAGS);
+	sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, const XTAL &sample_rate, stream_update_delegate callback, u32 flags = STREAM_DEFAULT_FLAGS);
 	virtual ~sound_stream();
 
 	// simple getters
@@ -631,13 +625,13 @@ public:
 	sound_stream_output &output(int index) { sound_assert(index >= 0 && index < m_output.size()); return m_output[index]; }
 
 	// sample rate and timing getters
-	u32 sample_rate() const { return (m_pending_sample_rate != SAMPLE_RATE_INVALID) ? m_pending_sample_rate : m_sample_rate; }
+	XTAL sample_rate() const { return m_pending_sample_rate.enabled() ? m_pending_sample_rate : m_sample_rate; }
 	attotime sample_time() const { return m_output[0].end_time(); }
 	attotime sample_period() const { return attotime(0, sample_period_attoseconds()); }
-	attoseconds_t sample_period_attoseconds() const { return (m_sample_rate != SAMPLE_RATE_INVALID) ? HZ_TO_ATTOSECONDS(m_sample_rate) : ATTOSECONDS_PER_SECOND; }
+	attoseconds_t sample_period_attoseconds() const { return m_sample_rate.enabled() ? HZ_TO_ATTOSECONDS(m_sample_rate.dvalue()) : ATTOSECONDS_PER_SECOND; }
 
 	// set the sample rate of the stream; will kick in at the next global update
-	void set_sample_rate(u32 sample_rate);
+	void set_sample_rate(const XTAL &sample_rate);
 
 	// connect the output 'outputnum' of given input_stream to this stream's input 'inputnum'
 	void set_input(int inputnum, sound_stream *input_stream, int outputnum = 0, float gain = 1.0f);
@@ -649,7 +643,7 @@ public:
 	read_stream_view update_view(attotime start, attotime end, u32 outputnum = 0);
 
 	// apply any pending sample rate changes; should only be called by the sound manager
-	void apply_sample_rate_changes(u32 updatenum, u32 downstream_rate);
+	void apply_sample_rate_changes(u32 updatenum, const XTAL &downstream_rate);
 
 #if (SOUND_DEBUG)
 	// print one level of the sound graph and recursively tell our inputs to do the same
@@ -662,7 +656,7 @@ protected:
 
 private:
 	// perform most of the initialization here
-	void init_common(u32 inputs, u32 outputs, u32 sample_rate, sound_stream_flags flags);
+	void init_common(u32 inputs, u32 outputs, const XTAL &sample_rate, u32 flags);
 
 	// if the sample rate has changed, this gets called to update internals
 	void sample_rate_changed();
@@ -687,8 +681,8 @@ private:
 	sound_stream *m_next;                          // next stream in the chain
 
 	// general information
-	u32 m_sample_rate;                             // current live sample rate
-	u32 m_pending_sample_rate;                     // pending sample rate for dynamic changes
+	XTAL m_sample_rate;                            // current live sample rate
+	XTAL m_pending_sample_rate;                    // pending sample rate for dynamic changes
 	u32 m_last_sample_rate_update;                 // update number of last sample rate change
 	bool m_input_adaptive;                         // adaptive stream that runs at the sample rate of its input
 	bool m_output_adaptive;                        // adaptive stream that runs at the sample rate of its output
@@ -771,7 +765,7 @@ public:
 	stream_buffer::sample_t compressor_scale() const { return m_compressor_scale; }
 
 	// allocate a new stream with a new-style callback
-	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags);
+	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, const XTAL &sample_rate, stream_update_delegate callback, u32 flags);
 
 	// WAV recording
 	bool is_recording() const { return bool(m_wavfile); }

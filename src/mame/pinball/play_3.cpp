@@ -538,15 +538,15 @@ void play_3_state::play_3(machine_config &config)
 	config.set_default_layout(layout_play_3);
 
 	// Devices
-	clock_device &xpoint(CLOCK(config, "xpoint", 60)); // crossing-point detector
+	clock_device &xpoint(CLOCK(config, "xpoint", XTAL::u(60))); // crossing-point detector
 	xpoint.signal_handler().set(FUNC(play_3_state::clock2_w));
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
-	TTL7474(config, m_4013a, 0);
+	TTL7474(config, m_4013a);
 	m_4013a->comp_output_cb().set(m_4013a, FUNC(ttl7474_device::d_w));
 	m_4013a->output_cb().set(m_4020, FUNC(ripple_counter_device::reset_w));
 
-	TTL7474(config, m_4013b, 0);
+	TTL7474(config, m_4013b);
 	m_4013b->output_cb().set(m_maincpu, FUNC(cosmac_device::ef2_w)).invert(); // inverted
 	m_4013b->comp_output_cb().set(m_maincpu, FUNC(cosmac_device::int_w)).invert(); // inverted
 

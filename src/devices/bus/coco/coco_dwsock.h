@@ -24,7 +24,7 @@
 class beckerport_device : public device_t
 {
 public:
-	beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~beckerport_device();
 
 	// optional information overrides

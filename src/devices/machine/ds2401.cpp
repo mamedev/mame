@@ -31,7 +31,7 @@ inline void ds2401_device::verboselog(int n_level, const char *s_fmt, ...)
 // device type definition
 DEFINE_DEVICE_TYPE(DS2401, ds2401_device, "ds2401", "DS2401 Silicon Serial Number")
 
-ds2401_device::ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ds2401_device::ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DS2401, tag, owner, clock)
 	, m_state(0)
 	, m_bit(0)

@@ -14,7 +14,7 @@ class vr0video_device : public device_t,
 						public device_video_interface
 {
 public:
-	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_areas(uint16_t *textureram, uint16_t *frameram);
 	void regs_map(address_map &map);

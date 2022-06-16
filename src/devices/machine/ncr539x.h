@@ -19,7 +19,7 @@ class ncr539x_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_callback() { return m_out_irq_cb.bind(); }
 	auto drq_callback() { return m_out_drq_cb.bind(); }

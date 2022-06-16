@@ -59,19 +59,19 @@ void arc_serial_sampler_device::device_add_mconfig(machine_config &config)
 //  arc_serial_midi_device - constructor
 //-------------------------------------------------
 
-arc_serial_midi_device::arc_serial_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+arc_serial_midi_device::arc_serial_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_archimedes_econet_interface(mconfig, *this)
 	, m_adlc(*this, "mc6854")
 {
 }
 
-arc_serial_midi_device::arc_serial_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_serial_midi_device::arc_serial_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_serial_midi_device(mconfig, ARC_SERIAL_MIDI, tag, owner, clock)
 {
 }
 
-arc_serial_sampler_device::arc_serial_sampler_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_serial_sampler_device::arc_serial_sampler_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_serial_midi_device(mconfig, ARC_SERIAL_SAMPLER, tag, owner, clock)
 {
 }

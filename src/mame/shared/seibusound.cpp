@@ -74,7 +74,7 @@
 
 DEFINE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device, "seibu_sound", "Seibu Sound System")
 
-seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEIBU_SOUND, tag, owner, clock),
 		m_int_cb(*this),
 		m_ym_read_cb(*this),
@@ -345,7 +345,7 @@ void seibu_sound_common::seibu_sound_map(address_map &map)
 
 DEFINE_DEVICE_TYPE(SEI80BU, sei80bu_device, "sei80bu", "SEI80BU Encrypted Z80 Interface")
 
-sei80bu_device::sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sei80bu_device::sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEI80BU, tag, owner, clock),
 		device_rom_interface(mconfig, *this)
 {
@@ -397,7 +397,7 @@ u8 sei80bu_device::opcode_r(offs_t offset)
 
 DEFINE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device, "seibu_adpcm", "Seibu ADPCM interface")
 
-seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEIBU_ADPCM, tag, owner, clock)
 	, m_msm(*this, finder_base::DUMMY_TAG)
 	, m_current(0)

@@ -26,10 +26,10 @@ class coco_midi_device :
 {
 	public:
 		// construction/destruction
-		coco_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+		coco_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	protected:
-		coco_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+		coco_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 		virtual void device_start() override;
 
 		// optional information overrides
@@ -45,14 +45,14 @@ class dragon_midi_device : public coco_midi_device
 {
 	public:
 		// construction/destruction
-		dragon_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+		dragon_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	protected:
-		dragon_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+		dragon_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 		virtual void device_start() override;
 };
 
-coco_midi_device::coco_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+coco_midi_device::coco_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, type, tag, owner, clock)
 		, device_cococart_interface(mconfig, *this )
 		, m_acia(*this, "mc6850")
@@ -60,7 +60,7 @@ coco_midi_device::coco_midi_device(const machine_config &mconfig, device_type ty
 {
 }
 
-coco_midi_device::coco_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_midi_device::coco_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: coco_midi_device(mconfig, COCO_MIDI, tag, owner, clock)
 {
 }
@@ -76,7 +76,7 @@ void coco_midi_device::device_add_mconfig(machine_config &config)
 	MIDI_PORT(config, m_mdthru, midiout_slot, "midiout");
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(31250*16)));
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 }
@@ -93,12 +93,12 @@ WRITE_LINE_MEMBER(coco_midi_device::acia_irq_w)
 	set_line_value(line::CART, state == 0);
 }
 
-dragon_midi_device::dragon_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+dragon_midi_device::dragon_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: coco_midi_device(mconfig, type, tag, owner, clock)
 {
 }
 
-dragon_midi_device::dragon_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dragon_midi_device::dragon_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dragon_midi_device(mconfig, DRAGON_MIDI, tag, owner, clock)
 {
 }

@@ -12,7 +12,7 @@
 
 DEFINE_DEVICE_TYPE(MSM5232, msm5232_device, "msm5232", "MSM5232")
 
-msm5232_device::msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msm5232_device::msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSM5232, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)

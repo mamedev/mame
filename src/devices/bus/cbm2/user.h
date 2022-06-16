@@ -73,14 +73,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: cbm2_user_port_device(mconfig, tag, owner, 0)
+		: cbm2_user_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto irq_callback() { return m_write_irq.bind(); }
 	auto sp_callback() { return m_write_sp.bind(); }

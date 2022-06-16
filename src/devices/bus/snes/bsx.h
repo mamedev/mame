@@ -15,7 +15,7 @@ class sns_rom_bsx_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_bsx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_bsx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// additional reading and writing
 	virtual uint8_t read_l(offs_t offset) override;
@@ -47,7 +47,7 @@ protected:
 		running_machine& m_machine;
 	};
 
-	sns_rom_bsx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_bsx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -81,7 +81,7 @@ class sns_rom_bsxlo_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_bsxlo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_bsxlo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// additional reading and writing
 	virtual uint8_t read_l(offs_t offset) override;
@@ -103,7 +103,7 @@ class sns_rom_bsxhi_device : public sns_rom21_device
 {
 public:
 	// construction/destruction
-	sns_rom_bsxhi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_bsxhi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// additional reading and writing
 	virtual uint8_t read_l(offs_t offset) override;
@@ -126,7 +126,7 @@ class sns_rom_bsmempak_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_bsmempak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_bsmempak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// additional reading and writing
 	virtual uint8_t read_l(offs_t offset) override;

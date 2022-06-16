@@ -42,12 +42,12 @@ DEFINE_DEVICE_TYPE(IREM_M37B_UE17B_AUDIO,  irem_m37b_ue17b_audio_device, "irem_m
 DEFINE_DEVICE_TYPE(DEMONEYE_AUDIO,         demoneye_audio_device,        "demoneye_audio",        "Irem Demoneye-X audio")
 
 
-irem_m37b_audio_device::irem_m37b_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock) :
+irem_m37b_audio_device::irem_m37b_audio_device(const machine_config &config, const char *tag, device_t *owner, const XTAL &clock) :
 	irem_m37b_audio_device(config, IREM_M37B_AUDIO, tag, owner, clock)
 {
 }
 
-irem_m37b_audio_device::irem_m37b_audio_device(const machine_config &config, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+irem_m37b_audio_device::irem_m37b_audio_device(const machine_config &config, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(config, type, tag, owner, clock),
 	m_audiocpu(*this, "audiocpu"),
 	m_ay8910(*this, "aysnd"),
@@ -56,13 +56,13 @@ irem_m37b_audio_device::irem_m37b_audio_device(const machine_config &config, dev
 }
 
 
-panther_audio_device::panther_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock) :
+panther_audio_device::panther_audio_device(const machine_config &config, const char *tag, device_t *owner, const XTAL &clock) :
 	irem_m37b_audio_device(config, PANTHER_AUDIO, tag, owner, clock)
 {
 }
 
 
-irem_m37b_ue17b_audio_device::irem_m37b_ue17b_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock) :
+irem_m37b_ue17b_audio_device::irem_m37b_ue17b_audio_device(const machine_config &config, const char *tag, device_t *owner, const XTAL &clock) :
 	irem_m37b_audio_device(config, IREM_M37B_UE17B_AUDIO, tag, owner, clock),
 	m_voicecpu(*this, "voice"),
 	m_soundlatch2(*this, "soundlatch2")
@@ -70,7 +70,7 @@ irem_m37b_ue17b_audio_device::irem_m37b_ue17b_audio_device(const machine_config 
 }
 
 
-demoneye_audio_device::demoneye_audio_device(const machine_config &config, const char *tag, device_t *owner, uint32_t clock) :
+demoneye_audio_device::demoneye_audio_device(const machine_config &config, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(config, DEMONEYE_AUDIO, tag, owner, clock),
 	m_audiocpu(*this, "audiocpu"),
 	m_ay(*this, "ay%u", 1U),

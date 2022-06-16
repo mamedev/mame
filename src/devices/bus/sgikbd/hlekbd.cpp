@@ -160,7 +160,7 @@ INPUT_PORTS_END
 
 } // anonymous namespace
 
-hle_device::hle_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+hle_device::hle_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SGI_HLE_KEYBOARD, tag, owner, clock)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_sgi_keyboard_port_interface(mconfig, *this)

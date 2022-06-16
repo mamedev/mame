@@ -665,7 +665,7 @@ INPUT_PORTS_END
 void ecoinf3_state::ecoinf3_pyramid(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80180(config, m_maincpu, 8000000); // certainly not a plain z80 at least, invalid opcodes for that
+	Z80180(config, m_maincpu, XTAL::u(8000000)); // certainly not a plain z80 at least, invalid opcodes for that
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinf3_state::pyramid_memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinf3_state::pyramid_portmap);
 
@@ -673,7 +673,7 @@ void ecoinf3_state::ecoinf3_pyramid(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 0.30); // no idea what the sound chip is, this sounds terrible
+	SN76489(config, "sn1", XTAL::u(4000000)).add_route(ALL_OUTPUTS, "mono", 0.30); // no idea what the sound chip is, this sounds terrible
 
 	i8255_device &ppia(I8255(config, "ppi8255_a"));
 	ppia.in_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_a_read_a));

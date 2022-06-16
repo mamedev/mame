@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(C64_EXOS, c64_exos_cartridge_device, "c64_exos", "C64 ExOS ca
 //  c64_exos_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_exos_cartridge_device::c64_exos_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_exos_cartridge_device::c64_exos_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_EXOS, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {

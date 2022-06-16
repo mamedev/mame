@@ -12,7 +12,7 @@ class bfm_adder2_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
-	bfm_adder2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bfm_adder2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void vid_uart_tx_w(uint8_t data);
 	void vid_uart_ctrl_w(uint8_t data);

@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(VIC10_MULTIMAX, vic10_multimax_device, "vic10_multimax", "VIC
 //  vic10_multimax_device - constructor
 //-------------------------------------------------
 
-vic10_multimax_device::vic10_multimax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vic10_multimax_device::vic10_multimax_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VIC10_MULTIMAX, tag, owner, clock), device_vic10_expansion_card_interface(mconfig, *this),
 	m_latch(0)
 {

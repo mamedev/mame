@@ -50,7 +50,7 @@ class icm7170_device :  public device_t,
 {
 public:
 	// construction/destruction
-	icm7170_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	icm7170_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq() { return m_out_irq_cb.bind(); }
 

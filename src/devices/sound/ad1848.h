@@ -11,7 +11,7 @@
 class ad1848_device : public device_t
 {
 public:
-	ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq() { return m_irq_cb.bind(); }
 	auto drq() { return m_drq_cb.bind(); }

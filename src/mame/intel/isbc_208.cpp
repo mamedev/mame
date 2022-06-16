@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(ISBC_208, isbc_208_device, "isbc_208", "ISBC 208 Flexible Disk Driver Controller")
 
-isbc_208_device::isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isbc_208_device::isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISBC_208, tag, owner, clock),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_dmac(*this, "dmac"),
@@ -115,7 +115,7 @@ void isbc_208_device::device_reset()
 	m_seg = 0;
 	// set from jumper all drives must be same type
 	if(m_fdc->subdevice<floppy_connector>("0")->get_device()->get_form_factor() == floppy_image::FF_8)
-		m_fdc->set_rate(500000);
+		m_fdc->set_rate(XTAL::u(500000));
 }
 
 void isbc_208_device::device_start()

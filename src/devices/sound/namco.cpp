@@ -49,7 +49,7 @@ DEFINE_DEVICE_TYPE(NAMCO,       namco_device,       "namco",       "Namco")
 DEFINE_DEVICE_TYPE(NAMCO_15XX,  namco_15xx_device,  "namco_15xx",  "Namco 15xx")
 DEFINE_DEVICE_TYPE(NAMCO_CUS30, namco_cus30_device, "namco_cus30", "Namco CUS30")
 
-namco_audio_device::namco_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+namco_audio_device::namco_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_wave_ptr(*this, DEVICE_SELF)
@@ -66,19 +66,19 @@ namco_audio_device::namco_audio_device(const machine_config &mconfig, device_typ
 {
 }
 
-namco_device::namco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco_device::namco_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: namco_audio_device(mconfig, NAMCO, tag, owner, clock)
 	, m_soundregs(nullptr)
 {
 }
 
-namco_15xx_device::namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco_15xx_device::namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	:namco_audio_device(mconfig, NAMCO_15XX, tag, owner, clock)
 	, m_soundregs(nullptr)
 {
 }
 
-namco_cus30_device::namco_cus30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namco_cus30_device::namco_cus30_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: namco_audio_device(mconfig, NAMCO_CUS30, tag, owner, clock)
 {
 }

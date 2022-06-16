@@ -720,7 +720,7 @@ void base_state::common(machine_config &config)
 	SN76489(config, "sn2", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.30); // divider unknown
 	SN76489(config, "sn3", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.30); // divider unknown
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_callback().set(FUNC(base_state::adpcm_int));
 	m_msm->set_prescaler_selector(msm5205_device::S64_4B); // 6KHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);

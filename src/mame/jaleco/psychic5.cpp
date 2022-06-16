@@ -745,7 +745,7 @@ void psychic5_state::psychic5(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psychic5);
 	PALETTE(config, m_palette).set_entries(768);
 
-	JALECO_BLEND(config, m_blend, 0);
+	JALECO_BLEND(config, m_blend);
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,psychic5)
 

@@ -66,7 +66,7 @@ DEFINE_DEVICE_TYPE(MAC_SCSI_HELPER, mac_scsi_helper_device, "scsipdma", "Mac 538
 
 ALLOW_SAVE_TYPE(mac_scsi_helper_device::mode);
 
-mac_scsi_helper_device::mac_scsi_helper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mac_scsi_helper_device::mac_scsi_helper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MAC_SCSI_HELPER, tag, owner, clock)
 	, m_scsi_read_callback(*this)
 	, m_scsi_write_callback(*this)

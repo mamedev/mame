@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "jvsdev.h"
 
-jvs_device::jvs_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+jvs_device::jvs_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock), jvs_outputs(0), host(*this, finder_base::DUMMY_TAG), jvs_address(0), jvs_reset_counter(0)
 {
 	next_device = nullptr;

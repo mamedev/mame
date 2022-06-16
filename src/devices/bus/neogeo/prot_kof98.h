@@ -14,7 +14,7 @@ class kof98_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
 	void protection_w(uint16_t data);

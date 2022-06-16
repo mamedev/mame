@@ -424,7 +424,7 @@ INPUT_PORTS_END
 void lviv_state::lviv(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 2500000);
+	I8080(config, m_maincpu, XTAL::u(2500000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &lviv_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &lviv_state::io_map);
 	config.set_maximum_quantum(attotime::from_hz(60));

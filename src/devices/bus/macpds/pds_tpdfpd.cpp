@@ -82,12 +82,12 @@ const tiny_rom_entry *macpds_sedisplay_device::device_rom_region() const
 //  macpds_sedisplay_device - constructor
 //-------------------------------------------------
 
-macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	macpds_sedisplay_device(mconfig, PDS_SEDISPLAY, tag, owner, clock)
 {
 }
 
-macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_macpds_card_interface(mconfig, *this),

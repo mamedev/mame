@@ -95,7 +95,7 @@ namespace bus::ti99::peb {
 /*
    Constructor for the HFDC card.
 */
-myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock):
 	device_t(mconfig, TI99_HFDC, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_motor_on_timer(nullptr),
@@ -1070,7 +1070,7 @@ ROM_END
 
 void myarc_hfdc_device::device_add_mconfig(machine_config& config)
 {
-	HDC9234(config, m_hdc9234, 0);
+	HDC9234(config, m_hdc9234);
 	m_hdc9234->intrq_cb().set(FUNC(myarc_hfdc_device::intrq_w));
 	m_hdc9234->dmarq_cb().set(FUNC(myarc_hfdc_device::dmarq_w));
 	m_hdc9234->dip_cb().set(FUNC(myarc_hfdc_device::dip_w));
@@ -1089,7 +1089,7 @@ void myarc_hfdc_device::device_add_mconfig(machine_config& config)
 	MFM_HD_CONNECTOR(config, "h2", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
 	MFM_HD_CONNECTOR(config, "h3", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
 
-	MM58274C(config, CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
+	MM58274C(config, CLOCK_TAG).set_mode_and_day(1, 0); // 24h, sunday
 
 	RAM(config, BUFFER).set_default_size("32K").set_default_value(0);
 }

@@ -466,7 +466,7 @@ static void arcadia_cart(device_slot_interface &device)
 void arcadia_state::arcadia(machine_config &config)
 {
 	/* basic machine hardware */
-	S2650(config, m_maincpu, 3580000/4); /* 0.895 MHz */
+	S2650(config, m_maincpu, XTAL::u(3580000)/4); /* 0.895 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &arcadia_state::arcadia_mem);
 	m_maincpu->sense_handler().set(FUNC(arcadia_state::vsync_r));
 	m_maincpu->set_periodic_int(FUNC(arcadia_state::video_line), attotime::from_hz(262*60));

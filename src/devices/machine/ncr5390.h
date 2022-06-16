@@ -10,7 +10,7 @@
 class ncr5390_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
-	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq_handler_cb() { return m_irq_handler.bind(); }
@@ -48,7 +48,7 @@ public:
 	void dma_w(uint8_t val);
 
 protected:
-	ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -240,7 +240,7 @@ protected:
 class ncr53c90a_device : public ncr5390_device
 {
 public:
-	ncr53c90a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ncr53c90a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 
@@ -253,7 +253,7 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
-	ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -284,7 +284,7 @@ private:
 class ncr53c94_device : public ncr53c90a_device
 {
 public:
-	ncr53c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ncr53c94_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	enum busmd_t : u8
 	{
@@ -308,7 +308,7 @@ public:
 	void dma16_w(u16 data);
 
 protected:
-	ncr53c94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ncr53c94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	enum conf3_mask : u8
 	{
@@ -330,7 +330,7 @@ private:
 class ncr53cf94_device : public ncr53c94_device
 {
 public:
-	ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(NCR5390, ncr5390_device)

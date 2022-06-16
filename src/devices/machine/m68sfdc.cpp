@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "m68sfdc.h"
 
-m68sfdc_device::m68sfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m68sfdc_device::m68sfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, M68SFDC, tag, owner, clock),
 	m_pia(*this, "pia"),
 	m_ssda(*this, "ssda"),
@@ -835,7 +835,7 @@ bool m68sfdc_device::pll_write_next_bit(bool bit, attotime &tm, floppy_image_dev
 
 void m68sfdc_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(m68sfdc_device::pia_pa_r));
 	m_pia->writepa_handler().set(FUNC(m68sfdc_device::pia_pa_w));
 	m_pia->ca1_w(0);
@@ -847,7 +847,7 @@ void m68sfdc_device::device_add_mconfig(machine_config &config)
 	m_pia->irqa_handler().set(FUNC(m68sfdc_device::handle_nmi));
 	m_pia->irqb_handler().set(FUNC(m68sfdc_device::handle_irq));
 
-	MC6852(config, m_ssda, 0);
+	MC6852(config, m_ssda);
 }
 
 DEFINE_DEVICE_TYPE(M68SFDC, m68sfdc_device, "m68sfdc", "M68SFDC")

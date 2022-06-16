@@ -404,7 +404,7 @@ void cpu09_state::cpu09(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_r").configure_periodic(FUNC(cpu09_state::kansas_r), attotime::from_hz(19200));
 
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpa_handler().set(FUNC(cpu09_state::pa_r));
 	m_pia0->ca1_w(0);
 	m_pia0->writepa_handler().set(FUNC(cpu09_state::pa_w));
@@ -412,13 +412,13 @@ void cpu09_state::cpu09(machine_config &config)
 
 	PTM6840(config, m_ptm, 4_MHz_XTAL / 4);
 	// all i/o lines connect to the 40-pin expansion connector
-	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->set_external_clocks(XTAL(), XTAL(), XTAL());
 	m_ptm->o1_callback().set("acia", FUNC(acia6850_device::write_txc));
 	m_ptm->o1_callback().append("acia", FUNC(acia6850_device::write_rxc));
 	m_ptm->o2_callback().set_inputline("maincpu", INPUT_LINE_NMI);
 	m_ptm->irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
@@ -445,21 +445,21 @@ void ivg09_state::ivg09(machine_config &config)
 	PALETTE(config, m_palette, FUNC(ivg09_state::ivg09_palette), 3);
 
 	/* sound hardware */
-	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
+	BEEP(config, m_beep, XTAL::u(950)).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
 	subdevice<rs232_port_device>("rs232")->set_default_option(nullptr);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(ivg09_state::kbd_put));
 
-	MC6845(config, m_crtc, 1008000); // unknown clock
+	MC6845(config, m_crtc, XTAL::u(1008000)); // unknown clock
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(ivg09_state::crtc_update_row));
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpb_handler().set(FUNC(ivg09_state::pb_ivg_r));
 	m_pia1->writepa_handler().set(FUNC(ivg09_state::pa_ivg_w));
 	m_pia1->cb2_handler().set(m_beep, FUNC(beep_device::set_state));

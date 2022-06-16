@@ -18,7 +18,7 @@ class ym3806_device : public ymfm_device_base<ymfm::ym3806>
 {
 public:
 	// constructor
-	ym3806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym3806_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -30,7 +30,7 @@ class ym3533_device : public ymfm_device_base<ymfm::ym3533>
 {
 public:
 	// constructor
-	ym3533_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym3533_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 #endif // MAME_SOUND_YMOPQ_H

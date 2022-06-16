@@ -42,7 +42,7 @@ DECLARE_DEVICE_TYPE(NEOGEO_ROM, neogeo_rom_device)
 class neogeo_vliner_cart_device : public neogeo_rom_device
 {
 public:
-	neogeo_vliner_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_vliner_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint16_t ram_r(offs_t offset) override { return m_cart_ram[offset]; }
 	virtual void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override { COMBINE_DATA(&m_cart_ram[offset]); }

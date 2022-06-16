@@ -28,12 +28,12 @@ class tmc0430_device : public device_t
 {
 public:
 	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *regionname, int offset, int ident) :
-		tmc0430_device(mconfig, tag, owner, 0)
+		tmc0430_device(mconfig, tag, owner)
 	{
 		set_region_and_ident(regionname, offset, ident);
 	}
 
-	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto ready_cb() { return m_gromready.bind(); }
 

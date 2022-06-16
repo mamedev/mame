@@ -27,7 +27,7 @@ class vtech_joystick_interface_device : public vtech_ioexp_device
 {
 public:
 	// construction/destruction
-	vtech_joystick_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_joystick_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t joystick_r(offs_t offset);
 

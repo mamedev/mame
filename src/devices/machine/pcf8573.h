@@ -46,7 +46,7 @@ class pcf8573_device :
 	public device_rtc_interface
 {
 public:
-	pcf8573_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcf8573_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto comp_cb() { return m_comp_cb.bind(); }
 	auto min_cb() { return m_min_cb.bind(); }

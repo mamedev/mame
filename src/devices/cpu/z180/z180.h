@@ -126,7 +126,7 @@ public:
 
 protected:
 	// construction/destruction
-	z180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extended_io, address_map_constructor internal_map);
+	z180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool extended_io, address_map_constructor internal_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -1810,24 +1810,24 @@ class z80180_device : public z180_device
 {
 public:
 	// construction/destruction
-	z80180_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80180_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class hd64180rp_device : public z180_device
 {
 public:
 	// construction/destruction
-	hd64180rp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd64180rp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class z8s180_device : public z180_device
 {
 public:
 	// construction/destruction
-	z8s180_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z8s180_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	z8s180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	z8s180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -1851,7 +1851,7 @@ class z80182_device : public z8s180_device
 {
 public:
 	// construction/destruction
-	z80182_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80182_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(Z80180, z80180_device)

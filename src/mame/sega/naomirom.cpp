@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(NAOMI_ROM_BOARD, naomi_rom_board, "naomi_rom_board", "Sega NAOMI ROM Board")
 
-naomi_rom_board::naomi_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+naomi_rom_board::naomi_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: naomi_board(mconfig, NAOMI_ROM_BOARD, tag, owner, clock)
 	, m_region(*this, DEVICE_SELF)
 {

@@ -48,7 +48,7 @@ device_bbc_cart_interface::~device_bbc_cart_interface()
 //-------------------------------------------------
 //  bbc_cartslot_device - constructor
 //-------------------------------------------------
-bbc_cartslot_device::bbc_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bbc_cartslot_device::bbc_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	electron_cartslot_device(mconfig, BBCM_CARTSLOT, tag, owner, clock)
 {
 }

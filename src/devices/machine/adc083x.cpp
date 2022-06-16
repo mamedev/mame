@@ -53,7 +53,7 @@ DEFINE_DEVICE_TYPE(ADC0832, adc0832_device, "adc0832", "ADC0832 A/D Converter")
 DEFINE_DEVICE_TYPE(ADC0834, adc0834_device, "adc0834", "ADC0834 A/D Converter")
 DEFINE_DEVICE_TYPE(ADC0838, adc0838_device, "adc0838", "ADC0838 A/D Converter")
 
-adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t mux_bits) :
+adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t mux_bits) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_mux_bits(mux_bits),
 	m_cs(0),
@@ -72,22 +72,22 @@ adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-adc0831_device::adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adc0831_device::adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adc083x_device(mconfig, ADC0831, tag, owner, clock, 0)
 {
 }
 
-adc0832_device::adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adc0832_device::adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adc083x_device(mconfig, ADC0832, tag, owner, clock, 2)
 {
 }
 
-adc0834_device::adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adc0834_device::adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adc083x_device(mconfig, ADC0834, tag, owner, clock, 3)
 {
 }
 
-adc0838_device::adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adc0838_device::adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adc083x_device(mconfig, ADC0838, tag, owner, clock, 4)
 {
 }

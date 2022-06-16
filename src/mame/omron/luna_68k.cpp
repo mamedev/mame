@@ -150,9 +150,9 @@ void luna_68k_state::luna(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("16M");
 
-	DS1287(config, m_rtc, 32'768);
+	DS1287(config, m_rtc, XTAL::u(32'768));
 
-	UPD7201(config, m_sio, 9'830'000); // D9.83B0
+	UPD7201(config, m_sio, XTAL::u(9'830'000)); // D9.83B0
 
 	// console
 	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
@@ -171,7 +171,7 @@ void luna_68k_state::luna(machine_config &config)
 	m_serial[1]->rxd_handler().set(m_sio, FUNC(upd7201_device::rxb_w));
 	m_serial[1]->cts_handler().set(m_sio, FUNC(upd7201_device::ctsb_w));
 
-	AM9513(config, m_stc, 9'830'000); // FIXME: clock? sources?
+	AM9513(config, m_stc, XTAL::u(9'830'000)); // FIXME: clock? sources?
 	m_stc->fout_cb().set(m_stc, FUNC(am9513_device::gate1_w)); // assumption based on a common configuration
 	m_stc->out4_cb().set(m_sio, FUNC(upd7201_device::rxca_w));
 	m_stc->out4_cb().append(m_sio, FUNC(upd7201_device::txca_w));

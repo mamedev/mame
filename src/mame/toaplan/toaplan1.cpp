@@ -1968,7 +1968,7 @@ void toaplan1_rallybik_state::rallybik(machine_config &config)
 	m_screen->set_screen_update(FUNC(toaplan1_rallybik_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(toaplan1_rallybik_state::screen_vblank));
 
-	TOAPLAN_SCU(config, m_spritegen, 0);
+	TOAPLAN_SCU(config, m_spritegen);
 	m_spritegen->set_screen(m_screen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_xoffsets(31, 15);

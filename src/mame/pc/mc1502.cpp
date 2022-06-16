@@ -348,7 +348,7 @@ void mc1502_state::mc1502(machine_config &config)
 	m_ppi8255n2->in_pc_callback().set("cent_status_in", FUNC(input_buffer_device::read));
 	m_ppi8255n2->out_pc_callback().set(FUNC(mc1502_state::mc1502_kppi_portc_w));
 
-	I8251(config, m_upd8251, 0);
+	I8251(config, m_upd8251);
 	m_upd8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_upd8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_upd8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -361,7 +361,7 @@ void mc1502_state::mc1502(machine_config &config)
 	rs232.dsr_handler().set(m_upd8251, FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set(m_upd8251, FUNC(i8251_device::write_cts));
 
-	isa8_device &isa(ISA8(config, "isa", 0));
+	isa8_device &isa(ISA8(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 	isa.irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
@@ -372,9 +372,9 @@ void mc1502_state::mc1502(machine_config &config)
 	isa.irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 	isa.iochrdy_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	ISA8_SLOT(config, "board0", 0, "isa", mc1502_isa8_cards, "cga_mc1502", true); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, "isa", mc1502_isa8_cards, "fdc", false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
-	ISA8_SLOT(config, "isa2", 0, "isa", mc1502_isa8_cards, "rom", false).set_option_machine_config("fdc", [this](device_t* device) { fdc_config(device); });
+	ISA8_SLOT(config, "board0", "isa", mc1502_isa8_cards, "cga_mc1502", true); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", "isa", mc1502_isa8_cards, "fdc", false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa2", "isa", mc1502_isa8_cards, "rom", false).set_option_machine_config("fdc", [this](device_t* device) { fdc_config(device); });
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -482,5 +482,5 @@ ROM_END
 ***************************************************************************/
 
 //     YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT         COMPANY               FULLNAME               FLAGS
-COMP ( 1989, mc1502, 0,      0,      mc1502,  mc1502,  mc1502_state, init_mc1502, "NPO Microprocessor", "Elektronika MS 1502", MACHINE_IMPERFECT_GRAPHICS )
+COMP ( 1989, mc1502,      0,      mc1502,  mc1502,  mc1502_state, init_mc1502, "NPO Microprocessor", "Elektronika MS 1502", MACHINE_IMPERFECT_GRAPHICS )
 COMP ( 1988, pk88,   0,      0,      mc1502,  mc1502,  mc1502_state, init_mc1502, "NPO Microprocessor", "Elektronika PK-88",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

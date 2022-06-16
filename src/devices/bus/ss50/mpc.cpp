@@ -24,7 +24,7 @@ class ss50_mpc_device : public device_t, public ss50_card_interface
 {
 public:
 	// construction/destruction
-	ss50_mpc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	ss50_mpc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, SS50_MPC, tag, owner, clock)
 		, ss50_card_interface(mconfig, *this)
 		, m_pia(*this, "pia")
@@ -101,7 +101,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void ss50_mpc_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0); // actually MC6820
+	PIA6821(config, m_pia); // actually MC6820
 	m_pia->writepa_handler().set("outgate", FUNC(input_merger_device::in_w<0>)).bit(0);
 	m_pia->cb2_handler().set(FUNC(ss50_mpc_device::reader_control_w));
 	m_pia->readpb_handler().set_ioport("STOP").mask(0x01).lshift(6);

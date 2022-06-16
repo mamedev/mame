@@ -31,7 +31,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(DS1994, ds1994_device, "ds1994", "DS1994 iButton 4Kb Memory Plus Time")
 
-ds1994_device::ds1994_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ds1994_device::ds1994_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DS1994, tag, owner, clock), device_nvram_interface(mconfig, *this)
 	, m_timer_main(nullptr)
 	, m_timer_reset(nullptr)

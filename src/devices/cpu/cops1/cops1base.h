@@ -67,7 +67,7 @@ public:
 
 protected:
 	// construction/destruction
-	cops1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	cops1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	// device-level overrides
 	virtual void device_start() override;

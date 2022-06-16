@@ -231,7 +231,7 @@ void aquarium_state::aquarium(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &aquarium_state::snd_portmap);
 
 	// Is this the actual IC type? Some other Excellent games from this period use a MAX693.
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -245,7 +245,7 @@ void aquarium_state::aquarium(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarium);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x1000/2);
 
-	EXCELLENT_SPRITE(config, m_sprgen, 0);
+	EXCELLENT_SPRITE(config, m_sprgen);
 	m_sprgen->set_palette(m_palette);
 	m_sprgen->set_color_base(0x300);
 	m_sprgen->set_colpri_callback(FUNC(aquarium_state::aquarium_colpri_cb));

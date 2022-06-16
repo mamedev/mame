@@ -15,7 +15,7 @@ class speechrom_device : public device_t
 {
 public:
 	// construction/destruction
-	speechrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	speechrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	/// TODO: implement bus behaviour
 	int read(int count);

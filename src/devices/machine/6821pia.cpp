@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(PIA6821, pia6821_device, "pia6821", "6821 PIA")
 //  pia6821_device - constructor
 //-------------------------------------------------
 
-pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PIA6821, tag, owner, clock),
 		m_in_a_handler(*this),
 		m_in_b_handler(*this),

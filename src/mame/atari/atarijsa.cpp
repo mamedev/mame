@@ -234,7 +234,7 @@ INPUT_PORTS_END
 //  atari_jsa_base_device - constructor
 //-------------------------------------------------
 
-atari_jsa_base_device::atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels)
+atari_jsa_base_device::atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, const XTAL &clock, int channels)
 	: device_t(mconfig, devtype, tag, owner, clock),
 		device_mixer_interface(mconfig, *this, channels),
 		m_soundcomm(*this, "soundcomm"),
@@ -430,7 +430,7 @@ void atari_jsa_base_device::update_sound_irq()
 //  atari_jsa_oki_base_device: Constructor
 //-------------------------------------------------
 
-atari_jsa_oki_base_device::atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels)
+atari_jsa_oki_base_device::atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, const XTAL &clock, int channels)
 	: atari_jsa_base_device(mconfig, devtype, tag, owner, clock, channels),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
@@ -647,7 +647,7 @@ void atari_jsa_oki_base_device::update_all_volumes()
 //  atari_jsa_i_device: Constructor
 //-------------------------------------------------
 
-atari_jsa_i_device::atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+atari_jsa_i_device::atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: atari_jsa_base_device(mconfig, ATARI_JSA_I, tag, owner, clock, 2),
 		m_pokey(*this, "pokey"),
 		m_tms5220(*this, "tms"),
@@ -882,7 +882,7 @@ void atari_jsa_i_device::update_all_volumes()
 //  atari_jsa_ii_device: Constructor
 //-------------------------------------------------
 
-atari_jsa_ii_device::atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+atari_jsa_ii_device::atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: atari_jsa_oki_base_device(mconfig, ATARI_JSA_II, tag, owner, clock, 1)
 	, m_jsaii(*this, "JSAII")
 {
@@ -961,12 +961,12 @@ ioport_constructor atari_jsa_ii_device::device_input_ports() const
 //  atari_jsa_iii_device: Constructor
 //-------------------------------------------------
 
-atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: atari_jsa_iii_device(mconfig, ATARI_JSA_III, tag, owner, clock, 1)
 {
 }
 
-atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels)
+atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, const XTAL &clock, int channels)
 	: atari_jsa_oki_base_device(mconfig, devtype, tag, owner, clock, channels)
 	, m_jsaiii(*this, "JSAIII")
 {
@@ -1045,7 +1045,7 @@ ioport_constructor atari_jsa_iii_device::device_input_ports() const
 //  atari_jsa_iiis_device: Constructor
 //-------------------------------------------------
 
-atari_jsa_iiis_device::atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+atari_jsa_iiis_device::atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: atari_jsa_iii_device(mconfig, ATARI_JSA_IIIS, tag, owner, clock, 2)
 {
 }

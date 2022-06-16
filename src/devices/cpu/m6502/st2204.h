@@ -30,12 +30,12 @@ public:
 		ST_DMD
 	};
 
-	st2204_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	st2204_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto dac_callback() { return m_dac_callback.bind(); }
 
 protected:
-	st2204_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor int_map);
+	st2204_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor int_map);
 
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -148,7 +148,7 @@ private:
 class st2202_device : public st2204_device
 {
 public:
-	st2202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	st2202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual u8 st2xxx_misc_mask() const override { return 0x0f; }

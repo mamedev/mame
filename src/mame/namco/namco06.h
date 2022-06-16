@@ -10,7 +10,7 @@
 class namco_06xx_device : public device_t
 {
 public:
-	namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_maincpu(T &&tag) { m_nmicpu.set_tag(std::forward<T>(tag)); }
 

@@ -140,7 +140,7 @@ void v102_state::v102(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(18.575_MHz_XTAL / 6);
 	pit.set_clk<1>(18.575_MHz_XTAL / 6);
 	pit.set_clk<2>(18.575_MHz_XTAL / 6);

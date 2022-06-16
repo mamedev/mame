@@ -65,7 +65,7 @@ public:
 	// construction/destruction
 	template <typename T, typename U>
 	ecbbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bustag, int num, U &&opts, char const *dflt)
-		: ecbbus_slot_device(mconfig, tag, owner, 0)
+		: ecbbus_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -74,7 +74,7 @@ public:
 		set_ecbbus_slot(std::forward<T>(bustag), num);
 	}
 
-	ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -103,7 +103,7 @@ class ecbbus_device : public device_t
 {
 public:
 	// construction/destruction
-	ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto irq_wr_callback() { return m_write_irq.bind(); }
 	auto nmi_wr_callback() { return m_write_nmi.bind(); }

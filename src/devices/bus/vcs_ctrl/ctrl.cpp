@@ -43,7 +43,7 @@ device_vcs_control_port_interface::device_vcs_control_port_interface(const machi
 //  vcs_control_port_device - constructor
 //-------------------------------------------------
 
-vcs_control_port_device::vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vcs_control_port_device::vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VCS_CONTROL_PORT, tag, owner, clock),
 	device_slot_interface(mconfig, *this), m_device(nullptr),
 	m_write_trigger(*this)

@@ -11,7 +11,7 @@
 class uts_extw_keyboard_device : public device_t, public device_uts_keyboard_interface
 {
 public:
-	uts_extw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	uts_extw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(ready_w) override;

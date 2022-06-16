@@ -260,7 +260,7 @@ static void junior80_floppies(device_slot_interface &device)
 void junior80_state::junior80(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2'500'000);  // 2.5 or 4MHz selectable by jumpers
+	Z80(config, m_maincpu, XTAL::u(2'500'000));  // 2.5 or 4MHz selectable by jumpers
 	m_maincpu->set_addrmap(AS_PROGRAM, &junior80_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &junior80_state::io_map);
 
@@ -269,13 +269,13 @@ void junior80_state::junior80(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", junior80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", junior80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	Z80PIO(config, m_pio, 0);
-	Z80SIO(config, m_uart, 0);
-	Z80CTC(config, m_ctc, 0);
-	PIT8253(config, m_pit, 0);
-	I8255(config, m_ppi, 0);
+	Z80PIO(config, m_pio);
+	Z80SIO(config, m_uart);
+	Z80CTC(config, m_ctc);
+	PIT8253(config, m_pit);
+	I8255(config, m_ppi);
 
-	I8257(config, m_dma, 0);
+	I8257(config, m_dma);
 	//m_dma->out_hrq_cb().set(FUNC(junior80_state::hrq_w));
 	//m_dma->in_memr_cb().set(FUNC(junior80_state::memory_r));
 	//m_dma->out_memw_cb().set(FUNC(junior80_state::memory_w));

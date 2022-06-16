@@ -120,9 +120,9 @@ void qvt190_state::qvt190(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // V61C16P55L + battery
 
-	ACIA6850(config, "acia1", 0);
+	ACIA6850(config, "acia1");
 
-	ACIA6850(config, "acia2", 0);
+	ACIA6850(config, "acia2");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16.6698_MHz_XTAL, 882, 18, 738, 315, 0, 300);

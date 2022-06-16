@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(DMV_K803, dmv_k803_device, "dmv_k803", "K803 RTC")
 //  dmv_k803_device - constructor
 //-------------------------------------------------
 
-dmv_k803_device::dmv_k803_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dmv_k803_device::dmv_k803_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, DMV_K803, tag, owner, clock),
 	device_dmvslot_interface( mconfig, *this ),
 	m_rtc(*this, "rtc"),

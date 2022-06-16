@@ -553,11 +553,11 @@ void battlane_state::machine_reset()
 void battlane_state::battlane(machine_config &config)
 {
 	// TODO: measure clocks and determine whether CPUs are MC6809 or MC6809E (both are surface-scratched)
-	MC6809E(config, m_maincpu, 1'500'000);
+	MC6809E(config, m_maincpu, XTAL::u(1'500'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &battlane_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(battlane_state::cpu1_interrupt));
 
-	MC6809E(config, m_subcpu, 1'500'000);
+	MC6809E(config, m_subcpu, XTAL::u(1'500'000));
 	m_subcpu->set_addrmap(AS_PROGRAM, &battlane_state::prg_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -577,7 +577,7 @@ void battlane_state::battlane(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3526_device &ymsnd(YM3526(config, "ymsnd", 3'000'000));
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", XTAL::u(3'000'000)));
 	ymsnd.irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 }

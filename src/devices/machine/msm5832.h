@@ -38,7 +38,7 @@ class msm5832_device :  public device_t,
 {
 public:
 	// construction/destruction
-	msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t data_r();
 	void data_w(uint8_t data);

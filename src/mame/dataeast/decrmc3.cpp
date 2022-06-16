@@ -18,7 +18,7 @@
 
 DEFINE_DEVICE_TYPE(DECO_RMC3, deco_rmc3_device, "deco_rmc3", "DECO RM-C3 PALETTE")
 
-deco_rmc3_device::deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+deco_rmc3_device::deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DECO_RMC3, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, m_entries(0)

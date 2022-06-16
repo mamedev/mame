@@ -20,11 +20,11 @@ class dmg_ppu_device :  public device_t, public device_video_interface
 public:
 	template <typename T>
 	dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
-		: dmg_ppu_device(mconfig, tag, owner, u32(0))
+		: dmg_ppu_device(mconfig, tag, owner)
 	{
 		set_lr35902_tag(std::forward<T>(cpu_tag));
 	}
-	dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T> void set_lr35902_tag(T &&tag) { m_lr35902.set_tag(std::forward<T>(tag)); }
 
@@ -75,7 +75,7 @@ protected:
 	virtual void update_sprites();
 	virtual void update_scanline(uint32_t cycles_to_go);
 
-	dmg_ppu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size);
+	dmg_ppu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -239,11 +239,11 @@ class mgb_ppu_device : public dmg_ppu_device
 public:
 	template <typename T>
 	mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
-		: mgb_ppu_device(mconfig, tag, owner, u32(0))
+		: mgb_ppu_device(mconfig, tag, owner)
 	{
 		set_lr35902_tag(std::forward<T>(cpu_tag));
 	}
-	mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 
@@ -257,11 +257,11 @@ class sgb_ppu_device : public dmg_ppu_device
 public:
 	template <typename T>
 	sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
-		: sgb_ppu_device(mconfig, tag, owner, u32(0))
+		: sgb_ppu_device(mconfig, tag, owner)
 	{
 		set_lr35902_tag(std::forward<T>(cpu_tag));
 	}
-	sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void sgb_io_write_pal(int offs, uint8_t *data);
 
@@ -284,11 +284,11 @@ class cgb_ppu_device : public dmg_ppu_device
 public:
 	template <typename T>
 	cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
-		: cgb_ppu_device(mconfig, tag, owner, u32(0))
+		: cgb_ppu_device(mconfig, tag, owner)
 	{
 		set_lr35902_tag(std::forward<T>(cpu_tag));
 	}
-	cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual uint8_t video_r(offs_t offset) override;
 	virtual void video_w(offs_t offset, uint8_t data) override;

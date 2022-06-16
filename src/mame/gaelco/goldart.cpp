@@ -322,7 +322,7 @@ void goldart_state::machine_reset()
 void goldart_state::goldart(machine_config &config)
 {
 	/* basic machine hardware */
-	ds5002fp_device &mcu(DS5002FP(config, "mcu", 12000000));
+	ds5002fp_device &mcu(DS5002FP(config, "mcu", XTAL::u(12000000)));
 	mcu.set_addrmap(AS_PROGRAM, &goldart_state::dallas_rom);
 	mcu.set_addrmap(AS_IO, &goldart_state::dallas_ram);
 	mcu.set_vblank_int("screen", FUNC(goldart_state::irq0_line_hold));
@@ -346,7 +346,7 @@ void goldart_state::goldart(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 /* Different versions of the internal code exist (0x6000-0x6fff code is VERY different between them)

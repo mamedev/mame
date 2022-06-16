@@ -23,7 +23,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(ATARI810, atari810_device, "atari810", "Atari 810 Disk Drive")
 
-atari810_device::atari810_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+atari810_device::atari810_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ATARI810, tag, owner, clock)
 	, device_a8sio_card_interface(mconfig, *this)
 	, m_pia(*this, "pia")

@@ -556,7 +556,7 @@ void inufuku_state::inufuku(machine_config &config)
 	screen.screen_vblank().set(m_sprattrram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	VSYSTEM_SPR(config, m_spr, 0);
+	VSYSTEM_SPR(config, m_spr);
 	m_spr->set_offsets(0, 1); // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
 	m_spr->set_pdraw(true);
 	m_spr->set_tile_indirect_cb(FUNC(inufuku_state::tile_callback));

@@ -23,7 +23,7 @@ class midway_serial_pic_device : public device_t
 {
 public:
 	// construction/destruction
-	midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_upper(int upper) { m_upper = upper; }
 
@@ -33,7 +33,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
 protected:
-	midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -65,7 +65,7 @@ class midway_serial_pic_emu_device : public device_t
 {
 public:
 	// construction/destruction
-	midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 read();
 	void write(u8 data);
@@ -73,7 +73,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 protected:
-	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -105,7 +105,7 @@ class midway_serial_pic2_device : public midway_serial_pic_device, public device
 {
 public:
 	// construction/destruction
-	midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_yearoffs(int yearoffs) { m_yearoffs = yearoffs; }
 
@@ -116,7 +116,7 @@ public:
 	void set_default_nvram(const uint8_t *nvram);
 
 protected:
-	midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -159,7 +159,7 @@ class midway_ioasic_device : public midway_serial_pic2_device
 {
 public:
 	// construction/destruction
-	midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_shuffle(uint8_t shuffle) { m_shuffle_type = shuffle; }
 	void set_shuffle_default(uint8_t shuffle) { m_shuffle_default = shuffle; }

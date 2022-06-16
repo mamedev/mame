@@ -24,8 +24,8 @@ class a1bus_slot_device : public device_t, public device_single_card_slot_interf
 public:
 	// construction/destruction
 	template <typename T, typename U>
-	a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&a1bus_tag, U &&opts, const char *dflt)
-		: a1bus_slot_device(mconfig, tag, owner, clock)
+	a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&a1bus_tag, U &&opts, const char *dflt)
+		: a1bus_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -33,10 +33,10 @@ public:
 		set_fixed(false);
 		m_a1bus.set_tag(std::forward<T>(a1bus_tag));
 	}
-	a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
-	a1bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a1bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -55,7 +55,7 @@ class a1bus_device : public device_t
 {
 public:
 	// construction/destruction
-	a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
@@ -75,7 +75,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 
 protected:
-	a1bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a1bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;

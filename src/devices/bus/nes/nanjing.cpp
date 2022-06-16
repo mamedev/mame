@@ -33,7 +33,7 @@
 DEFINE_DEVICE_TYPE(NES_NANJING, nes_nanjing_device, "nes_nanjing", "NES Cart Nanjing PCB")
 
 
-nes_nanjing_device::nes_nanjing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_nanjing_device::nes_nanjing_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_NANJING, tag, owner, clock)
 	, m_count(0)
 	, m_latch1(0)

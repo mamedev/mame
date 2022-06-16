@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(XC1701,   xc1701_device,   "xc1701",   "Xilinx 1,048,576 bit 
 DEFINE_DEVICE_TYPE(XC1702L,  xc1702l_device,  "xc1702l",  "Xilinx 2,097,152 bit Serial PROM")
 DEFINE_DEVICE_TYPE(XC1704L,  xc1704l_device,  "xc1704l",  "Xilinx 4,194,304 bit Serial PROM")
 
-base_xc1700e_device::base_xc1700e_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 capacity)
+base_xc1700e_device::base_xc1700e_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 capacity)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_capacity(capacity)
 	, m_region(*this, DEVICE_SELF)

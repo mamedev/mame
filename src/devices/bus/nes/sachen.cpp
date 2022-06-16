@@ -60,92 +60,92 @@ DEFINE_DEVICE_TYPE(NES_SACHEN_8259C,      nes_sachen_8259c_device,      "nes_s82
 DEFINE_DEVICE_TYPE(NES_SACHEN_8259D,      nes_sachen_8259d_device,      "nes_s8259d",   "NES Cart Sachen 8259D PCB")
 
 
-nes_sachen_sa009_device::nes_sachen_sa009_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_sa009_device::nes_sachen_sa009_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_SA009, tag, owner, clock)
 {
 }
 
-nes_sachen_sa0036_device::nes_sachen_sa0036_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_sachen_sa0036_device::nes_sachen_sa0036_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_SA0036, tag, owner, clock)
 {
 }
 
-nes_sachen_sa0037_device::nes_sachen_sa0037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_sa0037_device::nes_sachen_sa0037_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_SA0037, tag, owner, clock)
 {
 }
 
-nes_sachen_sa72007_device::nes_sachen_sa72007_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_sa72007_device::nes_sachen_sa72007_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_SA72007, tag, owner, clock)
 {
 }
 
-nes_sachen_sa72008_device::nes_sachen_sa72008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_sa72008_device::nes_sachen_sa72008_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_SA72008, tag, owner, clock)
 {
 }
 
-nes_sachen_tca01_device::nes_sachen_tca01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_tca01_device::nes_sachen_tca01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_TCA01, tag, owner, clock)
 {
 }
 
-nes_sachen_tcu01_device::nes_sachen_tcu01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_tcu01_device::nes_sachen_tcu01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_TCU01, tag, owner, clock)
 {
 }
 
-nes_sachen_tcu02_device::nes_sachen_tcu02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_tcu02_device::nes_sachen_tcu02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_TCU02, tag, owner, clock), m_latch(0)
 {
 }
 
-nes_sachen_3013_device::nes_sachen_3013_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_sachen_3013_device::nes_sachen_3013_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_3013, tag, owner, clock)
 {
 }
 
-nes_sachen_3014_device::nes_sachen_3014_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_sachen_3014_device::nes_sachen_3014_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_SACHEN_3014, tag, owner, clock), m_latch(0)
 {
 }
 
-nes_sachen_74x374_device::nes_sachen_74x374_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_74x374_device::nes_sachen_74x374_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_mmc_vrom_bank(0)
 {
 }
 
-nes_sachen_74x374_device::nes_sachen_74x374_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_74x374_device::nes_sachen_74x374_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sachen_74x374_device(mconfig, NES_SACHEN_74X374, tag, owner, clock)
 {
 }
 
-nes_sachen_74x374_alt_device::nes_sachen_74x374_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_74x374_alt_device::nes_sachen_74x374_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sachen_74x374_device(mconfig, NES_SACHEN_74X374_ALT, tag, owner, clock)
 {
 }
 
-nes_sachen_8259a_device::nes_sachen_8259a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_8259a_device::nes_sachen_8259a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sachen_74x374_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_sachen_8259a_device::nes_sachen_8259a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_8259a_device::nes_sachen_8259a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sachen_8259a_device(mconfig, NES_SACHEN_8259A, tag, owner, clock)
 {
 }
 
-nes_sachen_8259b_device::nes_sachen_8259b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_8259b_device::nes_sachen_8259b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sachen_8259a_device(mconfig, NES_SACHEN_8259B, tag, owner, clock)
 {
 }
 
-nes_sachen_8259c_device::nes_sachen_8259c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_8259c_device::nes_sachen_8259c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sachen_8259a_device(mconfig, NES_SACHEN_8259C, tag, owner, clock)
 {
 }
 
-nes_sachen_8259d_device::nes_sachen_8259d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sachen_8259d_device::nes_sachen_8259d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sachen_8259a_device(mconfig, NES_SACHEN_8259D, tag, owner, clock)
 {
 }

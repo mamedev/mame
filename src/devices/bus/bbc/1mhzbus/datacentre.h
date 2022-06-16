@@ -27,7 +27,7 @@ class bbc_datacentre_device :
 {
 public:
 	// construction/destruction
-	bbc_datacentre_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_datacentre_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(import_nvrest);
 	template<int Drive> DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);

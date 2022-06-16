@@ -13,7 +13,7 @@ intel_imm6_76_device::intel_imm6_76_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		uint32_t clock)
+		const XTAL &clock)
 	: device_t(mconfig, INTEL_IMM6_76, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, m_cycle_tmr(nullptr), m_cycle_a_tmr(nullptr), m_prg_tmr(nullptr)

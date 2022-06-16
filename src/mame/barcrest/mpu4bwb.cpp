@@ -129,7 +129,7 @@ void mpu4bwb_machines_state::bwboki_f(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mpu4bwb_machines_state,mpu4bwb)
 	mpu4_common2(config);
 
-	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	OKIM6376(config, m_msm6376, XTAL::u(128000));     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -138,7 +138,7 @@ template<const uint32_t* Key> void mpu4bwb_machines_state::bwboki_chr_cheat_f(ma
 {
 	bwboki_f(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4bwb_machines_state::mpu4_memmap_characteriser_bwb);
-	MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
+	MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb);
 	m_characteriser_bwb->set_common_key(Key[0] & 0xff);
 	m_characteriser_bwb->set_other_key(Key[1]);
 }

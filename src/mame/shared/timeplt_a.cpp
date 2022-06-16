@@ -22,17 +22,17 @@
 DEFINE_DEVICE_TYPE(TIMEPLT_AUDIO, timeplt_audio_device, "timplt_audio", "Time Pilot Audio")
 DEFINE_DEVICE_TYPE(LOCOMOTN_AUDIO, locomotn_audio_device, "locomotn_audio", "Loco-Motion Audio")
 
-timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: timeplt_audio_device(mconfig, TIMEPLT_AUDIO, tag, owner, clock)
 {
 }
 
-locomotn_audio_device::locomotn_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+locomotn_audio_device::locomotn_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: timeplt_audio_device(mconfig, LOCOMOTN_AUDIO, tag, owner, clock)
 {
 }
 
-timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_soundcpu(*this, "tpsound")
 	, m_soundlatch(*this, "soundlatch")

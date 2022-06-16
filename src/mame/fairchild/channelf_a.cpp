@@ -8,7 +8,7 @@
 
 DEFINE_DEVICE_TYPE(CHANNELF_SOUND, channelf_sound_device, "channelf_sound", "Channel F Sound")
 
-channelf_sound_device::channelf_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+channelf_sound_device::channelf_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CHANNELF_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
@@ -31,7 +31,7 @@ void channelf_sound_device::device_start()
 	int rate;
 
 	m_channel = stream_alloc(0, 1, machine().sample_rate());
-	rate = machine().sample_rate();
+	rate = machine().sample_rate().value();
 
 	/*
 	 * 2V = 1000Hz ~= 3579535/224/16

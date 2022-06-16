@@ -539,7 +539,7 @@ void mjkjidai_state::mjkjidai(machine_config &config)
 	SN76489(config, "sn1", 10_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
 	SN76489(config, "sn2", 10_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(mjkjidai_state::adpcm_int));
 	m_msm->set_prescaler_selector(msm5205_device::S64_4B);  // 6kHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);

@@ -21,12 +21,12 @@ DEFINE_DEVICE_TYPE(VSMILE_PAD, vsmile_pad_device, "vsmile_pad", "V.Smile Joystic
 //    V.Smile control pad
 //**************************************************************************
 
-vsmile_pad_device::vsmile_pad_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+vsmile_pad_device::vsmile_pad_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: vsmile_pad_device(mconfig, VSMILE_PAD, tag, owner, clock)
 {
 }
 
-vsmile_pad_device::vsmile_pad_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock)
+vsmile_pad_device::vsmile_pad_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 	: vsmile_ctrl_device_base(mconfig, type, tag, owner, clock)
 	, m_io_joy(*this, "JOY")
 	, m_io_colors(*this, "COLORS")

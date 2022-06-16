@@ -620,10 +620,10 @@ DEVICE_INPUT_DEFAULTS_END
 void iris3000_state::iris3130(machine_config &config)
 {
 	/* basic machine hardware */
-	M68020(config, m_maincpu, 16000000);
+	M68020(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &iris3000_state::mem_map);
 
-	M68000(config, m_storagercpu, 10000000);
+	M68000(config, m_storagercpu, XTAL::u(10000000));
 	m_storagercpu->set_addrmap(AS_PROGRAM, &iris3000_state::storager_map);
 
 	ADDRESS_MAP_BANK(config, "text_data").set_map(&iris3000_state::text_data_map).set_options(ENDIANNESS_BIG, 32, 32);

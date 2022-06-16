@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(MSX_SLOT_RAM_MM, msx_slot_ram_mm_device, "msx_slot_ram_mm", "MSX Internal Memory Mapped RAM")
 
-msx_slot_ram_mm_device::msx_slot_ram_mm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_ram_mm_device::msx_slot_ram_mm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_SLOT_RAM_MM, tag, owner, clock)
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_total_size(0)

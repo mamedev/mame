@@ -6,7 +6,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(ADDRESS_MAP_BANK, address_map_bank_device, "address_map_bank", "Address Map Bank")
 
-address_map_bank_device::address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+address_map_bank_device::address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ADDRESS_MAP_BANK, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_endianness(ENDIANNESS_NATIVE),

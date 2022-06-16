@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(WD7600, wd7600_device, "wd7600", "Western Digital WD7600 chip
 
 void wd7600_device::device_add_mconfig(machine_config & config)
 {
-	AM9517A(config, m_dma1, 0);
+	AM9517A(config, m_dma1);
 	m_dma1->out_hreq_callback().set(m_dma2, FUNC(am9517a_device::dreq0_w));
 	m_dma1->out_eop_callback().set(FUNC(wd7600_device::dma1_eop_w));
 	m_dma1->in_memr_callback().set(FUNC(wd7600_device::dma_read_byte));
@@ -41,7 +41,7 @@ void wd7600_device::device_add_mconfig(machine_config & config)
 	m_dma1->out_dack_callback<2>().set(FUNC(wd7600_device::dma1_dack2_w));
 	m_dma1->out_dack_callback<3>().set(FUNC(wd7600_device::dma1_dack3_w));
 
-	AM9517A(config, m_dma2, 0);
+	AM9517A(config, m_dma2);
 	m_dma2->out_hreq_callback().set(FUNC(wd7600_device::dma2_hreq_w));
 	m_dma2->in_memr_callback().set(FUNC(wd7600_device::dma_read_word));
 	m_dma2->out_memw_callback().set(FUNC(wd7600_device::dma_write_word));
@@ -56,16 +56,16 @@ void wd7600_device::device_add_mconfig(machine_config & config)
 	m_dma2->out_dack_callback<2>().set(FUNC(wd7600_device::dma2_dack2_w));
 	m_dma2->out_dack_callback<3>().set(FUNC(wd7600_device::dma2_dack3_w));
 
-	PIC8259(config, m_pic1, 0);
+	PIC8259(config, m_pic1);
 	m_pic1->out_int_callback().set(FUNC(wd7600_device::pic1_int_w));
 	m_pic1->in_sp_callback().set_constant(1);
 	m_pic1->read_slave_ack_callback().set(FUNC(wd7600_device::pic1_slave_ack_r));
 
-	PIC8259(config, m_pic2, 0);
+	PIC8259(config, m_pic2);
 	m_pic2->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir2_w));
 	m_pic2->in_sp_callback().set_constant(0);
 
-	PIT8254(config, m_ctc, 0);
+	PIT8254(config, m_ctc);
 	m_ctc->set_clk<0>(XTAL(14'318'181) / 12.0);
 	m_ctc->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
 	m_ctc->set_clk<1>(XTAL(14'318'181) / 12.0);
@@ -79,7 +79,7 @@ void wd7600_device::device_add_mconfig(machine_config & config)
 }
 
 
-wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WD7600, tag, owner, clock),
 	m_read_ior(*this),
 	m_write_iow(*this),

@@ -44,7 +44,7 @@ void st0016_cpu_device::charam_map(address_map &map)
 
 // note: a lot of bits are left uninitialized by the games, the default values are uncertain
 
-st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80_device(mconfig, ST0016_CPU, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr, "palette")
 	, device_video_interface(mconfig, *this, false)

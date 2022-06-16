@@ -284,7 +284,7 @@ ioport_constructor ec_1841_keyboard_device::device_input_ports() const
 //  ec_1841_keyboard_device - constructor
 //-------------------------------------------------
 
-ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PC_KBD_EC_1841, tag, owner, clock),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),

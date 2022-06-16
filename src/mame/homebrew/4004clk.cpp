@@ -32,7 +32,7 @@ public:
 		, m_neon_out(*this, "neon%u", 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_hz) { m_test_line->set_clock(newval ? 60 : 50); }
+	DECLARE_INPUT_CHANGED_MEMBER(switch_hz) { m_test_line->set_clock(newval ? XTAL::u(60) : XTAL::u(50)); }
 	void _4004clk(machine_config &config);
 
 protected:
@@ -165,14 +165,14 @@ void nixieclock_state::_4004clk(machine_config &config)
 	m_maincpu->set_ram_status_map(&nixieclock_state::_4004clk_stat);
 	m_maincpu->set_ram_ports_map(&nixieclock_state::_4004clk_mp);
 
-	CLOCK(config, m_test_line, 60).signal_handler().set_inputline(m_maincpu, I4004_TEST_LINE);
+	CLOCK(config, m_test_line, XTAL::u(60)).signal_handler().set_inputline(m_maincpu, I4004_TEST_LINE);
 
 	// video hardware
 	config.set_default_layout(layout_4004clk);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

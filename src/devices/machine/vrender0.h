@@ -40,7 +40,7 @@ class vr0uart_device : public device_t,
 {
 public:
 	// construction/destruction
-	vr0uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vr0uart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void regs_map(address_map &map);
 	void set_channel_num(int ch) { m_channel_num = ch; }
@@ -87,7 +87,7 @@ class vrender0soc_device : public device_t
 {
 public:
 	// construction/destruction
-	vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void regs_map(address_map &map);
 	void audiovideo_map(address_map &map);

@@ -115,7 +115,7 @@ private:
  *
  *************************************/
 
-#define MASTER_CLOCK        (18432000)
+#define MASTER_CLOCK        XTAL::u(18432000)
 
 #define PIXEL_CLOCK         (MASTER_CLOCK/3)
 

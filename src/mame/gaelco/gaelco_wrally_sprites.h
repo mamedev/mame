@@ -10,7 +10,7 @@
 class gaelco_wrally_sprites_device : public device_t
 {
 public:
-	gaelco_wrally_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gaelco_wrally_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
@@ -19,7 +19,7 @@ public:
 	void mix_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 
 protected:
-	gaelco_wrally_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gaelco_wrally_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -36,7 +36,7 @@ private:
 class blmbycar_sprites_device : public gaelco_wrally_sprites_device
 {
 public:
-	blmbycar_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	blmbycar_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void get_sprites_info(uint16_t* spriteram, int& sx, int& sy, int& number, int& color, int& color_effect, int& attr, int& high_priotiy, int &end) override;

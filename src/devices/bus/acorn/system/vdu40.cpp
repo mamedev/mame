@@ -53,7 +53,7 @@ void acorn_vdu40_device::device_add_mconfig(machine_config &config)
 //  acorn_vdu40_device - constructor
 //-------------------------------------------------
 
-acorn_vdu40_device::acorn_vdu40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_vdu40_device::acorn_vdu40_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACORN_VDU40, tag, owner, clock)
 	, device_acorn_bus_interface(mconfig, *this)
 	, m_screen(*this, "screen")

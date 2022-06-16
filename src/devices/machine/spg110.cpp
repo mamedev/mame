@@ -16,7 +16,7 @@
 
 DEFINE_DEVICE_TYPE(SPG110, spg110_device, "spg110", "SPG110 System-on-a-Chip")
 
-spg110_device::spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal) :
+spg110_device::spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal) :
 	unsp_device(mconfig, type, tag, owner, clock, internal),
 	device_mixer_interface(mconfig, *this, 2),
 	m_screen(*this, finder_base::DUMMY_TAG),
@@ -36,7 +36,7 @@ spg110_device::spg110_device(const machine_config &mconfig, device_type type, co
 }
 
 
-spg110_device::spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spg110_device::spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spg110_device(mconfig, SPG110, tag, owner, clock, address_map_constructor(FUNC(spg110_device::internal_map), this))
 {
 }

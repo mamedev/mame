@@ -22,7 +22,7 @@ class r800_device : public z80_device
 {
 public:
 	// device type constructor
-	r800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	r800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_execute_interface overrides

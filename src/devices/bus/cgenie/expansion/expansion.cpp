@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(CG_EXP_SLOT, cg_exp_slot_device, "cg_exp_slot", "Colour Genie
 //  cg_exp - constructor
 //-------------------------------------------------
 
-cg_exp_slot_device::cg_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cg_exp_slot_device::cg_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CG_EXP_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_cg_exp_interface>(mconfig, *this),
 	m_program(*this, finder_base::DUMMY_TAG, -1),

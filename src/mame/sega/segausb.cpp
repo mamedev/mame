@@ -23,11 +23,11 @@
     CONSTANTS
 ***************************************************************************/
 
-#define USB_MASTER_CLOCK    6000000
+#define USB_MASTER_CLOCK    XTAL::u(6000000)
 #define USB_2MHZ_CLOCK      (USB_MASTER_CLOCK/3)
 #define USB_PCS_CLOCK       (USB_2MHZ_CLOCK/2)
 #define USB_GOS_CLOCK       (USB_2MHZ_CLOCK/16/4)
-#define MM5837_CLOCK        100000
+#define MM5837_CLOCK        XTAL::u(100000)
 
 
 /***************************************************************************
@@ -36,7 +36,7 @@
 
 DEFINE_DEVICE_TYPE(SEGAUSB, usb_sound_device, "segausb", "Sega Universal Sound Board")
 
-usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
 		m_in_latch(0),
@@ -70,7 +70,7 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type ty
 {
 }
 
-usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: usb_sound_device(mconfig, SEGAUSB, tag, owner, clock)
 {
 }
@@ -764,16 +764,16 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 	m_ourcpu->p2_out_cb().set(FUNC(usb_sound_device::p2_w));
 	m_ourcpu->t1_in_cb().set(FUNC(usb_sound_device::t1_r));
 
-	TIMER(config, "usb_timer", 0).configure_periodic(
+	TIMER(config, "usb_timer").configure_periodic(
 			FUNC(usb_sound_device::increment_t1_clock_timer_cb),
 			attotime::from_hz(USB_2MHZ_CLOCK / 256));
 
 #if (ENABLE_SEGAUSB_NETLIST)
 
-	TIMER(config, "gos_timer", 0).configure_periodic(
+	TIMER(config, "gos_timer").configure_periodic(
 			FUNC(usb_sound_device::gos_timer), attotime::from_hz(USB_GOS_CLOCK));
 
-	NETLIST_SOUND(config, "sound_nl", 48000)
+	NETLIST_SOUND(config, "sound_nl", XTAL::u(48000))
 		.set_source(NETLIST_NAME(segausb))
 		.add_route(ALL_OUTPUTS, *this, 1.0);
 
@@ -810,7 +810,7 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 	// configure the PIT clocks and gates
 	for (int index = 0; index < 3; index++)
 	{
-		PIT8253(config, m_pit[index], 0);
+		PIT8253(config, m_pit[index]);
 		m_pit[index]->set_clk<0>(USB_PCS_CLOCK);
 		m_pit[index]->set_clk<1>(USB_PCS_CLOCK);
 		m_pit[index]->set_clk<2>(USB_2MHZ_CLOCK);
@@ -833,7 +833,7 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(SEGAUSBROM, usb_rom_sound_device, "segausbrom", "Sega Universal Sound Board with ROM")
 
-usb_rom_sound_device::usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+usb_rom_sound_device::usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: usb_sound_device(mconfig, SEGAUSBROM, tag, owner, clock)
 {
 }

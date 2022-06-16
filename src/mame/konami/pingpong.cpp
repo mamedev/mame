@@ -691,7 +691,7 @@ GFXDECODE_END
 void pingpong_state::pingpong(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu,18'432'000 / 6);      // 3.072 MHz (probably)
+	Z80(config, m_maincpu, XTAL::u(18'432'000) / 6);      // 3.072 MHz (probably)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pingpong_state::pingpong_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(pingpong_state::pingpong_interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
@@ -711,7 +711,7 @@ void pingpong_state::pingpong(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76496(config, "snsnd", 18'432'000 / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76496(config, "snsnd", XTAL::u(18'432'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 // too fast!

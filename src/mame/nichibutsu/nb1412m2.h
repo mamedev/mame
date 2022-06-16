@@ -22,7 +22,7 @@ class nb1412m2_device : public device_t, public device_memory_interface
 {
 public:
 	// construction/destruction
-	nb1412m2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nb1412m2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// I/O operations
 	void command_w(uint8_t data);

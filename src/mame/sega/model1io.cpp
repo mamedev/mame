@@ -147,7 +147,7 @@ void  model1io_device::device_add_mconfig(machine_config &config)
 	io.out_pf_callback().set(FUNC(model1io_device::io_pf_w));
 	io.in_pg_callback().set(FUNC(model1io_device::io_pg_r));
 
-	msm6253_device &adc(MSM6253(config, "adc", 0));
+	msm6253_device &adc(MSM6253(config, "adc"));
 	adc.set_input_cb<0>(FUNC(model1io_device::analog0_r));
 	adc.set_input_cb<1>(FUNC(model1io_device::analog1_r));
 	adc.set_input_cb<2>(FUNC(model1io_device::analog2_r));
@@ -163,7 +163,7 @@ void  model1io_device::device_add_mconfig(machine_config &config)
 //  model1io_device - constructor
 //-------------------------------------------------
 
-model1io_device::model1io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+model1io_device::model1io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SEGA_MODEL1IO, tag, owner, clock),
 	m_eeprom(*this, "eeprom"),
 	m_buttons(*this, "buttons"),

@@ -45,7 +45,7 @@ class a2bus_byte8251_device : public device_t, public device_a2bus_card_interfac
 {
 public:
 	// construction/destruction
-	a2bus_byte8251_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	a2bus_byte8251_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(rate_changed);
 
@@ -68,7 +68,7 @@ private:
 	required_ioport m_switches;
 };
 
-a2bus_byte8251_device::a2bus_byte8251_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+a2bus_byte8251_device::a2bus_byte8251_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, A2BUS_BYTE8251, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
 	, m_usart(*this, "8251")
@@ -131,7 +131,7 @@ ioport_constructor a2bus_byte8251_device::device_input_ports() const
 
 void a2bus_byte8251_device::device_add_mconfig(machine_config &config)
 {
-	I8251(config, m_usart, 1021800); // CLK tied to ϕ1 signal from bus pin 38
+	I8251(config, m_usart, XTAL::u(1021800)); // CLK tied to ϕ1 signal from bus pin 38
 	m_usart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	MM5307AA(config, m_brg, A2BUS_7M_CLOCK / 8);

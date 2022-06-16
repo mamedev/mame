@@ -37,7 +37,7 @@
 class htmusic_device : public device_t, public device_sound_interface
 {
 public:
-	htmusic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	htmusic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void ram_w(offs_t offset, uint8_t data) { m_wave_ram[offset & 0x7ff] = data; }
 
@@ -78,10 +78,10 @@ class bbc_m500_device : public device_t, public device_bbc_1mhzbus_interface
 {
 public:
 	// construction/destruction
-	bbc_m500_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_m500_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	bbc_m500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_m500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -109,7 +109,7 @@ class bbc_m5000_device : public bbc_m500_device
 {
 public:
 	// construction/destruction
-	bbc_m5000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_m5000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -124,7 +124,7 @@ class bbc_m3000_device : public bbc_m500_device
 {
 public:
 	// construction/destruction
-	bbc_m3000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_m3000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -140,7 +140,7 @@ class bbc_m87_device : public bbc_m500_device
 {
 public:
 	// construction/destruction
-	bbc_m87_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_m87_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

@@ -22,7 +22,7 @@ static constexpr int PWM_CLOCKS = 39;
 
 DEFINE_DEVICE_TYPE(SP0250, sp0250_device, "sp0250", "GI SP0250 LPC")
 
-sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SP0250, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_timer(nullptr),

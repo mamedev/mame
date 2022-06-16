@@ -9,7 +9,7 @@
 
 DEFINE_DEVICE_TYPE(NEREID, nereid_device, "nereid", "HP Nereid ASIC")
 
-nereid_device::nereid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nereid_device::nereid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_palette_interface(mconfig, *this),
 	m_red(0),
@@ -20,7 +20,7 @@ nereid_device::nereid_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-nereid_device::nereid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nereid_device::nereid_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	nereid_device(mconfig, NEREID, tag, owner, clock)
 {
 }

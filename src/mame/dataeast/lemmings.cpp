@@ -238,15 +238,15 @@ void lemmings_state::lemmings(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lemmings);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0]);
 	m_sprgen[0]->set_gfx_region(1);
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[1], 0);
+	DECO_SPRITE(config, m_sprgen[1]);
 	m_sprgen[1]->set_gfx_region(0);
 	m_sprgen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO146PROT(config, m_deco146, 0);
+	DECO146PROT(config, m_deco146);
 	m_deco146->port_a_cb().set_ioport("INPUTS");
 	m_deco146->port_b_cb().set_ioport("SYSTEM");
 	m_deco146->port_c_cb().set_ioport("DSW");
@@ -264,7 +264,7 @@ void lemmings_state::lemmings(machine_config &config)
 	ymsnd.add_route(0, "lspeaker", 0.45);
 	ymsnd.add_route(1, "rspeaker", 0.45);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1023924, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1023924), okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 }

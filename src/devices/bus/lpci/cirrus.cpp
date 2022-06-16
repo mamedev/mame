@@ -83,7 +83,7 @@ DEFINE_DEVICE_TYPE(PCI_CIRRUS_SVGA, pci_cirrus_svga_device, "pci_cirrus_svga", "
 //  pci_cirrus_svga_device - constructor
 //-------------------------------------------------
 
-pci_cirrus_svga_device::pci_cirrus_svga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pci_cirrus_svga_device::pci_cirrus_svga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PCI_CIRRUS_SVGA, tag, owner, clock)
 	, pci_device_interface(mconfig, *this)
 	, m_vga(*this, "vga")

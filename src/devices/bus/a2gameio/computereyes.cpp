@@ -22,7 +22,7 @@ class apple2_compeyes_device : public device_t, public device_a2gameio_interface
 {
 public:
 	// construction/destruction
-	apple2_compeyes_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	apple2_compeyes_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -48,7 +48,7 @@ private:
 //  DEVICE IMPLEMENTATION
 //**************************************************************************
 
-apple2_compeyes_device::apple2_compeyes_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+apple2_compeyes_device::apple2_compeyes_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, APPLE2_COMPUTEREYES, tag, owner, clock)
 	, device_a2gameio_interface(mconfig, *this)
 	, m_picture(*this, "srcimg")

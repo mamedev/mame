@@ -67,7 +67,7 @@ ioport_constructor vcs_paddles_device::device_input_ports() const
 //  vcs_paddles_device - constructor
 //-------------------------------------------------
 
-vcs_paddles_device::vcs_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vcs_paddles_device::vcs_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VCS_PADDLES, tag, owner, clock),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),

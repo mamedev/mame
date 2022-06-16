@@ -15,14 +15,14 @@ class rtpc_kbd_con_device
 public:
 	template <typename T>
 	rtpc_kbd_con_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: rtpc_kbd_con_device(mconfig, tag, owner, 0U)
+		: rtpc_kbd_con_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	rtpc_kbd_con_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0U);
+	rtpc_kbd_con_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto out_clock_cb() { return m_out_clock_cb.bind(); }
 	auto out_data_cb() { return m_out_data_cb.bind(); }

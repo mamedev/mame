@@ -223,7 +223,7 @@ void cortex_state::cortex(machine_config &config)
 	crtc.set_vram_size(0x4000);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(cortex_state::kbd_put));
 
 	//TMS9902(config, "uart1", XTAL(12'000'000) / 4);
@@ -231,7 +231,7 @@ void cortex_state::cortex(machine_config &config)
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 950); // guess
+	BEEP(config, m_beep, XTAL::u(950)); // guess
 	m_beep->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 

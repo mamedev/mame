@@ -29,17 +29,17 @@ DEFINE_DEVICE_TYPE(SNS_LOROM_MCPIR2,   sns_rom_mcpirate2_device, "sns_rom_mcpira
 DEFINE_DEVICE_TYPE(SNS_LOROM_20COL,    sns_rom_20col_device,     "sns_rom_20col",     "SNES Super 20 Collection")
 
 
-sns_rom_device::sns_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_device::sns_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock), device_sns_cart_interface(mconfig, *this)
 {
 }
 
-sns_rom_device::sns_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_device::sns_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_LOROM, tag, owner, clock)
 {
 }
 
-sns_rom_obc1_device::sns_rom_obc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_obc1_device::sns_rom_obc1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_LOROM_OBC1, tag, owner, clock), m_address(0), m_offset(0), m_shift(0)
 {
 }
@@ -47,43 +47,43 @@ sns_rom_obc1_device::sns_rom_obc1_device(const machine_config &mconfig, const ch
 
 
 // Pirate LoROM 'mappers'
-sns_rom_pokemon_device::sns_rom_pokemon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_pokemon_device::sns_rom_pokemon_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_LOROM_POKEMON, tag, owner, clock), m_latch(0)
 {
 }
 
-sns_rom_tekken2_device::sns_rom_tekken2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_tekken2_device::sns_rom_tekken2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_LOROM_TEKKEN2, tag, owner, clock), m_prot(0)
 {
 }
 
-sns_rom_soulblad_device::sns_rom_soulblad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_soulblad_device::sns_rom_soulblad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_LOROM_SOULBLAD, tag, owner, clock)
 {
 }
 
-sns_rom_banana_device::sns_rom_banana_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_banana_device::sns_rom_banana_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_LOROM_BANANA, tag, owner, clock)
 {
 }
 
-sns_rom_bugs_device::sns_rom_bugs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_bugs_device::sns_rom_bugs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_LOROM_BUGSLIFE, tag, owner, clock)
 {
 }
 
 // Multigame LoROM 'mappers'
-sns_rom_mcpirate1_device::sns_rom_mcpirate1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_mcpirate1_device::sns_rom_mcpirate1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_LOROM_MCPIR1, tag, owner, clock), m_base_bank(0)
 {
 }
 
-sns_rom_mcpirate2_device::sns_rom_mcpirate2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_mcpirate2_device::sns_rom_mcpirate2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_LOROM_MCPIR2, tag, owner, clock), m_base_bank(0)
 {
 }
 
-sns_rom_20col_device::sns_rom_20col_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_20col_device::sns_rom_20col_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, SNS_LOROM_20COL, tag, owner, clock), m_base_bank(0)
 {
 }

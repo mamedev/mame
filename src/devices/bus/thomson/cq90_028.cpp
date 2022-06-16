@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(CQ90_028, cq90_028_device, "cq90_028", "Thomson CQ90-028 QDD controller")
 
-cq90_028_device::cq90_028_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cq90_028_device::cq90_028_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CQ90_028, tag, owner, clock),
 	thomson_extension_interface(mconfig, *this),
 	m_serial(*this, "serial"),

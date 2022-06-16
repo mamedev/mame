@@ -30,7 +30,7 @@
 class upd4701_device : public device_t
 {
 public:
-	upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	template <typename T> void set_portx_tag(T &&tag) { m_portx.set_tag(std::forward<T>(tag)); }

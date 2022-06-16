@@ -13,7 +13,7 @@ output support
 
 DEFINE_DEVICE_TYPE(NAMCOC68, namcoc68_device, "namcoc68", "Namco C68 I/O")
 
-namcoc68_device::namcoc68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+namcoc68_device::namcoc68_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NAMCOC68, tag, owner, clock),
 	m_mcu(*this, "mcu"),
 	m_in_pb_cb(*this),

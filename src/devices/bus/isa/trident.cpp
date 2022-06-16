@@ -23,18 +23,18 @@ DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device, "tvga9000_vga", "Trident TVGA9
 #define LOG (1)
 #define LOG_ACCEL (1)
 
-trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: svga_device(mconfig, type, tag, owner, clock)
 {
 }
 
-tgui9860_device::tgui9860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tgui9860_device::tgui9860_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: trident_vga_device(mconfig, TRIDENT_VGA, tag, owner, clock)
 {
 	m_version = 0xd3;   // 0xd3 identifies at TGUI9660XGi (set to 0xe3 to identify at TGUI9440AGi)
 }
 
-tvga9000_device::tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tvga9000_device::tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: trident_vga_device(mconfig, TVGA9000_VGA, tag, owner, clock)
 {
 	m_version = 0x43;

@@ -95,7 +95,7 @@ DEFINE_DEVICE_TYPE(TI99_TIPI_RPI, bus::ti99::peb::tipi_attached_device, "ti99_ti
 
 namespace bus::ti99::peb {
 
-tipi_card_device::tipi_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tipi_card_device::tipi_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_TIPI, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_rpi(*this, RASPI),
@@ -643,7 +643,7 @@ INPUT_PORTS_END
 
 void tipi_card_device::device_add_mconfig(machine_config &config)
 {
-	TI99_TIPI_RPI(config, m_rpi, 0);
+	TI99_TIPI_RPI(config, m_rpi);
 }
 
 ROM_START( tipi )
@@ -666,7 +666,7 @@ ioport_constructor tipi_card_device::device_input_ports() const
 
 /* Connection to the external device, a Raspberry PI */
 
-tipi_attached_device::tipi_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tipi_attached_device::tipi_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99_TIPI_RPI, tag, owner, clock),
 	device_image_interface(mconfig, *this)
 {

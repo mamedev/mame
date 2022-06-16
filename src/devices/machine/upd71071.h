@@ -9,10 +9,10 @@
 class upd71071_device : public device_t
 {
 public:
-	upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
-	void set_clock(int clock) { m_upd_clock = clock; }
+	void set_clock(const XTAL &clock) { m_upd_clock = clock; }
 
 	auto out_hreq_callback() { return m_out_hreq_cb.bind(); }
 	auto out_eop_callback() { return m_out_eop_cb.bind(); }
@@ -62,7 +62,7 @@ private:
 	//int m_in_progress[4];
 	//int m_transfer_size[4];
 	int m_base;
-	int m_upd_clock;
+	XTAL m_upd_clock;
 	devcb_write_line m_out_hreq_cb;
 	devcb_write_line m_out_eop_cb;
 	devcb_read16::array<4> m_dma_read_cb;

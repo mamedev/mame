@@ -28,10 +28,10 @@ class epson_lx800_device :  public device_t, public device_centronics_peripheral
 {
 public:
 	// construction/destruction
-	epson_lx800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	epson_lx800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	epson_lx800_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	epson_lx800_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

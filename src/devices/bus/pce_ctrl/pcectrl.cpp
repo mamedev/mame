@@ -103,7 +103,7 @@ device_pce_control_port_interface::~device_pce_control_port_interface()
 //  pce_control_port_device - constructor
 //-------------------------------------------------
 
-pce_control_port_device::pce_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+pce_control_port_device::pce_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PCE_CONTROL_PORT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_device(nullptr)

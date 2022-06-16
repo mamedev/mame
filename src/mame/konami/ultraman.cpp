@@ -176,11 +176,11 @@ void ultraman_state::machine_reset()
 void ultraman_state::ultraman(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 24000000/2);      /* 12 MHz? */
+	M68000(config, m_maincpu, XTAL::u(24000000)/2);      /* 12 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ultraman_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ultraman_state::irq4_line_hold));
 
-	Z80(config, m_audiocpu, 24000000/6);    /* 4 MHz? */
+	Z80(config, m_audiocpu, XTAL::u(24000000)/6);    /* 4 MHz? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ultraman_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &ultraman_state::sound_io_map);
 
@@ -203,22 +203,22 @@ void ultraman_state::ultraman(machine_config &config)
 	palette.set_format(palette_device::xRGB_555, 8192);
 	palette.enable_shadows();
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(ultraman_state::sprite_callback));
 
-	K051316(config, m_k051316[0], 0);
+	K051316(config, m_k051316[0]);
 	m_k051316[0]->set_palette("palette");
 	m_k051316[0]->set_offsets(8, 0);
 	m_k051316[0]->set_zoom_callback(FUNC(ultraman_state::zoom_callback_1));
 
-	K051316(config, m_k051316[1], 0);
+	K051316(config, m_k051316[1]);
 	m_k051316[1]->set_palette("palette");
 	m_k051316[1]->set_offsets(8, 0);
 	m_k051316[1]->set_zoom_callback(FUNC(ultraman_state::zoom_callback_2));
 
-	K051316(config, m_k051316[2], 0);
+	K051316(config, m_k051316[2]);
 	m_k051316[2]->set_palette("palette");
 	m_k051316[2]->set_offsets(8, 0);
 	m_k051316[2]->set_zoom_callback(FUNC(ultraman_state::zoom_callback_3));
@@ -229,9 +229,9 @@ void ultraman_state::ultraman(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "ymsnd", 24000000/6).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL::u(24000000)/6).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 }

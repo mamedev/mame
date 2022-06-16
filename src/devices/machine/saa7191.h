@@ -19,7 +19,7 @@
 class saa7191_device : public device_t
 {
 public:
-	saa7191_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	saa7191_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void i2c_data_w(uint8_t data);
 	uint8_t i2c_data_r();

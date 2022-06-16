@@ -85,7 +85,7 @@ DASM notes:
 
 DEFINE_DEVICE_TYPE(STVCD, stvcd_device, "stvcd", "Sega Saturn/ST-V CD Block HLE")
 
-stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, STVCD, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
 	, device_memory_interface(mconfig, *this)

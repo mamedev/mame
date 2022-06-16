@@ -1056,13 +1056,13 @@ void raiden2_state::raiden2(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, raiden2_state::gfx_raiden2);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
 	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	RAIDEN2COP(config, m_raiden2cop, 0);
+	RAIDEN2COP(config, m_raiden2cop);
 	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
@@ -1081,7 +1081,7 @@ void raiden2_state::raiden2(machine_config &config)
 	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH));
 	oki2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
 	m_seibu_sound->set_rom_tag("audiocpu");
 	m_seibu_sound->set_rombank_tag("seibu_bank1");
@@ -1120,13 +1120,13 @@ void raiden2_state::zeroteam(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, raiden2_state::gfx_raiden2);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
 	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	RAIDEN2COP(config, m_raiden2cop, 0);
+	RAIDEN2COP(config, m_raiden2cop);
 	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);
@@ -1141,7 +1141,7 @@ void raiden2_state::zeroteam(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
 	m_seibu_sound->set_rom_tag("audiocpu");
 	m_seibu_sound->set_rombank_tag("seibu_bank1");

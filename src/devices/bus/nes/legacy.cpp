@@ -37,22 +37,22 @@ DEFINE_DEVICE_TYPE(NES_FFE4, nes_ffe4_device, "nes_ff4", "NES Cart FFE-4 PCB")
 DEFINE_DEVICE_TYPE(NES_FFE8, nes_ffe8_device, "nes_ff8", "NES Cart FFE-8 PCB")
 
 
-nes_ffe3_device::nes_ffe3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_ffe3_device::nes_ffe3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_FFE3, tag, owner, clock)
 {
 }
 
-nes_ffe4_device::nes_ffe4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_ffe4_device::nes_ffe4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_exram_enabled(0), m_exram_bank(0)
 {
 }
 
-nes_ffe4_device::nes_ffe4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_ffe4_device::nes_ffe4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_ffe4_device(mconfig, NES_FFE4, tag, owner, clock)
 {
 }
 
-nes_ffe8_device::nes_ffe8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_ffe8_device::nes_ffe8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_ffe4_device(mconfig, NES_FFE8, tag, owner, clock)
 {
 }

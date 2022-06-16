@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(CDD2000, cdd2000_device, "cdd2000", "Philips CDD2000 CD-R")
 
-cdd2000_device::cdd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cdd2000_device::cdd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CDD2000, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, "scsic")
 	, m_cdcpu(*this, "cdcpu")
@@ -34,11 +34,11 @@ void cdd2000_device::mem_map(address_map &map)
 
 void cdd2000_device::device_add_mconfig(machine_config &config)
 {
-	mc68hc11f1_device &cdcpu(MC68HC11F1(config, m_cdcpu, 8'000'000)); // type and clock guessed
+	mc68hc11f1_device &cdcpu(MC68HC11F1(config, m_cdcpu, XTAL::u(8'000'000))); // type and clock guessed
 	cdcpu.set_addrmap(AS_PROGRAM, &cdd2000_device::mem_map);
 	cdcpu.set_default_config(0x0b);
 
-	NCR53CF94(config, "scsic", 25'000'000); // type and clock guessed
+	NCR53CF94(config, "scsic", XTAL::u(25'000'000)); // type and clock guessed
 }
 
 ROM_START(cdd2000)

@@ -544,7 +544,7 @@ void mycom_state::mycom(machine_config &config)
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
 	The manual states the CRTC is a HD46505S (apparently same as HD6845S). The start registers need to be readable. */
-	HD6845S(config, m_crtc, 1008000);
+	HD6845S(config, m_crtc, XTAL::u(1008000));
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

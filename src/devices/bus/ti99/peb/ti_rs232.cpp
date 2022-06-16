@@ -140,7 +140,7 @@ namespace bus::ti99::peb {
 #define SERDEV1 "serdev1"
 #define PIODEV "piodev"
 
-ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_RS232, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_crulatch(*this, "crulatch"),
@@ -170,14 +170,14 @@ ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const ch
 /**************************************************************************/
 /* Ports */
 
-ti_rs232_attached_device::ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ti_rs232_attached_device::ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99_RS232_DEV, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_uart(nullptr)
 {
 }
 
-ti_pio_attached_device::ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ti_pio_attached_device::ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99_PIO_DEV, tag, owner, clock),
 	device_image_interface(mconfig, *this)
 {
@@ -1092,22 +1092,22 @@ INPUT_PORTS_END
 
 void ti_rs232_pio_device::device_add_mconfig(machine_config &config)
 {
-	TMS9902(config, m_uart0, 3000000);
+	TMS9902(config, m_uart0, XTAL::u(3000000));
 	m_uart0->int_cb().set(FUNC(ti_rs232_pio_device::int0_callback));
 	m_uart0->rcv_cb().set(FUNC(ti_rs232_pio_device::rcv0_callback));
 	m_uart0->xmit_cb().set(FUNC(ti_rs232_pio_device::xmit0_callback));
 	m_uart0->ctrl_cb().set(FUNC(ti_rs232_pio_device::ctrl0_callback));
-	TMS9902(config, m_uart1, 3000000);
+	TMS9902(config, m_uart1, XTAL::u(3000000));
 	m_uart1->int_cb().set(FUNC(ti_rs232_pio_device::int1_callback));
 	m_uart1->rcv_cb().set(FUNC(ti_rs232_pio_device::rcv1_callback));
 	m_uart1->xmit_cb().set(FUNC(ti_rs232_pio_device::xmit1_callback));
 	m_uart1->ctrl_cb().set(FUNC(ti_rs232_pio_device::ctrl1_callback));
-	TI99_RS232_DEV(config, m_serdev0, 0);
+	TI99_RS232_DEV(config, m_serdev0);
 	m_serdev0->connect(m_uart0);
-	TI99_RS232_DEV(config, m_serdev1, 0);
+	TI99_RS232_DEV(config, m_serdev1);
 	m_serdev1->connect(m_uart1);
 
-	TI99_PIO_DEV(config, m_piodev, 0);
+	TI99_PIO_DEV(config, m_piodev);
 
 	LS259(config, m_crulatch); // U12
 	m_crulatch->q_out_cb<0>().set(FUNC(ti_rs232_pio_device::selected_w));

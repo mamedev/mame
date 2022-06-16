@@ -573,7 +573,7 @@ void tpp2_state::config(machine_config &config)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	NETLIST_SOUND(config, "snd_nl", 48000)
+	NETLIST_SOUND(config, "snd_nl", XTAL::u(48000))
 		.set_source(NETLIST_NAME(popeye))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 

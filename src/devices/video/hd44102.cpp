@@ -54,7 +54,7 @@ DEFINE_DEVICE_TYPE(HD44102, hd44102_device, "hd44102", "Hitachi HD44102 LCD Cont
 //  hd44102_device - constructor
 //-------------------------------------------------
 
-hd44102_device::hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+hd44102_device::hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, HD44102, tag, owner, clock),
 	m_sx(0),
 	m_sy(0)

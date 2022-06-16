@@ -17,7 +17,7 @@ class dg640_device : public device_t, public device_s100_card_interface
 {
 public:
 	// construction/destruction
-	dg640_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dg640_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

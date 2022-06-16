@@ -25,7 +25,7 @@ class bbc_stl4m32_device :
 {
 public:
 	// construction/destruction
-	bbc_stl4m32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_stl4m32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(clock_switch);
 

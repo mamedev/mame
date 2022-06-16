@@ -526,14 +526,14 @@ void de_3_state::de_3_dmd2(machine_config &config)
 {
 	de_3(config);
 	DECODMD2(config, m_dmdtype2, 0, "dmdcpu");
-	DECOBSMT(config, m_decobsmt, 0);
+	DECOBSMT(config, m_decobsmt);
 }
 
 void de_3_state::de_3_dmd1(machine_config &config)
 {
 	de_3(config);
 	DECODMD1(config, m_dmdtype1, 0, "dmdcpu");
-	DECOBSMT(config, m_decobsmt, 0);
+	DECOBSMT(config, m_decobsmt);
 }
 
 void de_3_state::de_3_dmdo(machine_config &config)
@@ -561,7 +561,7 @@ void de_3_state::de_3b(machine_config &config)
 	DECODMD3(config, m_dmdtype3, 0, "dmdcpu");
 
 	/* sound hardware */
-	DECOBSMT(config, m_decobsmt, 0);
+	DECOBSMT(config, m_decobsmt);
 }
 
 void de_3_state::detest(machine_config &config)

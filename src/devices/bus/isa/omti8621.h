@@ -148,7 +148,7 @@ private:
 class omti8621_pc_device : public omti8621_device
 {
 public:
-	omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(ISA16_OMTI8621, omti8621_pc_device)
@@ -158,7 +158,7 @@ DECLARE_DEVICE_TYPE(ISA16_OMTI8621, omti8621_pc_device)
 class omti8621_apollo_device : public omti8621_device
 {
 public:
-	omti8621_apollo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	omti8621_apollo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// get sector diskaddr of logical unit lun into data_buffer
 	uint32_t get_sector(int32_t diskaddr, uint8_t *buffer, uint32_t length, uint8_t lun);

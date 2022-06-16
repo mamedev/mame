@@ -468,12 +468,12 @@ void calorie_state::machine_reset()
 void calorie_state::calorie(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);         /* 4 MHz */
+	Z80(config, m_maincpu, XTAL::u(4000000));         /* 4 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &calorie_state::calorie_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &calorie_state::decrypted_opcodes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(calorie_state::irq0_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 3000000));        /* 3 MHz */
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL::u(3000000)));        /* 3 MHz */
 	audiocpu.set_addrmap(AS_PROGRAM, &calorie_state::calorie_sound_map);
 	audiocpu.set_addrmap(AS_IO, &calorie_state::calorie_sound_io_map);
 	audiocpu.set_periodic_int(FUNC(calorie_state::irq0_line_hold), attotime::from_hz(64));
@@ -496,11 +496,11 @@ void calorie_state::calorie(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
+	YM2149(config, "ay1", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
+	YM2149(config, "ay2", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	YM2149(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
+	YM2149(config, "ay3", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.8);
 }
 
 void calorie_state::caloriee(machine_config &config)

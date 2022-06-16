@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(OSA_SPARC, saitekosa_sparc_device, "osa_sparc", "Sparc")
 //  initialization
 //-------------------------------------------------
 
-saitekosa_sparc_device::saitekosa_sparc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+saitekosa_sparc_device::saitekosa_sparc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, OSA_SPARC, tag, owner, clock),
 	device_saitekosa_expansion_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),

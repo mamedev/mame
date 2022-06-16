@@ -9,7 +9,7 @@
 
 static constexpr int TIMER_POLL = 1;
 
-pseudo_terminal_device::pseudo_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pseudo_terminal_device::pseudo_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PSEUDO_TERMINAL, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),

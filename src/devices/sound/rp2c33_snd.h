@@ -26,7 +26,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; } // one or more features are not verified, and possibly incorrect
 
 	// construction/destruction
-	rp2c33_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rp2c33_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// host interface
 	void write(offs_t offset, u8 data);

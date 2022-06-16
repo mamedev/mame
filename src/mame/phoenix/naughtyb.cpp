@@ -428,7 +428,7 @@ void naughtyb_state::naughtyb_base(machine_config &config)
 	/* uses the TMS3615NS for sound */
 	SPEAKER(config, "mono").front_center();
 
-	tms36xx_device &tms(TMS36XX(config, "tms", 350));
+	tms36xx_device &tms(TMS36XX(config, "tms", XTAL::u(350)));
 	tms.set_subtype(tms36xx_device::subtype::TMS3615);
 	tms.set_decays(0.15, 0.20, 0, 0, 0, 0);
 	// NOTE: it's unknown if the TMS3615 mixes more than one voice internally.

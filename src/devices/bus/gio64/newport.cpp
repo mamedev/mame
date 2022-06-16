@@ -63,7 +63,7 @@ DEFINE_DEVICE_TYPE(GIO64_XL24, gio64_xl24_device, "gio64_xl24", "SGI 24-bit XL b
  *
  *************************************/
 
-xmap9_device::xmap9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xmap9_device::xmap9_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XMAP9, tag, owner, clock)
 {
 }
@@ -215,7 +215,7 @@ void xmap9_device::write(uint32_t offset, uint32_t data)
  *
  *************************************/
 
-cmap_device::cmap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cmap_device::cmap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CMAP, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 {
@@ -297,7 +297,7 @@ uint32_t cmap_device::read(uint32_t offset)
 
 /*static*/ const size_t vc2_device::RAM_SIZE = 0x8000;
 
-vc2_device::vc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vc2_device::vc2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VC2, tag, owner, clock)
 	, m_vert_int(*this)
 	, m_screen_timing_changed(*this)
@@ -836,7 +836,7 @@ WRITE_LINE_MEMBER(vc2_device::vblank_w)
 
 /*static*/ const size_t rb2_device::BUFFER_SIZE = (1280 + 64) * (1024 + 64);
 
-rb2_device::rb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rb2_device::rb2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RB2, tag, owner, clock)
 {
 }
@@ -1079,7 +1079,7 @@ void rb2_device::store_pixel(uint32_t value)
 
 /*static*/ const uint32_t newport_base_device::s_host_shifts[4] = { 8, 8, 16, 32 };
 
-newport_base_device::newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+newport_base_device::newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gio64_card_interface(mconfig, *this)
 	, m_screen(*this, "screen")
@@ -1095,12 +1095,12 @@ newport_base_device::newport_base_device(const machine_config &mconfig, device_t
 {
 }
 
-gio64_xl8_device::gio64_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gio64_xl8_device::gio64_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: newport_base_device(mconfig, GIO64_XL8, tag, owner, clock)
 {
 }
 
-gio64_xl24_device::gio64_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gio64_xl24_device::gio64_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: newport_base_device(mconfig, GIO64_XL24, tag, owner, clock)
 {
 }
@@ -4430,7 +4430,7 @@ void newport_base_device::rex3_w(offs_t offset, uint64_t data, uint64_t mem_mask
 
 void newport_base_device::device_add_mconfig(machine_config &config)
 {
-	VC2(config, m_vc2, 0);
+	VC2(config, m_vc2);
 	m_vc2->vert_int().set(FUNC(newport_base_device::vrint_w));
 	m_vc2->screen_timing_changed().set(FUNC(newport_base_device::update_screen_size));
 

@@ -703,14 +703,14 @@ void kinst_state::kinst(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(6000000, 390, 0, 320, 261, 0, 240); // preliminary
+	screen.set_raw(XTAL::u(6000000), 390, 0, 320, 261, 0, 240); // preliminary
 	screen.screen_vblank().set_inputline(m_maincpu, 0);
 	screen.set_screen_update(FUNC(kinst_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::BGR_555);
 
 	// sound hardware
-	DCS_AUDIO_2K(config, m_dcs, 0);
+	DCS_AUDIO_2K(config, m_dcs);
 }
 
 

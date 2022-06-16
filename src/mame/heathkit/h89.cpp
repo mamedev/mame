@@ -198,7 +198,7 @@ void h89_state::h89(machine_config & config)
 	rs232.rxd_handler().set("ins8250", FUNC(ins8250_uart_device::rx_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_hz(100));
+	TIMER(config, "irq_timer").configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_hz(100));
 }
 
 /* ROM definition */

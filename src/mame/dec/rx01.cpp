@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(RX01, rx01_device, "rx01", "RX01 Floppy Disk Controller")
 //  rx01_device - constructor
 //-------------------------------------------------
 
-rx01_device::rx01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rx01_device::rx01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RX01, tag, owner, clock)
 	, m_image(*this, "floppy%u", 0U)
 {
@@ -72,7 +72,7 @@ void rx01_device::device_add_mconfig(machine_config &config)
 	cpu.set_addrmap(AS_DATA, &rx01_device::secbuf_map);
 
 	for (auto &floppy : m_image)
-		LEGACY_FLOPPY(config, floppy, 0, &rx01_floppy_interface);
+		LEGACY_FLOPPY(config, floppy, &rx01_floppy_interface);
 }
 
 //-------------------------------------------------

@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(PC8801_31, pc8801_31_device, "pc8801_31", "NEC PC8801-31 CD-R
 //-------------------------------------------------
 
 
-pc8801_31_device::pc8801_31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc8801_31_device::pc8801_31_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PC8801_31, tag, owner, clock)
 	, m_scsibus(*this, "scsi")
 	, m_rom_bank_cb(*this)

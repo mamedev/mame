@@ -683,7 +683,7 @@ INPUT_PORTS_END
 
 void srmp6_state::srmp6(machine_config &config)
 {
-	M68000(config, m_maincpu, 16000000);
+	M68000(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &srmp6_state::srmp6_map);
 	m_maincpu->set_vblank_int("screen", FUNC(srmp6_state::irq4_line_assert)); // irq3 is a timer irq, but it's never enabled
 

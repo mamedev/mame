@@ -740,16 +740,16 @@ void altos8600_state::altos8600(machine_config &config)
 	m_dmac->sintr1().set(FUNC(altos8600_state::sintr1_w));
 	m_dmac->sintr2().set(m_pic[1], FUNC(pic8259_device::ir4_w));
 
-	PIC8259(config, m_pic[0], 0);
+	PIC8259(config, m_pic[0]);
 	m_pic[0]->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic[0]->in_sp_callback().set_constant(1);
 	m_pic[0]->read_slave_ack_callback().set(FUNC(altos8600_state::get_slave_ack));
 
-	PIC8259(config, m_pic[1], 0);
+	PIC8259(config, m_pic[1]);
 	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir2_w));
 	m_pic[1]->in_sp_callback().set_constant(0);
 
-	PIC8259(config, m_pic[2], 0);
+	PIC8259(config, m_pic[2]);
 	m_pic[2]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir3_w));
 	m_pic[2]->in_sp_callback().set_constant(0);
 
@@ -774,9 +774,9 @@ void altos8600_state::altos8600(machine_config &config)
 	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcdb_w));
 	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsb_w));
 
-	I8255A(config, "ppi", 0);
+	I8255A(config, "ppi");
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(1228800);
 	pit.out_handler<0>().set(m_uart8274, FUNC(i8274_device::rxca_w));
 	pit.out_handler<0>().append(m_uart8274, FUNC(i8274_device::txca_w));
@@ -785,7 +785,7 @@ void altos8600_state::altos8600(machine_config &config)
 	pit.set_clk<2>(1228800);
 	pit.out_handler<1>().set(m_pic[0], FUNC(pic8259_device::ir1_w));
 
-	FD1797(config, m_fdc, 2000000);
+	FD1797(config, m_fdc, XTAL::u(2000000));
 	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set(FUNC(altos8600_state::fddrq_w));
 	FLOPPY_CONNECTOR(config, "fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
@@ -793,12 +793,12 @@ void altos8600_state::altos8600(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	ACS8600_ICS(config, m_ics, 0);
+	ACS8600_ICS(config, m_ics);
 	m_ics->set_host_space(m_dmac, AS_PROGRAM); // TODO: fixme
 	m_ics->irq1_callback().set(m_pic[0], FUNC(pic8259_device::ir5_w));
 	m_ics->irq2_callback().set(m_pic[0], FUNC(pic8259_device::ir6_w));
 
-	HARDDISK(config, "hdd", 0);
+	HARDDISK(config, "hdd");
 
 	SOFTWARE_LIST(config, "flop_list").set_original("altos8600");
 }

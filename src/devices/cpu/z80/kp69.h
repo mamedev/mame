@@ -41,7 +41,7 @@ public:
 
 protected:
 	// construction/destruction
-	kp69_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	kp69_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -82,7 +82,7 @@ class kp69_device : public kp69_base_device
 {
 public:
 	// device type constructor
-	kp69_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	kp69_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// write handlers
 	void lerl_pgrl_w(u8 data);

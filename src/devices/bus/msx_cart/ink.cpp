@@ -15,7 +15,7 @@ for protection.
 DEFINE_DEVICE_TYPE(MSX_CART_INK, msx_cart_ink_device, "msx_cart_ink", "MSX Cartridge - Ink")
 
 
-msx_cart_ink_device::msx_cart_ink_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_ink_device::msx_cart_ink_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_INK, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_flash(*this, "flash")

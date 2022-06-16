@@ -59,7 +59,7 @@ void tanbus_ravdu_device::device_add_mconfig(machine_config &config)
 //  tanbus_ravdu_device - constructor
 //-------------------------------------------------
 
-tanbus_ravdu_device::tanbus_ravdu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tanbus_ravdu_device::tanbus_ravdu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TANBUS_RAVDU, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
 	, m_screen(*this, "screen")

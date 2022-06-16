@@ -384,7 +384,7 @@ GFXDECODE_END
 
 void bigstrkb_state::bigstrkb(machine_config &config)
 {
-	M68000(config, m_maincpu, 12'000'000);
+	M68000(config, m_maincpu, XTAL::u(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &bigstrkb_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bigstrkb_state::irq6_line_hold));
 
@@ -402,13 +402,13 @@ void bigstrkb_state::bigstrkb(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-//  YM2151(config, "ymsnd", 4'000'000);
+//  YM2151(config, "ymsnd", XTAL::u(4'000'000));
 
-	okim6295_device &oki1(OKIM6295(config, "oki1", 4'000'000, okim6295_device::PIN7_HIGH));
+	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL::u(4'000'000), okim6295_device::PIN7_HIGH));
 	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
 	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
 
-	okim6295_device &oki2(OKIM6295(config, "oki2", 4'000'000, okim6295_device::PIN7_HIGH));
+	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL::u(4'000'000), okim6295_device::PIN7_HIGH));
 	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
 	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
 }

@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(A2BUS_CCS7710, ccs7710_device, "ccs7710", "CCS Model 7710 Asy
 //  DEVICE IMPLEMENTATION
 //**************************************************************************
 
-ccs7710_device::ccs7710_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ccs7710_device::ccs7710_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, A2BUS_CCS7710, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
 	, m_acia(*this, "acia")

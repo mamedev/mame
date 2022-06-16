@@ -29,7 +29,7 @@ class isa8_ibm_mfc_device : public device_t,
 {
 public:
 	// Construction/destruction
-	isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// Device-level overrides

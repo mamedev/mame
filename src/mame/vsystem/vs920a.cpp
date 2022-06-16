@@ -32,7 +32,7 @@ t=tile, p=palette
 
 DEFINE_DEVICE_TYPE(VS920A, vs920a_text_tilemap_device, "vs920a", "VS920A Text Tilemap")
 
-vs920a_text_tilemap_device::vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vs920a_text_tilemap_device::vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VS920A, tag, owner, clock)
 	, m_tmap(nullptr)
 	, m_vram()

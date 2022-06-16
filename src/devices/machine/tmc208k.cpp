@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(TMC28KU, tmc28ku_device, "tmc28ku", "TRW TMC28KU 8x8-bit Mult
 //-------------------------------------------------
 
 template <typename RegType, typename OutType>
-tmc208_base_device<RegType, OutType>::tmc208_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+tmc208_base_device<RegType, OutType>::tmc208_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_a_in(0)
 	, m_a(0)
@@ -44,12 +44,12 @@ tmc208_base_device<RegType, OutType>::tmc208_base_device(const machine_config &m
 {
 }
 
-tmc208k_device::tmc208k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmc208k_device::tmc208k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tmc208_base_device<int8_t, int16_t>(mconfig, TMC208K, tag, owner, clock)
 {
 }
 
-tmc28ku_device::tmc28ku_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmc28ku_device::tmc28ku_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tmc208_base_device<uint8_t, uint16_t>(mconfig, TMC28KU, tag, owner, clock)
 {
 }

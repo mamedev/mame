@@ -1141,7 +1141,7 @@ void cclimber_state::root(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::cclimber_map);
 	m_maincpu->set_addrmap(AS_IO, &cclimber_state::cclimber_portmap);
 
-	LS259(config, m_mainlatch, 0);
+	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
 	m_mainlatch->q_out_cb<1>().set(FUNC(cclimber_state::flip_screen_x_w));
 	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));
@@ -1239,7 +1239,7 @@ void cclimber_state::yamato(machine_config &config)
 	maincpu.set_addrmap(AS_OPCODES, &cclimber_state::yamato_decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
-	Z80(config, m_audiocpu, 3072000); /* 3.072 MHz ? */
+	Z80(config, m_audiocpu, XTAL::u(3072000)); /* 3.072 MHz ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cclimber_state::yamato_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &cclimber_state::yamato_audio_portmap);
 
@@ -1291,7 +1291,7 @@ void cclimber_state::swimmer(machine_config &config)
 	Z80(config, m_maincpu, XTAL(18'432'000)/6);    /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::swimmer_map);
 
-	LS259(config, m_mainlatch, 0);
+	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
 	m_mainlatch->q_out_cb<1>().set(FUNC(cclimber_state::flip_screen_x_w));
 	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));

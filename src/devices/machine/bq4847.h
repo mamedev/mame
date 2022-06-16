@@ -20,7 +20,7 @@ class bq4847_device : public device_t,
 					  public device_rtc_interface
 {
 public:
-	bq4847_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bq4847_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto wdo_handler() { return m_wdo_handler.bind(); }
 	auto int_handler() { return m_int_handler.bind(); }
@@ -32,7 +32,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_wdi); // watchdog disabled if wdi pin is left floating
 
 protected:
-	bq4847_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 32768);
+	bq4847_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(32768));
 
 	// device_t
 	virtual void device_start() override;
@@ -89,7 +89,7 @@ private:
 class bq4845_device : public bq4847_device
 {
 public:
-	bq4845_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	bq4845_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(BQ4845, bq4845_device)

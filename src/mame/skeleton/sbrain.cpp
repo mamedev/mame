@@ -706,7 +706,7 @@ void sbrain_state::sbrain(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beep, XTAL::u(800)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* Devices */
 	I8255(config, m_ppi);
@@ -749,7 +749,7 @@ void sbrain_state::sbrain(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", sbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", sbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	TIMER(config, "timer_a", 0).configure_periodic(FUNC(sbrain_state::kbd_scan), attotime::from_hz(15));
+	TIMER(config, "timer_a").configure_periodic(FUNC(sbrain_state::kbd_scan), attotime::from_hz(15));
 
 	SOFTWARE_LIST(config, "flop_list").set_original("sbrain");
 }

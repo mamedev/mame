@@ -233,7 +233,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void sx1000_state::common(machine_config &config)
 {
-	M68010(config, m_cpu, 10'000'000);
+	M68010(config, m_cpu, XTAL::u(10'000'000));
 	m_cpu->set_addrmap(AS_PROGRAM, &sx1000_state::cpu_map);
 
 	// 36 x D41256C-15 (256Kb DRAM) on CPU board
@@ -246,12 +246,12 @@ void sx1000_state::common(machine_config &config)
 
 	// M6845 config screen: HTOTAL: 944  VTOTAL: 444  MAX_X: 639  MAX_Y: 399  HSYNC: 720-823  VSYNC: 416-425  Freq: 76.347534fps
 	SCREEN(config, m_screen_crtc, SCREEN_TYPE_RASTER);
-	m_screen_crtc->set_raw(48'800'000, 944, 0, 640, 444, 0, 400);
+	m_screen_crtc->set_raw(XTAL::u(48'800'000), 944, 0, 640, 444, 0, 400);
 	m_screen_crtc->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
 
 	// ACRTC: full 944x449 vis (200, 18)-(847, 417)
 	SCREEN(config, m_screen_acrtc, SCREEN_TYPE_RASTER);
-	m_screen_acrtc->set_raw(48'800'000, 944, 200, 847, 449, 18, 417);
+	m_screen_acrtc->set_raw(XTAL::u(48'800'000), 944, 200, 847, 449, 18, 417);
 	m_screen_acrtc->set_screen_update(m_acrtc, FUNC(hd63484_device::update_screen));
 	m_screen_acrtc->set_palette(m_palette_acrtc);
 
@@ -263,13 +263,13 @@ void sx1000_state::common(machine_config &config)
 	// vdisp = 25
 	// mrast = 15
 	// MB89321A
-	HD6345(config, m_crtc, 4'000'000);
+	HD6345(config, m_crtc, XTAL::u(4'000'000));
 	m_crtc->set_screen(m_screen_crtc);
 	m_crtc->set_update_row_callback(FUNC(sx1000_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
 	m_crtc->set_hpixels_per_column(8);
 
-	HD63484(config, m_acrtc, 8'000'000);
+	HD63484(config, m_acrtc, XTAL::u(8'000'000));
 	m_acrtc->set_screen(m_screen_acrtc);
 	m_acrtc->set_addrmap(0, &sx1000_state::acrtc_map);
 
@@ -279,12 +279,12 @@ void sx1000_state::common(machine_config &config)
 	rs232_1.cts_handler().set(m_serial1, FUNC(i8251_device::write_cts));
 	rs232_1.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal1));
 
-	I8251(config, m_serial1, 4'000'000);
+	I8251(config, m_serial1, XTAL::u(4'000'000));
 	m_serial1->txd_handler().set(rs232_1, FUNC(rs232_port_device::write_txd));
 	m_serial1->dtr_handler().set(rs232_1, FUNC(rs232_port_device::write_dtr));
 	m_serial1->rts_handler().set(rs232_1, FUNC(rs232_port_device::write_rts));
 
-	CLOCK(config, "clock1", 1200*16).signal_handler().set(m_serial1, FUNC(i8251_device::write_txc));
+	CLOCK(config, "clock1", XTAL::u(1200*16)).signal_handler().set(m_serial1, FUNC(i8251_device::write_txc));
 
 	auto &rs232_2(RS232_PORT(config, "serial2", default_rs232_devices, nullptr));
 	rs232_2.rxd_handler().set(m_serial2, FUNC(i8251_device::write_rxd));
@@ -292,12 +292,12 @@ void sx1000_state::common(machine_config &config)
 	rs232_2.cts_handler().set(m_serial2, FUNC(i8251_device::write_cts));
 	rs232_2.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal2));
 
-	I8251(config, m_serial2, 4'000'000);
+	I8251(config, m_serial2, XTAL::u(4'000'000));
 	m_serial2->txd_handler().set(rs232_2, FUNC(rs232_port_device::write_txd));
 	m_serial2->dtr_handler().set(rs232_2, FUNC(rs232_port_device::write_dtr));
 	m_serial2->rts_handler().set(rs232_2, FUNC(rs232_port_device::write_rts));
 
-	CLOCK(config, "clock2", 9600*16).signal_handler().set(m_serial2, FUNC(i8251_device::write_txc));
+	CLOCK(config, "clock2", XTAL::u(9600*16)).signal_handler().set(m_serial2, FUNC(i8251_device::write_txc));
 }
 
 void sx1000_state::sx1010(machine_config &config)

@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(BERT, bert_device, "ncd_bert_asic", "NCD BERT ASIC")
 
-bert_device::bert_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+bert_device::bert_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BERT, tag, owner, clock)
 	, m_memory_space(*this, finder_base::DUMMY_TAG, 24, 16)
 {

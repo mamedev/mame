@@ -101,7 +101,7 @@ void vic20_final_expansion_3_device::device_add_mconfig(machine_config &config)
 //  vic20_final_expansion_3_device - constructor
 //-------------------------------------------------
 
-vic20_final_expansion_3_device::vic20_final_expansion_3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vic20_final_expansion_3_device::vic20_final_expansion_3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VIC20_FE3, tag, owner, clock),
 	device_vic20_expansion_card_interface(mconfig, *this),
 	m_flash_rom(*this, AM29F040_TAG),

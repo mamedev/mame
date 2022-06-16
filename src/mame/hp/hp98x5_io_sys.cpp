@@ -33,7 +33,7 @@ namespace {
 // Device type definition
 DEFINE_DEVICE_TYPE(HP98X5_IO_SYS, hp98x5_io_sys_device, "hp98x5_io_sys", "HP98x5 I/O sub-system")
 
-hp98x5_io_sys_device::hp98x5_io_sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp98x5_io_sys_device::hp98x5_io_sys_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 : device_t(mconfig , HP98X5_IO_SYS , tag , owner , clock)
 	, m_irl_handler(*this)
 	, m_irh_handler(*this)

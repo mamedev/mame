@@ -25,13 +25,13 @@ class agat7video_device : public device_t, public device_palette_interface
 public:
 	template <typename T, typename U>
 	agat7video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&ram_tag, U &&char_tag)
-		: agat7video_device(mconfig, tag, owner, (uint32_t)0)
+		: agat7video_device(mconfig, tag, owner)
 	{
 		m_ram_dev.set_tag(std::forward<T>(ram_tag));
 		m_char_region.set_tag(std::forward<U>(char_tag));
 	}
 
-	agat7video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	agat7video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);

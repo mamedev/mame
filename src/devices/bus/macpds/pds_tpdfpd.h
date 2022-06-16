@@ -20,10 +20,10 @@ class macpds_sedisplay_device :
 {
 public:
 	// construction/destruction
-	macpds_sedisplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	macpds_sedisplay_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

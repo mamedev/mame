@@ -158,12 +158,12 @@ const tiny_rom_entry *isa8_mda_device::device_rom_region() const
 //  isa8_mda_device - constructor
 //-------------------------------------------------
 
-isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_mda_device(mconfig, ISA8_MDA, tag, owner, clock)
 {
 }
 
-isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this), m_crtc(*this, MC6845_NAME), m_lpt(*this, "lpt"), m_framecnt(0), m_mode_control(0),
 	m_update_row_type(-1), m_chr_gen(nullptr), m_vsync(0), m_hsync(0), m_pixel(0),
@@ -584,7 +584,7 @@ const tiny_rom_entry *isa8_hercules_device::device_rom_region() const
 //  isa8_hercules_device - constructor
 //-------------------------------------------------
 
-isa8_hercules_device::isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_hercules_device::isa8_hercules_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_mda_device(mconfig, ISA8_HERCULES, tag, owner, clock), m_configuration_switch(0)
 {
 }
@@ -783,7 +783,7 @@ void isa8_ec1840_0002_device::device_add_mconfig(machine_config &config)
 //  isa8_ec1840_0002_device - constructor
 //-------------------------------------------------
 
-isa8_ec1840_0002_device::isa8_ec1840_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_ec1840_0002_device::isa8_ec1840_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_mda_device(mconfig, ISA8_EC1840_0002, tag, owner, clock), m_soft_chr_gen(nullptr)
 {
 }

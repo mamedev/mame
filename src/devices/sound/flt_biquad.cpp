@@ -46,7 +46,7 @@ ALLOW_SAVE_TYPE(filter_biquad_device::biquad_type);
 //-------------------------------------------------
 
 // initialize with some sane defaults for a highpass filter with a cutoff at 16hz, same as flt_rc's 'ac' mode.
-filter_biquad_device::filter_biquad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+filter_biquad_device::filter_biquad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, FILTER_BIQUAD, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

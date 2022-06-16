@@ -27,7 +27,7 @@ class at28c64b_device :
 {
 public:
 	// construction/destruction
-	at28c64b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at28c64b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void write(offs_t offset, u8 data);
 	u8 read(offs_t offset);

@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(X2201, x2201_device, "x2201", "Xicor X2201 1024x1 NOVRAM")
 //  x2201_device - constructor
 //-------------------------------------------------
 
-x2201_device::x2201_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+x2201_device::x2201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, X2201, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_default_data(*this, DEVICE_SELF)

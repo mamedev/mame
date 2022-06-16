@@ -707,7 +707,7 @@ void devstors_state::devstors(machine_config &config)
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(devstors_state::sprite_callback));
 
-	K051733(config, "k051733", 0);
+	K051733(config, "k051733");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

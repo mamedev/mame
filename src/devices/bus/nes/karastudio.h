@@ -51,7 +51,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts)
-		: nes_kstudio_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: nes_kstudio_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -59,7 +59,7 @@ public:
 		set_fixed(false);
 	}
 
-	nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~nes_kstudio_slot_device();
 
 	// image-level overrides
@@ -99,7 +99,7 @@ class nes_kstudio_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -127,7 +127,7 @@ class nes_karaokestudio_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read_m(offs_t offset) override;
 	virtual uint8_t read_h(offs_t offset) override;

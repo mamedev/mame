@@ -38,7 +38,7 @@ ROM_END
 
 void electron_elksd64_device::device_add_mconfig(machine_config &config)
 {
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->spi_miso_callback().set([this](int state) { m_status = state << 7; });
 }
 
@@ -59,7 +59,7 @@ const tiny_rom_entry *electron_elksd64_device::device_rom_region() const
 //  electron_elksd64_device - constructor
 //-------------------------------------------------
 
-electron_elksd64_device::electron_elksd64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_elksd64_device::electron_elksd64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_ELKSD64, tag, owner, clock)
 	, device_electron_expansion_interface(mconfig, *this)
 	, m_flash(*this, "flash")

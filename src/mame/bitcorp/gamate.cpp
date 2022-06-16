@@ -182,15 +182,15 @@ TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
 
 void gamate_state::gamate(machine_config &config)
 {
-	M6502(config, m_maincpu, 4433000/2); // NCR 65CX02
+	M6502(config, m_maincpu, XTAL::u(4433000)/2); // NCR 65CX02
 	m_maincpu->set_addrmap(AS_PROGRAM, &gamate_state::gamate_mem);
 
-	GAMATE_VIDEO(config, "video", 0);
+	GAMATE_VIDEO(config, "video");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left(); // Stereo headphone output
 	SPEAKER(config, "rspeaker").front_right();
-	AY8910(config, m_ay, 4433000 / 4); // AY compatible, no actual AY chip present
+	AY8910(config, m_ay, XTAL::u(4433000) / 4); // AY compatible, no actual AY chip present
 	m_ay->add_route(0, "lspeaker", 0.5);
 	m_ay->add_route(1, "rspeaker", 0.5);
 	m_ay->add_route(2, "lspeaker", 0.25);

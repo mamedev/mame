@@ -50,7 +50,7 @@ void cpc_playcity_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_playcity_device::cpc_playcity_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cpc_playcity_device::cpc_playcity_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CPC_PLAYCITY, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_slot(nullptr),

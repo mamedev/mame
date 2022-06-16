@@ -558,25 +558,25 @@ void gts80a_state::p0(machine_config &config)
 void gts80a_state::p2(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN2(config, m_p2_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_PIN2(config, m_p2_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void gts80a_state::p3(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN3(config, m_p3_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_PIN3(config, m_p3_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void gts80a_state::r1(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_REV1(config, m_r1_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 void gts80a_state::r1v(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
+	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 //******************* CAVEMAN ****************************************************************
@@ -645,7 +645,7 @@ void caveman_state::video_io_map(address_map &map)
 void caveman_state::caveman(machine_config &config)
 {
 	r1v(config);
-	I8088(config, m_videocpu, 5000000);
+	I8088(config, m_videocpu, XTAL::u(5000000));
 	m_videocpu->set_addrmap(AS_PROGRAM, &caveman_state::video_map);
 	m_videocpu->set_addrmap(AS_IO, &caveman_state::video_io_map);
 

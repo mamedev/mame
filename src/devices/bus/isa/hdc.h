@@ -25,7 +25,7 @@ class xt_hdc_device :
 {
 public:
 	// construction/destruction
-	xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto drq_handler() { return m_drq_handler.bind(); }
@@ -46,7 +46,7 @@ public:
 	bool install_rom() { return (m_type != EC1841); }
 
 protected:
-	xt_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	xt_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -113,7 +113,7 @@ private:
 class ec1841_device : public xt_hdc_device
 {
 public:
-	ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
@@ -122,7 +122,7 @@ protected:
 class st11m_device : public xt_hdc_device
 {
 public:
-	st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	devcb_write_line m_irq_handler;
@@ -141,14 +141,14 @@ class isa8_hdc_device :
 {
 public:
 	// construction/destruction
-	isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t pc_hdc_r(offs_t offset);
 	void pc_hdc_w(offs_t offset, uint8_t data);
 	required_device<xt_hdc_device> m_hdc;
 
 protected:
-	isa8_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -174,7 +174,7 @@ public:
 class isa8_hdc_ec1841_device : public isa8_hdc_device
 {
 public:
-	isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

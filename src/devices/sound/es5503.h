@@ -15,7 +15,7 @@ class es5503_device : public device_t,
 {
 public:
 	// construction/destruction
-	es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// channels must be a power of two
 	void set_channels(int channels) { output_channels = channels; }

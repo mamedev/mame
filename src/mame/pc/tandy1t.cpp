@@ -60,7 +60,7 @@ class t1000_mb_device : public pc_noppi_mb_device
 {
 public:
 	// construction/destruction
-	t1000_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	t1000_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: pc_noppi_mb_device(mconfig, T1000_MOTHERBOARD, tag, owner, clock)
 	{ }
 protected:
@@ -136,7 +136,7 @@ private:
 	} m_eeprom_ee[0x40]; /* only 0 to 4 used in hx, addressing seems to allow this */
 
 	int m_eeprom_state = 0;
-	int m_eeprom_clock = 0;
+	int m_eeprom_clock = XTAL();
 	uint8_t m_eeprom_oper = 0;
 	uint16_t m_eeprom_data = 0;
 
@@ -560,7 +560,7 @@ INPUT_PORTS_END
 class t1000_keyboard_device : public pc_keyboard_device
 {
 public:
-	t1000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	t1000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -568,7 +568,7 @@ protected:
 
 DEFINE_DEVICE_TYPE(T1000_KEYB, t1000_keyboard_device, "t1000_keyb", "Tandy 1000 Keyboard")
 
-t1000_keyboard_device::t1000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+t1000_keyboard_device::t1000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pc_keyboard_device(mconfig, T1000_KEYB, tag, owner, clock)
 {
 	m_type = KEYBOARD_TYPE::PC;
@@ -681,13 +681,13 @@ GFXDECODE_END
 
 void tandy1000_state::tandy1000_common(machine_config &config)
 {
-	T1000_MOTHERBOARD(config, m_mb, 0);
+	T1000_MOTHERBOARD(config, m_mb);
 	m_mb->set_cputag("maincpu");
 	m_mb->int_callback().set_inputline("maincpu", 0);
 	m_mb->nmi_callback().set_inputline("maincpu", INPUT_LINE_NMI);
 
 	/* video hardware */
-	PCVIDEO_T1000(config, m_video, 0);
+	PCVIDEO_T1000(config, m_video);
 	m_video->set_screen("pcvideo_t1000:screen");
 	GFXDECODE(config, "gfxdecode", "pcvideo_t1000:palette", gfx_t1000);
 
@@ -696,11 +696,11 @@ void tandy1000_state::tandy1000_common(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	isa8_slot_device &isa_fdc(ISA8_SLOT(config, "isa_fdc", 0, "mb:isa", pc_isa8_cards, "fdc_xt", true)); // FIXME: determine ISA bus clock
+	isa8_slot_device &isa_fdc(ISA8_SLOT(config, "isa_fdc", "mb:isa", pc_isa8_cards, "fdc_xt", true)); // FIXME: determine ISA bus clock
 	isa_fdc.set_option_machine_config("fdc_xt", cfg_fdc_35);
 
-	ISA8_SLOT(config, "isa_lpt", 0, "mb:isa", pc_isa8_cards, "lpt", true);
-	ISA8_SLOT(config, "isa_com", 0, "mb:isa", pc_isa8_cards, "com", true);
+	ISA8_SLOT(config, "isa_lpt", "mb:isa", pc_isa8_cards, "lpt", true);
+	ISA8_SLOT(config, "isa_com", "mb:isa", pc_isa8_cards, "com", true);
 
 	PC_JOY(config, "pc_joy");
 
@@ -725,7 +725,7 @@ void tandy1000_state::tandy1000_101key(machine_config &config)
 
 void tandy1000_state::t1000hx(machine_config &config)
 {
-	I8088(config, m_maincpu, 8000000);
+	I8088(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tandy1000_state::tandy1000_map);
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
@@ -735,7 +735,7 @@ void tandy1000_state::t1000hx(machine_config &config)
 	tandy1000_90key(config);
 
 	// plus cards are isa with a nonstandard conntector
-	ISA8_SLOT(config, "plus1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "plus1", "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
 
 	m_ram->set_extra_options("256K, 384K");
 }
@@ -745,10 +745,10 @@ void tandy1000_state::t1000sx(machine_config &config)
 	t1000hx(config);
 	subdevice<isa8_slot_device>("isa_fdc")->set_option_machine_config("fdc_xt", cfg_fdc_525);
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", "mb:isa", pc_isa8_cards, nullptr, false);
 
 	m_ram->set_extra_options("384K");
 }
@@ -776,10 +776,10 @@ void tandy1000_state::t1000sl2(machine_config &config)
 	t1000rl(config);
 	m_maincpu->set_clock(XTAL(24'000'000) / 3);
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", "mb:isa", pc_isa8_cards, nullptr, false);
 }
 
 void tandy1000_state::t1000tl(machine_config &config)
@@ -793,11 +793,11 @@ void tandy1000_state::t1000tl(machine_config &config)
 
 	tandy1000_101key(config);
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", "mb:isa", pc_isa8_cards, nullptr, false);
 }
 
 void tandy1000_state::t1000tx(machine_config &config)

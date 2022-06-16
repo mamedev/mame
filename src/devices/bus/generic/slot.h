@@ -196,7 +196,7 @@ public:
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
 protected:
-	generic_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	generic_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -216,7 +216,7 @@ class generic_socket_device : public generic_slot_device
 public:
 	template <typename T>
 	generic_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *intf, char const *exts = nullptr)
-		: generic_socket_device(mconfig, tag, owner, u32(0))
+		: generic_socket_device(mconfig, tag, owner)
 	{
 		opts(*this);
 		set_fixed(false);
@@ -225,7 +225,7 @@ public:
 			set_extensions(exts);
 	}
 
-	generic_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	generic_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual const char *image_type_name() const noexcept override { return "romimage"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "rom"; }
@@ -236,7 +236,7 @@ class generic_cartslot_device : public generic_slot_device
 public:
 	template <typename T>
 	generic_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *intf, char const *exts = nullptr)
-		: generic_cartslot_device(mconfig, tag, owner, u32(0))
+		: generic_cartslot_device(mconfig, tag, owner)
 	{
 		opts(*this);
 		set_fixed(false);
@@ -245,7 +245,7 @@ public:
 			set_extensions(exts);
 	}
 
-	generic_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	generic_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual const char *image_type_name() const noexcept override { return "cartridge"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "cart"; }

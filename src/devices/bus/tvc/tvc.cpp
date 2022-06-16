@@ -51,7 +51,7 @@ device_tvcexp_interface::~device_tvcexp_interface()
 //-------------------------------------------------
 //  tvcexp_slot_device - constructor
 //-------------------------------------------------
-tvcexp_slot_device::tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tvcexp_slot_device::tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TVCEXP_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_tvcexp_interface>(mconfig, *this),
 	m_out_irq_cb(*this),

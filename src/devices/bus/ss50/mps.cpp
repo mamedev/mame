@@ -22,7 +22,7 @@ class ss50_mps_device : public device_t, public ss50_card_interface
 {
 public:
 	// construction/destruction
-	ss50_mps_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	ss50_mps_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, SS50_MPS, tag, owner, clock)
 		, ss50_card_interface(mconfig, *this)
 		, m_acia(*this, "acia")
@@ -109,7 +109,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void ss50_mps_device::device_add_mconfig(machine_config &config)
 {
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//m_acia->rts_handler().set(FUNC(ss50_mps_device::reader_control_w));
 	m_acia->irq_handler().set(FUNC(ss50_mps_device::acia_irq_w));

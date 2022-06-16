@@ -174,7 +174,7 @@ constexpr uint8_t IFCMD_UNT        = 0x5f;  // Untalk
 DEFINE_DEVICE_TYPE(TMS9914, tms9914_device, "tms9914", "TMS9914 GPIB Controller")
 
 // Constructors
-tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig , TMS9914 , tag , owner , clock),
 	  m_dio_read_func(*this),
 	  m_dio_write_func(*this),

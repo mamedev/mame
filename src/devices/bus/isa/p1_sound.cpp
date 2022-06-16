@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(P1_SOUND, p1_sound_device, "p1_sound", "Poisk-1 sound card (B
 
 void p1_sound_device::device_add_mconfig(machine_config &config)
 {
-	I8251(config, m_midi, 0);
+	I8251(config, m_midi);
 	m_midi->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_midi->rxrdy_handler().set(":isa", FUNC(isa8_device::irq3_w));
 
@@ -35,7 +35,7 @@ void p1_sound_device::device_add_mconfig(machine_config &config)
 
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	PIT8253(config, m_d14, 0);
+	PIT8253(config, m_d14);
 	m_d14->set_clk<0>(XTAL(12'500'000)/10);
 //  sampler at 10 KHz
 	m_d14->out_handler<0>().set(FUNC(p1_sound_device::sampler_sync));
@@ -44,7 +44,7 @@ void p1_sound_device::device_add_mconfig(machine_config &config)
 	m_d14->set_clk<2>(XTAL(12'500'000)/10);
 	m_d14->out_handler<2>().set(m_midi, FUNC(i8251_device::write_rxc));
 
-	PIT8253(config, m_d16, 0);
+	PIT8253(config, m_d16);
 	m_d16->set_clk<0>(XTAL(12'500'000)/10);
 //  m_d16->out_handler<0>().set(FUNC(XXX));
 	m_d16->set_clk<1>(XTAL(12'500'000)/10);
@@ -52,7 +52,7 @@ void p1_sound_device::device_add_mconfig(machine_config &config)
 	m_d16->set_clk<2>(XTAL(12'500'000)/10);
 //  m_d16->out_handler<2>().set(FUNC(XXX));
 
-	PIT8253(config, m_d17, 0);
+	PIT8253(config, m_d17);
 	m_d17->set_clk<0>(XTAL(12'500'000)/10);
 //  m_d17->out_handler<0>().set(FUNC(XXX));
 	m_d17->set_clk<1>(XTAL(12'500'000)/10);
@@ -62,7 +62,7 @@ void p1_sound_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	FILTER_RC(config, m_filter).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "filter", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "filter", 0.5); // unknown DAC
 }
 
 
@@ -74,7 +74,7 @@ void p1_sound_device::device_add_mconfig(machine_config &config)
 //  p1_sound_device - constructor
 //-------------------------------------------------
 
-p1_sound_device::p1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+p1_sound_device::p1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, P1_SOUND, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_dac(*this, "dac")

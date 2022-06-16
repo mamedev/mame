@@ -87,7 +87,7 @@ protected:
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
-			u32 clock,
+			const XTAL &clock,
 			device_type type,
 			u32 addr_width,
 			u16 vector_mask,
@@ -189,7 +189,7 @@ protected:
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
-			u32 clock,
+			const XTAL &clock,
 			device_type type,
 			u32 addr_width,
 			address_map_constructor internal_map);
@@ -201,7 +201,7 @@ protected:
 class m68hc05c4_device : public m68hc05_device
 {
 public:
-	m68hc05c4_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	m68hc05c4_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void c4_map(address_map &map);
@@ -217,7 +217,7 @@ protected:
 class m68hc05c8_device : public m68hc05_device
 {
 public:
-	m68hc05c8_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	m68hc05c8_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void c8_map(address_map &map);
@@ -233,7 +233,7 @@ protected:
 class m68hc705c4a_device : public m68hc705_device
 {
 public:
-	m68hc705c4a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	m68hc705c4a_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void c4a_map(address_map &map);
@@ -257,7 +257,7 @@ private:
 class m68hc705c8a_device : public m68hc705_device
 {
 public:
-	m68hc705c8a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	m68hc705c8a_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void c8a_map(address_map &map);
@@ -287,7 +287,7 @@ private:
 class m68hc705j1a_device : public m68hc705_device
 {
 public:
-	m68hc705j1a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	m68hc705j1a_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void j1a_map(address_map &map);
@@ -304,7 +304,7 @@ protected:
 class m68hc05l9_device : public m68hc05_device
 {
 public:
-	m68hc05l9_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	m68hc05l9_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void l9_map(address_map &map);
@@ -320,7 +320,7 @@ protected:
 class m68hc05l11_device : public m68hc05_device
 {
 public:
-	m68hc05l11_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	m68hc05l11_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void l11_map(address_map &map);

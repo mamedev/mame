@@ -124,11 +124,11 @@ void cirsa910510_state::cirsa910510(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cirsa910510_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &cirsa910510_state::io_map);
 
-	I8155(config, "main_8155_0", 0);
+	I8155(config, "main_8155_0");
 
-	I8155(config, "main_8155_1", 0);
+	I8155(config, "main_8155_1");
 
-	I8155(config, "sound_8155", 0); // on sound PCB
+	I8155(config, "sound_8155"); // on sound PCB
 
 	//I8256(config, "muart1", 18.432_MHz_XTAL / 3);
 

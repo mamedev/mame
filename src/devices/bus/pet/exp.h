@@ -29,7 +29,7 @@ class pet_expansion_slot_device : public device_t,
 {
 public:
 	template <typename T>
-	pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: pet_expansion_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -38,7 +38,7 @@ public:
 		set_fixed(false);
 	}
 
-	pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~pet_expansion_slot_device();
 
 	auto dma_read_callback() { return m_read_dma.bind(); }

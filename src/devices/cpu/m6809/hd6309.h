@@ -30,11 +30,11 @@ class hd6309_device : public m6809_base_device
 {
 public:
 	// construction/destruction
-	hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// delegating constructor
-	hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int divider);
+	hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, device_type type, int divider);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -148,7 +148,7 @@ class hd6309e_device : public hd6309_device
 {
 public:
 	// construction/destruction
-	hd6309e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd6309e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 #define HD6309_IRQ_LINE  M6809_IRQ_LINE   /* 0 - IRQ line number */

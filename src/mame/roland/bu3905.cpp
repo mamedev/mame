@@ -16,7 +16,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(BU3905, bu3905_device, "bu3905", "Roland BU3905S R11-0006 Output Assigner")
 
-bu3905_device::bu3905_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+bu3905_device::bu3905_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BU3905, tag, owner, clock)
 {
 }

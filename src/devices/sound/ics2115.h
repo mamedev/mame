@@ -19,7 +19,7 @@ public:
 	// current ramping behavior is seems like incorrect?
 
 	// construction/destruction
-	ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq() { return m_irq_cb.bind(); }
 

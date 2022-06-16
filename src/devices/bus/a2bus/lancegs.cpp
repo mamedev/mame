@@ -63,10 +63,10 @@ class a2bus_lancegs_device:
 {
 public:
 	// construction/destruction
-	a2bus_lancegs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_lancegs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2bus_lancegs_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_lancegs_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -89,12 +89,12 @@ private:
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_lancegs_device::a2bus_lancegs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_lancegs_device::a2bus_lancegs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_lancegs_device(mconfig, A2BUS_LANCEGS, tag, owner, clock)
 {
 }
 
-a2bus_lancegs_device::a2bus_lancegs_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_lancegs_device::a2bus_lancegs_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_netinf(*this, "smc91c96"),
@@ -106,7 +106,7 @@ a2bus_lancegs_device::a2bus_lancegs_device(const machine_config &mconfig, device
 void a2bus_lancegs_device::device_add_mconfig(machine_config &config)
 {
 	SMC91C96(config, m_netinf, 20_MHz_XTAL); // Datasheet fig 12.26, pg 122.
-	I2C_24C04(config, m_i2cmem, 0).set_address(0x80).set_e0(1);
+	I2C_24C04(config, m_i2cmem).set_address(0x80).set_e0(1);
 
 	m_netinf->irq_handler().set(FUNC(a2bus_lancegs_device::netinf_irq_w));
 }

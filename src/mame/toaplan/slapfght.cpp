@@ -1014,7 +1014,7 @@ void slapfght_state::tigerhb4(machine_config &config)
 	tigerhb2(config);
 
 	// TODO: hook up
-	m68705p_device &mcu(M68705P5(config, "mcu", 6000000)); // unverified clock
+	m68705p_device &mcu(M68705P5(config, "mcu", XTAL::u(6000000))); // unverified clock
 	mcu.porta_r().set_log("port A read");
 	mcu.portb_r().set_log("port B read");
 	mcu.portc_r().set_log("port C read");

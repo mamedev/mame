@@ -12,7 +12,7 @@ class deco_mxc06_device : public device_t, public device_video_interface
 public:
 	typedef device_delegate<void (u32 &colour, u32 &pri_mask)> colpri_cb_delegate;
 
-	deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb.set(std::forward<T>(args)...); }

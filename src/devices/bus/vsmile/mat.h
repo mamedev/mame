@@ -17,7 +17,7 @@ class vsmile_mat_device : public vsmile_pad_device
 {
 public:
 	// construction/destruction
-	vsmile_mat_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
+	vsmile_mat_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~vsmile_mat_device();
 
 	// input handlers

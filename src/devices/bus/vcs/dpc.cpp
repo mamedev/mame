@@ -16,7 +16,7 @@
 DEFINE_DEVICE_TYPE(ATARI_DPC, dpc_device, "atari_dpc", "Atari DPC")
 
 
-dpc_device::dpc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+dpc_device::dpc_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	device_t(mconfig, ATARI_DPC, tag, owner, clock),
 	m_movamt(0),
 	m_latch_62(0),
@@ -234,7 +234,7 @@ void dpc_device::write(offs_t offset, uint8_t data)
 DEFINE_DEVICE_TYPE(A26_ROM_DPC, a26_rom_dpc_device, "a2600_dpc", "Atari 2600 ROM Cart Pitfall II")
 
 
-a26_rom_dpc_device::a26_rom_dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_dpc_device::a26_rom_dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_f8_device(mconfig, A26_ROM_DPC, tag, owner, clock), m_dpc(*this, "dpc")
 {
 }
@@ -251,7 +251,7 @@ void a26_rom_dpc_device::setup_addon_ptr(uint8_t *ptr)
 
 void a26_rom_dpc_device::device_add_mconfig(machine_config &config)
 {
-	ATARI_DPC(config, m_dpc, 0);
+	ATARI_DPC(config, m_dpc);
 }
 
 void a26_rom_dpc_device::install_memory_handlers(address_space *space)

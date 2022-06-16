@@ -67,7 +67,7 @@ void a26_rom_base_device::write_ram(offs_t offset, uint8_t data)
  GAMES: a large majority
  -------------------------------------------------*/
 
-a26_rom_2k_4k_device::a26_rom_2k_4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_2k_4k_device::a26_rom_2k_4k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_2K_4K, tag, owner, clock)
 {
 }
@@ -92,13 +92,13 @@ void a26_rom_2k_4k_device::install_memory_handlers(address_space *space)
 
  -------------------------------------------------*/
 
-a26_rom_f6_device::a26_rom_f6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_f6_device::a26_rom_f6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, type, tag, owner, clock)
 	, m_bank(*this, "bank")
 {
 }
 
-a26_rom_f6_device::a26_rom_f6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_f6_device::a26_rom_f6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_f6_device(mconfig, A26_ROM_F6, tag, owner, clock)
 {
 }
@@ -141,7 +141,7 @@ void a26_rom_f6_device::switch_bank(offs_t offset, uint8_t data)
  GAMES: Fatal Run
  -------------------------------------------------*/
 
-a26_rom_f4_device::a26_rom_f4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_f4_device::a26_rom_f4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_f6_device(mconfig, A26_ROM_F4, tag, owner, clock)
 {
 }
@@ -167,12 +167,12 @@ void a26_rom_f4_device::install_memory_handlers(address_space *space)
 
  -------------------------------------------------*/
 
-a26_rom_f8_device::a26_rom_f8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_f8_device::a26_rom_f8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_f6_device(mconfig, type, tag, owner, clock)
 {
 }
 
-a26_rom_f8_device::a26_rom_f8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_f8_device::a26_rom_f8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_f8_device(mconfig, A26_ROM_F8, tag, owner, clock)
 {
 }
@@ -188,7 +188,7 @@ void a26_rom_f8_device::install_memory_handlers(address_space *space)
 }
 
 
-a26_rom_f8_sw_device::a26_rom_f8_sw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_f8_sw_device::a26_rom_f8_sw_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_f8_device(mconfig, A26_ROM_F8_SW, tag, owner, clock)
 {
 }
@@ -206,7 +206,7 @@ a26_rom_f8_sw_device::a26_rom_f8_sw_device(const machine_config &mconfig, const 
 
  -------------------------------------------------*/
 
-a26_rom_fa_device::a26_rom_fa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_fa_device::a26_rom_fa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_f6_device(mconfig, A26_ROM_FA, tag, owner, clock)
 {
 }
@@ -233,7 +233,7 @@ void a26_rom_fa_device::install_memory_handlers(address_space *space)
 
  -------------------------------------------------*/
 
-a26_rom_fe_device::a26_rom_fe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_fe_device::a26_rom_fe_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_FE, tag, owner, clock)
 	, m_bank(*this, "bank")
 	, m_trigger_on_next_access(false)
@@ -311,7 +311,7 @@ void a26_rom_fe_device::trigger_bank()
 
  -------------------------------------------------*/
 
-a26_rom_3e_device::a26_rom_3e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_3e_device::a26_rom_3e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_3E, tag, owner, clock)
 	, m_rom_bank(*this, "rom_bank")
 	, m_ram_bank(*this, "ram_bank")
@@ -374,7 +374,7 @@ void a26_rom_3e_device::select_rom_bank(offs_t address, uint8_t data)
 
  -------------------------------------------------*/
 
-a26_rom_3f_device::a26_rom_3f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_3f_device::a26_rom_3f_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_3F, tag, owner, clock)
 	, m_bank(*this, "bank")
 	, m_bank_mask(0)
@@ -415,7 +415,7 @@ void a26_rom_3f_device::select_bank(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-a26_rom_e0_device::a26_rom_e0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_e0_device::a26_rom_e0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_E0, tag, owner, clock)
 	, m_bank(*this, "bank%u", 0U)
 {
@@ -477,7 +477,7 @@ void a26_rom_e0_device::switch_bank(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-a26_rom_e7_device::a26_rom_e7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_e7_device::a26_rom_e7_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_E7, tag, owner, clock)
 	, m_rom_bank(*this, "rom_bank")
 	, m_lo_ram_bank(*this, "low_ram")
@@ -541,7 +541,7 @@ void a26_rom_e7_device::switch_ram_bank(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-a26_rom_ua_device::a26_rom_ua_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_ua_device::a26_rom_ua_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_UA, tag, owner, clock)
 	, m_bank(*this, "bank")
 {
@@ -579,7 +579,7 @@ void a26_rom_ua_device::change_bank(offs_t offset)
 
  -------------------------------------------------*/
 
-a26_rom_cv_device::a26_rom_cv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_cv_device::a26_rom_cv_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_CV, tag, owner, clock)
 {
 }
@@ -603,7 +603,7 @@ void a26_rom_cv_device::install_memory_handlers(address_space *space)
 
  -------------------------------------------------*/
 
-a26_rom_dc_device::a26_rom_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_dc_device::a26_rom_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_DC, tag, owner, clock)
 	, m_bank(*this, "bank")
 {
@@ -645,7 +645,7 @@ void a26_rom_dc_device::switch_bank(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-a26_rom_fv_device::a26_rom_fv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_fv_device::a26_rom_fv_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_FV, tag, owner, clock)
 	, m_bank(*this, "bank")
 {
@@ -682,7 +682,7 @@ void a26_rom_fv_device::switch_bank(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-a26_rom_jvp_device::a26_rom_jvp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_jvp_device::a26_rom_jvp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_JVP, tag, owner, clock)
 	, m_bank(*this, "bank")
 {
@@ -721,7 +721,7 @@ void a26_rom_jvp_device::change_bank()
 
  -------------------------------------------------*/
 
-a26_rom_4in1_device::a26_rom_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_4in1_device::a26_rom_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_4IN1, tag, owner, clock)
 	, m_bank(*this, "bank")
 	, m_current_game(0)
@@ -758,7 +758,7 @@ void a26_rom_4in1_device::install_memory_handlers(address_space *space)
 
  -------------------------------------------------*/
 
-a26_rom_8in1_device::a26_rom_8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_8in1_device::a26_rom_8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_8IN1, tag, owner, clock)
 	, m_bank(*this, "bank")
 {
@@ -803,7 +803,7 @@ void a26_rom_8in1_device::switch_bank(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-a26_rom_32in1_device::a26_rom_32in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_32in1_device::a26_rom_32in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_32IN1, tag, owner, clock)
 	, m_bank(*this, "bank")
 	, m_current_game(0)
@@ -838,7 +838,7 @@ void a26_rom_32in1_device::install_memory_handlers(address_space *space)
  http://blog.kevtris.org/blogfiles/Atari%202600%20Mappers.txt
  --------------------------------------------------*/
 
-a26_rom_x07_device::a26_rom_x07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_x07_device::a26_rom_x07_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_X07, tag, owner, clock)
 	, m_bank(*this, "bank")
 {

@@ -942,7 +942,7 @@ INPUT_PORTS_END
 void psion5mx_state::psion5mx(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM710T(config, m_maincpu, 36000000); // 36MHz, per wikipedia
+	ARM710T(config, m_maincpu, XTAL::u(36000000)); // 36MHz, per wikipedia
 	m_maincpu->set_addrmap(AS_PROGRAM, &psion5mx_state::main_map);
 
 	ETNA(config, m_etna);

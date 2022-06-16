@@ -26,7 +26,7 @@
 
 DEFINE_DEVICE_TYPE(SIS7001_USB, sis7001_usb_device, "sis7001_usb", "SiS 7001 USB Host Controller")
 
-sis7001_usb_device::sis7001_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sis7001_usb_device::sis7001_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, SIS7001_USB, tag, owner, clock)
 
 {

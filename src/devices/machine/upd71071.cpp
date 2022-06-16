@@ -93,7 +93,7 @@
 
 DEFINE_DEVICE_TYPE(UPD71071, upd71071_device, "upd71071", "NEC uPD71071 DMA Controller")
 
-upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UPD71071, tag, owner, clock)
 	, m_upd_clock(0)
 	, m_out_hreq_cb(*this)

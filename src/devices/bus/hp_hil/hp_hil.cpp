@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(HP_HIL_SLOT, hp_hil_slot_device, "hp_hil_slot", "HP-HIL Slot"
 //-------------------------------------------------
 //  hp_hil_slot_device - constructor
 //-------------------------------------------------
-hp_hil_slot_device::hp_hil_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp_hil_slot_device::hp_hil_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HP_HIL_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_hp_hil_interface>(mconfig, *this)
 	, m_mlc(*this, finder_base::DUMMY_TAG)
@@ -55,7 +55,7 @@ DEFINE_DEVICE_TYPE(HP_HIL_MLC, hp_hil_mlc_device, "hp_hil_mlc", "HP-HIL Master L
 //-------------------------------------------------
 //  hp_hil_mlc_device - constructor
 //-------------------------------------------------
-hp_hil_mlc_device::hp_hil_mlc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp_hil_mlc_device::hp_hil_mlc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t{mconfig, HP_HIL_MLC, tag, owner, clock}
 	, m_r2{0}
 	, m_r3{0}

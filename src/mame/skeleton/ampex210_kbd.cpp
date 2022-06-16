@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE(AMPEX230_KEYBOARD, ampex230_keyboard_device, "ampex230_kbd", "Ampex 230 Keyboard")
 
-ampex230_keyboard_device::ampex230_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ampex230_keyboard_device::ampex230_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AMPEX230_KEYBOARD, tag, owner, clock)
 	, m_data_out_callback(*this)
 	, m_clock_out_callback(*this)

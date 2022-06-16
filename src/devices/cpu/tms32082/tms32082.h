@@ -10,7 +10,7 @@ class tms32082_mp_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	enum
 	{
@@ -157,7 +157,7 @@ class tms32082_pp_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	enum
 	{

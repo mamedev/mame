@@ -25,7 +25,7 @@
  *
  *************************************/
 
-segag80_audio_device_base::segag80_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 lomask, u8 himask, bool haspsg, netlist_ptr netlist, double output_scale) :
+segag80_audio_device_base::segag80_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 lomask, u8 himask, bool haspsg, netlist_ptr netlist, double output_scale) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_mixer_interface(mconfig, *this),
 	m_lo_input(*this, "sound_nl:lo_%u", 0),
@@ -41,7 +41,7 @@ segag80_audio_device_base::segag80_audio_device_base(const machine_config &mconf
 
 void segag80_audio_device_base::device_add_mconfig(machine_config &config)
 {
-	NETLIST_SOUND(config, "sound_nl", 48000)
+	NETLIST_SOUND(config, "sound_nl", XTAL::u(48000))
 		.set_source(m_netlist)
 		.add_route(ALL_OUTPUTS, *this, 1.0);
 
@@ -128,7 +128,7 @@ void segag80_audio_device_base::write_ay(offs_t addr, uint8_t data)
 
 DEFINE_DEVICE_TYPE(ELIMINATOR_AUDIO, elim_audio_device, "elim_audio", "Eliminator Sound Board")
 
-elim_audio_device::elim_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+elim_audio_device::elim_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	segag80_audio_device_base(mconfig, ELIMINATOR_AUDIO, tag, owner, clock, 0xfe, 0xff, false, NETLIST_NAME(elim), 0.15)
 {
 }
@@ -143,7 +143,7 @@ elim_audio_device::elim_audio_device(const machine_config &mconfig, const char *
 
 DEFINE_DEVICE_TYPE(ZEKTOR_AUDIO, zektor_audio_device, "zektor_audio", "Zektor Sound Board")
 
-zektor_audio_device::zektor_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+zektor_audio_device::zektor_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	segag80_audio_device_base(mconfig, ZEKTOR_AUDIO, tag, owner, clock, 0xfe, 0xff, true, NETLIST_NAME(zektor), 0.15)
 {
 }
@@ -158,7 +158,7 @@ zektor_audio_device::zektor_audio_device(const machine_config &mconfig, const ch
 
 DEFINE_DEVICE_TYPE(SPACE_FURY_AUDIO, spacfury_audio_device, "spcfury_audio", "Space Fury Sound Board")
 
-spacfury_audio_device::spacfury_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+spacfury_audio_device::spacfury_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	segag80_audio_device_base(mconfig, SPACE_FURY_AUDIO, tag, owner, clock, 0xc7, 0x3f, false, NETLIST_NAME(spacfury), 2.0)
 {
 }
@@ -173,7 +173,7 @@ spacfury_audio_device::spacfury_audio_device(const machine_config &mconfig, cons
 
 DEFINE_DEVICE_TYPE(ASTRO_BLASTER_AUDIO, astrob_audio_device, "astrob_audio", "Astro Blaster Sound Board")
 
-astrob_audio_device::astrob_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+astrob_audio_device::astrob_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	segag80_audio_device_base(mconfig, ASTRO_BLASTER_AUDIO, tag, owner, clock, 0xff, 0xff, false, NETLIST_NAME(astrob), 1.0)
 {
 }

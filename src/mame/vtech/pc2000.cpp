@@ -931,7 +931,7 @@ void pc2000_state::pc2000gen(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beep, XTAL::u(3250)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "genius_cart").set_device_load(FUNC(pc2000_state::cart_load));
 
@@ -941,14 +941,14 @@ void pc2000_state::pc2000gen(machine_config &config)
 void pc2000_state::pc2000(machine_config &config)
 {
 	pc2000gen(config);
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc);
 	m_lcdc->set_lcd_size(2, 20);
 }
 
 void pc2000_state::pc2000eur(machine_config &config)
 {
 	pc2000gen(config);
-	SED1278_0B(config, m_lcdc, 0);
+	SED1278_0B(config, m_lcdc);
 	m_lcdc->set_lcd_size(2, 20);
 }
 

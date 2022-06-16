@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(ULTRA12F, ultra12f_device, "ultra12f", "Ultra 12F ESDI Caching Disk Controller")
 DEFINE_DEVICE_TYPE(ULTRA12F32, ultra12f32_device, "ultra12f32", "Ultra 12F/32 ESDI Caching Disk Controller")
 
-ultra12f_device::ultra12f_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+ultra12f_device::ultra12f_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_hpc(*this, "hpc")
@@ -26,12 +26,12 @@ ultra12f_device::ultra12f_device(const machine_config &mconfig, device_type type
 {
 }
 
-ultra12f_device::ultra12f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ultra12f_device::ultra12f_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ultra12f_device(mconfig, ULTRA12F, tag, owner, clock)
 {
 }
 
-ultra12f32_device::ultra12f32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ultra12f32_device::ultra12f32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ultra12f_device(mconfig, ULTRA12F32, tag, owner, clock)
 {
 }

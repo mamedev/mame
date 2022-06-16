@@ -761,7 +761,7 @@ void tvc_exp(device_slot_interface &device)
 void tvc_state::tvc(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3125000);
+	Z80(config, m_maincpu, XTAL::u(3125000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tvc_state::tvc_mem);
 	m_maincpu->set_addrmap(AS_IO, &tvc_state::tvc_io);
 
@@ -808,7 +808,7 @@ void tvc_state::tvc(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	TVC_SOUND(config, m_sound, 0);
+	TVC_SOUND(config, m_sound);
 	m_sound->sndint_wr_callback().set(FUNC(tvc_state::int_ff_set));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 0.75);
 

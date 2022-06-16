@@ -11,7 +11,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(ACB4070, acb4070_device, "acb4070", "ACB4070")
 
-acb4070_device::acb4070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acb4070_device::acb4070_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scsihd_device(mconfig, ACB4070, tag, owner, clock)
 {
 }

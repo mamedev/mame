@@ -390,7 +390,7 @@ void summit_state::machine_start()
 
 void summit_state::summit(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &summit_state::mainmap);
 	m_maincpu->set_vblank_int("screen", FUNC(summit_state::irq0_line_hold));
 

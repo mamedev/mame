@@ -29,7 +29,7 @@ class bbc_ide8_device :
 {
 public:
 	// construction/destruction
-	bbc_ide8_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	bbc_ide8_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -52,7 +52,7 @@ class bbc_beebide_device :
 {
 public:
 	// construction/destruction
-	bbc_beebide_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	bbc_beebide_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

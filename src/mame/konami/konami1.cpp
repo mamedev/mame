@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(KONAMI1, konami1_device, "konami1", "KONAMI-1")
 
-konami1_device::konami1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+konami1_device::konami1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m6809_base_device(mconfig, tag, owner, clock, KONAMI1, 1)
 {
 	m_boundary = 0x0000;

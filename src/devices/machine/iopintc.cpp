@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(SONYIOP_INTC, iop_intc_device, "iopintc", "PlayStation 2 IOP INTC")
 
-iop_intc_device::iop_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iop_intc_device::iop_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYIOP_INTC, tag, owner, clock)
 	, m_iop(*this, finder_base::DUMMY_TAG)
 {

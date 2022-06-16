@@ -135,7 +135,7 @@ void decodmd_type3_device::device_add_mconfig(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(decodmd_type3_device::dmd_irq), attotime::from_hz(150));
+	TIMER(config, "irq_timer").configure_periodic(FUNC(decodmd_type3_device::dmd_irq), attotime::from_hz(150));
 
 	MC6845(config, m_mc6845, XTAL(12'000'000) / 4);  // TODO: confirm clock speed
 	m_mc6845->set_screen(nullptr);
@@ -152,7 +152,7 @@ void decodmd_type3_device::device_add_mconfig(machine_config &config)
 }
 
 
-decodmd_type3_device::decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+decodmd_type3_device::decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DECODMD3, tag, owner, clock)
 	, m_cpu(*this,"dmdcpu")
 	, m_mc6845(*this,"dmd6845")

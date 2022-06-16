@@ -375,7 +375,7 @@ INPUT_PORTS_END
 void beaminv_state::beaminv(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2000000);   /* 2 MHz ? */
+	Z80(config, m_maincpu, XTAL::u(2000000));   /* 2 MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &beaminv_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &beaminv_state::main_io_map);
 

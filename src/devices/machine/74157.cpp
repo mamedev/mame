@@ -35,12 +35,12 @@ DEFINE_DEVICE_TYPE(LS157_X2, ls157_x2_device, "ls157_x2", "74LS157 Quad 2-to-1 M
 //  ls157_device - constructor
 //-------------------------------------------------
 
-ls157_device::ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ls157_device::ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ls157_device(mconfig, LS157, tag, owner, clock, 0x0f)
 {
 }
 
-ls157_device::ls157_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mask)
+ls157_device::ls157_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 mask)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_a_in_cb(*this)
 	, m_b_in_cb(*this)
@@ -58,7 +58,7 @@ ls157_device::ls157_device(const machine_config &mconfig, device_type type, cons
 //  ls157_x2_device - constructor
 //-------------------------------------------------
 
-ls157_x2_device::ls157_x2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ls157_x2_device::ls157_x2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ls157_device(mconfig, LS157_X2, tag, owner, clock, 0xff)
 {
 }
@@ -277,7 +277,7 @@ u8 ls157_device::output_r()
 
 DEFINE_DEVICE_TYPE(HC157, hc157_device, "hc157", "74HC157 Quad 2-to-1 Multiplexer")
 
-hc157_device::hc157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hc157_device::hc157_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ls157_device(mconfig, HC157, tag, owner, clock, 0x0f)
 {
 }
@@ -289,7 +289,7 @@ hc157_device::hc157_device(const machine_config &mconfig, const char *tag, devic
 
 DEFINE_DEVICE_TYPE(HCT157, hct157_device, "hct157", "74HCT157 Quad 2-to-1 Multiplexer")
 
-hct157_device::hct157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hct157_device::hct157_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ls157_device(mconfig, HCT157, tag, owner, clock, 0x0f)
 {
 }

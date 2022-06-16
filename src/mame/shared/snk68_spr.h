@@ -13,7 +13,7 @@ class snk68_spr_device : public device_t
 public:
 	typedef device_delegate<void (int &, int &, int &, int &)> tile_indirection_delegate;
 
-	snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// static configuration
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }

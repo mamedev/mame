@@ -570,7 +570,7 @@ void sbrkout_state::sbrkout(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.99);
 }
 
 

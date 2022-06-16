@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(CMI01A_CHANNEL_CARD, cmi01a_device, "cmi_01a", "Fairlight CMI-01A Channel Card")
 
-cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CMI01A_CHANNEL_CARD, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_irq_merger(*this, "cmi01a_irq")
@@ -38,7 +38,7 @@ cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, dev
 
 void cmi01a_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia[0], 0); // 6821 C6/7/8/9
+	PIA6821(config, m_pia[0]); // 6821 C6/7/8/9
 	m_pia[0]->readcb1_handler().set(FUNC(cmi01a_device::tri_r));
 	m_pia[0]->readpa_handler().set(FUNC(cmi01a_device::ws_dir_r));
 	m_pia[0]->writepa_handler().set(FUNC(cmi01a_device::ws_dir_w));
@@ -49,7 +49,7 @@ void cmi01a_device::device_add_mconfig(machine_config &config)
 	m_pia[0]->irqa_handler().set(m_irq_merger, FUNC(input_merger_device::in_w<0>));
 	m_pia[0]->irqb_handler().set(m_irq_merger, FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_pia[1], 0); // 6821 D6/7/8/9
+	PIA6821(config, m_pia[1]); // 6821 D6/7/8/9
 	m_pia[1]->readca1_handler().set(FUNC(cmi01a_device::zx_r));
 	m_pia[1]->readcb1_handler().set(FUNC(cmi01a_device::eosi_r));
 	m_pia[1]->readpa_handler().set(FUNC(cmi01a_device::pitch_octave_r));
@@ -79,9 +79,9 @@ void cmi01a_device::device_start()
 	m_rstb_pulse_timer = timer_alloc(FUNC(cmi01a_device::rstb_pulse_cb), this);
 	m_sample_timer = timer_alloc(FUNC(cmi01a_device::update_sample), this);
 
-	m_stream = stream_alloc(0, 1, 48000);
+	m_stream = stream_alloc(0, 1, XTAL::u(48000));
 
-	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->set_external_clocks(XTAL(), XTAL(), XTAL());
 
 	save_pointer(NAME(m_wave_ram), 0x4000);
 	save_item(NAME(m_current_sample));

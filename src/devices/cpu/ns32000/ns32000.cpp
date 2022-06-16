@@ -96,7 +96,7 @@ static const u32 size_mask[] = { 0x000000ffU, 0x0000ffffU, 0x00000000U, 0xffffff
 
 #define SP ((m_psr & PSR_S) ? m_sp1 : m_sp0)
 
-template <int Width>ns32000_device<Width>::ns32000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int databits, int addrbits)
+template <int Width>ns32000_device<Width>::ns32000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int databits, int addrbits)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_address_mask(0xffffffffU >> (32 - addrbits))
 	, m_program_config("program", ENDIANNESS_LITTLE, databits, addrbits, 0)
@@ -130,22 +130,22 @@ template <int Width>ns32000_device<Width>::ns32000_device(const machine_config &
 {
 }
 
-ns32008_device::ns32008_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ns32008_device::ns32008_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ns32000_device(mconfig, NS32008, tag, owner, clock, 8, 24)
 {
 }
 
-ns32016_device::ns32016_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ns32016_device::ns32016_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ns32000_device(mconfig, NS32016, tag, owner, clock, 16, 24)
 {
 }
 
-ns32032_device::ns32032_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ns32032_device::ns32032_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ns32000_device(mconfig, NS32032, tag, owner, clock, 32, 24)
 {
 }
 
-ns32332_device::ns32332_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ns32332_device::ns32332_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ns32000_device(mconfig, NS32332, tag, owner, clock, 32, 32)
 {
 }

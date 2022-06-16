@@ -41,7 +41,7 @@ public:
 
 protected:
 	// construction/destruction
-	tx0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addr_bits, int address_mask, int ir_mask);
+	tx0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int addr_bits, int address_mask, int ir_mask);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -133,7 +133,7 @@ public:
 	tx0_8kw_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 protected:
-	tx0_8kw_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	tx0_8kw_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void execute_run() override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

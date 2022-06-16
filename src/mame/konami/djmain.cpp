@@ -1383,8 +1383,8 @@ void djmain_state::djmainj(machine_config &config)
 {
 	/* basic machine hardware */
 	// popn3 works 9.6 MHz or slower in some songs */
-	//M68EC020(config, m_maincpu, 18432000/2);    /*  9.216 MHz!? */
-	M68EC020(config, m_maincpu, 32000000/4);   /*  8.000 MHz!? */
+	//M68EC020(config, m_maincpu, XTAL::u(18432000)/2);    /*  9.216 MHz!? */
+	M68EC020(config, m_maincpu, XTAL::u(32000000)/4);   /*  8.000 MHz!? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &djmain_state::maincpu_djmainj);
 	m_maincpu->set_vblank_int("screen", FUNC(djmain_state::vb_interrupt));
 
@@ -1402,12 +1402,12 @@ void djmain_state::djmainj(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4440 / 4);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_djmain);
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(djmain_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4dj, 1, 1);
 	m_k056832->set_palette(m_palette);
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

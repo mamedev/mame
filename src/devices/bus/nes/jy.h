@@ -14,7 +14,7 @@ class nes_jy_typea_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read_l(offs_t offset) override;
 	virtual uint8_t read_m(offs_t offset) override;
@@ -28,7 +28,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -73,10 +73,10 @@ class nes_jy_typeb_device : public nes_jy_typea_device
 {
 public:
 	// construction/destruction
-	nes_jy_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_jy_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	void update_mirror_typeb();
 	virtual void update_mirror() override { update_mirror_typeb(); }
@@ -88,7 +88,7 @@ class nes_jy_typec_device : public nes_jy_typeb_device
 {
 public:
 	// construction/destruction
-	nes_jy_typec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_jy_typec_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t chr_r(offs_t offset) override;
 

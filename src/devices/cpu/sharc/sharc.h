@@ -90,7 +90,7 @@ public:
 
 
 	// construction/destruction
-	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, const XTAL &_clock);
 	virtual ~adsp21062_device() override;
 
 	// configuration helpers

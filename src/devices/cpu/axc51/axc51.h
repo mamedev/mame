@@ -36,8 +36,8 @@ public:
 
 protected:
 	// construction/destruction
-	axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
-	axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, address_map_constructor io_map, int program_width, int data_width, uint8_t features = 0);
+	axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int program_width, int data_width, uint8_t features = 0);
+	axc51base_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor program_map, address_map_constructor data_map, address_map_constructor io_map, int program_width, int data_width, uint8_t features = 0);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -519,10 +519,10 @@ class ax208_cpu_device : public axc51base_cpu_device
 {
 public:
 	// construction/destruction
-	ax208_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ax208_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ax208_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_reset() override;
 
@@ -536,7 +536,7 @@ class ax208p_cpu_device : public ax208_cpu_device
 {
 public:
 	// construction/destruction
-	ax208p_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ax208p_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

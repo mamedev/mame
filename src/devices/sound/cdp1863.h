@@ -36,7 +36,7 @@ class cdp1863_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration helpers
 	void set_clock2(int clock2) { m_clock2 = clock2; }

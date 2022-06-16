@@ -12,7 +12,7 @@
 class k007232_device : public device_t, public device_sound_interface, public device_memory_interface
 {
 public:
-	k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto port_write() { return m_port_write_handler.bind(); }
 

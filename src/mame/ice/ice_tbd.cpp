@@ -69,7 +69,7 @@ void ice_tbd_state::machine_reset()
 void ice_tbd_state::ice_tbd(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000);         /* ? MHz */
+	Z80(config, m_maincpu, XTAL::u(8000000));         /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ice_tbd_state::ice_tbd_map);
 	m_maincpu->set_addrmap(AS_IO, &ice_tbd_state::ice_tbd_io_map);
 

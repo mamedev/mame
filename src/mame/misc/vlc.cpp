@@ -616,7 +616,7 @@ void nevada_state::nevada(machine_config &config)
 	m_duart[2]->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
 	m_duart[2]->inport_cb().set_ioport("DSW3");
 
-	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_duart[1], FUNC(mc68681_device::rx_a_w));
+	MICROTOUCH(config, m_microtouch, XTAL::u(9600)).stx().set(m_duart[1], FUNC(mc68681_device::rx_a_w));
 
 	/* devices */
 	MSM6242(config, m_rtc, XTAL(32'768));

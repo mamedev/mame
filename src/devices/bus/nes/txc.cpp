@@ -44,32 +44,32 @@ DEFINE_DEVICE_TYPE(NES_TXC_STRIKEW,    nes_txc_strikew_device,   "nes_txc_strike
 DEFINE_DEVICE_TYPE(NES_TXC_COMMANDOS,  nes_txc_commandos_device, "nes_txc_comm",    "NES Cart TXC Cart Commandos PCB") // and others
 
 
-nes_txc_22211_device::nes_txc_22211_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_txc_22211_device::nes_txc_22211_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_txc_22211_device::nes_txc_22211_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_txc_22211_device::nes_txc_22211_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_TXC_22211, tag, owner, clock)
 {
 }
 
-nes_txc_dumarc_device::nes_txc_dumarc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_txc_dumarc_device::nes_txc_dumarc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txc_22211_device(mconfig, NES_TXC_DUMARACING, tag, owner, clock)
 {
 }
 
-nes_txc_mjblock_device::nes_txc_mjblock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_txc_mjblock_device::nes_txc_mjblock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txc_22211_device(mconfig, NES_TXC_MJBLOCK, tag, owner, clock)
 {
 }
 
-nes_txc_strikew_device::nes_txc_strikew_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_txc_strikew_device::nes_txc_strikew_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_TXC_STRIKEW, tag, owner, clock)
 {
 }
 
-nes_txc_commandos_device::nes_txc_commandos_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_txc_commandos_device::nes_txc_commandos_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_TXC_COMMANDOS, tag, owner, clock)
 {
 }

@@ -21,14 +21,14 @@ TODO:
 
 class ide_pci_device : public pci_device {
 public:
-	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id
+	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t main_id, uint32_t revision, uint32_t subdevice_id
 		, const char *bmtag = ":pci:00.0", uint32_t bmspace = AS_DATA)
-		: ide_pci_device(mconfig, tag, owner, clock)
+		: ide_pci_device(mconfig, tag, owner)
 	{
 		set_ids(main_id, revision, 0x01018a, subdevice_id);
 		m_bus_master_space.set_tag(bmtag, bmspace);
 	}
-	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto irq_handler() { return m_irq_handler.bind(); }
 

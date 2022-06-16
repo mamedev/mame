@@ -268,7 +268,7 @@ void imagetek_i4300_device::v3_map(address_map &map)
 //-------------------------------------------------
 
 
-imagetek_i4100_device::imagetek_i4100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_ext_tiles)
+imagetek_i4100_device::imagetek_i4100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool has_ext_tiles)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, has_ext_tiles ? gfxinfo_ext : gfxinfo, "palette")
 	, device_video_interface(mconfig, *this)
@@ -297,18 +297,18 @@ imagetek_i4100_device::imagetek_i4100_device(const machine_config &mconfig, devi
 {
 }
 
-imagetek_i4100_device::imagetek_i4100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+imagetek_i4100_device::imagetek_i4100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: imagetek_i4100_device(mconfig, I4100, tag, owner, clock, false)
 {
 }
 
 
-imagetek_i4220_device::imagetek_i4220_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+imagetek_i4220_device::imagetek_i4220_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: imagetek_i4100_device(mconfig, I4220, tag, owner, clock, true)
 {
 }
 
-imagetek_i4300_device::imagetek_i4300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+imagetek_i4300_device::imagetek_i4300_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: imagetek_i4100_device(mconfig, I4300, tag, owner, clock, true)
 {
 	std::fill(std::begin(m_irq_levels), std::end(m_irq_levels), 0);

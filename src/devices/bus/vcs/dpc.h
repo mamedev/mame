@@ -17,7 +17,7 @@ class dpc_device : public device_t
 {
 public:
 	// construction/destruction
-	dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_display_data(uint8_t *data) { m_displaydata = data; }
 
@@ -67,7 +67,7 @@ DECLARE_DEVICE_TYPE(ATARI_DPC, dpc_device)
 class a26_rom_dpc_device : public a26_rom_f8_device
 {
 public:
-	a26_rom_dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_device<dpc_device> m_dpc;
 

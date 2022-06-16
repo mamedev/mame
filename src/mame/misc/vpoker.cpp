@@ -662,7 +662,7 @@ void vpoker_state::vpoker(machine_config &config)
 
 	/* 6840 PTM */
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", XTAL(4'000'000) / 4));
-	ptm.set_external_clocks(0, 0, 0);
+	ptm.set_external_clocks(XTAL(), XTAL(), XTAL());
 	ptm.irq_callback().set(FUNC(vpoker_state::ptm_irq));
 
 	/* sound hardware */

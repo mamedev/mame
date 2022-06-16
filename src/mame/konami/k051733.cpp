@@ -65,7 +65,7 @@ reads from 0x0006, and only uses bit 1.
 
 DEFINE_DEVICE_TYPE(K051733, k051733_device, "k051733", "K051733 Protection")
 
-k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K051733, tag, owner, clock),
 	//m_ram[0x20],
 	m_rng(0)

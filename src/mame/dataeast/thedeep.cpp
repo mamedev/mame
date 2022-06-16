@@ -510,7 +510,7 @@ void thedeep_state::thedeep(machine_config &config)
 	Z80(config, m_maincpu, 12_MHz_XTAL / 2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &thedeep_state::main_map);
 
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(thedeep_state::interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(thedeep_state::interrupt), "screen", 0, 1);
 
 	r65c02_device &audiocpu(R65C02(config, "audiocpu", 12_MHz_XTAL / 8)); // verified on PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &thedeep_state::audio_map);
@@ -539,9 +539,9 @@ void thedeep_state::thedeep(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thedeep);
 	PALETTE(config, m_palette, FUNC(thedeep_state::palette), 512);
 
-	DECO_MXC06(config, m_spritegen, 0);
+	DECO_MXC06(config, m_spritegen);
 
-	DECO_BAC06(config, m_tilegen, 0);
+	DECO_BAC06(config, m_tilegen);
 	m_tilegen->set_gfx_region_wide(1, 1, 0);
 	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
 	m_tilegen->set_thedeep_kludge();  // TODO: this game wants TILE_FLIPX always set. Investigate why.

@@ -9,12 +9,12 @@ DEFINE_DEVICE_TYPE(DS12885, ds12885_device, "ds12885", "DS12885 RTC/NVRAM")
 //  ds12885_device - constructor
 //-------------------------------------------------
 
-ds12885_device::ds12885_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ds12885_device::ds12885_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ds12885_device(mconfig, DS12885, tag, owner, clock)
 {
 }
 
-ds12885_device::ds12885_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ds12885_device::ds12885_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: mc146818_device(mconfig, type, tag, owner, clock)
 {
 }
@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(DS12885EXT, ds12885ext_device, "ds12885ext", "DS12885 RTC/NVR
 //  ds12885ext_device - constructor
 //-------------------------------------------------
 
-ds12885ext_device::ds12885ext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ds12885ext_device::ds12885ext_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ds12885_device(mconfig, DS12885EXT, tag, owner, clock)
 {
 }

@@ -36,10 +36,10 @@ public:
 	enum mode_t { AGA_OFF, AGA_COLOR, AGA_MONO };
 
 	// construction/destruction
-	isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	isa8_aga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_aga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t pc_aga_mda_r(offs_t offset);
 	void pc_aga_mda_w(offs_t offset, uint8_t data);
@@ -105,7 +105,7 @@ class isa8_aga_pc200_device :
 {
 public:
 	// construction/destruction
-	isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	uint8_t pc200_videoram_r(offs_t offset);

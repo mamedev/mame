@@ -26,12 +26,12 @@ class a2bus_cmsscsi_device:
 {
 public:
 	// construction/destruction
-	a2bus_cmsscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_cmsscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
 
 protected:
-	a2bus_cmsscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_cmsscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

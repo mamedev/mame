@@ -53,7 +53,7 @@ const tiny_rom_entry *tandy2k_keyboard_device::device_rom_region() const
 
 void tandy2k_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	I8048(config, m_maincpu, 1000000); // ?
+	I8048(config, m_maincpu, XTAL::u(1000000)); // ?
 	m_maincpu->p1_out_cb().set(FUNC(tandy2k_keyboard_device::kb_p1_w));
 	m_maincpu->p2_out_cb().set(FUNC(tandy2k_keyboard_device::kb_p2_w));
 	m_maincpu->bus_in_cb().set(FUNC(tandy2k_keyboard_device::kb_p1_r));
@@ -207,7 +207,7 @@ ioport_constructor tandy2k_keyboard_device::device_input_ports() const
 //  tandy2k_keyboard_device - constructor
 //-------------------------------------------------
 
-tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TANDY2K_KEYBOARD, tag, owner, clock),
 	m_maincpu(*this, I8048_TAG),
 	m_y(*this, "Y%u", 0),

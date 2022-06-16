@@ -154,8 +154,8 @@ INPUT_PORTS_END
 } // anonymous namespace
 
 
-m20_keyboard_device::m20_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-	: buffered_rs232_device(mconfig, M20_KEYBOARD, tag, owner, 0)
+m20_keyboard_device::m20_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
+	: buffered_rs232_device(mconfig, M20_KEYBOARD, tag, owner)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8")
 	, m_modifiers(*this, "MODIFIERS")
 {

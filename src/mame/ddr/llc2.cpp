@@ -277,14 +277,14 @@ void llc2_state::llc2(machine_config &config)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->set_clk<0>(12_MHz_XTAL / 8);
 	m_ctc->set_clk<1>(12_MHz_XTAL / 8);
-	m_ctc->set_clk<2>(50);      // comes from deep in the video section, assumed to be 50Hz
+	m_ctc->set_clk<2>(XTAL::u(50));      // comes from deep in the video section, assumed to be 50Hz
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
+	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

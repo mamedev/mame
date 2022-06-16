@@ -672,7 +672,7 @@ void cpu30_state::cpu30(machine_config &config)
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cpu30_state::cpu_space_map);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	VME(config, "vme", 0);
+	VME(config, "vme");
 	VME_SLOT(config, "slot1", fccpu30_vme_cards, nullptr, 1, "vme");
 	/* Terminal Port config */
 	/* Force CPU30 series of boards has up to four serial ports, p1-p4, the FGA boot uses p4 as console and subsequent
@@ -697,7 +697,7 @@ void cpu30_state::cpu30(machine_config &config)
 #define RS232P4_TAG      "rs232p4"
 
 	DUSCC68562(config, m_dusccterm, DUSCC_CLOCK);
-	m_dusccterm->configure_channels(0, 0, 0, 0);
+	m_dusccterm->configure_channels(XTAL(), XTAL(), XTAL(), XTAL());
 	/* Port 1 on Port B */
 	m_dusccterm->out_txdb_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_txd));
 	m_dusccterm->out_dtrb_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_dtr));
@@ -710,7 +710,7 @@ void cpu30_state::cpu30(machine_config &config)
 	m_dusccterm->out_int_callback().set(m_fga002, FUNC(fga002_device::lirq4_w));
 
 	duscc68562_device &duscc2(DUSCC68562(config, "duscc2", DUSCC_CLOCK));
-	duscc2.configure_channels(0, 0, 0, 0);
+	duscc2.configure_channels(XTAL(), XTAL(), XTAL(), XTAL());
 	/* Port 2 on Port A */
 	duscc2.out_txda_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_txd));
 	duscc2.out_dtra_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_dtr));
@@ -756,7 +756,7 @@ void cpu30_state::cpu30(machine_config &config)
 //  m_pit2->timer_irq_callback().set(m_fga002, FUNC(fga002_device::lirq3_w)); // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	/* FGA-002, Force Gate Array */
-	FGA002(config, m_fga002, 0);
+	FGA002(config, m_fga002);
 	m_fga002->out_int().set(FUNC(cpu30_state::fga_irq_callback));
 	m_fga002->liack4().set("duscc",  FUNC(duscc_device::iack));
 	m_fga002->liack5().set("duscc2", FUNC(duscc_device::iack));

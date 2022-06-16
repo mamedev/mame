@@ -82,7 +82,7 @@
 class tms6100_device : public device_t
 {
 public:
-	tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// 4-bit mode (mask option)
 	// note: in 4-bit mode, use data_r, otherwise use data_line_r
@@ -99,7 +99,7 @@ public:
 	int data_line_r();
 
 protected:
-	tms6100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	tms6100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -131,7 +131,7 @@ protected:
 class m58819_device : public tms6100_device
 {
 public:
-	m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

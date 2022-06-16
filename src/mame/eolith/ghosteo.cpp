@@ -615,7 +615,7 @@ void ghosteo_state::machine_reset()
 void ghosteo_state::ghosteo(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM9(config, m_maincpu, 200000000);
+	ARM9(config, m_maincpu, XTAL::u(200000000));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -626,7 +626,7 @@ void ghosteo_state::ghosteo(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(256);
 
-	S3C2410(config, m_s3c2410, 12000000);
+	S3C2410(config, m_s3c2410, XTAL::u(12000000));
 	m_s3c2410->set_palette_tag("palette");
 	m_s3c2410->set_screen_tag("screen");
 	m_s3c2410->core_pin_r_callback().set(FUNC(ghosteo_state::s3c2410_core_pin_r));
@@ -640,11 +640,11 @@ void ghosteo_state::ghosteo(machine_config &config)
 	m_s3c2410->nand_data_r_callback().set(FUNC(ghosteo_state::s3c2410_nand_data_r));
 	m_s3c2410->nand_data_w_callback().set(FUNC(ghosteo_state::s3c2410_nand_data_w));
 
-//  nand_device &nand(NAND(config, "nand", 0));
+//  nand_device &nand(NAND(config, "nand"));
 //  nand.set_nand_type(nand_device::chip::K9F5608U0D);    // or another variant with ID 0xEC 0x75 ?
 //  nand.rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::s3c24xx_pin_frnb_w));
 
-	I2C_24C16(config, "i2cmem", 0); // M24CL16-S
+	I2C_24C16(config, "i2cmem"); // M24CL16-S
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -31,7 +31,7 @@ private:
 
 void swtpc8212_state::swtpc8212(machine_config &config)
 {
-	SWTPC8212(config, m_swtpc8212, 0);
+	SWTPC8212(config, m_swtpc8212);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_rs232->dcd_handler().set(m_swtpc8212, FUNC(swtpc8212_device::rs232_conn_dcd_w));

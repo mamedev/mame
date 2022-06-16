@@ -96,12 +96,12 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+		coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 		INPUT_CHANGED_MEMBER( switch_changed );
 
 	protected:
-		coco_multipak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+		coco_multipak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 		// device-level overrides
 		virtual void device_start() override;
@@ -152,7 +152,7 @@ class dragon_multipak_device : public coco_multipak_device
 {
 public:
 	// construction/destruction
-	dragon_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dragon_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -264,19 +264,19 @@ ioport_constructor coco_multipak_device::device_input_ports() const
 //  coco_multipak_device - constructor
 //-------------------------------------------------
 
-coco_multipak_device::coco_multipak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+coco_multipak_device::coco_multipak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_slots(*this, "slot%u", 1), m_select(0), m_block(0)
 {
 }
 
-coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: coco_multipak_device(mconfig, COCO_MULTIPAK, tag, owner, clock)
 {
 }
 
-dragon_multipak_device::dragon_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dragon_multipak_device::dragon_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: coco_multipak_device(mconfig, DRAGON_MULTIPAK, tag, owner, clock)
 {
 }

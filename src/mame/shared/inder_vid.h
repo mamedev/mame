@@ -24,7 +24,7 @@ class inder_vid_device : public device_t
 {
 public:
 	// construction/destruction
-	inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// probably set by a register somewhere either on TMS side or 68k side
 	void set_bpp(int bpp)

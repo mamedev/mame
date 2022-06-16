@@ -41,7 +41,7 @@
 
 class h8s2320_device : public h8s2000_device {
 public:
-	h8s2320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2320_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t syscr_r();
 	void syscr_w(uint8_t data);
@@ -83,7 +83,7 @@ protected:
 	uint32_t ram_start;
 	uint8_t syscr;
 
-	h8s2320_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start);
+	h8s2320_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t start);
 
 	virtual bool exr_in_stack() const override;
 	virtual void update_irq_filter() override;
@@ -102,42 +102,42 @@ protected:
 
 class h8s2321_device : public h8s2320_device {
 public:
-	h8s2321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2321_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class h8s2322_device : public h8s2320_device {
 public:
-	h8s2322_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2322_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class h8s2323_device : public h8s2320_device {
 public:
-	h8s2323_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2323_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class h8s2324_device : public h8s2320_device {
 public:
-	h8s2324_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2324_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class h8s2326_device : public h8s2320_device {
 public:
-	h8s2326_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2326_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class h8s2327_device : public h8s2320_device {
 public:
-	h8s2327_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2327_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class h8s2328_device : public h8s2320_device {
 public:
-	h8s2328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2328_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class h8s2329_device : public h8s2320_device {
 public:
-	h8s2329_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2329_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(H8S2320, h8s2320_device)

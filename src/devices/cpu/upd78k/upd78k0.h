@@ -29,11 +29,11 @@ public:
 	};
 
 	// configuration (TODO: callbacks)
-	void set_subclock(u32 clock) { m_subclock = clock; }
+	void set_subclock(const XTAL &clock) { m_subclock = clock; }
 	void set_subclock(const XTAL &xtal) { m_subclock = xtal.value(); }
 
 protected:
-	upd78k0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 iram_size, address_map_constructor mem_map, address_map_constructor sfr_map);
+	upd78k0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u16 iram_size, address_map_constructor mem_map, address_map_constructor sfr_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -83,9 +83,9 @@ class upd78053_device : public upd78k0_device
 {
 public:
 	// device type constructors
-	upd78053_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd78053_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	template <typename X>
-	upd78053_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, X &&subclock)
+	upd78053_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, X &&subclock)
 		: upd78053_device(mconfig, tag, owner, clock)
 	{
 		set_subclock(std::forward<X>(subclock));

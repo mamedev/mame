@@ -32,17 +32,17 @@ DEFINE_DEVICE_TYPE(NES_PXROM, nes_pxrom_device, "nes_pxrom", "NES Cart PxROM (MM
 DEFINE_DEVICE_TYPE(NES_FXROM, nes_fxrom_device, "nes_fxrom", "NES Cart FxROM (MMC-2) PCB")
 
 
-nes_pxrom_device::nes_pxrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_pxrom_device::nes_pxrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch1(0), m_latch2(0)
 {
 }
 
-nes_pxrom_device::nes_pxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_pxrom_device::nes_pxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_pxrom_device(mconfig, NES_PXROM, tag, owner, clock)
 {
 }
 
-nes_fxrom_device::nes_fxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_fxrom_device::nes_fxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_pxrom_device(mconfig, NES_FXROM, tag, owner, clock)
 {
 }

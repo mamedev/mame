@@ -153,12 +153,12 @@ device_kcexp_interface::~device_kcexp_interface()
 //-------------------------------------------------
 //  kcexp_slot_device - constructor
 //-------------------------------------------------
-kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	kcexp_slot_device(mconfig, KCEXP_SLOT, tag, owner, clock)
 {
 }
 
-kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_single_card_slot_interface<device_kcexp_interface>(mconfig, *this),
 	m_out_irq_cb(*this),
@@ -298,7 +298,7 @@ WRITE_LINE_MEMBER( kcexp_slot_device::meo_w )
 //-------------------------------------------------
 //  kccart_slot_device - constructor
 //-------------------------------------------------
-kccart_slot_device::kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+kccart_slot_device::kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	kcexp_slot_device(mconfig, KCCART_SLOT, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this)
 {

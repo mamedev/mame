@@ -528,7 +528,7 @@ void e100_state::e100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &e100_state::e100_map);
 
 	/* Devices */
-	TTL74145(config, m_kbd_74145, 0);
+	TTL74145(config, m_kbd_74145);
 
 	/* --PIA inits----------------------- */
 	/* 0xF883 0xC818 (PIA1 DDR A)     = 0x00 - Port A all inputs */
@@ -545,7 +545,7 @@ void e100_state::e100(machine_config &config)
 	/* 0xF894 0xC818 (PIA2 Control A) = 0x34 - CA2 is low and lock DDRA */
 	/* 0xF896 0xC818 (PIA1 Control B) = 0x34 - CB2 is low and lock DDRB */
 	/* 0xF896 0xC818 (PIA2 Control B) = 0x34 - CB2 is low and lock DDRB */
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->writepa_handler().set(FUNC(e100_state::pia1_kbA_w));
 	m_pia1->readpa_handler().set(FUNC(e100_state::pia1_kbA_r));
 	m_pia1->writepb_handler().set(FUNC(e100_state::pia1_kbB_w));
@@ -555,7 +555,7 @@ void e100_state::e100(machine_config &config)
 	m_pia1->cb2_handler().set(FUNC(e100_state::pia1_cb2_w));
 
 	/* The optional second PIA enables the expansion port on CA1 and a software RTC with 50Hz resolution */
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	m_pia2->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	/* Serial port support */

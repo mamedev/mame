@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "null_modem.h"
 
-null_modem_device::null_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+null_modem_device::null_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NULL_MODEM, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
@@ -25,7 +25,7 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 
 void null_modem_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config, m_stream, 0);
+	BITBANGER(config, m_stream);
 }
 
 static INPUT_PORTS_START(null_modem)

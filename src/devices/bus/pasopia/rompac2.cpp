@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(PASOPIA_PA7246, pasopia_pa7246_device, "pa7246", "PA7246 Paso
 //  pasopia_pa7246_device - construction
 //-------------------------------------------------
 
-pasopia_pa7246_device::pasopia_pa7246_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pasopia_pa7246_device::pasopia_pa7246_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PASOPIA_PA7246, tag, owner, clock)
 	, pac2_card_interface(mconfig, *this)
 	, m_kanji_rom(*this, "kanji")

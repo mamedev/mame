@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(CPS3, cps3_sound_device, "cps3_custom", "CPS3 Custom Sound")
 //  cps3_sound_device - constructor
 //-------------------------------------------------
 
-cps3_sound_device::cps3_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cps3_sound_device::cps3_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CPS3, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)

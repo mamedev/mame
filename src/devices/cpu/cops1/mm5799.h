@@ -37,7 +37,7 @@
 class mm5799_device : public cops1_base_device
 {
 public:
-	mm5799_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mm5799_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

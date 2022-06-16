@@ -39,7 +39,7 @@ void sh7604_wdt_device::wdt_regs(address_map &map)
 //  sh7604_wdt_device - constructor
 //-------------------------------------------------
 
-sh7604_wdt_device::sh7604_wdt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sh7604_wdt_device::sh7604_wdt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SH7604_WDT, tag, owner, clock)
 {
 }

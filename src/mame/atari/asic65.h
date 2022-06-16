@@ -22,13 +22,13 @@ enum {
 class asic65_device : public device_t
 {
 public:
-	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u8 type)
-		: asic65_device(mconfig, tag, owner, clock)
+	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, u8 type)
+		: asic65_device(mconfig, tag, owner)
 	{
 		set_type(type);
 	}
 
-	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	void set_type(u8 type) { m_asic65_type = type; }

@@ -25,7 +25,7 @@ class centronics_samdac_device : public device_t, public device_centronics_perip
 {
 public:
 	// construction/destruction
-	centronics_samdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	centronics_samdac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// from centronics port
 	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override;

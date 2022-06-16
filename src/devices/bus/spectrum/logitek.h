@@ -26,7 +26,7 @@ class spectrum_proceed_device :
 {
 public:
 	// construction/destruction
-	spectrum_proceed_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_proceed_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 

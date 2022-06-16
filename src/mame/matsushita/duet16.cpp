@@ -369,7 +369,7 @@ void duet16_state::duet16(machine_config &config)
 
 	I8741A(config, "i8741", 20_MHz_XTAL / 4);
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	AM9517A(config, m_dmac, 20_MHz_XTAL / 4);
@@ -380,7 +380,7 @@ void duet16_state::duet16(machine_config &config)
 	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dmac->out_eop_callback().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
-	pit8253_device &bgpit(PIT8253(config, "bgpit", 0));
+	pit8253_device &bgpit(PIT8253(config, "bgpit"));
 	bgpit.set_clk<0>(8_MHz_XTAL / 13);
 	bgpit.set_clk<1>(8_MHz_XTAL / 13);
 	bgpit.set_clk<2>(8_MHz_XTAL / 13);
@@ -392,7 +392,7 @@ void duet16_state::duet16(machine_config &config)
 	bgpit.out_handler<2>().append("kbusart", FUNC(i8251_device::write_rxc));
 
 	ptm6840_device &itm(PTM6840(config, "itm", 8_MHz_XTAL / 8));
-	itm.set_external_clocks(0.0, 0.0, (8_MHz_XTAL / 8).dvalue()); // C3 = 1MHz
+	itm.set_external_clocks(XTAL(), XTAL(), 8_MHz_XTAL / 8); // C3 = 1MHz
 	itm.o3_callback().set("itm", FUNC(ptm6840_device::set_c1)); // C1 = C2 = O3
 	itm.o3_callback().append("itm", FUNC(ptm6840_device::set_c2));
 	itm.irq_callback().set(m_tmint, FUNC(input_merger_device::in_w<0>));
@@ -420,7 +420,7 @@ void duet16_state::duet16(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", duet16_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats, true);
 	FLOPPY_CONNECTOR(config, "fdc:1", duet16_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats, true);
 
-	hd6845s_device &crtc(HD6845S(config, "crtc", 2000000)); // "46505S" on schematics
+	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL::u(2000000))); // "46505S" on schematics
 	crtc.set_char_width(8);
 	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row));
 

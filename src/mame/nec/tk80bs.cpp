@@ -204,7 +204,7 @@ void tk80bs_state::tk80bs(machine_config &config)
 	m_ppi->in_pa_callback().set(FUNC(tk80bs_state::port_a_r));
 	m_ppi->in_pb_callback().set(FUNC(tk80bs_state::port_b_r));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(tk80bs_state::kbd_put));
 }
 

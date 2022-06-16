@@ -136,7 +136,7 @@ ioport_constructor luxor_4105_device::device_input_ports() const
 //  luxor_4105_device - constructor
 //-------------------------------------------------
 
-luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, LUXOR_4105, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	m_sasi(*this, "sasi:7:scsicb"),

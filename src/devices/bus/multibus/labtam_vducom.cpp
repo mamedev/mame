@@ -30,7 +30,7 @@ enum u7_mask : u8
 
 DEFINE_DEVICE_TYPE(LABTAM_VDUCOM, labtam_vducom_device, "labtam_vducom", "Labtam 8086 VDU COMM")
 
-labtam_vducom_device::labtam_vducom_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+labtam_vducom_device::labtam_vducom_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LABTAM_VDUCOM, tag, owner, clock)
 	, device_multibus_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
@@ -144,12 +144,12 @@ void labtam_vducom_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_IO, &labtam_vducom_device::cpu_pio);
 	m_cpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_cb));
 
-	AM9513(config, m_ctc[0], 4'000'000);
+	AM9513(config, m_ctc[0], XTAL::u(4'000'000));
 	//m_ctc[0]->out1_cb().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_ctc[0]->out4_cb().set(m_ctc[0], FUNC(am9513_device::gate5_w)); // ?
 	m_ctc[0]->out5_cb().set(m_ctc[0], FUNC(am9513_device::source4_w)); // ?
 
-	AM9513(config, m_ctc[1], 4'000'000);
+	AM9513(config, m_ctc[1], XTAL::u(4'000'000));
 	m_ctc[1]->out1_cb().set(m_com[1], FUNC(upd7201_device::txcb_w));
 	m_ctc[1]->out2_cb().set(m_com[1], FUNC(upd7201_device::rxcb_w));
 	m_ctc[1]->out3_cb().set(m_com[1], FUNC(upd7201_device::rxca_w));
@@ -161,15 +161,15 @@ void labtam_vducom_device::device_add_mconfig(machine_config &config)
 	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_cpu, INPUT_LINE_INT0);
 
-	UPD7201(config, m_com[0], 4'000'000);
+	UPD7201(config, m_com[0], XTAL::u(4'000'000));
 	m_com[0]->out_int_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
-	UPD7201(config, m_com[1], 4'000'000);
+	UPD7201(config, m_com[1], XTAL::u(4'000'000));
 	m_com[1]->out_int_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
 
 	X2212(config, m_nvram[0]);
 	X2212(config, m_nvram[1]);
 
-	MC6845(config, m_crtc, 1'000'000);
+	MC6845(config, m_crtc, XTAL::u(1'000'000));
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_hpixels_per_column(16);
 	m_crtc->set_update_row_callback(FUNC(labtam_vducom_device::update_row));
@@ -179,7 +179,7 @@ void labtam_vducom_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette, FUNC(labtam_vducom_device::palette_init), 4);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(1'000'000, 62*16, 2*16, 52*16, 78*4, 3*4, 75*4);
+	m_screen->set_raw(XTAL::u(1'000'000), 62*16, 2*16, 52*16, 78*4, 3*4, 75*4);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
 	// gfxdecode is only to show the font data in the tile viewer

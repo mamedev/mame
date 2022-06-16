@@ -23,7 +23,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(I5000_SND, i5000snd_device, "i5000snd", "Imagetek I5000 Sound")
 
-i5000snd_device::i5000snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i5000snd_device::i5000snd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, I5000_SND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr), m_rom_base(nullptr), m_rom_mask(0)

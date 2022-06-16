@@ -3897,7 +3897,7 @@ ioport_constructor powervr2_device::device_input_ports() const
 	return INPUT_PORTS_NAME( powervr2 );
 }
 
-powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, POWERVR2, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, irq_cb(*this)

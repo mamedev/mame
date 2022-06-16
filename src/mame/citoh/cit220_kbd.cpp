@@ -26,7 +26,7 @@
 
 DEFINE_DEVICE_TYPE(CIT220P_KEYBOARD, cit220p_keyboard_device, "cit220p_kbd", "CIT-220+ Keyboard")
 
-cit220p_keyboard_device::cit220p_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cit220p_keyboard_device::cit220p_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CIT220P_KEYBOARD, tag, owner, clock)
 	, m_mcu(*this, "mcu")
 	, m_beeper(*this, "beeper")
@@ -234,7 +234,7 @@ ioport_constructor cit220p_keyboard_device::device_input_ports() const
 
 void cit220p_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	I8035(config, m_mcu, 2376000); // type and clock guessed
+	I8035(config, m_mcu, XTAL::u(2376000)); // type and clock guessed
 	m_mcu->set_addrmap(AS_PROGRAM, &cit220p_keyboard_device::prog_map);
 	m_mcu->set_addrmap(AS_IO, &cit220p_keyboard_device::ext_map);
 	m_mcu->bus_in_cb().set(FUNC(cit220p_keyboard_device::mcu_bus_r));
@@ -244,7 +244,7 @@ void cit220p_keyboard_device::device_add_mconfig(machine_config &config)
 	m_mcu->t1_in_cb().set_ioport("MODIFIERS").bit(0);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 1000).add_route(ALL_OUTPUTS, "mono", 1.0); // unknown frequency
+	BEEP(config, m_beeper, XTAL::u(1000)).add_route(ALL_OUTPUTS, "mono", 1.0); // unknown frequency
 }
 
 

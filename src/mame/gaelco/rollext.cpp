@@ -748,12 +748,12 @@ void rollext_state::machine_start()
 
 void rollext_state::rollext(machine_config &config)
 {
-	TMS32082_MP(config, m_maincpu, 60000000);
+	TMS32082_MP(config, m_maincpu, XTAL::u(60000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &rollext_state::memmap);
 	m_maincpu->set_vblank_int("screen", FUNC(rollext_state::vblank_interrupt));
 	//m_maincpu->set_periodic_int(FUNC(rollext_state::irq3_line_assert), attotime::from_hz(500));
 
-	tms32082_pp_device &pp0(TMS32082_PP(config, "pp0", 60000000));
+	tms32082_pp_device &pp0(TMS32082_PP(config, "pp0", XTAL::u(60000000)));
 	pp0.set_addrmap(AS_PROGRAM, &rollext_state::memmap);
 
 	config.set_maximum_quantum(attotime::from_hz(100));

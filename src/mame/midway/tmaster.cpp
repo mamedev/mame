@@ -384,7 +384,7 @@ void tmaster_state::tm(machine_config &config)
 	m_duart->irq_cb().set(FUNC(tmaster_state::duart_irq_handler));
 	m_duart->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
 
-	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_duart, FUNC(mc68681_device::rx_a_w));
+	MICROTOUCH(config, m_microtouch, XTAL::u(9600)).stx().set(m_duart, FUNC(mc68681_device::rx_a_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -412,7 +412,7 @@ void tmaster_state::tm(machine_config &config)
 void tmaster_state::tmds1204(machine_config &config)
 {
 	tm(config);
-	DS1204(config, "ds1204", 0);
+	DS1204(config, "ds1204");
 }
 
 /***************************************************************************

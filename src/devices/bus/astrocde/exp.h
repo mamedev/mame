@@ -30,14 +30,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	astrocade_exp_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: astrocade_exp_device(mconfig, tag, owner, (uint32_t)0)
+		: astrocade_exp_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	astrocade_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	astrocade_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~astrocade_exp_device();
 
 	// device-level overrides

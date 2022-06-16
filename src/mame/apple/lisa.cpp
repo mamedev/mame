@@ -63,12 +63,12 @@ void lisa_state::lisa(machine_config &config)
 	iocop.read_si().set_constant(1); // FIXME: actually tied to VIA CA2 but both pulled up to +5
 	iocop.read_g().set_constant(15);
 
-	cop421_cpu_device &kbcop(COP421(config, "kbcop", 3932160)); // same clock as other COP?
+	cop421_cpu_device &kbcop(COP421(config, "kbcop", XTAL::u(3932160))); // same clock as other COP?
 	kbcop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
 	kbcop.read_si().set_constant(0);
 	kbcop.read_g().set_constant(15);
 
-	M6504(config, m_fdc_cpu, 2000000);        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
+	M6504(config, m_fdc_cpu, XTAL::u(2000000));        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	m_fdc_cpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa_fdc_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
@@ -121,7 +121,7 @@ void lisa_state::lisa(machine_config &config)
 
 	MOS6522(config, m_via1, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)
 
-	SCC8530(config, m_scc, 7833600);
+	SCC8530(config, m_scc, XTAL::u(7833600));
 }
 
 void lisa_state::lisa210(machine_config &config)
@@ -130,8 +130,8 @@ void lisa_state::lisa210(machine_config &config)
 	m_fdc_cpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa210_fdc_map);
 
 	/* via */
-	m_via0->set_clock(1250000);
-	m_via1->set_clock(1250000);
+	m_via0->set_clock(XTAL::u(1250000));
+	m_via1->set_clock(XTAL::u(1250000));
 }
 
 void lisa_state::macxl(machine_config &config)

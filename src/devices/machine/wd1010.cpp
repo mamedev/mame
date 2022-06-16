@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(WD1010, wd1010_device, "wd1010", "Western Digital WD1010-05")
 //  wd1010_device - constructor
 //-------------------------------------------------
 
-wd1010_device::wd1010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wd1010_device::wd1010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WD1010, tag, owner, clock),
 	m_out_intrq_cb(*this),
 	m_out_bdrq_cb(*this),

@@ -24,13 +24,13 @@ DEFINE_DEVICE_TYPE(MC10_PAK, mc10_pak_device, "mc10pak", "MC-10 Program PAK")
 //-------------------------------------------------
 //  mc10_pak_device - constructor
 //-------------------------------------------------
-mc10_pak_device::mc10_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+mc10_pak_device::mc10_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_mc10cart_interface(mconfig, *this)
 {
 }
 
-mc10_pak_device::mc10_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mc10_pak_device::mc10_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc10_pak_device(mconfig, MC10_PAK, tag, owner, clock)
 {
 }

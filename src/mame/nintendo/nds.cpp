@@ -22,7 +22,7 @@
 #define VERBOSE_LEVEL   (0)
 
 // Measured value from GBATEK.  Actual crystal unknown.
-#define MASTER_CLOCK (33513982)
+#define MASTER_CLOCK XTAL::u(33513982)
 
 #define INT_VBL                 0x00000001
 #define INT_HBL                 0x00000002
@@ -57,7 +57,7 @@
 #define INT_NEWDMA2             0x40000000  // DSi only
 #define INT_NEWDMA3             0x80000000  // DSi only
 
-static const uint32_t timer_clks[4] = { MASTER_CLOCK, MASTER_CLOCK / 64, MASTER_CLOCK / 256, MASTER_CLOCK / 1024 };
+static const XTAL timer_clks[4] = { MASTER_CLOCK, MASTER_CLOCK / 64, MASTER_CLOCK / 256, MASTER_CLOCK / 1024 };
 
 static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
 {
@@ -104,7 +104,7 @@ uint32_t nds_state::arm7_io_r(offs_t offset, uint32_t mem_mask)
 	//                  printf("time %f ticks %f 1/hz %f\n", time, ticks, 1.0 / m_timer_hz[timer]);
 
 						time *= ticks;
-						time /= (1.0 / m_timer_hz[timer]);
+						time /= (1.0 / m_timer_hz[timer].dvalue());
 
 						elapsed = (uint32_t)time;
 					}
@@ -206,12 +206,9 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case TIMER_OFFSET+2:
 		case TIMER_OFFSET+3:
 			{
-				double rate, clocksel;
-				uint32_t old_timer_regs;
-
 				int timer = (offset - TIMER_OFFSET)+4;
 
-				old_timer_regs = m_timer_regs[timer];
+				uint32_t old_timer_regs = m_timer_regs[timer];
 
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
@@ -226,29 +223,28 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				// enabling this timer?
 				if ((ACCESSING_BITS_16_31) && (data & 0x800000))
 				{
-					double final;
 
 					if ((old_timer_regs & 0x00800000) == 0) // start bit 0 -> 1
 					{
 						m_timer_regs[timer] = (m_timer_regs[timer] & 0xFFFF0000) | (m_timer_reload[timer] & 0x0000FFFF);
 					}
 
-					rate = 0x10000 - (m_timer_regs[timer] & 0xffff);
+					int rate = 0x10000 - (m_timer_regs[timer] & 0xffff);
 
-					clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3];
+					XTAL clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3];
 
-					final = clocksel / rate;
+					XTAL final = clocksel / rate;
 
 					m_timer_hz[timer] = final;
 
 					m_timer_recalc[timer] = 0;
 
-					printf("Enabling timer %d @ %f Hz regs %08x\n", timer, final, m_timer_regs[timer]);
+					printf("Enabling timer %d @ %f Hz regs %08x\n", timer, final.dvalue(), m_timer_regs[timer]);
 
 					// enable the timer
 					if( !(data & 0x40000) ) // if we're not in Count-Up mode
 					{
-						attotime time = attotime::from_hz(final);
+						attotime time = attotime::from_hz(final.dvalue());
 						m_tmr_timer[timer]->adjust(time, timer, time);
 					}
 				}
@@ -391,7 +387,7 @@ uint32_t nds_state::arm9_io_r(offs_t offset, uint32_t mem_mask)
 	//                  printf("time %f ticks %f 1/hz %f\n", time, ticks, 1.0 / m_timer_hz[timer]);
 
 						time *= ticks;
-						time /= (1.0 / m_timer_hz[timer]);
+						time /= (1.0 / m_timer_hz[timer].dvalue());
 
 						elapsed = (uint32_t)time;
 					}
@@ -443,12 +439,9 @@ void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case TIMER_OFFSET+2:
 		case TIMER_OFFSET+3:
 			{
-				double rate, clocksel;
-				uint32_t old_timer_regs;
-
 				int timer = (offset - TIMER_OFFSET)+4;
 
-				old_timer_regs = m_timer_regs[timer];
+				uint32_t old_timer_regs = m_timer_regs[timer];
 
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
@@ -463,29 +456,27 @@ void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				// enabling this timer?
 				if ((ACCESSING_BITS_16_31) && (data & 0x800000))
 				{
-					double final;
-
 					if ((old_timer_regs & 0x00800000) == 0) // start bit 0 -> 1
 					{
 						m_timer_regs[timer] = (m_timer_regs[timer] & 0xFFFF0000) | (m_timer_reload[timer] & 0x0000FFFF);
 					}
 
-					rate = 0x10000 - (m_timer_regs[timer] & 0xffff);
+					int rate = 0x10000 - (m_timer_regs[timer] & 0xffff);
 
-					clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3];
+					XTAL clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3];
 
-					final = clocksel / rate;
+					XTAL final = clocksel / rate;
 
 					m_timer_hz[timer] = final;
 
 					m_timer_recalc[timer] = 0;
 
-					printf("Enabling timer %d @ %f Hz\n", timer, final);
+					printf("Enabling timer %d @ %f Hz\n", timer, final.dvalue());
 
 					// enable the timer
 					if( !(data & 0x40000) ) // if we're not in Count-Up mode
 					{
-						attotime time = attotime::from_hz(final);
+						attotime time = attotime::from_hz(final.dvalue());
 						m_tmr_timer[timer]->adjust(time, timer, time);
 					}
 				}
@@ -870,15 +861,13 @@ TIMER_CALLBACK_MEMBER(nds_state::timer_expire)
 	// "or when the timer start bit becomes changed from 0 to 1."
 	if (m_timer_recalc[tmr] != 0)
 	{
-		double rate, clocksel, final;
-		attotime time;
 		m_timer_recalc[tmr] = 0;
 		m_timer_regs[tmr] = (m_timer_regs[tmr] & 0xFFFF0000) | (m_timer_reload[tmr] & 0x0000FFFF);
-		rate = 0x10000 - (m_timer_regs[tmr] & 0xffff);
-		clocksel = timer_clks[(m_timer_regs[tmr] >> 16) & 3];
-		final = clocksel / rate;
+		int rate = 0x10000 - (m_timer_regs[tmr] & 0xffff);
+		XTAL clocksel = timer_clks[(m_timer_regs[tmr] >> 16) & 3];
+		XTAL final = clocksel / rate;
 		m_timer_hz[tmr] = final;
-		time = attotime::from_hz(final);
+		attotime time = attotime::from_hz(final);
 		m_tmr_timer[tmr]->adjust(time, tmr, time);
 	}
 

@@ -437,7 +437,7 @@ void informer_213_state::informer_213(machine_config &config)
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beep", 500).add_route(ALL_OUTPUTS, "mono", 0.50); // frequency unknown
+	BEEP(config, "beep", XTAL::u(500)).add_route(ALL_OUTPUTS, "mono", 0.50); // frequency unknown
 
 	informer_213_kbd_hle_device &kbd(INFORMER_213_KBD_HLE(config, "kbd"));
 	kbd.int_handler().set(FUNC(informer_213_state::kbd_int_w));

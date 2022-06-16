@@ -21,7 +21,7 @@
 //  cpu_device - constructor
 //-------------------------------------------------
 
-cpu_device::cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+cpu_device::cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_execute_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),

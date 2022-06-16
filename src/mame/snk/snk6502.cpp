@@ -853,7 +853,7 @@ void snk6502_state::sasuke(machine_config &config)
 	TIMER(config, "sasuke_timer").configure_periodic(FUNC(snk6502_state::sasuke_update_counter), attotime::from_hz(MASTER_CLOCK / 8));
 
 	// sound hardware
-	SASUKE_SOUND(config, "snk6502", 0);
+	SASUKE_SOUND(config, "snk6502");
 }
 
 void snk6502_state::satansat(machine_config &config)
@@ -900,7 +900,7 @@ void vanguard_state::vanguard(machine_config &config)
 	crtc.set_char_width(8);
 
 	// sound hardware
-	VANGUARD_SOUND(config, "snk6502", 0);
+	VANGUARD_SOUND(config, "snk6502");
 }
 
 void fantasy_state::fantasy(machine_config &config)

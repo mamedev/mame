@@ -45,12 +45,12 @@ std::unique_ptr<util::disasm_interface> sm530_device::create_disassembler()
 
 
 // device definitions
-sm530_device::sm530_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+sm530_device::sm530_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	sm511_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data),
 	m_write_f(*this)
 { }
 
-sm530_device::sm530_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+sm530_device::sm530_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sm530_device(mconfig, SM530, tag, owner, clock, 1 /* stack levels */, 11 /* prg width */, address_map_constructor(FUNC(sm530_device::program_2k), this), 7 /* data width */, address_map_constructor(FUNC(sm530_device::data_64_24x4), this))
 { }
 

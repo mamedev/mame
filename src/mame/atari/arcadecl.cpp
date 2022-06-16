@@ -339,7 +339,7 @@ void arcadecl_state::arcadecl(machine_config &config)
 {
 	sparkz(config);
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, arcadecl_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, arcadecl_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 }
 

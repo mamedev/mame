@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(M6509, m6509_device, "m6509", "MOS Technology 6509")
 
-m6509_device::m6509_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m6509_device::m6509_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m6502_device(mconfig, M6509, tag, owner, clock), bank_i(0), bank_y(0)
 {
 	program_config.m_addr_width = 20;

@@ -205,7 +205,7 @@ void vindictr_state::vindictr(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_COLS, 64,64).set_info_callback(FUNC(vindictr_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(vindictr_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, vindictr_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, vindictr_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -220,7 +220,7 @@ void vindictr_state::vindictr(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ATARI_JSA_I(config, m_jsa, 0);
+	ATARI_JSA_I(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260010").bit(12);
 	m_jsa->add_route(0, "lspeaker", 1.0);

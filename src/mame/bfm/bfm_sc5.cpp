@@ -337,24 +337,24 @@ void bfm_sc5_state::bfm_sc5_duart_output_w(uint8_t data)
 
 void bfm_sc5_state::bfm_sc5(machine_config &config)
 {
-	MCF5206E(config, m_maincpu, 40000000); /* MCF5206eFT */
+	MCF5206E(config, m_maincpu, XTAL::u(40000000)); /* MCF5206eFT */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc5_state::sc5_map);
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", m_maincpu);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MC68681(config, m_duart, 16000000/4); // ?? Mhz
-	m_duart->set_clocks(16000000/2/8, 16000000/2/16, 16000000/2/16, 16000000/2/8);
+	MC68681(config, m_duart, XTAL::u(16000000)/4); // ?? Mhz
+	m_duart->set_clocks(XTAL::u(16000000)/2/8, XTAL::u(16000000)/2/16, XTAL::u(16000000)/2/16, XTAL::u(16000000)/2/8);
 	m_duart->irq_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_irq_handler));
 	m_duart->a_tx_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_txa));
 	m_duart->inport_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_input_r));
 	m_duart->outport_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_output_w));
 
-	BFM_BDA(config, m_vfd0, 60, 0);
+	BFM_BDA(config, m_vfd0, XTAL::u(60), 0);
 
 	config.set_default_layout(layout_bfm_sc5);
 
-	YMZ280B(config, m_ymz, 16000000); // ?? Mhz
+	YMZ280B(config, m_ymz, XTAL::u(16000000)); // ?? Mhz
 	m_ymz->add_route(ALL_OUTPUTS, "mono", 1.0);
 }

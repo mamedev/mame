@@ -23,12 +23,12 @@ DEFINE_DEVICE_TYPE(ISA8_SLOT, isa8_slot_device, "isa8_slot", "8-bit ISA slot")
 //-------------------------------------------------
 //  isa8_slot_device - constructor
 //-------------------------------------------------
-isa8_slot_device::isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_slot_device::isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_slot_device(mconfig, ISA8_SLOT, tag, owner, clock)
 {
 }
 
-isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_isa_bus(*this, finder_base::DUMMY_TAG)
@@ -67,7 +67,7 @@ DEFINE_DEVICE_TYPE(ISA16_SLOT, isa16_slot_device, "isa16_slot", "16-bit ISA slot
 //-------------------------------------------------
 //  isa16_slot_device - constructor
 //-------------------------------------------------
-isa16_slot_device::isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa16_slot_device::isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_slot_device(mconfig, ISA16_SLOT, tag, owner, clock)
 {
 }
@@ -99,12 +99,12 @@ DEFINE_DEVICE_TYPE(ISA8, isa8_device, "isa8", "8-bit ISA bus")
 //  isa8_device - constructor
 //-------------------------------------------------
 
-isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_device(mconfig, ISA8, tag, owner, clock)
 {
 }
 
-isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_mem_config("mem8", ENDIANNESS_LITTLE, 8, 24, 0, address_map_constructor()),
@@ -507,7 +507,7 @@ DEFINE_DEVICE_TYPE(ISA16, isa16_device, "isa16", "16-bit ISA bus")
 //  isa16_device - constructor
 //-------------------------------------------------
 
-isa16_device::isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa16_device::isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_device(mconfig, ISA16, tag, owner, clock),
 	m_out_irq10_cb(*this),
 	m_out_irq11_cb(*this),

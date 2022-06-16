@@ -34,7 +34,7 @@
 #include <cmath>
 
 
-#define MASTER_CLOCK    (4000000)
+#define MASTER_CLOCK    XTAL::u(4000000)
 #define V_TOTAL_PONG    315
 #define H_TOTAL_PONG    256     // tbc
 
@@ -68,7 +68,7 @@ INPUT_PORTS_END
 
 void palestra_state::palestra(machine_config &config)
 {
-	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK())
+	NETLIST_CPU(config, m_maincpu)
 		.set_source(netlist_palestra);
 
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", m_video, FUNC(fixedfreq_device::update_composite_monochrome));

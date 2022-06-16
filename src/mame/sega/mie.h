@@ -20,7 +20,7 @@ class mie_device : public maple_device
 {
 public:
 	template <typename T, typename U>
-	mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&host_tag, int host_port, U &&jvs_tag)
+	mie_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&host_tag, int host_port, U &&jvs_tag)
 		: mie_device(mconfig, tag, owner, clock)
 	{
 		host.set_tag(std::forward<T>(host_tag));
@@ -28,7 +28,7 @@ public:
 		jvs.set_tag(std::forward<U>(jvs_tag));
 	}
 
-	mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mie_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <uint8_t Which, typename T>
 	void set_gpio_name(T &&gpio_port_tag) { gpio_port[Which].set_tag(std::forward<T>(gpio_port_tag)); }
@@ -131,7 +131,7 @@ public:
 	friend class mie_device;
 
 	// construction/destruction
-	mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

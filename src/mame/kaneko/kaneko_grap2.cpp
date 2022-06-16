@@ -34,7 +34,7 @@ void kaneko_grap2_device::grap2_map(address_map &map)
 
 DEFINE_DEVICE_TYPE(KANEKO_GRAP2, kaneko_grap2_device, "kaneko_grap2", "Kaneko GRAP2")
 
-kaneko_grap2_device::kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kaneko_grap2_device::kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KANEKO_GRAP2, tag, owner, clock)
 	, device_rom_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)

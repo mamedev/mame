@@ -32,7 +32,7 @@
 
 DEFINE_DEVICE_TYPE(K007232, k007232_device, "k007232", "K007232 PCM Controller")
 
-k007232_device::k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+k007232_device::k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K007232, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)

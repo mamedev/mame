@@ -14,7 +14,7 @@ class nes_gs2015_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_gs2015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_gs2015_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read_l(offs_t offset) override { return read_m(offset); }
 	virtual uint8_t read_m(offs_t offset) override;
@@ -28,14 +28,14 @@ class nes_gs2004_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_gs2004_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_gs2004_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_m(offs_t offset) override;
 	virtual void write_h(offs_t offset, u8 data) override;
 
 protected:
 	// construction/destruction
-	nes_gs2004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int bank);
+	nes_gs2004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int bank);
 
 private:
 	const u32 m_base;
@@ -48,7 +48,7 @@ class nes_gs2013_device : public nes_gs2004_device
 {
 public:
 	// construction/destruction
-	nes_gs2013_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_gs2013_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -58,7 +58,7 @@ class nes_tf9_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_tf9_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_tf9_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 };
@@ -70,7 +70,7 @@ class nes_3dblock_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

@@ -130,14 +130,14 @@ void elzet80_state::elzet80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &elzet80_state::io_map);
 
 	// devices
-	FD1793(config, m_fdc, 1000000);    // unknown where this is derived
+	FD1793(config, m_fdc, XTAL::u(1000000));    // unknown where this is derived
 	FLOPPY_CONNECTOR(config, "fdc:0", elzet80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", elzet80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	Z80PIO(config, m_pio, 0);
-	Z80SIO(config, m_uart, 0);
-	Z80CTC(config, m_ctc, 0);
-	Z80DMA(config, m_dma, 0);
+	Z80PIO(config, m_pio);
+	Z80SIO(config, m_uart);
+	Z80CTC(config, m_ctc);
+	Z80DMA(config, m_dma);
 }
 
 

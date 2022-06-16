@@ -28,7 +28,7 @@ class e0516_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	e0516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e0516_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );

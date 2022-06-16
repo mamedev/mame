@@ -90,19 +90,19 @@ const uint8_t i8086_cpu_device::m_i8086_timing[] =
 DEFINE_DEVICE_TYPE(I8086, i8086_cpu_device, "i8086", "Intel 8086")
 DEFINE_DEVICE_TYPE(I8088, i8088_cpu_device, "i8088", "Intel 8088")
 
-i8088_cpu_device::i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8088_cpu_device::i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8086_cpu_device(mconfig, I8088, tag, owner, clock, 8)
 {
 	memcpy(m_timing, m_i8086_timing, sizeof(m_i8086_timing));
 }
 
-i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8086_cpu_device(mconfig, I8086, tag, owner, clock, 16)
 {
 	memcpy(m_timing, m_i8086_timing, sizeof(m_i8086_timing));
 }
 
-i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size)
+i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int data_bus_size)
 	: i8086_common_cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
@@ -362,7 +362,7 @@ void i8086_cpu_device::device_start()
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 }
 
-i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_ip(0)
 	, m_TF(0)

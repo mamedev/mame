@@ -430,7 +430,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 
 	pcat_common(config);
 
-	PCI_BUS_LEGACY(config, m_pcibus, 0, 0);
+	PCI_BUS_LEGACY(config, m_pcibus);
 	m_pcibus->set_device(0, FUNC(xtom3d_state::intel82439tx_pci_r), FUNC(xtom3d_state::intel82439tx_pci_w));
 	m_pcibus->set_device(7, FUNC(xtom3d_state::intel82371ab_pci_r), FUNC(xtom3d_state::intel82371ab_pci_w));
 

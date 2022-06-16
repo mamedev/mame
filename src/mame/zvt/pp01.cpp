@@ -185,7 +185,7 @@ INPUT_PORTS_END
 void pp01_state::pp01(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 2000000);
+	I8080(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pp01_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &pp01_state::io_map);
 
@@ -205,12 +205,12 @@ void pp01_state::pp01(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	I8251(config, m_uart, 2000000);
+	I8251(config, m_uart, XTAL::u(2000000));
 	m_uart->txd_handler().set([this] (bool state) { m_txd = state; });
 	m_uart->txempty_handler().set([this] (bool state) { m_txe = state; });
 	m_uart->rts_handler().set([this] (bool state) { m_rts = state; });
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<2>(2000000);
 	m_pit->out_handler<2>().set(FUNC(pp01_state::z2_w));
 

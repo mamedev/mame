@@ -126,7 +126,7 @@ void device_sdlc_consumer_interface::rx_reset()
 }
 
 
-sdlc_logger_device::sdlc_logger_device(machine_config const &mconfig, char const *tag, device_t *owner, std::uint32_t clock) :
+sdlc_logger_device::sdlc_logger_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SDLC_LOGGER, tag, owner, clock),
 	device_sdlc_consumer_interface(mconfig, *this),
 	m_data_nrzi(0U),

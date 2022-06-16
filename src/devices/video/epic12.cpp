@@ -8,7 +8,7 @@
 
 DEFINE_DEVICE_TYPE(EPIC12, epic12_device, "epic12", "EPIC12 Blitter")
 
-epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, EPIC12, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_ram16(nullptr), m_gfx_size(0), m_bitmaps(nullptr), m_use_ram(nullptr)

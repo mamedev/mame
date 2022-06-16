@@ -47,7 +47,7 @@ public:
 
 protected:
 	// construction/destruction
-	fd1089_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	fd1089_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device overrides
 	virtual void device_start() override;
@@ -85,7 +85,7 @@ class fd1089a_device : public fd1089_base_device
 {
 public:
 	// construction/destruction
-	fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual uint8_t decode(uint8_t val, uint8_t key, bool opcode) override;
@@ -99,7 +99,7 @@ class fd1089b_device : public fd1089_base_device
 {
 public:
 	// construction/destruction
-	fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual uint8_t decode(uint8_t val, uint8_t key, bool opcode) override;

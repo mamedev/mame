@@ -26,7 +26,7 @@ class c64_4tba_device : public device_t, public device_pet_user_port_interface
 {
 public:
 	// construction/destruction
-	c64_4tba_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64_4tba_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

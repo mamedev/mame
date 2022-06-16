@@ -337,7 +337,7 @@ void enmirage_state::enmirage_es5503_map(address_map &map)
 
 void enmirage_state::mirage(machine_config &config)
 {
-	MC6809E(config, m_maincpu, 2000000);
+	MC6809E(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &enmirage_state::mirage_map);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irq_merge).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
@@ -352,14 +352,14 @@ void enmirage_state::mirage(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	es5503_device &es5503(ES5503(config, "es5503", 8000000));
+	es5503_device &es5503(ES5503(config, "es5503", XTAL::u(8000000)));
 	es5503.set_channels(8);
 	es5503.set_addrmap(0, &enmirage_state::enmirage_es5503_map);
 	es5503.irq_func().set(m_irq_merge, FUNC(input_merger_device::in_w<2>));
 	es5503.adc_func().set(FUNC(enmirage_state::mirage_adc_read));
 	es5503.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MOS6522(config, m_via, 3000000);
+	MOS6522(config, m_via, XTAL::u(3000000));
 	m_via->writepa_handler().set(FUNC(enmirage_state::mirage_via_write_porta));
 	m_via->readpb_handler().set(FUNC(enmirage_state::mirage_via_read_portb));
 	m_via->writepb_handler().set(FUNC(enmirage_state::mirage_via_write_portb));
@@ -373,7 +373,7 @@ void enmirage_state::mirage(machine_config &config)
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	WD1772(config, m_fdc, 8000000);
+	WD1772(config, m_fdc, XTAL::u(8000000));
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_fdc->drq_wr_callback().set(m_irq_merge, FUNC(input_merger_device::in_w<1>));
 

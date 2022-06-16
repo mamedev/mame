@@ -194,7 +194,7 @@ void m2comm_device::device_add_mconfig(machine_config &config)
 //  m2comm_device - constructor
 //-------------------------------------------------
 
-m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, M2COMM, tag, owner, clock)
 {
 	// prepare localhost "filename"

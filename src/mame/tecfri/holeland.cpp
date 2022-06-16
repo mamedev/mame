@@ -556,7 +556,7 @@ GFXDECODE_END
 void holeland_state::holeland(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 3'355'700); // measured 298ns on PCB
+	Z80(config, m_maincpu, XTAL::u(3'355'700)); // measured 298ns on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &holeland_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &holeland_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(holeland_state::irq0_line_hold));
@@ -592,7 +592,7 @@ void holeland_state::holeland(machine_config &config)
 	ay2.port_b_read_callback().set_ioport("DSW2");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	sp0256_device &speech(SP0256(config, "speech", 3'355'700)); // measured 298ns on PCB
+	sp0256_device &speech(SP0256(config, "speech", XTAL::u(3'355'700))); // measured 298ns on PCB
 	speech.data_request_callback().set_inputline("maincpu", INPUT_LINE_NMI);
 	speech.add_route(ALL_OUTPUTS, "mono", 1.0);
 }

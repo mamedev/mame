@@ -380,7 +380,7 @@
 DEFINE_DEVICE_TYPE(PDP1, pdp1_device, "pdp1_cpu", "DEC PDP-1 Central Processor")
 
 
-pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, PDP1, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 18, -2) // data is actually 18 bits wide
 	, m_extern_iot(*this)

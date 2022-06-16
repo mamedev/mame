@@ -259,7 +259,7 @@ INPUT_PORTS_END
 void rotaryf_state::rotaryf(machine_config &config)
 {
 	/* basic machine hardware */
-	I8085A(config, m_maincpu, 4000000); /* ?? MHz */
+	I8085A(config, m_maincpu, XTAL::u(4000000)); /* ?? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &rotaryf_state::rotaryf_map);
 	m_maincpu->set_addrmap(AS_IO, &rotaryf_state::rotaryf_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(rotaryf_state::rotaryf_interrupt), "screen", 0, 1);

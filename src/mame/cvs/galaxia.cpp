@@ -314,15 +314,15 @@ void galaxia_state::galaxia(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxia);
 	PALETTE(config, m_palette, FUNC(galaxia_state::galaxia_palette), 0x18+2);
 
-	S2636(config, m_s2636[0], 0);
+	S2636(config, m_s2636[0]);
 	m_s2636[0]->set_offsets(-13, -26);
 	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	S2636(config, m_s2636[1], 0);
+	S2636(config, m_s2636[1]);
 	m_s2636[1]->set_offsets(-13, -26);
 	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	S2636(config, m_s2636[2], 0);
+	S2636(config, m_s2636[2]);
 	m_s2636[2]->set_offsets(-13, -26);
 	m_s2636[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
@@ -357,7 +357,7 @@ void galaxia_state::astrowar(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,astrowar)
 
-	S2636(config, m_s2636[0], 0);
+	S2636(config, m_s2636[0]);
 	m_s2636[0]->set_offsets(-13, -8);
 	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 

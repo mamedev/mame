@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(BBC_MASTERSD, bbc_mastersd_device, "bbc_mastersd", "MasterSD 
 
 void bbc_mastersd_device::device_add_mconfig(machine_config &config)
 {
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->spi_miso_callback().set([this](int state) { m_in_bit = state; });
 }
 
@@ -38,7 +38,7 @@ void bbc_mastersd_device::device_add_mconfig(machine_config &config)
 //  bbc_mastersd_device - constructor
 //-------------------------------------------------
 
-bbc_mastersd_device::bbc_mastersd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_mastersd_device::bbc_mastersd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_MASTERSD, tag, owner, clock)
 	, device_bbc_cart_interface(mconfig, *this)
 	, m_sdcard(*this, "sdcard")

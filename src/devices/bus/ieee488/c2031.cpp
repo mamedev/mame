@@ -320,7 +320,7 @@ void c2031_device::device_add_mconfig(machine_config &config)
 	C64H156(config, m_ga, XTAL(16'000'000));
 	m_ga->byte_callback().set(FUNC(c2031_device::byte_w));
 
-	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0", 0));
+	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0"));
 	connector.option_add("525ssqd", FLOPPY_525_SSQD);
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);
@@ -386,7 +386,7 @@ inline int c2031_device::get_device_number()
 //  c2031_device - constructor
 //-------------------------------------------------
 
-c2031_device::c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c2031_device::c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, C2031, tag, owner, clock)
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, M6502_TAG)

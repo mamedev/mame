@@ -237,7 +237,7 @@ const unsigned char noise_tbl[]=
 DEFINE_DEVICE_TYPE(UPD1771C, upd1771c_device, "upd1771c", "NEC uPD1771C 017")
 
 
-upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UPD1771C, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_ack_handler(*this)

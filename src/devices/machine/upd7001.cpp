@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(UPD7001, upd7001_device, "upd7001", "NEC uPD7001 A/D Converte
 //  upd7001_device - constructor
 //-------------------------------------------------
 
-upd7001_device::upd7001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upd7001_device::upd7001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UPD7001, tag, owner, clock)
 	, m_an_callback(*this)
 	, m_eoc_callback(*this)

@@ -89,10 +89,10 @@ void tv965_state::tv965(machine_config &config)
 	crtc.intr_callback().set_inputline(m_maincpu, G65816_LINE_NMI);
 	crtc.set_screen("screen");
 
-	mos6551_device &acia1(MOS6551(config, "acia1", 0));
+	mos6551_device &acia1(MOS6551(config, "acia1"));
 	acia1.set_xtal(3.6864_MHz_XTAL / 2); // divider not verified, possibly even programmable
 
-	mos6551_device &acia2(MOS6551(config, "acia2", 0));
+	mos6551_device &acia2(MOS6551(config, "acia2"));
 	acia2.set_xtal(3.6864_MHz_XTAL / 2); // divider not verified, possibly even programmable
 }
 

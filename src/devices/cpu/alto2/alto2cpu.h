@@ -179,7 +179,7 @@ class alto2_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	alto2_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	alto2_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~alto2_cpu_device();
 
 	auto kb_read_callback() { return m_kb_read_callback.bind(); }

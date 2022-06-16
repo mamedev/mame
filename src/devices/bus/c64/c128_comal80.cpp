@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(C128_COMAL80, c128_comal80_cartridge_device, "c128_comal80", 
 //  c128_comal80_cartridge_device - constructor
 //-------------------------------------------------
 
-c128_comal80_cartridge_device::c128_comal80_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c128_comal80_cartridge_device::c128_comal80_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C128_COMAL80, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)

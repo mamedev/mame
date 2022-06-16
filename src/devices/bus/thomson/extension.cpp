@@ -9,7 +9,7 @@
 
 DEFINE_DEVICE_TYPE(THOMSON_EXTENSION, thomson_extension_device, "thomson_extension", "Thomson TO*/MO* extension port")
 
-thomson_extension_device::thomson_extension_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+thomson_extension_device::thomson_extension_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, THOMSON_EXTENSION, tag, owner, clock),
 	device_single_card_slot_interface<thomson_extension_interface>(mconfig, *this)
 {

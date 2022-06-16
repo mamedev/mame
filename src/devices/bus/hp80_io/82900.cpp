@@ -28,7 +28,7 @@ namespace {
 	}
 }
 
-hp82900_io_card_device::hp82900_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp82900_io_card_device::hp82900_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig , HP82900_IO_CARD , tag , owner , clock),
 	  device_hp80_io_interface(mconfig, *this),
 	  m_cpu(*this , "cpu"),
@@ -163,7 +163,7 @@ void hp82900_io_card_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_IO , &hp82900_io_card_device::cpu_io_map);
 	m_cpu->refresh_cb().set(FUNC(hp82900_io_card_device::z80_m1_w));
 
-	HP_1MB5(config, m_translator, 0);
+	HP_1MB5(config, m_translator);
 	m_translator->irl_handler().set(FUNC(hp82900_io_card_device::irl_w));
 	m_translator->halt_handler().set(FUNC(hp82900_io_card_device::halt_w));
 	m_translator->reset_handler().set(FUNC(hp82900_io_card_device::reset_w));

@@ -13,7 +13,7 @@ class dp83932c_device
 	, public device_network_interface
 {
 public:
-	dp83932c_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	dp83932c_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <typename T> void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }

@@ -146,7 +146,7 @@ GFXDECODE_END
 void unkpoker_state::unkpoker(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, 2000000); // guessed
+	I8080A(config, m_maincpu, XTAL::u(2000000)); // guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &unkpoker_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &unkpoker_state::io_map);
 

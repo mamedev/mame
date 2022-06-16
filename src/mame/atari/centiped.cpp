@@ -1775,7 +1775,7 @@ GFXDECODE_END
 void centiped_state::centiped_base(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 12096000/8);  /* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
+	M6502(config, m_maincpu, XTAL::u(12096000)/8);  /* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
 
 	MCFG_MACHINE_RESET_OVERRIDE(centiped_state,centiped)
 
@@ -1818,7 +1818,7 @@ void centiped_state::centiped(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	pokey_device &pokey(POKEY(config, "pokey", 12096000/8));
+	pokey_device &pokey(POKEY(config, "pokey", XTAL::u(12096000)/8));
 	pokey.set_output_opamp_low_pass(RES_K(3.3), CAP_U(0.01), 5.0);
 	pokey.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
@@ -1843,7 +1843,7 @@ void centiped_state::caterplr(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_aysnd, 12096000/8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	AY8910(config, m_aysnd, XTAL::u(12096000)/8).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void centiped_state::centipdb(machine_config &config)
@@ -1858,7 +1858,7 @@ void centiped_state::centipdb(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_aysnd, 12096000/8);
+	AY8910(config, m_aysnd, XTAL::u(12096000)/8);
 	m_aysnd->port_a_read_callback().set(FUNC(centiped_state::caterplr_unknown_r));
 	m_aysnd->add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -1878,7 +1878,7 @@ void centiped_state::magworm(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8912(config, m_aysnd, 12096000/8).add_route(ALL_OUTPUTS, "mono", 2.0); // AY-3-8912 at 2/3H
+	AY8912(config, m_aysnd, XTAL::u(12096000)/8).add_route(ALL_OUTPUTS, "mono", 2.0); // AY-3-8912 at 2/3H
 }
 
 void centiped_state::milliped(machine_config &config)
@@ -1903,11 +1903,11 @@ void centiped_state::milliped(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	pokey_device &pokey1(POKEY(config, "pokey", 12096000/8));
+	pokey_device &pokey1(POKEY(config, "pokey", XTAL::u(12096000)/8));
 	pokey1.allpot_r().set_ioport("DSW1");
 	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	pokey_device &pokey2(POKEY(config, "pokey2", 12096000/8));
+	pokey_device &pokey2(POKEY(config, "pokey2", XTAL::u(12096000)/8));
 	pokey2.allpot_r().set_ioport("DSW2");
 	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
@@ -1949,7 +1949,7 @@ void centiped_state::warlords(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	pokey_device &pokey(POKEY(config, "pokey", 12096000/8));
+	pokey_device &pokey(POKEY(config, "pokey", XTAL::u(12096000)/8));
 	pokey.pot_r<0>().set_ioport("PADDLE0");
 	pokey.pot_r<1>().set_ioport("PADDLE1");
 	pokey.pot_r<2>().set_ioport("PADDLE2");
@@ -1972,7 +1972,7 @@ void centiped_state::mazeinv(machine_config &config)
 void centiped_state::bullsdrt(machine_config &config)
 {
 	/* basic machine hardware */
-	S2650(config, m_maincpu, 12096000/8);
+	S2650(config, m_maincpu, XTAL::u(12096000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &centiped_state::bullsdrt_map);
 	m_maincpu->set_addrmap(AS_IO, &centiped_state::bullsdrt_port_map);
 	m_maincpu->set_addrmap(AS_DATA, &centiped_state::bullsdrt_data_map);
@@ -2003,7 +2003,7 @@ void centiped_state::bullsdrt(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	sn76496_device &snsnd(SN76496(config, "snsnd", 12096000/8));
+	sn76496_device &snsnd(SN76496(config, "snsnd", XTAL::u(12096000)/8));
 	snsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

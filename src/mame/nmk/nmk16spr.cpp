@@ -37,7 +37,7 @@
 
 DEFINE_DEVICE_TYPE(NMK_16BIT_SPRITE, nmk_16bit_sprite_device, "nmk16spr", "NMK 16 bit Sprite hardware")
 
-nmk_16bit_sprite_device::nmk_16bit_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nmk_16bit_sprite_device::nmk_16bit_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NMK_16BIT_SPRITE, tag, owner, clock)
 	, m_colpri_cb(*this)
 	, m_ext_cb(*this)

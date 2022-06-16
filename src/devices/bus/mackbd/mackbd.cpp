@@ -99,7 +99,7 @@ DEFINE_DEVICE_TYPE(MAC_KEYBOARD_PORT, mac_keyboard_port_device, "mackbd_port", "
 //  HOST PORT
 //**************************************************************************
 
-mac_keyboard_port_device::mac_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+mac_keyboard_port_device::mac_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MAC_KEYBOARD_PORT, tag, owner, clock)
 	, device_single_card_slot_interface<device_mac_keyboard_interface>(mconfig, *this)
 	, m_clock_cb{ *this }

@@ -85,8 +85,8 @@ namespace {
 #define Y1      XTAL(2'457'600)
 
 // 32028400 also exists
-#define Y2      32084988.0
-#define Y2_NTSC 32042400.0
+#define Y2      XTAL::u(32084988)
+#define Y2_NTSC XTAL::u(32042400)
 
 // STBook
 
@@ -109,7 +109,7 @@ namespace {
 
 #define DMA_SECTOR_SIZE             512
 
-static const double DMASOUND_RATE[] = { Y2/640.0/8.0, Y2/640.0/4.0, Y2/640.0/2.0, Y2/640.0 };
+static const XTAL DMASOUND_RATE[] = { Y2/640.0/8.0, Y2/640.0/4.0, Y2/640.0/2.0, Y2/640.0 };
 
 static const int IKBD_MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
 static const int IKBD_MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
@@ -2486,7 +2486,7 @@ void ste_state::ste(machine_config &config)
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(0, "rspeaker", 0.50);
 /*
-    custom_device &custom_dac(CUSTOM(config, "custom", 0)); // DAC
+    custom_device &custom_dac(CUSTOM(config, "custom")); // DAC
     custom_dac.add_route(0, "rspeaker", 0.50);
     custom_dac.add_route(1, "lspeaker", 0.50);
 */

@@ -77,7 +77,7 @@ ROM_END
 //  philips_22vp931_device - constructor
 //-------------------------------------------------
 
-philips_22vp931_device::philips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+philips_22vp931_device::philips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: laserdisc_device(mconfig, PHILIPS_22VP931, tag, owner, clock),
 		m_i8049_cpu(*this, "vp931"),
 		m_process_vbi_timer(nullptr),

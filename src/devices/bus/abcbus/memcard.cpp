@@ -110,7 +110,7 @@ const tiny_rom_entry *abc_memory_card_device::device_rom_region() const
 //  abc_memory_card_device - constructor
 //-------------------------------------------------
 
-abc_memory_card_device::abc_memory_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc_memory_card_device::abc_memory_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ABC_MEMORY_CARD, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	m_dos_rom(*this, "dos"),

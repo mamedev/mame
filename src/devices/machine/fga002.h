@@ -10,7 +10,7 @@ class fga002_device :  public device_t
 {
 	public:
 	// construction/destruction
-	fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
@@ -46,7 +46,7 @@ class fga002_device :  public device_t
 	// interrupt sources in prio order if on same interrupt level. TODO: Add all sources
 	const static fga_irq_t s_irq_sources[];
 
-	fga002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	fga002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

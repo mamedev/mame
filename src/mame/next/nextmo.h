@@ -9,7 +9,7 @@
 class nextmo_device : public device_t
 {
 public:
-	nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_wr_callback() { return irq_cb.bind(); }
 	auto drq_wr_callback() { return drq_cb.bind(); }

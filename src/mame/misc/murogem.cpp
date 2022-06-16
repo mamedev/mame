@@ -250,7 +250,7 @@ uint32_t murogem_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 void murogem_state::murogem(machine_config &config)
 {
 	/* basic machine hardware */
-	M6802(config, m_maincpu, 8000000);      /* ? MHz */
+	M6802(config, m_maincpu, XTAL::u(8000000));      /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &murogem_state::murogem_map);
 	m_maincpu->set_vblank_int("screen", FUNC(murogem_state::irq0_line_hold));
 
@@ -265,14 +265,14 @@ void murogem_state::murogem(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_murogem);
 	PALETTE(config, m_palette, FUNC(murogem_state::murogem_palette), 0x100);
 
-	mc6845_device &crtc(MC6845(config, "crtc", 750000)); /* ? MHz */
+	mc6845_device &crtc(MC6845(config, "crtc", XTAL::u(750000))); /* ? MHz */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.375);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.375);
 }
 
 

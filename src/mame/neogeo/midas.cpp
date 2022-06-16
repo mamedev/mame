@@ -644,7 +644,7 @@ void midas_state::livequiz(machine_config &config)
 	m_screen->set_screen_update(FUNC(midas_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(midas_state::screen_vblank));
 
-	NEOGEO_SPRITE_MIDAS(config, m_sprgen, 0).set_screen(m_screen);
+	NEOGEO_SPRITE_MIDAS(config, m_sprgen).set_screen(m_screen);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_midas);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x10000);
@@ -670,15 +670,15 @@ void midas_state::hammer(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	TICKET_DISPENSER(config, m_prize[0], 0);
+	TICKET_DISPENSER(config, m_prize[0]);
 	m_prize[0]->set_period(attotime::from_msec(1000*5));
 	m_prize[0]->set_senses(TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW, false);
 
-	TICKET_DISPENSER(config, m_prize[1], 0);
+	TICKET_DISPENSER(config, m_prize[1]);
 	m_prize[1]->set_period(attotime::from_msec(1000*5));
 	m_prize[1]->set_senses(TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW, false);
 
-	TICKET_DISPENSER(config, m_ticket, 0);
+	TICKET_DISPENSER(config, m_ticket);
 	m_ticket->set_period(attotime::from_msec(200));
 	m_ticket->set_senses(TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW, false);
 
@@ -688,7 +688,7 @@ void midas_state::hammer(machine_config &config)
 	m_screen->set_screen_update(FUNC(midas_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(midas_state::screen_vblank));
 
-	NEOGEO_SPRITE_MIDAS(config, m_sprgen, 0).set_screen(m_screen);
+	NEOGEO_SPRITE_MIDAS(config, m_sprgen).set_screen(m_screen);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_midas);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x10000);

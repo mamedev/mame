@@ -773,7 +773,7 @@ void spdheat_state::spdheat(machine_config &config)
 	ym4.port_b_write_callback().set(FUNC(spdheat_state::ym4_port_b_w));
 	ym4.add_route(ALL_OUTPUTS, "mono", 0.3);
 
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.3);
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.3);
 }
 
 

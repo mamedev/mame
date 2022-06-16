@@ -111,7 +111,7 @@ void device_a78_cart_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 //  a78_cart_slot_device - constructor
 //-------------------------------------------------
-a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, A78_CART_SLOT, tag, owner, clock)
 	, device_cartrom_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)

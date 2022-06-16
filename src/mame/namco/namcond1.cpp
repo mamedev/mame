@@ -509,7 +509,7 @@ void namcond1_state::namcond1(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	YGV608(config, m_ygv608, 0);
+	YGV608(config, m_ygv608);
 	m_ygv608->vblank_callback().set_inputline(m_maincpu, 1);
 	m_ygv608->raster_callback().set_inputline(m_maincpu, 2);
 	m_ygv608->set_screen("screen");
@@ -534,7 +534,7 @@ void namcond1_state::namcond1(machine_config &config)
 	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
 	//c352.add_route(3, "rspeaker", 1.00);
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 }
 
 void namcond1_state::abcheck(machine_config &config)

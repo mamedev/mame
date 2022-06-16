@@ -42,7 +42,7 @@ enum
 
 DEFINE_DEVICE_TYPE(TI99X_FD800, fd800_legacy_device, "ti99x_fd800", "TI FD800 Diablo floppy disk controller")
 
-fd800_legacy_device::fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+fd800_legacy_device::fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99X_FD800, tag, owner, clock),
 	m_recv_buf(0), m_stat_reg(0), m_xmit_buf(0), m_cmd_reg(0), m_interrupt_f_f(0),
 	m_int_line(*this), m_buf_pos(0), m_buf_mode(), m_unit(0), m_sector(0)

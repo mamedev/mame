@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(TUBE, tube_device, "tube", "Acorn Tube ULA")
 //  bbc_tube_slot_device - constructor
 //-------------------------------------------------
 
-tube_device::tube_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tube_device::tube_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TUBE, tag, owner, clock)
 	, m_hirq_handler(*this)
 	, m_pnmi_handler(*this)

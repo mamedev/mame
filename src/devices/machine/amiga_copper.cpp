@@ -64,7 +64,7 @@ DEFINE_DEVICE_TYPE(AMIGA_COPPER, amiga_copper_device, "amiga_copper", "Amiga Cop
 //-------------------------------------------------
 
 
-amiga_copper_device::amiga_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+amiga_copper_device::amiga_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AMIGA_COPPER, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_chipmem_r(*this)

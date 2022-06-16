@@ -9,13 +9,13 @@
 class bfm_bd1_device : public device_t
 {
 public:
-	bfm_bd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t port_val)
+	bfm_bd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint8_t port_val)
 		: bfm_bd1_device(mconfig, tag, owner, clock)
 	{
 		set_port_val(port_val);
 	}
 
-	bfm_bd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bfm_bd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration helpers
 	void set_port_val(uint8_t val) { m_port_val = val; }

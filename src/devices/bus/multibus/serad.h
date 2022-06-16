@@ -18,7 +18,7 @@ class serad_device
 	, public device_multibus_interface
 {
 public:
-	serad_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	serad_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides

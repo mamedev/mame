@@ -23,16 +23,16 @@ DEFINE_DEVICE_TYPE(MD4332B, md4332b_device, "md4332b", "Mitel MD4332B LCD Driver
 //  constructor
 //-------------------------------------------------
 
-md4330b_device::md4330b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 qmax) :
+md4330b_device::md4330b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 qmax) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_qmax(qmax), m_write_q(*this), m_write_do(*this)
 { }
 
-md4330b_device::md4330b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+md4330b_device::md4330b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	md4330b_device(mconfig, MD4330B, tag, owner, clock, 30)
 { }
 
-md4332b_device::md4332b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+md4332b_device::md4332b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	md4330b_device(mconfig, MD4332B, tag, owner, clock, 32)
 { }
 

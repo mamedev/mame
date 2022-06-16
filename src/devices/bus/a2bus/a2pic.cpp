@@ -14,7 +14,7 @@ namespace {
 class a2bus_pic_device : public device_t, public device_a2bus_card_interface
 {
 public:
-	a2bus_pic_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	a2bus_pic_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// DIP switch/jumper handlers
 	DECLARE_INPUT_CHANGED_MEMBER(sw1_strobe);
@@ -126,7 +126,7 @@ INPUT_PORTS_END
 
 
 
-a2bus_pic_device::a2bus_pic_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+a2bus_pic_device::a2bus_pic_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, A2BUS_PIC, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_printer_conn(*this, "prn"),

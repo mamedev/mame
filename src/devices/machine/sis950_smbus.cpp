@@ -50,7 +50,7 @@ void sis950_smbus_device::map(address_map &map)
 #endif
 }
 
-sis950_smbus_device::sis950_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sis950_smbus_device::sis950_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SIS950_SMBUS, tag, owner, clock)
 {
 }

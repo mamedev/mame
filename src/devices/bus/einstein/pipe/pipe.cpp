@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(TATUNG_PIPE, tatung_pipe_device, "tatung_pipe", "Tatung Pipe 
 //  tatung_pipe_device - constructor
 //-------------------------------------------------
 
-tatung_pipe_device::tatung_pipe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tatung_pipe_device::tatung_pipe_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TATUNG_PIPE, tag, owner, clock),
 	device_single_card_slot_interface<device_tatung_pipe_interface>(mconfig, *this),
 	m_program(*this, finder_base::DUMMY_TAG, -1),

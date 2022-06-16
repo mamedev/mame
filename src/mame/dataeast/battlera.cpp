@@ -343,7 +343,7 @@ void battlera_state::battlera(machine_config &config)
 	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
 	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
 
-	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
+	huc6270_device &huc6270(HUC6270(config, "huc6270"));
 	huc6270.set_vram_size(0x20000);
 	huc6270.irq().set_inputline(m_maincpu, 0);
 

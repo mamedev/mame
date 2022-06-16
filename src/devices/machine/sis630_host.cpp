@@ -36,7 +36,7 @@
 
 DEFINE_DEVICE_TYPE(SIS630_HOST, sis630_host_device, "sis630_host", "SiS 630 Host-to-PCI Bridge")
 
-sis630_host_device::sis630_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sis630_host_device::sis630_host_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_host_device(mconfig, SIS630_HOST, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 {

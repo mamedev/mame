@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(EFO_ZSU1,           efo_zsu1_device,           "efo_zsu1",   
 DEFINE_DEVICE_TYPE(CEDAR_MAGNET_SOUND, cedar_magnet_sound_device, "gedmag_sound", "Cedar Sound")
 
 
-efo_zsu_device::efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+efo_zsu_device::efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_ctc(*this, "ctc%u", 0U)
 	, m_ctc0_ch0(*this, "ctc0:ch0")
@@ -61,19 +61,19 @@ efo_zsu_device::efo_zsu_device(const machine_config &mconfig, device_type type, 
 }
 
 
-efo_zsu_device::efo_zsu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+efo_zsu_device::efo_zsu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: efo_zsu_device(mconfig, EFO_ZSU, tag, owner, clock)
 {
 }
 
 
-efo_zsu1_device::efo_zsu1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+efo_zsu1_device::efo_zsu1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: efo_zsu_device(mconfig, EFO_ZSU1, tag, owner, clock)
 {
 }
 
 
-cedar_magnet_sound_device::cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cedar_magnet_sound_device::cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: efo_zsu_device(mconfig, CEDAR_MAGNET_SOUND, tag, owner, clock)
 	, cedar_magnet_board_interface(mconfig, *this, "soundcpu", "ram")
 {
@@ -279,7 +279,7 @@ void efo_zsu_device::device_add_mconfig(machine_config &config)
 	aysnd1.port_a_write_callback().set(FUNC(efo_zsu_device::ay1_porta_w));
 	aysnd1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	CD40105(config, m_fifo, 0);
+	CD40105(config, m_fifo);
 	m_fifo->out_ready_cb().set(FUNC(efo_zsu_device::fifo_dor_w));
 	m_fifo->out_cb().set(m_adpcm, FUNC(msm5205_device::data_w));
 

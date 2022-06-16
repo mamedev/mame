@@ -52,7 +52,7 @@ const char *const pcf8584_device::s_bus_function[4] = { "NOP", "stop", "start", 
 //  pcf8584_device - constructor
 //-------------------------------------------------
 
-pcf8584_device::pcf8584_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pcf8584_device::pcf8584_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PCF8584, tag, owner, clock)
 	, m_sda_callback(*this)
 	, m_sda_out_callback(*this)

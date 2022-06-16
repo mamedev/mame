@@ -62,12 +62,12 @@ DEFINE_DEVICE_TYPE(ISA8_AGA_PC200, isa8_aga_pc200_device, "isa_aga_pc200", "AGA 
 //  isa8_aga_device - constructor
 //-------------------------------------------------
 
-isa8_aga_device::isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_aga_device::isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_aga_device(mconfig, ISA8_AGA, tag, owner, clock)
 {
 }
 
-isa8_aga_device::isa8_aga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_aga_device::isa8_aga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_palette(*this, "palette"),
@@ -148,7 +148,7 @@ ioport_constructor isa8_aga_device::device_input_ports() const
 //  isa8_aga_pc200_device - constructor
 //-------------------------------------------------
 
-isa8_aga_pc200_device::isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_aga_pc200_device::isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_aga_device(mconfig, ISA8_AGA_PC200, tag, owner, clock),
 	m_port8(0),
 	m_portd(0),

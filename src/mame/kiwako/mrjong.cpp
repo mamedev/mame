@@ -364,7 +364,7 @@ GFXDECODE_END
 void mrjong_state::mrjong(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 15'468'000 / 6); // 2.578 MHz
+	Z80(config, m_maincpu, XTAL::u(15'468'000) / 6); // 2.578 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &mrjong_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &mrjong_state::io_map);
 
@@ -383,8 +383,8 @@ void mrjong_state::mrjong(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SN76489(config, "sn1", 15'468'000 / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn2", 15'468'000 / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn1", XTAL::u(15'468'000) / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn2", XTAL::u(15'468'000) / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

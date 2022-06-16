@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE(NP600A3, np600a3_device, "np600a3", "InterLan NP600A-3 Intelligent Protocol Processor")
 
-np600a3_device::np600a3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+np600a3_device::np600a3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NP600A3, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_npcpu(*this, "npcpu")

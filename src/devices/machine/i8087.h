@@ -13,7 +13,7 @@ DECLARE_DEVICE_TYPE(I8087, i8087_device)
 class i8087_device : public device_t
 {
 public:
-	i8087_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	i8087_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	template <class Object> void set_space_88(Object &&tag, int spacenum) { m_space.set_tag(std::forward<Object>(tag), spacenum); m_space.set_data_width(8); }
 	template <class Object> void set_space_86(Object &&tag, int spacenum) { m_space.set_tag(std::forward<Object>(tag), spacenum); m_space.set_data_width(16); }
 	auto irq() { return m_int_handler.bind(); }
@@ -23,7 +23,7 @@ public:
 	void addr_w(uint32_t data);
 
 protected:
-	i8087_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	i8087_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

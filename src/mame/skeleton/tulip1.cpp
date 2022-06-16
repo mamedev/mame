@@ -143,37 +143,37 @@ void tulip1_state::machine_start()
 void tulip1_state::tulip1(machine_config &config)
 {
 	// main cpu
-	I8086(config, m_cpu, 8000000);
+	I8086(config, m_cpu, XTAL::u(8000000));
 	m_cpu->set_addrmap(AS_PROGRAM, &tulip1_state::mem_map);
 	m_cpu->set_addrmap(AS_IO, &tulip1_state::io_map);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(16000000, 912, 0, 640, 312, 0, 275); // unknown clock
+	screen.set_raw(XTAL::u(16000000), 912, 0, 640, 312, 0, 275); // unknown clock
 	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, chars);
 
-	HD6845S(config, m_crtc, 2000000); // unknown clock
+	HD6845S(config, m_crtc, XTAL::u(2000000)); // unknown clock
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(tulip1_state::crtc_update_row));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &rs232(RS232_PORT(config, "kbd", default_rs232_devices, "keyboard"));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(153600)));
 	uart_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	uart_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	// floppy disk controller
-	WD2793(config, m_fdc, 1000000); // unknown clock
+	WD2793(config, m_fdc, XTAL::u(1000000)); // unknown clock
 
 	// floppy drives
 	FLOPPY_CONNECTOR(config, "fdc:0", tulip1_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);

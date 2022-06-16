@@ -359,9 +359,9 @@ void pass_state::pass(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2203(config, "ymsnd", 14'318'180 / 4).add_route(ALL_OUTPUTS, "mono", 0.60);
+	YM2203(config, "ymsnd", XTAL::u(14'318'180) / 4).add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	OKIM6295(config, "oki", 792'000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(792'000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // clock frequency & pin 7 not verified
 }
 
 

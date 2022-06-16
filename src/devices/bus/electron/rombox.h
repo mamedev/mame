@@ -24,7 +24,7 @@ class electron_rombox_device:
 {
 public:
 	// construction/destruction
-	electron_rombox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	electron_rombox_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -36,7 +36,7 @@ GFXDECODE_END
 
 DEFINE_DEVICE_TYPE(NAMCO_C169ROZ, namco_c169roz_device, "namco_c169roz", "Namco C169 (ROZ)")
 
-namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NAMCO_C169ROZ, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_color_base(0),

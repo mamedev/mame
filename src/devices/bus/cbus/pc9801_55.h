@@ -26,8 +26,8 @@ class pc9801_55_device : public device_t
 {
 public:
 	// construction/destruction
-	//pc9801_55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	pc9801_55_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	//pc9801_55_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
+	pc9801_55_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
@@ -55,7 +55,7 @@ private:
 class pc9801_55u_device : public pc9801_55_device
 {
 public:
-	pc9801_55u_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc9801_55u_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -65,7 +65,7 @@ private:
 class pc9801_55l_device : public pc9801_55_device
 {
 public:
-	pc9801_55l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc9801_55l_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	virtual const tiny_rom_entry *device_rom_region() const override;

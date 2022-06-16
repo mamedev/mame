@@ -89,7 +89,7 @@ DEFINE_DEVICE_TYPE(PCI_BUS, pci_bus_device, "pci_bus", "PCI Bus")
 //-------------------------------------------------
 //  pci_bus_device - constructor
 //-------------------------------------------------
-pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PCI_BUS, tag, owner, clock), m_busnum(0),
 	m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr),
 	m_father(*this, finder_base::DUMMY_TAG)
@@ -328,7 +328,7 @@ pci_device_interface::~pci_device_interface()
 DEFINE_DEVICE_TYPE(PCI_CONNECTOR, pci_connector_device, "pci_connector", "PCI device connector abstraction")
 
 
-pci_connector_device::pci_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pci_connector_device::pci_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PCI_CONNECTOR, tag, owner, clock),
 	device_single_card_slot_interface<pci_device_interface>(mconfig, *this)
 {

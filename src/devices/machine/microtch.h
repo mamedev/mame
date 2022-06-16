@@ -14,7 +14,7 @@ class microtouch_device :
 public:
 	typedef device_delegate<int (int *, int *)> touch_cb;
 
-	microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	auto stx() { return m_out_stx_func.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(rx) { device_serial_interface::rx_w(state); }

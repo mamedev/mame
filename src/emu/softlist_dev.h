@@ -99,7 +99,7 @@ public:
 	};
 
 	// construction/destruction
-	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration helpers
 	software_list_device &set_type(const char *list, softlist_type list_type) { m_list_name.assign(list); m_list_type = list_type; return *this; }

@@ -63,7 +63,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// static configuration helpers
 	auto trigger_wr_callback() { return m_write_trigger.bind(); }

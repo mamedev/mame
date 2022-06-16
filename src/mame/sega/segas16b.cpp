@@ -3939,7 +3939,7 @@ void segas16b_state::system16b(machine_config &config)
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
 
 	// sound hardware
@@ -3954,7 +3954,7 @@ void segas16b_state::system16b(machine_config &config)
 	m_upd7759->drq().set(FUNC(segas16b_state::upd7759_generate_nmi));
 	m_upd7759->add_route(0, "netlist", 0.48, 2);
 
-	NETLIST_SOUND(config, "netlist", 48000)
+	NETLIST_SOUND(config, "netlist", XTAL::u(48000))
 		.set_source(netlist_segas16b_audio)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
@@ -4043,9 +4043,9 @@ void segas16b_state::system16b_i8751(machine_config &config)
 
 void segas16b_state::rom_5797_fragment(machine_config &config)
 {
-	SEGA_315_5248_MULTIPLIER(config, m_multiplier, 0);
-	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
-	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_2, 0);
+	SEGA_315_5248_MULTIPLIER(config, m_multiplier);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_2);
 }
 
 void segas16b_state::system16b_5797(machine_config &config)
@@ -4122,7 +4122,7 @@ void segas16b_state::fpointbl(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(75); // these align the pieces with the playfield
 	m_sprites->set_local_originy(-2); // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
 
@@ -4162,7 +4162,7 @@ void segas16b_state::lockonph(machine_config &config)
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
 
 	// sound hardware
@@ -4245,7 +4245,7 @@ void dfjail_state::dfjail(machine_config &config)
 	//config.device_remove("ym2151");
 	config.device_remove("upd");
 
-	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25); // AD7533KN
+	AD7533(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.25); // AD7533KN
 }
 
 

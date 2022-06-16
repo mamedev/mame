@@ -28,7 +28,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::CONTROLS; }
 
 	// construction/destruction
-	nes_konamibag_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_konamibag_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_exp(offs_t offset) override;
 	virtual void write(u8 data) override;

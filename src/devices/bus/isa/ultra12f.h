@@ -18,12 +18,12 @@
 class ultra12f_device : public device_t, public device_isa16_card_interface
 {
 public:
-	ultra12f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ultra12f_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	ultra12f_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	ultra12f_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -41,7 +41,7 @@ private:
 class ultra12f32_device : public ultra12f_device
 {
 public:
-	ultra12f32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ultra12f32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

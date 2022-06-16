@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(TLC34076, tlc34076_device, "tlc34076", "TI TLC34076 VIP")
 //-------------------------------------------------
 //  tlc34076_device - constructor
 //-------------------------------------------------
-tlc34076_device::tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tlc34076_device::tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TLC34076, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, m_dacbits(6)

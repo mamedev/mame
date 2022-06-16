@@ -81,7 +81,7 @@ uint8_t crush11_host_device::header_type_r()
 	return 0x80; // from lspci dump
 }
 
-crush11_host_device::crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+crush11_host_device::crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_host_device(mconfig, CRUSH11, tag, owner, clock)
 	, cpu(*this, finder_base::DUMMY_TAG)
 	, biosrom(*this, finder_base::DUMMY_TAG)
@@ -172,14 +172,14 @@ void crush11_memory_device::config_map(address_map &map)
 	map(0xc8, 0xcb).nopr();
 }
 
-crush11_memory_device::crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id, int ram_size)
+crush11_memory_device::crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t subsystem_id, int ram_size)
 	: crush11_memory_device(mconfig, tag, owner, clock)
 {
 	set_ids(0x10de01ac, 0xb2, 0x050000, subsystem_id);
 	set_ram_size(ram_size);
 }
 
-crush11_memory_device::crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+crush11_memory_device::crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, CRUSH11_MEMORY, tag, owner, clock)
 {
 }
@@ -224,7 +224,7 @@ void crush11_memory_device::map_extra(uint64_t memory_window_start, uint64_t mem
 
 DEFINE_DEVICE_TYPE(SMBUS_LOGGER, smbus_logger_device, "smbus_logger", "SMBUS LOGGER")
 
-smbus_logger_device::smbus_logger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+smbus_logger_device::smbus_logger_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SMBUS_LOGGER, tag, owner, clock)
 {
 }
@@ -254,12 +254,12 @@ void smbus_logger_device::device_reset()
 
 DEFINE_DEVICE_TYPE(SMBUS_ROM, smbus_rom_device, "smbus_rom", "SMBUS ROM")
 
-smbus_rom_device::smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+smbus_rom_device::smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SMBUS_ROM, tag, owner, clock)
 {
 }
 
-smbus_rom_device::smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const uint8_t *data, int size) :
+smbus_rom_device::smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, const uint8_t *data, int size) :
 	smbus_rom_device(mconfig, tag, owner, clock)
 {
 	buffer = data;
@@ -288,7 +288,7 @@ void smbus_rom_device::device_reset()
 
 DEFINE_DEVICE_TYPE(AS99127F, as99127f_device, "as99127f", "Asus AS99127F")
 
-as99127f_device::as99127f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+as99127f_device::as99127f_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AS99127F, tag, owner, clock)
 {
 }
@@ -317,7 +317,7 @@ void as99127f_device::device_start()
 
 DEFINE_DEVICE_TYPE(AS99127F_SENSOR2, as99127f_sensor2_device, "as99127f_sensor2", "Asus AS99127F temperature sensor 2")
 
-as99127f_sensor2_device::as99127f_sensor2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+as99127f_sensor2_device::as99127f_sensor2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AS99127F_SENSOR2, tag, owner, clock)
 {
 }
@@ -341,7 +341,7 @@ void as99127f_sensor2_device::device_start()
 
 DEFINE_DEVICE_TYPE(AS99127F_SENSOR3, as99127f_sensor3_device, "as99127f_sensor3", "Asus AS99127F temperature sensor 3")
 
-as99127f_sensor3_device::as99127f_sensor3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+as99127f_sensor3_device::as99127f_sensor3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AS99127F_SENSOR3, tag, owner, clock)
 {
 }
@@ -367,7 +367,7 @@ void as99127f_sensor3_device::device_start()
 
 DEFINE_DEVICE_TYPE(IT8703F, it8703f_device, "it8703f_device", "ITE IT8703F-A SuperIO")
 
-it8703f_device::it8703f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+it8703f_device::it8703f_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IT8703F, tag, owner, clock)
 	, mode(OperatingMode::Run)
 	, config_key_step(0)
@@ -437,7 +437,7 @@ uint16_t it8703f_device::get_base_address(int logical, int index)
 void it8703f_device::device_add_mconfig(machine_config &config)
 {
 	// floppy disc controller
-	smc37c78_device& fdcdev(SMC37C78(config, floppy_controller_fdcdev, 24'000'000));
+	smc37c78_device& fdcdev(SMC37C78(config, floppy_controller_fdcdev, XTAL::u(24'000'000)));
 	fdcdev.intrq_wr_callback().set(FUNC(it8703f_device::irq_floppy_w));
 	fdcdev.drq_wr_callback().set(FUNC(it8703f_device::drq_floppy_w));
 
@@ -1156,13 +1156,13 @@ static void floppy_formats(format_registration &fr)
 
 void nforcepc_state::nforcepc(machine_config &config)
 {
-	athlonxp_device &maincpu(ATHLONXP(config, "maincpu", 90000000));
+	athlonxp_device &maincpu(ATHLONXP(config, "maincpu", XTAL::u(90000000)));
 	maincpu.set_addrmap(AS_PROGRAM, &nforcepc_state::nforce_map);
 	maincpu.set_addrmap(AS_IO, &nforcepc_state::nforce_map_io);
 	maincpu.set_irq_acknowledge_callback(FUNC(nforcepc_state::irq_callback));
 	//maincpu.smiact().set("pci:01.0", FUNC(???_host_device::smi_act_w));
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	CRUSH11(config, "pci:00.0", 0, "maincpu", "bios"); // 10de:01a4 NVIDIA Corporation nForce CPU bridge
 	CRUSH11_MEMORY(config, "pci:00.1", 0, 0x10430c11, 2); // 10de:01ac NVIDIA Corporation nForce 220/420 Memory Controller
 	// 10de:01ad NVIDIA Corporation nForce 220/420 Memory Controller
@@ -1171,7 +1171,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	isa.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
 	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_award_w));
 	isa.interrupt_output().set(FUNC(nforcepc_state::maincpu_interrupt));
-	it8703f_device &ite(IT8703F(config, "pci:01.0:0", 0));
+	it8703f_device &ite(IT8703F(config, "pci:01.0:0"));
 	ite.pin_reset().set_inputline("maincpu", INPUT_LINE_RESET);
 	ite.pin_gatea20().set_inputline("maincpu", INPUT_LINE_A20);
 	ite.txd1().set("serport0", FUNC(rs232_port_device::write_txd));
@@ -1182,16 +1182,16 @@ void nforcepc_state::nforcepc(machine_config &config)
 	ite.nrts2().set("serport1", FUNC(rs232_port_device::write_rts));
 	MCPX_SMBUS(config, "pci:01.1", 0, 0x10430c11); // 10de:01b4 NVIDIA Corporation nForce PCI System Management (SMBus)
 	SMBUS_ROM(config, "pci:01.1:050", 0, test_spd_data, sizeof(test_spd_data)); // these 3 are on smbus number 0
-	SMBUS_LOGGER(config, "pci:01.1:051", 0);
-	SMBUS_LOGGER(config, "pci:01.1:052", 0);
-	SMBUS_LOGGER(config, "pci:01.1:108", 0); // these 4 are on smbus number 1
-	AS99127F(config, "pci:01.1:12d", 0);
-	AS99127F_SENSOR2(config, "pci:01.1:148", 0);
-	AS99127F_SENSOR3(config, "pci:01.1:149", 0);
+	SMBUS_LOGGER(config, "pci:01.1:051");
+	SMBUS_LOGGER(config, "pci:01.1:052");
+	SMBUS_LOGGER(config, "pci:01.1:108"); // these 4 are on smbus number 1
+	AS99127F(config, "pci:01.1:12d");
+	AS99127F_SENSOR2(config, "pci:01.1:148");
+	AS99127F_SENSOR3(config, "pci:01.1:149");
 	mcpx_ohci_device &ohci(MCPX_OHCI(config, "pci:02.0", 0, 0x10430c11)); // 10de:01c2 NVIDIA Corporation nForce USB Controller
 	ohci.interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq1));
 	MCPX_OHCI(config, "pci:03.0", 0, 0x10430c11); // 10de:01c2 NVIDIA Corporation nForce USB Controller
-	MCPX_ETH(config, "pci:04.0", 0); // 10de:01c3 NVIDIA Corporation nForce Ethernet Controller
+	MCPX_ETH(config, "pci:04.0"); // 10de:01c3 NVIDIA Corporation nForce Ethernet Controller
 	MCPX_APU(config, "pci:05.0", 0, 0x10430c11, m_maincpu); // 10de:01b0 NVIDIA Corporation nForce Audio Processing Unit
 	MCPX_AC97_AUDIO(config, "pci:06.0", 0, 0x10438384); // 10de:01b1 NVIDIA Corporation nForce AC'97 Audio Controller
 	PCI_BRIDGE(config, "pci:08.0", 0, 0x10de01b8, 0xc2); // 10de:01b8 NVIDIA Corporation nForce PCI-to-PCI bridge
@@ -1202,8 +1202,8 @@ void nforcepc_state::nforcepc(machine_config &config)
 	ide.subdevice<ide_controller_32_device>("ide1")->options(ata_devices, "hdd", nullptr, true);
 	ide.subdevice<ide_controller_32_device>("ide2")->options(ata_devices, "cdrom", nullptr, true);
 	NV2A_AGP(config, "pci:1e.0", 0, 0x10de01b7, 0xb2); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
-	VIRGEDX_PCI(config, "pci:0a.0", 0);
-	SST_49LF020(config, "bios", 0);
+	VIRGEDX_PCI(config, "pci:0a.0");
+	SST_49LF020(config, "bios");
 
 	FLOPPY_CONNECTOR(config, "pci:01.0:0:fdc:0", pc_hd_floppies, "35hd", floppy_formats);
 	FLOPPY_CONNECTOR(config, "pci:01.0:0:fdc:1", pc_hd_floppies, "35hd", floppy_formats);

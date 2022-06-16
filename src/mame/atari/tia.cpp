@@ -349,7 +349,7 @@ void tia_pal_video_device::init_palette()
 	extend_palette();
 }
 
-tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
@@ -368,7 +368,7 @@ DEFINE_DEVICE_TYPE(TIA_PAL_VIDEO, tia_pal_video_device, "tia_pal_video", "TIA Vi
 //  tia_pal_video_device - constructor
 //-------------------------------------------------
 
-tia_pal_video_device::tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tia_pal_video_device::tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tia_video_device(mconfig, TIA_PAL_VIDEO, tag, owner, clock)
 {
 }
@@ -380,7 +380,7 @@ DEFINE_DEVICE_TYPE(TIA_NTSC_VIDEO, tia_ntsc_video_device, "tia_ntsc_video", "TIA
 //  tia_ntsc_video_device - constructor
 //-------------------------------------------------
 
-tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tia_video_device(mconfig, TIA_NTSC_VIDEO, tag, owner, clock)
 {
 }

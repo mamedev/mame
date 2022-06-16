@@ -135,7 +135,7 @@ GFXDECODE_MEMBER( k051960_device::gfxinfo_gradius3 )
 GFXDECODE_END
 
 
-k051960_device::k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k051960_device::k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K051960, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo)
 	, device_video_interface(mconfig, *this)

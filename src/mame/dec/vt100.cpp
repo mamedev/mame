@@ -355,13 +355,13 @@ void vt100_state::vt100(machine_config &config)
 
 	ER1400(config, m_nvr);
 
-	VT100_KEYBOARD(config, m_keyboard, 0).signal_out_callback().set(m_kbduart, FUNC(ay31015_device::write_si));
+	VT100_KEYBOARD(config, m_keyboard).signal_out_callback().set(m_kbduart, FUNC(ay31015_device::write_si));
 
-	AY31015(config, m_kbduart, 0);
+	AY31015(config, m_kbduart);
 	m_kbduart->write_dav_callback().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst1_w));
 	m_kbduart->set_auto_rdav(true);
 
-	RST_POS_BUFFER(config, m_rstbuf, 0).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, m_rstbuf).int_callback().set_inputline(m_maincpu, 0);
 }
 
 void vt100_state::stp_mem(address_map &map)
@@ -385,19 +385,19 @@ void vt100_state::vt100ac(machine_config &config)
 {
 	vt100(config);
 
-	i8085a_cpu_device &stpcpu(I8085A(config, "stpcpu", 4915200));
+	i8085a_cpu_device &stpcpu(I8085A(config, "stpcpu", XTAL::u(4915200)));
 	stpcpu.set_addrmap(AS_PROGRAM, &vt100_state::stp_mem);
 	stpcpu.set_addrmap(AS_IO, &vt100_state::stp_io);
 
-	i8251_device &stpusart0(I8251(config, "stpusart0", 2457600));
+	i8251_device &stpusart0(I8251(config, "stpusart0", XTAL::u(2457600)));
 	stpusart0.rxrdy_handler().set("stprxint", FUNC(input_merger_device::in_w<0>));
 	stpusart0.txrdy_handler().set("stptxint", FUNC(input_merger_device::in_w<0>));
 
-	i8251_device &stpusart1(I8251(config, "stpusart1", 2457600));
+	i8251_device &stpusart1(I8251(config, "stpusart1", XTAL::u(2457600)));
 	stpusart1.rxrdy_handler().set("stprxint", FUNC(input_merger_device::in_w<1>));
 	stpusart1.txrdy_handler().set("stptxint", FUNC(input_merger_device::in_w<1>));
 
-	i8251_device &stpusart2(I8251(config, "stpusart2", 2457600)); // for printer?
+	i8251_device &stpusart2(I8251(config, "stpusart2", XTAL::u(2457600))); // for printer?
 	stpusart2.rxrdy_handler().set("stprxint", FUNC(input_merger_device::in_w<2>));
 	stpusart2.txrdy_handler().set("stptxint", FUNC(input_merger_device::in_w<2>));
 

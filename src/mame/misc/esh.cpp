@@ -351,7 +351,7 @@ void esh_state::esh(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIONEER_LDV1000(config, m_laserdisc, 0);
+	PIONEER_LDV1000(config, m_laserdisc);
 	m_laserdisc->command_strobe_callback().set(FUNC(esh_state::ld_command_strobe_cb));
 	m_laserdisc->set_overlay(256, 256, FUNC(esh_state::screen_update_esh));
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
@@ -368,7 +368,7 @@ void esh_state::esh(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beep, XTAL::u(2000)).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 // we just disable even lines so we can simulate line blinking

@@ -42,7 +42,7 @@ class snes_ppu_device :  public device_t,
 {
 public:
 	// construction/destruction
-	snes_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	snes_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration helpers
 	auto open_bus_callback() { return m_openbus_cb.bind(); }

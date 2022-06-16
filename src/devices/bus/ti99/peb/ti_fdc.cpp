@@ -42,7 +42,7 @@ namespace bus::ti99::peb {
 
 #define TI_FDC_TAG "ti_dssd_controller"
 
-ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_FDC, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_address(0),
@@ -418,7 +418,7 @@ void ti_fdc_device::device_add_mconfig(machine_config& config)
 	m_crulatch->q_out_cb<6>().set(FUNC(ti_fdc_device::dsel3_w));
 	m_crulatch->q_out_cb<7>().set(FUNC(ti_fdc_device::sidsel_w));
 
-	TTL74123(config, m_motormf, 0);
+	TTL74123(config, m_motormf);
 	m_motormf->out_cb().set(FUNC(ti_fdc_device::dvena_w));
 	m_motormf->set_connection_type(TTL74123_GROUNDED);
 	m_motormf->set_resistor_value(RES_K(200));

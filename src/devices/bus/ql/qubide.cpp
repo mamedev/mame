@@ -160,7 +160,7 @@ ioport_constructor qubide_device::device_input_ports() const
 //  qubide_device - constructor
 //-------------------------------------------------
 
-qubide_device::qubide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+qubide_device::qubide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, QUBIDE, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_ata(*this, "ata"),

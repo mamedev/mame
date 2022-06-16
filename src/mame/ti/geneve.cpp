@@ -1135,13 +1135,13 @@ void geneve_state::geneve(machine_config &config)
 	geneve_common(config);
 
 	// Gate array
-	GENEVE_GATE_ARRAY(config, m_gatearray, 0);
+	GENEVE_GATE_ARRAY(config, m_gatearray);
 	m_gatearray->kbdint_cb().set(FUNC(geneve_state::keyboard_interrupt));
 	m_gatearray->kbdclk_cb().set(m_kbdconn, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_gatearray->kbddata_cb().set(m_kbdconn, FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// Peripheral expansion box (Geneve composition)
-	TI99_PERIBOX_GEN(config, m_peribox, 0);
+	TI99_PERIBOX_GEN(config, m_peribox);
 	m_peribox->inta_cb().set(FUNC(geneve_state::inta));
 	m_peribox->intb_cb().set(FUNC(geneve_state::intb));
 	m_peribox->ready_cb().set(FUNC(geneve_state::extready));
@@ -1150,16 +1150,16 @@ void geneve_state::geneve(machine_config &config)
 void geneve_state::genmod(machine_config &config)
 {
 	geneve_common(config);
-	GENMOD_DECODER(config, m_genmod_decoder, 0);
+	GENMOD_DECODER(config, m_genmod_decoder);
 
 	// Gate Array
-	GENEVE_GATE_ARRAY(config, m_gatearray, 0);
+	GENEVE_GATE_ARRAY(config, m_gatearray);
 	m_gatearray->kbdint_cb().set(FUNC(geneve_state::keyboard_interrupt));
 	m_gatearray->kbdclk_cb().set(m_kbdconn, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_gatearray->kbddata_cb().set(m_kbdconn, FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// Peripheral expansion box (Geneve composition with Genmod and plugged-in Memex)
-	TI99_PERIBOX_GENMOD(config, m_peribox, 0);
+	TI99_PERIBOX_GENMOD(config, m_peribox);
 	m_peribox->inta_cb().set(FUNC(geneve_state::inta));
 	m_peribox->intb_cb().set(FUNC(geneve_state::intb));
 	m_peribox->ready_cb().set(FUNC(geneve_state::extready));
@@ -1169,7 +1169,7 @@ void geneve_state::geneve_common(machine_config &config)
 {
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
-	TMS9995(config, m_cpu, 12000000);
+	TMS9995(config, m_cpu, XTAL::u(12000000));
 	m_cpu->set_addrmap(AS_PROGRAM, &geneve_state::memmap);
 	m_cpu->set_addrmap(AS_IO, &geneve_state::crumap);
 	m_cpu->set_addrmap(tms9995_device::AS_SETADDRESS, &geneve_state::memmap_setaddress);
@@ -1192,7 +1192,7 @@ void geneve_state::geneve_common(machine_config &config)
 	screen.set_screen_update(TIGEN_V9938_TAG, FUNC(v99x8_device::screen_update));
 
 	// Main board components
-	TMS9901(config, m_tms9901, 0);
+	TMS9901(config, m_tms9901);
 	m_tms9901->read_cb().set(FUNC(geneve_state::psi_input));
 	m_tms9901->p_out_cb(0).set(FUNC(geneve_state::peripheral_bus_reset));
 	m_tms9901->p_out_cb(1).set(FUNC(geneve_state::VDP_reset));
@@ -1208,10 +1208,10 @@ void geneve_state::geneve_common(machine_config &config)
 	m_tms9901->p_out_cb(13).set(FUNC(geneve_state::pfm_a18));
 
 	// Clock
-	MM58274C(config, GENEVE_CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
+	MM58274C(config, GENEVE_CLOCK_TAG).set_mode_and_day(1, 0); // 24h, sunday
 
 	// PAL
-	GENEVE_PAL(config, m_pal, 0);
+	GENEVE_PAL(config, m_pal);
 	m_pal->ready_cb().set("maincpu", FUNC(tms9995_device::ready_line));
 
 	// Sound hardware

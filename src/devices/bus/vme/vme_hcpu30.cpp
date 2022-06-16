@@ -172,14 +172,14 @@ static void hcpu_floppies(device_slot_interface &device)
 void vme_hcpu30_card_device::device_add_mconfig(machine_config &config)
 {
 	// I/O CPU
-	M68020(config, m_maincpu, 16670000);
+	M68020(config, m_maincpu, XTAL::u(16670000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vme_hcpu30_card_device::hcpu30_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_hcpu30_card_device::cpu_space_map);
 	m_maincpu->disable_interrupt_mixer();
 
 	// FIXME: functional test expects dtr->dcd, rts->cts connections on both ports and tx->rx connection on port B
 	DUSCC68562(config, m_dusccterm, DUSCC_CLOCK);
-	m_dusccterm->configure_channels(0, 0, 0, 0);
+	m_dusccterm->configure_channels(XTAL(), XTAL(), XTAL(), XTAL());
 	m_dusccterm->out_txda_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_txd));
 	m_dusccterm->out_dtra_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_dtr));
 	m_dusccterm->out_rtsa_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_rts));
@@ -526,7 +526,7 @@ void vme_hcpu30_card_device::set_bus_error(uint32_t address, bool rw, uint32_t m
 	m_bus_error_timer->adjust(m_oscpu->cycles_to_attotime(16)); // let rmw cycles complete
 }
 
-vme_hcpu30_card_device::vme_hcpu30_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vme_hcpu30_card_device::vme_hcpu30_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
@@ -551,7 +551,7 @@ vme_hcpu30_card_device::vme_hcpu30_card_device(const machine_config &mconfig, de
 
 //
 
-vme_hcpu30_card_device::vme_hcpu30_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_hcpu30_card_device::vme_hcpu30_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vme_hcpu30_card_device(mconfig, VME_HCPU30, tag, owner, clock)
 {
 }

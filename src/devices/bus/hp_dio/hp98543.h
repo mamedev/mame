@@ -19,7 +19,7 @@ class dio16_98543_device :
 	public device_memory_interface
 {
 public:
-	dio16_98543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dio16_98543_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t rom_r(offs_t offset);
 	void rom_w(offs_t offset, uint16_t data);
@@ -36,7 +36,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
-	dio16_98543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	dio16_98543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

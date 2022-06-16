@@ -16,7 +16,7 @@ TODO: handle protection properly and with callbacks
 
 DEFINE_DEVICE_TYPE(NAMCOS21_DSP, namcos21_dsp_device, "namcos21_dsp_device", "Namco System 21 DSP Setup (1x TMS320C25 type)")
 
-namcos21_dsp_device::namcos21_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+namcos21_dsp_device::namcos21_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NAMCOS21_DSP, tag, owner, clock),
 	m_dsp(*this, "dsp"),
 	m_winrun_dspbios(*this,"winrun_dspbios"),

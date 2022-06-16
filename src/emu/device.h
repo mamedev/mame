@@ -32,7 +32,7 @@
 //**************************************************************************
 
 // macro for specifying a clock derived from an owning device
-#define DERIVED_CLOCK(num, den)     (0xff000000 | ((num) << 12) | ((den) << 0))
+#define DERIVED_CLOCK(num, den)     XTAL::u((0xff000000 | ((num) << 12) | ((den) << 0)))
 
 
 
@@ -191,7 +191,7 @@ class device_type_impl_base
 private:
 	friend class device_registrar;
 
-	typedef std::unique_ptr<device_t> (*create_func)(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	typedef std::unique_ptr<device_t> (*create_func)(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	device_type_impl_base(device_type_impl_base const &) = delete;
 	device_type_impl_base(device_type_impl_base &&) = delete;
@@ -199,16 +199,15 @@ private:
 	device_type_impl_base &operator=(device_type_impl_base &&) = delete;
 
 	template <typename DeviceClass>
-	static std::unique_ptr<device_t> create_device(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	static std::unique_ptr<device_t> create_device(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	{
 		return std::make_unique<DeviceClass>(mconfig, tag, owner, clock);
 	}
 
 	template <typename DriverClass>
-	static std::unique_ptr<device_t> create_driver(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	static std::unique_ptr<device_t> create_driver(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	{
 		assert(!owner);
-		assert(!clock);
 
 		return std::make_unique<DriverClass>(mconfig, type, tag);
 	}
@@ -276,7 +275,7 @@ public:
 	device_feature::type imperfect_features() const { return m_imperfect_features; }
 	device_type_impl_base const *parent_rom_device_type() const { return m_parent_rom; }
 
-	std::unique_ptr<device_t> create(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
+	std::unique_ptr<device_t> create(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) const
 	{
 		return m_creator(*this, mconfig, tag, owner, clock);
 	}
@@ -575,7 +574,7 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			u32 clock);
+			const XTAL &clock = XTAL());
 
 public:
 	// device flags
@@ -634,7 +633,7 @@ public:
 	const char *source() const { return m_type.source(); }
 	device_t *owner() const { return m_owner; }
 	device_t *next() const { return m_next; }
-	u32 configured_clock() const { return m_configured_clock; }
+	XTAL configured_clock() const { return XTAL::u(m_configured_clock); }
 	const machine_config &mconfig() const { return m_machine_config; }
 	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
 	const std::vector<rom_entry> &rom_region_vector() const;
@@ -677,8 +676,11 @@ public:
 
 	// configuration helpers
 	void add_machine_configuration(machine_config &config);
-	void set_clock(u32 clock);
-	void set_clock(const XTAL &xtal) { set_clock(xtal.value()); }
+
+private:
+	void internal_set_clock(u32 clock);
+public:
+	void set_clock(const XTAL &xtal) { internal_set_clock(xtal.value()); }
 	void set_input_default(const input_device_default *config) { m_input_defaults = config; }
 	template <typename... Params> void set_default_bios_tag(Params &&... args) { assert(!configured()); m_default_bios_tag.assign(std::forward<Params>(args)...); }
 
@@ -690,12 +692,14 @@ public:
 	void reset();
 
 	// clock/timing accessors
-	u32 clock() const { return m_clock; }
-	u32 unscaled_clock() const { return m_unscaled_clock; }
-	void set_unscaled_clock(u32 clock, bool sync_on_new_clock_domain = false);
-	void set_unscaled_clock(const XTAL &xtal, bool sync_on_new_clock_domain = false) { set_unscaled_clock(xtal.value(), sync_on_new_clock_domain); }
-	void set_unscaled_clock_int(u32 clock) { set_unscaled_clock(clock, false); } // non-overloaded name because binding to overloads is ugly
-	void set_unscaled_clock_int_sync(u32 clock) { set_unscaled_clock(clock, true); } // non-overloaded name because binding to overloads is ugly
+	XTAL clock() const { return XTAL::u(m_clock); }
+	XTAL unscaled_clock() const { return XTAL::u(m_unscaled_clock); }
+private:
+	void internal_set_unscaled_clock(u32 clock, bool sync_on_new_clock_domain = false);
+public:
+	void set_unscaled_clock(const XTAL &xtal, bool sync_on_new_clock_domain = false) { internal_set_unscaled_clock(xtal.value(), sync_on_new_clock_domain); }
+	void set_unscaled_clock_ns(const XTAL &clock) { set_unscaled_clock(clock, false); } // non-overloaded name because binding to overloads is ugly
+	void set_unscaled_clock_s(const XTAL &clock) { set_unscaled_clock(clock, true); } // non-overloaded name because binding to overloads is ugly
 	double clock_scale() const { return m_clock_scale; }
 	void set_clock_scale(double clockscale);
 	attotime clocks_to_attotime(u64 clocks) const noexcept;

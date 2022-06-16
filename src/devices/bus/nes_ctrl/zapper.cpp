@@ -63,7 +63,7 @@ ioport_constructor nes_bandaihs_device::device_input_ports() const
 
 void nes_zapper_device::device_add_mconfig(machine_config &config)
 {
-	NES_ZAPPER_SENSOR(config, m_sensor, 0);
+	NES_ZAPPER_SENSOR(config, m_sensor);
 	if (m_port != nullptr)
 		m_sensor->set_screen_tag(m_port->m_screen);
 }
@@ -77,7 +77,7 @@ void nes_zapper_device::device_add_mconfig(machine_config &config)
 //  constructor
 //-------------------------------------------------
 
-nes_zapper_device::nes_zapper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nes_zapper_device::nes_zapper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_sensor(*this, "sensor")
@@ -87,12 +87,12 @@ nes_zapper_device::nes_zapper_device(const machine_config &mconfig, device_type 
 {
 }
 
-nes_zapper_device::nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_zapper_device::nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_zapper_device(mconfig, NES_ZAPPER, tag, owner, clock)
 {
 }
 
-nes_bandaihs_device::nes_bandaihs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bandaihs_device::nes_bandaihs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_zapper_device(mconfig, NES_BANDAIHS, tag, owner, clock)
 	, m_joypad(*this, "JOYPAD")
 	, m_latch(0)

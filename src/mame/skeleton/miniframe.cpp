@@ -235,13 +235,13 @@ void miniframe_state::miniframe(machine_config &config)
 	ADDRESS_MAP_BANK(config, "ramrombank").set_map(&miniframe_state::ramrombank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x400000);
 
 	// floppy
-	WD2797(config, m_wd2797, 1000000);
+	WD2797(config, m_wd2797, XTAL::u(1000000));
 //  m_wd2797->intrq_wr_callback().set(FUNC(miniframe_state::wd2797_intrq_w));
 //  m_wd2797->drq_wr_callback().set(FUNC(miniframe_state::wd2797_drq_w));
 	FLOPPY_CONNECTOR(config, "wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	// 8263s
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 	pit8253.set_clk<0>(76800);
 	pit8253.set_clk<1>(76800);
 	pit8253.out_handler<0>().set("pic8259", FUNC(pic8259_device::ir4_w)); // FIXME: fighting for IR4 - error, or needs input merger?
@@ -250,13 +250,13 @@ void miniframe_state::miniframe(machine_config &config)
 	// and ir4 on the PIC
 	pit8253.out_handler<1>().append("pic8259", FUNC(pic8259_device::ir4_w));
 
-	pit8253_device &baudgen(PIT8253(config, "baudgen", 0));
+	pit8253_device &baudgen(PIT8253(config, "baudgen"));
 	baudgen.set_clk<0>(1228800);
 	baudgen.set_clk<1>(1228800);
 	baudgen.set_clk<2>(1228800);
 
 	// PIC8259s
-	pic8259_device &pic8259(PIC8259(config, "pic8259", 0));
+	pic8259_device &pic8259(PIC8259(config, "pic8259"));
 	pic8259.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 	pic8259.in_sp_callback().set_constant(1);
 }

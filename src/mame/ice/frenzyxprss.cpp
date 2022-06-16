@@ -86,7 +86,7 @@ void frenzyxprss_state::machine_reset()
 void frenzyxprss_state::frenzyxprss(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM3(config, m_maincpu, 100000000); // Intel Celeron SL5ZF 1GHz
+	PENTIUM3(config, m_maincpu, XTAL::u(100000000)); // Intel Celeron SL5ZF 1GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &frenzyxprss_state::frenzyxprss_map);
 
 	// Video hardware

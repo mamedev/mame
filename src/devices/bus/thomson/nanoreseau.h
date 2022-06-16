@@ -14,7 +14,7 @@
 class nanoreseau_device : public device_t, public thomson_extension_interface
 {
 public:
-	nanoreseau_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool no_id = false);
+	nanoreseau_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool no_id = false);
 	virtual ~nanoreseau_device() = default;
 
 	virtual void rom_map(address_map &map) override;
@@ -44,7 +44,7 @@ private:
 class nanoreseau_mo_device : public nanoreseau_device
 {
 public:
-	nanoreseau_mo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0, bool no_id = false);
+	nanoreseau_mo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL(), bool no_id = false);
 	virtual ~nanoreseau_mo_device() = default;
 
 protected:
@@ -54,7 +54,7 @@ protected:
 class nanoreseau_to_device : public nanoreseau_device
 {
 public:
-	nanoreseau_to_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0, bool no_id = false);
+	nanoreseau_to_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL(), bool no_id = false);
 	virtual ~nanoreseau_to_device() = default;
 
 protected:

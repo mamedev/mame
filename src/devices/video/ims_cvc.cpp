@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(G300, g300_device, "g300", "INMOS G300 Colour Video Controlle
 DEFINE_DEVICE_TYPE(G332, g332_device, "g332", "INMOS G332 Colour Video Controller")
 DEFINE_DEVICE_TYPE(G364, g364_device, "g364", "INMOS G364 Colour Video Controller")
 
-ims_cvc_device::ims_cvc_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+ims_cvc_device::ims_cvc_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, m_screen(*this, finder_base::DUMMY_TAG)
@@ -34,23 +34,23 @@ ims_cvc_device::ims_cvc_device(machine_config const &mconfig, device_type type, 
 {
 }
 
-g300_device::g300_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+g300_device::g300_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: ims_cvc_device(mconfig, G300, tag, owner, clock)
 {
 }
 
-g332_device::g332_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+g332_device::g332_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 	: ims_cvc_device(mconfig, type, tag, owner, clock)
 	, m_microport(*this, "microport")
 {
 }
 
-g332_device::g332_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+g332_device::g332_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: g332_device(mconfig, G332, tag, owner, clock)
 {
 }
 
-g364_device::g364_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+g364_device::g364_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: g332_device(mconfig, G364, tag, owner, clock)
 {
 }
@@ -362,7 +362,7 @@ void g332_device::control_a_w(u32 data)
 
 			rectangle const visarea(hbend, hbend + (m_display << 2) - 1, vbend, height - 1);
 
-			u32 const dotclock = (m_boot & PLL_SELECT) ? clock() * (m_boot & PLL_MULTIPLIER) : clock();
+			u32 const dotclock = (m_boot & PLL_SELECT) ? clock().value() * (m_boot & PLL_MULTIPLIER) : clock().value();
 			attotime const refresh = attotime::from_hz(dotclock / (width * height));
 
 			m_screen->configure(width, height, visarea, refresh.as_attoseconds());

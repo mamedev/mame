@@ -39,12 +39,12 @@ DEFINE_DEVICE_TYPE(T11,      t11_device,      "t11",      "DEC T11")
 DEFINE_DEVICE_TYPE(K1801VM2, k1801vm2_device, "k1801vm2", "K1801VM2")
 
 
-k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: t11_device(mconfig, K1801VM2, tag, owner, clock)
 {
 }
 
-t11_device::t11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+t11_device::t11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
 	, c_initial_mode(0)
@@ -63,7 +63,7 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 	m_ppc.d = 0;
 }
 
-t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: t11_device(mconfig, T11, tag, owner, clock)
 {
 }

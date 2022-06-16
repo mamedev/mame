@@ -41,7 +41,7 @@ void bbc_sprite_device::device_add_mconfig(machine_config &config)
 //  bbc_sprite_device - constructor
 //-------------------------------------------------
 
-bbc_sprite_device::bbc_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_sprite_device::bbc_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_SPRITE, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_vdp(*this, "vdp")

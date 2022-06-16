@@ -910,12 +910,12 @@ void epc_state::epc(machine_config &config)
 		}
 	});
 
-	ISA8_SLOT(config, "isa1", 0, m_isabus, epc_isa8_cards, "epc_mda", false);
-	ISA8_SLOT(config, "isa2", 0, m_isabus, epc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, m_isabus, epc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", 0, m_isabus, epc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", 0, m_isabus, epc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", 0, m_isabus, epc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", m_isabus, epc_isa8_cards, "epc_mda", false);
+	ISA8_SLOT(config, "isa2", m_isabus, epc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", m_isabus, epc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", m_isabus, epc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", m_isabus, epc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", m_isabus, epc_isa8_cards, nullptr, false);
 
 	// System board has 128kB memory with parity, expansion can be achieved through the
 	// 128kB Memory Expansion Board 1090 and/or the 128kB Multifunction Board MB1080-001
@@ -1067,4 +1067,4 @@ ROM_START( epc )
 ROM_END
 
 COMP( 1985, epc,     0,      0,      epc,     epc_ports, epc_state, init_epc,    "Ericsson Information System",     "Ericsson PC" ,          0)
-//COMP( 1985, eppc,   ibm5150, 0,  pccga,         pccga,  pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
+//COMP( 1985, eppc,   ibm5150,  pccga,         pccga,  pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )

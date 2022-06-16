@@ -411,14 +411,14 @@ void sns_rom_sdd1_device::SDD1_emu::SDD1emu_decompress(uint8_t *ROM, uint32_t *m
 DEFINE_DEVICE_TYPE(SNS_LOROM_SDD1, sns_rom_sdd1_device, "sns_rom_sdd1", "SNES Cart + S-DD1")
 
 
-sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sns_cart_interface(mconfig, *this)
 	, m_sdd1_enable(0), m_xfer_enable(0), m_sdd1emu(nullptr)
 {
 }
 
-sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_sdd1_device(mconfig, SNS_LOROM_SDD1, tag, owner, clock)
 {
 }

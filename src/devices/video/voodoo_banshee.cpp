@@ -178,7 +178,7 @@ void banshee_vga_regs::register_save(save_proxy &save)
 
 DEFINE_DEVICE_TYPE(VOODOO_BANSHEE, voodoo_banshee_device, "voodoo_banshee", "3dfx Voodoo Banshee")
 
-voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
+voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, voodoo_model model) :
 	voodoo_2_device(mconfig, type, tag, owner, clock, model),
 	m_cmdfifo2(*this)
 {
@@ -1633,7 +1633,7 @@ void voodoo_banshee_device::execute_blit(u32 data)
 
 DEFINE_DEVICE_TYPE(VOODOO_3, voodoo_3_device, "voodoo_3", "3dfx Voodoo 3")
 
-voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	voodoo_banshee_device(mconfig, VOODOO_3, tag, owner, clock, voodoo_model::VOODOO_3)
 {
 }

@@ -178,7 +178,7 @@ void olivpc1_state::olivpc1(machine_config &config)
 	PC_KEYB(config, m_keyboard);
 	m_keyboard->keypress().set([this](int state) { m_obf = state; m_maincpu->set_input_line(INPUT_LINE_IRQ1, state); });
 
-	isa8_device &isa(ISA8(config, "isa", 0));
+	isa8_device &isa(ISA8(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 	isa.drq1_callback().set(m_maincpu, FUNC(v40_device::dreq_w<0>));
@@ -189,8 +189,8 @@ void olivpc1_state::olivpc1(machine_config &config)
 	isa.irq5_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
 	isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	ISA8_SLOT(config, "intcga", 0, isa, pc_isa8_cards, "cga", true);
-	ISA8_SLOT(config, "isa1", 0, isa, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "intcga", isa, pc_isa8_cards, "cga", true);
+	ISA8_SLOT(config, "isa1", isa, pc_isa8_cards, nullptr, false);
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K, 256K, 384K");
 
 	SOFTWARE_LIST(config, "pc_list").set_compatible("ibm5150");

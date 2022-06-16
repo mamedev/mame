@@ -109,12 +109,12 @@ void tc0090lvc_device::vram_map(address_map &map)
 	map(0x080000, 0x0801ff).ram().mirror(0x00e00).w("palette", FUNC(palette_device::write8)).share("palette");
 }
 
-tc0090lvc_device::tc0090lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tc0090lvc_device::tc0090lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tc0090lvc_device(mconfig, TC0090LVC, tag, owner, clock)
 {
 }
 
-tc0090lvc_device::tc0090lvc_device(const machine_config &mconfig, device_type &type, const char *tag, device_t *owner, u32 clock)
+tc0090lvc_device::tc0090lvc_device(const machine_config &mconfig, device_type &type, const char *tag, device_t *owner, const XTAL &clock)
 	: z80_device(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo, "palette")
 	, m_program_space_config("program", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(tc0090lvc_device::cpu_map), this))
@@ -132,7 +132,7 @@ tc0090lvc_device::tc0090lvc_device(const machine_config &mconfig, device_type &t
 {
 }
 
-tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tc0090lvc_device(mconfig, TC0091LVC, tag, owner, clock)
 {
 }

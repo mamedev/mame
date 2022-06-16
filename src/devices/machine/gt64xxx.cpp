@@ -164,7 +164,7 @@ void gt64xxx_device::cpu_map(address_map &map)
 	map(0x00000000, 0x00000cff).rw(FUNC(gt64xxx_device::cpu_if_r), FUNC(gt64xxx_device::cpu_if_w));
 }
 
-gt64xxx_device::gt64xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+gt64xxx_device::gt64xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_host_device(mconfig, type, tag, owner, clock)
 	, m_cpu(*this, finder_base::DUMMY_TAG), m_be(0), m_autoconfig(0), m_irq_num(-1)
 	, m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32)

@@ -33,7 +33,7 @@ public:
 
 protected:
 	// construction/destruction
-	magtape_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	magtape_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override;
@@ -45,7 +45,7 @@ class microtape_image_device : public magtape_image_device
 {
 protected:
 	// construction/destruction
-	microtape_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	microtape_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// image-level overrides
 	virtual const char *image_type_name() const noexcept override { return "microtape"; }

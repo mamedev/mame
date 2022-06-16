@@ -1960,19 +1960,19 @@ WRITE_LINE_MEMBER(cischeat_state::sound_irq)
 void cischeat_state::bigrun(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_cpu1, 10000000);
+	M68000(config, m_cpu1, XTAL::u(10000000));
 	m_cpu1->set_addrmap(AS_PROGRAM, &cischeat_state::bigrun_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::bigrun_scanline), "screen", 0, 1);
 
-	M68000(config, m_cpu2, 10000000);
+	M68000(config, m_cpu2, XTAL::u(10000000));
 	m_cpu2->set_addrmap(AS_PROGRAM, &cischeat_state::bigrun_map2);
 	m_cpu2->set_vblank_int("screen", FUNC(cischeat_state::irq4_line_hold));
 
-	M68000(config, m_cpu3, 10000000);
+	M68000(config, m_cpu3, XTAL::u(10000000));
 	m_cpu3->set_addrmap(AS_PROGRAM, &cischeat_state::bigrun_map3);
 	m_cpu3->set_vblank_int("screen", FUNC(cischeat_state::irq4_line_hold));
 
-	M68000(config, m_soundcpu, 6000000);
+	M68000(config, m_soundcpu, XTAL::u(6000000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &cischeat_state::bigrun_sound_map);
 	// timing set by the YM irqhandler
 //  m_soundcpu->set_periodic_int(FUNC(cischeat_state::irq4_line_hold), attotime::from_hz(16*30));
@@ -2005,16 +2005,16 @@ void cischeat_state::bigrun(machine_config &config)
 	GENERIC_LATCH_16(config, m_soundlatch2);
 
 	// TODO: all sound frequencies unverified (assume same as Mega System 1)
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 7000000/2));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(7000000)/2));
 	ymsnd.irq_handler().set(FUNC(cischeat_state::sound_irq));
 	ymsnd.add_route(0, "lspeaker", 0.50);
 	ymsnd.add_route(1, "rspeaker", 0.50);
 
-	OKIM6295(config, m_oki1, 4000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki1, XTAL::u(4000000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	OKIM6295(config, m_oki2, 4000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki2, XTAL::u(4000000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 }
@@ -2056,13 +2056,13 @@ void cischeat_state::f1gpstar(machine_config &config)
 	bigrun(config);
 
 	/* basic machine hardware */
-	m_cpu1->set_clock(12000000);
+	m_cpu1->set_clock(XTAL::u(12000000));
 	m_cpu1->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstar_map);
 
-	m_cpu2->set_clock(12000000);
+	m_cpu2->set_clock(XTAL::u(12000000));
 	m_cpu2->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstar_map2);
 
-	m_cpu3->set_clock(12000000);
+	m_cpu3->set_clock(XTAL::u(12000000));
 	m_cpu3->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstar_map3);
 
 	m_soundcpu->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstar_sound_map);
@@ -2091,7 +2091,7 @@ void cischeat_state::f1gpstr2(machine_config &config)
 
 	m_soundcpu->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstr2_sound_map);
 
-	M68000(config, m_cpu5, 10000000);
+	M68000(config, m_cpu5, XTAL::u(10000000));
 	m_cpu5->set_addrmap(AS_PROGRAM, &cischeat_state::f1gpstr2_io_map);
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
@@ -2133,11 +2133,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 void cischeat_state::scudhamm(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cischeat_state::scudhamm_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::scudhamm_scanline), "screen", 0, 1);
 
-	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown clock
+	adc0804_device &adc(ADC0804(config, "adc", XTAL::u(640000))); // unknown clock
 	adc.vin_callback().set(FUNC(cischeat_state::scudhamm_analog_r));
 
 	WATCHDOG_TIMER(config, m_watchdog);
@@ -2165,11 +2165,11 @@ void cischeat_state::scudhamm(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	OKIM6295(config, m_oki1, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	OKIM6295(config, m_oki1, XTAL::u(4000000)/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
 	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
-	OKIM6295(config, m_oki2, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	OKIM6295(config, m_oki2, XTAL::u(4000000)/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
 	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 }
@@ -2269,12 +2269,12 @@ void captflag_state::captflag(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	OKIM6295(config, m_oki1, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	OKIM6295(config, m_oki1, XTAL::u(4000000)/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
 	m_oki1->set_addrmap(0, &captflag_state::oki1_map);
 	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
-	OKIM6295(config, m_oki2, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	OKIM6295(config, m_oki2, XTAL::u(4000000)/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
 	m_oki2->set_addrmap(0, &captflag_state::oki2_map);
 	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);

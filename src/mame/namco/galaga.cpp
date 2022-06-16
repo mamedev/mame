@@ -1643,7 +1643,7 @@ void bosco_state::bosco(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bosco);
 	PALETTE(config, m_palette, FUNC(bosco_state::bosco_palette), 64*4 + 64*4 + 4 + 64, 32+64);
 
-	STARFIELD_05XX(config, m_starfield, 0);
+	STARFIELD_05XX(config, m_starfield);
 	m_starfield->set_starfield_config(0, STARFIELD_Y_OFFSET_BOSCO, STARFIELD_X_LIMIT_BOSCO);
 
 	/* sound hardware */
@@ -1720,7 +1720,7 @@ void galaga_state::galaga(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaga);
 	PALETTE(config, m_palette, FUNC(galaga_state::galaga_palette), 64*4 + 64*4 + 4 + 64, 32+64);
 
-	STARFIELD_05XX(config, m_starfield, 0);
+	STARFIELD_05XX(config, m_starfield);
 	m_starfield->set_starfield_config(STARFIELD_X_OFFSET_GALAGA, 0, STARFIELD_X_LIMIT_GALAGA);
 
 	/* sound hardware */

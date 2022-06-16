@@ -298,12 +298,12 @@ const tiny_rom_entry *isa8_cga_device::device_rom_region() const
 //  isa8_cga_device - constructor
 //-------------------------------------------------
 
-isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_device(mconfig, ISA8_CGA, tag, owner, clock)
 {
 }
 
-isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_crtc(*this, CGA_MC6845_NAME), m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
@@ -426,7 +426,7 @@ DEFINE_DEVICE_TYPE(ISA8_CGA_POISK2, isa8_cga_poisk2_device, "cga_poisk2", "ISA8_
 //  isa8_cga_poisk2_device - constructor
 //-------------------------------------------------
 
-isa8_cga_poisk2_device::isa8_cga_poisk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_poisk2_device::isa8_cga_poisk2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_device(mconfig, ISA8_CGA_POISK2, tag, owner, clock)
 {
 	m_chr_gen_offset[0] = 0x0000;
@@ -455,12 +455,12 @@ DEFINE_DEVICE_TYPE(ISA8_CGA_SUPERIMPOSE, isa8_cga_superimpose_device, "cga_super
 //  isa8_cga_superimpose_device - constructor
 //-------------------------------------------------
 
-isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_superimpose_device(mconfig, ISA8_CGA_SUPERIMPOSE, tag, owner, clock)
 {
 }
 
-isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_device(mconfig, type, tag, owner, clock)
 {
 	m_superimpose = true;
@@ -1310,7 +1310,7 @@ const uint8_t isa8_cga_pc1512_device::mc6845_writeonce_register[31] =
 //  isa8_cga_pc1512_device - constructor
 //-------------------------------------------------
 
-isa8_cga_pc1512_device::isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_pc1512_device::isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_device(mconfig, ISA8_CGA_PC1512, tag, owner, clock), m_write(0), m_read(0), m_mc6845_address(0)
 {
 	m_vram_size = 0x10000;
@@ -1436,7 +1436,7 @@ DEFINE_DEVICE_TYPE(ISA8_WYSE700, isa8_wyse700_device, "wyse700", "Wyse 700")
 //  isa8_wyse700_device - constructor
 //-------------------------------------------------
 
-isa8_wyse700_device::isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_wyse700_device::isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_device(mconfig, ISA8_WYSE700, tag, owner, clock), m_vrambank(*this, "wy1"), m_bank_offset(0), m_bank_base(0), m_control(0)
 {
 	m_vram_size = 0x20000;
@@ -1535,7 +1535,7 @@ DEFINE_DEVICE_TYPE(ISA8_EC1841_0002, isa8_ec1841_0002_device, "ec1841_0002", "EC
 //  isa8_ec1841_0002_device - constructor
 //-------------------------------------------------
 
-isa8_ec1841_0002_device::isa8_ec1841_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_ec1841_0002_device::isa8_ec1841_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_device(mconfig, ISA8_EC1841_0002, tag, owner, clock), m_p3df(0)
 {
 }
@@ -1645,7 +1645,7 @@ MC6845_RECONFIGURE( isa8_cga_mc1502_device::reconfigure )
 //  isa8_cga_mc1502_device - constructor
 //-------------------------------------------------
 
-isa8_cga_mc1502_device::isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_mc1502_device::isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_device(mconfig, ISA8_CGA_MC1502, tag, owner, clock)
 {
 	m_vram_size = 0x8000;
@@ -1674,7 +1674,7 @@ DEFINE_DEVICE_TYPE(ISA8_CGA_ISKR1031, isa8_cga_iskr1031_device, "cga_iskr1031", 
 //  isa8_cga_iskr1031_device - constructor
 //-------------------------------------------------
 
-isa8_cga_iskr1031_device::isa8_cga_iskr1031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_iskr1031_device::isa8_cga_iskr1031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_device(mconfig, ISA8_CGA_ISKR1031, tag, owner, clock)
 {
 }
@@ -1699,7 +1699,7 @@ DEFINE_DEVICE_TYPE(ISA8_CGA_ISKR1030M, isa8_cga_iskr1030m_device, "cga_iskr1030m
 //  isa8_cga_iskr1030m_device - constructor
 //-------------------------------------------------
 
-isa8_cga_iskr1030m_device::isa8_cga_iskr1030m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_iskr1030m_device::isa8_cga_iskr1030m_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_device(mconfig, ISA8_CGA_ISKR1030M, tag, owner, clock)
 {
 }
@@ -1737,12 +1737,12 @@ void isa8_cga_m24_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_reconfigure_callback(FUNC(isa8_cga_m24_device::reconfigure));
 }
 
-isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_m24_device(mconfig, ISA8_CGA_M24, tag, owner, clock)
 {
 }
 
-isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_device(mconfig, type, tag, owner, clock), m_mode2(0), m_index(0)
 {
 	m_vram_size = 0x8000;
@@ -1930,7 +1930,7 @@ void isa8_cga_cportiii_device::device_add_mconfig(machine_config &config)
 	subdevice<screen_device>(CGA_SCREEN_NAME)->set_color(rgb_t(255, 125, 0));
 }
 
-isa8_cga_cportiii_device::isa8_cga_cportiii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_cga_cportiii_device::isa8_cga_cportiii_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_cga_m24_device(mconfig, ISA8_CGA_CPORTIII, tag, owner, clock)
 {
 }

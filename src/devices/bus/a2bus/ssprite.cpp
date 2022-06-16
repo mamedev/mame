@@ -39,10 +39,10 @@ class a2bus_ssprite_device:
 {
 public:
 	// construction/destruction
-	a2bus_ssprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ssprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2bus_ssprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ssprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -72,20 +72,20 @@ void a2bus_ssprite_device::device_add_mconfig(machine_config &config)
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
 	SPEAKER(config, "mono").front_center();
-	AY8912(config, m_ay, 1022727).add_route(ALL_OUTPUTS, "mono", 1.0);
-	TMS5220(config, m_tms5220, 640000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	AY8912(config, m_ay, XTAL::u(1022727)).add_route(ALL_OUTPUTS, "mono", 1.0);
+	TMS5220(config, m_tms5220, XTAL::u(640000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ssprite_device::a2bus_ssprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ssprite_device::a2bus_ssprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_ssprite_device(mconfig, A2BUS_SSPRITE, tag, owner, clock)
 {
 }
 
-a2bus_ssprite_device::a2bus_ssprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ssprite_device::a2bus_ssprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG),

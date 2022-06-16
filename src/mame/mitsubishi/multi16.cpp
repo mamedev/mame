@@ -152,7 +152,7 @@ static void multi16_floppies(device_slot_interface &device)
 
 void multi16_state::multi16(machine_config &config)
 {
-	I8086(config, m_maincpu, 8000000);
+	I8086(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &multi16_state::multi16_map);
 	m_maincpu->set_addrmap(AS_IO, &multi16_state::multi16_io);
 	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
@@ -164,19 +164,19 @@ void multi16_state::multi16(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(16000000, 848, 0, 640, 518, 0, 400); // unknown clock
+	screen.set_raw(XTAL::u(16000000), 848, 0, 640, 518, 0, 400); // unknown clock
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
-	HD6845S(config, m_crtc, 2000000); // unknown clock
+	HD6845S(config, m_crtc, XTAL::u(2000000)); // unknown clock
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(multi16_state::crtc_update_row));
 
 	// floppy
-	MB8866(config, m_fdc, 2000000);
+	MB8866(config, m_fdc, XTAL::u(2000000));
 
 	FLOPPY_CONNECTOR(config, m_floppy[0], multi16_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[1], multi16_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);

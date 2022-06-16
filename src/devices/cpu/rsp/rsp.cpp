@@ -109,7 +109,7 @@ static const int vector_elements_2[16][8] =
 #define CACHE_SIZE                      (32 * 1024 * 1024)
 
 
-rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, RSP, tag, owner, clock)
 	, m_imem_config("imem", ENDIANNESS_BIG, 32, 12)
 	, m_dmem_config("dmem", ENDIANNESS_BIG, 32, 12)

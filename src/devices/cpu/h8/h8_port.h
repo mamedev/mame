@@ -18,9 +18,9 @@
 
 class h8_port_device : public device_t {
 public:
-	h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, int address, uint8_t default_ddr, uint8_t mask)
-		: h8_port_device(mconfig, tag, owner, 0)
+		: h8_port_device(mconfig, tag, owner)
 	{
 		set_info(address, default_ddr, mask);
 	}

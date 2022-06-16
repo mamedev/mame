@@ -152,7 +152,7 @@ void quakeat_state::machine_start()
 void quakeat_state::quake(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM2(config, m_maincpu, 233000000); /* Pentium II, 233MHz */
+	PENTIUM2(config, m_maincpu, XTAL::u(233000000)); /* Pentium II, 233MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &quakeat_state::quake_map);
 	m_maincpu->set_addrmap(AS_IO, &quakeat_state::quake_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));

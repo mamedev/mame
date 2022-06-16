@@ -27,7 +27,7 @@ class bml3bus_rtc_device:
 {
 public:
 	// construction/destruction
-	bml3bus_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bml3bus_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t bml3_rtc_r(offs_t offset);
 	void bml3_rtc_w(offs_t offset, uint8_t data);

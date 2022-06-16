@@ -83,7 +83,7 @@ namespace {
 
 // copied by Pong, not accurate for this driver!
 // start
-#define MASTER_CLOCK    7159000
+#define MASTER_CLOCK    XTAL::u(7159000)
 #define V_TOTAL         (0x105+1)       // 262
 #define H_TOTAL         (0x1C6+1)       // 454
 
@@ -95,7 +95,7 @@ namespace {
 #define HRES_MULT       (1)
 // end
 
-#define SC_VIDCLOCK     (14318000/2)
+#define SC_VIDCLOCK     (XTAL::u(14318000)/2)
 #define SC_HTOTAL       (0x1C8+0)       // 456
 #define SC_VTOTAL       (0x103+1)       // 259
 #define SC_HBSTART      (SC_HTOTAL)
@@ -103,11 +103,11 @@ namespace {
 #define SC_VBSTART      (SC_VTOTAL)
 #define SC_VBEND        (8)
 
-#define TANK_VIDCLOCK   (14318181)
+#define TANK_VIDCLOCK   XTAL::u(14318181)
 #define TANK_HTOTAL     (952)
 #define TANK_VTOTAL     (262)
 
-#define GTRAK10_VIDCLOCK (14318181 / 2)
+#define GTRAK10_VIDCLOCK (XTAL::u(14318181) / 2)
 #define GTRAK10_HTOTAL 451
 #define GTRAK10_VTOTAL 521
 
@@ -194,7 +194,7 @@ static NETLIST_START(atarikee)
 void atarikee_state::atarikee(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_atarikee);
+	NETLIST_CPU(config, m_maincpu).set_source(netlist_atarikee);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -206,13 +206,13 @@ void atarikee_state::atarikee(machine_config &config)
 	m_video->set_threshold(0.30);
 }
 
-#define STUNTCYC_NL_CLOCK (SC_HTOTAL*SC_VTOTAL*60*140)
+#define STUNTCYC_NL_CLOCK XTAL::u(SC_HTOTAL*SC_VTOTAL*60*140)
 
 void stuntcyc_state::stuntcyc(machine_config &config)
 {
 	/* basic machine hardware */
 	NETLIST_CPU(config, m_maincpu, STUNTCYC_NL_CLOCK).set_source(netlist_stuntcyc);
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw", "coinsw.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:startsw1", "START1.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:startsw2", "START2.POS", 0);
@@ -232,8 +232,8 @@ void stuntcyc_state::stuntcyc(machine_config &config)
 void tank_state::tank(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(tank));
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_CPU(config, m_maincpu).set_source(NETLIST_NAME(tank));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 	NETLIST_LOGIC_INPUT(config, "maincpu:p1lup",   "P1_LEFT_UP.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:p1ldown", "P1_LEFT_DOWN.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:p1rup",   "P1_RIGHT_UP.POS", 0);
@@ -264,9 +264,9 @@ void tank_state::tank(machine_config &config)
 void gtrak10_state::gtrak10(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", netlist::config::DEFAULT_CLOCK()).set_source(netlist_gtrak10);
+	NETLIST_CPU(config, "maincpu").set_source(netlist_gtrak10);
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	NETLIST_LOGIC_INPUT(config, "maincpu:p1lup",    "P1_LEFT_UP.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:p1lleft",  "P1_LEFT_LEFT.POS", 0);

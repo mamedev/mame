@@ -663,7 +663,7 @@ void xmen_state::bootleg_sound_hardware(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1'000'000, okim6295_device::PIN7_HIGH)); // clock and pin7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1'000'000), okim6295_device::PIN7_HIGH)); // clock and pin7 not verified
 	oki.set_addrmap(0, &xmen_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -691,17 +691,17 @@ void xmen_state::base(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback));
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246);
 	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, -2);
 	m_k053246->set_palette("palette");
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 }
 
 void xmen_state::xmen(machine_config &config)

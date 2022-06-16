@@ -26,7 +26,7 @@ class bbc_joystick_device :
 {
 protected:
 	// construction/destruction
-	bbc_joystick_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_joystick_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -43,7 +43,7 @@ private:
 class bbc_acornjoy_device : public bbc_joystick_device
 {
 public:
-	bbc_acornjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_acornjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };
@@ -51,7 +51,7 @@ public:
 class bbc_voltmace3b_device : public bbc_joystick_device
 {
 public:
-	bbc_voltmace3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_voltmace3b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };

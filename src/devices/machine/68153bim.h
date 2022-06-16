@@ -45,7 +45,7 @@ class bim68153_channel : public device_t
 	friend class bim68153_device;
 
 public:
-	bim68153_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bim68153_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -102,7 +102,7 @@ class bim68153_device : public device_t
 
 public:
 	// construction/destruction
-	bim68153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bim68153_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u16 iack(int irqline);
 	int acknowledge();
@@ -133,7 +133,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( int3_w ) { m_chn[CHN_3]->int_w(state); }
 
 protected:
-	bim68153_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	bim68153_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -187,7 +187,7 @@ protected:
 class ei68c153_device : public bim68153_device
 {
 public :
-	ei68c153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ei68c153_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition

@@ -114,7 +114,7 @@ static const int pi_table[32] =
 DEFINE_DEVICE_TYPE(MEA8000, mea8000_device, "mea8000", "Philips/Signetics MEA 8000 speech synthesizer")
 
 
-mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mea8000_device::mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MEA8000, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_write_req(*this),

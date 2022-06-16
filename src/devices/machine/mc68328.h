@@ -93,7 +93,7 @@
 class mc68328_device : public m68000_device
 {
 public:
-	mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_port_a() { return m_out_port_a_cb.bind(); }
 	auto out_port_b() { return m_out_port_b_cb.bind(); }

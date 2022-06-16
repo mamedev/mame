@@ -273,7 +273,7 @@ void sleic_state::sleic(machine_config &config)
 	RIPPLE_COUNTER(config, m_4020);
 	m_4020->set_stages(11); // Using Q1-11
 	m_4020->count_out_cb().set(FUNC(sleic_state::clockcnt_w));
-	CLOCK(config, "rclock", 8'000'000/4).signal_handler().set(m_4020, FUNC(ripple_counter_device::clock_w));
+	CLOCK(config, "rclock", XTAL::u(8'000'000)/4).signal_handler().set(m_4020, FUNC(ripple_counter_device::clock_w));
 
 	/* video hardware */
 	//dmd;
@@ -282,10 +282,10 @@ void sleic_state::sleic(machine_config &config)
 	genpin_audio(config);
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6376(config, m_oki, 128'000); // xtal value not shown, guessing
+	OKIM6376(config, m_oki, XTAL::u(128'000)); // xtal value not shown, guessing
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	//ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(4'000'000))); // no idea.. ic type not shown, source of clock not evident
+	//ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL:u(4'000'000))); // no idea.. ic type not shown, source of clock not evident
 	//ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	//ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 }

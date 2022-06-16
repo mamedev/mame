@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(SVI_EXPANDER, svi_expander_device, "svi_expander", "SVI 318/3
 //  svi_expander_device - constructor
 //-------------------------------------------------
 
-svi_expander_device::svi_expander_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+svi_expander_device::svi_expander_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SVI_EXPANDER, tag, owner, clock),
 	device_single_card_slot_interface<device_svi_expander_interface>(mconfig, *this),
 	m_module(nullptr),

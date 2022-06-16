@@ -48,7 +48,7 @@ class zx8302_device :  public device_t,
 {
 public:
 	// construction/destruction
-	zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_rtc_clock(int rtc_clock) { m_rtc_clock = rtc_clock; }
 	void set_rtc_clock(const XTAL &rtc_clock) { set_rtc_clock(rtc_clock.value()); }

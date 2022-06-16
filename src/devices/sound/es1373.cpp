@@ -84,7 +84,7 @@ void es1373_device::map(address_map &map)
 	map(0x00, 0x3f).rw(FUNC(es1373_device::reg_r), FUNC(es1373_device::reg_w));
 }
 
-es1373_device::es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+es1373_device::es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, ES1373, tag, owner, clock)
 	, device_sound_interface(mconfig, *this), m_stream(nullptr)
 	, m_eslog(nullptr), m_tempCount(0), m_timer(nullptr), m_memory_space(nullptr), m_irq_handler(*this)

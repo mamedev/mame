@@ -322,7 +322,7 @@ void mwarr_state::mwarr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mwarr);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
-	EDEVICES_VID(config, m_video, 0);
+	EDEVICES_VID(config, m_video);
 	m_video->set_bg_videoram_tag("bg_videoram");
 	m_video->set_mlow_videoram_tag("mlow_videoram");
 	m_video->set_mhigh_videoram_tag("mhigh_videoram");

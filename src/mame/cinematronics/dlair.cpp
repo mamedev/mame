@@ -157,8 +157,8 @@ private:
  *
  *************************************/
 
-#define MASTER_CLOCK_US             16000000
-#define MASTER_CLOCK_EURO           14318180
+#define MASTER_CLOCK_US             XTAL::u(16000000)
+#define MASTER_CLOCK_EURO           XTAL::u(14318180)
 
 
 
@@ -728,7 +728,7 @@ void dlair_state::dlair_base(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK_US/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dlair_state::dlus_map);
-	m_maincpu->set_periodic_int(FUNC(dlair_state::irq0_line_hold),  attotime::from_hz((double)MASTER_CLOCK_US/8/16/16/16/16));
+	m_maincpu->set_periodic_int(FUNC(dlair_state::irq0_line_hold),  attotime::from_hz(MASTER_CLOCK_US.dvalue()/8/16/16/16/16));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -744,7 +744,7 @@ void dlair_state::dlair_base(machine_config &config)
 void dlair_state::dlair_pr7820(machine_config &config)
 {
 	dlair_base(config);
-	PIONEER_PR7820(config, m_pr7820, 0);
+	PIONEER_PR7820(config, m_pr7820);
 	m_pr7820->add_route(0, "lspeaker", 1.0);
 	m_pr7820->add_route(1, "rspeaker", 1.0);
 	m_pr7820->add_ntsc_screen(config, "screen");
@@ -754,7 +754,7 @@ void dlair_state::dlair_pr7820(machine_config &config)
 void dlair_state::dlair_ldv1000(machine_config &config)
 {
 	dlair_base(config);
-	PIONEER_LDV1000(config, m_ldv1000, 0);
+	PIONEER_LDV1000(config, m_ldv1000);
 	m_ldv1000->add_route(0, "lspeaker", 1.0);
 	m_ldv1000->add_route(1, "rspeaker", 1.0);
 	m_ldv1000->add_ntsc_screen(config, "screen");
@@ -779,7 +779,7 @@ void dlair_state::dleuro(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)));
 
-	PHILIPS_22VP932(config, m_22vp932, 0);
+	PHILIPS_22VP932(config, m_22vp932);
 	m_22vp932->set_overlay(256, 256, FUNC(dlair_state::screen_update_dleuro));
 	m_22vp932->add_route(0, "lspeaker", 1.0);
 	m_22vp932->add_route(1, "rspeaker", 1.0);

@@ -92,16 +92,16 @@ INPUT_PORTS_END
 
 void stellafr_state::stellafr(machine_config &config)
 {
-	M68000(config, m_maincpu, 10000000 ); //?
+	M68000(config, m_maincpu, XTAL::u(10000000)); //?
 	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
 
-	MC68681(config, m_duart, 3686400);
+	MC68681(config, m_duart, XTAL::u(3686400));
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2); // ?
 	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
 
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1000000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(1000000)));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
 	aysnd.port_a_read_callback().set_ioport("INPUTS");
 	aysnd.port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));

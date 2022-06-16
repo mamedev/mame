@@ -271,7 +271,7 @@ void abc_fd2_device::device_add_mconfig(machine_config &config)
 //  abc_fd2_device - constructor
 //-------------------------------------------------
 
-abc_fd2_device::abc_fd2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc_fd2_device::abc_fd2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ABC_FD2, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),

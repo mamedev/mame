@@ -20,7 +20,7 @@ class ram_32k_device : public device_t, public device_rc2014_card_interface
 {
 public:
 	// construction/destruction
-	ram_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ram_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -30,7 +30,7 @@ private:
 	std::unique_ptr<u8[]> m_ram;
 };
 
-ram_32k_device::ram_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ram_32k_device::ram_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RC2014_RAM_32K, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_ram(nullptr)
@@ -59,7 +59,7 @@ class ram_64k_base : public device_t
 {
 protected:
 	// construction/destruction
-	ram_64k_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	ram_64k_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -79,7 +79,7 @@ protected:
 	required_ioport m_paged;
 };
 
-ram_64k_base::ram_64k_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+ram_64k_base::ram_64k_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_bank(0)
 	, m_ram(nullptr)
@@ -128,7 +128,7 @@ class ram_64k_device : public ram_64k_base, public device_rc2014_ext_card_interf
 {
 public:
 	// construction/destruction
-	ram_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ram_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -139,7 +139,7 @@ protected:
 	void update_banks() override;
 };
 
-ram_64k_device::ram_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ram_64k_device::ram_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ram_64k_base(mconfig, RC2014_RAM_64K, tag, owner, clock)
 	, device_rc2014_ext_card_interface(mconfig, *this)
 {
@@ -177,7 +177,7 @@ class ram_64k_device_40pin : public ram_64k_base, public device_rc2014_card_inte
 {
 public:
 	// construction/destruction
-	ram_64k_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ram_64k_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -187,7 +187,7 @@ protected:
 	void update_banks() override {};
 };
 
-ram_64k_device_40pin::ram_64k_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ram_64k_device_40pin::ram_64k_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ram_64k_base(mconfig, RC2014_RAM_64K_40P, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 {

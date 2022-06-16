@@ -11,7 +11,7 @@
 class m24_keyboard_device :  public device_t
 {
 public:
-	m24_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m24_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_data_handler() { return m_out_data.bind(); }
 

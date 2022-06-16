@@ -41,18 +41,18 @@ void a2bus_ace2x00_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ace2x00_device::a2bus_ace2x00_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ace2x00_device::a2bus_ace2x00_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr)
 {
 }
 
-a2bus_ace2x00_slot1_device::a2bus_ace2x00_slot1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ace2x00_slot1_device::a2bus_ace2x00_slot1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_ace2x00_device(mconfig, A2BUS_ACE2X00_SLOT1, tag, owner, clock)
 {
 }
 
-a2bus_ace2x00_slot6_device::a2bus_ace2x00_slot6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ace2x00_slot6_device::a2bus_ace2x00_slot6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_ace2x00_device(mconfig, A2BUS_ACE2X00_SLOT6, tag, owner, clock),
 	m_iwm(*this, "iwm"),
 	m_floppy(*this, "%u", 0U)

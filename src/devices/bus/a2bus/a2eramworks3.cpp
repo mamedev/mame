@@ -30,24 +30,24 @@ DEFINE_DEVICE_TYPE(A2EAUX_FRANKLIN512, a2eaux_franklin512_device, "a2ef512", "Fr
 //  LIVE DEVICE
 //**************************************************************************
 
-a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		a2eaux_ramworks3_device(mconfig, A2EAUX_RAMWORKS3, tag, owner, clock)
 {
 }
 
-a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 		device_t(mconfig, type, tag, owner, clock),
 		device_a2eauxslot_card_interface(mconfig, *this),
 		m_bank(0)
 {
 }
 
-a2eaux_franklin384_device::a2eaux_franklin384_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2eaux_franklin384_device::a2eaux_franklin384_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		a2eaux_ramworks3_device(mconfig, A2EAUX_FRANKLIN384, tag, owner, clock)
 {
 }
 
-a2eaux_franklin512_device::a2eaux_franklin512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2eaux_franklin512_device::a2eaux_franklin512_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		a2eaux_ramworks3_device(mconfig, A2EAUX_FRANKLIN512, tag, owner, clock)
 {
 }

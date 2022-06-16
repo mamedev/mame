@@ -64,7 +64,7 @@ void bbc_usersplit_device::device_add_mconfig(machine_config &config)
 //  bbc_usersplit_device - constructor
 //-------------------------------------------------
 
-bbc_usersplit_device::bbc_usersplit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_usersplit_device::bbc_usersplit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_USERSPLIT, tag, owner, clock)
 	, device_bbc_userport_interface(mconfig, *this)
 	, m_userport(*this, "userport%u", 1)

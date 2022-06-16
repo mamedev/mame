@@ -11,7 +11,7 @@ namespace {
 class ie15_terminal_device : public device_t, public device_rs232_port_interface
 {
 public:
-	ie15_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	ie15_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, SERIAL_TERMINAL_IE15, tag, owner, clock)
 		, device_rs232_port_interface(mconfig, *this)
 		, m_ie15(*this, "ie15")
@@ -33,7 +33,7 @@ private:
 
 void ie15_terminal_device::device_add_mconfig(machine_config &config)
 {
-	IE15(config, m_ie15, 0);
+	IE15(config, m_ie15);
 
 	m_ie15->rs232_conn_txd_handler().set(FUNC(ie15_terminal_device::output_rxd));
 	//m_ie15->rs232_conn_rts_handler().set(FUNC(ie15_terminal_device::route_term_rts));

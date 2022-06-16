@@ -129,7 +129,7 @@ const tiny_rom_entry *a2bus_agat9flop_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-diskiing_device::diskiing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+diskiing_device::diskiing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_wozfdc(*this, WOZFDC_TAG),
@@ -138,17 +138,17 @@ diskiing_device::diskiing_device(const machine_config &mconfig, device_type type
 {
 }
 
-a2bus_diskiing_device::a2bus_diskiing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_diskiing_device::a2bus_diskiing_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	diskiing_device(mconfig, A2BUS_DISKIING, tag, owner, clock)
 {
 }
 
-a2bus_diskiing13_device::a2bus_diskiing13_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_diskiing13_device::a2bus_diskiing13_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	diskiing_device(mconfig, A2BUS_DISKIING13, tag, owner, clock)
 {
 }
 
-a2bus_applesurance_device::a2bus_applesurance_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_applesurance_device::a2bus_applesurance_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	diskiing_device(mconfig, A2BUS_APPLESURANCE, tag, owner, clock),
 	m_c800_bank(1)
 {

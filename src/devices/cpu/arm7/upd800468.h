@@ -18,7 +18,7 @@
 class upd800468_timer_device : public device_t
 {
 public:
-	upd800468_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd800468_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 
@@ -45,7 +45,7 @@ private:
 class upd800468_device : public arm7_cpu_device
 {
 public:
-	upd800468_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	upd800468_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void upd800468_map(address_map &map);
 

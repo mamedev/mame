@@ -37,37 +37,37 @@ DEFINE_DEVICE_TYPE(NES_SRPG_5IN1,     nes_srpg5in1_device,      "nes_srpg5in1", 
 DEFINE_DEVICE_TYPE(NES_TXC_22110,     nes_txc_22110_device,     "nes_txc_22110",     "NES Cart TXC 01-22110-000 PCB")
 
 
-nes_bmc_jy012005_device::nes_bmc_jy012005_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_jy012005_device::nes_bmc_jy012005_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sxrom_device(mconfig, NES_BMC_JY012005, tag, owner, clock), m_latch0(0)
 {
 }
 
-nes_bmc_jy820845c_device::nes_bmc_jy820845c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_jy820845c_device::nes_bmc_jy820845c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sxrom_device(mconfig, NES_BMC_JY820845C, tag, owner, clock), m_latch0(0), m_mode(0)
 {
 }
 
-nes_farid_slrom_device::nes_farid_slrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_farid_slrom_device::nes_farid_slrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sxrom_device(mconfig, NES_FARID_SLROM, tag, owner, clock), m_outer(0)
 {
 }
 
-nes_ninjaryu_device::nes_ninjaryu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ninjaryu_device::nes_ninjaryu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sxrom_device(mconfig, NES_NINJARYU, tag, owner, clock)
 {
 }
 
-nes_resetsxrom_device::nes_resetsxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_resetsxrom_device::nes_resetsxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sxrom_device(mconfig, NES_RESETSXROM, tag, owner, clock), m_reset_count(-1)
 {
 }
 
-nes_srpg5in1_device::nes_srpg5in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_srpg5in1_device::nes_srpg5in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sxrom_device(mconfig, NES_SRPG_5IN1, tag, owner, clock), m_outer(0), m_outer_count(0), m_outer_latch(0)
 {
 }
 
-nes_txc_22110_device::nes_txc_22110_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_txc_22110_device::nes_txc_22110_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sxrom_device(mconfig, NES_TXC_22110, tag, owner, clock), m_latch0(0), m_mode(0)
 {
 }

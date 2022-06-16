@@ -16,7 +16,7 @@ class huc6202_device : public device_t
 {
 public:
 	// construction/destruction
-	huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto next_pixel_0_callback() { return m_next_pixel_0_cb.bind(); }
 	auto time_til_next_event_0_callback() { return m_time_til_next_event_0_cb.bind(); }

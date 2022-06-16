@@ -664,7 +664,7 @@ void fortyl_state::common(machine_config &config)
 
 	TA7630(config, m_ta7630);
 
-	YM2149(config, m_ay, 2000000);
+	YM2149(config, m_ay, XTAL::u(2000000));
 	m_ay->port_a_write_callback().set(FUNC(fortyl_state::sound_control_2_w));
 	m_ay->port_b_write_callback().set(FUNC(fortyl_state::sound_control_3_w));
 	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.1);
@@ -683,7 +683,7 @@ void fortyl_state::common(machine_config &config)
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
 }
 
 void fortyl_state::_40love(machine_config &config)

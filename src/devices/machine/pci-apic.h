@@ -9,12 +9,12 @@
 
 class apic_device : public pci_device {
 public:
-	apic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
+	apic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
 		: apic_device(mconfig, tag, owner, clock)
 	{
 		set_ids(main_id, revision, 0x080010, subdevice_id);
 	}
-	apic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

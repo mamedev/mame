@@ -916,11 +916,11 @@ void opwolf_state::opwolf(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_opwolf);
 	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 2048);
 
-	PC080SN(config, m_pc080sn, 0);
+	PC080SN(config, m_pc080sn);
 	m_pc080sn->set_gfx_region(0);
 	m_pc080sn->set_gfxdecode_tag("gfxdecode");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_palette("palette");
 	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::opwolf_colpri_cb));
 
@@ -934,19 +934,19 @@ void opwolf_state::opwolf(machine_config &config)
 	ymsnd.add_route(0, "lspeaker", 1.0);
 	ymsnd.add_route(1, "rspeaker", 1.0);
 
-	MSM5205(config, m_msm[0], 384000);
+	MSM5205(config, m_msm[0], XTAL::u(384000));
 	m_msm[0]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<0>));
 	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
 	m_msm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MSM5205(config, m_msm[1], 384000);
+	MSM5205(config, m_msm[1], XTAL::u(384000));
 	m_msm[1]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<1>));
 	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
 	m_msm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 }
@@ -990,11 +990,11 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 	GFXDECODE(config, "gfxdecode", "palette", gfx_opwolf);
 	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 2048);
 
-	PC080SN(config, m_pc080sn, 0);
+	PC080SN(config, m_pc080sn);
 	m_pc080sn->set_gfx_region(0);
 	m_pc080sn->set_gfxdecode_tag("gfxdecode");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_palette("palette");
 	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::opwolf_colpri_cb));
 
@@ -1008,19 +1008,19 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 	ymsnd.add_route(0, "lspeaker", 1.0);
 	ymsnd.add_route(1, "rspeaker", 1.0);
 
-	MSM5205(config, m_msm[0], 384000);
+	MSM5205(config, m_msm[0], XTAL::u(384000));
 	m_msm[0]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<0>));
 	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
 	m_msm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MSM5205(config, m_msm[1], 384000);
+	MSM5205(config, m_msm[1], XTAL::u(384000));
 	m_msm[1]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<1>));
 	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
 	m_msm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 }

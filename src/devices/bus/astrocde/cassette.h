@@ -25,7 +25,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::TAPE; }
 
 	// construction/destruction
-	astrocade_cassette_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
+	astrocade_cassette_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~astrocade_cassette_device();
 
 	// device_astrocade_ctrl_interface implementation

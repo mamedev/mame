@@ -1049,16 +1049,16 @@ void spinb_state::msm5205(machine_config &config)
 	ppim.in_pc_callback().set(FUNC(spinb_state::ppim_c_r));
 	ppim.out_pc_callback().set(FUNC(spinb_state::ppim_c_w));
 
-	TTL7474(config, m_ic5a, 0);
+	TTL7474(config, m_ic5a);
 	m_ic5a->comp_output_cb().set(FUNC(spinb_state::ic5a_w));
 
-	HC157(config, m_ic14a, 0); // IC15 on Jolly Park
+	HC157(config, m_ic14a); // IC15 on Jolly Park
 	m_ic14a->out_callback().set("5205a", FUNC(msm5205_device::data_w));
 
-	TTL7474(config, m_ic5m, 0);
+	TTL7474(config, m_ic5m);
 	m_ic5m->comp_output_cb().set(FUNC(spinb_state::ic5m_w));
 
-	HC157(config, m_ic14m, 0); // IC15 on Jolly Park
+	HC157(config, m_ic14m); // IC15 on Jolly Park
 	m_ic14m->out_callback().set("5205m", FUNC(msm5205_device::data_w));
 }
 
@@ -1092,16 +1092,16 @@ void spinb_state::msm6585(machine_config &config)
 	ppim.in_pc_callback().set(FUNC(spinb_state::ppim_c_r));
 	ppim.out_pc_callback().set(FUNC(spinb_state::ppim_c_w));
 
-	TTL7474(config, m_ic5a, 0);
+	TTL7474(config, m_ic5a);
 	m_ic5a->comp_output_cb().set(FUNC(spinb_state::ic5a_w));
 
-	HC157(config, m_ic14a, 0); // IC15 on Jolly Park
+	HC157(config, m_ic14a); // IC15 on Jolly Park
 	m_ic14a->out_callback().set("6585a", FUNC(msm5205_device::data_w));
 
-	TTL7474(config, m_ic5m, 0);
+	TTL7474(config, m_ic5m);
 	m_ic5m->comp_output_cb().set(FUNC(spinb_state::ic5m_w));
 
-	HC157(config, m_ic14m, 0); // IC15 on Jolly Park
+	HC157(config, m_ic14m); // IC15 on Jolly Park
 	m_ic14m->out_callback().set("6585m", FUNC(msm5205_device::data_w));
 }
 

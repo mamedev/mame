@@ -21,7 +21,7 @@
 class es8712_device : public device_t, public device_rom_interface<20> // TODO : 20 address bits?
 {
 public:
-	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <typename T> void set_msm_tag(T &&tag) { m_msm.set_tag(std::forward<T>(tag)); }

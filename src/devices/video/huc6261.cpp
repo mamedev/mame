@@ -31,7 +31,7 @@ constexpr unsigned huc6261_device::LPF;
 DEFINE_DEVICE_TYPE(HUC6261, huc6261_device, "huc6261", "Hudson HuC6261 VCE")
 
 
-huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	:   device_t(mconfig, HUC6261, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_huc6270_a(*this, finder_base::DUMMY_TAG),

@@ -19,7 +19,7 @@ Output signal at machine start is right after falling edge.
 
 DEFINE_DEVICE_TYPE(CLOCK, clock_device, "clock", "Clock")
 
-clock_device::clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+clock_device::clock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CLOCK, tag, owner, clock),
 	m_signal(0),
 	m_output(-1),

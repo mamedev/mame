@@ -90,7 +90,7 @@ void ez2d_state::machine_reset()
 void ez2d_state::ez2d(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM3(config, m_maincpu, 100000000); // actually a Celeron at 533 MHz
+	PENTIUM3(config, m_maincpu, XTAL::u(100000000)); // actually a Celeron at 533 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &ez2d_state::ez2d_map);
 
 	/* video hardware */

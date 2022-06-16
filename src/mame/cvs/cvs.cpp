@@ -996,13 +996,13 @@ void cvs_state::cvs(machine_config &config)
 	m_screen->set_screen_update(FUNC(cvs_state::screen_update_cvs));
 	m_screen->set_palette(m_palette);
 
-	S2636(config, m_s2636[0], 0);
+	S2636(config, m_s2636[0]);
 	m_s2636[0]->set_offsets(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
-	S2636(config, m_s2636[1], 0);
+	S2636(config, m_s2636[1]);
 	m_s2636[1]->set_offsets(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
-	S2636(config, m_s2636[2], 0);
+	S2636(config, m_s2636[2]);
 	m_s2636[2]->set_offsets(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
 	/* audio hardware */
@@ -1010,9 +1010,9 @@ void cvs_state::cvs(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_8BIT_R2R(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_4BIT_R2R(config, m_dac2).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_1BIT(config, m_dac3).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	TMS5100(config, m_tms5110, XTAL(640'000));
 	m_tms5110->data().set(FUNC(cvs_state::speech_rom_read_bit));

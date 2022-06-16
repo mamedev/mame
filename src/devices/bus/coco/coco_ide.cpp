@@ -47,7 +47,7 @@ ioport_constructor coco_ide_device::device_input_ports() const
 //  coco_ide_device - constructor
 //-------------------------------------------------
 
-coco_ide_device::coco_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_ide_device::coco_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, COCO_IDE, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this )
 	, m_ata(*this, "ata")

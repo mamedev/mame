@@ -41,7 +41,7 @@ class ieee488_device : public device_t
 {
 public:
 	// construction/destruction
-	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto eoi_callback() { return m_write_eoi.bind(); }
 	auto dav_callback() { return m_write_dav.bind(); }
@@ -171,7 +171,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	ieee488_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, int address, T &&opts, char const *dflt)
-		: ieee488_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: ieee488_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -179,7 +179,7 @@ public:
 		set_fixed(false);
 		set_address(address);
 	}
-	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	static void add_cbm_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot);
 	static void add_cbm_defaults(machine_config &config, const char *_default_drive)

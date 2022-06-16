@@ -21,7 +21,7 @@ class compact_flash_device : public device_t, public device_rc2014_card_interfac
 {
 public:
 	// construction/destruction
-	compact_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	compact_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -37,7 +37,7 @@ private:
 	required_device<ata_interface_device> m_ata;
 };
 
-compact_flash_device::compact_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+compact_flash_device::compact_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RC2014_COMPACT_FLASH, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_ata(*this, "ata")

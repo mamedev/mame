@@ -61,7 +61,7 @@ static const char *const register_names[] =
 //  cs8221_device - constructor
 //-------------------------------------------------
 
-cs8221_device::cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cs8221_device::cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CS8221, tag, owner, clock),
 		m_address(0),
 		m_address_valid(false)

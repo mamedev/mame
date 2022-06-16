@@ -1376,7 +1376,7 @@ void dkong_state::radarscp1_audio(machine_config &config)
 	vp1.read_cb<6>().set("tms", FUNC(m58817_device::status_r));
 
 	/* tms memory controller */
-	M58819(config, "m58819", 0);
+	M58819(config, "m58819");
 
 	M58817(config, m_m58817, XTAL(640'000));
 	m_m58817->m0().set("m58819", FUNC(tms6100_device::m0_w));

@@ -16,7 +16,7 @@ namespace bus::ti99::gromport {
 class ti99_single_cart_conn_device : public cartridge_connector_device
 {
 public:
-	ti99_single_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti99_single_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;

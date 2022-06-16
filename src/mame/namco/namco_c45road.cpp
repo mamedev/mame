@@ -77,7 +77,7 @@ void namco_c45_road_device::map(address_map &map)
 //  namco_c45_road_device -- constructor
 //-------------------------------------------------
 
-namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NAMCO_C45_ROAD, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	device_memory_interface(mconfig, *this),

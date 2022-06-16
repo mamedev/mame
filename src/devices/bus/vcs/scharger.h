@@ -17,7 +17,7 @@
 class a26_rom_ss_device : public a26_rom_base_device
 {
 public:
-	a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 	uint8_t read_lo(offs_t offset);

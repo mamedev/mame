@@ -18,7 +18,7 @@ class md_jcart_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_jcart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_jcart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -28,7 +28,7 @@ public:
 	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 protected:
-	md_jcart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	md_jcart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -46,10 +46,10 @@ class md_seprom_codemast_device : public md_jcart_device
 {
 public:
 	// construction/destruction
-	md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -74,7 +74,7 @@ class md_seprom_mm96_device : public md_seprom_codemast_device
 {
 public:
 	// construction/destruction
-	md_seprom_mm96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_seprom_mm96_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

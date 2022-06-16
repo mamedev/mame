@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(TTL74123, ttl74123_device, "ttl74123", "74123 TTL")
 //  ttl74123_device - constructor
 //-------------------------------------------------
 
-ttl74123_device::ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ttl74123_device::ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TTL74123, tag, owner, clock),
 		m_clear_timer(nullptr),
 		m_output_timer(nullptr),

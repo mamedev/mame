@@ -12,7 +12,7 @@ class ymf271_device : public device_t, public device_sound_interface, public dev
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }

@@ -168,7 +168,7 @@ void altos2_state::altos2(machine_config &config)
 	m_vpac->int_callback().set("ctc", FUNC(z80ctc_device::trg3));
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_bell, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_bell, XTAL::u(1000)).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 ROM_START( altos2 )

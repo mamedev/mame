@@ -290,7 +290,7 @@ void queen_state::queen(machine_config &config)
 
 	pcat_common(config);
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus"));
 	pcibus.set_device(0, FUNC(queen_state::intel82439tx_pci_r), FUNC(queen_state::intel82439tx_pci_w));
 	pcibus.set_device(7, FUNC(queen_state::intel82371ab_pci_r), FUNC(queen_state::intel82371ab_pci_w));
 

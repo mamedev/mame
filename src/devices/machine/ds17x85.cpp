@@ -44,7 +44,7 @@ DEFINE_DEVICE_TYPE(DS17887, ds17887_device, "ds17887", "DS17887 RTC")
 //  ds17x85_device - constructor
 //-------------------------------------------------
 
-ds17x85_device::ds17x85_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 model, u32 extram_size)
+ds17x85_device::ds17x85_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 model, u32 extram_size)
 	: mc146818_device(mconfig, type, tag, owner, clock)
 	, m_model(model)
 	, m_extram_size(extram_size)
@@ -57,7 +57,7 @@ ds17x85_device::ds17x85_device(const machine_config &mconfig, device_type type, 
 //  ds1685_device - constructor
 //-------------------------------------------------
 
-ds1685_device::ds1685_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ds1685_device::ds1685_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ds17x85_device(mconfig, DS1685, tag, owner, clock, 0x71, 128)
 {
 }
@@ -66,7 +66,7 @@ ds1685_device::ds1685_device(const machine_config &mconfig, const char *tag, dev
 //  ds1687_device - constructor
 //-------------------------------------------------
 
-ds1687_device::ds1687_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ds1687_device::ds1687_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ds17x85_device(mconfig, DS1687, tag, owner, clock, 0x71, 128)
 {
 }
@@ -75,7 +75,7 @@ ds1687_device::ds1687_device(const machine_config &mconfig, const char *tag, dev
 //  ds17285_device - constructor
 //-------------------------------------------------
 
-ds17285_device::ds17285_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ds17285_device::ds17285_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ds17x85_device(mconfig, DS17285, tag, owner, clock, 0x72, 2048)
 {
 }
@@ -84,7 +84,7 @@ ds17285_device::ds17285_device(const machine_config &mconfig, const char *tag, d
 //  ds17287_device - constructor
 //-------------------------------------------------
 
-ds17287_device::ds17287_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ds17287_device::ds17287_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ds17x85_device(mconfig, DS17287, tag, owner, clock, 0x72, 2048)
 {
 }
@@ -93,7 +93,7 @@ ds17287_device::ds17287_device(const machine_config &mconfig, const char *tag, d
 //  ds17485_device - constructor
 //-------------------------------------------------
 
-ds17485_device::ds17485_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ds17485_device::ds17485_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ds17x85_device(mconfig, DS17485, tag, owner, clock, 0x74, 4096)
 {
 }
@@ -102,7 +102,7 @@ ds17485_device::ds17485_device(const machine_config &mconfig, const char *tag, d
 //  ds17487_device - constructor
 //-------------------------------------------------
 
-ds17487_device::ds17487_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ds17487_device::ds17487_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ds17x85_device(mconfig, DS17487, tag, owner, clock, 0x74, 4096)
 {
 }
@@ -111,7 +111,7 @@ ds17487_device::ds17487_device(const machine_config &mconfig, const char *tag, d
 //  ds17885_device - constructor
 //-------------------------------------------------
 
-ds17885_device::ds17885_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ds17885_device::ds17885_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ds17x85_device(mconfig, DS17885, tag, owner, clock, 0x78, 8192)
 {
 }
@@ -120,7 +120,7 @@ ds17885_device::ds17885_device(const machine_config &mconfig, const char *tag, d
 //  ds17887_device - constructor
 //-------------------------------------------------
 
-ds17887_device::ds17887_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ds17887_device::ds17887_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ds17x85_device(mconfig, DS17887, tag, owner, clock, 0x78, 8192)
 {
 }

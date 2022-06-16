@@ -72,7 +72,7 @@ public:
 	void interrupt_pin_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
 protected:
-	pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	optional_memory_region m_region;
 
@@ -136,7 +136,7 @@ protected:
 
 class agp_device : public pci_device {
 protected:
-	agp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	agp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -144,12 +144,12 @@ protected:
 
 class pci_bridge_device : public pci_device, public device_memory_interface {
 public:
-	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision)
+	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t main_id, uint32_t revision)
 		: pci_bridge_device(mconfig, tag, owner, clock)
 	{
 		set_ids_bridge(main_id, revision);
 	}
-	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void set_remap_cb(mapper_cb _remap_cb) override;
 	virtual void map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -201,7 +201,7 @@ protected:
 		AS_PCI_CONFIG = 0
 	};
 
-	pci_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pci_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -232,7 +232,7 @@ private:
 
 class agp_bridge_device : public pci_bridge_device {
 protected:
-	agp_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	agp_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -243,7 +243,7 @@ public:
 	void io_configuration_access_map(address_map &map);
 
 protected:
-	pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t config_address_r();
 	void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -271,7 +271,7 @@ protected:
 
 class pci_root_device : public device_t {
 public:
-	pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

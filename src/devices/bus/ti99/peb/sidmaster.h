@@ -24,7 +24,7 @@ namespace bus::ti99::peb {
 class sidmaster_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
-	sidmaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sidmaster_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void readz(offs_t offset, uint8_t *value) override { };  // No read
 	void write(offs_t offset, uint8_t data) override;
 

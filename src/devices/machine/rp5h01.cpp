@@ -32,7 +32,7 @@ uint8_t const rp5h01_device::s_initial_data[0x10] =
 
 DEFINE_DEVICE_TYPE(RP5H01, rp5h01_device, "rp5h01", "RP5H01 6/7-bit Counter")
 
-rp5h01_device::rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rp5h01_device::rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RP5H01, tag, owner, clock)
 	, m_data(nullptr)
 	, m_rom(*this, DEVICE_SELF)

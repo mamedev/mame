@@ -50,7 +50,7 @@ DEFINE_DEVICE_TYPE(V25, v25_device, "v25", "NEC V25")
 DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "NEC V35")
 
 
-v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
+v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 9, 0, address_map_constructor(FUNC(v25_common_device::ida_sfr_map), this))
@@ -72,13 +72,13 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 }
 
 
-v25_device::v25_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+v25_device::v25_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: v25_common_device(mconfig, V25, tag, owner, clock, false, 4, 4, V20_TYPE)
 {
 }
 
 
-v35_device::v35_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+v35_device::v35_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: v25_common_device(mconfig, V35, tag, owner, clock, true, 6, 2, V30_TYPE)
 {
 }

@@ -34,7 +34,7 @@ class dac76_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	dac76_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dac76_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// chord
 	DECLARE_WRITE_LINE_MEMBER(b1_w) { m_chord &= ~(1 << 2); m_chord |= (state << 2); }

@@ -98,7 +98,7 @@ INPUT_PORTS_END
 
 void vtech_storio_state::vtech_storio_base(machine_config &config)
 {
-	ARM9(config, m_maincpu, 240000000); // ARM926EJ-S CPU core (probably 240MHz, but not sure)
+	ARM9(config, m_maincpu, XTAL::u(240000000)); // ARM926EJ-S CPU core (probably 240MHz, but not sure)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

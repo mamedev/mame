@@ -434,8 +434,8 @@ void sb16_lle_device::device_add_mconfig(machine_config &config)
 	ymf262.add_route(2, "lspeaker", 1.00);
 	ymf262.add_route(3, "rspeaker", 1.00);
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_16BIT_R2R(config, m_ldac).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 
 	PC_JOY(config, m_joy);
 }
@@ -684,7 +684,7 @@ void sb16_lle_device::mpu401_w(offs_t offset, uint8_t data)
 
 }
 
-sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA16_SB16, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
 	m_ldac(*this, "ldac"),

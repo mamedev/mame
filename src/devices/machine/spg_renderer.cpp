@@ -6,13 +6,13 @@
 
 DEFINE_DEVICE_TYPE(SPG_RENDERER, spg_renderer_device, "spg_renderer", "SunPlus / GeneralPlus video rendering")
 
-spg_renderer_device::spg_renderer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+spg_renderer_device::spg_renderer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_space_read_cb(*this)
 {
 }
 
-spg_renderer_device::spg_renderer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spg_renderer_device::spg_renderer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	spg_renderer_device(mconfig, SPG_RENDERER, tag, owner, clock)
 {
 }

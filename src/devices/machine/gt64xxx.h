@@ -69,7 +69,7 @@ public:
 	virtual void device_post_load() override;
 
 protected:
-	gt64xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gt64xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	address_space *m_cpu_space;
 	virtual space_config_vector memory_space_config() const override;
@@ -155,14 +155,14 @@ private:
 class gt64010_device : public gt64xxx_device {
 public:
 	template <typename T>
-	gt64010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int irq_num)
+	gt64010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag, int irq_num)
 		: gt64010_device(mconfig, tag, owner, clock)
 	{
 		set_ids_host(0x11ab0146, 0x03, 0x00000000);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_irq_num(irq_num);
 	}
-	gt64010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	gt64010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: gt64xxx_device(mconfig, GT64010, tag, owner, clock) {}
 };
 
@@ -173,14 +173,14 @@ public:
 class gt64111_device : public gt64xxx_device {
 public:
 	template <typename T>
-	gt64111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int irq_num)
+	gt64111_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag, int irq_num)
 		: gt64111_device(mconfig, tag, owner, clock)
 	{
 		set_ids(0x414611ab, 0x10, 0x058000, 0x00000000);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_irq_num(irq_num);
 	}
-	gt64111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	gt64111_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: gt64xxx_device(mconfig, GT64111, tag, owner, clock) {}
 };
 

@@ -147,7 +147,7 @@
 #define FRAC_MASK       (FRAC_ONE - 1)
 
 
-upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
@@ -183,13 +183,13 @@ upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, 
 
 DEFINE_DEVICE_TYPE(UPD7759, upd7759_device, "upd7759", "NEC uPD7759")
 
-upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upd7759_device(mconfig, UPD7759, tag, owner, clock)
 {
 }
 
 
-upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: upd775x_device(mconfig, type, tag, owner, clock)
 	, m_drqcallback(*this)
 	, m_timer(nullptr)
@@ -199,12 +199,12 @@ upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, 
 
 DEFINE_DEVICE_TYPE(UPD7756, upd7756_device, "upd7756", "NEC uPD7756")
 
-upd7756_device::upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+upd7756_device::upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upd7756_device(mconfig, UPD7756, tag, owner, clock)
 {
 }
 
-upd7756_device::upd7756_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+upd7756_device::upd7756_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: upd775x_device(mconfig, type, tag, owner, clock)
 {
 }

@@ -69,7 +69,7 @@ public:
 	static constexpr uint16_t BURST = 0x0001;
 
 	// construction/destruction
-	i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void i960_stall()
 	{

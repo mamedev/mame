@@ -74,7 +74,7 @@ class pcf8583_device :
 	public device_nvram_interface
 {
 public:
-	pcf8583_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcf8583_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq() { return m_irq_cb.bind(); }
 

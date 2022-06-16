@@ -61,7 +61,7 @@ std::unique_ptr<util::disasm_interface> epg3231_device::create_disassembler()
 	return std::make_unique<epg3231_disassembler>();
 }
 
-riscii_series_device::riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs)
+riscii_series_device::riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, unsigned addrbits, unsigned pcbits, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, addrbits, -1)
 	, m_regs_config("register", ENDIANNESS_LITTLE, 8, 8 + bankbits, 0, regs)
@@ -175,7 +175,7 @@ void epg3231_device::regs_map(address_map &map)
 	map(0x0050, 0x007f).ram();
 }
 
-epg3231_device::epg3231_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+epg3231_device::epg3231_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: riscii_series_device(mconfig, EPG3231, tag, owner, clock, 22, 18, 5, 0x1f, 0xbb,
 		address_map_constructor(FUNC(epg3231_device::regs_map), this))
 {

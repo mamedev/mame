@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(NVRAM, nvram_device, "nvram", "NVRAM")
 //  nvram_device - constructor
 //-------------------------------------------------
 
-nvram_device::nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nvram_device::nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NVRAM, tag, owner, clock),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),

@@ -334,7 +334,7 @@ void usgames_state::usg32(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8912(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8912(config, "aysnd", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
 void usgames_state::usg185(machine_config &config)

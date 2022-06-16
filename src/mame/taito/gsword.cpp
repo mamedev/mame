@@ -993,7 +993,7 @@ void gsword_state::gsword(machine_config &config)
 	mcu3.t1_in_cb().set_ioport("COINS").bit(1);
 
 	// clock unknown, using value from gladiatr
-	CLOCK(config, "tclk", 12'000'000/8/128/2).signal_handler().set([this] (int state) { m_tclk_val = state != 0; });
+	CLOCK(config, "tclk", XTAL::u(12'000'000)/8/128/2).signal_handler().set([this] (int state) { m_tclk_val = state != 0; });
 
 	// lazy way to ensure communication works
 	config.set_perfect_quantum("mcu1");
@@ -1017,7 +1017,7 @@ void gsword_state::gsword(machine_config &config)
 
 	AY8910(config, m_ay0, XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.30); // Clock verified on PCB
 
-	AY8910(config, m_ay1, 1500000);
+	AY8910(config, m_ay1, XTAL::u(1500000));
 	m_ay1->port_a_write_callback().set(FUNC(gsword_state::nmi_set_w));
 	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.30);
 
@@ -1077,11 +1077,11 @@ void josvolly_state::josvolly(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay0, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
-	AY8910(config, m_ay1, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8910(config, m_ay0, XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8910(config, m_ay1, XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 #if 0
-	MSM5205(config, "msm", 384000).add_route(ALL_OUTPUTS, "mono", 0.60);
+	MSM5205(config, "msm", XTAL::u(384000)).add_route(ALL_OUTPUTS, "mono", 0.60);
 #endif
 }
 

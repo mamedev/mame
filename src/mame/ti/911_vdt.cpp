@@ -141,7 +141,7 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 
 DEFINE_DEVICE_TYPE(VDT911, vdt911_device, "vdt911", "911 VDT")
 
-vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VDT911, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfx_vdt911, "palette")
 	, m_beeper(*this, "beeper")
@@ -795,7 +795,7 @@ void vdt911_device::device_add_mconfig(machine_config &config)
 	m_screen->set_palette("palette");
 
 	SPEAKER(config, "speaker").front_center();
-	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "speaker", 0.50);
+	BEEP(config, m_beeper, XTAL::u(3250)).add_route(ALL_OUTPUTS, "speaker", 0.50);
 
 	PALETTE(config, "palette", FUNC(vdt911_device::vdt911_palette), std::size(vdt911_pens), std::size(vdt911_colors));
 }

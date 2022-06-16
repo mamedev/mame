@@ -864,7 +864,7 @@ void gticlub_state::gticlub(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
-	ADC1038(config, m_adc1038, 0);
+	ADC1038(config, m_adc1038);
 	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
 	m_adc1038->set_gti_club_hack(true);
 
@@ -880,17 +880,17 @@ void gticlub_state::gticlub(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(65536);
 
-	K001604(config, m_k001604[0], 0);
+	K001604(config, m_k001604[0]);
 	m_k001604[0]->set_palette(m_palette);
 
-	K001005(config, m_k001005, 0, m_k001006[0]);
+	K001005(config, m_k001005, m_k001006[0]);
 
-	K001006(config, m_k001006[0], 0);
+	K001006(config, m_k001006[0]);
 	m_k001006[0]->set_gfx_region("textures");
 
 	// The second K001006 chip connects to the second K001005 chip.
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
-	K001006(config, m_k001006[1], 0);
+	K001006(config, m_k001006[1]);
 	m_k001006[1]->set_gfx_region("textures");
 
 	K056800(config, m_k056800, XTAL(33'868'800)/2);
@@ -903,7 +903,7 @@ void gticlub_state::gticlub(machine_config &config)
 	rfsnd.add_route(0, "lspeaker", 1.0);
 	rfsnd.add_route(1, "rspeaker", 1.0);
 
-	KONPPC(config, m_konppc, 0);
+	KONPPC(config, m_konppc);
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
 }
@@ -946,7 +946,7 @@ void gticlub_state::hangplt(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
-	ADC1038(config, m_adc1038, 0);
+	ADC1038(config, m_adc1038);
 	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
 
 	K056230(config, m_k056230);
@@ -970,8 +970,8 @@ void gticlub_state::hangplt(machine_config &config)
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
-	K033906(config, "k033906_1", 0, m_voodoo[0]);
-	K033906(config, "k033906_2", 0, m_voodoo[1]);
+	K033906(config, "k033906_1", m_voodoo[0]);
+	K033906(config, "k033906_2", m_voodoo[1]);
 
 	// video hardware
 	PALETTE(config, m_palette).set_entries(65536);
@@ -988,10 +988,10 @@ void gticlub_state::hangplt(machine_config &config)
 	rscreen.set_visarea(0, 511, 0, 383);
 	rscreen.set_screen_update(FUNC(gticlub_state::screen_update_two_screens<1>));
 
-	K001604(config, m_k001604[0], 0);
+	K001604(config, m_k001604[0]);
 	m_k001604[0]->set_palette(m_palette);
 
-	K001604(config, m_k001604[1], 0);
+	K001604(config, m_k001604[1]);
 	m_k001604[1]->set_palette(m_palette);
 
 	K056800(config, m_k056800, XTAL(33'868'800)/2);
@@ -1004,7 +1004,7 @@ void gticlub_state::hangplt(machine_config &config)
 	rfsnd.add_route(0, "lspeaker", 1.0);
 	rfsnd.add_route(1, "rspeaker", 1.0);
 
-	KONPPC(config, m_konppc, 0);
+	KONPPC(config, m_konppc);
 	m_konppc->set_num_boards(2);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_HANGPLT);
 }

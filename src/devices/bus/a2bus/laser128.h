@@ -25,13 +25,13 @@ class a2bus_laser128_device:
 {
 public:
 	// construction/destruction
-	a2bus_laser128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_laser128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// special config API
 	void set_parallel_printer(bool bPrinterIsParallel) { m_bParPrinter = bPrinterIsParallel; }
 
 protected:
-	a2bus_laser128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_laser128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -57,7 +57,7 @@ private:
 class a2bus_laser128_orig_device: public a2bus_laser128_device
 {
 public:
-	a2bus_laser128_orig_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_laser128_orig_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual uint8_t read_c800(uint16_t offset) override;

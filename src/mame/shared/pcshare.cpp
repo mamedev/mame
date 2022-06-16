@@ -147,7 +147,7 @@ void pcat_base_state::pcvideo_vga(machine_config &config)
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
 
-	vga_device &vga(VGA(config, "vga", 0));
+	vga_device &vga(VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x100000);
 }
@@ -158,7 +158,7 @@ void pcat_base_state::pcvideo_trident_vga(machine_config &config)
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(trident_vga_device::screen_update));
 
-	trident_vga_device &vga(TRIDENT_VGA(config, "vga", 0));
+	trident_vga_device &vga(TRIDENT_VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 }
@@ -169,7 +169,7 @@ void pcat_base_state::pcvideo_s3_vga(machine_config &config)
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3_vga_device::screen_update));
 
-	s3_vga_device &vga(S3_VGA(config, "vga", 0));
+	s3_vga_device &vga(S3_VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x100000);
 }
@@ -181,7 +181,7 @@ void pcat_base_state::pcvideo_cirrus_gd5428(machine_config &config)
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
 
-	cirrus_gd5428_device &vga(CIRRUS_GD5428(config, "vga", 0));
+	cirrus_gd5428_device &vga(CIRRUS_GD5428(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 
@@ -193,7 +193,7 @@ void pcat_base_state::pcvideo_cirrus_gd5430(machine_config &config)
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5430_device::screen_update));
 
-	cirrus_gd5430_device &vga(CIRRUS_GD5430(config, "vga", 0));
+	cirrus_gd5430_device &vga(CIRRUS_GD5430(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 
@@ -201,12 +201,12 @@ void pcat_base_state::pcvideo_cirrus_gd5430(machine_config &config)
 
 void pcat_base_state::pcat_common(machine_config &config)
 {
-	PIC8259(config, m_pic8259_1, 0);
+	PIC8259(config, m_pic8259_1);
 	m_pic8259_1->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic8259_1->in_sp_callback().set_constant(1);
 	m_pic8259_1->read_slave_ack_callback().set(FUNC(pcat_base_state::get_slave_ack));
 
-	PIC8259(config, m_pic8259_2, 0);
+	PIC8259(config, m_pic8259_2);
 	m_pic8259_2->out_int_callback().set(m_pic8259_1, FUNC(pic8259_device::ir2_w));
 	m_pic8259_2->in_sp_callback().set_constant(0);
 
@@ -221,7 +221,7 @@ void pcat_base_state::pcat_common(machine_config &config)
 
 	AM9517A(config, m_dma8237_2, 14.318181_MHz_XTAL / 3);
 
-	PIT8254(config, m_pit8254, 0);
+	PIT8254(config, m_pit8254);
 	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
 	m_pit8254->out_handler<0>().set(m_pic8259_1, FUNC(pic8259_device::ir0_w));
 	m_pit8254->set_clk<1>(4772720/4); // DRAM refresh
@@ -232,7 +232,7 @@ void pcat_base_state::pcat_common(machine_config &config)
 	m_mc146818->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
 	m_mc146818->set_century_index(0x32);
 
-	KBDC8042(config, m_kbdc, 0);
+	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	m_kbdc->gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);

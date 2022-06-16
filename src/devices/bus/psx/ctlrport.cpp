@@ -11,7 +11,7 @@ DEFINE_DEVICE_TYPE(PSX_CONTROLLER_PORT,     psx_controller_port_device,     "psx
 DEFINE_DEVICE_TYPE(PSXCONTROLLERPORTS,      psxcontrollerports_device,      "psxcontrollerports",      "Playstation Controller Bus")
 DEFINE_DEVICE_TYPE(PSX_STANDARD_CONTROLLER, psx_standard_controller_device, "psx_standard_controller", "Playstation Standard Controller")
 
-psx_controller_port_device::psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+psx_controller_port_device::psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PSX_CONTROLLER_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_psx_controller_interface>(mconfig, *this),
 	m_tx(false),
@@ -27,7 +27,7 @@ void psx_controller_port_device::device_config_complete()
 
 void psx_controller_port_device::device_add_mconfig(machine_config &config)
 {
-	PSXCARD(config, m_card, 0);
+	PSXCARD(config, m_card);
 }
 
 void psx_controller_port_device::disable_card(bool state)
@@ -38,7 +38,7 @@ void psx_controller_port_device::disable_card(bool state)
 	m_card->disable(state);
 }
 
-psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PSXCONTROLLERPORTS, tag, owner, clock),
 	m_port0(*this, "^port1"),
 	m_port1(*this, "^port2"),
@@ -177,7 +177,7 @@ void device_psx_controller_interface::sel_w(bool state) {
 	m_sel = state;
 }
 
-psx_standard_controller_device::psx_standard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+psx_standard_controller_device::psx_standard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PSX_STANDARD_CONTROLLER, tag, owner, clock),
 	device_psx_controller_interface(mconfig, *this),
 	m_pad0(*this, "PSXPAD0"),

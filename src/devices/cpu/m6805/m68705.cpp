@@ -214,7 +214,7 @@ Ux Parts:
 
 */
 
-m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size)
+m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, device_type type, u32 addr_width, unsigned ram_size)
 	: m6805_base_device(mconfig, tag, owner, clock, type, { addr_width > 13 ? s_hmos_b_ops : s_hmos_s_ops, s_hmos_cycles, addr_width, 0x007f, 0x0060, M6805_VECTOR_SWI }, address_map_constructor(FUNC(m6805_hmos_device::map), this))
 	, m_timer(*this)
 	, m_port_open_drain{ false, false, false, false }
@@ -228,7 +228,7 @@ m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *
 {
 }
 
-m68705_device::m68705_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size)
+m68705_device::m68705_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, device_type type, u32 addr_width, unsigned ram_size)
 	: m6805_hmos_device(mconfig, tag, owner, clock, type, addr_width, ram_size)
 	, device_nvram_interface(mconfig, *this)
 	, m_user_rom(*this, DEVICE_SELF)
@@ -634,7 +634,7 @@ void m68705p_device::internal_map(address_map &map)
 	map(0x07f8, 0x07ff).rw(FUNC(m68705p_device::eprom_r<0x07f8>), FUNC(m68705p_device::eprom_w<0x07f8>)); // Interrupt vectors
 }
 
-m68705p_device::m68705p_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock,  device_type type)
+m68705p_device::m68705p_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock,  device_type type)
 	: m68705_device(mconfig, tag, owner, clock, type, 11, 112)
 {
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
@@ -669,7 +669,7 @@ void m68705u_device::internal_map(address_map &map)
 	map(0x0ff8, 0x0fff).rw(FUNC(m68705u_device::eprom_r<0x0ff8>), FUNC(m68705u_device::eprom_w<0x0ff8>)); // Interrupt vectors
 }
 
-m68705u_device::m68705u_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type)
+m68705u_device::m68705u_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, device_type type)
 	: m68705_device(mconfig, tag, owner, clock, type, 12, 112)
 {
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
@@ -705,7 +705,7 @@ void m68705r_device::internal_map(address_map &map)
 	map(0x0ff8, 0x0fff).rw(FUNC(m68705r_device::eprom_r<0x0ff8>), FUNC(m68705r_device::eprom_w<0x0ff8>)); // Interrupt vectors
 }
 
-m68705r_device::m68705r_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type)
+m68705r_device::m68705r_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, device_type type)
 	: m68705u_device(mconfig, tag, owner, clock, type)
 {
 }
@@ -726,7 +726,7 @@ std::unique_ptr<util::disasm_interface> m68705r_device::create_disassembler()
  * M68705P3 device
  ****************************************************************************/
 
-m68705p3_device::m68705p3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m68705p3_device::m68705p3_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: m68705p_device(mconfig, tag, owner, clock, M68705P3)
 {
 }
@@ -746,7 +746,7 @@ u8 m68705p3_device::get_mask_options() const
  * M68705P5 device
  ****************************************************************************/
 
-m68705p5_device::m68705p5_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m68705p5_device::m68705p5_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: m68705p_device(mconfig, tag, owner, clock, M68705P5)
 {
 }
@@ -766,7 +766,7 @@ u8 m68705p5_device::get_mask_options() const
  * M68705R3 device
  ****************************************************************************/
 
-m68705r3_device::m68705r3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m68705r3_device::m68705r3_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: m68705r_device(mconfig, tag, owner, clock, M68705R3)
 {
 }
@@ -786,7 +786,7 @@ u8 m68705r3_device::get_mask_options() const
  * M68705U3 device
  ****************************************************************************/
 
-m68705u3_device::m68705u3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m68705u3_device::m68705u3_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: m68705u_device(mconfig, tag, owner, clock, M68705U3)
 {
 }
@@ -801,7 +801,7 @@ u8 m68705u3_device::get_mask_options() const
 	return get_user_rom()[0x0f38] & 0xf7; // no SNM bit
 }
 
-m6805p2_device::m6805p2_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m6805p2_device::m6805p2_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: m6805_mrom_device(mconfig, tag, owner, clock, M6805P2, 11, 64)
 {
 	/*
@@ -816,7 +816,7 @@ m6805p2_device::m6805p2_device(machine_config const &mconfig, char const *tag, d
 	set_port_mask<3>(0xff); // Port D isn't present
 }
 
-m6805p6_device::m6805p6_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m6805p6_device::m6805p6_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: m6805_mrom_device(mconfig, tag, owner, clock, M6805P6, 11, 64)
 {
 	m_timer.set_options(m6805_timer::TIMER_MOR /* | m6805::TIMER_NPC */);
@@ -826,33 +826,33 @@ m6805p6_device::m6805p6_device(machine_config const &mconfig, char const *tag, d
 	set_port_mask<3>(0xff); // Port D isn't present
 }
 
-m6805r2_device::m6805r2_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m6805r2_device::m6805r2_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: m6805_mrom_device(mconfig, tag, owner, clock, M6805R2, 12, 64)
 {
 	m_timer.set_options(m6805_timer::TIMER_MOR);
 	m_timer.set_source(m6805_timer::CLOCK_TIMER);
 }
 
-m6805r3_device::m6805r3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m6805r3_device::m6805r3_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: m6805_mrom_device(mconfig, tag, owner, clock, M6805R3, 12, 112)
 {
 	m_timer.set_options(m6805_timer::TIMER_PGM);
 }
 
-m6805u2_device::m6805u2_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m6805u2_device::m6805u2_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: m6805_mrom_device(mconfig, tag, owner, clock, M6805U2, 12, 64)
 {
 	m_timer.set_options(m6805_timer::TIMER_MOR);
 	m_timer.set_source(m6805_timer::CLOCK_TIMER);
 }
 
-m6805u3_device::m6805u3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+m6805u3_device::m6805u3_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: m6805_mrom_device(mconfig, tag, owner, clock, M6805U3, 12, 112)
 {
 	m_timer.set_options(m6805_timer::TIMER_PGM);
 }
 
-hd6805s1_device::hd6805s1_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+hd6805s1_device::hd6805s1_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: m6805_mrom_device(mconfig, tag, owner, clock, HD6805S1, 11, 64)
 {
 	m_timer.set_options(m6805_timer::TIMER_NPC);
@@ -861,7 +861,7 @@ hd6805s1_device::hd6805s1_device(machine_config const &mconfig, char const *tag,
 	set_port_mask<3>(0xff); // Port D isn't present
 }
 
-hd6805u1_device::hd6805u1_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+hd6805u1_device::hd6805u1_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: m6805_mrom_device(mconfig, tag, owner, clock, HD6805U1, 12, 96)
 {
 	// Port D has optional analog comparator but no INT2 (no MISC register, either)

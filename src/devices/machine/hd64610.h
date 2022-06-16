@@ -34,7 +34,7 @@ class hd64610_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq() { return m_out_irq_cb.bind(); }
 	auto clkout() { return m_out_1hz_cb.bind(); }

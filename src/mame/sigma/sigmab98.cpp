@@ -1431,7 +1431,7 @@ INTERRUPT_GEN_MEMBER(sigmab98_state::sigmab98_vblank_interrupt)
 
 void sigmab98_state::sigmab98(machine_config &config)
 {
-	KY80(config, m_maincpu, 20000000);  // !! TAXAN KY-80, clock @X1? !!
+	KY80(config, m_maincpu, XTAL::u(20000000));  // !! TAXAN KY-80, clock @X1? !!
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::gegege_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::gegege_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sigmab98_state::sigmab98_vblank_interrupt));
@@ -1460,7 +1460,7 @@ void sigmab98_state::sigmab98(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));    // clock @X2?
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL::u(16934400)));    // clock @X2?
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }
@@ -1499,7 +1499,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM (TC55257DFL-70L)
 	// No EEPROM
 
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 
 	// 2 x 8-bit parallel/serial converters

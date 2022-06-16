@@ -20,13 +20,13 @@ class spg2xx_sysdma_device : public device_t
 {
 public:
 	template <typename T>
-	spg2xx_sysdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	spg2xx_sysdma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag)
 		: spg2xx_sysdma_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	spg2xx_sysdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg2xx_sysdma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	uint16_t dma_r(offs_t offset);
 	void dma_w(offs_t offset, uint16_t data);
 

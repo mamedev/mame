@@ -94,7 +94,7 @@ void sega_16bit_sprite_device::draw_write(uint16_t data)
 //  sega_hangon_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_hangon_sprite_device::sega_hangon_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_hangon_sprite_device::sega_hangon_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_HANGON_SPRITES, tag, owner)
 	, m_sprite_region_ptr(*this, DEVICE_SELF)
 {
@@ -271,7 +271,7 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 //  sega_sharrier_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_sharrier_sprite_device::sega_sharrier_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_sharrier_sprite_device::sega_sharrier_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SHARRIER_SPRITES, tag, owner)
 	, m_sprite_region_ptr(*this, DEVICE_SELF)
 {
@@ -459,7 +459,7 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 //  sega_sys16a_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_sys16a_sprite_device::sega_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_sys16a_sprite_device::sega_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SYS16A_SPRITES, tag, owner)
 	, m_sprite_region_ptr(*this, DEVICE_SELF)
 {
@@ -639,7 +639,7 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 //  bootleg_sys16a_sprite_device -- constructor
 //-------------------------------------------------
 
-bootleg_sys16a_sprite_device::bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bootleg_sys16a_sprite_device::bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_16bit_sprite_device(mconfig, BOOTLEG_SYS16A_SPRITES, tag, owner)
 	, m_sprite_region_ptr(*this, DEVICE_SELF)
 {
@@ -827,7 +827,7 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 //  sega_sys16b_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_sys16b_sprite_device::sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_sys16b_sprite_device::sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SYS16B_SPRITES, tag, owner)
 	, m_sprite_region_ptr(*this, DEVICE_SELF)
 {
@@ -1023,12 +1023,12 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 //  sega_outrun_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_outrun_sprite_device(mconfig, SEGA_OUTRUN_SPRITES, tag, owner, clock, false)
 {
 }
 
-sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool xboard_variant)
+sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool xboard_variant)
 	: sega_16bit_sprite_device(mconfig, type, tag, owner)
 	, m_is_xboard(xboard_variant)
 	, m_sprite_region_ptr(*this, DEVICE_SELF)
@@ -1041,7 +1041,7 @@ sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconf
 //  sega_xboard_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_xboard_sprite_device::sega_xboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_xboard_sprite_device::sega_xboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_outrun_sprite_device(mconfig, SEGA_XBOARD_SPRITES, tag, owner, clock, true)
 {
 }
@@ -1226,7 +1226,7 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 //  sega_yboard_sprite_device -- constructor
 //-------------------------------------------------
 
-sega_yboard_sprite_device::sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_yboard_sprite_device::sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_YBOARD_SPRITES, tag, owner)
 	, m_sprite_region_ptr(*this, DEVICE_SELF)
 {

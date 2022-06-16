@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(DIAG264_CASSETTE_LOOPBACK, diag264_cassette_loopback_device, 
 //  diag264_cassette_loopback_device - constructor
 //-------------------------------------------------
 
-diag264_cassette_loopback_device::diag264_cassette_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+diag264_cassette_loopback_device::diag264_cassette_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DIAG264_CASSETTE_LOOPBACK, tag, owner, clock)
 	, device_pet_datassette_port_interface(mconfig, *this)
 	, m_read(1)

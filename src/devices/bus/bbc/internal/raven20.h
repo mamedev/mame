@@ -23,7 +23,7 @@ class bbc_raven20_device :
 {
 public:
 	// construction/destruction
-	bbc_raven20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_raven20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -171,7 +171,7 @@ void aw_rom_board::submap(address_map &map)
 	map(0x40, 0x41).rw(FUNC(aw_rom_board::pio_r), FUNC(aw_rom_board::pio_w));
 }
 
-aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: naomi_g1_device(mconfig, AW_ROM_BOARD, tag, owner, clock)
 	, m_region(*this, DEVICE_SELF)
 {

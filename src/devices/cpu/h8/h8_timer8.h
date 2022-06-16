@@ -29,10 +29,10 @@ public:
 		DIV
 	};
 
-	h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int irq_ca, int irq_cb, int irq_v,
 				int div1, int div2, int div3, int div4, int div5, int div6)
-		: h8_timer8_channel_device(mconfig, tag, owner, 0)
+		: h8_timer8_channel_device(mconfig, tag, owner)
 	{
 		set_info(intc, irq_ca, irq_cb, irq_v, div1, div2, div3, div4, div5, div6);
 	}
@@ -88,7 +88,7 @@ protected:
 	int clock_type, clock_divider, clear_type, counter_cycle;
 	uint64_t last_clock_update, event_time;
 
-	h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -102,10 +102,10 @@ protected:
 
 class h8h_timer8_channel_device : public h8_timer8_channel_device {
 public:
-	h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int irq_ca, int irq_cb, int irq_v,
 				const char *chain_tag, int chain_type, bool has_adte, bool has_ice)
-		: h8h_timer8_channel_device(mconfig, tag, owner, 0)
+		: h8h_timer8_channel_device(mconfig, tag, owner)
 	{
 		set_info(intc, irq_ca, irq_cb, irq_v, chain_tag, chain_type, has_adte, has_ice);
 	}

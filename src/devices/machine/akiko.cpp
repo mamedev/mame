@@ -63,7 +63,7 @@ void akiko_device::device_add_mconfig(machine_config &config)
 //  akiko_device - constructor
 //-------------------------------------------------
 
-akiko_device::akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+akiko_device::akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AKIKO, tag, owner, clock)
 	, m_c2p_input_index(0)
 	, m_c2p_output_index(0)

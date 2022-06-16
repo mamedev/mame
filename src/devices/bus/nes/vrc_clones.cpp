@@ -44,77 +44,77 @@ DEFINE_DEVICE_TYPE(NES_WAIXING_SGZ, nes_waixing_sgz_device, "nes_waixing_sgz", "
 DEFINE_DEVICE_TYPE(NES_HENGG_SHJY3, nes_hengg_shjy3_device, "nes_hengg_shjy3", "NES Cart Henggedianzi Shen Hua Jian Yun III PCB")
 
 
-nes_2yudb_device::nes_2yudb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_2yudb_device::nes_2yudb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_konami_vrc4_device(mconfig, NES_2YUDB, tag, owner, clock), m_outer(0)
 {
 }
 
-nes_900218_device::nes_900218_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_900218_device::nes_900218_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_konami_vrc2_device(mconfig, NES_900218, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
 
-nes_ax40g_device::nes_ax40g_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ax40g_device::nes_ax40g_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_konami_vrc2_device(mconfig, NES_AX40G, tag, owner, clock)
 {
 }
 
-nes_ax5705_device::nes_ax5705_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ax5705_device::nes_ax5705_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_konami_vrc4_device(mconfig, NES_AX5705, tag, owner, clock)
 {
 }
 
-nes_bmc_830506c_device::nes_bmc_830506c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_830506c_device::nes_bmc_830506c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_konami_vrc4_device(mconfig, NES_BMC_830506C, tag, owner, clock), m_outer(0)
 {
 }
 
-nes_bmc_831128c_device::nes_bmc_831128c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_831128c_device::nes_bmc_831128c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_konami_vrc4_device(mconfig, NES_BMC_831128C, tag, owner, clock), m_reg(0)
 {
 }
 
-nes_bmc_kl06_device::nes_bmc_kl06_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bmc_kl06_device::nes_bmc_kl06_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_konami_vrc4_device(mconfig, NES_BMC_KL06, tag, owner, clock), m_reg(0)
 {
 }
 
-nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_konami_vrc4_device(mconfig, NES_CITYFIGHT, tag, owner, clock)
 {
 }
 
-nes_shuiguan_device::nes_shuiguan_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_shuiguan_device::nes_shuiguan_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_konami_vrc4_device(mconfig, NES_SHUIGUAN, tag, owner, clock)
 {
 }
 
-nes_t230_device::nes_t230_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_t230_device::nes_t230_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_konami_vrc4_device(mconfig, NES_T230, tag, owner, clock)
 {
 }
 
-nes_tf1201_device::nes_tf1201_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_tf1201_device::nes_tf1201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_konami_vrc4_device(mconfig, NES_TF1201, tag, owner, clock)
 {
 }
 
-nes_th21311_device::nes_th21311_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_th21311_device::nes_th21311_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_konami_vrc2_device(mconfig, NES_TH21311, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
 
-nes_waixing_sgz_device::nes_waixing_sgz_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 chr_match)
+nes_waixing_sgz_device::nes_waixing_sgz_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 chr_match)
 	: nes_konami_vrc4_device(mconfig, type, tag, owner, clock), m_chr_match(chr_match)
 {
 }
 
-nes_waixing_sgz_device::nes_waixing_sgz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_waixing_sgz_device::nes_waixing_sgz_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_sgz_device(mconfig, NES_WAIXING_SGZ, tag, owner, clock, 0x06)
 {
 }
 
-nes_hengg_shjy3_device::nes_hengg_shjy3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_hengg_shjy3_device::nes_hengg_shjy3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_sgz_device(mconfig, NES_HENGG_SHJY3, tag, owner, clock, 0x04)
 {
 }

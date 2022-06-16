@@ -29,7 +29,7 @@ void oric_microdisc_device::map(address_map &map)
 	map(0x318, 0x318).r(FUNC(oric_microdisc_device::port_318_r));
 }
 
-oric_microdisc_device::oric_microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+oric_microdisc_device::oric_microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ORIC_MICRODISC, tag, owner, clock),
 	device_oricext_interface(mconfig, *this),
 	fdc(*this, "fdc"), microdisc_rom(nullptr),

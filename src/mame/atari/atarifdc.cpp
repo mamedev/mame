@@ -741,7 +741,7 @@ static const floppy_interface atari_floppy_interface =
 
 DEFINE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device, "atari_fdc", "Atari FDC")
 
-atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ATARI_FDC, tag, owner, clock),
 	m_floppy(*this, "floppy%u", 0U),
 	m_pokey(*this, "^pokey"),
@@ -778,5 +778,5 @@ void atari_fdc_device::device_start()
 void atari_fdc_device::device_add_mconfig(machine_config &config)
 {
 	for (auto &floppy : m_floppy)
-		LEGACY_FLOPPY(config, floppy, 0, &atari_floppy_interface);
+		LEGACY_FLOPPY(config, floppy, &atari_floppy_interface);
 }

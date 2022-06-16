@@ -178,7 +178,7 @@ Rowscroll style:
 
 DEFINE_DEVICE_TYPE(DECO16IC, deco16ic_device, "deco16ic", "DECO 55 / 56 / 74 / 141 Tilemap Generator")
 
-deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DECO16IC, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_pf1_data(nullptr)

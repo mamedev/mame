@@ -28,7 +28,7 @@ class gtia_device :  public device_t
 {
 public:
 	// construction/destruction
-	gtia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gtia_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_region(gtia_region region) { m_region = region; }
 	auto read_callback() { return m_read_cb.bind(); }

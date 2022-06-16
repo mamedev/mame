@@ -423,7 +423,7 @@ void sym1_state::sym1(machine_config &config)
 	riot.pb_rd_callback().set(FUNC(sym1_state::riot_b_r));
 	riot.pb_wr_callback().set(FUNC(sym1_state::riot_b_w));
 
-	TTL74145(config, m_ttl74145, 0);
+	TTL74145(config, m_ttl74145);
 	m_ttl74145->output_line_callback<0>().set(FUNC(sym1_state::sym1_74145_output_0_w));
 	m_ttl74145->output_line_callback<1>().set(FUNC(sym1_state::sym1_74145_output_1_w));
 	m_ttl74145->output_line_callback<2>().set(FUNC(sym1_state::sym1_74145_output_2_w));
@@ -445,7 +445,7 @@ void sym1_state::sym1(machine_config &config)
 	via3.writepa_handler().set(FUNC(sym1_state::via3_a_w));
 	via3.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	input_merger_device &merger(INPUT_MERGER_ANY_HIGH(config, "mainirq", 0)); // wire-or connection
+	input_merger_device &merger(INPUT_MERGER_ANY_HIGH(config, "mainirq")); // wire-or connection
 	merger.output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	RS232_PORT(config, "crt", default_rs232_devices, nullptr);

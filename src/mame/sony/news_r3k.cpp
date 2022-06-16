@@ -194,7 +194,7 @@ void news_r3k_state::init_common()
 	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
 
 	// HACK: hardwire the rate until fdc is better understood
-	m_fdc->set_rate(500000);
+	m_fdc->set_rate(XTAL::u(500000));
 
 	// HACK: signal floppy density?
 	m_scsi->port_w(0x02);
@@ -412,7 +412,7 @@ void news_r3k_state::common(machine_config &config)
 	// TODO: confirm each bank supports 4x1M or 4x4M
 	m_ram->set_extra_options("4M,8M,12M,20M,24M,32M,36M,48M");
 
-	DMAC_0448(config, m_dma, 0);
+	DMAC_0448(config, m_dma);
 	m_dma->set_bus(m_cpu, 0);
 	m_dma->out_int_cb().set(FUNC(news_r3k_state::irq_w<DMA>));
 	m_dma->dma_r_cb<1>().set(m_fdc, FUNC(upd72067_device::dma_r));
@@ -481,7 +481,7 @@ void news_r3k_state::common(machine_config &config)
 		});
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);
-	m_lcd->set_raw(52416000, 1120, 0, 1120, 780, 0, 780);
+	m_lcd->set_raw(XTAL::u(52416000), 1120, 0, 1120, 780, 0, 780);
 	m_lcd->set_screen_update(FUNC(news_r3k_state::screen_update));
 
 	NEWS_HID_HLE(config, m_hid);

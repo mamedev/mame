@@ -33,7 +33,7 @@ INPUT_PORTS_START( hle_hp_46060b_device )
 INPUT_PORTS_END
 } // anonymous namespace
 
-hle_hp_46060b_device::hle_hp_46060b_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+hle_hp_46060b_device::hle_hp_46060b_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: hle_device_base(mconfig, HP_46060B_MOUSE, tag, owner, clock),
 	mouse_x_delta{0},
 	mouse_y_delta{0},

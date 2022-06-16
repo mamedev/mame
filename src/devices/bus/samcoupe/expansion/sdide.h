@@ -25,7 +25,7 @@ class sam_sdide_device : public device_t, public device_samcoupe_expansion_inter
 {
 public:
 	// construction/destruction
-	sam_sdide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sam_sdide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// from host
 	virtual uint8_t iorq_r(offs_t offset) override;

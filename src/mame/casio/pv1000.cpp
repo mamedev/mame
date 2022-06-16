@@ -22,7 +22,7 @@ class pv1000_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void voice_w(offs_t offset, uint8_t data);
 
@@ -48,7 +48,7 @@ private:
 
 DEFINE_DEVICE_TYPE(PV1000, pv1000_sound_device, "pv1000_sound", "NEC D65010G031")
 
-pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PV1000, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {
@@ -441,13 +441,13 @@ GFXDECODE_END
 
 void pv1000_state::pv1000(machine_config &config)
 {
-	Z80(config, m_maincpu, 17897725/5);
+	Z80(config, m_maincpu, XTAL::u(17897725)/5);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pv1000_state::pv1000_mem);
 	m_maincpu->set_addrmap(AS_IO, &pv1000_state::pv1000_io);
 
 	/* D65010G031 - Video & sound chip */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(17897725/3, 380, 0, 256, 262, 0, 192);
+	m_screen->set_raw(XTAL::u(17897725)/3, 380, 0, 256, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(pv1000_state::screen_update_pv1000));
 	m_screen->set_palette(m_palette);
 
@@ -456,7 +456,7 @@ void pv1000_state::pv1000(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pv1000);
 
 	SPEAKER(config, "mono").front_center();
-	PV1000(config, m_sound, 17897725).add_route(ALL_OUTPUTS, "mono", 1.00);
+	PV1000(config, m_sound, XTAL::u(17897725)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* Cartridge slot */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "pv1000_cart"));

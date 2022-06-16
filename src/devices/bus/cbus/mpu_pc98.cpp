@@ -54,7 +54,7 @@ void mpu_pc98_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-mpu_pc98_device::mpu_pc98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mpu_pc98_device::mpu_pc98_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MPU_PC98, tag, owner, clock)
 	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_mpu401(*this, MPU_CORE_TAG)

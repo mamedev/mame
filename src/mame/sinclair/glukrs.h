@@ -13,7 +13,7 @@ class glukrs_device : public device_t,
 					  public device_rtc_interface
 {
 public:
-	glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32'768);
+	glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = 32'768);
 
 	void enable() { m_glukrs_active = true; }
 	void disable() { m_glukrs_active = false; }

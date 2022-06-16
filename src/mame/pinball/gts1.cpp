@@ -442,7 +442,7 @@ void gts1_state::gts1_solenoid_w(offs_t offset, u8 data)
 	case  2:  // tens chime
 		if (m_p1_sound)
 		{
-			m_p1_sound->set_clock(593);
+			m_p1_sound->set_clock(XTAL::u(593));
 			m_p1_sound->set_state(data);
 		}
 		else
@@ -455,7 +455,7 @@ void gts1_state::gts1_solenoid_w(offs_t offset, u8 data)
 	case  3:  // hundreds chime
 		if (m_p1_sound)
 		{
-			m_p1_sound->set_clock(265);
+			m_p1_sound->set_clock(XTAL::u(265));
 			m_p1_sound->set_state(data);
 		}
 		else
@@ -468,7 +468,7 @@ void gts1_state::gts1_solenoid_w(offs_t offset, u8 data)
 	case  4:  // thousands chime
 		if (m_p1_sound)
 		{
-			m_p1_sound->set_clock(153);
+			m_p1_sound->set_clock(XTAL::u(153));
 			m_p1_sound->set_state(data);
 		}
 		else
@@ -751,24 +751,24 @@ void gts1_state::p0(machine_config & config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* A1753CE 2048 x 8 ROM (000-7ff), 128 x 4 RAM (00-7f) and 16 I/O lines (20 ... 2f) */
-	ra17xx_device &u5(RA17XX(config, "u5", 0));
+	ra17xx_device &u5(RA17XX(config, "u5"));
 	u5.iord_cb().set(FUNC(gts1_state::gts1_switches_r));
 	u5.iowr_cb().set(FUNC(gts1_state::gts1_switches_w));
 	u5.set_cpu_tag(m_maincpu);
 
 	/* A1752CF 2048 x 8 ROM (800-fff), 128 x 4 RAM (80-ff) and 16 I/O lines (40 ... 4f) */
-	ra17xx_device &u4(RA17XX(config, "u4", 0));
+	ra17xx_device &u4(RA17XX(config, "u4"));
 	u4.iord_cb().set(FUNC(gts1_state::gts1_solenoid_r));
 	u4.iowr_cb().set(FUNC(gts1_state::gts1_solenoid_w));
 	u4.set_cpu_tag(m_maincpu);
 
 	/* 10696 General Purpose Input/Output */
-	r10696_device &u2(R10696(config, "u2", 0));
+	r10696_device &u2(R10696(config, "u2"));
 	u2.iord_cb().set(FUNC(gts1_state::gts1_nvram_r));
 	u2.iowr_cb().set(FUNC(gts1_state::gts1_nvram_w));
 
 	/* 10696 General Purpose Input/Output */
-	r10696_device &u3(R10696(config, "u3", 0));
+	r10696_device &u3(R10696(config, "u3"));
 	u3.iord_cb().set(FUNC(gts1_state::gts1_lamp_apm_r));
 	u3.iowr_cb().set(FUNC(gts1_state::gts1_lamp_apm_w));
 
@@ -787,14 +787,14 @@ void gts1_state::p1(machine_config &config)
 {
 	p0(config);
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_p1_sound, 387).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_p1_sound, XTAL::u(387)).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void gts1_state::p2(machine_config &config)
 {
 	p0(config);
 	SPEAKER(config, "mono").front_center();
-	GOTTLIEB_SOUND_PIN2(config, m_p2_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	GOTTLIEB_SOUND_PIN2(config, m_p2_sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

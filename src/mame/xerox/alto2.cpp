@@ -292,8 +292,8 @@ void alto2_state::alto2(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	DIABLO_HD(config, DIABLO_HD_0, 3333333);
-	DIABLO_HD(config, DIABLO_HD_1, 3333333);
+	DIABLO_HD(config, DIABLO_HD_0, XTAL::u(3333333));
+	DIABLO_HD(config, DIABLO_HD_1, XTAL::u(3333333));
 }
 
 void alto2_state::driver_start()

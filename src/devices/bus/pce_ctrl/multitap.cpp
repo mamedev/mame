@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(PCE_MULTITAP, pce_multitap_device, "pce_multitap", "NEC PC En
 //  pce_multitap_device - constructor
 //-------------------------------------------------
 
-pce_multitap_device::pce_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+pce_multitap_device::pce_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PCE_MULTITAP, tag, owner, clock),
 	device_pce_control_port_interface(mconfig, *this),
 	m_subctrl_port(*this, "ctrl%u", 1U),

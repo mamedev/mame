@@ -207,9 +207,9 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	uint32_t s3c240x_get_fclk(int reg);
-	uint32_t s3c240x_get_hclk(int reg);
-	uint32_t s3c240x_get_pclk(int reg);
+	XTAL s3c240x_get_fclk(int reg);
+	XTAL s3c240x_get_hclk(int reg);
+	XTAL s3c240x_get_pclk(int reg);
 	void s3c240x_lcd_dma_reload();
 	void s3c240x_lcd_dma_init();
 	void s3c240x_lcd_configure();

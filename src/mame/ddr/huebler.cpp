@@ -358,7 +358,7 @@ void amu880_state::amu880(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(amu880_state::screen_update));
-	screen.set_raw(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10);
+	screen.set_raw(XTAL::u(9000000), 576, 0*6, 64*6, 320, 0*10, 24*10);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_amu880);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);

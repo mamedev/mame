@@ -817,7 +817,7 @@ void thayers_state::thayers(machine_config &config)
 	mcu.write_so().set(FUNC(thayers_state::kbclk_w));
 
 	/* video hardware */
-	PIONEER_PR7820(config, m_pr7820, 0);
+	PIONEER_PR7820(config, m_pr7820);
 	m_pr7820->set_screen("screen");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

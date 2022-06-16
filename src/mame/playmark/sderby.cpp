@@ -807,7 +807,7 @@ GFXDECODE_END
 
 void sderby_state::sderby(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sderby_state::sderby_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq2_line_hold));
 
@@ -825,12 +825,12 @@ void sderby_state::sderby(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 void sderby_state::sderbya(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sderby_state::sderbya_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq2_line_hold));
 
@@ -848,12 +848,12 @@ void sderby_state::sderbya(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 void sderby_state::luckboom(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sderby_state::luckboom_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq4_line_hold));
 
@@ -871,12 +871,12 @@ void sderby_state::luckboom(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 void sderby_state::spacewin(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sderby_state::spacewin_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq2_line_hold));
 
@@ -894,7 +894,7 @@ void sderby_state::spacewin(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 void sderby_state::shinygld(machine_config &config)
@@ -922,7 +922,7 @@ void sderby_state::shinygld(machine_config &config)
 
 void sderby_state::pmroulet(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sderby_state::roulette_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sderby_state::irq2_line_hold));
 
@@ -940,7 +940,7 @@ void sderby_state::pmroulet(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 void sderby_state::magictch(machine_config &config)

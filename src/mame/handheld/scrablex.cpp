@@ -181,7 +181,7 @@ INPUT_PORTS_END
 void scrablex_state::scrablex(machine_config &config)
 {
 	// basic machine hardware
-	MB8841(config, m_maincpu, 500000); // approximation - RC osc. R=15K, C=100pF
+	MB8841(config, m_maincpu, XTAL::u(500000)); // approximation - RC osc. R=15K, C=100pF
 	m_maincpu->write_o().set(FUNC(scrablex_state::write_o));
 	m_maincpu->write_p().set(FUNC(scrablex_state::write_p));
 	m_maincpu->read_r<0>().set(FUNC(scrablex_state::read_r<0>));

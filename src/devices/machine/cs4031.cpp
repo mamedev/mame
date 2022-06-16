@@ -96,7 +96,7 @@ const float cs4031_device::m_dma_clock_divider[] =
 
 void cs4031_device::device_add_mconfig(machine_config &config)
 {
-	AM9517A(config, m_dma1, 0);
+	AM9517A(config, m_dma1);
 	m_dma1->out_hreq_callback().set(m_dma2, FUNC(am9517a_device::dreq0_w));
 	m_dma1->out_eop_callback().set(FUNC(cs4031_device::dma1_eop_w));
 	m_dma1->in_memr_callback().set(FUNC(cs4031_device::dma_read_byte));
@@ -114,7 +114,7 @@ void cs4031_device::device_add_mconfig(machine_config &config)
 	m_dma1->out_dack_callback<2>().set(FUNC(cs4031_device::dma1_dack2_w));
 	m_dma1->out_dack_callback<3>().set(FUNC(cs4031_device::dma1_dack3_w));
 
-	AM9517A(config, m_dma2, 0);
+	AM9517A(config, m_dma2);
 	m_dma2->out_hreq_callback().set(FUNC(cs4031_device::dma2_hreq_w));
 	m_dma2->in_memr_callback().set(FUNC(cs4031_device::dma_read_word));
 	m_dma2->out_memw_callback().set(FUNC(cs4031_device::dma_write_word));
@@ -129,16 +129,16 @@ void cs4031_device::device_add_mconfig(machine_config &config)
 	m_dma2->out_dack_callback<2>().set(FUNC(cs4031_device::dma2_dack2_w));
 	m_dma2->out_dack_callback<3>().set(FUNC(cs4031_device::dma2_dack3_w));
 
-	PIC8259(config, m_intc1, 0);
+	PIC8259(config, m_intc1);
 	m_intc1->out_int_callback().set(FUNC(cs4031_device::intc1_int_w));
 	m_intc1->in_sp_callback().set_constant(1);
 	m_intc1->read_slave_ack_callback().set(FUNC(cs4031_device::intc1_slave_ack_r));
 
-	PIC8259(config, m_intc2, 0);
+	PIC8259(config, m_intc2);
 	m_intc2->out_int_callback().set(m_intc1, FUNC(pic8259_device::ir2_w));
 	m_intc2->in_sp_callback().set_constant(0);
 
-	PIT8254(config, m_ctc, 0);
+	PIT8254(config, m_ctc);
 	m_ctc->set_clk<0>(XTAL(14'318'181) / 12.0);
 	m_ctc->out_handler<0>().set(m_intc1, FUNC(pic8259_device::ir0_w));
 	m_ctc->set_clk<1>(XTAL(14'318'181) / 12.0);
@@ -160,7 +160,7 @@ void cs4031_device::device_add_mconfig(machine_config &config)
 //  cs4031_device - constructor
 //-------------------------------------------------
 
-cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CS4031, tag, owner, clock),
 	m_read_ior(*this),
 	m_write_iow(*this),

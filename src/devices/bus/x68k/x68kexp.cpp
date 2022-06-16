@@ -45,7 +45,7 @@ uint8_t device_x68k_expansion_card_interface::iack4()
 //  LIVE DEVICE
 //**************************************************************************
 
-x68k_expansion_slot_device::x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+x68k_expansion_slot_device::x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, X68K_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_x68k_expansion_card_interface>(mconfig, *this),
 	m_space(*this, finder_base::DUMMY_TAG, -1),

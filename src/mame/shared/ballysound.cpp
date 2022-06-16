@@ -253,7 +253,7 @@ void bally_as3022_device::device_add_mconfig(machine_config &config)
 	M6808(config, m_cpu, DERIVED_CLOCK(1, 1));
 	m_cpu->set_addrmap(AS_PROGRAM, &bally_as3022_device::as3022_map);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(bally_as3022_device::pia_porta_r));
 	m_pia->writepa_handler().set(FUNC(bally_as3022_device::pia_porta_w));
 	m_pia->writepb_handler().set(FUNC(bally_as3022_device::pia_portb_w));
@@ -401,7 +401,7 @@ void bally_sounds_plus_device::device_add_mconfig(machine_config &config)
 	// and required as the chip likes to output a DC offset at idle.
 	FILTER_RC(config, m_mc3417_filter).set_ac();
 	m_mc3417_filter->add_route(ALL_OUTPUTS, *this, 1.0);
-	MC3417(config, m_mc3417, 0);
+	MC3417(config, m_mc3417);
 	// A gain of 2.2 is a guess. It sounds about loud enough and doesn't clip.
 	m_mc3417->add_route(ALL_OUTPUTS, "mc3417_filter", 2.2);
 }
@@ -528,7 +528,7 @@ void bally_cheap_squeak_device::device_add_mconfig(machine_config &config)
 	m_cpu->in_p2_cb().set(FUNC(bally_cheap_squeak_device::in_p2_cb));
 	m_cpu->out_p2_cb().set(FUNC(bally_cheap_squeak_device::out_p2_cb));
 
-	ZN429E(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 1.00, AUTO_ALLOC_INPUT, 0);
+	ZN429E(config, "dac").add_route(ALL_OUTPUTS, *this, 1.00, AUTO_ALLOC_INPUT, 0);
 }
 
 //-------------------------------------------------
@@ -696,14 +696,14 @@ void bally_squawk_n_talk_device::device_add_mconfig(machine_config &config)
 	M6802(config, m_cpu, DERIVED_CLOCK(1, 1)); // could also be jumpered to use a 6808
 	m_cpu->set_addrmap(AS_PROGRAM, &bally_squawk_n_talk_device::squawk_n_talk_map);
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set(m_tms5200, FUNC(tms5220_device::status_r));
 	m_pia1->writepa_handler().set(m_tms5200, FUNC(tms5220_device::data_w));
 	m_pia1->writepb_handler().set(FUNC(bally_squawk_n_talk_device::pia1_portb_w));
 	m_pia1->irqa_handler().set(FUNC(bally_squawk_n_talk_device::pia_irq_w));
 	m_pia1->irqb_handler().set(FUNC(bally_squawk_n_talk_device::pia_irq_w));
 
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	m_pia2->readpa_handler().set(FUNC(bally_squawk_n_talk_device::pia2_porta_r));
 	m_pia2->ca2_handler().set_output("sound_led0");
 	m_pia2->irqa_handler().set(FUNC(bally_squawk_n_talk_device::pia_irq_w));
@@ -712,13 +712,13 @@ void bally_squawk_n_talk_device::device_add_mconfig(machine_config &config)
 	FILTER_RC(config, m_dac_filter);
 	m_dac_filter->add_route(ALL_OUTPUTS, *this, 1.0);
 	m_dac_filter->set_rc(filter_rc_device::HIGHPASS, 2000, 0, 0, CAP_U(2));
-	AD558(config, "dac", 0).add_route(ALL_OUTPUTS, "dac_filter", 0.75);
+	AD558(config, "dac").add_route(ALL_OUTPUTS, "dac_filter", 0.75);
 
 	// TODO: Calculate exact filter values. An AC filter is good enough for now
 	// and required as the chip likes to output a DC offset at idle.
 	FILTER_RC(config, m_speech_filter).set_ac();
 	m_speech_filter->add_route(ALL_OUTPUTS, *this, 1.0);
-	TMS5200(config, m_tms5200, 640000);
+	TMS5200(config, m_tms5200, XTAL::u(640000));
 	m_tms5200->add_route(ALL_OUTPUTS, "speech_filter", 1.0);
 	m_tms5200->ready_cb().set(m_pia1, FUNC(pia6821_device::ca2_w));
 	m_tms5200->irq_cb().set(m_pia1, FUNC(pia6821_device::cb1_w));

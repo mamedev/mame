@@ -1354,11 +1354,11 @@ WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
 void segas18_state::system18(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000);
+	M68000(config, m_maincpu, XTAL::u(10000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas18_state::system18_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas18_state::irq4_line_hold));
 
-	Z80(config, m_soundcpu, 8000000);
+	Z80(config, m_soundcpu, XTAL::u(8000000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas18_state::sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segas18_state::sound_portmap);
 
@@ -1368,7 +1368,7 @@ void segas18_state::system18(machine_config &config)
 	m_mapper->set_mapper(FUNC(segas18_state::memory_mapper));
 	m_mapper->pbf().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	SEGA_315_5296(config, m_io, 16000000);
+	SEGA_315_5296(config, m_io, XTAL::u(16000000));
 	m_io->in_pa_callback().set_ioport("P1");
 	m_io->in_pb_callback().set_ioport("P2");
 	m_io->in_pc_callback().set_ioport("P3");
@@ -1403,20 +1403,20 @@ void segas18_state::system18(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas18);
 	PALETTE(config, m_palette).set_entries(2048*2 + 64*3);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3438_device &ym1(YM3438(config, "ym1", 8000000));
+	ym3438_device &ym1(YM3438(config, "ym1", XTAL::u(8000000)));
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 	ym1.irq_handler().set_inputline("soundcpu", INPUT_LINE_IRQ0);
 
-	ym3438_device &ym2(YM3438(config, "ym2", 8000000));
+	ym3438_device &ym2(YM3438(config, "ym2", XTAL::u(8000000)));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", 10000000)); // ASSP (RF)5C68A
+	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", XTAL::u(10000000))); // ASSP (RF)5C68A
 	rfsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 	rfsnd.set_addrmap(0, &segas18_state::pcm_map);
 }
@@ -1489,7 +1489,7 @@ void segas18_state::system18_i8751(machine_config &config)
 
 	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
-	I8751(config, m_mcu, 8000000);
+	I8751(config, m_mcu, XTAL::u(8000000));
 	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
 	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
 }
@@ -1503,7 +1503,7 @@ void segas18_state::system18_fd1094_i8751(machine_config &config)
 
 	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
-	I8751(config, m_mcu, 8000000);
+	I8751(config, m_mcu, XTAL::u(8000000));
 	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
 	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
 }

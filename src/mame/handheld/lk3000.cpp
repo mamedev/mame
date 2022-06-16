@@ -318,10 +318,10 @@ void lk3000_state::lk3000(machine_config &config)
 	psu.write_b().set(FUNC(lk3000_state::p5_w));
 
 	// video hardware
-	DL1414T(config, m_dl1414[0], 0U).update().set(FUNC(lk3000_state::update_display<0>));
-	DL1414T(config, m_dl1414[1], 0U).update().set(FUNC(lk3000_state::update_display<1>));
-	DL1414T(config, m_dl1414[2], 0U).update().set(FUNC(lk3000_state::update_display<2>));
-	DL1414T(config, m_dl1414[3], 0U).update().set(FUNC(lk3000_state::update_display<3>));
+	DL1414T(config, m_dl1414[0]).update().set(FUNC(lk3000_state::update_display<0>));
+	DL1414T(config, m_dl1414[1]).update().set(FUNC(lk3000_state::update_display<1>));
+	DL1414T(config, m_dl1414[2]).update().set(FUNC(lk3000_state::update_display<2>));
+	DL1414T(config, m_dl1414[3]).update().set(FUNC(lk3000_state::update_display<3>));
 	config.set_default_layout(layout_lk3000);
 
 	// cartridge

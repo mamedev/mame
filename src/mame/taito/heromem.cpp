@@ -241,11 +241,11 @@ void heromem_state::heromem(machine_config &config)
 	rscreen.screen_vblank().set(FUNC(heromem_state::screen_vblank_r));
 	rscreen.set_palette("tc0091lvc_r:palette");
 
-	pc060ha_device &ciu_l(PC060HA(config, "ciu_l", 0));
+	pc060ha_device &ciu_l(PC060HA(config, "ciu_l"));
 	ciu_l.set_master_tag("maincpu");
 	ciu_l.set_slave_tag(m_tc0091lvc_l);
 
-	pc060ha_device &ciu_r(PC060HA(config, "ciu_r", 0));
+	pc060ha_device &ciu_r(PC060HA(config, "ciu_r"));
 	ciu_r.set_master_tag("maincpu");
 	ciu_r.set_slave_tag(m_tc0091lvc_r);
 
@@ -260,11 +260,11 @@ void heromem_state::heromem(machine_config &config)
 
 	SPEAKER(config, "rspeaker").front_right();
 
-	tc0140syt_device &syt_l(TC0140SYT(config, "tc0140syt_l", 0));
+	tc0140syt_device &syt_l(TC0140SYT(config, "tc0140syt_l"));
 	syt_l.set_master_tag("maincpu");
 	syt_l.set_slave_tag("audiocpu_l");
 
-	tc0140syt_device &syt_r(TC0140SYT(config, "tc0140syt_r", 0));
+	tc0140syt_device &syt_r(TC0140SYT(config, "tc0140syt_r"));
 	syt_r.set_master_tag("maincpu");
 	syt_r.set_slave_tag("audiocpu_r");
 

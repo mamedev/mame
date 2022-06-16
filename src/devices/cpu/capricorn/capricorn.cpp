@@ -138,7 +138,7 @@ static constexpr uint8_t E_MASK = 0xf;
 
 DEFINE_DEVICE_TYPE(HP_CAPRICORN , capricorn_cpu_device , "capricorn" , "HP-Capricorn")
 
-capricorn_cpu_device::capricorn_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+capricorn_cpu_device::capricorn_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, HP_CAPRICORN, tag, owner, clock),
 	m_program_config("program" , ENDIANNESS_LITTLE , 8 , 16),
 	m_opcode_func(*this),

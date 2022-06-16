@@ -56,7 +56,7 @@ void type7xxx_state::type7009_map(address_map &map)
 
 void type7xxx_state::type7009(machine_config &config)
 {
-	PPC601(config, m_maincpu, 80000000);
+	PPC601(config, m_maincpu, XTAL::u(80000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &type7xxx_state::type7009_map);
 }
 

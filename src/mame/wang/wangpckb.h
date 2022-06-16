@@ -28,7 +28,7 @@ class wangpc_keyboard_device :  public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto txd_handler() { return m_txd_handler.bind(); }
 

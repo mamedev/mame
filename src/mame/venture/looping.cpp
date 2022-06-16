@@ -668,12 +668,12 @@ void looping_state::looping(machine_config &config)
 	m_aysnd->port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
-	TMS5220(config, m_tms, 640'000);
+	TMS5220(config, m_tms, XTAL::u(640'000));
 	//m_tms->irq_cb().set(FUNC(looping_state::spcint));
 	m_tms->irq_cb().set(FUNC(looping_state::int_update));
 	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
+	DAC_2BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
 
 	ls259_device &sen0(LS259(config, "sen0")); // B3 on sound board
 	sen0.q_out_cb<0>().set(FUNC(looping_state::souint_clr));

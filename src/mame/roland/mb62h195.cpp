@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(MB62H195, mb62h195_device, "mb62h195", "Roland MB62H195 I/O")
 //  mb62h195_device - constructor
 //-------------------------------------------------
 
-mb62h195_device::mb62h195_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mb62h195_device::mb62h195_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MB62H195, tag, owner, clock)
 	, m_lc_callback(*this)
 	, m_r_callback(*this)

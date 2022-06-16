@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(HP_IPC_OPTROM, hp_ipc_optrom_device, "hp_ipc_optrom", "HP IPC
 // +--------------------+
 // |hp_ipc_optrom_device|
 // +--------------------+
-hp_ipc_optrom_device::hp_ipc_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp_ipc_optrom_device::hp_ipc_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HP_IPC_OPTROM, tag, owner, clock)
 	, device_rom_image_interface(mconfig, *this)
 	, m_base(0)

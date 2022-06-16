@@ -48,7 +48,7 @@ namespace {
 	}
 }
 
-hp_1mb5_device::hp_1mb5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp_1mb5_device::hp_1mb5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 : device_t(mconfig , HP_1MB5 , tag , owner , clock),
 	m_irl_handler(*this),
 	m_halt_handler(*this),

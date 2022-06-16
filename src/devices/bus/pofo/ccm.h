@@ -98,7 +98,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	portfolio_memory_card_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: portfolio_memory_card_slot_device(mconfig, tag, owner, 0)
+		: portfolio_memory_card_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -106,7 +106,7 @@ public:
 		set_fixed(false);
 	}
 
-	portfolio_memory_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	portfolio_memory_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// computer interface
 	bool cdet_r() { return (m_card != nullptr) ? m_card->cdet() : 1; }

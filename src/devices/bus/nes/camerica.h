@@ -14,7 +14,7 @@ class nes_bf9093_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bf9093_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_bf9093_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
@@ -28,14 +28,14 @@ class nes_bf9096_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_bf9096_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_bf9096_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
 protected:
-	nes_bf9096_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool page_swap);
+	nes_bf9096_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool page_swap);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -52,7 +52,7 @@ class nes_bf9096a_device : public nes_bf9096_device
 {
 public:
 	// construction/destruction
-	nes_bf9096a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_bf9096a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -62,7 +62,7 @@ class nes_golden5_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_golden5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_golden5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 

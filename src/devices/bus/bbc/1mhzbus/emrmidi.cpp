@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(BBC_EMRMIDI, bbc_emrmidi_device, "bbc_emrmidi", "EMR BBC Midi
 
 void bbc_emrmidi_device::device_add_mconfig(machine_config &config)
 {
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("mdout1", FUNC(midi_port_device::write_txd));
 	m_acia->txd_handler().append("mdout2", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
@@ -60,7 +60,7 @@ void bbc_emrmidi_device::device_add_mconfig(machine_config &config)
 //  bbc_emrmidi_device - constructor
 //-------------------------------------------------
 
-bbc_emrmidi_device::bbc_emrmidi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_emrmidi_device::bbc_emrmidi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_EMRMIDI, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_acia(*this, "acia1")

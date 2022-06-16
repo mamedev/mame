@@ -41,7 +41,7 @@ enum
 
 DEFINE_DEVICE_TYPE(MOS6530, mos6530_device, "mos6530", "MOS 6530 MIOT")
 
-mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MOS6530, tag, owner, clock),
 		m_in_pa_cb(*this),
 		m_out_pa_cb(*this),

@@ -7,7 +7,7 @@
 DEFINE_DEVICE_TYPE(SUPERFX1, superfx1_device, "superfx1", "Nintendo SuperFX 1")
 DEFINE_DEVICE_TYPE(SUPERFX2, superfx2_device, "superfx2", "Nintendo SuperFX 2")
 
-superfx_device::superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+superfx_device::superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 32, 0)
 	, m_out_irq_func(*this), m_pipeline(0), m_ramaddr(0), m_sfr(0), m_pbr(0), m_rombr(0), m_rambr(0), m_cbr(0), m_scbr(0), m_scmr(0), m_colr(0), m_por(0)
@@ -16,12 +16,12 @@ superfx_device::superfx_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-superfx1_device::superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+superfx1_device::superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: superfx_device(mconfig, SUPERFX1, tag, owner, clock)
 {
 }
 
-superfx2_device::superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+superfx2_device::superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: superfx_device(mconfig, SUPERFX2, tag, owner, clock)
 {
 }
@@ -546,7 +546,7 @@ void superfx_device::mmio_write(uint32_t addr, uint8_t data)
 	}
 }
 
-void superfx_device::superfx_add_clocks_internal(uint32_t clocks)
+void superfx_device::superfx_add_clocks_internal(const XTAL &clocks)
 {
 	if(m_romcl)
 	{

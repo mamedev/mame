@@ -31,27 +31,27 @@ ROM_START( sed1200x0b )
 	ROM_LOAD( "sed1200-b.bin", 0x000, 0x800, CRC(d0741f51) SHA1(c8c856f1357286a2c8c806af81724a828345357e))
 ROM_END
 
-sed1200_device::sed1200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+sed1200_device::sed1200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock), cursor_direction(false), cursor_blinking(false), cursor_full(false), cursor_on(false), display_on(false), cursor_address(0), cgram_address(0), cgrom(nullptr)
 {
 }
 
-sed1200d0a_device::sed1200d0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sed1200d0a_device::sed1200d0a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sed1200_device(mconfig, SED1200D0A, tag, owner, clock)
 {
 }
 
-sed1200f0a_device::sed1200f0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sed1200f0a_device::sed1200f0a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sed1200_device(mconfig, SED1200F0A, tag, owner, clock)
 {
 }
 
-sed1200d0b_device::sed1200d0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sed1200d0b_device::sed1200d0b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sed1200_device(mconfig, SED1200D0B, tag, owner, clock)
 {
 }
 
-sed1200f0b_device::sed1200f0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sed1200f0b_device::sed1200f0b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sed1200_device(mconfig, SED1200F0B, tag, owner, clock)
 {
 }

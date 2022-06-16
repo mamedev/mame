@@ -24,7 +24,7 @@ class s11c_bg_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// base config
 	void s11_bg_base(machine_config &config);
@@ -52,7 +52,7 @@ public:
 	//mc6809e_device *get_cpu() { return m_cpu; }
 protected:
 	// constructor with overridable type for subclass
-	s11c_bg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	s11c_bg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// overrides
 	virtual void device_start() override;
@@ -87,7 +87,7 @@ private:
 class s11_bg_device : public s11c_bg_device
 {
 public:
-	s11_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	s11_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 };
@@ -95,7 +95,7 @@ protected:
 class s11_obg_device : public s11c_bg_device
 {
 public:
-	s11_obg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	s11_obg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 };
@@ -103,7 +103,7 @@ protected:
 class s11_bgm_device : public s11c_bg_device
 {
 public:
-	s11_bgm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	s11_bgm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 };
@@ -111,7 +111,7 @@ protected:
 class s11_bgs_device : public s11c_bg_device
 {
 public:
-	s11_bgs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	s11_bgs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 };

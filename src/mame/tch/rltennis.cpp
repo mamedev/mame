@@ -197,14 +197,14 @@ void rltennis_state::rltennis(machine_config &config)
 
 	EEPROM_2864(config, "eeprom");
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &rltennis_state::ramdac_map);
 	ramdac.set_split_read(1);
 
 	SPEAKER(config, "speaker").front_center();
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // Unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // Unknown DAC
+	DAC_8BIT_R2R(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 0.5); // Unknown DAC
+	DAC_8BIT_R2R(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 0.25); // Unknown DAC
 }
 
 ROM_START( rltennis )

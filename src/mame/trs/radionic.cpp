@@ -531,7 +531,7 @@ void radionic_state::radionic(machine_config &config)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
-	CLOCK(config, m_clock, 4'800);
+	CLOCK(config, m_clock, XTAL::u(4'800));
 	m_clock->signal_handler().set(m_uart2, FUNC(i8251_device::write_txc));
 	m_clock->signal_handler().set(m_uart2, FUNC(i8251_device::write_rxc));
 

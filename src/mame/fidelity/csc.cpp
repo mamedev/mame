@@ -625,14 +625,14 @@ void csc_state::csc(machine_config &config)
 	irq_clock.set_pulse_width(attotime::from_nsec(42750)); // measured ~42.75us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(csc_state::pia0_pa_r));
 	m_pia[0]->writepa_handler().set(FUNC(csc_state::pia0_pa_w));
 	m_pia[0]->writepb_handler().set(FUNC(csc_state::pia0_pb_w));
 	m_pia[0]->ca2_handler().set(FUNC(csc_state::pia0_ca2_w));
 	m_pia[0]->cb2_handler().set(FUNC(csc_state::pia0_cb2_w));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpb_handler().set(FUNC(csc_state::pia1_pb_r));
 	m_pia[1]->writepa_handler().set(FUNC(csc_state::pia1_pa_w));
 	m_pia[1]->writepb_handler().set(FUNC(csc_state::pia1_pb_w));
@@ -649,7 +649,7 @@ void csc_state::csc(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
+	S14001A(config, m_speech, XTAL::u(25000)); // R/C circuit, around 25khz
 	m_speech->ext_read().set(FUNC(csc_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 
@@ -682,14 +682,14 @@ void su9_state::su9(machine_config &config)
 void csc_state::rsc(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 1800000); // measured approx 1.81MHz
+	M6502(config, m_maincpu, XTAL::u(1800000)); // measured approx 1.81MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &csc_state::rsc_map);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 546)); // from 555 timer, measured
+	auto &irq_clock(CLOCK(config, "irq_clock", XTAL::u(546))); // from 555 timer, measured
 	irq_clock.set_pulse_width(attotime::from_usec(38)); // active for 38us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	PIA6821(config, m_pia[0], 0); // MOS 6520
+	PIA6821(config, m_pia[0]); // MOS 6520
 	m_pia[0]->readpa_handler().set(FUNC(csc_state::pia0_pa_r));
 	m_pia[0]->writepa_handler().set(FUNC(csc_state::pia0_pa_w));
 	m_pia[0]->writepb_handler().set(FUNC(csc_state::pia0_pb_w));

@@ -101,7 +101,7 @@ void ctk2000_state::driver_reset()
 void ctk2000_state::ctk2000(machine_config &config)
 {
 	// CPU
-	UPD800468(config, m_maincpu, 48'000'000);
+	UPD800468(config, m_maincpu, XTAL::u(48'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ctk2000_state::ctk2000_map);
 	m_maincpu->port_in_cb<2>().set_ioport("P2_R");
 	m_maincpu->port_out_cb<2>().set_ioport("P2_W");
@@ -113,7 +113,7 @@ void ctk2000_state::ctk2000(machine_config &config)
 	m_maincpu->adc_cb<3>().set_ioport("AIN3");
 
 	// LCD
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc);
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(ctk2000_state::lcd_update));
 

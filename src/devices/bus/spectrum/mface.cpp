@@ -354,7 +354,7 @@ const tiny_rom_entry *spectrum_mprint_device::device_rom_region() const
 //  spectrum_mface_base_device - constructor
 //-------------------------------------------------
 
-spectrum_mface_base_device::spectrum_mface_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface_base_device::spectrum_mface_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_rom(*this, "rom")
@@ -362,64 +362,64 @@ spectrum_mface_base_device::spectrum_mface_base_device(const machine_config &mco
 {
 }
 
-spectrum_mface1v2_device::spectrum_mface1v2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface1v2_device::spectrum_mface1v2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_mface_base_device(mconfig, type, tag, owner, clock)
 	, m_joy(*this, "JOY")
 	, m_hwconfig(*this, "CONFIG")
 {
 }
 
-spectrum_mface1v2_device::spectrum_mface1v2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface1v2_device::spectrum_mface1v2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_mface1v2_device(mconfig, SPECTRUM_MFACE1V2, tag, owner, clock)
 {
 }
 
-spectrum_mface1v1_device::spectrum_mface1v1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface1v1_device::spectrum_mface1v1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_mface1v2_device(mconfig, SPECTRUM_MFACE1V1, tag, owner, clock)
 {
 }
 
-spectrum_mface1v3_device::spectrum_mface1v3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface1v3_device::spectrum_mface1v3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_mface1v2_device(mconfig, type, tag, owner, clock)
 {
 }
 
-spectrum_mface1v3_device::spectrum_mface1v3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface1v3_device::spectrum_mface1v3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_mface1v3_device(mconfig, SPECTRUM_MFACE1V3, tag, owner, clock)
 {
 }
 
-spectrum_mface1_device::spectrum_mface1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface1_device::spectrum_mface1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_mface1v3_device(mconfig, SPECTRUM_MFACE1, tag, owner, clock)
 {
 }
 
-spectrum_mface128_base_device::spectrum_mface128_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface128_base_device::spectrum_mface128_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_mface_base_device(mconfig, type, tag, owner, clock)
 {
 }
 
-spectrum_mface128v1_device::spectrum_mface128v1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface128v1_device::spectrum_mface128v1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_mface128_base_device(mconfig, type, tag, owner, clock)
 {
 }
 
-spectrum_mface128v1_device::spectrum_mface128v1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface128v1_device::spectrum_mface128v1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_mface128v1_device(mconfig, SPECTRUM_MFACE128V1, tag, owner, clock)
 {
 }
 
-spectrum_mface128_device::spectrum_mface128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface128_device::spectrum_mface128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_mface128v1_device(mconfig, SPECTRUM_MFACE128, tag, owner, clock)
 {
 }
 
-spectrum_mface3_device::spectrum_mface3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface3_device::spectrum_mface3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_mface128_base_device(mconfig, SPECTRUM_MFACE3, tag, owner, clock)
 {
 }
 
-spectrum_mprint_device::spectrum_mprint_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mprint_device::spectrum_mprint_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_mface128_base_device(mconfig, SPECTRUM_MPRINT, tag, owner, clock)
 	, m_centronics(*this, "centronics")
 {

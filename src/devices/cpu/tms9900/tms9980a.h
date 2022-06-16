@@ -26,10 +26,10 @@ enum
 class tms9980a_device : public tms99xx_device
 {
 public:
-	tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	tms9980a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	tms9980a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	void        mem_read(void) override;
 	void        mem_write(void) override;
@@ -58,7 +58,7 @@ protected:
 class tms9981_device : public tms9980a_device
 {
 public:
-	tms9981_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9981_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition

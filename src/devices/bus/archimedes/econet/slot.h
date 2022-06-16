@@ -57,7 +57,7 @@ public:
 		set_fixed(false);
 	}
 
-	archimedes_econet_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	archimedes_econet_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callbacks
 	auto efiq_handler() { return m_efiq_handler.bind(); }

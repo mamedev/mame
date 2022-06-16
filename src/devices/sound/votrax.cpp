@@ -75,7 +75,7 @@ const double votrax_sc01_device::s_glottal_wave[9] =
 };
 
 
-votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VOTRAX_SC01, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  m_stream(nullptr),

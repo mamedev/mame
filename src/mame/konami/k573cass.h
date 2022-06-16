@@ -26,7 +26,7 @@ class konami573_cassette_slot_device : public device_t, public device_single_car
 	friend class konami573_cassette_interface;
 
 public:
-	konami573_cassette_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konami573_cassette_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto dsr_handler() { return m_dsr_handler.bind(); }
 
@@ -88,7 +88,7 @@ DECLARE_DEVICE_TYPE(KONAMI573_CASSETTE_X, konami573_cassette_x_device)
 class konami573_cassette_x_device: public device_t, public konami573_cassette_interface
 {
 public:
-	konami573_cassette_x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konami573_cassette_x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0) override;
@@ -97,7 +97,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d3) override;
 
 protected:
-	konami573_cassette_x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	konami573_cassette_x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -111,7 +111,7 @@ DECLARE_DEVICE_TYPE(KONAMI573_CASSETTE_XI, konami573_cassette_xi_device)
 class konami573_cassette_xi_device: public konami573_cassette_x_device
 {
 public:
-	konami573_cassette_xi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konami573_cassette_xi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4) override;
@@ -138,7 +138,7 @@ DECLARE_DEVICE_TYPE(KONAMI573_CASSETTE_Y, konami573_cassette_y_device)
 class konami573_cassette_y_device: public device_t, public konami573_cassette_interface
 {
 public:
-	konami573_cassette_y_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konami573_cassette_y_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto d0_handler() { return m_d0_handler.bind(); }
@@ -161,7 +161,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d7) override;
 
 protected:
-	konami573_cassette_y_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	konami573_cassette_y_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -185,7 +185,7 @@ DECLARE_DEVICE_TYPE(KONAMI573_CASSETTE_YI, konami573_cassette_yi_device)
 class konami573_cassette_yi_device: public konami573_cassette_y_device
 {
 public:
-	konami573_cassette_yi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konami573_cassette_yi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4) override;
@@ -203,7 +203,7 @@ DECLARE_DEVICE_TYPE(KONAMI573_CASSETTE_ZI, konami573_cassette_zi_device)
 class konami573_cassette_zi_device: public device_t, public konami573_cassette_interface
 {
 public:
-	konami573_cassette_zi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konami573_cassette_zi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401) override;
 	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda) override;

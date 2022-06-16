@@ -11,7 +11,7 @@
 class namco_50xx_device : public device_t
 {
 public:
-	namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	WRITE_LINE_MEMBER( reset );
 	WRITE_LINE_MEMBER( chip_select );

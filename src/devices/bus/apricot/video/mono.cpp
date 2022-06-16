@@ -73,7 +73,7 @@ void apricot_mono_display_device::device_add_mconfig(machine_config &config)
 //  apricot_mono_display_device - constructor
 //-------------------------------------------------
 
-apricot_mono_display_device::apricot_mono_display_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apricot_mono_display_device::apricot_mono_display_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, APRICOT_MONO_DISPLAY, tag, owner, clock),
 	device_apricot_video_interface(mconfig, *this),
 	m_crtc(*this, "crtc"),

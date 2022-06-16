@@ -46,15 +46,7 @@ class vtech_ioexp_slot_device : public device_t, public device_single_card_slot_
 	friend class device_vtech_ioexp_interface;
 public:
 	// construction/destruction
-	vtech_ioexp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner)
-		: vtech_ioexp_slot_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		vtech_ioexp_slot_carts(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
-	}
-	vtech_ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~vtech_ioexp_slot_device();
 
 	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
@@ -90,7 +82,7 @@ class vtech_ioexp_device : public device_t, public device_vtech_ioexp_interface
 {
 public:
 	// construction/destruction
-	vtech_ioexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vtech_ioexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// from host
 	virtual uint8_t iorq_r(offs_t offset) override;

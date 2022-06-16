@@ -16,7 +16,7 @@
 
 DEFINE_DEVICE_TYPE(METERS, meters_device, "meters", "Electromechanical meters")
 
-meters_device::meters_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+meters_device::meters_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, METERS, tag, owner, clock)
 	, m_number_mtr(0)
 {

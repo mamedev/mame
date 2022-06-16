@@ -879,7 +879,7 @@ void dectalk_state::dectalk(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	AD7541(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.9); // ad7541.e107 (E88 10KHz OSC, handled by timer)
+	AD7541(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.9); // ad7541.e107 (E88 10KHz OSC, handled by timer)
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 

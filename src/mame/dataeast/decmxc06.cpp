@@ -45,7 +45,7 @@ Notes (dec0.cpp)
 
 DEFINE_DEVICE_TYPE(DECO_MXC06, deco_mxc06_device, "deco_mxc06", "DECO MXC06 Sprite")
 
-deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DECO_MXC06, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_colpri_cb(*this)

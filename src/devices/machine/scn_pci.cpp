@@ -157,7 +157,7 @@ ALLOW_SAVE_TYPE(scn_pci_device::xmtr_state);
 //  scn_pci_device - constructor
 //-------------------------------------------------
 
-scn_pci_device::scn_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u16 *br_div, bool is_enhanced, bool is_aci)
+scn_pci_device::scn_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const u16 *br_div, bool is_enhanced, bool is_aci)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_dtr_callback(*this)
 	, m_rts_callback(*this)
@@ -210,7 +210,7 @@ scn_pci_device::scn_pci_device(const machine_config &mconfig, device_type type, 
 //  scn2651_device - constructor
 //-------------------------------------------------
 
-scn2651_device::scn2651_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+scn2651_device::scn2651_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scn_pci_device(mconfig, SCN2651, tag, owner, clock, s_br_divisors_3, false, false)
 {
 }
@@ -219,7 +219,7 @@ scn2651_device::scn2651_device(const machine_config &mconfig, const char *tag, d
 //  scn2661a_device - constructor
 //-------------------------------------------------
 
-scn2661a_device::scn2661a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+scn2661a_device::scn2661a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scn_pci_device(mconfig, SCN2661A, tag, owner, clock, s_br_divisors_1, true, false)
 {
 }
@@ -228,7 +228,7 @@ scn2661a_device::scn2661a_device(const machine_config &mconfig, const char *tag,
 //  scn2661b_device - constructor
 //-------------------------------------------------
 
-scn2661b_device::scn2661b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+scn2661b_device::scn2661b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scn_pci_device(mconfig, SCN2661B, tag, owner, clock, s_br_divisors_2, true, false)
 {
 }
@@ -237,7 +237,7 @@ scn2661b_device::scn2661b_device(const machine_config &mconfig, const char *tag,
 //  scn2661c_device - constructor
 //-------------------------------------------------
 
-scn2661c_device::scn2661c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+scn2661c_device::scn2661c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scn_pci_device(mconfig, SCN2661C, tag, owner, clock, s_br_divisors_3, true, false)
 {
 }
@@ -246,7 +246,7 @@ scn2661c_device::scn2661c_device(const machine_config &mconfig, const char *tag,
 //  scn2641_device - constructor
 //-------------------------------------------------
 
-scn2641_device::scn2641_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+scn2641_device::scn2641_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scn_pci_device(mconfig, SCN2641, tag, owner, clock, s_br_divisors, true, true)
 	, m_intr_callback(*this)
 {

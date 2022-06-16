@@ -27,7 +27,7 @@ class scsi_port_device : public device_t
 
 public:
 	// construction/destruction
-	scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto bsy_handler() { return m_bsy_handler.bind(); }
 	auto sel_handler() { return m_sel_handler.bind(); }
@@ -174,7 +174,7 @@ class scsi_port_slot_device : public device_t, public device_single_card_slot_in
 	friend class scsi_port_interface;
 
 public:
-	scsi_port_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	scsi_port_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	scsi_port_interface *dev() { return m_dev; }
 	scsi_port_device *port() { return m_port; }

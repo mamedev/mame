@@ -292,7 +292,7 @@ void powerins_state::powerins(machine_config &config)
 
 	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 }
@@ -312,7 +312,7 @@ void powerins_state::powerinsa(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(powerins_state, powerinsa)
 
-	m_oki[0]->set_clock(990000); // pin7 not verified
+	m_oki[0]->set_clock(XTAL::u(990000)); // pin7 not verified
 	m_oki[0]->set_addrmap(0, &powerins_state::powerinsa_oki_map);
 
 	config.device_remove("oki2");

@@ -57,12 +57,12 @@ static util::wav_file_ptr wavraw; // Raw waveform
 
 DEFINE_DEVICE_TYPE(GAELCO_GAE1, gaelco_gae1_device, "gaelco_gae1", "Gaelco GAE1")
 
-gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: gaelco_gae1_device(mconfig, GAELCO_GAE1, tag, owner, clock)
 {
 }
 
-gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
@@ -339,7 +339,7 @@ void gaelco_gae1_device::rom_bank_pre_change()
 
 DEFINE_DEVICE_TYPE(GAELCO_CG1V, gaelco_cg1v_device, "gaelco_cg1v", "Gaelco CG1V")
 
-gaelco_cg1v_device::gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gaelco_cg1v_device::gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: gaelco_gae1_device(mconfig, GAELCO_CG1V, tag, owner, clock)
 {
 }

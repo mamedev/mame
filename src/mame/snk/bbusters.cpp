@@ -474,11 +474,11 @@ GFXDECODE_END
 void bbusters_state::bbusters(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbusters_state::bbusters_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bbusters_state::irq6_line_hold));
 
-	Z80(config, m_audiocpu, 4000000); // Accurate
+	Z80(config, m_audiocpu, XTAL::u(4000000)); // Accurate
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bbusters_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &bbusters_state::sound_portmap);
 
@@ -506,12 +506,12 @@ void bbusters_state::bbusters(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_bbusters);
 	PALETTE(config, "palette").set_format(palette_device::RGBx_444, 2048);
 
-	SNK_BBUSTERS_SPR(config, m_sprites[0], 0);
+	SNK_BBUSTERS_SPR(config, m_sprites[0]);
 	m_sprites[0]->set_scaletable_tag("sprites1:scale_table");
 	m_sprites[0]->set_palette("palette");
 	m_sprites[0]->set_spriteram_tag("spriteram1");
 
-	SNK_BBUSTERS_SPR(config, m_sprites[1], 0);
+	SNK_BBUSTERS_SPR(config, m_sprites[1]);
 	m_sprites[1]->set_scaletable_tag("sprites2:scale_table");
 	m_sprites[1]->set_palette("palette");
 	m_sprites[1]->set_spriteram_tag("spriteram2");
@@ -526,7 +526,7 @@ void bbusters_state::bbusters(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "lspeaker", 1.0);
 	ymsnd.add_route(0, "rspeaker", 1.0);

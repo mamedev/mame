@@ -231,7 +231,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 	//m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(v53a_device::ir?_w));
 	//m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::drq?_w));
 
-	pit8254_device &pit(PIT8254(config, "synctmr", 0)); // MB89254
+	pit8254_device &pit(PIT8254(config, "synctmr")); // MB89254
 	pit.set_clk<0>(16_MHz_XTAL / 4);
 	pit.set_clk<1>(16_MHz_XTAL / 4);
 	pit.set_clk<2>(16_MHz_XTAL / 4);

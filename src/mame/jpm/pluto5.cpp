@@ -265,7 +265,7 @@ void pluto5_state::machine_start()
 
 void pluto5_state::pluto5(machine_config &config)
 {
-	M68340(config, m_maincpu, 16000000);
+	M68340(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pluto5_state::pluto5_map);
 
 

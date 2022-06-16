@@ -54,7 +54,7 @@ public:
 	};
 
 	// construction/destruction
-	g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto wdm_handler() { return m_wdm_w.bind(); }
 
@@ -68,7 +68,7 @@ public:
 	};
 
 protected:
-	g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal);
+	g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int cpu_type, address_map_constructor internal);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -1543,14 +1543,14 @@ protected:
 class g65802_device : public g65816_device
 {
 public:
-	g65802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	g65802_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class _5a22_device : public g65816_device
 {
 public:
-	_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void wrmpya_w(uint8_t data);
 	void wrmpyb_w(uint8_t data);

@@ -127,13 +127,13 @@ enum {
 class nb1413m3_device : public device_t
 {
 public:
-	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int type) :
+	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, int type) :
 		nb1413m3_device(mconfig, tag, owner, clock)
 	{
 		set_type(type);
 	}
 
-	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~nb1413m3_device() {}
 
 	// configuration helpers

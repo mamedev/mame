@@ -246,7 +246,7 @@ device_cbm_iec_interface::~device_cbm_iec_interface()
 //  cbm_iec_slot_device - constructor
 //-------------------------------------------------
 
-cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CBM_IEC_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this), m_address(0)
 {
@@ -281,7 +281,7 @@ void cbm_iec_slot_device::device_start()
 //  cbm_iec_device - constructor
 //-------------------------------------------------
 
-cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CBM_IEC, tag, owner, clock),
 	m_write_srq(*this),
 	m_write_atn(*this),

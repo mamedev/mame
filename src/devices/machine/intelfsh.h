@@ -63,7 +63,7 @@ public:
 
 protected:
 	// construction/destruction
-	intelfsh_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	intelfsh_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -120,7 +120,7 @@ public:
 
 protected:
 	// construction/destruction
-	intelfsh8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	intelfsh8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 };
 
 
@@ -138,7 +138,7 @@ public:
 
 protected:
 	// construction/destruction
-	intelfsh16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	intelfsh16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 };
 
 
@@ -148,103 +148,103 @@ protected:
 class intel_28f016s5_device : public intelfsh8_device
 {
 public:
-	intel_28f016s5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_28f016s5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class fujitsu_29f160te_device : public intelfsh8_device
 {
 public:
-	fujitsu_29f160te_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fujitsu_29f160te_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class fujitsu_29f016a_device : public intelfsh8_device
 {
 public:
-	fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class fujitsu_29dl164bd_device : public intelfsh8_device
 {
 public:
-	fujitsu_29dl164bd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fujitsu_29dl164bd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class fujitsu_29lv002tc_device : public intelfsh8_device
 {
 public:
-	fujitsu_29lv002tc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fujitsu_29lv002tc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class fujitsu_29lv800b_device : public intelfsh16_device
 {
 public:
-	fujitsu_29lv800b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fujitsu_29lv800b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class atmel_29c010_device : public intelfsh8_device
 {
 public:
-	atmel_29c010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	atmel_29c010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class amd_29f010_device : public intelfsh8_device
 {
 public:
-	amd_29f010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29f010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class amd_29f040_device : public intelfsh8_device
 {
 public:
-	amd_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class amd_29f080_device : public intelfsh8_device
 {
 public:
-	amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class amd_29f400t_device : public intelfsh8_device
 {
 public:
-	amd_29f400t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29f400t_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class amd_29f800t_device : public intelfsh8_device
 {
 public:
-	amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class amd_29f800b_16bit_device : public intelfsh16_device
 {
 public:
-	amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class amd_29lv200t_device : public intelfsh8_device
 {
 public:
-	amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class sharp_lh28f016s_device : public intelfsh8_device
 {
 public:
-	sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class sharp_lh28f016s_16bit_device : public intelfsh16_device
 {
 public:
-	sharp_lh28f016s_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sharp_lh28f016s_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class intel_e28f008sa_device : public intelfsh8_device
 {
 public:
-	intel_e28f008sa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_e28f008sa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class macronix_29f008tc_device : public intelfsh8_device
@@ -256,128 +256,128 @@ public:
 class macronix_29l001mc_device : public intelfsh8_device
 {
 public:
-	macronix_29l001mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	macronix_29l001mc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class macronix_29lv160tmc_device : public intelfsh8_device
 {
 public:
-	macronix_29lv160tmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	macronix_29lv160tmc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class panasonic_mn63f805mnp_device : public intelfsh8_device
 {
 public:
-	panasonic_mn63f805mnp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	panasonic_mn63f805mnp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class sanyo_le26fv10n1ts_device : public intelfsh8_device
 {
 public:
-	sanyo_le26fv10n1ts_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sanyo_le26fv10n1ts_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class sst_28sf040_device : public intelfsh8_device
 {
 public:
-	sst_28sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sst_28sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class sst_39sf040_device : public intelfsh8_device
 {
 public:
-	sst_39sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sst_39sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class sst_39vf020_device : public intelfsh8_device
 {
 public:
-	sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class sst_49lf020_device : public intelfsh8_device
 {
 public:
-	sst_49lf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sst_49lf020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class tms_29f040_device : public intelfsh8_device
 {
 public:
-	tms_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	tms_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // 16-bit variants
 class sharp_lh28f400_device : public intelfsh16_device
 {
 public:
-	sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class intel_te28f160_device : public intelfsh16_device
 {
 public:
-	intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class sharp_lh28f160s3_device : public intelfsh16_device
 {
 public:
-	sharp_lh28f160s3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sharp_lh28f160s3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class intel_te28f320_device : public intelfsh16_device
 {
 public:
-	intel_te28f320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_te28f320_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class spansion_s29gl064s_device : public intelfsh16_device
 {
 public:
-	spansion_s29gl064s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	spansion_s29gl064s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class intel_e28f400b_device : public intelfsh16_device
 {
 public:
-	intel_e28f400b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_e28f400b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class sharp_lh28f320bf_device : public intelfsh16_device
 {
 public:
-	sharp_lh28f320bf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sharp_lh28f320bf_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class intel_28f320j3d_device : public intelfsh16_device
 {
 public:
-	intel_28f320j3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_28f320j3d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class intel_28f320j5_device : public intelfsh16_device
 {
 public:
-	intel_28f320j5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_28f320j5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class sst_39vf400a_device : public intelfsh16_device
 {
 public:
-	sst_39vf400a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sst_39vf400a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class atmel_49f4096_device : public intelfsh16_device
 {
 public:
-	atmel_49f4096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	atmel_49f4096_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class cat28f020_device : public intelfsh8_device
 {
 public:
-	cat28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	cat28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 

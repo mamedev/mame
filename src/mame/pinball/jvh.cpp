@@ -150,7 +150,7 @@ void jvh_state::machine_reset()
 void jvh_state::common(machine_config &config)
 {
 	// CPU TMS9980A; no line connections
-	TMS9980A(config, m_maincpu, 10000000);
+	TMS9980A(config, m_maincpu, XTAL::u(10000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &jvh_state::main_map);
 
 	m6802_cpu_device &audiocpu(M6802(config, "audiocpu", XTAL(4'000'000)));
@@ -180,11 +180,11 @@ void jvh_state::jvh2(machine_config &config)
 
 void jvh_state::jvh3(machine_config &config)
 {
-	TMS9995(config, m_maincpu, 12000000);
+	TMS9995(config, m_maincpu, XTAL::u(12000000));
 
-	M6809(config, "audiocpu", 2000000);
+	M6809(config, "audiocpu", XTAL::u(2000000));
 
-	M6809(config, "audiocpu2", 2000000);
+	M6809(config, "audiocpu2", XTAL::u(2000000));
 
 	// YM2203, YM3812, DAC
 

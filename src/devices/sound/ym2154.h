@@ -19,7 +19,7 @@ class ym2154_device : public device_t, public device_sound_interface, public dev
 
 public:
 	// internal constructor
-	ym2154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym2154_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq_handler() { return m_update_irq.bind(); }

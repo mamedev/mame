@@ -8,7 +8,7 @@
 
 DEFINE_DEVICE_TYPE(DSPV, dspv_device, "dspv", "Yamaha DSPV audio simulation DSP (YSS217-F/")
 
-dspv_device::dspv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dspv_device::dspv_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, DSPV, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  m_program_config("program", ENDIANNESS_BIG, 16, 16, -1, address_map_constructor(FUNC(dspv_device::prg_map), this)),

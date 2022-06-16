@@ -20,7 +20,7 @@ class i8251_device :  public device_t,
 {
 public:
 	// construction/destruction
-	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto txd_handler() { return m_txd_handler.bind(); }
@@ -153,7 +153,7 @@ class v5x_scu_device :  public i8251_device
 {
 public:
 	// construction/destruction
-	v5x_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+	v5x_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;

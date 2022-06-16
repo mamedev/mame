@@ -32,13 +32,13 @@ DEFINE_DEVICE_TYPE(A2BUS_AGAT7RAM, a2bus_agat7ram_device, "a7ram", "Agat-7 32K R
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_agat7ram_device::a2bus_agat7ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_agat7ram_device::a2bus_agat7ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_main_bank(0), m_csr(0)
 {
 }
 
-a2bus_agat7ram_device::a2bus_agat7ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_agat7ram_device::a2bus_agat7ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_agat7ram_device(mconfig, A2BUS_AGAT7RAM, tag, owner, clock)
 {
 }

@@ -219,7 +219,7 @@ void poolshrk_state::poolshrk_palette(palette_device &palette) const
 void poolshrk_state::poolshrk(machine_config &config)
 {
 	/* basic machine hardware */
-	M6800(config, m_maincpu, 11055000 / 8); /* ? */
+	M6800(config, m_maincpu, XTAL::u(11055000) / 8); /* ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &poolshrk_state::poolshrk_cpu_map);
 	m_maincpu->set_vblank_int("screen", FUNC(poolshrk_state::irq0_line_assert));
 

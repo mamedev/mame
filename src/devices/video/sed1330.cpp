@@ -148,7 +148,7 @@ inline void sed1330_device::increment_csr()
 //  sed1330_device - constructor
 //-------------------------------------------------
 
-sed1330_device::sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sed1330_device::sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SED1330, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
@@ -384,7 +384,7 @@ void sed1330_device::data_w(uint8_t data)
 		case 5:
 			m_lf = data + 1;
 			LOG("SED1330 Frame Height: %u\n", m_lf);
-			if (clock() != 0)
+			if (!clock().disabled())
 			{
 				attotime fr = clocks_to_attotime(m_tcr * m_lf * 9);
 				screen().configure(m_tcr * m_fx, m_lf, screen().visible_area(), fr.as_attoseconds());

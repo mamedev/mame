@@ -17,7 +17,7 @@ class dc7085_channel
 public:
 	auto tx_cb() { return m_tx_cb.bind(); }
 
-	dc7085_channel(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	dc7085_channel(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides
@@ -49,7 +49,7 @@ private:
 class dc7085_device : public device_t
 {
 public:
-	dc7085_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	dc7085_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	void map(address_map &map);
 

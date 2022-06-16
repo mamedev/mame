@@ -704,7 +704,7 @@ void kikikai_state::base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2203(config, m_ymsnd, 3000000);
+	YM2203(config, m_ymsnd, XTAL::u(3000000));
 	m_ymsnd->port_a_read_callback().set_ioport("DSW0");
 	m_ymsnd->port_b_read_callback().set_ioport("DSW1");
 	m_ymsnd->add_route(0, "mono", 0.30);
@@ -754,7 +754,7 @@ void mexico86_state::mexico86_68705(machine_config& config)
 	base(config);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(mexico86_state::mcram_vect_r));
 
-	M68705P3(config, m_68705mcu, 4000000); /* xtal is 4MHz, divided by 4 internally */
+	M68705P3(config, m_68705mcu, XTAL::u(4000000)); /* xtal is 4MHz, divided by 4 internally */
 	m_68705mcu->portc_r().set_ioport("IN0");
 	m_68705mcu->porta_w().set(FUNC(mexico86_state::mexico86_68705_port_a_w));
 	m_68705mcu->portb_w().set(FUNC(mexico86_state::mexico86_68705_port_b_w));

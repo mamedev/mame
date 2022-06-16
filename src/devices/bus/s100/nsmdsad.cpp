@@ -74,7 +74,7 @@ void s100_mds_ad_device::device_add_mconfig(machine_config &config)
 //  s100_mds_ad_device - constructor
 //-------------------------------------------------
 
-s100_mds_ad_device::s100_mds_ad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+s100_mds_ad_device::s100_mds_ad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, S100_MDS_AD, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this),
 	m_floppy(*this, "floppy%u", 0U),

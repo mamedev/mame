@@ -14,7 +14,7 @@ const uint32_t prom82s129_base_device::PROM_SIZE = 256;
 DEFINE_DEVICE_TYPE(PROM82S126, prom82s126_device, "82s126", "82S126 1K-bit bipolar PROM")
 DEFINE_DEVICE_TYPE(PROM82S129, prom82s129_device, "82s129", "82S129 1K-bit bipolar PROM")
 
-prom82s129_base_device::prom82s129_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+prom82s129_base_device::prom82s129_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_region(*this, DEVICE_SELF)
 	, m_out_func(*this)
@@ -29,12 +29,12 @@ prom82s129_base_device::prom82s129_base_device(const machine_config &mconfig, de
 {
 }
 
-prom82s126_device::prom82s126_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+prom82s126_device::prom82s126_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: prom82s129_base_device(mconfig, PROM82S126, tag, owner, clock)
 {
 }
 
-prom82s129_device::prom82s129_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+prom82s129_device::prom82s129_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: prom82s129_base_device(mconfig, PROM82S129, tag, owner, clock)
 {
 }

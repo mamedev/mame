@@ -60,7 +60,7 @@
 class xen_daisy_device : public device_t, public z80_daisy_chain_interface
 {
 public:
-	xen_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	xen_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint8_t acknowledge();
 	IRQ_CALLBACK_MEMBER(inta_cb);
@@ -71,7 +71,7 @@ protected:
 
 DEFINE_DEVICE_TYPE(XEN_DAISY, xen_daisy_device, "xen_daisy", "Apricot XEN daisy chain abstraction")
 
-xen_daisy_device::xen_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+xen_daisy_device::xen_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XEN_DAISY, tag, owner, clock)
 	, z80_daisy_chain_interface(mconfig, *this)
 {
@@ -481,9 +481,9 @@ void apxen_state::apxen(machine_config &config)
 	m_io->set_addr_width(16);
 	m_io->set_endianness(ENDIANNESS_LITTLE);
 
-	UPD71071(config, m_dmac, 8000000);
+	UPD71071(config, m_dmac, XTAL::u(8000000));
 	m_dmac->set_cpu_tag("maincpu");
-	m_dmac->set_clock(8000000);
+	m_dmac->set_clock(XTAL::u(8000000));
 	m_dmac->out_eop_callback().set(m_pic[1], FUNC(pic8259_device::ir2_w));
 	m_dmac->dma_read_callback<1>().set(m_fdc, FUNC(wd2797_device::data_r));
 	m_dmac->dma_write_callback<1>().set(m_fdc, FUNC(wd2797_device::data_w));
@@ -491,19 +491,19 @@ void apxen_state::apxen(machine_config &config)
 	EEPROM_93C06_16BIT(config, m_eeprom); // NMC9306
 	m_eeprom->do_callback().set(m_sio, FUNC(z80sio_device::ctsb_w));
 
-	PIC8259(config, m_pic[0], 0);
+	PIC8259(config, m_pic[0]);
 	m_pic[0]->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic[0]->in_sp_callback().set_constant(1);
 	m_pic[0]->read_slave_ack_callback().set(FUNC(apxen_state::get_slave_ack));
 
-	PIC8259(config, m_pic[1], 0);
+	PIC8259(config, m_pic[1]);
 	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir2_w));
 	m_pic[1]->in_sp_callback().set_constant(0);
 
 	XEN_DAISY(config, m_daisy);
 	m_daisy->set_daisy_config(xen_daisy_chain);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2000000);
 	m_pit->out_handler<0>().set(m_sio, FUNC(z80sio_device::rxca_w));
 	m_pit->set_clk<1>(2000000);
@@ -513,14 +513,14 @@ void apxen_state::apxen(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "z80int").output_handler().set(m_pic[0], FUNC(pic8259_device::ir1_w));
 
-	Z8536(config, m_cio, 4000000);
+	Z8536(config, m_cio, XTAL::u(4000000));
 	m_cio->irq_wr_cb().set("z80int", FUNC(input_merger_device::in_w<0>));
 	m_cio->pa_rd_cb().set(FUNC(apxen_state::cio_porta_r));
 	m_cio->pa_wr_cb().set(FUNC(apxen_state::cio_porta_w));
 	m_cio->pb_wr_cb().set(FUNC(apxen_state::cio_portb_w));
 	m_cio->pc_wr_cb().set(FUNC(apxen_state::cio_portc_w));
 
-	Z80SIO(config, m_sio, 4000000);
+	Z80SIO(config, m_sio, XTAL::u(4000000));
 	m_sio->out_int_callback().set("z80int", FUNC(input_merger_device::in_w<1>));
 	// channel a: rs232
 	m_sio->out_txdb_callback().set("kbd", FUNC(apricot_keyboard_bus_device::out_w));
@@ -530,7 +530,7 @@ void apxen_state::apxen(machine_config &config)
 	MM58274C(config, "rtc", 32.768_kHz_XTAL);
 
 	// floppy
-	WD2797(config, m_fdc, 2000000);
+	WD2797(config, m_fdc, XTAL::u(2000000));
 	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set([this](int state) { m_dmac->dmarq(state, 1); });
 	FLOPPY_CONNECTOR(config, "fdc:0", apricot_floppies, "d32w", apxen_state::floppy_formats);
@@ -544,7 +544,7 @@ void apxen_state::apxen(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SN76489(config, "sn", 2000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	// keyboard
 	APRICOT_KEYBOARD_INTERFACE(config, "kbd", apricot_keyboard_devices, "hle").in_handler().set(m_sio, FUNC(z80sio_device::rxb_w));

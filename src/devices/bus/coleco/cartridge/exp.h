@@ -55,14 +55,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	colecovision_cartridge_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: colecovision_cartridge_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: colecovision_cartridge_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// computer interface
 	uint8_t bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000);

@@ -77,7 +77,7 @@ public:
 			const machine_config &mconfig,
 			const char *tag,
 			device_t *owner,
-			u32 clock);
+			const XTAL &clock);
 
 	template <typename... T>
 	void set_keyboard_callback(T &&... args)
@@ -93,7 +93,7 @@ protected:
 			device_type type,
 			char const *tag,
 			device_t *owner,
-			u32 clock);
+			const XTAL &clock);
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void key_make(u8 row, u8 column) override;

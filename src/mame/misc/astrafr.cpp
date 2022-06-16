@@ -309,10 +309,10 @@ MACHINE_START_MEMBER(astrafr_state,astra_2e)
 
 void astrafr_state::astrafr_dual(machine_config &config)
 {
-	M68340(config, m_maincpu, 16000000);
+	M68340(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrafr_state::astrafr_master_map);
 
-	M68340(config, m_slavecpu, 16000000);
+	M68340(config, m_slavecpu, XTAL::u(16000000));
 	m_slavecpu->set_addrmap(AS_PROGRAM, &astrafr_state::astrafr_slave_map);
 
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
@@ -332,10 +332,10 @@ void astrafr_state::astrafr_dual_37(machine_config &config)
 
 void astrafr_state::astrafr_dual_alt(machine_config &config)
 {
-	M68340(config, m_maincpu, 16000000);
+	M68340(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrafr_state::astrafr_master_alt_map);
 
-	M68340(config, m_slavecpu, 16000000);
+	M68340(config, m_slavecpu, XTAL::u(16000000));
 	m_slavecpu->set_addrmap(AS_PROGRAM, &astrafr_state::astrafr_slave_map);
 }
 
@@ -349,7 +349,7 @@ void astrafr_state::astrafr_dual_alt_37(machine_config &config)
 
 void astrafr_state::astra_single(machine_config &config)
 {
-	M68340(config, m_maincpu, 16000000);
+	M68340(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrafr_state::astra_map);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 }
@@ -377,7 +377,7 @@ MACHINE_START_MEMBER(astrafr_state,astra_57)
 
 void astrafr_state::astra_single_alt(machine_config &config)
 {
-	M68340(config, m_maincpu, 16000000);
+	M68340(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrafr_state::astra_map);
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 }

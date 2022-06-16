@@ -76,7 +76,7 @@ void electron_plus2_device::device_add_mconfig(machine_config &config)
 //  electron_plus2_device - constructor
 //-------------------------------------------------
 
-electron_plus2_device::electron_plus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_plus2_device::electron_plus2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_PLUS2, tag, owner, clock)
 	, device_electron_expansion_interface(mconfig, *this)
 	, m_irqs(*this, "irqs")

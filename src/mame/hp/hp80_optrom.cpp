@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(HP80_OPTROM, hp80_optrom_device, "hp80_optrom", "HP80 optiona
 // +------------------+
 // |hp80_optrom_device|
 // +------------------+
-hp80_optrom_device::hp80_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+hp80_optrom_device::hp80_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, HP80_OPTROM, tag, owner, clock),
 	device_rom_image_interface(mconfig, *this),
 	m_select_code(0)

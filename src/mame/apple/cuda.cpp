@@ -381,7 +381,7 @@ void cuda_device::pram_w(offs_t offset, uint8_t data)
 //  cuda_device - constructor
 //-------------------------------------------------
 
-cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CUDA, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	write_reset(*this),

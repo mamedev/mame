@@ -59,15 +59,15 @@ INPUT_PORTS_END
 
 void ec7915_state::ec7915(machine_config &config)
 {
-	I8080A(config, m_maincpu, 2000000); // КР580ВМ80А (not Z80) + SAB8224P clock generator
+	I8080A(config, m_maincpu, XTAL::u(2000000)); // КР580ВМ80А (not Z80) + SAB8224P clock generator
 	m_maincpu->set_addrmap(AS_PROGRAM, &ec7915_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &ec7915_state::io_map);
 
-	//I8214(config, "picu", 2000000); // CEMI UCY74S414
+	//I8214(config, "picu", XTAL::u(2000000)); // CEMI UCY74S414
 
-	PIT8253(config, "pit", 0); // КР580ВИ53
+	PIT8253(config, "pit"); // КР580ВИ53
 
-	I8251(config, "usart", 2000000); // КР580ВВ51А
+	I8251(config, "usart", XTAL::u(2000000)); // КР580ВВ51А
 	// 8251 usage appears to prefer synchronous communications
 
 	// 2x NEC D8255AC-2 on main board + КР580ВВ55А on display board

@@ -12,7 +12,7 @@
 DEFINE_DEVICE_TYPE(VINAS, vinas_device, "vinas", "IX0902/IX0903 VINAS CRTC")
 DEFINE_DEVICE_TYPE(VICON, vicon_device, "vicon", "IX1093 VICON CRTC")
 
-x68k_crtc_device::x68k_crtc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+x68k_crtc_device::x68k_crtc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_vdisp_callback(*this)
@@ -47,12 +47,12 @@ x68k_crtc_device::x68k_crtc_device(const machine_config &mconfig, device_type ty
 	std::fill(std::begin(m_reg), std::end(m_reg), 0);
 }
 
-vinas_device::vinas_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+vinas_device::vinas_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: x68k_crtc_device(mconfig, VINAS, tag, owner, clock)
 {
 }
 
-vicon_device::vicon_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+vicon_device::vicon_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: x68k_crtc_device(mconfig, VICON, tag, owner, clock)
 {
 }

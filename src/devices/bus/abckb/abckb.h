@@ -24,7 +24,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	abc_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: abc_keyboard_port_device(mconfig, tag, owner, 0)
+		: abc_keyboard_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -32,7 +32,7 @@ public:
 		set_fixed(false);
 	}
 
-	abc_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	abc_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto out_rx_handler() { return m_out_rx_handler.bind(); }
 	auto out_trxc_handler() { return m_out_trxc_handler.bind(); }

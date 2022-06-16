@@ -933,7 +933,7 @@ INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 void cedar_magnet_state::cedar_magnet(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	Z80(config, m_maincpu, XTAL::u(4000000));         /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cedar_magnet_state::cedar_magnet_map);
 	m_maincpu->set_addrmap(AS_IO, &cedar_magnet_state::cedar_magnet_io);
 	m_maincpu->set_vblank_int("screen", FUNC(cedar_magnet_state::irq));
@@ -942,14 +942,14 @@ void cedar_magnet_state::cedar_magnet(machine_config &config)
 	ADDRESS_MAP_BANK(config, "mb_sub_ram").set_map(&cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 	ADDRESS_MAP_BANK(config, "mb_sub_pal").set_map(&cedar_magnet_state::cedar_magnet_mainboard_sub_pal_map).set_options(ENDIANNESS_LITTLE, 8, 8+6, 0x100);
 
-	Z80PIO(config, m_ic48_pio, 4000000/2);
+	Z80PIO(config, m_ic48_pio, XTAL::u(4000000)/2);
 //  m_ic48_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ic48_pio->in_pa_callback().set(FUNC(cedar_magnet_state::ic48_pio_pa_r));
 	m_ic48_pio->out_pa_callback().set(FUNC(cedar_magnet_state::ic48_pio_pa_w));
 	m_ic48_pio->in_pb_callback().set(FUNC(cedar_magnet_state::ic48_pio_pb_r));
 	m_ic48_pio->out_pb_callback().set(FUNC(cedar_magnet_state::ic48_pio_pb_w));
 
-	Z80PIO(config, m_ic49_pio, 4000000/2);
+	Z80PIO(config, m_ic49_pio, XTAL::u(4000000)/2);
 //  m_ic49_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 //  m_ic49_pio->in_pa_callback().set(FUNC(cedar_magnet_state::ic49_pio_pa_r)); // NOT USED
 //  m_ic49_pio->out_pa_callback().set(FUNC(cedar_magnet_state::ic49_pio_pa_w)); // NOT USED
@@ -967,12 +967,12 @@ void cedar_magnet_state::cedar_magnet(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x400);
 
-	CEDAR_MAGNET_SOUND(config, m_cedsound, 0);
-	CEDAR_MAGNET_PLANE(config, m_cedplane0, 0);
-	CEDAR_MAGNET_PLANE(config, m_cedplane1, 0);
-	CEDAR_MAGNET_SPRITE(config, m_cedsprite, 0);
+	CEDAR_MAGNET_SOUND(config, m_cedsound);
+	CEDAR_MAGNET_PLANE(config, m_cedplane0);
+	CEDAR_MAGNET_PLANE(config, m_cedplane1);
+	CEDAR_MAGNET_SPRITE(config, m_cedsprite);
 
-	CEDAR_MAGNET_FLOP(config, "flop", 0);
+	CEDAR_MAGNET_FLOP(config, "flop");
 
 	config.set_perfect_quantum(m_maincpu);
 }

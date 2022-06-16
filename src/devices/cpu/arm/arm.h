@@ -27,7 +27,7 @@ public:
 	};
 
 	// construction/destruction
-	arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_copro_type(copro_type type) { m_copro_type = type; }
 
@@ -41,7 +41,7 @@ protected:
 		ARM32_IR13, ARM32_IR14, ARM32_SR13, ARM32_SR14
 	};
 
-	arm_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	arm_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -16,21 +16,14 @@ class nsc810_device :  public device_t
 {
 public:
 	// construction/destruction
-	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t clk0, uint32_t clk1)
-		: nsc810_device(mconfig, tag, owner, clock)
-	{
-		set_timer0_clock(clk0);
-		set_timer1_clock(clk1);
-	}
-
-	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const XTAL &clk0, const XTAL &clk1)
-		: nsc810_device(mconfig, tag, owner, clock)
+	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clk0, const XTAL &clk1)
+		: nsc810_device(mconfig, tag, owner)
 	{
 		set_timer0_clock(clk0.value());
 		set_timer1_clock(clk1.value());
 	}
 
-	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto portA_read_callback() { return m_portA_r.bind(); }
 	auto portB_read_callback() { return m_portB_r.bind(); }

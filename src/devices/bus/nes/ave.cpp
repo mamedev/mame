@@ -38,17 +38,17 @@ DEFINE_DEVICE_TYPE(NES_NINA006, nes_nina006_device, "nes_nina006", "NES Cart AVE
 DEFINE_DEVICE_TYPE(NES_MAXI15,  nes_maxi15_device,  "nes_maxi15",  "NES Cart AVE Maxi 15 PCB")
 
 
-nes_nina001_device::nes_nina001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_nina001_device::nes_nina001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_NINA001, tag, owner, clock)
 {
 }
 
-nes_nina006_device::nes_nina006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_nina006_device::nes_nina006_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_NINA006, tag, owner, clock)
 {
 }
 
-nes_maxi15_device::nes_maxi15_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_maxi15_device::nes_maxi15_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_MAXI15, tag, owner, clock)
 {
 }

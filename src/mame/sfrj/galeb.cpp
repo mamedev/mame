@@ -301,7 +301,7 @@ u32 galeb_state::screen_update_galeb(screen_device &screen, bitmap_ind16 &bitmap
 void galeb_state::galeb(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1000000);
+	M6502(config, m_maincpu, XTAL::u(1000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &galeb_state::mem_map);
 
 	/* video hardware */
@@ -319,13 +319,13 @@ void galeb_state::galeb(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.0625); // unknown DAC
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.0625); // unknown DAC
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 4'800)); // 300 baud x 16(divider) = 4800
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(4'800))); // 300 baud x 16(divider) = 4800
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
 	/* cassette */

@@ -22,7 +22,7 @@
 class latch8_device : public device_t
 {
 public:
-	latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// Write bit to discrete node
 	template <unsigned N> auto write_cb() { return m_write_cb[N].bind(); }

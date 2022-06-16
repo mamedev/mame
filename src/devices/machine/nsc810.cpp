@@ -24,7 +24,7 @@
 
 DEFINE_DEVICE_TYPE(NSC810, nsc810_device, "nsc810", "National Semiconductor NSC810 RAM-I/O-Timer")
 
-nsc810_device::nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nsc810_device::nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NSC810, tag, owner, clock),
 	m_portA_latch(0), m_portB_latch(0), m_portC_latch(0),
 	m_ddrA(0), m_ddrB(0), m_ddrC(0),

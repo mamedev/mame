@@ -1565,24 +1565,24 @@ void williams_state::williams_base(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic6
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic6
 
 	// pia
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
 	m_pia[0]->readpb_handler().set_ioport("IN1");
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("IN2");
 	m_pia[1]->writepb_handler().set(FUNC(williams_state::snd_cmd_w));
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	PIA6821(config, m_pia[2], 0);
+	PIA6821(config, m_pia[2]);
 	m_pia[2]->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia[2]->irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[2]->irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
@@ -1637,11 +1637,11 @@ void wms_muxed_state::williams_muxed(machine_config &config)
 	m_pia[0]->cb2_handler().set("mux_0", FUNC(ls157_device::select_w));
 	m_pia[0]->cb2_handler().append("mux_1", FUNC(ls157_device::select_w));
 
-	LS157(config, m_mux0, 0); // IC3 on interface board (actually LS257 with OC tied low)
+	LS157(config, m_mux0); // IC3 on interface board (actually LS257 with OC tied low)
 	m_mux0->a_in_callback().set_ioport("INP2");
 	m_mux0->b_in_callback().set_ioport("INP1");
 
-	LS157(config, m_mux1, 0); // IC4 on interface board (actually LS257 with OC tied low)
+	LS157(config, m_mux1); // IC4 on interface board (actually LS257 with OC tied low)
 	m_mux1->a_in_callback().set_ioport("INP2A");
 	m_mux1->b_in_callback().set_ioport("INP1A");
 }
@@ -1664,7 +1664,7 @@ void spdball_state::spdball(machine_config &config)
 	williams_b1(config);
 
 	// pia
-	PIA6821(config, m_pia[3], 0);
+	PIA6821(config, m_pia[3]);
 	m_pia[3]->readpa_handler().set_ioport("IN3");
 	m_pia[3]->readpb_handler().set_ioport("IN4");
 }
@@ -1692,7 +1692,7 @@ void sinistar_state::sinistar(machine_config &config)
 	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
 
 	// sound hardware
-	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
+	HC55516(config, "cvsd").add_route(ALL_OUTPUTS, "speaker", 0.8);
 }
 
 void playball_state::playball(machine_config &config)
@@ -1703,7 +1703,7 @@ void playball_state::playball(machine_config &config)
 	m_screen->set_visarea(6, 298-1, 8, 240-1);
 
 	// sound hardware
-	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
+	HC55516(config, "cvsd").add_route(ALL_OUTPUTS, "speaker", 0.8);
 
 	// pia
 	m_pia[2]->ca2_handler().set("cvsd", FUNC(hc55516_device::digit_w));
@@ -1724,7 +1724,7 @@ void blaster_state::blastkit(machine_config &config)
 	m_pia[0]->cb2_handler().set("mux_a", FUNC(ls157_x2_device::select_w));
 
 	// All multiplexers on Blaster interface board are really LS257 with OC tied to GND (which is equivalent to LS157)
-	LS157_X2(config, m_muxa, 0);
+	LS157_X2(config, m_muxa);
 	m_muxa->a_in_callback().set_ioport("IN3");
 	m_muxa->b_in_callback().set(FUNC(williams_state::port_0_49way_r));
 }
@@ -1747,7 +1747,7 @@ void blaster_state::blaster(machine_config &config)
 	m_muxa->a_in_callback().set(FUNC(williams_state::port_0_49way_r));
 	m_muxa->b_in_callback().set_ioport("IN3");
 
-	LS157(config, m_muxb, 0); // IC3
+	LS157(config, m_muxb); // IC3
 	m_muxb->a_in_callback().set_ioport("INP1");
 	m_muxb->b_in_callback().set_ioport("INP2");
 
@@ -1756,7 +1756,7 @@ void blaster_state::blaster(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(blaster_state::blaster_snd_cmd_w));
 	m_pia[2]->writepa_handler().set("ldac", FUNC(dac_byte_interface::data_w));
 
-	PIA6821(config, m_pia[3], 0);
+	PIA6821(config, m_pia[3]);
 	m_pia[3]->writepa_handler().set("rdac", FUNC(dac_byte_interface::data_w));
 	m_pia[3]->irqa_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[3]->irqb_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<1>));
@@ -1767,8 +1767,8 @@ void blaster_state::blaster(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MC1408(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	MC1408(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	MC1408(config, "ldac").add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
+	MC1408(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 }
 
 
@@ -1803,24 +1803,24 @@ void williams2_state::williams2_base(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
 	// pia
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
 	m_pia[0]->readpb_handler().set_ioport("IN1");
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("IN2");
 	m_pia[1]->writepb_handler().set(FUNC(williams2_state::snd_cmd_w));
 	m_pia[1]->cb2_handler().set(m_pia[2], FUNC(pia6821_device::ca1_w));
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	PIA6821(config, m_pia[2], 0);
+	PIA6821(config, m_pia[2]);
 	m_pia[2]->writepa_handler().set(m_pia[1], FUNC(pia6821_device::portb_w));
 	m_pia[2]->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia[2]->ca2_handler().set(m_pia[1], FUNC(pia6821_device::cb1_w));
@@ -1843,7 +1843,7 @@ void inferno_state::inferno(machine_config &config)
 
 	m_pia[2]->set_port_a_input_overrides_output_mask(0xff);
 
-	LS157_X2(config, m_mux, 0); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
+	LS157_X2(config, m_mux); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
 	m_mux->a_in_callback().set_ioport("INP1");
 	m_mux->b_in_callback().set_ioport("INP2");
 }
@@ -1883,7 +1883,7 @@ void tshoot_state::tshoot(machine_config &config)
 
 	m_pia[2]->cb2_handler().set(FUNC(tshoot_state::maxvol_w));
 
-	LS157_X2(config, m_mux, 0); // U2 + U3 on interface board
+	LS157_X2(config, m_mux); // U2 + U3 on interface board
 	m_mux->a_in_callback().set_ioport("INP1");
 	m_mux->b_in_callback().set_ioport("INP2");
 }
@@ -1915,7 +1915,7 @@ void joust2_state::joust2(machine_config &config)
 	m_bg->cb2_cb().set(m_pia[2], FUNC(pia6821_device::cb1_w));
 	m_pia[2]->cb2_handler().set(m_bg, FUNC(s11_obg_device::resetq_w)); // inverted?
 
-	LS157(config, m_mux, 0);
+	LS157(config, m_mux);
 	m_mux->a_in_callback().set_ioport("INP1");
 	m_mux->b_in_callback().set_ioport("INP2");
 }

@@ -301,11 +301,11 @@ INPUT_PORTS_END
 
 void sbugger_state::sbugger(machine_config &config)
 {
-	I8085A(config, m_maincpu, 6'000'000);        // 3.00 MHz???
+	I8085A(config, m_maincpu, XTAL::u(6'000'000));        // 3.00 MHz???
 	m_maincpu->set_addrmap(AS_PROGRAM, &sbugger_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &sbugger_state::io_map);
 
-	i8156_device &i8156(I8156(config, "i8156", 200'000));     // freq is an approximation
+	i8156_device &i8156(I8156(config, "i8156", XTAL::u(200'000)));     // freq is an approximation
 	i8156.in_pa_callback().set_ioport("INPUTS");
 	i8156.in_pb_callback().set_ioport("DSW1");
 	i8156.in_pc_callback().set_ioport("DSW2");
@@ -326,9 +326,9 @@ void sbugger_state::sbugger(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, "sn76489.1", 3'000'000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn76489.1", XTAL::u(3'000'000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	SN76489(config, "sn76489.2", 3'000'000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn76489.2", XTAL::u(3'000'000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

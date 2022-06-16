@@ -52,7 +52,7 @@ void a2bus_mcms1_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mcms_l").front_left();
 	SPEAKER(config, "mcms_r").front_right();
 
-	MCMS(config, m_mcms, 1000000);
+	MCMS(config, m_mcms, XTAL::u(1000000));
 	m_mcms->irq_cb().set(FUNC(a2bus_mcms1_device::irq_w));
 	m_mcms->add_route(0, "mcms_l", 1.0);
 	m_mcms->add_route(1, "mcms_r", 1.0);
@@ -62,14 +62,14 @@ void a2bus_mcms1_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE - Card 1
 //**************************************************************************
 
-a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_mcms(*this, ENGINE_TAG)
 {
 }
 
-a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_mcms1_device(mconfig, A2BUS_MCMS1, tag, owner, clock)
 {
 }
@@ -139,13 +139,13 @@ WRITE_LINE_MEMBER(a2bus_mcms1_device::irq_w)
 //  LIVE DEVICE - Card 2
 //**************************************************************************
 
-a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_card1(nullptr), m_engine(nullptr)
 {
 }
 
-a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_mcms2_device(mconfig, A2BUS_MCMS2, tag, owner, clock)
 {
 }
@@ -196,7 +196,7 @@ void a2bus_mcms2_device::write_cnxx(uint8_t offset, uint8_t data)
     Sound device implementation
 */
 
-mcms_device::mcms_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mcms_device::mcms_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MCMS, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_write_irq(*this), m_stream(nullptr), m_timer(nullptr), m_clrtimer(nullptr), m_pBusDevice(nullptr), m_enabled(false), m_mastervol(0), m_rand(0)

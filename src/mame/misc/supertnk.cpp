@@ -454,7 +454,7 @@ void supertnk_state::supertnk(machine_config &config)
 	// audio hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, "aysnd", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 

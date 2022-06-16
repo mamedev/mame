@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(UPD78053, upd78053_device, "upd78053", "NEC uPD78053")
 //  upd78k0_device - constructor
 //-------------------------------------------------
 
-upd78k0_device::upd78k0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 iram_size, address_map_constructor mem_map, address_map_constructor sfr_map)
+upd78k0_device::upd78k0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u16 iram_size, address_map_constructor mem_map, address_map_constructor sfr_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, mem_map)
 	, m_iram_config("iram", ENDIANNESS_LITTLE, 16, iram_size > 0x200 ? 10 : iram_size > 0x100 ? 9 : 8, 0,
@@ -192,7 +192,7 @@ void upd78k0_device::state_string_export(const device_state_entry &entry, std::s
 //  upd78053_device - constructor
 //-------------------------------------------------
 
-upd78053_device::upd78053_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upd78053_device::upd78053_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upd78k0_device(mconfig, UPD78053, tag, owner, clock, 0x400,
 						address_map_constructor(FUNC(upd78053_device::mem_map), this),
 						address_map_constructor(FUNC(upd78053_device::sfr_map), this))

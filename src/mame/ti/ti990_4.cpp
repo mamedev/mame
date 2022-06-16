@@ -279,19 +279,19 @@ void ti990_4_state::ti990_4(machine_config &config)
 {
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
-	TMS9900(config, m_maincpu, 3000000);
+	TMS9900(config, m_maincpu, XTAL::u(3000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti990_4_state::memmap);
 	m_maincpu->set_addrmap(AS_IO, &ti990_4_state::crumap);
 	m_maincpu->extop_cb().set(FUNC(ti990_4_state::external_operation));
 	m_maincpu->intlevel_cb().set(FUNC(ti990_4_state::interrupt_level));
 
 	// Terminal
-	asr733_device& term(ASR733(config, "asr733", 0));
+	asr733_device& term(ASR733(config, "asr733"));
 	term.keyint_cb().set(FUNC(ti990_4_state::asrkey_interrupt));
 	term.lineint_cb().set(FUNC(ti990_4_state::line_interrupt));
 
 	// Floppy controller
-	TI99X_FD800(config, "fd800", 0).int_cb().set(FUNC(ti990_4_state::fd_interrupt));
+	TI99X_FD800(config, "fd800").int_cb().set(FUNC(ti990_4_state::fd_interrupt));
 
 	//  TODO: Add floppy drives
 }
@@ -300,19 +300,19 @@ void ti990_4_state::ti990_4v(machine_config &config)
 {
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
-	TMS9900(config, m_maincpu, 3000000);
+	TMS9900(config, m_maincpu, XTAL::u(3000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti990_4_state::memmap);
 	m_maincpu->set_addrmap(AS_IO, &ti990_4_state::crumap_v);
 	m_maincpu->extop_cb().set(FUNC(ti990_4_state::external_operation));
 	m_maincpu->intlevel_cb().set(FUNC(ti990_4_state::interrupt_level));
 
 	// VDT 911 terminal
-	vdt911_device& term(VDT911(config, "vdt911", 0));
+	vdt911_device& term(VDT911(config, "vdt911"));
 	term.keyint_cb().set(FUNC(ti990_4_state::vdtkey_interrupt));
 	term.lineint_cb().set(FUNC(ti990_4_state::line_interrupt));
 
 	// Floppy controller
-	TI99X_FD800(config, "fd800", 0).int_cb().set(FUNC(ti990_4_state::fd_interrupt));
+	TI99X_FD800(config, "fd800").int_cb().set(FUNC(ti990_4_state::fd_interrupt));
 
 	//  TODO: Add floppy drives
 }

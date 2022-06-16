@@ -509,15 +509,15 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state::cart_load )
 void casloopy_state::casloopy(machine_config &config)
 {
 	/* basic machine hardware */
-	SH2A(config, m_maincpu, 8000000);
+	SH2A(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &casloopy_state::casloopy_map);
 
-//  v60_device &subcpu(V60(config, "subcpu", 8000000));
+//  v60_device &subcpu(V60(config, "subcpu", XTAL::u(8000000)));
 //  subcpu.set_addrmap(AS_PROGRAM, &casloopy_state::casloopy_sub_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(8000000, 444, 0, 256, 263, 0, 224);
+	m_screen->set_raw(XTAL::u(8000000), 444, 0, 256, 263, 0, 224);
 //  m_screen->set_refresh_hz(60);
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 //  m_screen->set_size(444, 263);

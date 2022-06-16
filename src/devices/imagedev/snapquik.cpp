@@ -20,12 +20,12 @@ DEFINE_DEVICE_TYPE(SNAPSHOT, snapshot_image_device, "snapsot_image", "Snapshot")
 //  snapshot_image_device - constructor
 //-------------------------------------------------
 
-snapshot_image_device::snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+snapshot_image_device::snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: snapshot_image_device(mconfig, SNAPSHOT, tag, owner, clock)
 {
 }
 
-snapshot_image_device::snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+snapshot_image_device::snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, m_load(*this)
@@ -90,7 +90,7 @@ DEFINE_DEVICE_TYPE(QUICKLOAD, quickload_image_device, "quickload", "Quickload")
 //  quickload_image_device - constructor
 //-------------------------------------------------
 
-quickload_image_device::quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+quickload_image_device::quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: snapshot_image_device(mconfig, QUICKLOAD, tag, owner, clock)
 {
 }

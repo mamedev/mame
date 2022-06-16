@@ -52,7 +52,7 @@ ROM_END
 
 void a2bus_excel9_device::device_add_mconfig(machine_config &config)
 {
-	MC6809E(config, m_6809, 1021800);   // 6809E runs at ~1 MHz
+	MC6809E(config, m_6809, XTAL::u(1021800));   // 6809E runs at ~1 MHz
 	m_6809->set_addrmap(AS_PROGRAM, &a2bus_excel9_device::m6809_mem);
 }
 
@@ -69,7 +69,7 @@ const tiny_rom_entry *a2bus_excel9_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_excel9_device::a2bus_excel9_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a2bus_excel9_device::a2bus_excel9_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
 	, m_6809(*this, "m6809")
@@ -83,7 +83,7 @@ a2bus_excel9_device::a2bus_excel9_device(const machine_config &mconfig, device_t
 {
 }
 
-a2bus_excel9_device::a2bus_excel9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_excel9_device::a2bus_excel9_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_excel9_device(mconfig, A2BUS_EXCEL9, tag, owner, clock)
 {
 }

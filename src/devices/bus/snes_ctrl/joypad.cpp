@@ -53,7 +53,7 @@ ioport_constructor snes_joypad_device::device_input_ports() const
 //  snes_joypad_device - constructor
 //-------------------------------------------------
 
-snes_joypad_device::snes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+snes_joypad_device::snes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SNES_JOYPAD, tag, owner, clock),
 	device_snes_control_port_interface(mconfig, *this),
 	m_joypad(*this, "JOYPAD"),

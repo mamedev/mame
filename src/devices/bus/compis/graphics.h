@@ -50,7 +50,7 @@ class compis_graphics_slot_device : public device_t, public device_single_card_s
 public:
 	// construction/destruction
 	template <typename T>
-	compis_graphics_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
+	compis_graphics_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, T &&opts, char const *dflt)
 		: compis_graphics_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -58,7 +58,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	compis_graphics_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	compis_graphics_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto drq() { return m_write_dma_request.bind(); }
 

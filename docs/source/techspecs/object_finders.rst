@@ -80,7 +80,7 @@ Object finders are declared as members of the device class:
     class a2bus_parprn_device : public device_t, public device_a2bus_card_interface
     {
     public:
-        a2bus_parprn_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+        a2bus_parprn_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
         virtual void write_c0nx(u8 offset, u8 data) override;
         virtual u8 read_cnxx(u8 offset) override;
@@ -104,7 +104,7 @@ In the constructor, we set the initial target for the object finders:
 
 .. code-block:: C++
 
-    a2bus_parprn_device::a2bus_parprn_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+    a2bus_parprn_device::a2bus_parprn_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
         device_t(mconfig, A2BUS_PARPRN, tag, owner, clock),
         device_a2bus_card_interface(mconfig, *this),
         m_printer_conn(*this, "prn"),
@@ -229,7 +229,7 @@ the object finders in the device class (with all distractions removed):
     {
         template <typename T, typename U>
         sbus_device(
-                machine_config const &mconfig, char const *tag, device_t *owner, u32 clock,
+                machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock,
                 T &&cpu_tag,
                 U &&space_tag, int space_num) :
             sbus_device(mconfig, tag, owner, clock)
@@ -238,7 +238,7 @@ the object finders in the device class (with all distractions removed):
             set_type1space(std::forward<U>(space_tag), space_num);
         }
 
-        sbus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+        sbus_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
             device_t(mconfig, SBUS, tag, owner, clock),
             device_memory_interface(mconfig, *this),
             m_maincpu(*this, finder_base::DUMMY_TAG),
@@ -292,11 +292,11 @@ purely for convenience.
 
 When we want to instantiate this device and hook it up, we do this::
 
-    SPARCV7(config, m_maincpu, 20'000'000);
+    SPARCV7(config, m_maincpu, XTAL::u(20'000'000));
 
     ADDRESS_MAP_BANK(config, m_type1space);
 
-    SBUS(config, m_sbus, 20'000'000);
+    SBUS(config, m_sbus, XTAL::u(20'000'000));
     m_sbus->set_cpu(m_maincpu);
     m_sbus->set_type1space(m_type1space, 0);
 
@@ -306,14 +306,14 @@ devices, and to configure the SBus device.
 Note that we could also use literal C strings to configure the SBus device, at
 the cost of needing to update the tags in multiple places if they change::
 
-    SBUS(config, m_sbus, 20'000'000);
+    SBUS(config, m_sbus, XTAL::u(20'000'000));
     m_sbus->set_cpu("maincpu");
     m_sbus->set_type1space("type1", 0);
 
 If we want to use the convenience constructor, we just supply additional
 arguments when instantiating the device::
 
-    SBUS(config, m_sbus, 20'000'000, m_maincpu, m_type1space, 0);
+    SBUS(config, m_sbus, XTAL::u(20'000'000), m_maincpu, m_type1space, 0);
 
 
 Object finder arrays
@@ -365,7 +365,7 @@ A common case for an object array finder is a key matrix:
     class keyboard_base : public device_t, public device_mac_keyboard_interface
     {
     protected:
-        keyboard_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+        keyboard_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock) :
             device_t(mconfig, type, tag, owner, clock),
             device_mac_keyboard_interface(mconfig, *this),
             m_rows(*this, "ROW%u", 0U)
@@ -503,7 +503,7 @@ object finder to access it.  We’ll use the Sega X-board device as an example:
     class segaxbd_state : public device_t
     {
     protected:
-        segaxbd_state(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+        segaxbd_state(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock) :
             device_t(mconfig, type, tag, owner, clock),
             m_soundcpu(*this, "soundcpu"),
             m_soundcpu2(*this, "soundcpu2"),
@@ -609,7 +609,7 @@ functions for configuring them:
             public device_single_card_slot_interface<device_vboy_cart_interface>
     {
     public:
-        vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0U);
+        vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
         template <typename T> void set_exp(T &&tag, int no, offs_t base)
         {
@@ -648,7 +648,7 @@ numbers (``finder_base::DUMMY_TAG`` and -1):
 
 .. code-block:: C++
 
-    vboy_cart_slot_device::vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+    vboy_cart_slot_device::vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
         device_t(mconfig, VBOY_CART_SLOT, tag, owner, clock),
         device_image_interface(mconfig, *this),
         device_single_card_slot_interface<device_vboy_cart_interface>(mconfig, *this),

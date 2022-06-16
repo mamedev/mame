@@ -55,7 +55,7 @@ class ttl7474_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// static configuration helpers
 	auto output_cb() { return m_output_func.bind(); }

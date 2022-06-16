@@ -15,7 +15,7 @@ class gamate_video_device : public device_t,
 {
 public:
 	// construction/destruction
-	gamate_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gamate_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void lcdcon_w(uint8_t data);
 	void xscroll_w(uint8_t data);

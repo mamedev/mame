@@ -200,7 +200,7 @@ const tiny_rom_entry *bbc_tube_65c102_device::device_rom_region() const
 //  bbc_tube_6502_device - constructor
 //-------------------------------------------------
 
-bbc_tube_6502_device::bbc_tube_6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_6502_device::bbc_tube_6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_tube_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
@@ -211,17 +211,17 @@ bbc_tube_6502_device::bbc_tube_6502_device(const machine_config &mconfig, device
 {
 }
 
-bbc_tube_6502_device::bbc_tube_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_6502_device::bbc_tube_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_6502_device(mconfig, BBC_TUBE_6502, tag, owner, clock)
 {
 }
 
-bbc_tube_6502p_device::bbc_tube_6502p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_6502p_device::bbc_tube_6502p_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_6502_device(mconfig, BBC_TUBE_6502P, tag, owner, clock)
 {
 }
 
-bbc_tube_6502e_device::bbc_tube_6502e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_6502e_device::bbc_tube_6502e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_6502_device(mconfig, BBC_TUBE_6502E, tag, owner, clock)
 	, m_opcode_ind_y(false)
 	, m_page(0)
@@ -229,7 +229,7 @@ bbc_tube_6502e_device::bbc_tube_6502e_device(const machine_config &mconfig, cons
 {
 }
 
-bbc_tube_65c102_device::bbc_tube_65c102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_65c102_device::bbc_tube_65c102_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_6502_device(mconfig, BBC_TUBE_65C102, tag, owner, clock)
 {
 }

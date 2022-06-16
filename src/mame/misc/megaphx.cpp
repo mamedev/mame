@@ -411,9 +411,9 @@ void megaphx_state::megaphx(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(megaphx_state::ppi_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(megaphx_state::ppi_portc_w));
 
-	INDER_VIDEO(config, m_indervid, 0);
+	INDER_VIDEO(config, m_indervid);
 
-	INDER_AUDIO(config, "inder_sb", 0);
+	INDER_AUDIO(config, "inder_sb");
 }
 
 ROM_START( megaphx )

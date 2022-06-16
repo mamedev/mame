@@ -30,7 +30,7 @@ class arc_econet_device:
 {
 public:
 	// construction/destruction
-	arc_econet_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_econet_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -61,7 +61,7 @@ INPUT_PORTS_END
 void tr606_state::tr606(machine_config &config)
 {
 	// basic machine hardware
-	NEC_D650(config, m_maincpu, 454545); // LC circuit(TI S74230), 2.2us
+	NEC_D650(config, m_maincpu, XTAL::u(454545)); // LC circuit(TI S74230), 2.2us
 
 	auto &irq_clock(CLOCK(config, "irq_clock"));
 	irq_clock.set_period(attotime::from_usec(1800)); // clock rate 1.8ms (same as tb303)

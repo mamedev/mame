@@ -64,7 +64,7 @@ void sv806_device::device_add_mconfig(machine_config &config)
 //  sv806_device - constructor
 //-------------------------------------------------
 
-sv806_device::sv806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sv806_device::sv806_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SV806, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this),
 	m_crtc(*this, "crtc"),

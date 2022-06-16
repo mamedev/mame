@@ -665,7 +665,7 @@ void ssem_state::machine_reset()
 void ssem_state::ssem(machine_config &config)
 {
 	/* basic machine hardware */
-	SSEMCPU(config, m_maincpu, 700);
+	SSEMCPU(config, m_maincpu, XTAL::u(700));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssem_state::ssem_map);
 
 	/* video hardware */

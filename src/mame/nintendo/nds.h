@@ -102,7 +102,7 @@ private:
 	uint32_t m_timer_regs[8]{};
 	uint16_t m_timer_reload[8]{};
 	int m_timer_recalc[8]{};
-	double m_timer_hz[8]{};
+	XTAL m_timer_hz[8];
 
 	emu_timer *m_tmr_timer[8]{}, *m_irq_timer = nullptr;
 

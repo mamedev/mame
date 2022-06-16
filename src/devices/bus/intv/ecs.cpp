@@ -28,7 +28,7 @@
 
 DEFINE_DEVICE_TYPE(INTV_ROM_ECS, intv_ecs_device, "intv_ecs", "Intellivision ECS Expansion")
 
-intv_ecs_device::intv_ecs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+intv_ecs_device::intv_ecs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	intv_rom_device(mconfig, INTV_ROM_ECS, tag, owner, clock),
 	m_snd(*this, "ay8914"),
 	m_subslot(*this, "subslot"),

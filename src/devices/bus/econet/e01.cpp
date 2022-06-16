@@ -78,7 +78,7 @@
 DEFINE_DEVICE_TYPE(ECONET_E01,  econet_e01_device,  "econet_e01",  "Acorn FileStore E01")
 DEFINE_DEVICE_TYPE(ECONET_E01S, econet_e01s_device, "econet_e01s", "Acorn FileStore E01S")
 
-econet_e01s_device::econet_e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+econet_e01s_device::econet_e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: econet_e01_device(mconfig, ECONET_E01S, tag, owner, clock, TYPE_E01S)
 {
 }
@@ -253,7 +253,7 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	via.irq_handler().set(FUNC(econet_e01_device::via_irq_w));
 
-	MC6854(config, m_adlc, 0);
+	MC6854(config, m_adlc);
 	m_adlc->out_irq_cb().set(FUNC(econet_e01_device::adlc_irq_w));
 	m_adlc->out_txd_cb().set(FUNC(econet_e01_device::econet_data_w));
 
@@ -380,13 +380,13 @@ inline void econet_e01_device::hdc_irq_enable(int enabled)
 //  econet_e01_device - constructor
 //-------------------------------------------------
 
-econet_e01_device::econet_e01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+econet_e01_device::econet_e01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: econet_e01_device(mconfig, ECONET_E01, tag, owner, clock, TYPE_E01)
 {
 }
 
 
-econet_e01_device::econet_e01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant)
+econet_e01_device::econet_e01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int variant)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_econet_interface(mconfig, *this)
 	, m_maincpu(*this, R65C102_TAG)

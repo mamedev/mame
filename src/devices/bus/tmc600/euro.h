@@ -77,7 +77,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	tmc600_eurobus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: tmc600_eurobus_slot_device(mconfig, tag, owner, 0)
+		: tmc600_eurobus_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -85,7 +85,7 @@ public:
 		set_fixed(false);
 	}
 
-	tmc600_eurobus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	tmc600_eurobus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides

@@ -16,7 +16,7 @@
 class mc6843_device : public device_t
 {
 public:
-	mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void force_ready() { m_force_ready = true; }
 

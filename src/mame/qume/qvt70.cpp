@@ -384,7 +384,7 @@ void qvt70_state::machine_reset()
 
 void qvt70_state::qvt70(machine_config &config)
 {
-	Z80(config, m_maincpu, 8'000'000);
+	Z80(config, m_maincpu, XTAL::u(8'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &qvt70_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &qvt70_state::io_map);
 
@@ -400,7 +400,7 @@ void qvt70_state::qvt70(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", chars);
 
-	Z80DART(config, "dart", 4'000'000);
+	Z80DART(config, "dart", XTAL::u(4'000'000));
 	// dart irq connected to maincpu int
 
 	// 25-pin (dcd, rxd, txd, dtr, dsr, rts, cts and current loop)

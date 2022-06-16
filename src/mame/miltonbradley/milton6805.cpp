@@ -82,7 +82,7 @@ void milton_state::machine_start()
 class milton_filter_device : public device_t, public device_sound_interface
 {
 public:
-	milton_filter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	milton_filter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_start() override;
@@ -96,7 +96,7 @@ private:
 DEFINE_DEVICE_TYPE(MILTON_LED_FILTER, milton_filter_device, "milton_led_filter", "Milton LED Filter")
 
 
-milton_filter_device::milton_filter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+milton_filter_device::milton_filter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MILTON_LED_FILTER, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_led_out(*this, "led")

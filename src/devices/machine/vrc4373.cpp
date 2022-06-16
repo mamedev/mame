@@ -94,7 +94,7 @@ void vrc4373_device::target2_map(address_map &map)
 	map(0x00000000, 0xFFFFFFFF).rw(FUNC(vrc4373_device::target2_r), FUNC(vrc4373_device::target2_w));
 }
 
-vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_host_device(mconfig, VRC4373, tag, owner, clock)
 	, m_cpu_space(nullptr), m_irq_cb(*this), m_cpu(*this, finder_base::DUMMY_TAG), m_ram_size(0x0), m_simm0_size(0x0)
 	, m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32)

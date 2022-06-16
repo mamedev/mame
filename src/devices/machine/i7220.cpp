@@ -60,7 +60,7 @@ DEFINE_DEVICE_TYPE(I7220, i7220_device, "i7220", "Intel 7220 BMC")
 //  i7220_device - constructor
 //-------------------------------------------------
 
-i7220_device::i7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i7220_device::i7220_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, I7220, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, intrq_cb(*this)

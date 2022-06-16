@@ -22,7 +22,7 @@ class hd44102_device : public device_t
 {
 public:
 	// construction/destruction
-	hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration helpers
 	void set_screen_offsets(int sx, int sy) { m_sx = sx; m_sy = sy; } // when using screen_update

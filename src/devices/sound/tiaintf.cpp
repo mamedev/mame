@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(TIA, tia_device, "tia_sound", "Atari TIA (Sound)")
 //  tia_device - constructor
 //-------------------------------------------------
 
-tia_device::tia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tia_device::tia_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TIA, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),

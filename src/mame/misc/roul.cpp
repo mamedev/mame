@@ -314,11 +314,11 @@ INPUT_PORTS_END
 void roul_state::roul(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &roul_state::roul_map);
 	m_maincpu->set_addrmap(AS_IO, &roul_state::roul_cpu_io_map);
 
-	Z80(config, m_soundcpu, 4000000);
+	Z80(config, m_soundcpu, XTAL::u(4000000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &roul_state::sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &roul_state::sound_cpu_io_map);
 
@@ -340,7 +340,7 @@ void roul_state::roul(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "aysnd", 1000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	AY8910(config, "aysnd", XTAL::u(1000000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 ROM_START(roul)

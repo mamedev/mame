@@ -24,7 +24,7 @@ public:
 	void tone_generator_hi_w(u8 data);
 
 protected:
-	midway_tone_generator_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	midway_tone_generator_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	required_device<discrete_sound_device> m_discrete;
 };
@@ -33,7 +33,7 @@ protected:
 class seawolf_audio_device : public device_t
 {
 public:
-	seawolf_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	seawolf_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void write(u8 data);
 
@@ -50,7 +50,7 @@ private:
 class gunfight_audio_device : public device_t
 {
 public:
-	gunfight_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	gunfight_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void write(u8 data);
 
@@ -70,7 +70,7 @@ private:
 class boothill_audio_device : public midway_tone_generator_device_base
 {
 public:
-	boothill_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	boothill_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void write(u8 data);
 
@@ -86,7 +86,7 @@ class desertgu_audio_device : public midway_tone_generator_device_base
 public:
 	auto ctrl_sel_out() { return m_ctrl_sel_out.bind(); }
 
-	desertgu_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	desertgu_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
@@ -106,7 +106,7 @@ private:
 class dplay_audio_device : public midway_tone_generator_device_base
 {
 public:
-	dplay_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	dplay_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void write(u8 data);
 
@@ -120,7 +120,7 @@ protected:
 class gmissile_audio_device : public device_t
 {
 public:
-	gmissile_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	gmissile_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
@@ -141,7 +141,7 @@ private:
 class m4_audio_device : public device_t
 {
 public:
-	m4_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	m4_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
@@ -162,7 +162,7 @@ class clowns_audio_device : public midway_tone_generator_device_base
 public:
 	auto ctrl_sel_out() { return m_ctrl_sel_out.bind(); }
 
-	clowns_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	clowns_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
@@ -185,7 +185,7 @@ class spacwalk_audio_device : public midway_tone_generator_device_base
 public:
 	auto ctrl_sel_out() { return m_ctrl_sel_out.bind(); }
 
-	spacwalk_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	spacwalk_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
@@ -204,7 +204,7 @@ private:
 class dogpatch_audio_device : public midway_tone_generator_device_base
 {
 public:
-	dogpatch_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	dogpatch_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void write(u8 data);
 
@@ -217,7 +217,7 @@ protected:
 class spcenctr_audio_device : public device_t
 {
 public:
-	spcenctr_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	spcenctr_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
@@ -242,7 +242,7 @@ private:
 class phantom2_audio_device : public device_t
 {
 public:
-	phantom2_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	phantom2_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
@@ -264,7 +264,7 @@ class invaders_audio_device : public device_t
 public:
 	auto flip_screen_out() { return m_flip_screen_out.bind(); }
 
-	invaders_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	invaders_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
@@ -284,7 +284,7 @@ private:
 class invad2ct_audio_device : public device_t
 {
 public:
-	invad2ct_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	invad2ct_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void p1_w(u8 data);
 	void p2_w(u8 data);
@@ -308,7 +308,7 @@ public:
 	void p2_w(u8 data);
 
 protected:
-	zzzap_common_audio_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, void (*netlist)(netlist::nlparse_t &));
+	zzzap_common_audio_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock, void (*netlist)(netlist::nlparse_t &));
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -332,14 +332,14 @@ private:
 class zzzap_audio_device : public zzzap_common_audio_device
 {
 public:
-	zzzap_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	zzzap_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 
 class lagunar_audio_device : public zzzap_common_audio_device
 {
 public:
-	lagunar_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	lagunar_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 

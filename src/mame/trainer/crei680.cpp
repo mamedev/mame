@@ -288,17 +288,17 @@ void crei680_state::crei680(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 900).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, "beeper", XTAL::u(900)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia0);
 	m_pia0->readpa_handler().set_ioport("X1");
 	m_pia0->writepb_handler().set(FUNC(crei680_state::pia0b_w));
 	//m_pia0->cb2_handler().set(FUNC(crei680_state::screen_w));
 	m_pia0->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia0->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set_ioport("X0");
 	m_pia1->writepb_handler().set(FUNC(crei680_state::pia1b_w));
 	//m_pia1->cb2_handler().set(FUNC(crei680_state::screen_w));
@@ -309,7 +309,7 @@ void crei680_state::crei680(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	ACIA6850(config, m_uart, 0);
+	ACIA6850(config, m_uart);
 	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 	//m_uart->rts_handler().set(FUNC(crei680_state::acia_rts_w));
 	m_uart->irq_handler().set_inputline("maincpu", M6800_IRQ_LINE);

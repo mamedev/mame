@@ -55,11 +55,11 @@ INPUT_PORTS_END
 
 void airbase99_state::airbase99(machine_config &config)
 {
-	PIC17C43(config, m_maincpu, 16'000'000); // PIC17C43-16/P (XTAL unreadable)
+	PIC17C43(config, m_maincpu, XTAL::u(16'000'000)); // PIC17C43-16/P (XTAL unreadable)
 	m_maincpu->set_mode(pic17c43_device::mode::MICROPROCESSOR);
 	m_maincpu->set_addrmap(AS_PROGRAM, &airbase99_state::mem_map);
 
-	PIC17C43(config, m_slavecpu, 16'000'000); // PIC17C43-33/P (XTAL unreadable)
+	PIC17C43(config, m_slavecpu, XTAL::u(16'000'000)); // PIC17C43-33/P (XTAL unreadable)
 	m_slavecpu->set_mode(pic17c43_device::mode::MICROCONTROLLER);
 	m_slavecpu->set_disable();
 
@@ -73,7 +73,7 @@ void airbase99_state::airbase99(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc"));
 	lcdc.set_lcd_size(2, 20);
 	lcdc.set_pixel_update_cb(FUNC(airbase99_state::pixel_update));
 }

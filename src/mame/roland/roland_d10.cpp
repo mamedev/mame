@@ -304,7 +304,7 @@ void roland_d10_state::d10(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(roland_d10_state::d10_palette), 2);
 
-	MSM6222B_01(config, m_lcd, 0);
+	MSM6222B_01(config, m_lcd);
 
 	TIMER(config, m_midi_timer).configure_generic(FUNC(roland_d10_state::midi_timer_cb));
 

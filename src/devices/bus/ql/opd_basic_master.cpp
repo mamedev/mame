@@ -47,7 +47,7 @@ const tiny_rom_entry *opd_basic_master_device::device_rom_region() const
 //  opd_basic_master_device - constructor
 //-------------------------------------------------
 
-opd_basic_master_device::opd_basic_master_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+opd_basic_master_device::opd_basic_master_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, OPD_BASIC_MASTER, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this)
 {

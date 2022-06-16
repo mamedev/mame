@@ -24,7 +24,7 @@ class gayle_device : public device_t
 {
 public:
 	// construction/destruction
-	gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto int2_handler() { return m_int2_w.bind(); }

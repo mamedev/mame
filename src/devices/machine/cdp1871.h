@@ -38,7 +38,7 @@ class cdp1871_device :  public device_t
 {
 public:
 	// construction/destruction
-	cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto d1_callback() { return m_read_d1.bind(); }
 	auto d2_callback() { return m_read_d2.bind(); }

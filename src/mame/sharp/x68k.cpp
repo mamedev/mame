@@ -1623,7 +1623,7 @@ void x68k_state::x68000_base(machine_config &config)
 	rs232_port_device &keyboard(RS232_PORT(config, "keyboard", keyboard_devices, "x68k"));
 	keyboard.rxd_handler().set(m_mfpdev, FUNC(mc68901_device::si_w));
 
-	I8255A(config, m_ppi, 0);
+	I8255A(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(x68k_state::ppi_port_a_r));
 	m_ppi->in_pb_callback().set(FUNC(x68k_state::ppi_port_b_r));
 	m_ppi->in_pc_callback().set(FUNC(x68k_state::ppi_port_c_r));
@@ -1718,7 +1718,7 @@ void x68k_state::x68000(machine_config &config)
 	m_crtc->gvram_read_cb().set(FUNC(x68k_state::gvram_read));
 	m_crtc->gvram_write_cb().set(FUNC(x68k_state::gvram_write));
 
-	X68KHDC(config, "x68k_hdc", 0);
+	X68KHDC(config, "x68k_hdc");
 }
 
 void x68ksupr_state::x68ksupr_base(machine_config &config)

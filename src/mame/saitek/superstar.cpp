@@ -196,7 +196,7 @@ INPUT_PORTS_END
 void star_state::sstar28k(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 2000000); // no XTAL
+	M6502(config, m_maincpu, XTAL::u(2000000)); // no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::sstar28k_map);
 
 	const attotime nmi_period = attotime::from_hz(2000000 / 0x2000); // 4020 Q13

@@ -838,7 +838,7 @@ void fantland_state::fantland(machine_config &config)
 
 	YM2151(config, "ymsnd", 16_MHz_XTAL / 4).add_route(0, "speaker", 0.35).add_route(1, "speaker", 0.35); // divider not verified
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 
@@ -876,7 +876,7 @@ void fantland_state::galaxygn(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3000000));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(3000000)));
 	ymsnd.irq_handler().set(FUNC(fantland_state::galaxygn_sound_irq));
 	ymsnd.add_route(0, "speaker", 1.0);
 	ymsnd.add_route(1, "speaker", 1.0);
@@ -928,10 +928,10 @@ void borntofi_state::machine_reset()
 void borntofi_state::borntofi(machine_config &config)
 {
 	// Basic machine hardware
-	V20(config, m_maincpu, 16000000/2);     // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
+	V20(config, m_maincpu, XTAL(16000000)/2);     // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
 	m_maincpu->set_addrmap(AS_PROGRAM, &borntofi_state::main_map);
 
-	I8088(config, m_audiocpu, 18432000/3);  // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
+	I8088(config, m_audiocpu, XTAL(18432000)/3);  // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
 	m_audiocpu->set_addrmap(AS_PROGRAM, &borntofi_state::sound_map);
 
 	// Video hardware
@@ -953,22 +953,22 @@ void borntofi_state::borntofi(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	// OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
-	msm5205_device &msm1(MSM5205(config, "msm1", 384000));
+	msm5205_device &msm1(MSM5205(config, "msm1", XTAL(18432000)/48));
 	msm1.vck_legacy_callback().set(FUNC(borntofi_state::adpcm_int<0>));   // IRQ handler
 	msm1.set_prescaler_selector(msm5205_device::S48_4B);      // 8 kHz, 4 Bits
 	msm1.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	msm5205_device &msm2(MSM5205(config, "msm2", 384000));
+	msm5205_device &msm2(MSM5205(config, "msm2", XTAL(18432000)/48));
 	msm2.vck_legacy_callback().set(FUNC(borntofi_state::adpcm_int<1>));   // IRQ handler
 	msm2.set_prescaler_selector(msm5205_device::S48_4B);      // 8 kHz, 4 Bits
 	msm2.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	msm5205_device &msm3(MSM5205(config, "msm3", 384000));
+	msm5205_device &msm3(MSM5205(config, "msm3", XTAL(18432000)/48));
 	msm3.vck_legacy_callback().set(FUNC(borntofi_state::adpcm_int<2>));   // IRQ handler
 	msm3.set_prescaler_selector(msm5205_device::S48_4B);      // 8 kHz, 4 Bits
 	msm3.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	msm5205_device &msm4(MSM5205(config, "msm4", 384000));
+	msm5205_device &msm4(MSM5205(config, "msm4", XTAL(18432000)/48));
 	msm4.vck_legacy_callback().set(FUNC(borntofi_state::adpcm_int<3>));   // IRQ handler
 	msm4.set_prescaler_selector(msm5205_device::S48_4B);      // 8 kHz, 4 Bits
 	msm3.add_route(ALL_OUTPUTS, "speaker", 1.0);

@@ -1435,18 +1435,18 @@ void segaybd_state::yboard(machine_config &config)
 	io.out_ph_callback().set(FUNC(segaybd_state::output2_w));
 	// FMCS and CKOT connect to CS and OSC IN on MSM6253 below
 
-	msm6253_device &adc(MSM6253(config, "adc", 0));
+	msm6253_device &adc(MSM6253(config, "adc"));
 	adc.set_input_tag<0>("ADC.0");
 	adc.set_input_tag<1>("ADC.1");
 	adc.set_input_tag<2>("ADC.2");
 	adc.set_input_cb<3>(FUNC(segaybd_state::analog_mux));
 
-	SEGA_315_5248_MULTIPLIER(config, "multiplier_main", 0);
-	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx", 0);
-	SEGA_315_5248_MULTIPLIER(config, "multiplier_suby", 0);
-	SEGA_315_5249_DIVIDER(config, "divider_main", 0);
-	SEGA_315_5249_DIVIDER(config, "divider_subx", 0);
-	SEGA_315_5249_DIVIDER(config, "divider_suby", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_main");
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx");
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_suby");
+	SEGA_315_5249_DIVIDER(config, "divider_main");
+	SEGA_315_5249_DIVIDER(config, "divider_subx");
+	SEGA_315_5249_DIVIDER(config, "divider_suby");
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1458,8 +1458,8 @@ void segaybd_state::yboard(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
 
-	SEGA_SYS16B_SPRITES(config, m_bsprites, 0);
-	SEGA_YBOARD_SPRITES(config, m_ysprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_bsprites);
+	SEGA_YBOARD_SPRITES(config, m_ysprites);
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 
 	PALETTE(config, m_palette).set_entries(8192*2);

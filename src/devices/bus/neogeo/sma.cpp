@@ -66,7 +66,7 @@ void neogeo_sma_cart_device::device_add_mconfig(machine_config &config)
  kof99
 **************************************************/
 
-neogeo_sma_kof99_cart_device::neogeo_sma_kof99_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_sma_kof99_cart_device::neogeo_sma_kof99_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_sma_cart_device(mconfig, NEOGEO_SMA_KOF99_CART, tag, owner, clock)
 {
 }
@@ -83,7 +83,7 @@ void neogeo_sma_kof99_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
  garou
 **************************************************/
 
-neogeo_sma_garou_cart_device::neogeo_sma_garou_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_sma_garou_cart_device::neogeo_sma_garou_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_sma_cart_device(mconfig, NEOGEO_SMA_GAROU_CART, tag, owner, clock)
 {
 }
@@ -100,7 +100,7 @@ void neogeo_sma_garou_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
  garouh
  **************************************************/
 
-neogeo_sma_garouh_cart_device::neogeo_sma_garouh_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_sma_garouh_cart_device::neogeo_sma_garouh_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_sma_cart_device(mconfig, NEOGEO_SMA_GAROUH_CART, tag, owner, clock)
 {
 }
@@ -117,7 +117,7 @@ void neogeo_sma_garouh_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
  mslug3
  **************************************************/
 
-neogeo_sma_mslug3_cart_device::neogeo_sma_mslug3_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_sma_mslug3_cart_device::neogeo_sma_mslug3_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_sma_cart_device(mconfig, NEOGEO_SMA_MSLUG3_CART, tag, owner, clock)
 {
 }
@@ -129,7 +129,7 @@ void neogeo_sma_mslug3_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_cmc_prot->sfix_decrypt(spr_region, spr_region_size, fix_region, fix_region_size);
 }
 
-neogeo_sma_mslug3a_cart_device::neogeo_sma_mslug3a_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_sma_mslug3a_cart_device::neogeo_sma_mslug3a_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_sma_cart_device(mconfig, NEOGEO_SMA_MSLUG3A_CART, tag, owner, clock)
 {
 }
@@ -146,7 +146,7 @@ void neogeo_sma_mslug3a_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
  kof2000
 **************************************************/
 
-neogeo_sma_kof2000_cart_device::neogeo_sma_kof2000_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_sma_kof2000_cart_device::neogeo_sma_kof2000_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_sma_cart_device(mconfig, NEOGEO_SMA_KOF2000_CART, tag, owner, clock)
 {
 }

@@ -65,7 +65,7 @@ class psx_standard_controller_device :  public device_t,
 										public device_psx_controller_interface
 {
 public:
-	psx_standard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psx_standard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -82,7 +82,7 @@ private:
 class psxcontrollerports_device : public device_t
 {
 public:
-	psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void ack();
 
@@ -110,14 +110,14 @@ class psx_controller_port_device :  public device_t,
 public:
 	template <typename T>
 	psx_controller_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: psx_controller_port_device(mconfig, tag, owner, (uint32_t)0)
+		: psx_controller_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	typedef delegate<void ()> void_cb;
 	void ack() { if(!ack_cb.isnull()) ack_cb(); }

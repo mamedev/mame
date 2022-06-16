@@ -153,7 +153,7 @@ void evmbug_state::evmbug(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &evmbug_state::io_map);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(evmbug_state::kbd_put));
 
 	//TMS9902(config, "uart1", XTAL(12'000'000) / 4);

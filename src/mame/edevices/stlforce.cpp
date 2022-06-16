@@ -282,7 +282,7 @@ void stlforce_state::stlforce(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stlforce);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
-	edevices_sforce_device &video(EDEVICES_SFORCE_VID(config, "video", 0));
+	edevices_sforce_device &video(EDEVICES_SFORCE_VID(config, "video"));
 	video.set_bg_videoram_tag("bg_videoram");
 	video.set_mlow_videoram_tag("mlow_videoram");
 	video.set_mhigh_videoram_tag("mhigh_videoram");

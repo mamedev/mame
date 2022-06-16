@@ -73,7 +73,7 @@ DEFINE_DEVICE_TYPE(VT100_VIDEO, vt100_video_device, "vt100_video", "VT100 Video"
 DEFINE_DEVICE_TYPE(RAINBOW_VIDEO, rainbow_video_device, "rainbow_video", "Rainbow Video")
 
 
-vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_read_ram(*this)
@@ -86,13 +86,13 @@ vt100_video_device::vt100_video_device(const machine_config &mconfig, device_typ
 }
 
 
-vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vt100_video_device(mconfig, VT100_VIDEO, tag, owner, clock)
 {
 }
 
 
-rainbow_video_device::rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rainbow_video_device::rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vt100_video_device(mconfig, RAINBOW_VIDEO, tag, owner, clock)
 {
 }

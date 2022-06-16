@@ -390,7 +390,7 @@ void isa8_ibm_mfc_device::device_add_mconfig(machine_config &config)
 	m_d71055c_1->in_pb_callback().set(FUNC(isa8_ibm_mfc_device::ppi1_i_b));
 	m_d71055c_1->out_pc_callback().set(FUNC(isa8_ibm_mfc_device::ppi1_o_c));
 
-	I8251(config, m_d71051, 0);
+	I8251(config, m_d71051);
 
 	clock_device &usart_clock(CLOCK(config, "usart_clock", XTAL(4'000'000) / 8)); // 500KHz
 	usart_clock.signal_handler().set(FUNC(isa8_ibm_mfc_device::write_usart_clock));
@@ -441,7 +441,7 @@ const tiny_rom_entry *isa8_ibm_mfc_device::device_rom_region() const
 //  isa8_ibm_mfc_device - constructor
 //-------------------------------------------------
 
-isa8_ibm_mfc_device::isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_ibm_mfc_device::isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA8_IBM_MFC, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_tcr(0), m_pc_ppi_c(0), m_z80_ppi_c(0), m_pc_irq_state(0), m_z80_irq_state(0),

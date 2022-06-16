@@ -46,7 +46,7 @@ protected:
 		NS16550A
 	};
 
-	ins8250_uart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, dev_type device_type);
+	ins8250_uart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, dev_type device_type);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -101,19 +101,19 @@ private:
 class ins8250_device : public ins8250_uart_device
 {
 public:
-	ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class ns16450_device : public ins8250_uart_device
 {
 public:
-	ns16450_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ns16450_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class ns16550_device : public ins8250_uart_device
 {
 public:
-	ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -139,7 +139,7 @@ private:
 class pc16552_device : public device_t
 {
 public:
-	pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 read(offs_t offset) { return ((offset & 8) ? m_chan1 : m_chan0)->ins8250_r(offset & 7); }
 	void write(offs_t offset, u8 data) { ((offset & 8) ? m_chan1 : m_chan0)->ins8250_w(offset & 7, data); }

@@ -183,27 +183,27 @@ INPUT_PORTS_END
 
 void bingoc_state::bingoc(machine_config &config)
 {
-	M68000(config, m_maincpu, 8000000);      /* ? MHz */
+	M68000(config, m_maincpu, XTAL::u(8000000));      /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bingoc_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bingoc_state::irq2_line_hold));
 
-	Z80(config, m_soundcpu, 4000000);        /* ? MHz */
+	Z80(config, m_soundcpu, XTAL::u(4000000));        /* ? MHz */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &bingoc_state::sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &bingoc_state::sound_io);
 #if SOUND_TEST
 	m_soundcpu->set_vblank_int("screen", FUNC(bingoc_state::nmi_line_pulse));
 #endif
 
-	I8251(config, "uart1", 4000000); // unknown
-	I8251(config, "uart2", 4000000); // unknown
-	I8251(config, "uart3", 4000000); // unknown
-	I8251(config, "uart4", 4000000); // unknown
-	I8251(config, "uart5", 4000000); // unknown
-	I8251(config, "uart6", 4000000); // unknown
-	I8251(config, "uart7", 4000000); // unknown
-	I8251(config, "uart8", 4000000); // unknown
+	I8251(config, "uart1", XTAL::u(4000000)); // unknown
+	I8251(config, "uart2", XTAL::u(4000000)); // unknown
+	I8251(config, "uart3", XTAL::u(4000000)); // unknown
+	I8251(config, "uart4", XTAL::u(4000000)); // unknown
+	I8251(config, "uart5", XTAL::u(4000000)); // unknown
+	I8251(config, "uart6", XTAL::u(4000000)); // unknown
+	I8251(config, "uart7", XTAL::u(4000000)); // unknown
+	I8251(config, "uart8", XTAL::u(4000000)); // unknown
 
-	SEGA_315_5338A(config, "io", 0); // ?
+	SEGA_315_5338A(config, "io"); // ?
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -320,7 +320,7 @@ void juicebox_state::init_juicebox()
 
 void juicebox_state::juicebox(machine_config &config)
 {
-	ARM7(config, m_maincpu, 66000000);
+	ARM7(config, m_maincpu, XTAL::u(66000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &juicebox_state::juicebox_map);
 
 	PALETTE(config, "palette").set_entries(32768);
@@ -333,15 +333,15 @@ void juicebox_state::juicebox(machine_config &config)
 	screen.set_screen_update("s3c44b0", FUNC(s3c44b0_device::video_update));
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 
-	S3C44B0(config, m_s3c44b0, 10000000);
+	S3C44B0(config, m_s3c44b0, XTAL::u(10000000));
 	m_s3c44b0->set_cpu("maincpu");
 	m_s3c44b0->gpio_port_r_cb().set(FUNC(juicebox_state::s3c44b0_gpio_port_r));
 	m_s3c44b0->gpio_port_w_cb().set(FUNC(juicebox_state::s3c44b0_gpio_port_w));
 	m_s3c44b0->i2s_data_w_cb().set("dac", FUNC(dac_word_interface::data_w));
 
-	SMARTMEDIA(config, m_smartmedia, 0);
+	SMARTMEDIA(config, m_smartmedia);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("juicebox");

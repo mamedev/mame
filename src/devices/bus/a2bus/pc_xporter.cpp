@@ -107,12 +107,12 @@ class a2bus_pcxporter_device:
 {
 public:
 	// construction/destruction
-	a2bus_pcxporter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_pcxporter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	[[maybe_unused]] uint16_t pc_bios_r(offs_t offset); // TODO: hook up to something?
 
 protected:
-	a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -252,7 +252,7 @@ void a2bus_pcxporter_device::device_add_mconfig(machine_config &config)
 	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_v30, 0);
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace(m_v30, AS_PROGRAM);
 	m_isabus->set_iospace(m_v30, AS_IO);
 	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
@@ -273,15 +273,15 @@ void a2bus_pcxporter_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, "cga", true); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, "fdc_xt", true);
+	ISA8_SLOT(config, "isa1", m_isabus, pc_isa8_cards, "cga", true); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", m_isabus, pc_isa8_cards, "fdc_xt", true);
 }
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_v30(*this, "v30"),
@@ -294,7 +294,7 @@ a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, de
 {
 }
 
-a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_pcxporter_device(mconfig, A2BUS_PCXPORTER, tag, owner, clock)
 {
 }

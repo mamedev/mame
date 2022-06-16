@@ -101,7 +101,7 @@ DEFINE_DEVICE_TYPE(MB88303, mb88303_device, "mb88303", "Fujitsu MB88303")
 //  mb88303_device - constructor
 //-------------------------------------------------
 
-mb88303_device::mb88303_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mb88303_device::mb88303_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MB88303, tag, owner, clock)
 	, m_write_vow(*this)
 	, m_write_vobn(*this)

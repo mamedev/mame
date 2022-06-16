@@ -33,7 +33,7 @@ public:
 
 protected:
 	// construction/destruction
-	coco_family_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	coco_family_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, type, tag, owner, clock)
 		, device_cococart_interface(mconfig, *this)
 	{

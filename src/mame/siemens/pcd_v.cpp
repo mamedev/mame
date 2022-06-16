@@ -12,7 +12,7 @@
 DEFINE_DEVICE_TYPE(PCD_VIDEO, pcd_video_device, "pcd_video", "Siemens PC-D Video")
 DEFINE_DEVICE_TYPE(PCX_VIDEO, pcx_video_device, "pcx_video", "Siemens PC-X Video")
 
-pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, nullptr, "palette"),
 	m_maincpu(*this, ":maincpu"),
@@ -21,7 +21,7 @@ pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type 
 {
 }
 
-pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pcdx_video_device(mconfig, PCD_VIDEO, tag, owner, clock),
 	m_crtc(*this, "crtc"),
 	m_mouse_btn(*this, "MOUSE"),
@@ -32,7 +32,7 @@ pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *ta
 {
 }
 
-pcx_video_device::pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pcx_video_device::pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pcdx_video_device(mconfig, PCX_VIDEO, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_crtc(*this, "crtc"),
@@ -423,7 +423,7 @@ void pcx_video_device::device_start()
 	m_txd_handler.resolve_safe();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(600);
+	set_rate(XTAL::u(600));
 
 	decode_gfx(gfx_pcx);
 }

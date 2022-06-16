@@ -27,7 +27,7 @@ class sms_multitap_device : public device_t,
 {
 public:
 	// construction/destruction
-	sms_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sms_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -12,7 +12,7 @@
 #include "i8x9x.h"
 #include "i8x9xd.h"
 
-i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int data_width) :
+i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int data_width) :
 	mcs96_device(mconfig, type, tag, owner, clock, data_width, address_map_constructor(FUNC(i8x9x_device::internal_regs), this)),
 	m_ach_cb(*this),
 	m_hso_cb(*this),
@@ -571,22 +571,22 @@ void i8x9x_device::execute_set_input(int linenum, int state)
 	}
 }
 
-c8095_90_device::c8095_90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+c8095_90_device::c8095_90_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i8x9x_device(mconfig, C8095_90, tag, owner, clock, 16)
 {
 }
 
-n8097bh_device::n8097bh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+n8097bh_device::n8097bh_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i8x9x_device(mconfig, N8097BH, tag, owner, clock, 16)
 {
 }
 
-p8098_device::p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+p8098_device::p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i8x9x_device(mconfig, P8098, tag, owner, clock, 8)
 {
 }
 
-p8798_device::p8798_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+p8798_device::p8798_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i8x9x_device(mconfig, P8798, tag, owner, clock, 8)
 {
 }

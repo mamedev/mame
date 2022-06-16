@@ -134,7 +134,7 @@ inline static int32_t asl(int32_t value, int shift, uint8_t &flags) {
 }
 
 // Initialize ESP to mostly zeroed, configured for 64k samples of delay line memory, running (not halted)
-es5510_device::es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+es5510_device::es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, ES5510, tag, owner, clock)
 	, icount(0)
 	, halt_asserted(false)

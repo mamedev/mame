@@ -175,7 +175,7 @@ void z8_device::register_map(address_map &map)
 }
 
 
-z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, bool preprogrammed)
+z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t rom_size, bool preprogrammed)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, preprogrammed ? address_map_constructor(FUNC(z8_device::preprogrammed_map), this) : address_map_constructor(FUNC(z8_device::program_map), this))
 	, m_data_config("data", ENDIANNESS_BIG, 8, 16, 0)
@@ -189,25 +189,25 @@ z8_device::z8_device(const machine_config &mconfig, device_type type, const char
 }
 
 
-z8601_device::z8601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z8601_device::z8601_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z8_device(mconfig, Z8601, tag, owner, clock, 0x800, false)
 {
 }
 
 
-ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z8_device(mconfig, UB8830D, tag, owner, clock, 0x800, false)
 {
 }
 
 
-z8611_device::z8611_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z8611_device::z8611_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z8_device(mconfig, Z8611, tag, owner, clock, 0x1000, false)
 {
 }
 
 
-z8671_device::z8671_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z8671_device::z8671_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z8_device(mconfig, Z8671, tag, owner, clock, 0x800, true)
 {
 }
@@ -223,13 +223,13 @@ const tiny_rom_entry *z8671_device::device_rom_region() const
 }
 
 
-z8681_device::z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z8681_device::z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z8_device(mconfig, Z8681, tag, owner, clock, 0, false)
 {
 }
 
 
-z8682_device::z8682_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z8682_device::z8682_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z8_device(mconfig, Z8682, tag, owner, clock, 0x800, true)
 {
 }
@@ -246,7 +246,7 @@ const tiny_rom_entry *z8682_device::device_rom_region() const
 }
 
 
-z86e02_device::z86e02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z86e02_device::z86e02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z8_device(mconfig, Z86E02, tag, owner, clock, 0x200, false)
 {
 }

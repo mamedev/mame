@@ -13,7 +13,7 @@ class chanf_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	chanf_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	chanf_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override {}
@@ -28,7 +28,7 @@ public:
 	virtual uint8_t read_rom(offs_t offset) override;
 
 protected:
-	chanf_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	chanf_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// used for RAM chip in Hangman & Maze
 	uint8_t m_latch[2];       // PORT A & PORT B
@@ -42,7 +42,7 @@ class chanf_maze_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_maze_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	chanf_maze_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -60,7 +60,7 @@ class chanf_hangman_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_hangman_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	chanf_hangman_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -78,7 +78,7 @@ class chanf_chess_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	chanf_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_ram(offs_t offset) override { return common_read_3853(offset); }
@@ -92,7 +92,7 @@ class chanf_multi_old_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_multi_old_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	chanf_multi_old_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -115,7 +115,7 @@ class chanf_multi_final_device : public chanf_rom_device
 {
 public:
 	// construction/destruction
-	chanf_multi_final_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	chanf_multi_final_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

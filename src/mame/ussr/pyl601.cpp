@@ -579,7 +579,7 @@ void pyl601_state::pyl601(machine_config &config)
 	crtc.set_char_width(8);   /* ? */
 	crtc.set_update_row_callback(FUNC(pyl601_state::pyl601_update_row));
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), true, true);
 	FLOPPY_CONNECTOR(config, "upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats);
 	SOFTWARE_LIST(config, "flop_list").set_original("pyl601");

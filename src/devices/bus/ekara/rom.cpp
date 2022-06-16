@@ -17,56 +17,56 @@ DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC02_GC0010,    ekara_rom_i2c_24lc02_gc0010_d
 DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC08_EVIO,    ekara_rom_i2c_24lc08_evio_device,  "ekara_rom_i2c_24lc08_evio",   "EKARA Cartridge with I2C 24LC08 (evio direct access)")
 
 
-ekara_rom_plain_device::ekara_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+ekara_rom_plain_device::ekara_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock), device_ekara_cart_interface(mconfig, *this)
 {
 }
 
-ekara_rom_plain_device::ekara_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ekara_rom_plain_device::ekara_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ekara_rom_plain_device(mconfig, EKARA_ROM_PLAIN, tag, owner, clock)
 {
 }
 
 
 
-ekara_rom_i2c_base_device::ekara_rom_i2c_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+ekara_rom_i2c_base_device::ekara_rom_i2c_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	ekara_rom_plain_device(mconfig, type, tag, owner, clock),
 	m_i2cmem(*this, "i2cmem")
 {
 	m_buscontrol[0] = m_buscontrol[1] = m_buscontrol[2] = 0x00;
 }
 
-ekara_rom_i2c_base_device::ekara_rom_i2c_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ekara_rom_i2c_base_device::ekara_rom_i2c_base_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ekara_rom_i2c_base_device(mconfig, EKARA_ROM_I2C_BASE, tag, owner, clock)
 {
 }
 
-ekara_rom_i2c_24c08_epitch_device::ekara_rom_i2c_24c08_epitch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ekara_rom_i2c_24c08_epitch_device::ekara_rom_i2c_24c08_epitch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ekara_rom_i2c_base_device(mconfig, EKARA_ROM_I2C_24C08_EPITCH, tag, owner, clock)
 {
 }
 
-ekara_rom_i2c_24lc04_device::ekara_rom_i2c_24lc04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ekara_rom_i2c_24lc04_device::ekara_rom_i2c_24lc04_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ekara_rom_i2c_base_device(mconfig, EKARA_ROM_I2C_24LC04, tag, owner, clock)
 {
 }
 
-ekara_rom_i2c_24lc02_device::ekara_rom_i2c_24lc02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ekara_rom_i2c_24lc02_device::ekara_rom_i2c_24lc02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ekara_rom_i2c_base_device(mconfig, EKARA_ROM_I2C_24LC02, tag, owner, clock)
 {
 }
 
-ekara_rom_i2c_24lc02_gc0010_device::ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ekara_rom_i2c_24lc02_gc0010_device::ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ekara_rom_i2c_24lc02_gc0010_device(mconfig, EKARA_ROM_I2C_24LC02_GC0010, tag, owner, clock)
 {
 }
 
-ekara_rom_i2c_24lc02_gc0010_device::ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+ekara_rom_i2c_24lc02_gc0010_device::ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	ekara_rom_i2c_base_device(mconfig, type, tag, owner, clock)
 {
 }
 
-ekara_rom_i2c_24lc08_evio_device::ekara_rom_i2c_24lc08_evio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ekara_rom_i2c_24lc08_evio_device::ekara_rom_i2c_24lc08_evio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ekara_rom_i2c_24lc02_gc0010_device(mconfig, EKARA_ROM_I2C_24LC08_EVIO, tag, owner, clock)
 {
 }
@@ -159,21 +159,21 @@ bool ekara_rom_i2c_24c08_epitch_device::is_write_access_not_rom(void)
 
 void ekara_rom_i2c_24c08_epitch_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 // i2c 24lc04
 
 void ekara_rom_i2c_24lc04_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C04(config, "i2cmem", 0); // 24LC04
+	I2C_24C04(config, "i2cmem"); // 24LC04
 }
 
 // i2c 24lc02
 
 void ekara_rom_i2c_24lc02_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C02(config, "i2cmem", 0); // 24LC02
+	I2C_24C02(config, "i2cmem"); // 24LC02
 }
 
 // i2c 24lc02 with direct IO port access
@@ -217,7 +217,7 @@ READ_LINE_MEMBER(ekara_rom_i2c_24lc02_gc0010_device::read_sda )
 
 void ekara_rom_i2c_24lc02_gc0010_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C02(config, "i2cmem", 0); // 24LC02
+	I2C_24C02(config, "i2cmem"); // 24LC02
 }
 
 

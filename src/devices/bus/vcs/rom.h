@@ -14,7 +14,7 @@ class a26_rom_base_device : public device_t,
 							public device_vcs_cart_interface
 {
 protected:
-	a26_rom_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	a26_rom_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, type, tag, owner, clock)
 		, device_vcs_cart_interface(mconfig, *this)
 	{ }
@@ -41,12 +41,12 @@ public:
 class a26_rom_f6_device : public a26_rom_base_device
 {
 public:
-	a26_rom_f6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_f6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	a26_rom_f6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_f6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	void install_super_chip_handlers(address_space *space);
 
 	virtual void device_reset() override;
@@ -62,7 +62,7 @@ protected:
 class a26_rom_f4_device : public a26_rom_f6_device
 {
 public:
-	a26_rom_f4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_f4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -76,12 +76,12 @@ protected:
 class a26_rom_f8_device : public a26_rom_f6_device
 {
 public:
-	a26_rom_f8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_f8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	a26_rom_f8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_f8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -90,7 +90,7 @@ protected:
 class a26_rom_f8_sw_device : public a26_rom_f8_device
 {
 public:
-	a26_rom_f8_sw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_f8_sw_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// Snow White proto starts from bank 1
@@ -103,7 +103,7 @@ protected:
 class a26_rom_fa_device : public a26_rom_f6_device
 {
 public:
-	a26_rom_fa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_fa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 };
@@ -114,7 +114,7 @@ public:
 class a26_rom_fe_device : public a26_rom_base_device
 {
 public:
-	a26_rom_fe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_fe_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -135,7 +135,7 @@ protected:
 class a26_rom_3e_device : public a26_rom_base_device
 {
 public:
-	a26_rom_3e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_3e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -157,7 +157,7 @@ protected:
 class a26_rom_3f_device : public a26_rom_base_device
 {
 public:
-	a26_rom_3f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_3f_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -175,7 +175,7 @@ protected:
 class a26_rom_e0_device : public a26_rom_base_device
 {
 public:
-	a26_rom_e0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_e0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -192,7 +192,7 @@ protected:
 class a26_rom_e7_device : public a26_rom_base_device
 {
 public:
-	a26_rom_e7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_e7_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -213,7 +213,7 @@ protected:
 class a26_rom_ua_device : public a26_rom_base_device
 {
 public:
-	a26_rom_ua_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_ua_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -230,7 +230,7 @@ protected:
 class a26_rom_cv_device : public a26_rom_base_device
 {
 public:
-	a26_rom_cv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_cv_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 };
@@ -241,7 +241,7 @@ public:
 class a26_rom_dc_device : public a26_rom_base_device
 {
 public:
-	a26_rom_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -259,7 +259,7 @@ protected:
 class a26_rom_fv_device : public a26_rom_base_device
 {
 public:
-	a26_rom_fv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_fv_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -276,7 +276,7 @@ protected:
 class a26_rom_jvp_device : public a26_rom_base_device
 {
 public:
-	a26_rom_jvp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_jvp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -293,7 +293,7 @@ protected:
 class a26_rom_4in1_device : public a26_rom_base_device
 {
 public:
-	a26_rom_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -311,7 +311,7 @@ protected:
 class a26_rom_8in1_device : public a26_rom_base_device
 {
 public:
-	a26_rom_8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -330,7 +330,7 @@ protected:
 class a26_rom_32in1_device : public a26_rom_base_device
 {
 public:
-	a26_rom_32in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_32in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 
@@ -348,7 +348,7 @@ protected:
 class a26_rom_x07_device : public a26_rom_base_device
 {
 public:
-	a26_rom_x07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a26_rom_x07_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void install_memory_handlers(address_space *space) override;
 

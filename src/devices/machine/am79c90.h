@@ -21,7 +21,7 @@ public:
 	void reset_w(int state) { if (!state) device_reset(); }
 
 protected:
-	am7990_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	am7990_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -175,7 +175,7 @@ private:
 class am7990_device : public am7990_device_base
 {
 public:
-	am7990_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	am7990_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual int get_buf_length(u16 data) const override { return (data == 0xf000) ? 4096 : -s16(0xf000 | data); }
@@ -184,7 +184,7 @@ protected:
 class am79c90_device : public am7990_device_base
 {
 public:
-	am79c90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	am79c90_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual int get_buf_length(u16 data) const override { return data ? ((data == 0xf000) ? 4096 : -s16(0xf000 | data)) : 0; }

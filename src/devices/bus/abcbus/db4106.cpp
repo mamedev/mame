@@ -70,7 +70,7 @@ void databoard_4106_device::databoard_4106_io(address_map &map)
 
 void databoard_4106_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_memory_map(&databoard_4106_device::databoard_4106_mem);
 	m_maincpu->set_io_map(&databoard_4106_device::databoard_4106_io);
 }
@@ -103,7 +103,7 @@ ioport_constructor databoard_4106_device::device_input_ports() const
 //  databoard_4106_device - constructor
 //-------------------------------------------------
 
-databoard_4106_device::databoard_4106_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+databoard_4106_device::databoard_4106_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, DATABOARD_4106, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG)

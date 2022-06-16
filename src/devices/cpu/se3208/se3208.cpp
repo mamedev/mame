@@ -46,7 +46,7 @@
 DEFINE_DEVICE_TYPE(SE3208, se3208_device, "se3208", "ADChips SE3208")
 
 
-se3208_device::se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+se3208_device::se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, SE3208, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_machinex_cb(*this)

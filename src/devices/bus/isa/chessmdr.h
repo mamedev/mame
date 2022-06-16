@@ -21,7 +21,7 @@ class isa8_chessmdr_device :
 {
 public:
 	// construction/destruction
-	isa8_chessmdr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_chessmdr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

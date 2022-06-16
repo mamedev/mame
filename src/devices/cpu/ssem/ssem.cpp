@@ -80,7 +80,7 @@ DEFINE_DEVICE_TYPE(SSEMCPU, ssem_device, "ssem_cpu", "Manchester SSEM")
 //  ssem_device - constructor
 //-------------------------------------------------
 
-ssem_device::ssem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ssem_device::ssem_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, SSEMCPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16)
 	, m_pc(1)

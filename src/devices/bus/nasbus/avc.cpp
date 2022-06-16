@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(NASCOM_AVC, nascom_avc_device, "nascom_avc", "Nascom Advanced
 void nascom_avc_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(16250000, 1024, 0, 768, 320, 0, 256);
+	screen.set_raw(XTAL::u(16250000), 1024, 0, 768, 320, 0, 256);
 	screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
@@ -46,7 +46,7 @@ void nascom_avc_device::device_add_mconfig(machine_config &config)
 //  nascom_avc_device - constructor
 //-------------------------------------------------
 
-nascom_avc_device::nascom_avc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nascom_avc_device::nascom_avc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NASCOM_AVC, tag, owner, clock),
 	device_nasbus_card_interface(mconfig, *this),
 	m_crtc(*this, "mc6845"),

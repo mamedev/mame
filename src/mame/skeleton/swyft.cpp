@@ -761,7 +761,7 @@ void swyft_state::swyft(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	ACIA6850(config, m_acia6850, 0);
+	ACIA6850(config, m_acia6850);
 	// acia rx and tx clocks come from one of the VIA pins and are tied together, fix this below? acia e clock comes from 68008
 	clock_device &acia_clock(CLOCK(config, "acia_clock", (XTAL(15'897'600)/2)/5)); // out e clock from 68008, ~ 10in clocks per out clock
 	acia_clock.signal_handler().set(FUNC(swyft_state::write_acia_clock));

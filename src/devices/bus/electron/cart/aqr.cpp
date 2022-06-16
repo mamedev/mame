@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(ELECTRON_AQR, electron_aqr_device, "electron_aqr", "Electron 
 //  electron_aqr_device - constructor
 //-------------------------------------------------
 
-electron_aqr_device::electron_aqr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_aqr_device::electron_aqr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_AQR, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
 	, m_page_register(0)

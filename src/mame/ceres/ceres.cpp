@@ -368,7 +368,7 @@ void ceres1_state::ceres1(machine_config &config)
 
 	// TODO: RS-485 ports "na" and "nb"
 	SCC8530N(config, m_scc, 6_MHz_XTAL);
-	m_scc->configure_channels(m_uart->clock(), 0, m_uart->clock(), 0);
+	m_scc->configure_channels(m_uart->clock(), XTAL(), m_uart->clock(), XTAL());
 	m_scc->out_int_callback().set(m_icu, FUNC(am9519_device::ireq1_w)).invert();
 
 	M3002(config, m_rtc, 32.768_kHz_XTAL);
@@ -378,15 +378,15 @@ void ceres1_state::ceres1(machine_config &config)
 	m_icu->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
 	// TODO: WD1002-05 Winchester/Floppy Disk Controller (WFC)
-	HARDDISK(config, m_hdd[0], 0);
-	HARDDISK(config, m_hdd[1], 0);
-	HARDDISK(config, m_hdd[2], 0);
+	HARDDISK(config, m_hdd[0]);
+	HARDDISK(config, m_hdd[1]);
+	HARDDISK(config, m_hdd[2]);
 
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
 	FLOPPY_CONNECTOR(config, "fdc:0", "fdd", FLOPPY_35_DD, true, floppy_image_device::default_mfm_floppy_formats);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(70'000'000, 1344, 0, 1024, 838, 0, 800);
+	m_screen->set_raw(XTAL::u(70'000'000), 1344, 0, 1024, 838, 0, 800);
 	m_screen->set_screen_update(FUNC(ceres1_state::screen_update));
 }
 

@@ -31,7 +31,7 @@ public:
 
 	// construction/destruction
 	template <typename T>
-	mc10cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&opts, const char *dflt)
+	mc10cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: mc10cart_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -40,7 +40,7 @@ public:
 		set_fixed(false);
 	}
 
-	mc10cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mc10cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration
 	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }

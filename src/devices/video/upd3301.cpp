@@ -102,7 +102,7 @@ DEFINE_DEVICE_TYPE(UPD3301, upd3301_device, "upd3301", "NEC uPD3301")
 //  upd3301_device - constructor
 //-------------------------------------------------
 
-upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UPD3301, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_write_int(*this)

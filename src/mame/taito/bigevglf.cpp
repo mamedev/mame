@@ -608,7 +608,7 @@ void bigevglf_state::bigevglf(machine_config &config)
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.50); // unknown DAC
 }
 
 /***************************************************************************

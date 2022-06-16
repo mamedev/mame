@@ -136,7 +136,7 @@ DEFINE_DEVICE_TYPE(SASUKE_SOUND,   sasuke_sound_device,   "sasuke_sound",   "SNK
 DEFINE_DEVICE_TYPE(SATANSAT_SOUND, satansat_sound_device, "satansat_sound", "SNK Satan of Saturn Sound")
 
 
-snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SNK6502_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_tone_clock_expire(0)
@@ -563,7 +563,7 @@ void snk6502_sound_device::sound_stream_update(sound_stream &stream, std::vector
 }
 
 
-vanguard_sound_device::vanguard_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vanguard_sound_device::vanguard_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VANGUARD_SOUND, tag, owner, clock)
 	, m_custom(*this, "custom")
 	, m_sn76477_2(*this, "sn76477.2")
@@ -689,7 +689,7 @@ void vanguard_sound_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	SNK6502_SOUND(config, m_custom, 0);
+	SNK6502_SOUND(config, m_custom);
 	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	SAMPLES(config, m_samples);
@@ -744,12 +744,12 @@ void vanguard_sound_device::device_reset()
 }
 
 
-fantasy_sound_device::fantasy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+fantasy_sound_device::fantasy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: fantasy_sound_device(mconfig, FANTASY_SOUND, tag, owner, clock)
 {
 }
 
-fantasy_sound_device::fantasy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+fantasy_sound_device::fantasy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_custom(*this, "custom")
 	, m_discrete(*this, "discrete")
@@ -886,7 +886,7 @@ void fantasy_sound_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	SNK6502_SOUND(config, m_custom, 0);
+	SNK6502_SOUND(config, m_custom);
 	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	samples_device &samples(SAMPLES(config, "samples"));
@@ -929,7 +929,7 @@ void fantasy_sound_device::device_reset()
 }
 
 
-nibbler_sound_device::nibbler_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nibbler_sound_device::nibbler_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: fantasy_sound_device(mconfig, NIBBLER_SOUND, tag, owner, clock)
 {
 }
@@ -942,7 +942,7 @@ void nibbler_sound_device::device_add_mconfig(machine_config &config)
 }
 
 
-pballoon_sound_device::pballoon_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pballoon_sound_device::pballoon_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: fantasy_sound_device(mconfig, PBALLOON_SOUND, tag, owner, clock)
 {
 }
@@ -961,7 +961,7 @@ void pballoon_sound_device::device_reset()
 }
 
 
-sasuke_sound_device::sasuke_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sasuke_sound_device::sasuke_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SASUKE_SOUND, tag, owner, clock)
 	, m_custom(*this, "custom")
 	, m_samples(*this, "samples")
@@ -1036,7 +1036,7 @@ void sasuke_sound_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	SNK6502_SOUND(config, m_custom, 0);
+	SNK6502_SOUND(config, m_custom);
 	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	samples_device &samples(SAMPLES(config, "samples"));
@@ -1110,7 +1110,7 @@ void sasuke_sound_device::device_reset()
 }
 
 
-satansat_sound_device::satansat_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+satansat_sound_device::satansat_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SATANSAT_SOUND, tag, owner, clock)
 	, m_custom(*this, "custom")
 	, m_samples(*this, "samples")
@@ -1177,7 +1177,7 @@ void satansat_sound_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	SNK6502_SOUND(config, m_custom, 0);
+	SNK6502_SOUND(config, m_custom);
 	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	samples_device &samples(SAMPLES(config, "samples"));

@@ -83,7 +83,7 @@ INPUT_PORTS_END
 void paokaipc_state::paokaipc(machine_config &config)
 {
 	// TODO: everything inherited from fruitpc.cpp, needs proper identification of motherboard.
-	PENTIUM(config, m_maincpu, 66000000); // unknown CPU, at least Pentium according to logs
+	PENTIUM(config, m_maincpu, XTAL::u(66000000)); // unknown CPU, at least Pentium according to logs
 	m_maincpu->set_addrmap(AS_PROGRAM, &paokaipc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &paokaipc_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
@@ -95,10 +95,10 @@ void paokaipc_state::paokaipc(machine_config &config)
 
 	pcvideo_vga(config);
 
-	PCI_ROOT(config, m_pciroot, 0);
+	PCI_ROOT(config, m_pciroot);
 	// ...
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir2_w));
@@ -112,7 +112,7 @@ void paokaipc_state::paokaipc(machine_config &config)
 	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
-//  isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, "isa", fruitpc_isa8_cards, "sb15", true));
+//  isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", "isa", fruitpc_isa8_cards, "sb15", true));
 //  isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(fruitpc_sb_def));
 //  isa1.set_option_machine_config("sb15", fruitpc_sb_conf);
 }

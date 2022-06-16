@@ -222,7 +222,7 @@ void fd1089_base_device::decrypted_opcodes_map(address_map &map)
 //  fd1089_base_device - constructor
 //-------------------------------------------------
 
-fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: m68000_device(mconfig, type, tag, owner, clock),
 		m_region(*this, DEVICE_SELF),
 		m_key(*this, "key"),
@@ -232,12 +232,12 @@ fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_typ
 	set_addrmap(AS_OPCODES, address_map_constructor(FUNC(fd1089_base_device::decrypted_opcodes_map), this));
 }
 
-fd1089a_device::fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+fd1089a_device::fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: fd1089_base_device(mconfig, FD1089A, tag, owner, clock)
 {
 }
 
-fd1089b_device::fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+fd1089b_device::fd1089b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: fd1089_base_device(mconfig, FD1089B, tag, owner, clock)
 {
 }

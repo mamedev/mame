@@ -69,7 +69,7 @@ class tmp96c141_device : public tlcs900_device
 {
 public:
 	// device type constructor
-	tmp96c141_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tmp96c141_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// TODO: configuration helpers
 

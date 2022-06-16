@@ -12,7 +12,7 @@ class address_map_bank_device :
 {
 public:
 	// construction/destruction
-	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	template <typename... T> address_map_bank_device& set_map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }

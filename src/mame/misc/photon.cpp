@@ -211,7 +211,7 @@ uint32_t photon_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 void photon_state::photon(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 1780000);
+	I8080(config, m_maincpu, XTAL::u(1780000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &photon_state::pk8000_mem);
 	m_maincpu->set_addrmap(AS_IO, &photon_state::pk8000_io);
 	m_maincpu->set_vblank_int("screen", FUNC(photon_state::interrupt));

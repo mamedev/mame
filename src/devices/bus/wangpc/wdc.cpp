@@ -94,15 +94,15 @@ void wangpc_wdc_device::wangpc_wdc_io(address_map &map)
 
 void wangpc_wdc_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_maincpu, 2000000); // XTAL(10'000'000) / ?
+	Z80(config, m_maincpu, XTAL::u(2000000)); // XTAL(10'000'000) / ?
 	//m_maincpu->set_daisy_config(wangpc_wdc_daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wangpc_wdc_device::wangpc_wdc_mem);
 	m_maincpu->set_addrmap(AS_IO, &wangpc_wdc_device::wangpc_wdc_io);
 
-	Z80CTC(config, m_ctc, 2000000);
+	Z80CTC(config, m_ctc, XTAL::u(2000000));
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	SCSIHD(config, "harddisk0", 0);
+	SCSIHD(config, "harddisk0");
 }
 
 
@@ -134,7 +134,7 @@ inline void wangpc_wdc_device::set_irq(int state)
 //  wangpc_wdc_device - constructor
 //-------------------------------------------------
 
-wangpc_wdc_device::wangpc_wdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wangpc_wdc_device::wangpc_wdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WANGPC_WDC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),

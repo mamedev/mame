@@ -114,7 +114,7 @@ public:
 	}
 
 protected:
-	keyboard_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+	keyboard_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, type, tag, owner, clock)
 		, device_mac_keyboard_interface(mconfig, *this)
 		, m_mpu{ *this, "mpu" }
@@ -455,7 +455,7 @@ INPUT_PORTS_END
 class m0110a_device : public keyboard_base
 {
 public:
-	m0110a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	m0110a_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: keyboard_base(mconfig, MACKBD_M0110A, tag, owner, clock)
 	{
 	}
@@ -470,7 +470,7 @@ protected:
 class m0110a_f_device : public keyboard_base
 {
 public:
-	m0110a_f_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	m0110a_f_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: keyboard_base(mconfig, MACKBD_M0110A_F, tag, owner, clock)
 	{
 	}
@@ -487,7 +487,7 @@ protected:
 class m0110a_j_device : public keyboard_base
 {
 public:
-	m0110a_j_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	m0110a_j_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: keyboard_base(mconfig, MACKBD_M0110A_J, tag, owner, clock)
 	{
 	}

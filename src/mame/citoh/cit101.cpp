@@ -436,7 +436,7 @@ void cit101_state::cit101(machine_config &config)
 
 	CIT101_KEYBOARD(config, "keyboard").txd_callback().set("kbduart", FUNC(i8251_device::write_rxd));
 
-	pit8253_device &pit0(PIT8253(config, "pit0", 0));
+	pit8253_device &pit0(PIT8253(config, "pit0"));
 	pit0.set_clk<0>(6.144_MHz_XTAL / 4);
 	pit0.set_clk<1>(6.144_MHz_XTAL / 4);
 	//pit0.set_clk<2>(6.144_MHz_XTAL / 4);
@@ -445,7 +445,7 @@ void cit101_state::cit101(machine_config &config)
 	// OUT2 might be used for an internal expansion similar to the VT100 STP.
 	// The output appears to be fixed to a 307.2 kHz rate; turning this off boosts driver performance.
 
-	pit8253_device &pit1(PIT8253(config, "pit1", 0));
+	pit8253_device &pit1(PIT8253(config, "pit1"));
 	pit1.set_clk<0>(6.144_MHz_XTAL / 4);
 	pit1.set_clk<1>(6.144_MHz_XTAL / 4);
 	pit1.set_clk<2>(6.144_MHz_XTAL / 4);
@@ -454,7 +454,7 @@ void cit101_state::cit101(machine_config &config)
 	pit1.out_handler<2>().set("kbduart", FUNC(i8251_device::write_txc));
 	pit1.out_handler<2>().append("kbduart", FUNC(i8251_device::write_rxc));
 
-	i8255_device &ppi(I8255A(config, "ppi", 0));
+	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(cit101_state::nvr_address_w));
 	ppi.in_pb_callback().set(m_nvr, FUNC(er2055_device::data));
 	ppi.out_pb_callback().set(m_nvr, FUNC(er2055_device::set_data));

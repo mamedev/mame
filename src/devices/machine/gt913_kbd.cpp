@@ -26,7 +26,7 @@
 
 DEFINE_DEVICE_TYPE(GT913_KBD_HLE, gt913_kbd_hle_device, "gt913_kbd_hle", "Casio GT913F keyboard controller (HLE)")
 
-gt913_kbd_hle_device::gt913_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gt913_kbd_hle_device::gt913_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, GT913_KBD_HLE, tag, owner, clock),
 	device_matrix_keyboard_interface(mconfig, *this, "FI0", "FI1", "FI2", "FI3", "FI4", "FI5", "FI6", "FI7", "FI8", "FI9", "FI10", "KI0", "KI1", "KI2"),
 	m_velocity(*this, "VELOCITY"),

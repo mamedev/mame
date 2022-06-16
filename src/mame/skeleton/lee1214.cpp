@@ -69,7 +69,7 @@ void lee1214_state::lee1214(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lee1214_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &lee1214_state::io_map);
 
-	i8274_device &mpsc(I8274(config, "mpsc", 4'000'000));
+	i8274_device &mpsc(I8274(config, "mpsc", XTAL::u(4'000'000)));
 	mpsc.out_int_callback().set("maincpu", FUNC(i80188_cpu_device::int0_w));
 
 	EEPROM_2816(config, "eeprom");

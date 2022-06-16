@@ -280,9 +280,9 @@ void gamecom_state::gamecom(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	/* TODO: much more complex than this */
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC (Digital audio)
-	DAC_4BIT_R2R(config, m_dac0, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
-	DAC_4BIT_R2R(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC (Digital audio)
+	DAC_4BIT_R2R(config, m_dac0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
+	DAC_4BIT_R2R(config, m_dac1).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC (Frequency modulation)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot1", generic_linear_slot, "gamecom_cart", "bin,tgc").set_device_load(FUNC(gamecom_state::cart1_load));

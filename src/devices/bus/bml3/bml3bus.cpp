@@ -59,12 +59,12 @@ DEFINE_DEVICE_TYPE(BML3BUS_SLOT, bml3bus_slot_device, "bml3bus_slot", "Hitachi M
 //-------------------------------------------------
 //  bml3bus_slot_device - constructor
 //-------------------------------------------------
-bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	bml3bus_slot_device(mconfig, BML3BUS_SLOT, tag, owner, clock)
 {
 }
 
-bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+bml3bus_slot_device::bml3bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_single_card_slot_interface<device_bml3bus_card_interface>(mconfig, *this),
 	m_bml3bus(*this, finder_base::DUMMY_TAG),
@@ -97,12 +97,12 @@ DEFINE_DEVICE_TYPE(BML3BUS, bml3bus_device, "bml3bus", "Hitachi MB-6890 Bus")
 //  bml3bus_device - constructor
 //-------------------------------------------------
 
-bml3bus_device::bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bml3bus_device::bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	bml3bus_device(mconfig, BML3BUS, tag, owner, clock)
 {
 }
 
-bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_space(*this, finder_base::DUMMY_TAG, -1, 8),
 	m_out_nmi_cb(*this),

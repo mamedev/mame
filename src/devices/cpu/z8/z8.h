@@ -39,7 +39,7 @@ protected:
 	};
 
 	// construction/destruction
-	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, bool preprogrammed);
+	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t rom_size, bool preprogrammed);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -383,28 +383,28 @@ private:
 class z8601_device : public z8_device
 {
 public:
-	z8601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z8601_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class ub8830d_device : public z8_device
 {
 public:
-	ub8830d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ub8830d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class z8611_device : public z8_device
 {
 public:
-	z8611_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z8611_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class z8671_device : public z8_device
 {
 public:
-	z8671_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z8671_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	const tiny_rom_entry *device_rom_region() const override;
@@ -414,14 +414,14 @@ protected:
 class z8681_device : public z8_device
 {
 public:
-	z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class z8682_device : public z8_device
 {
 public:
-	z8682_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z8682_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	const tiny_rom_entry *device_rom_region() const override;
@@ -431,7 +431,7 @@ protected:
 class z86e02_device : public z8_device
 {
 public:
-	z86e02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z86e02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

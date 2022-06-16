@@ -23,7 +23,7 @@ void i82439tx_host_device::config_map(address_map &map)
 	map(0x92, 0x92).r(FUNC(i82439tx_host_device::errsyn_r));
 }
 
-i82439tx_host_device::i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i82439tx_host_device::i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_host_device(mconfig, I82439TX, tag, owner, clock)
 	, cpu(*this, finder_base::DUMMY_TAG)
 {

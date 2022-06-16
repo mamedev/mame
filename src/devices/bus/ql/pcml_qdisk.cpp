@@ -49,7 +49,7 @@ const tiny_rom_entry *pcml_q_disk_interface_device::device_rom_region() const
 //  pcml_q_disk_interface_device - constructor
 //-------------------------------------------------
 
-pcml_q_disk_interface_device::pcml_q_disk_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pcml_q_disk_interface_device::pcml_q_disk_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PCML_Q_DISK_INTERFACE, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this)
 {

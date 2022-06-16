@@ -23,11 +23,11 @@ DEFINE_DEVICE_TYPE(B6000, b6000_cpu_device, "b6000", "Rockwell B6000")
 
 
 // constructor
-b6000_cpu_device::b6000_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+b6000_cpu_device::b6000_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	b5000_cpu_device(mconfig, type, tag, owner, clock, prgwidth, program, datawidth, data)
 { }
 
-b6000_cpu_device::b6000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+b6000_cpu_device::b6000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	b6000_cpu_device(mconfig, B6000, tag, owner, clock, 9, address_map_constructor(FUNC(b6000_cpu_device::program_512x8), this), 6, address_map_constructor(FUNC(b6000_cpu_device::data_45x4), this))
 { }
 

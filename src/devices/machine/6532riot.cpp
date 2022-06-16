@@ -413,7 +413,7 @@ WRITE_LINE_MEMBER(riot6532_device::pb7_w) { portb_in_set(state ? 0x80 : 0x00, 0x
 //  riot6532_device - constructor
 //-------------------------------------------------
 
-riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RIOT6532, tag, owner, clock),
 		m_in_pa_cb(*this),
 		m_out_pa_cb(*this),

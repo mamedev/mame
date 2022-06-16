@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(SONYIOP_DMA, iop_dma_device, "iopdma", "PlayStation 2 IOP DMAC")
 
-iop_dma_device::iop_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iop_dma_device::iop_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYIOP_DMA, tag, owner, clock)
 	, device_execute_interface(mconfig, *this)
 	, m_intc(*this, finder_base::DUMMY_TAG)

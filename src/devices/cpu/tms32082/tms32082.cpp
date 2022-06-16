@@ -43,7 +43,7 @@ const uint32_t tms32082_mp_device::SHIFT_MASK[] =
 
 
 
-tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, TMS32082_MP, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(tms32082_mp_device::mp_internal_map), this))
 	, m_cmd_callback(*this)
@@ -528,7 +528,7 @@ void tms32082_pp_device::pp_internal_map(address_map &map)
 	map(0x01001000, 0x01001fff).ram().share("pp1_param");
 }
 
-tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, TMS32082_PP, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(tms32082_pp_device::pp_internal_map), this))
 {

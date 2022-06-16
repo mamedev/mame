@@ -507,7 +507,7 @@ void unior_state::unior(machine_config &config)
 	m_uart->txempty_handler().set([this] (bool state) { m_txe = state; });
 	m_uart->rts_handler().set([this] (bool state) { m_rts = state; });
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(20_MHz_XTAL / 12);
 	m_pit->set_clk<1>(20_MHz_XTAL / 9);
 	m_pit->out_handler<1>().set(FUNC(unior_state::ctc_z1_w));

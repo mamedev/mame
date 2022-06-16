@@ -658,9 +658,9 @@ void base_state::base(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	TRACKFLD_AUDIO(config, m_soundbrd, 0, m_audiocpu, finder_base::DUMMY_TAG);
+	TRACKFLD_AUDIO(config, m_soundbrd, m_audiocpu, finder_base::DUMMY_TAG);
 
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 
 	SN76496(config, m_sn, XTAL(14'318'181)/8);  // verified on PCB
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -673,7 +673,7 @@ void hyperspt_state::hyperspt(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hyperspt_state::hyperspt_common_main_map);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &hyperspt_state::sound_map);
 
-	TRACKFLD_AUDIO(config.replace(), m_soundbrd, 0, m_audiocpu, m_vlm);
+	TRACKFLD_AUDIO(config.replace(), m_soundbrd, m_audiocpu, m_vlm);
 
 	VLM5030(config, m_vlm, XTAL(3'579'545));    // verified on PCB
 	m_vlm->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -691,9 +691,9 @@ void hypersptb_state::hypersptb(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	HYPROLYB_ADPCM(config, "hyprolyb_adpcm", 0);
+	HYPROLYB_ADPCM(config, "hyprolyb_adpcm");
 
-	msm5205_device &msm(MSM5205(config, "msm", 384'000));
+	msm5205_device &msm(MSM5205(config, "msm", XTAL::u(384'000)));
 	msm.vck_legacy_callback().set("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::vck_callback));
 	msm.set_prescaler_selector(msm5205_device::S96_4B); // 4 kHz
 	msm.add_route(ALL_OUTPUTS, "speaker", 0.5);

@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(SPEAKER, speaker_device, "speaker", "Speaker")
 //  speaker_device - constructor
 //-------------------------------------------------
 
-speaker_device::speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+speaker_device::speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPEAKER, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this)
 	, m_x(0.0)
@@ -73,7 +73,7 @@ void speaker_device::mix(stream_buffer::sample_t *leftmix, stream_buffer::sample
 	// track maximum sample value for each 0.1s bucket
 	if (machine().options().speaker_report() != 0)
 	{
-		u32 samples_per_bucket = m_mixer_stream->sample_rate() / BUCKETS_PER_SECOND;
+		u32 samples_per_bucket = m_mixer_stream->sample_rate().value() / BUCKETS_PER_SECOND;
 		for (int sample = 0; sample < expected_samples; sample++)
 		{
 			m_current_max = std::max(m_current_max, fabsf(view.get(sample)));

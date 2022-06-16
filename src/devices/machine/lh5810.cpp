@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(LH5810, lh5810_device, "lh5810", "LH5810 I/O Port")
 //  lh5810_device - constructor
 //-------------------------------------------------
 
-lh5810_device::lh5810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lh5810_device::lh5810_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LH5810, tag, owner, clock)
 	, m_porta_r_cb(*this)
 	, m_porta_w_cb(*this)

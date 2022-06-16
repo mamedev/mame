@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(ALPHA68K_PALETTE, alpha68k_palette_device, "alpha68k_palette"
 //  alpha68k_palette_device - constructor
 //-------------------------------------------------
 
-alpha68k_palette_device::alpha68k_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+alpha68k_palette_device::alpha68k_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ALPHA68K_PALETTE, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 {

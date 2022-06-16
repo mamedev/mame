@@ -24,7 +24,7 @@ class vtech_lpen_interface_device : public vtech_ioexp_device
 {
 public:
 	// construction/destruction
-	vtech_lpen_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_lpen_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::CONTROLS; }
 

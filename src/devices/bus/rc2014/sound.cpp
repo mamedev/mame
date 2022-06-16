@@ -22,7 +22,7 @@ class rc2014_ym_ay_device : public device_t, public device_rc2014_card_interface
 {
 protected:
 	// construction/destruction
-	rc2014_ym_ay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	rc2014_ym_ay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -34,7 +34,7 @@ protected:
 	required_ioport_array<6> m_jp;
 };
 
-rc2014_ym_ay_device::rc2014_ym_ay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+rc2014_ym_ay_device::rc2014_ym_ay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_psg(*this, "psg")
@@ -133,7 +133,7 @@ class rc2014_ym2149_device : public rc2014_ym_ay_device
 {
 public:
 	// construction/destruction
-	rc2014_ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rc2014_ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -141,7 +141,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-rc2014_ym2149_device::rc2014_ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rc2014_ym2149_device::rc2014_ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rc2014_ym_ay_device(mconfig, RC2014_YM2149_SOUND, tag, owner, clock)
 {
 }
@@ -161,7 +161,7 @@ void rc2014_ym2149_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2149(config, m_psg, 0);
+	YM2149(config, m_psg);
 	m_psg->add_route(0, "rspeaker", 0.25);
 	m_psg->add_route(2, "rspeaker", 0.25);
 	m_psg->add_route(1, "lspeaker", 0.25);
@@ -176,14 +176,14 @@ class rc2014_ay8190_device : public rc2014_ym_ay_device
 {
 public:
 	// construction/destruction
-	rc2014_ay8190_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rc2014_ay8190_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-rc2014_ay8190_device::rc2014_ay8190_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rc2014_ay8190_device::rc2014_ay8190_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rc2014_ym_ay_device(mconfig, RC2014_AY8190_SOUND, tag, owner, clock)
 {
 }
@@ -193,7 +193,7 @@ void rc2014_ay8190_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	AY8910(config, m_psg, 0);
+	AY8910(config, m_psg);
 	m_psg->add_route(0, "rspeaker", 0.25);
 	m_psg->add_route(2, "rspeaker", 0.25);
 	m_psg->add_route(1, "lspeaker", 0.25);

@@ -11,8 +11,8 @@
 #include "emu.h"
 #include "ngen_kb.h"
 
-ngen_keyboard_device::ngen_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-	: serial_keyboard_device(mconfig, NGEN_KEYBOARD, tag, owner, 0)
+ngen_keyboard_device::ngen_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
+	: serial_keyboard_device(mconfig, NGEN_KEYBOARD, tag, owner)
 	, m_keys_down(0U)
 	, m_last_reset(0U)
 {
@@ -68,7 +68,7 @@ void ngen_keyboard_device::device_start()
 	save_item(NAME(m_keys_down));
 	save_item(NAME(m_last_reset));
 
-	set_rcv_rate(19200);
+	set_rcv_rate(XTAL::u(19200));
 }
 
 void ngen_keyboard_device::device_reset()

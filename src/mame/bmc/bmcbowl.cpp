@@ -476,7 +476,7 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	screen.screen_vblank().append("via6522_0", FUNC(via6522_device::write_cb1));
 
 	PALETTE(config, m_palette).set_entries(256);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &bmcbowl_state::ramdac_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -494,7 +494,7 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	aysnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1122000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1122000), okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 

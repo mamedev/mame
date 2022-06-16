@@ -466,7 +466,7 @@ const hdc92x4_device::cmddef hdc92x4_device::s_command[] =
 /*
     Standard constructor for the base class and the two variants
 */
-hdc92x4_device::hdc92x4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_hdc9234)
+hdc92x4_device::hdc92x4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool is_hdc9234)
 	: device_t(mconfig, type, tag, owner, clock),
 	m_is_hdc9234(is_hdc9234),
 	m_out_intrq(*this),
@@ -479,12 +479,12 @@ hdc92x4_device::hdc92x4_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-hdc9224_device::hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hdc9224_device::hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hdc92x4_device(mconfig, HDC9224, tag, owner, clock, false)
 {
 }
 
-hdc9234_device::hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hdc9234_device::hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hdc92x4_device(mconfig, HDC9234, tag, owner, clock, true)
 {
 }

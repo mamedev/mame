@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(HD61202, hd61202_device, "hd61202", "Hitachi HD61202 LCD Driv
 //  hd61202_device - constructor
 //-------------------------------------------------
 
-hd61202_device::hd61202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hd61202_device::hd61202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HD61202, tag, owner, clock)
 	, m_screen_update_cb(*this)
 {

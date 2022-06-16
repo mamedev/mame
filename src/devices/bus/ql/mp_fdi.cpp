@@ -49,7 +49,7 @@ const tiny_rom_entry *micro_peripherals_floppy_disk_interface_device::device_rom
 //  micro_peripherals_floppy_disk_interface_device - constructor
 //-------------------------------------------------
 
-micro_peripherals_floppy_disk_interface_device::micro_peripherals_floppy_disk_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+micro_peripherals_floppy_disk_interface_device::micro_peripherals_floppy_disk_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MICRO_PERIPHERALS_FLOPPY_DISK_INTERFACE, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this)
 {

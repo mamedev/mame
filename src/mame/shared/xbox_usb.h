@@ -475,7 +475,7 @@ class ohci_usb_connector : public device_t, public device_single_card_slot_inter
 public:
 	template <typename T>
 	ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed)
-		: ohci_usb_connector(mconfig, tag, owner, 0)
+		: ohci_usb_connector(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -483,7 +483,7 @@ public:
 		set_fixed(fixed);
 	}
 
-	ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~ohci_usb_connector();
 
 protected:
@@ -501,7 +501,7 @@ DECLARE_DEVICE_TYPE(OHCI_GAME_CONTROLLER, ohci_game_controller_device)
 class ohci_game_controller_device : public device_t, public device_usb_ohci_function_interface
 {
 public:
-	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void initialize() override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size) override;

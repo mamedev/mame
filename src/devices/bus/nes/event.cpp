@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(NES_EVENT,  nes_event_device,  "nes_event",  "NES Cart EVENT 
 DEFINE_DEVICE_TYPE(NES_EVENT2, nes_event2_device, "nes_event2", "NES Cart EVENT2 PCB")
 
 
-nes_event_device::nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_event_device::nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sxrom_device(mconfig, NES_EVENT, tag, owner, clock)
 	, m_dsw(*this, "DIPSW")
 	, m_nwc_init(0)
@@ -46,7 +46,7 @@ nes_event_device::nes_event_device(const machine_config &mconfig, const char *ta
 {
 }
 
-nes_event2_device::nes_event2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_event2_device::nes_event2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_tqrom_device(mconfig, NES_EVENT2, tag, owner, clock)
 	, m_dsw(*this, "DIPSW")
 	, m_tqrom_mode(false)

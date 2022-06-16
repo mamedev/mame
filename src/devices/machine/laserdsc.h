@@ -101,7 +101,7 @@ public:
 	typedef device_delegate<chd_file *(void)> get_disc_delegate;
 	typedef device_delegate<void (int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)> audio_delegate;
 
-	laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// use these to add laserdisc screens with proper video update parameters
 	// TODO: actually move these SCREEN_RAW_PARAMS to a common screen info header

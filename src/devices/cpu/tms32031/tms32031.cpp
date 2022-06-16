@@ -406,7 +406,7 @@ void tms3203x_device::tmsreg::from_double(double val)
 //  tms3203x_device - constructor
 //-------------------------------------------------
 
-tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, int clock_per_inst, address_map_constructor internal_map)
+tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t chiptype, int clock_per_inst, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 24, -2, internal_map),
 		m_chip_type(chiptype),
@@ -438,22 +438,22 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 #endif
 }
 
-tms32030_device::tms32030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms32030_device::tms32030_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms3203x_device(mconfig, TMS32030, tag, owner, clock, CHIP_TYPE_TMS32030, 2, address_map_constructor(FUNC(tms32030_device::internal_32030), this))
 {
 }
 
-tms32031_device::tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms32031_device::tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms3203x_device(mconfig, TMS32031, tag, owner, clock, CHIP_TYPE_TMS32031, 2, address_map_constructor(FUNC(tms32031_device::internal_32031), this))
 {
 }
 
-tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms3203x_device(mconfig, TMS32032, tag, owner, clock, CHIP_TYPE_TMS32032, 2, address_map_constructor(FUNC(tms32032_device::internal_32032), this))
 {
 }
 
-tms32033_device::tms32033_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms32033_device::tms32033_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms3203x_device(mconfig, TMS32033, tag, owner, clock, CHIP_TYPE_TMS32031, 1, address_map_constructor(FUNC(tms32033_device::internal_32033), this))
 {
 }

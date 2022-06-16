@@ -119,7 +119,7 @@ INPUT_PORTS_END
 } // anonymous namespace
 
 
-rmnimbus_keyboard_device::rmnimbus_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+rmnimbus_keyboard_device::rmnimbus_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
 	: buffered_rs232_device(mconfig, RMNIMBUS_KEYBOARD, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINEA")
 {

@@ -350,12 +350,12 @@ void _39in1_state::init_pokrwild()  { decrypt(0x20, 0x00, 0x00, 0x40, 0x08, 0x00
 
 void _39in1_state::base(machine_config &config)
 {
-	PXA255(config, m_maincpu, 200'000'000);
+	PXA255(config, m_maincpu, XTAL::u(200'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &_39in1_state::base_map);
 
 	EEPROM_93C66_16BIT(config, "eeprom");
 
-	PXA255_PERIPHERALS(config, m_pxa_periphs, 200'000'000, m_maincpu);
+	PXA255_PERIPHERALS(config, m_pxa_periphs, XTAL::u(200'000'000), m_maincpu);
 	m_pxa_periphs->gpio0_write().set(FUNC(_39in1_state::eeprom_w));
 	m_pxa_periphs->gpio0_read().set(FUNC(_39in1_state::eeprom_r));
 	m_pxa_periphs->gpio1_read().set_ioport("DSW").lshift(21);

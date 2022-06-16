@@ -74,7 +74,7 @@ static constexpr u32 PC090OJ_ACTIVE_RAM_SIZE = 0x800;
 
 DEFINE_DEVICE_TYPE(PC090OJ, pc090oj_device, "pc090oj", "Taito PC090OJ")
 
-pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PC090OJ, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, m_colpri_cb(*this)

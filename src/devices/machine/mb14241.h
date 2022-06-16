@@ -14,7 +14,7 @@
 class mb14241_device : public device_t
 {
 public:
-	mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void shift_count_w(u8 data);
 	void shift_data_w(u8 data);

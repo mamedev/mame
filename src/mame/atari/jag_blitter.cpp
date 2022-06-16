@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(JAG_BLITTER, jag_blitter_device, "jag_blitter", "Atari Jaguar
 //  jag_blitter_device - constructor
 //-------------------------------------------------
 
-jag_blitter_device::jag_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+jag_blitter_device::jag_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, JAG_BLITTER, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("regs", ENDIANNESS_BIG, 32, 8, 0, address_map_constructor(FUNC(jag_blitter_device::regs_map), this))

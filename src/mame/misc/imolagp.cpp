@@ -538,18 +538,18 @@ void imolagp_state::machine_reset()
 void imolagp_state::imolagp(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3000000); // ? (assume slower than slave)
+	Z80(config, m_maincpu, XTAL::u(3000000)); // ? (assume slower than slave)
 	m_maincpu->set_addrmap(AS_PROGRAM, &imolagp_state::imolagp_master_map);
 	m_maincpu->set_addrmap(AS_IO, &imolagp_state::imolagp_master_io);
 	TIMER(config, m_steer_pot_timer).configure_generic(FUNC(imolagp_state::imolagp_pot_callback)); // maincpu nmi
 
-	Z80(config, m_slavecpu, 4000000); // ?
+	Z80(config, m_slavecpu, XTAL::u(4000000)); // ?
 	m_slavecpu->set_addrmap(AS_PROGRAM, &imolagp_state::imolagp_slave_map);
 	m_slavecpu->set_addrmap(AS_IO, &imolagp_state::imolagp_slave_io);
 
 	config.set_perfect_quantum(m_maincpu);
 
-	i8255_device &ppi(I8255A(config, "ppi8255", 0));
+	i8255_device &ppi(I8255A(config, "ppi8255"));
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_log("PPI8255 - unmapped read port B");
@@ -574,7 +574,7 @@ void imolagp_state::imolagp(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.5); // ?
+	AY8910(config, "aysnd", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 0.5); // ?
 }
 
 

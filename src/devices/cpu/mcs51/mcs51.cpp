@@ -267,7 +267,7 @@ void mcs51_cpu_device::data_internal(address_map &map)
 
 
 
-mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features)
+mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor program_map, address_map_constructor data_map, int program_width, int data_width, uint8_t features)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0, data_map)
@@ -295,147 +295,147 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 }
 
 
-mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int program_width, int data_width, uint8_t features)
 	: mcs51_cpu_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(mcs51_cpu_device::program_internal), this), address_map_constructor(FUNC(mcs51_cpu_device::data_internal), this), program_width, data_width, features)
 {
 }
 
 
-i8031_device::i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8031_device::i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs51_cpu_device(mconfig, I8031, tag, owner, clock, 0, 7)
 {
 }
 
-i8051_device::i8051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8051_device::i8051_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs51_cpu_device(mconfig, I8051, tag, owner, clock, 12, 7)
 {
 }
 
-i8751_device::i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8751_device::i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs51_cpu_device(mconfig, I8751, tag, owner, clock, 12, 7)
 {
 }
 
-am8753_device::am8753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+am8753_device::am8753_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs51_cpu_device(mconfig, AM8753, tag, owner, clock, 13, 7)
 {
 }
 
-i8052_device::i8052_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+i8052_device::i8052_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int program_width, int data_width, uint8_t features)
 	: mcs51_cpu_device(mconfig, type, tag, owner, clock, program_width, data_width, features | FEATURE_I8052)
 {
 	m_num_interrupts = 6;
 }
 
-i8052_device::i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8052_device::i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8052_device(mconfig, I8052, tag, owner, clock, 13, 8)
 {
 }
 
-i8032_device::i8032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8032_device::i8032_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8052_device(mconfig, I8032, tag, owner, clock, 0, 8)
 {
 }
 
-i8752_device::i8752_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8752_device::i8752_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8052_device(mconfig, I8752, tag, owner, clock, 13, 8)
 {
 }
 
-i80c31_device::i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i80c31_device::i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i8052_device(mconfig, I80C31, tag, owner, clock, 0, 7)
 {
 }
 
-i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int program_width, int data_width, uint8_t features)
 	: mcs51_cpu_device(mconfig, type, tag, owner, clock, program_width, data_width, features | FEATURE_CMOS)
 {
 }
 
-i80c51_device::i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i80c51_device::i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80c51_device(mconfig, I80C51, tag, owner, clock, 12, 7)
 {
 }
 
-i87c51_device::i87c51_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i87c51_device::i87c51_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80c51_device(mconfig, I87C51, tag, owner, clock, 12, 7)
 {
 }
 
 
-i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int program_width, int data_width, uint8_t features)
 	: i8052_device(mconfig, type, tag, owner, clock, program_width, data_width, features | FEATURE_I80C52 | FEATURE_CMOS)
 {
 }
 
-i80c52_device::i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i80c52_device::i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80c52_device(mconfig, I80C52, tag, owner, clock, 13, 8)
 {
 }
 
-i80c32_device::i80c32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i80c32_device::i80c32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80c52_device(mconfig, I80C32, tag, owner, clock, 0, 8)
 {
 }
 
 
-i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80c52_device(mconfig, I87C52, tag, owner, clock, 13, 8)
 {
 }
 
-i87c51fa_device::i87c51fa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+i87c51fa_device::i87c51fa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int program_width, int data_width, uint8_t features)
 	: i80c52_device(mconfig, type, tag, owner, clock, program_width, data_width, features)
 {
 }
 
-i87c51fa_device::i87c51fa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i87c51fa_device::i87c51fa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i87c51fa_device(mconfig, I87C51FA, tag, owner, clock, 13, 8)
 {
 }
 
-i80c51gb_device::i80c51gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i80c51gb_device::i80c51gb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i87c51fa_device(mconfig, I80C51GB, tag, owner, clock, 0, 8)
 {
 }
 
-at89c52_device::at89c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+at89c52_device::at89c52_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80c52_device(mconfig, AT89C52, tag, owner, clock, 13, 8)
 {
 }
 
-at89s52_device::at89s52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+at89s52_device::at89s52_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80c52_device(mconfig, AT89S52, tag, owner, clock, 13, 8)
 {
 }
 
-at89c4051_device::at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+at89c4051_device::at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80c51_device(mconfig, AT89C4051, tag, owner, clock, 12, 7)
 {
 }
 
-ds80c320_device::ds80c320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ds80c320_device::ds80c320_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80c52_device(mconfig, DS80C320, tag, owner, clock, 0, 8)
 {
 }
 
-sab80c535_device::sab80c535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sab80c535_device::sab80c535_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i80c51_device(mconfig, SAB80C535, tag, owner, clock, 0, 8)
 {
 }
 
-i8344_device::i8344_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8344_device::i8344_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs51_cpu_device(mconfig, I8344, tag, owner, clock, 0, 8)
 {
 }
 
-i8744_device::i8744_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8744_device::i8744_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs51_cpu_device(mconfig, I8744, tag, owner, clock, 12, 8)
 {
 }
 
 /* program width field is set to 0 because technically the SRAM isn't internal */
-ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs51_cpu_device(mconfig, DS5002FP, tag, owner, clock, 0, 7, FEATURE_DS5002FP | FEATURE_CMOS)
 	, device_nvram_interface(mconfig, *this)
 	, m_region(*this, "internal")

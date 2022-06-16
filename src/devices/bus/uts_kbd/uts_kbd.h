@@ -27,10 +27,10 @@ class uts_keyboard_port_device : public device_t, public device_single_card_slot
 
 public:
 	// construction/destruction
-	uts_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	uts_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	template <typename T>
 	uts_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: uts_keyboard_port_device(mconfig, tag, owner, 0U)
+		: uts_keyboard_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);

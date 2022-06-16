@@ -149,7 +149,7 @@ public:
 	auto tout2_cb() { return subdevice<pit8253_device>("tcu")->out_handler<2>(); }
 
 protected:
-	v50_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_16bit, u8 prefetch_size, u8 prefetch_cycles, u32 chip_type);
+	v50_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool is_16bit, u8 prefetch_size, u8 prefetch_cycles, u32 chip_type);
 
 	// device-specific overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -191,7 +191,7 @@ private:
 class v40_device : public v50_base_device
 {
 public:
-	v40_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	v40_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void install_peripheral_io() override;
@@ -200,7 +200,7 @@ protected:
 class v50_device : public v50_base_device
 {
 public:
-	v50_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	v50_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void install_peripheral_io() override;
@@ -209,7 +209,7 @@ protected:
 class v53_device : public v33_base_device, public device_v5x_interface
 {
 public:
-	v53_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	v53_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <unsigned Channel> DECLARE_WRITE_LINE_MEMBER(dreq_w)
 	{
@@ -228,7 +228,7 @@ public:
 	template <unsigned Timer> auto out_handler() { return subdevice<pit8253_device>("tcu")->out_handler<Timer>(); }
 
 protected:
-	v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-specific overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -262,7 +262,7 @@ private:
 class v53a_device : public v53_device
 {
 public:
-	v53a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	v53a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(V40,  v40_device)

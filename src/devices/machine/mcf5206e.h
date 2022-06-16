@@ -24,13 +24,13 @@ class mcf5206e_peripheral_device :  public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: mcf5206e_peripheral_device(mconfig, tag, owner, clock)
+	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: mcf5206e_peripheral_device(mconfig, tag, owner)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint32_t dev_r(offs_t offset, uint32_t mem_mask = ~0);
 	void dev_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

@@ -185,7 +185,7 @@ void lancelot_state::lancelot(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();  // YAC512 left
 	SPEAKER(config, "rspeaker").front_right();  // YAC512 right
-	ymf262_device &ymf(YMF262(config, "ymf", 14'318'180));
+	ymf262_device &ymf(YMF262(config, "ymf", XTAL::u(14'318'180)));
 	ymf.irq_handler().set_inputline("audiocpu", 2); // to P82/INT2 of the audio cpu
 	ymf.add_route(0, "lspeaker", 0.50);
 	ymf.add_route(1, "rspeaker", 0.50);

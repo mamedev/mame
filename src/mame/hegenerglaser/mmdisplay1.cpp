@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE1, mephisto_display1_device, "mdisplay
 //  constructor
 //-------------------------------------------------
 
-mephisto_display1_device::mephisto_display1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+mephisto_display1_device::mephisto_display1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MEPHISTO_DISPLAY_MODULE1, tag, owner, clock),
 	m_digits(*this, "digit%u", 0U),
 	m_output_digit(*this)

@@ -67,7 +67,7 @@ public:
 	static constexpr unsigned VERT_DISPLAY_START_NTSC    = 13 + 27;
 
 	// construction/destruction
-	tms9928a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9928a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_vram_size(int vram_size) { m_vram_size = vram_size; }
 	auto int_callback() { return m_out_int_line_cb.bind(); }
@@ -89,7 +89,7 @@ public:
 	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }
 
 protected:
-	tms9928a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t horz_total, bool is_50hz, bool is_reva, bool is_99);
+	tms9928a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint16_t horz_total, bool is_50hz, bool is_reva, bool is_99);
 
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -156,56 +156,56 @@ private:
 class tms9918_device : public tms9928a_device
 {
 public:
-	tms9918_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9918_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms9918a_device : public tms9928a_device
 {
 public:
-	tms9918a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9918a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms9118_device : public tms9928a_device
 {
 public:
-	tms9118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9118_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms9128_device : public tms9928a_device
 {
 public:
-	tms9128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms9929_device : public tms9928a_device
 {
 public:
-	tms9929_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9929_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms9929a_device : public tms9928a_device
 {
 public:
-	tms9929a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9929a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms9129_device : public tms9928a_device
 {
 public:
-	tms9129_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9129_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class efo90501_device : public tms9928a_device
 {
 public:
-	efo90501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	efo90501_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

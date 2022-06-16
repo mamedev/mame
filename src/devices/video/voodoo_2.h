@@ -173,14 +173,14 @@ class voodoo_2_device : public voodoo_1_device
 
 protected:
 	// internal construction
-	voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo::voodoo_model model);
+	voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, voodoo::voodoo_model model);
 
 public:
 	// nominal clock value
-	static constexpr u32 NOMINAL_CLOCK = 90'000'000;
+	static constexpr XTAL NOMINAL_CLOCK = XTAL::u(90'000'000);
 
 	// construction
-	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		voodoo_2_device(mconfig, VOODOO_2, tag, owner, clock, voodoo::voodoo_model::VOODOO_2) { }
 
 	// address map and read/write helpers

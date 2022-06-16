@@ -33,12 +33,12 @@ class egret_device :  public device_t, public device_nvram_interface
 public:
 	// construction/destruction
 	egret_device(const machine_config &mconfig, const char *tag, device_t *owner, int type)
-		: egret_device(mconfig, tag, owner, (uint32_t)0)
+		: egret_device(mconfig, tag, owner)
 	{
 		set_type(type);
 	}
 
-	egret_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	egret_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration helpers
 	void set_type(int type) { rom_offset = type; }

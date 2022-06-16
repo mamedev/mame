@@ -203,7 +203,7 @@ INPUT_PORTS_END
 void ftri1_state::ftri1(machine_config &config)
 {
 	// basic machine hardware
-	MM78(config, m_maincpu, 300000); // approximation - VC osc. R=68K
+	MM78(config, m_maincpu, XTAL::u(300000)); // approximation - VC osc. R=68K
 	m_maincpu->write_d().set(FUNC(ftri1_state::write_d));
 	m_maincpu->write_r().set(FUNC(ftri1_state::write_r));
 	m_maincpu->read_p().set_ioport("IN.0");
@@ -329,7 +329,7 @@ INPUT_PORTS_END
 void mastmind_state::mastmind(machine_config &config)
 {
 	// basic machine hardware
-	MM75(config, m_maincpu, 360000); // approximation - VC osc. R=56K
+	MM75(config, m_maincpu, XTAL::u(360000)); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(mastmind_state::write_d));
 	m_maincpu->write_r().set(FUNC(mastmind_state::write_r));
 	m_maincpu->read_p().set(FUNC(mastmind_state::read_p));
@@ -350,7 +350,7 @@ void mastmind_state::smastmind(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 2400); // approximation
+	BEEP(config, m_beeper, XTAL::u(2400)); // approximation
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -473,7 +473,7 @@ INPUT_PORTS_END
 void dunksunk_state::dunksunk(machine_config &config)
 {
 	// basic machine hardware
-	MM76EL(config, m_maincpu, 390000); // approximation - VC osc. R=56K
+	MM76EL(config, m_maincpu, XTAL::u(390000)); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(dunksunk_state::write_d));
 	m_maincpu->write_r().set(FUNC(dunksunk_state::write_r));
 	m_maincpu->read_p().set_ioport("IN.0");
@@ -616,7 +616,7 @@ INPUT_PORTS_END
 void memoquiz_state::memoquiz(machine_config &config)
 {
 	// basic machine hardware
-	MM75(config, m_maincpu, 360000); // approximation - VC osc. R=56K
+	MM75(config, m_maincpu, XTAL::u(360000)); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(memoquiz_state::write_d));
 	m_maincpu->write_r().set(FUNC(memoquiz_state::write_r));
 	m_maincpu->read_p().set(FUNC(memoquiz_state::read_p));
@@ -722,7 +722,7 @@ INPUT_PORTS_END
 void mfootb2_state::mfootb2(machine_config &config)
 {
 	// basic machine hardware
-	MM77LA(config, m_maincpu, 380000); // approximation - VC osc. R=56K
+	MM77LA(config, m_maincpu, XTAL::u(380000)); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(mfootb2_state::write_d));
 	m_maincpu->read_d().set_ioport("IN.1");
 	m_maincpu->write_r().set(FUNC(mfootb2_state::write_r));
@@ -887,7 +887,7 @@ INPUT_PORTS_END
 void brainbaf_state::brainbaf(machine_config &config)
 {
 	// basic machine hardware
-	MM78LA(config, m_maincpu, 440000); // approximation - VC osc. R=10K
+	MM78LA(config, m_maincpu, XTAL::u(440000)); // approximation - VC osc. R=10K
 	m_maincpu->write_d().set(FUNC(brainbaf_state::write_d));
 	m_maincpu->write_r().set(FUNC(brainbaf_state::write_r));
 	m_maincpu->read_p().set(FUNC(brainbaf_state::read_p));
@@ -1065,7 +1065,7 @@ INPUT_PORTS_END
 void horocomp_state::horocomp(machine_config &config)
 {
 	// basic machine hardware
-	MM78LA(config, m_maincpu, 440000); // approximation - VC osc. R=10K
+	MM78LA(config, m_maincpu, XTAL::u(440000)); // approximation - VC osc. R=10K
 	m_maincpu->write_d().set(FUNC(horocomp_state::write_d));
 	m_maincpu->write_r().set(FUNC(horocomp_state::write_r));
 	m_maincpu->read_p().set(FUNC(horocomp_state::read_p));
@@ -1249,7 +1249,7 @@ INPUT_PORTS_END
 void mwcfootb_state::mwcfootb(machine_config &config)
 {
 	// basic machine hardware
-	MM78(config, m_maincpu, 360000); // approximation - VC osc. R=56K
+	MM78(config, m_maincpu, XTAL::u(360000)); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(mwcfootb_state::main_write_d));
 	m_maincpu->read_d().set(FUNC(mwcfootb_state::main_read_d));
 	m_maincpu->write_r().set(FUNC(mwcfootb_state::main_write_r));
@@ -1257,7 +1257,7 @@ void mwcfootb_state::mwcfootb(machine_config &config)
 	m_maincpu->read_sdi().set(m_subcpu, FUNC(pps41_base_device::sdo_r));
 	m_maincpu->write_ssc().set(m_subcpu, FUNC(pps41_base_device::ssc_w));
 
-	MM78(config, m_subcpu, 360000); // osc. from maincpu
+	MM78(config, m_subcpu, XTAL::u(360000)); // osc. from maincpu
 	m_subcpu->write_d().set(FUNC(mwcfootb_state::sub_write_d));
 	m_subcpu->write_r().set(FUNC(mwcfootb_state::sub_write_r));
 	m_subcpu->read_sdi().set(m_maincpu, FUNC(pps41_base_device::sdo_r));
@@ -1421,7 +1421,7 @@ INPUT_PORTS_END
 void scrabsen_state::scrabsen(machine_config &config)
 {
 	// basic machine hardware
-	MM76EL(config, m_maincpu, 380000); // approximation - VC osc. R=56K
+	MM76EL(config, m_maincpu, XTAL::u(380000)); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(scrabsen_state::write_d));
 	m_maincpu->write_r().set(FUNC(scrabsen_state::write_r));
 	m_maincpu->read_p().set(FUNC(scrabsen_state::read_p));
@@ -1557,7 +1557,7 @@ INPUT_PORTS_END
 void rdqa_state::rdqa(machine_config &config)
 {
 	// basic machine hardware
-	MM76EL(config, m_maincpu, 400000); // approximation - VC osc. R=56K
+	MM76EL(config, m_maincpu, XTAL::u(400000)); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(rdqa_state::write_d));
 	m_maincpu->write_r().set(FUNC(rdqa_state::write_r));
 	m_maincpu->read_p().set(FUNC(rdqa_state::read_p));

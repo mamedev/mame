@@ -8,7 +8,7 @@
 class tc0150rod_device : public device_t
 {
 public:
-	tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t word_r(offs_t offset);
 	void word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

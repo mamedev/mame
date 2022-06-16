@@ -96,7 +96,7 @@ const uint8_t cdp1871_device::key_codes[4][11][8] =
 //  cdp1871_device - constructor
 //-------------------------------------------------
 
-cdp1871_device::cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cdp1871_device::cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CDP1871, tag, owner, clock),
 	m_read_d1(*this),
 	m_read_d2(*this),

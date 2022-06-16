@@ -356,11 +356,11 @@ void triothep_state::machine_reset()
 void actfancr_state::actfancr(machine_config &config)
 {
 	// basic machine hardware
-	H6280(config, m_maincpu, 21477200/3); // Should be accurate
+	H6280(config, m_maincpu, XTAL::u(21477200)/3); // Should be accurate
 	m_maincpu->set_addrmap(AS_PROGRAM, &actfancr_state::prg_map);
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	M6502(config, m_audiocpu, 1500000); // Should be accurate
+	M6502(config, m_audiocpu, XTAL::u(1500000)); // Should be accurate
 	m_audiocpu->set_addrmap(AS_PROGRAM, &actfancr_state::dec0_s_map);
 
 	// video hardware
@@ -376,32 +376,32 @@ void actfancr_state::actfancr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_actfan);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
-	DECO_BAC06(config, m_tilegen[0], 0);
+	DECO_BAC06(config, m_tilegen[0]);
 	m_tilegen[0]->set_gfx_region_wide(2, 2, 2);
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_BAC06(config, m_tilegen[1], 0);
+	DECO_BAC06(config, m_tilegen[1]);
 	m_tilegen[1]->set_gfx_region_wide(0, 0, 0);
 	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_MXC06(config, m_spritegen, 0);
+	DECO_MXC06(config, m_spritegen);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL::u(1500000)));
 	ym1.add_route(0, "mono", 0.90);
 	ym1.add_route(1, "mono", 0.90);
 	ym1.add_route(2, "mono", 0.90);
 	ym1.add_route(3, "mono", 0.50);
 
-	ym3812_device &ym2(YM3812(config, "ym2", 3000000));
+	ym3812_device &ym2(YM3812(config, "ym2", XTAL::u(3000000)));
 	ym2.irq_handler().set_inputline("audiocpu", M6502_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1024188, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1024188), okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 0.85);
 }
 

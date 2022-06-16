@@ -9,12 +9,12 @@
 
 class sb0400_device : public pci_device {
 public:
-	sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id)
+	sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t subdevice_id)
 		: sb0400_device(mconfig, tag, owner, clock)
 	{
 		set_ids(0x11020008, 0x00, 0x040100, subdevice_id);
 	}
-	sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

@@ -1901,7 +1901,7 @@ void captaven_state::captaven(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline(m_maincpu, ARM_IRQ_LINE);
 
-	DECO_IRQ(config, m_deco_irq, 0);
+	DECO_IRQ(config, m_deco_irq);
 	m_deco_irq->set_screen_tag(m_screen);
 	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
 	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
@@ -1914,7 +1914,7 @@ void captaven_state::captaven(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_captaven);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x20);
@@ -1925,7 +1925,7 @@ void captaven_state::captaven(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);    // pf3 is in 8bpp mode, pf4 is not used
+	DECO16IC(config, m_deco_tilegen[1]);    // pf3 is in 8bpp mode, pf4 is not used
 	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x04);
@@ -1939,12 +1939,12 @@ void captaven_state::captaven(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0]);
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_pri_callback(FUNC(captaven_state::captaven_pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO146PROT(config, m_ioprot, 0);
+	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("IN0");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("IN1");
@@ -1990,7 +1990,7 @@ void fghthist_state::fghthist(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fghthist);
 	PALETTE(config, m_palette).set_entries(2048);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -2003,7 +2003,7 @@ void fghthist_state::fghthist(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
@@ -2016,12 +2016,12 @@ void fghthist_state::fghthist(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0]);
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_pri_callback(FUNC(fghthist_state::fghthist_pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO146PROT(config, m_ioprot, 0);
+	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("IN0");
 	m_ioprot->port_b_cb().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(0);
 	m_ioprot->port_c_cb().set_ioport("IN1");
@@ -2035,17 +2035,17 @@ void fghthist_state::fghthist(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	YM2151(config, m_ym2151, 32220000/9);
+	YM2151(config, m_ym2151, XTAL::u(32220000)/9);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
 	m_ym2151->add_route(0, "lspeaker", 0.42);
 	m_ym2151->add_route(1, "rspeaker", 0.42);
 
-	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[0], XTAL::u(32220000)/32, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[1], XTAL::u(32220000)/16, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
 	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 }
@@ -2088,14 +2088,14 @@ void dragngun_state::dragngun(machine_config &config)
 	ARM(config, m_maincpu, XTAL(28'000'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragngun_state::dragngun_map);
 
-	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL::u(32220000)/8));
 	audiocpu.set_addrmap(AS_PROGRAM, &dragngun_state::h6280_sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
 
-	DECO_IRQ(config, m_deco_irq, 0);
+	DECO_IRQ(config, m_deco_irq);
 	m_deco_irq->set_screen_tag(m_screen);
 	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
 	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
@@ -2110,7 +2110,7 @@ void dragngun_state::dragngun(machine_config &config)
 
 	BUFFERED_SPRITERAM32(config, m_spriteram);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x20);
@@ -2123,7 +2123,7 @@ void dragngun_state::dragngun(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x04);
@@ -2145,7 +2145,7 @@ void dragngun_state::dragngun(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
 	PALETTE(config, m_palette).set_entries(2048);
 
-	DECO146PROT(config, m_ioprot, 0);
+	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("DSW");
@@ -2156,23 +2156,23 @@ void dragngun_state::dragngun(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, m_ym2151, 32220000/9);
+	YM2151(config, m_ym2151, XTAL::u(32220000)/9);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
 	m_ym2151->add_route(0, "lspeaker", 0.42);
 	m_ym2151->add_route(1, "rspeaker", 0.42);
 
-	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[0], XTAL::u(32220000)/32, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[1], XTAL::u(32220000)/16, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
 	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 
 	SPEAKER(config, "gun_speaker").front_center();
 
-	OKIM6295(config, m_oki[2], 32220000/32, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[2], XTAL::u(32220000)/32, okim6295_device::PIN7_HIGH);
 	m_oki[2]->add_route(ALL_OUTPUTS, "gun_speaker", 1.0);
 
 	LC7535(config, m_vol_main);
@@ -2200,7 +2200,7 @@ void dragngun_state::lockloadu(machine_config &config)
 
 void dragngun_state::namco_sprites(machine_config &config)
 {
-	NAMCO_C355SPR(config, m_sprgenzoom, 0);
+	NAMCO_C355SPR(config, m_sprgenzoom);
 	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
 	m_sprgenzoom->set_palette(m_palette);
 	m_sprgenzoom->set_colors(32);
@@ -2223,13 +2223,13 @@ void dragngun_state::lockload(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
 
-	Z80(config, m_audiocpu, 32220000/8);
+	Z80(config, m_audiocpu, XTAL::u(32220000)/8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dragngun_state::lockload_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &dragngun_state::z80_sound_io);
 
 	INPUT_MERGER_ANY_HIGH(config, "sound_irq_merger").output_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
-	DECO_IRQ(config, m_deco_irq, 0);
+	DECO_IRQ(config, m_deco_irq);
 	m_deco_irq->set_screen_tag(m_screen);
 	m_deco_irq->lightgun1_callback().set_ioport("LIGHT0_Y");
 	m_deco_irq->lightgun2_callback().set_ioport("LIGHT1_Y");
@@ -2251,7 +2251,7 @@ void dragngun_state::lockload(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
 	PALETTE(config, m_palette).set_entries(2048);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x20);
@@ -2264,7 +2264,7 @@ void dragngun_state::lockload(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);    // lockload definitely wants pf34 half width..
 	m_deco_tilegen[1]->set_pf1_col_bank(0x04);
@@ -2279,7 +2279,7 @@ void dragngun_state::lockload(machine_config &config)
 
 	namco_sprites(config);
 
-	DECO146PROT(config, m_ioprot, 0);
+	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("DSW");
@@ -2290,17 +2290,17 @@ void dragngun_state::lockload(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, m_ym2151, 32220000/9);
+	YM2151(config, m_ym2151, XTAL::u(32220000)/9);
 	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_ym2151->port_write_handler().set(FUNC(dragngun_state::lockload_okibank_lo_w));
 	m_ym2151->add_route(0, "lspeaker", 0.42);
 	m_ym2151->add_route(1, "rspeaker", 0.42);
 
-	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[0], XTAL::u(32220000)/32, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[1], XTAL::u(32220000)/16, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
 	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 
@@ -2312,7 +2312,7 @@ void dragngun_state::lockload(machine_config &config)
 void nslasher_state::tattass(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM(config, m_maincpu, 28000000/4); // unconfirmed
+	ARM(config, m_maincpu, XTAL::u(28000000)/4); // unconfirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &nslasher_state::tattass_map);
 	m_maincpu->set_vblank_int("screen", FUNC(deco32_state::irq0_line_assert));
 
@@ -2322,9 +2322,9 @@ void nslasher_state::tattass(machine_config &config)
 	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(nslasher_state::screen_update_tattass));
 
-	DECO_ACE(config, m_deco_ace, 0);
+	DECO_ACE(config, m_deco_ace);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -2337,7 +2337,7 @@ void nslasher_state::tattass(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
@@ -2351,17 +2351,17 @@ void nslasher_state::tattass(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0]);
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[1], 0);
+	DECO_SPRITE(config, m_sprgen[1]);
 	m_sprgen[1]->set_gfx_region(4);
 	m_sprgen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_deco_ace, gfx_nslasher);
 
-	DECO104PROT(config, m_ioprot, 0);
+	DECO104PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("IN0");
 	m_ioprot->port_b_cb().set(FUNC(nslasher_state::port_b_tattass));
 	m_ioprot->port_c_cb().set_ioport("IN1");
@@ -2369,7 +2369,7 @@ void nslasher_state::tattass(machine_config &config)
 	m_ioprot->set_interface_scramble_interleave();
 
 	/* sound hardware */
-	DECOBSMT(config, m_decobsmt, 0);
+	DECOBSMT(config, m_decobsmt);
 }
 
 void nslasher_state::nslasher(machine_config &config)
@@ -2379,7 +2379,7 @@ void nslasher_state::nslasher(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nslasher_state::nslasher_map);
 	m_maincpu->set_vblank_int("screen", FUNC(deco32_state::irq0_line_assert));
 
-	Z80(config, m_audiocpu, 32220000/9);
+	Z80(config, m_audiocpu, XTAL::u(32220000)/9);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nslasher_state::z80_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nslasher_state::z80_sound_io);
 
@@ -2393,9 +2393,9 @@ void nslasher_state::nslasher(machine_config &config)
 	m_screen->set_raw(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(nslasher_state::screen_update_nslasher));
 
-	DECO_ACE(config, m_deco_ace, 0);
+	DECO_ACE(config, m_deco_ace);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -2408,7 +2408,7 @@ void nslasher_state::nslasher(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
@@ -2422,17 +2422,17 @@ void nslasher_state::nslasher(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0]);
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[1], 0);
+	DECO_SPRITE(config, m_sprgen[1]);
 	m_sprgen[1]->set_gfx_region(4);
 	m_sprgen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_deco_ace, gfx_nslasher);
 
-	DECO104PROT(config, m_ioprot, 0);
+	DECO104PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("IN0");
 	m_ioprot->port_b_cb().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(0);
 	m_ioprot->port_c_cb().set_ioport("IN1");
@@ -2443,17 +2443,17 @@ void nslasher_state::nslasher(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, m_ym2151, 32220000/9);
+	YM2151(config, m_ym2151, XTAL::u(32220000)/9);
 	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
 	m_ym2151->add_route(0, "lspeaker", 0.40);
 	m_ym2151->add_route(1, "rspeaker", 0.40);
 
-	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[0], XTAL::u(32220000)/32, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
 	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
 
-	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[1], XTAL::u(32220000)/16, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
 	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 }
@@ -2464,7 +2464,7 @@ void nslasher_state::nslasheru(machine_config &config)
 	nslasher(config);
 	config.device_remove("audiocpu");
 
-	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL::u(32220000)/8));
 	audiocpu.set_addrmap(AS_PROGRAM, &nslasher_state::h6280_sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);

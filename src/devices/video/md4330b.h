@@ -42,7 +42,7 @@
 class md4330b_device : public device_t
 {
 public:
-	md4330b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	md4330b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	auto write_q() { return m_write_q.bind(); }
@@ -55,7 +55,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(do_r) { return m_do; }
 
 protected:
-	md4330b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 qmax);
+	md4330b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 qmax);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -81,7 +81,7 @@ protected:
 class md4332b_device : public md4330b_device
 {
 public:
-	md4332b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	md4332b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 

@@ -438,7 +438,7 @@ void wardner_state::wardner(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(2);
 
-	TOAPLAN_SCU(config, m_spritegen, 0);
+	TOAPLAN_SCU(config, m_spritegen);
 	m_spritegen->set_screen(m_screen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_xoffsets(32, 14);

@@ -149,7 +149,7 @@
 
 DEFINE_DEVICE_TYPE(VIC3, vic3_device, "vic3", "CSG 4567 VIC-III")
 
-vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VIC3, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)

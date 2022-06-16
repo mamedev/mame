@@ -63,17 +63,17 @@ public:
 	// construction/destruction
 	template <typename T>
 	apricot_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: apricot_expansion_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: apricot_expansion_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	apricot_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apricot_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
-	apricot_expansion_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	apricot_expansion_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -89,7 +89,7 @@ class apricot_expansion_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~apricot_expansion_bus_device();
 
 	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }

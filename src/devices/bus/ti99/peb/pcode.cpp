@@ -97,7 +97,7 @@ namespace bus::ti99::peb {
 
 #define CRU_BASE 0x1f00
 
-ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_P_CODE, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_groms(*this, "grom%u", 0U),

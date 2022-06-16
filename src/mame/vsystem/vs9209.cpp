@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(VS9209, vs9209_device, "vs9209", "VS9209 I/O")
 //  vs9209_device - constructor
 //-------------------------------------------------
 
-vs9209_device::vs9209_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+vs9209_device::vs9209_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VS9209, tag, owner, clock)
 	, m_input_cb(*this)
 	, m_output_cb(*this)

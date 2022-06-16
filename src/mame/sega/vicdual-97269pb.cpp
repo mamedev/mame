@@ -91,7 +91,7 @@ const tiny_rom_entry *s97269pb_device::device_rom_region() const
 //  s97269pb_device - constructor
 //-------------------------------------------------
 
-s97269pb_device::s97269pb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+s97269pb_device::s97269pb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, S97269PB, tag, owner, clock),
 	m_prom_ptr(*this, "s97269pb")
 {

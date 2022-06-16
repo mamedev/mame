@@ -22,13 +22,13 @@ public:
 
 protected:
 	// construction/destruction
-	sbus_cgsix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint32_t vram_size)
+	sbus_cgsix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const uint32_t vram_size)
 		: sbus_cgsix_device(mconfig, type, tag, owner, clock)
 	{
 		set_vram_size(vram_size);
 	}
 
-	sbus_cgsix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sbus_cgsix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_vram_size(uint32_t vram_size) { m_vram_size = vram_size; }
@@ -520,7 +520,7 @@ protected:
 class sbus_turbogx_device : public sbus_cgsix_device
 {
 public:
-	sbus_turbogx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sbus_turbogx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides
@@ -536,7 +536,7 @@ protected:
 class sbus_turbogxp_device : public sbus_cgsix_device
 {
 public:
-	sbus_turbogxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sbus_turbogxp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides

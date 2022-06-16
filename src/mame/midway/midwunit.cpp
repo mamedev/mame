@@ -627,7 +627,7 @@ void midwunit_state::wunit(machine_config &config)
 {
 	MIDWUNIT_VIDEO(config, m_video, m_maincpu, m_palette, m_gfxrom);
 
-	TMS34010(config, m_maincpu, 50000000);
+	TMS34010(config, m_maincpu, XTAL::u(50000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &midwunit_state::main_map);
 	m_maincpu->set_halt_on_reset(false);     /* halt on reset */
 	m_maincpu->set_pixel_clock(PIXEL_CLOCK); /* pixel clock */
@@ -649,20 +649,20 @@ void midwunit_state::wunit(machine_config &config)
 	screen.set_palette(m_palette);
 
 	/* sound hardware */
-	DCS_AUDIO_8K(config, m_dcs, 0);
+	DCS_AUDIO_8K(config, m_dcs);
 }
 
 void midwunit_state::wunit_picsim(machine_config &config)
 {
 	wunit(config);
-	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
+	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic);
 	m_midway_serial_pic->set_upper(528); // this is actually development PIC code, all games check for in addition to their own game specific code!
 }
 
 void midwunit_state::wunit_picemu(machine_config &config)
 {
 	wunit(config);
-	MIDWAY_SERIAL_PIC_EMU(config, m_midway_serial_pic_emu, 0);
+	MIDWAY_SERIAL_PIC_EMU(config, m_midway_serial_pic_emu);
 }
 
 

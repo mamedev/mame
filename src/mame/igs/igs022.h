@@ -8,7 +8,7 @@
 class igs022_device : public device_t
 {
 public:
-	igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void handle_command();
 

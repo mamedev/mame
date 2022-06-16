@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(C64_REU1764, c64_reu1764_cartridge_device, "c64_1764reu", "17
 
 void c64_reu_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	MOS8726(config, m_dmac, 1000000); // dummy clock
+	MOS8726(config, m_dmac, XTAL::u(1000000)); // dummy clock
 
 	GENERIC_SOCKET(config, m_eprom, generic_linear_slot, nullptr, "bin,rom");
 }
@@ -48,7 +48,7 @@ void c64_reu_cartridge_device::device_add_mconfig(machine_config &config)
 //  c64_reu_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, int jp1, size_t ram_size) :
+c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant, int jp1, size_t ram_size) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_dmac(*this, MOS8726R1_TAG),
@@ -60,13 +60,13 @@ c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig
 {
 }
 
-c64_reu1700_cartridge_device::c64_reu1700_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c64_reu1700_cartridge_device::c64_reu1700_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c64_reu_cartridge_device(mconfig, C64_REU1700, tag, owner, clock, TYPE_1700, 0, 128 * 1024) { }
 
-c64_reu1750_cartridge_device::c64_reu1750_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c64_reu1750_cartridge_device::c64_reu1750_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c64_reu_cartridge_device(mconfig, C64_REU1750, tag, owner, clock, TYPE_1750, 1, 256 * 1024) { }
 
-c64_reu1764_cartridge_device::c64_reu1764_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c64_reu1764_cartridge_device::c64_reu1764_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c64_reu_cartridge_device(mconfig, C64_REU1764, tag, owner, clock, TYPE_1764, 1, 512 * 1024) { }
 
 

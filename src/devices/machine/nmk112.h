@@ -18,7 +18,7 @@
 class nmk112_device : public device_t
 {
 public:
-	nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <typename T> nmk112_device &set_rom0_tag(T &&tag) { m_rom0.set_tag(std::forward<T>(tag)); return *this; }

@@ -370,7 +370,7 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	grid_keyboard_device &keyboard(GRID_KEYBOARD(config, "keyboard", 0));
+	grid_keyboard_device &keyboard(GRID_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(gridcomp_state::kbd_put));
 
 	i7220_device &i7220(I7220(config, "i7220", XTAL(4'000'000)));
@@ -417,7 +417,7 @@ void gridcomp_state::grid1101(machine_config &config)
 	rs232_port.dcd_handler().set("uart8274", FUNC(i8274_device::dcda_w));
 	rs232_port.cts_handler().set("uart8274", FUNC(i8274_device::ctsa_w));
 
-	I8255(config, "modem", 0);
+	I8255(config, "modem");
 
 	RAM(config, m_ram).set_default_size("256K").set_default_value(0);
 }

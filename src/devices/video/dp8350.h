@@ -73,7 +73,7 @@ public:
 
 protected:
 	// base type constructor
-	dp835x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
+	dp835x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock,
 					  int char_width, int char_height, int chars_per_row, int rows_per_frame,
 					  int vsync_delay_f1, int vsync_width_f1, int vblank_interval_f1,
 					  int vsync_delay_f0, int vsync_width_f0, int vblank_interval_f0,
@@ -158,7 +158,7 @@ class dp8350_device : public dp835x_device
 {
 public:
 	// device constructor
-	dp8350_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dp8350_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> dp8367_device
@@ -167,7 +167,7 @@ class dp8367_device : public dp835x_device
 {
 public:
 	// device constructor
-	dp8367_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dp8367_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> dp835x_a_device
@@ -176,7 +176,7 @@ class dp835x_a_device : public dp835x_device
 {
 public:
 	// device constructor
-	dp835x_a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dp835x_a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type declarations

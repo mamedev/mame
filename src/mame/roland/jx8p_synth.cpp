@@ -13,7 +13,7 @@ DEFINE_DEVICE_TYPE(JX8P_SYNTH, jx8p_synth_device, "jx8p_synth", "Roland JX-8P Sy
 DEFINE_DEVICE_TYPE(SUPERJX_SYNTH, superjx_synth_device, "superjx_synth", "Roland Super JX Synthesizer Board")
 
 
-jx8p_synth_device::jx8p_synth_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+jx8p_synth_device::jx8p_synth_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_synthcpu(*this, "synthcpu")
 	, m_ramio(*this, "ramio")
@@ -21,12 +21,12 @@ jx8p_synth_device::jx8p_synth_device(const machine_config &mconfig, device_type 
 {
 }
 
-jx8p_synth_device::jx8p_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+jx8p_synth_device::jx8p_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: jx8p_synth_device(mconfig, JX8P_SYNTH, tag, owner, clock)
 {
 }
 
-superjx_synth_device::superjx_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+superjx_synth_device::superjx_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: jx8p_synth_device(mconfig, SUPERJX_SYNTH, tag, owner, clock)
 {
 }
@@ -77,7 +77,7 @@ void jx8p_synth_device::device_add_mconfig(machine_config &config)
 	m_synthcpu->set_addrmap(AS_PROGRAM, &jx8p_synth_device::prog_map);
 	m_synthcpu->set_addrmap(AS_IO, &jx8p_synth_device::ext_map);
 
-	I8155(config, m_ramio, 0); // µPD8155HC
+	I8155(config, m_ramio); // µPD8155HC
 	m_ramio->out_pa_callback().set(FUNC(jx8p_synth_device::prescale_w));
 
 	for (auto &pit : m_pit)
@@ -90,7 +90,7 @@ void superjx_synth_device::device_add_mconfig(machine_config &config)
 	m_synthcpu->set_addrmap(AS_PROGRAM, &superjx_synth_device::prog_map);
 	m_synthcpu->set_addrmap(AS_IO, &superjx_synth_device::ext_map);
 
-	I8155(config, m_ramio, 0); // µPD8155HC-2
+	I8155(config, m_ramio); // µPD8155HC-2
 	m_ramio->out_pa_callback().set(FUNC(superjx_synth_device::prescale_w));
 
 	for (auto &pit : m_pit)

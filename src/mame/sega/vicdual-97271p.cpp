@@ -76,7 +76,7 @@ enum
 //  s97271p_device - constructor
 //-------------------------------------------------
 
-s97271p_device::s97271p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+s97271p_device::s97271p_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, S97271P, tag, owner, clock),
 	m_samples(*this, "samples")
 {

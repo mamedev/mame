@@ -17,7 +17,7 @@
 class sgi_gr1_device : public device_t
 {
 public:
-	sgi_gr1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	sgi_gr1_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 

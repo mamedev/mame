@@ -100,12 +100,12 @@ DEFINE_DEVICE_TYPE(LYNX2_SND, lynx2_sound_device, "lynx2_sound", "Atari Hayato (
 //  lynx_sound_device - constructor
 //-------------------------------------------------
 
-lynx_sound_device::lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lynx_sound_device::lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: lynx_sound_device(mconfig, LYNX_SND, tag, owner, clock)
 {
 }
 
-lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_timer_delegate(*this)
@@ -113,7 +113,7 @@ lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type 
 }
 
 
-lynx2_sound_device::lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lynx2_sound_device::lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: lynx_sound_device(mconfig, LYNX2_SND, tag, owner, clock)
 {
 }

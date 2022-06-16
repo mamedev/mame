@@ -355,11 +355,11 @@ void parodius_state::banking_callback(uint8_t data)
 void parodius_state::parodius(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 3000000); // 053248
+	KONAMI(config, m_maincpu, XTAL::u(3000000)); // 053248
 	m_maincpu->set_addrmap(AS_PROGRAM, &parodius_state::main_map);
 	m_maincpu->line().set(FUNC(parodius_state::banking_callback));
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, XTAL::u(3579545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &parodius_state::sound_map); // NMIs are triggered by the 053260
 
 	ADDRESS_MAP_BANK(config, "bank0000").set_map(&parodius_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
@@ -377,25 +377,25 @@ void parodius_state::parodius(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(parodius_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245);
 	m_k053245->set_palette("palette");
 	m_k053245->set_sprite_callback(FUNC(parodius_state::sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL::u(3579545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	k053260_device &k053260(K053260(config, "k053260", 3579545));
+	k053260_device &k053260(K053260(config, "k053260", XTAL::u(3579545)));
 	k053260.add_route(0, "lspeaker", 0.70);
 	k053260.add_route(1, "rspeaker", 0.70);
 	k053260.sh1_cb().set(FUNC(parodius_state::z80_nmi_w));

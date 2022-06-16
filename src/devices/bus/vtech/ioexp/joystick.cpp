@@ -75,7 +75,7 @@ ioport_constructor vtech_joystick_interface_device::device_input_ports() const
 //  vtech_joystick_interface_device - constructor
 //-------------------------------------------------
 
-vtech_joystick_interface_device::vtech_joystick_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vtech_joystick_interface_device::vtech_joystick_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vtech_ioexp_device(mconfig, VTECH_JOYSTICK_INTERFACE, tag, owner, clock),
 	m_joy0(*this, "joystick_0"),
 	m_joy0_arm(*this, "joystick_0_arm"),

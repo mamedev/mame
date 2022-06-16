@@ -16,7 +16,7 @@
 
 class deco16_device : public m6502_device {
 public:
-	deco16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	deco16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 

@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(IE15_CPU, ie15_cpu_device, "ie15_cpu", "ie15 CPU")
 //-------------------------------------------------
 //  ie15_cpu_device - constructor
 //-------------------------------------------------
-ie15_cpu_device::ie15_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ie15_cpu_device::ie15_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, IE15_CPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 14)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8), m_A(0), m_CF(0), m_ZF(0), m_RF(0), m_flags(0)

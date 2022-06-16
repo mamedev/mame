@@ -26,13 +26,13 @@ class nes_joypad_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_bit0() override;
 	virtual void write(u8 data) override;
 
 protected:
-	nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 latch_fill = 0x80);
+	nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 latch_fill = 0x80);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -52,13 +52,13 @@ class nes_fcpadexp_device : public nes_joypad_device
 {
 public:
 	// construction/destruction
-	nes_fcpadexp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_fcpadexp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_bit0() override { return 0; }
 	virtual u8 read_exp(offs_t offset) override;
 
 protected:
-	nes_fcpadexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 latch_fill = 0x80);
+	nes_fcpadexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 latch_fill = 0x80);
 };
 
 
@@ -68,7 +68,7 @@ class nes_fcpad2_device : public nes_joypad_device
 {
 public:
 	// construction/destruction
-	nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_bit2() override;
 
@@ -87,7 +87,7 @@ class nes_ccpadl_device : public nes_joypad_device
 {
 public:
 	// construction/destruction
-	nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -101,7 +101,7 @@ class nes_ccpadr_device : public nes_joypad_device
 {
 public:
 	// construction/destruction
-	nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -115,7 +115,7 @@ class nes_arcstick_device : public nes_fcpadexp_device
 {
 public:
 	// construction/destruction
-	nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_exp(offs_t offset) override;
 	virtual void write(u8 data) override;
@@ -137,7 +137,7 @@ class nes_vboyctrl_device : public nes_joypad_device
 {
 public:
 	// construction/destruction
-	nes_vboyctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_vboyctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

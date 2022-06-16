@@ -1020,7 +1020,7 @@ void scudsp_cpu_device::data_map(address_map &map)
 	map(0x00, 0xff).ram();
 }
 
-scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, SCUDSP, tag, owner, clock)
 	, m_out_irq_cb(*this)
 	, m_in_dma_cb(*this)

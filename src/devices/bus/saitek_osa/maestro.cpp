@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(OSA_ANALYST, saitekosa_analyst_device, "osa_analyst", "Analys
 //  initialization
 //-------------------------------------------------
 
-saitekosa_maestro_device::saitekosa_maestro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+saitekosa_maestro_device::saitekosa_maestro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_saitekosa_expansion_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -57,11 +57,11 @@ saitekosa_maestro_device::saitekosa_maestro_device(const machine_config &mconfig
 	m_extrom(*this, "extrom")
 { }
 
-saitekosa_maestro_device::saitekosa_maestro_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+saitekosa_maestro_device::saitekosa_maestro_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	saitekosa_maestro_device(mconfig, OSA_MAESTRO, tag, owner, clock)
 { }
 
-saitekosa_analyst_device::saitekosa_analyst_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+saitekosa_analyst_device::saitekosa_analyst_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	saitekosa_maestro_device(mconfig, OSA_ANALYST, tag, owner, clock),
 	m_lcd(*this, "lcd")
 { }
@@ -237,7 +237,7 @@ void saitekosa_analyst_device::device_add_mconfig(machine_config &config)
 	saitekosa_maestro_device::device_add_mconfig(config);
 
 	// video hardware
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd);
 }
 
 

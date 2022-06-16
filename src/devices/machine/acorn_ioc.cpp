@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(ACORN_IOC, acorn_ioc_device, "ioc", "Acorn IOC")
 //  LIVE DEVICE
 //**************************************************************************
 
-acorn_ioc_device::acorn_ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_ioc_device::acorn_ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACORN_IOC, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_peripherals_r(*this)
@@ -74,7 +74,7 @@ void acorn_ioc_device::device_reset()
 
 	// KART interface
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
-	set_rate(31250);
+	set_rate(XTAL::u(31250));
 
 	for (int i = 0; i < 6; i++)
 		m_giop_w[i](1);

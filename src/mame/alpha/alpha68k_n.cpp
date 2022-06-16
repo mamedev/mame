@@ -735,18 +735,18 @@ void sstingray_state::sstingry(machine_config &config)
 {
 	base_config(config);
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 6000000); /* 24MHz/4? */
+	M68000(config, m_maincpu, XTAL::u(6000000)); /* 24MHz/4? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sstingray_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sstingray_state::irq1_line_hold));
 	//m_maincpu->set_periodic_int(FUNC(sstingray_state::irq2_line_hold), attotime::from_hz(60)); // MCU irq
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, XTAL::u(3579545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sstingray_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &sstingray_state::sound_iomap);
 	m_audiocpu->set_vblank_int("screen", FUNC(sstingray_state::irq0_line_hold));
 	m_audiocpu->set_periodic_int(FUNC(sstingray_state::nmi_line_pulse), attotime::from_hz(4000));
 
-	I8748(config, m_alpha8511, 9263750);     /* 9.263750 MHz(?) oscillator, divided by 3*5 internally */
+	I8748(config, m_alpha8511, XTAL::u(9263750));     /* 9.263750 MHz(?) oscillator, divided by 3*5 internally */
 	m_alpha8511->bus_in_cb().set(FUNC(sstingray_state::alpha8511_bus_r));
 	m_alpha8511->bus_out_cb().set(FUNC(sstingray_state::alpha8511_bus_w));
 	m_alpha8511->p1_in_cb().set(FUNC(sstingray_state::alpha8511_address_r));
@@ -759,16 +759,16 @@ void sstingray_state::sstingry(machine_config &config)
 	video_config(config, 0x40, 0, true);
 
 	// sound hardware
-	ym2203_device &ym(YM2203(config, "ym", 2'000'000));            // Verified from video by PCB, 24MHz/12?
+	ym2203_device &ym(YM2203(config, "ym", XTAL::u(2'000'000)));            // Verified from video by PCB, 24MHz/12?
 	ym.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ay8910_device &aysnd1(AY8910(config, "aysnd1", 2'000'000));    // Verified from video by PCB, 24MHz/12?
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", XTAL::u(2'000'000)));    // Verified from video by PCB, 24MHz/12?
 	aysnd1.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ay8910_device &aysnd2(AY8910(config, "aysnd2", 2'000'000));    // Verified from video by PCB, 24MHz/12?
+	ay8910_device &aysnd2(AY8910(config, "aysnd2", XTAL::u(2'000'000)));    // Verified from video by PCB, 24MHz/12?
 	aysnd2.add_route(ALL_OUTPUTS, "speaker", 0.45);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.50); // unknown DAC
 }
 
 void kyros_state::kyros(machine_config &config)
@@ -801,19 +801,19 @@ void kyros_state::kyros(machine_config &config)
 	ay8910_device &aysnd2(AY8910(config, "aysnd2", 16_MHz_XTAL / 8));    // Verified on original PCB
 	aysnd2.add_route(ALL_OUTPUTS, "speaker", 0.6);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50);
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.50);
 }
 
 void jongbou_state::jongbou(machine_config &config)
 {
 	base_config(config);
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &jongbou_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(jongbou_state::irq1_line_hold));
 	m_maincpu->set_periodic_int(FUNC(jongbou_state::irq2_line_hold), attotime::from_hz(60*16)); // MCU irq
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL::u(4000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &jongbou_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &jongbou_state::sound_iomap);
 	m_audiocpu->set_periodic_int(FUNC(jongbou_state::irq0_line_hold), attotime::from_hz(160*60));
@@ -824,7 +824,7 @@ void jongbou_state::jongbou(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jongbou);
 
 	/* sound hardware */
-	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(2000000)));
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.65);
 }

@@ -28,7 +28,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 protected:
-	hle_msmouse_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
+	hle_msmouse_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -65,7 +65,7 @@ private:
 class hle_msft_mouse_device : public hle_msmouse_device_base
 {
 public:
-	hle_msft_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	hle_msft_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -83,7 +83,7 @@ private:
 class hle_logitech_mouse_device : public hle_msmouse_device_base
 {
 public:
-	hle_logitech_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	hle_logitech_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -101,7 +101,7 @@ private:
 class hle_wheel_mouse_device : public hle_msmouse_device_base
 {
 public:
-	hle_wheel_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	hle_wheel_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -129,7 +129,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 protected:
-	hle_msystems_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
+	hle_msystems_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 
@@ -157,10 +157,10 @@ private:
 class hle_msystems_mouse_device : public hle_msystems_device_base
 {
 public:
-	hle_msystems_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	hle_msystems_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	hle_msystems_mouse_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
+	hle_msystems_mouse_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
@@ -187,7 +187,7 @@ private:
 class hle_rotatable_mouse_device : public hle_msystems_device_base
 {
 public:
-	hle_rotatable_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	hle_rotatable_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -214,7 +214,7 @@ private:
 class hle_sgi_mouse_device : public hle_msystems_mouse_device
 {
 public:
-	hle_sgi_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	hle_sgi_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

@@ -418,8 +418,8 @@ void vidbrain_state::vidbrain(machine_config &config)
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(UV201_TAG, FUNC(uv201_device::screen_update));
-	screen.set_raw(3636363, 232, 18, 232, 262, 21, 262);
-	UV201(config, m_uv, 3636363);
+	screen.set_raw(XTAL::u(3636363), 232, 18, 232, 262, 21, 262);
+	UV201(config, m_uv, XTAL::u(3636363));
 	m_uv->set_screen(SCREEN_TAG);
 	m_uv->ext_int_wr_callback().set(FUNC(vidbrain_state::ext_int_w));
 	m_uv->hblank_wr_callback().set(FUNC(vidbrain_state::hblank_w));
@@ -427,7 +427,7 @@ void vidbrain_state::vidbrain(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.167); // 74ls74.u16 + 120k + 56k
+	DAC_2BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.167); // 74ls74.u16 + 120k + 56k
 
 	// devices
 	F3853(config, m_smi, XTAL(4'000'000)/2);

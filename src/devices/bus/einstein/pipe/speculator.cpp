@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(EINSTEIN_SPECULATOR, einstein_speculator_device, "einstein_sp
 
 void einstein_speculator_device::device_add_mconfig(machine_config &config)
 {
-	TTL74123(config, m_ic5a, 0);
+	TTL74123(config, m_ic5a);
 	m_ic5a->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_ic5a->set_resistor_value(RES_K(47));
 	m_ic5a->set_capacitor_value(CAP_P(560));
@@ -36,7 +36,7 @@ void einstein_speculator_device::device_add_mconfig(machine_config &config)
 	m_ic5a->set_clear_pin_value(0);
 	m_ic5a->out_cb().set(FUNC(einstein_speculator_device::ic5a_q_w));
 
-	TTL74123(config, m_ic5b, 0);
+	TTL74123(config, m_ic5b);
 	m_ic5b->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_ic5b->set_resistor_value(RES_K(47));
 	m_ic5b->set_capacitor_value(CAP_P(560));
@@ -64,7 +64,7 @@ void einstein_speculator_device::device_add_mconfig(machine_config &config)
 //  einstein_speculator_device - constructor
 //-------------------------------------------------
 
-einstein_speculator_device::einstein_speculator_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+einstein_speculator_device::einstein_speculator_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, EINSTEIN_SPECULATOR, tag, owner, clock),
 	device_tatung_pipe_interface(mconfig, *this),
 	m_ic5a(*this, "ic5a"), m_ic5b(*this, "ic5b"),

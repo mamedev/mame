@@ -72,7 +72,7 @@ namespace bus::ti99::peb {
 
 // ----------------------------------
 
-corcomp_fdc_device::corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
+corcomp_fdc_device::corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock):
 	  device_t(mconfig, type, tag, owner, clock),
 	  device_ti99_peribox_card_interface(mconfig, *this),
 	  m_wdc(*this, WDC_TAG),
@@ -490,7 +490,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	m_wdc->drq_wr_callback().set(FUNC(corcomp_fdc_device::fdc_drq_w));
 	m_wdc->hld_wr_callback().set(FUNC(corcomp_fdc_device::fdc_hld_w));
 
-	TMS9901(config, m_tms9901, 0);
+	TMS9901(config, m_tms9901);
 	m_tms9901->read_cb().set(FUNC(corcomp_fdc_device::tms9901_input));
 
 	// Outputs
@@ -519,7 +519,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	m_tms9901->p_out_cb(11).set(FUNC(corcomp_fdc_device::select_bank));
 
 	// Motor monoflop
-	TTL74123(config, m_motormf, 0);
+	TTL74123(config, m_motormf);
 	m_motormf->set_connection_type(TTL74123_GROUNDED);
 	m_motormf->set_resistor_value(RES_K(100));
 	m_motormf->set_capacitor_value(CAP_U(47));
@@ -541,7 +541,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 // Original CorComp Disk Controller Card (PEB-DCC)
 // ============================================================================
 
-corcomp_dcc_device::corcomp_dcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+corcomp_dcc_device::corcomp_dcc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock):
 	  corcomp_fdc_device(mconfig, TI99_CCDCC, tag, owner, clock)
 {
 }
@@ -555,8 +555,8 @@ void corcomp_dcc_device::device_add_mconfig(machine_config& config)
 	m_tms9901->p_out_cb(3).set(WDC_TAG, FUNC(wd_fdc_device_base::hlt_w));
 
 	// PAL circuits are connected in device_config_complete
-	CCDCC_PALU2(config, CCDCC_PALU2_TAG, 0);
-	CCDCC_PALU1(config, CCDCC_PALU1_TAG, 0);
+	CCDCC_PALU2(config, CCDCC_PALU2_TAG);
+	CCDCC_PALU1(config, CCDCC_PALU1_TAG);
 }
 
 ROM_START( cc_dcc )
@@ -586,14 +586,14 @@ const tiny_rom_entry *corcomp_dcc_device::device_rom_region() const
 //    PAL circuits on the CorComp board
 // ========================================================================
 
-ccfdc_dec_pal_device::ccfdc_dec_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ccfdc_dec_pal_device::ccfdc_dec_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	:  device_t(mconfig, type, tag, owner, clock),
 	   m_board(nullptr),
 	   m_tms9901(*owner, TMS9901_TAG)
 {
 }
 
-ccfdc_sel_pal_device::ccfdc_sel_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ccfdc_sel_pal_device::ccfdc_sel_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	:  device_t(mconfig, type, tag, owner, clock),
 	   m_board(nullptr),
 	   m_decpal(nullptr),
@@ -677,12 +677,12 @@ READ_LINE_MEMBER( ccfdc_sel_pal_device::selectdsr )
 //    selector PAL u1.
 // ========================================================================
 
-ccdcc_palu2_device::ccdcc_palu2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ccdcc_palu2_device::ccdcc_palu2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ccfdc_dec_pal_device(mconfig, CCDCC_PALU2, tag, owner, clock)
 {
 }
 
-ccdcc_palu1_device::ccdcc_palu1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ccdcc_palu1_device::ccdcc_palu1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ccfdc_sel_pal_device(mconfig, CCDCC_PALU1, tag, owner, clock)
 {
 }
@@ -715,7 +715,7 @@ void ccdcc_palu1_device::device_config_complete()
 // Revised CorComp floppy disk controller card REV A
 // ============================================================================
 
-corcomp_fdca_device::corcomp_fdca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+corcomp_fdca_device::corcomp_fdca_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock):
 	  corcomp_fdc_device(mconfig, TI99_CCFDC, tag, owner, clock)
 {
 }
@@ -726,8 +726,8 @@ void corcomp_fdca_device::device_add_mconfig(machine_config& config)
 	common_config(config);
 
 	// PAL circuits are connected in device_config_complete
-	CCFDC_PALU12(config, CCFDC_PALU12_TAG, 0);
-	CCFDC_PALU6(config, CCFDC_PALU6_TAG, 0);
+	CCFDC_PALU12(config, CCFDC_PALU12_TAG);
+	CCFDC_PALU6(config, CCFDC_PALU6_TAG);
 }
 
 /*
@@ -764,7 +764,7 @@ const tiny_rom_entry *corcomp_fdca_device::device_rom_region() const
 //    selector PAL u6.
 // ========================================================================
 
-ccfdc_palu12_device::ccfdc_palu12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ccfdc_palu12_device::ccfdc_palu12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ccfdc_dec_pal_device(mconfig, CCFDC_PALU12, tag, owner, clock)
 {
 }
@@ -778,7 +778,7 @@ READ_LINE_MEMBER( ccfdc_palu12_device::address9901 )
 	return ((m_board->get_address() & 0xffc0)==0x1100)? ASSERT_LINE : CLEAR_LINE;
 }
 
-ccfdc_palu6_device::ccfdc_palu6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ccfdc_palu6_device::ccfdc_palu6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ccfdc_sel_pal_device(mconfig, CCFDC_PALU6, tag, owner, clock)
 {
 }

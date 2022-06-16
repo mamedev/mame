@@ -16,7 +16,7 @@ DECLARE_DEVICE_TYPE(MSX_CART_BM_012, msx_cart_bm_012_device)
 class msx_cart_bm_012_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_bm_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_bm_012_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

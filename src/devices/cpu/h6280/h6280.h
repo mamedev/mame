@@ -32,7 +32,7 @@ class h6280_device : public cpu_device, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// public interfaces
 	void set_irq_line(int irqline, int state);

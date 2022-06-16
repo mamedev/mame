@@ -31,7 +31,7 @@ class apricot_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto txd_wr_callback() { return m_write_txd.bind(); }
 

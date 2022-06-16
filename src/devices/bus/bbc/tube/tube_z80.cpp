@@ -108,7 +108,7 @@ const tiny_rom_entry *bbc_tube_z80w_device::device_rom_region() const
 //  bbc_tube_z80_device - constructor
 //-------------------------------------------------
 
-bbc_tube_z80_device::bbc_tube_z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_z80_device::bbc_tube_z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_tube_interface(mconfig, *this)
 	, m_z80(*this, "z80")
@@ -118,12 +118,12 @@ bbc_tube_z80_device::bbc_tube_z80_device(const machine_config &mconfig, device_t
 {
 }
 
-bbc_tube_z80_device::bbc_tube_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_z80_device::bbc_tube_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_z80_device(mconfig, BBC_TUBE_Z80, tag, owner, clock)
 {
 }
 
-bbc_tube_z80w_device::bbc_tube_z80w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_z80w_device::bbc_tube_z80w_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_z80_device(mconfig, BBC_TUBE_Z80W, tag, owner, clock)
 {
 }

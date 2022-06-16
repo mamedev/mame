@@ -15,7 +15,7 @@
 class cd90_351_device : public device_t, public thomson_extension_interface
 {
 public:
-	cd90_351_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 16000000);
+	cd90_351_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = 16000000);
 	virtual ~cd90_351_device() = default;
 
 	virtual void rom_map(address_map &map) override;

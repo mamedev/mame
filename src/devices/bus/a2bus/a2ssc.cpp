@@ -32,10 +32,10 @@ class a2bus_ssc_device:
 {
 public:
 	// construction/destruction
-	a2bus_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -63,7 +63,7 @@ class apricorn_ssi_device : public a2bus_ssc_device
 {
 public:
 	// construction/destruction
-	apricorn_ssi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apricorn_ssi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -269,7 +269,7 @@ ioport_constructor apricorn_ssi_device::device_input_ports() const
 
 void a2bus_ssc_device::device_add_mconfig(machine_config &config)
 {
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set(FUNC(a2bus_ssc_device::acia_irq_w));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -301,12 +301,12 @@ const tiny_rom_entry *apricorn_ssi_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		a2bus_ssc_device(mconfig, A2BUS_SSC, tag, owner, clock)
 {
 }
 
-a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
@@ -317,7 +317,7 @@ a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type ty
 {
 }
 
-apricorn_ssi_device::apricorn_ssi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apricorn_ssi_device::apricorn_ssi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		a2bus_ssc_device(mconfig, APRICORN_SSI, tag, owner, clock),
 		m_alt_bank(false)
 {

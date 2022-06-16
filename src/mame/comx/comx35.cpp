@@ -633,7 +633,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	// expansion bus
-	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, "eb").irq_callback().set(FUNC(comx35_state::irq_w));
+	COMX_EXPANSION_SLOT(config, m_exp, comx_expansion_cards, "eb").irq_callback().set(FUNC(comx35_state::irq_w));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("32K");

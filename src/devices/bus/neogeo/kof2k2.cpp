@@ -64,7 +64,7 @@ void neogeo_kof2k2type_cart_device::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(NEOGEO_K2K2_KOF2002_CART, neogeo_kof2002_cart_device, "neocart_kof2002", "Neo Geo KoF 2002 Cart")
 
-neogeo_kof2002_cart_device::neogeo_kof2002_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_kof2002_cart_device::neogeo_kof2002_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_kof2k2type_cart_device(mconfig, NEOGEO_K2K2_KOF2002_CART, tag, owner, clock)
 {
 }
@@ -84,7 +84,7 @@ void neogeo_kof2002_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_K2K2_KF2K2PLS_CART, neogeo_kf2k2pls_cart_device, "neocart_kf2k2pls", "Neo Geo KoF 2002 Plus Cart")
 
-neogeo_kf2k2pls_cart_device::neogeo_kf2k2pls_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_kf2k2pls_cart_device::neogeo_kf2k2pls_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_kof2k2type_cart_device(mconfig, NEOGEO_K2K2_KF2K2PLS_CART, tag, owner, clock)
 {
 }
@@ -104,7 +104,7 @@ void neogeo_kf2k2pls_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_K2K2_MATRIM_CART, neogeo_matrim_cart_device, "neocart_matrim", "Neo Geo Matrimelee Cart")
 
-neogeo_matrim_cart_device::neogeo_matrim_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_matrim_cart_device::neogeo_matrim_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_kof2k2type_cart_device(mconfig, NEOGEO_K2K2_MATRIM_CART, tag, owner, clock)
 {
 }
@@ -124,7 +124,7 @@ void neogeo_matrim_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_K2K2_SAMSHO5_CART, neogeo_samsho5_cart_device, "neocart_samsho5", "Neo Geo Samurai Shodown 5 Cart")
 
-neogeo_samsho5_cart_device::neogeo_samsho5_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_samsho5_cart_device::neogeo_samsho5_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_kof2k2type_cart_device(mconfig, NEOGEO_K2K2_SAMSHO5_CART, tag, owner, clock)
 {
 }
@@ -144,7 +144,7 @@ void neogeo_samsho5_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_K2K2_SAMSHO5SP_CART, neogeo_samsho5sp_cart_device, "neocart_samsh5sp", "Neo Geo Samurai Shodown 5 Special Cart")
 
-neogeo_samsho5sp_cart_device::neogeo_samsho5sp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_samsho5sp_cart_device::neogeo_samsho5sp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_kof2k2type_cart_device(mconfig, NEOGEO_K2K2_SAMSHO5SP_CART, tag, owner, clock)
 {
 }

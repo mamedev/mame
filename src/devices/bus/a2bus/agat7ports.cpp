@@ -63,7 +63,7 @@ void a2bus_agat7_ports_device::device_add_mconfig(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	I8251(config, m_d10, 0);
+	I8251(config, m_d10);
 }
 
 //-------------------------------------------------
@@ -80,7 +80,7 @@ ioport_constructor a2bus_agat7_ports_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_agat7_ports_device::a2bus_agat7_ports_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a2bus_agat7_ports_device::a2bus_agat7_ports_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
 	, m_printer_cfg(*this, "PRINTER_CFG")
@@ -90,7 +90,7 @@ a2bus_agat7_ports_device::a2bus_agat7_ports_device(const machine_config &mconfig
 {
 }
 
-a2bus_agat7_ports_device::a2bus_agat7_ports_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_agat7_ports_device::a2bus_agat7_ports_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_agat7_ports_device(mconfig, A2BUS_AGAT7_PORTS, tag, owner, clock)
 {
 }

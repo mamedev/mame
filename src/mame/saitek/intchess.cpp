@@ -286,7 +286,7 @@ void intchess_state::intchess(machine_config &config)
 	m_via->readpb_handler().set(FUNC(intchess_state::control_r));
 	m_via->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	MM74C923(config, m_encoder, 0); // timing parameters unknown
+	MM74C923(config, m_encoder); // timing parameters unknown
 	m_encoder->da_wr_callback().set(m_via, FUNC(via6522_device::write_ca2));
 	m_encoder->x1_rd_callback().set_ioport("X1");
 	m_encoder->x2_rd_callback().set_ioport("X2");

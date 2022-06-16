@@ -40,7 +40,7 @@ class sp0256_device : public device_t,
 						public device_sound_interface
 {
 public:
-	sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto data_request_callback() { return m_drq_cb.bind(); }
 	auto standby_callback() { return m_sby_cb.bind(); }

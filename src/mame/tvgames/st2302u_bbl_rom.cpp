@@ -315,7 +315,7 @@ INPUT_PORTS_END
 
 void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 {
-	ST2302U(config, m_maincpu, 24000000);
+	ST2302U(config, m_maincpu, XTAL::u(24000000));
 	m_maincpu->set_addrmap(AS_DATA, &st22xx_bbl338_state::st22xx_dphh8213_map);
 	m_maincpu->in_pa_callback().set(FUNC(st22xx_bbl338_state::porta_r));
 	m_maincpu->out_pa_callback().set(FUNC(st22xx_bbl338_state::porta_w));
@@ -337,12 +337,12 @@ void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
 	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
 
-	BL_HANDHELDS_LCDC(config, m_lcdc, 0);
+	BL_HANDHELDS_LCDC(config, m_lcdc);
 }
 
 void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 {
-	ST2302U(config, m_maincpu, 24000000);
+	ST2302U(config, m_maincpu, XTAL::u(24000000));
 	m_maincpu->set_addrmap(AS_DATA, &st22xx_bbl338_state::st22xx_bbl338_map);
 	m_maincpu->in_pa_callback().set(FUNC(st22xx_bbl338_state::porta_r));
 	m_maincpu->out_pb_callback().set(FUNC(st22xx_bbl338_state::portb_w));
@@ -357,7 +357,7 @@ void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
 
 	// incorrect for bbl338 (or will need changes to support higher resolutions)
-	BL_HANDHELDS_LCDC(config, m_lcdc, 0);
+	BL_HANDHELDS_LCDC(config, m_lcdc);
 }
 
 

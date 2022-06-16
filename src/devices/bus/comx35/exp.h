@@ -47,8 +47,8 @@ class comx_expansion_slot_device : public device_t, public device_single_card_sl
 public:
 	// construction/destruction
 	template <typename T>
-	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
-		: comx_expansion_slot_device(mconfig, tag, owner, clock)
+	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: comx_expansion_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -56,7 +56,7 @@ public:
 		set_fixed(false);
 	}
 
-	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto irq_callback() { return m_write_irq.bind(); }
 

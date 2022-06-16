@@ -13,7 +13,7 @@ class kof2k3bl_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	kof2k3bl_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	kof2k3bl_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint16_t protection_r(offs_t offset);
 	void kof2003_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

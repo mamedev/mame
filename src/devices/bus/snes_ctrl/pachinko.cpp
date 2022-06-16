@@ -45,7 +45,7 @@ ioport_constructor snes_pachinko_device::device_input_ports() const
 //  snes_pachinko_device - constructor
 //-------------------------------------------------
 
-snes_pachinko_device::snes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+snes_pachinko_device::snes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SNES_PACHINKO, tag, owner, clock),
 	device_snes_control_port_interface(mconfig, *this),
 	m_dial(*this, "DIAL"),

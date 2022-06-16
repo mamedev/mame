@@ -301,13 +301,13 @@ void poly_state::poly(machine_config &config)
 
 	/* timer */
 	PTM6840(config, m_ptm, 12.0576_MHz_XTAL / 3);
-	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->set_external_clocks(XTAL(), XTAL(), XTAL());
 	m_ptm->o2_callback().set(FUNC(poly_state::ptm_o2_callback));
 	m_ptm->o3_callback().set(FUNC(poly_state::ptm_o3_callback));
 	//m_ptm->irq_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* keyboard encoder */
-	//KR2376_12(config, m_kr2376, 50000);
+	//KR2376_12(config, m_kr2376, XTAL::u(50000));
 	//m_kr2376->x<0>().set_ioport("X0");
 	//m_kr2376->x<1>().set_ioport("X1");
 	//m_kr2376->x<2>().set_ioport("X2");
@@ -321,29 +321,29 @@ void poly_state::poly(machine_config &config)
 	//m_kr2376->strobe().set("pia1", FUNC(pia6821_device::cb1_w));
 
 	/* generic keyboard until ROM in KR2376-12 is known */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(poly_state::kbd_put));
 
 	/* video control */
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->writepa_handler().set(FUNC(poly_state::pia0_pa_w));
 	m_pia[0]->writepb_handler().set(FUNC(poly_state::pia0_pb_w));
 	m_pia[0]->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 	m_pia[0]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 
 	/* keyboard PIA */
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpb_handler().set(FUNC(poly_state::pia1_b_in));
 	m_pia[1]->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<4>));
 	m_pia[1]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<5>));
 
 	/* optional rs232 interface */
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	//m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<6>));
 
-	CLOCK(config, m_acia_clock, 153600);
+	CLOCK(config, m_acia_clock, XTAL::u(153600));
 	m_acia_clock->signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	m_acia_clock->signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 

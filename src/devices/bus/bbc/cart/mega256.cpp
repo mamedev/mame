@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(BBC_MEGA256, bbc_mega256_device, "bbc_mega256", "Solidisk Meg
 //  bbc_mega256_device - constructor
 //-------------------------------------------------
 
-bbc_mega256_device::bbc_mega256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_mega256_device::bbc_mega256_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_MEGA256, tag, owner, clock)
 	, device_bbc_cart_interface(mconfig, *this)
 	, m_page(0)

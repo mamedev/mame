@@ -34,7 +34,7 @@ class pc11_device : public paper_tape_reader_device,
 {
 public:
 	// construction/destruction
-	pc11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc11_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// image-level overrides
 	virtual const char *image_interface() const noexcept override { return "pdp11_ptap"; }

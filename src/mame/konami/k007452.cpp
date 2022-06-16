@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(KONAMI_007452_MATH, k007452_device, "konami_007452", "Konami 
 //  k007452_device - constructor
 //-------------------------------------------------
 
-k007452_device::k007452_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+k007452_device::k007452_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KONAMI_007452_MATH, tag, owner, clock)
 {
 }

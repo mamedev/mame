@@ -527,7 +527,7 @@ void ctk551_state::ctk530(machine_config& config)
 	midiout_slot(mdout);
 	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
 
-	PWM_DISPLAY(config, m_pwm, 0);
+	PWM_DISPLAY(config, m_pwm);
 	m_pwm->set_size(4, 8);
 	m_pwm->set_segmask(0x7, 0xff);
 
@@ -576,7 +576,7 @@ void ctk551_state::ctk601(machine_config& config)
 	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
 
 	// LCD
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc);
 	m_lcdc->set_lcd_size(2, 8);
 
 	auto& screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
@@ -594,7 +594,7 @@ void ctk551_state::ctk601(machine_config& config)
 void ctk551_state::ctk551(machine_config &config)
 {
 	// CPU
-	GT913(config, m_maincpu, 30'000'000 / 2);
+	GT913(config, m_maincpu, XTAL::u(30'000'000) / 2);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk530_map);
 	m_maincpu->set_addrmap(AS_IO, &ctk551_state::ctk551_io_map);
 	m_maincpu->add_route(0, "lspeaker", 1.0);
@@ -610,7 +610,7 @@ void ctk551_state::ctk551(machine_config &config)
 	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
 
 	// LCD
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc);
 	m_lcdc->set_lcd_size(2, 8);
 
 	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);

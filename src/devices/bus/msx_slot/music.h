@@ -16,7 +16,7 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_MUSIC, msx_slot_music_device)
 class msx_slot_music_device : public msx_slot_rom_device
 {
 public:
-	msx_slot_music_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_music_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	void set_ym2413_tag(const char *tag) { m_ym2413_tag = tag; }

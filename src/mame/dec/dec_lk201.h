@@ -44,7 +44,7 @@ class lk201_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint8_t ddr_r(offs_t offset);
 	void ddr_w(offs_t offset, uint8_t data);

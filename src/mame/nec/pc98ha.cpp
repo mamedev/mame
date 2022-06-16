@@ -433,22 +433,22 @@ void pc98lt_state::lt_config(machine_config &config)
 
 //  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	PC9801_KBD(config, m_keyb, 53);
+	PC9801_KBD(config, m_keyb, XTAL::u(53));
 	m_keyb->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 
-	I8255(config, m_ppi_sys, 0);
+	I8255(config, m_ppi_sys);
 	// PC98LT/HA has no dips, port A acts as a RAM storage
 	m_ppi_sys->in_pa_callback().set(m_ppi_sys, FUNC(i8255_device::pa_r));
 	m_ppi_sys->in_pb_callback().set_ioport("SYSB");
 //  m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
 	m_ppi_sys->out_pc_callback().set(FUNC(pc98lt_state::ppi_sys_beep_portc_w));
 
-	I8255(config, m_ppi_prn, 0);
+	I8255(config, m_ppi_prn);
 	m_ppi_prn->in_pb_callback().set_ioport("PRNB");
 
 	UPD1990A(config, m_rtc);
 
-	UPD765A(config, m_fdc, 8'000'000, false, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), false, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>)).invert();
 //  m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<3>)).invert(); // 2dd
@@ -466,7 +466,7 @@ void pc98lt_state::lt_config(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc98lt);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.05);
+	BEEP(config, m_beeper, XTAL::u(2400)).add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void pc98ha_state::ha_config(machine_config &config)
@@ -480,7 +480,7 @@ void pc98ha_state::ha_config(machine_config &config)
 //  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	config.device_remove("rtc");
-	UPD4991A(config, m_rtc_pio, 32'768);
+	UPD4991A(config, m_rtc_pio, XTAL::u(32'768));
 }
 
 // all ROMs in both sets needs at least chip renaming, and I haven't seen a single PCB pic from the net.

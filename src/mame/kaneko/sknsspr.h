@@ -11,7 +11,7 @@
 class sknsspr_device : public device_t, public device_video_interface, public device_rom_interface<27>
 {
 public:
-	sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u32* spriteram_source, size_t spriteram_size, u32* sprite_regs);
 	void skns_sprite_kludge(int x, int y);

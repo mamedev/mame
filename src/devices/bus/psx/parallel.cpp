@@ -46,7 +46,7 @@ psx_parallel_interface::~psx_parallel_interface()
 //  psx_parallel_slot_device - constructor
 //-------------------------------------------------
 
-psx_parallel_slot_device::psx_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+psx_parallel_slot_device::psx_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PSX_PARALLEL_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<psx_parallel_interface>(mconfig, *this),
 	m_card(nullptr)

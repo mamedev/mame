@@ -152,7 +152,7 @@ void p1_fdc_device::p1_fdc_w(offs_t offset, uint8_t data)
 //  p1_fdc_device - constructor
 //-------------------------------------------------
 
-p1_fdc_device::p1_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+p1_fdc_device::p1_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, P1_FDC, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_fdc(*this, "fdc")

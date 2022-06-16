@@ -17,7 +17,7 @@ class mb3773_device : public device_t
 {
 public:
 	// construction/destruction
-	mb3773_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mb3773_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// I/O operations
 	WRITE_LINE_MEMBER( write_line_ck );

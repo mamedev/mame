@@ -8,7 +8,7 @@
 
 DEFINE_DEVICE_TYPE(ELAN_EP3A19A_SYS, elan_ep3a19asys_device, "elan_ep3a19asys", "Elan EP3A19A System")
 
-elan_ep3a19asys_device::elan_ep3a19asys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+elan_ep3a19asys_device::elan_ep3a19asys_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	elan_eu3a05commonsys_device(mconfig, ELAN_EP3A19A_SYS, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("regs", ENDIANNESS_NATIVE, 8, 5, 0, address_map_constructor(FUNC(elan_ep3a19asys_device::map), this))

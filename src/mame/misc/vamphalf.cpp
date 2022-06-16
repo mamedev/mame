@@ -1141,7 +1141,7 @@ GFXDECODE_END
 
 void vamphalf_state::common(machine_config &config)
 {
-	E116T(config, m_maincpu, 50000000);    /* 50 MHz */
+	E116T(config, m_maincpu, XTAL::u(50000000));    /* 50 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_state::common_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
 

@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(EF9369, ef9369_device, "ef9369", "Thomson EF9369 Single Chip 
 //  ef9369_device - constructor
 //-------------------------------------------------
 
-ef9369_device::ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ef9369_device::ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, EF9369, tag, owner, clock)
 	, m_color_update_cb(*this)
 	, m_address(0)

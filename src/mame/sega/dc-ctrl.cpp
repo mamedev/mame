@@ -9,7 +9,7 @@
  *
  ******************************/
 
-dc_common_device::dc_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dc_common_device::dc_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	maple_device(mconfig, type, tag, owner, clock)
 	, port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 {
@@ -59,7 +59,7 @@ void dc_common_device::maple_w(const uint32_t *data, uint32_t in_size)
 
 DEFINE_DEVICE_TYPE(DC_CONTROLLER, dc_controller_device, "dcctrl", "Dreamcast Controller")
 
-dc_controller_device::dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dc_controller_device::dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dc_common_device(mconfig, DC_CONTROLLER, tag, owner, clock)
 {
 	model = "Dreamcast Controller";
@@ -118,7 +118,7 @@ void dc_controller_device::read(uint32_t *dest)
 
 DEFINE_DEVICE_TYPE(DC_KEYBOARD, dc_keyboard_device, "dckb", "Dreamcast Keyboard")
 
-dc_keyboard_device::dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dc_keyboard_device::dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dc_common_device(mconfig, DC_KEYBOARD, tag, owner, clock)
 {
 	model = "92key Keyboard for JPN";

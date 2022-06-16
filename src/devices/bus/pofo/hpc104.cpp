@@ -95,7 +95,7 @@ ioport_constructor pofo_hpc104_2_device::device_input_ports() const
 //  pofo_hpc104_device - constructor
 //-------------------------------------------------
 
-pofo_hpc104_device::pofo_hpc104_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+pofo_hpc104_device::pofo_hpc104_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_portfolio_expansion_slot_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
@@ -106,7 +106,7 @@ pofo_hpc104_device::pofo_hpc104_device(const machine_config &mconfig, device_typ
 {
 }
 
-pofo_hpc104_device::pofo_hpc104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pofo_hpc104_device::pofo_hpc104_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pofo_hpc104_device(mconfig, POFO_HPC104, tag, owner, clock)
 {
 }
@@ -116,7 +116,7 @@ pofo_hpc104_device::pofo_hpc104_device(const machine_config &mconfig, const char
 //  pofo_hpc104_2_device - constructor
 //-------------------------------------------------
 
-pofo_hpc104_2_device::pofo_hpc104_2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pofo_hpc104_2_device::pofo_hpc104_2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pofo_hpc104_device(mconfig, POFO_HPC104_2, tag, owner, clock)
 {
 }

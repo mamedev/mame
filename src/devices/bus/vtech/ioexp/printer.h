@@ -27,7 +27,7 @@ class vtech_printer_interface_device : public vtech_ioexp_device
 {
 public:
 	// construction/destruction
-	vtech_printer_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_printer_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

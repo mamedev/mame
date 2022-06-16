@@ -32,7 +32,7 @@ ALLOW_SAVE_TYPE(t6963c_device::auto_mode);
 //  t6963c_device - constructor
 //-------------------------------------------------
 
-t6963c_device::t6963c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+t6963c_device::t6963c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, T6963C, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_display_config("display", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -394,7 +394,7 @@ uint32_t t6963c_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 //  lm24014h_device - constructor
 //-------------------------------------------------
 
-lm24014h_device::lm24014h_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+lm24014h_device::lm24014h_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LM24014H, tag, owner, clock)
 	, m_lcdc(*this, "lcdc")
 	, m_fs(1)
@@ -439,7 +439,7 @@ void lm24014h_device::lcd_palette(palette_device &palette) const
 
 void lm24014h_device::device_add_mconfig(machine_config &config)
 {
-	T6963C(config, m_lcdc, 0); // XTAL is unknown
+	T6963C(config, m_lcdc); // XTAL is unknown
 	m_lcdc->set_addrmap(0, &lm24014h_device::ram_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

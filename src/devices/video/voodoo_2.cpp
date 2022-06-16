@@ -653,7 +653,7 @@ command_fifo::packet_handler command_fifo::s_packet_handler[8] =
 
 DEFINE_DEVICE_TYPE(VOODOO_2, voodoo_2_device, "voodoo_2", "3dfx Voodoo 2")
 
-voodoo_2_device::voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
+voodoo_2_device::voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, voodoo_model model) :
 	voodoo_1_device(mconfig, type, tag, owner, clock, model),
 	m_sverts(0),
 	m_cmdfifo(*this)

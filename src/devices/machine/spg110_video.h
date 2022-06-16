@@ -16,11 +16,11 @@ class spg110_video_device : public device_t, public device_memory_interface
 
 {
 public:
-	spg110_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	spg110_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg110_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
+	spg110_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T, typename U>
-	spg110_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
+	spg110_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag, U &&screen_tag)
 		: spg110_video_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));

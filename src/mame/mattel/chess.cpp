@@ -200,9 +200,9 @@ void mchess_state::mchess(machine_config &config)
 	m_maincpu->p2_in_cb().set(FUNC(mchess_state::lcd_r));
 
 	// video hardware
-	HLCD0569(config, m_lcd[0], 500); // C=0.01uF
+	HLCD0569(config, m_lcd[0], XTAL::u(500)); // C=0.01uF
 	m_lcd[0]->write_cols().set(FUNC(mchess_state::lcd_output_w<0>));
-	HLCD0569(config, m_lcd[1], 500); // C=0.01uF
+	HLCD0569(config, m_lcd[1], XTAL::u(500)); // C=0.01uF
 	m_lcd[1]->write_cols().set(FUNC(mchess_state::lcd_output_w<1>));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));

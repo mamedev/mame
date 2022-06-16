@@ -253,7 +253,7 @@ void att4425_state::att4425(machine_config &config)
 	ctc.zc_callback<2>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 #endif
 
-	Z80SIO(config, m_sio, 4800);
+	Z80SIO(config, m_sio, XTAL::u(4800));
 	m_sio->out_int_callback().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
 	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
@@ -270,10 +270,10 @@ void att4425_state::att4425(machine_config &config)
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, "printer"));
 	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
 
-	clock_device &line_clock(CLOCK(config, "line_clock", 9600 * 64));
+	clock_device &line_clock(CLOCK(config, "line_clock", XTAL::u(9600 * 64)));
 	line_clock.signal_handler().set(FUNC(att4425_state::write_line_clock));
 
-	I8251(config, m_i8251, 0);
+	I8251(config, m_i8251);
 	m_i8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_i8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_i8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -283,7 +283,7 @@ void att4425_state::att4425(machine_config &config)
 	rs232.cts_handler().set(m_i8251, FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set(m_i8251, FUNC(i8251_device::write_dsr));
 
-	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4800 * 64));
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", XTAL::u(4800 * 64)));
 	keyboard_clock.signal_handler().set(FUNC(att4425_state::write_keyboard_clock));
 
 	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);

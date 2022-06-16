@@ -12,10 +12,10 @@ class ds12885_device : public mc146818_device
 {
 public:
 	// construction/destruction
-	ds12885_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
+	ds12885_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(32'768));
 
 protected:
-	ds12885_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ds12885_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual int data_size() const override { return 128; }
 	virtual int get_timer_bypass() const override;
@@ -30,7 +30,7 @@ class ds12885ext_device : public ds12885_device
 {
 public:
 	// construction/destruction
-	ds12885ext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
+	ds12885ext_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(32'768));
 
 	// read/write access to extended ram
 	uint8_t read_extended(offs_t offset);

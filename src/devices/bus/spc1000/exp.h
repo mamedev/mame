@@ -30,14 +30,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	spc1000_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts)
-		: spc1000_exp_device(mconfig, tag, owner, (uint32_t)0)
+		: spc1000_exp_device(mconfig, tag, owner)
 	{
 		opts(*this);
 		set_default_option(nullptr);
 		set_fixed(false);
 	}
 
-	spc1000_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spc1000_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~spc1000_exp_device();
 
 	// reading and writing

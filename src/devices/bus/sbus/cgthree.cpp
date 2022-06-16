@@ -38,10 +38,10 @@ void sbus_cgthree_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update(FUNC(sbus_cgthree_device::screen_update));
 	m_screen->set_raw(92.9405_MHz_XTAL, 1504, 0, 1152, 937, 0, 900);
 
-	BT458(config, m_ramdac, 0);
+	BT458(config, m_ramdac);
 }
 
-sbus_cgthree_device::sbus_cgthree_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sbus_cgthree_device::sbus_cgthree_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SBUS_CGTHREE, tag, owner, clock)
 	, device_sbus_card_interface(mconfig, *this)
 	, m_rom(*this, "prom")

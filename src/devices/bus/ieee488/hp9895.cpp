@@ -132,7 +132,7 @@ static const uint8_t xv_drive_masks[] = {
 	BIT_MASK(REG_XV_DRIVE1_BIT)
 };
 
-hp9895_device::hp9895_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp9895_device::hp9895_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HP9895, tag, owner, clock),
 	  device_ieee488_interface(mconfig, *this),
 	  m_cpu(*this , "cpu"),
@@ -870,12 +870,12 @@ const tiny_rom_entry *hp9895_device::device_rom_region() const
 
 void hp9895_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_cpu, 4000000);
+	Z80(config, m_cpu, XTAL::u(4000000));
 	m_cpu->set_addrmap(AS_PROGRAM, &hp9895_device::z80_program_map);
 	m_cpu->set_addrmap(AS_IO, &hp9895_device::z80_io_map);
 	m_cpu->refresh_cb().set(FUNC(hp9895_device::z80_m1_w));
 
-	PHI(config, m_phi, 0);
+	PHI(config, m_phi);
 	m_phi->eoi_write_cb().set(FUNC(hp9895_device::phi_eoi_w));
 	m_phi->dav_write_cb().set(FUNC(hp9895_device::phi_dav_w));
 	m_phi->nrfd_write_cb().set(FUNC(hp9895_device::phi_nrfd_w));

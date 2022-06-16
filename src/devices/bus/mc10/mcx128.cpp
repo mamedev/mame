@@ -66,11 +66,11 @@ class mc10_pak_mcx128_device :
 {
 public:
 	// construction/destruction
-	mc10_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mc10_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// construction/destruction
-	mc10_pak_mcx128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	mc10_pak_mcx128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -114,12 +114,12 @@ DEFINE_DEVICE_TYPE_PRIVATE(MC10_PAK_MCX128, device_mc10cart_interface, mc10_pak_
 //  mc10_pak_device - constructor
 //-------------------------------------------------
 
-mc10_pak_mcx128_device::mc10_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mc10_pak_mcx128_device::mc10_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	:mc10_pak_mcx128_device(mconfig, MC10_PAK_MCX128, tag, owner, clock)
 {
 }
 
-mc10_pak_mcx128_device::mc10_pak_mcx128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+mc10_pak_mcx128_device::mc10_pak_mcx128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_mc10cart_interface(mconfig, *this)
 	, m_share(*this, "ext_ram", 1024*128, ENDIANNESS_BIG)
@@ -349,7 +349,7 @@ class alice_pak_mcx128_device : public mc10_pak_mcx128_device
 {
 public:
 	// construction/destruction
-	alice_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	alice_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -363,7 +363,7 @@ protected:
 //  mc10_pak_device - constructor
 //-------------------------------------------------
 
-alice_pak_mcx128_device::alice_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+alice_pak_mcx128_device::alice_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc10_pak_mcx128_device(mconfig, ALICE_PAK_MCX128, tag, owner, clock)
 {
 }

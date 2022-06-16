@@ -27,7 +27,7 @@
 /* Debugging flag */
 #define MATHDEBUG   0
 
-#define MASTER_CLOCK (12096000)
+#define MASTER_CLOCK XTAL::u(12096000)
 
 
 

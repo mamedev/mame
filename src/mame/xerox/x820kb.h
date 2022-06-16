@@ -24,7 +24,7 @@ class xerox_820_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	xerox_820_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xerox_820_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto kbstb_wr_callback() { return m_kbstb_cb.bind(); }
 

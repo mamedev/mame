@@ -3217,7 +3217,7 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 
 	// *************************** COLOR GRAPHICS (OPTION) **************************************
 	// While the OSC frequency is confirmed, the divider is not (refresh rate is ~60 Hz with 32).
-	UPD7220(config, m_hgdc, 31188000 / 32); // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
+	UPD7220(config, m_hgdc, XTAL(31188000) / 32); // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
 	m_hgdc->vsync_wr_callback().set(FUNC(rainbow_base_state::GDC_vblank_irq)); // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
 	m_hgdc->set_addrmap(0, &rainbow_base_state::upd7220_map);
@@ -3231,10 +3231,10 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 
 	// VR241 color monitor is specified for 20 MHz bandwidth ( 60 Hz / 15.72 kHz horizontal rate )
 	// - sufficient for 800 x 240 non-interlaced at 60 Hz (non interlaced).
-	//m_screen2->set_raw(31188000 / 2 , 992, 0, 800, 262, 0, 240);
+	//m_screen2->set_raw(XTAL(31188000) / 2 , 992, 0, 800, 262, 0, 240);
 
 	// Alternate configuration:
-	m_screen2->set_raw(31188000 / 4 , 496, 0, 400, 262, 0, 240);
+	m_screen2->set_raw(XTAL(31188000) / 4 , 496, 0, 400, 262, 0, 240);
 
 	m_screen2->set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
 
@@ -3248,7 +3248,7 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("rainbow");
 
 	/// ********************************* HARD DISK CONTROLLER *****************************************
-	WD2010(config, m_hdc, 5000000); // 10 Mhz quartz on controller (divided by 2 for WCLK)
+	WD2010(config, m_hdc, XTAL(10000000)/2); // 10 Mhz quartz on controller (divided by 2 for WCLK)
 	m_hdc->out_intrq_callback().set(FUNC(rainbow_base_state::bundle_irq)); // FIRST IRQ SOURCE (OR'ed with DRQ)
 	m_hdc->out_bdrq_callback().set(FUNC(rainbow_base_state::hdc_bdrq));  // BUFFER DATA REQUEST
 
@@ -3271,13 +3271,13 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 	HARDDISK(config, "decharddisk1");
 	/// ******************************** / HARD DISK CONTROLLER ****************************************
 
-	CORVUS_HDC(config, m_corvus_hdc, 0);
+	CORVUS_HDC(config, m_corvus_hdc);
 	HARDDISK(config, "harddisk1", "corvus_hdd");
 	HARDDISK(config, "harddisk2", "corvus_hdd");
 	HARDDISK(config, "harddisk3", "corvus_hdd");
 	HARDDISK(config, "harddisk4", "corvus_hdd");
 
-	DS1315(config, m_rtc, 0); // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
+	DS1315(config, m_rtc); // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
 	COM8116_003(config, m_dbrg, 24.0734_MHz_XTAL / 4); // 6.01835 MHz (nominally 6 MHz)
 	m_dbrg->fr_handler().set(FUNC(rainbow_base_state::dbrg_fr_w));
@@ -3310,7 +3310,7 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 	m_kbd8251->rxrdy_handler().set(FUNC(rainbow_base_state::kbd_rxready_w));
 	m_kbd8251->txrdy_handler().set(FUNC(rainbow_base_state::kbd_txready_w));
 
-	LK201(config, m_lk201, 0);
+	LK201(config, m_lk201);
 	m_lk201->tx_handler().set(m_kbd8251, FUNC(i8251_device::write_rxd));
 
 	ripple_counter_device &prtbrg(RIPPLE_COUNTER(config, "prtbrg", 24.0734_MHz_XTAL / 6 / 13)); // 74LS393 at E17 (both halves)

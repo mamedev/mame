@@ -139,18 +139,18 @@ void emu68k_state::add_lcd(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(emu68k_state::palette_init), 2);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc"));
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(emu68k_state::lcd_pixel_update));
 }
 
 void emu68k_state::proteus1(machine_config &config)
 {
-	M68000(config, m_maincpu, 10'000'000);
+	M68000(config, m_maincpu, XTAL::u(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &emu68k_state::proteus1_map);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &emu68k_state::fc7_map);
 
-	MC68901(config, m_mfp, 10'000'000); // FIXME: not the right type at all
+	MC68901(config, m_mfp, XTAL::u(10'000'000)); // FIXME: not the right type at all
 	m_mfp->set_timer_clock(2'500'000);
 	m_mfp->out_irq_cb().set_inputline(m_maincpu, M68K_IRQ_1); // TODO: verify level
 

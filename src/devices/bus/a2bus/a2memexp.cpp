@@ -48,7 +48,7 @@ public:
 
 protected:
 	// construction/destruction
-	a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -71,13 +71,13 @@ private:
 class a2bus_memexpapple_device : public a2bus_memexp_device
 {
 public:
-	a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class a2bus_ramfactor_device : public a2bus_memexp_device
 {
 public:
-	a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -113,7 +113,7 @@ const tiny_rom_entry *a2bus_ramfactor_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_memexp_device::a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_memexp_device::a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_isramfactor(false), m_bankhior(0), m_addrmask(0),
 	m_rom(*this, MEMEXP_ROM_REGION),
@@ -121,7 +121,7 @@ a2bus_memexp_device::a2bus_memexp_device(const machine_config &mconfig, device_t
 {
 }
 
-a2bus_memexpapple_device::a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_memexpapple_device::a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_memexp_device(mconfig, A2BUS_MEMEXP, tag, owner, clock)
 {
 	m_isramfactor = false;
@@ -129,7 +129,7 @@ a2bus_memexpapple_device::a2bus_memexpapple_device(const machine_config &mconfig
 	m_addrmask = 0xfffff;
 }
 
-a2bus_ramfactor_device::a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ramfactor_device::a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_memexp_device(mconfig, A2BUS_RAMFACTOR, tag, owner, clock)
 {
 	m_isramfactor = true;

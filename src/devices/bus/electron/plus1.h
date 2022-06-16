@@ -29,10 +29,10 @@ class electron_plus1_device:
 {
 public:
 	// construction/destruction
-	electron_plus1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	electron_plus1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	electron_plus1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	electron_plus1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -62,7 +62,7 @@ protected:
 class electron_ap1_device : public electron_plus1_device
 {
 public:
-	electron_ap1_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	electron_ap1_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -73,7 +73,7 @@ protected:
 class electron_ap6_device : public electron_plus1_device
 {
 public:
-	electron_ap6_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	electron_ap6_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

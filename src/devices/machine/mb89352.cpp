@@ -155,7 +155,7 @@ DEFINE_DEVICE_TYPE(MB89352A, mb89352_device, "mb89352", "Fujitsu MB89352A")
  * Device
  */
 
-mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	legacy_scsi_host_adapter(mconfig, MB89352A, tag, owner, clock),
 	m_irq_cb(*this),
 	m_drq_cb(*this)

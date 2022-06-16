@@ -25,11 +25,11 @@ class apple2_gameio_device : public device_t, public device_single_card_slot_int
 {
 public:
 	// construction/destruction
-	apple2_gameio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	apple2_gameio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T>
 	apple2_gameio_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: apple2_gameio_device(mconfig, tag, owner, 0U)
+		: apple2_gameio_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);

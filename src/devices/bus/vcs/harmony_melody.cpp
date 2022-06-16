@@ -64,7 +64,7 @@ map:
 DEFINE_DEVICE_TYPE(A26_ROM_HARMONY, a26_rom_harmony_device, "a2600_harmony", "Atari 2600 ROM Cart HARMONY/MELODY")
 
 
-a26_rom_harmony_device::a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a26_rom_harmony_device::a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a26_rom_base_device(mconfig, A26_ROM_HARMONY, tag, owner, clock)
 	, m_cpu(*this, "arm")
 	, m_base_bank(0)
@@ -81,7 +81,7 @@ void a26_rom_harmony_device::harmony_arm7_map(address_map &map)
 
 void a26_rom_harmony_device::device_add_mconfig(machine_config &config)
 {
-	LPC2103(config, m_cpu, 70000000);
+	LPC2103(config, m_cpu, XTAL::u(70000000));
 	m_cpu->set_addrmap(AS_PROGRAM, &a26_rom_harmony_device::harmony_arm7_map);
 }
 

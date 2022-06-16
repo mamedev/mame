@@ -41,7 +41,7 @@ static const int m_mmc5_attrib[4] = {0x00, 0x55, 0xaa, 0xff};
 DEFINE_DEVICE_TYPE(NES_EXROM, nes_exrom_device, "nes_exrom", "NES Cart ExROM (MMC-5) PCB")
 
 
-nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_EXROM, tag, owner, clock), m_irq_count(0)
 	, m_irq_status(0), m_irq_enable(0), m_mult1(0), m_mult2(0), m_mmc5_scanline(0), m_vrom_page_a(0), m_vrom_page_b(0), m_floodtile(0), m_floodattr(0)
 	, m_prg_mode(0), m_chr_mode(0), m_wram_protect_1(0), m_wram_protect_2(0), m_exram_control(0), m_wram_base(0), m_last_chr(0), m_ex1_chr(0)

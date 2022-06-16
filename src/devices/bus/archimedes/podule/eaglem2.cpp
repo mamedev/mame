@@ -38,7 +38,7 @@ class arc_eaglem2_device :
 {
 public:
 	// construction/destruction
-	arc_eaglem2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_eaglem2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::CAPTURE | feature::SOUND; }
 
@@ -115,7 +115,7 @@ void arc_eaglem2_device::device_add_mconfig(machine_config &config)
 //  arc_eaglem2_device - constructor
 //-------------------------------------------------
 
-arc_eaglem2_device::arc_eaglem2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_eaglem2_device::arc_eaglem2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_EAGLEM2, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")

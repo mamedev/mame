@@ -15,7 +15,7 @@
 DEFINE_DEVICE_TYPE(LZ8420M, lz8420m_device, "lz8420m", "Sharp LZ8420M")
 
 
-lz8420m_device::lz8420m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lz8420m_device::lz8420m_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80_device(mconfig, LZ8420M, tag, owner, clock)
 {
 }

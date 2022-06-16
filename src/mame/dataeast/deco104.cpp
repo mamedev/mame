@@ -1051,7 +1051,7 @@ static deco146port_xx const port104_table[] = {
 DEFINE_DEVICE_TYPE(DECO104PROT, deco104_device, "deco104", "DECO 104 Protection")
 
 
-deco104_device::deco104_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+deco104_device::deco104_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: deco_146_base_device(mconfig, DECO104PROT, tag, owner, clock)
 {
 	m_bankswitch_swap_read_address = 0x66;

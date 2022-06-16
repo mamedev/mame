@@ -22,7 +22,7 @@ class ssp1601_device : public cpu_device
 {
 public:
 	// construction/destruction
-	ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ssp1601_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

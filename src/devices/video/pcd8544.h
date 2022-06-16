@@ -27,7 +27,7 @@ public:
 	typedef device_delegate<void (device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect , uint8_t *vram, int inv)> screen_update_delegate;
 
 	// construction/destruction
-	pcd8544_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcd8544_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	template <typename... T> void set_screen_update_cb(T &&... args) { m_screen_update_cb.set(std::forward<T>(args)...); }
 
 	// device interface

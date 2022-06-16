@@ -23,7 +23,7 @@ class m2_bda_device;
 class m2_te_device : public device_t
 {
 public:
-	m2_te_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m2_te_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Static configuration helpers
 	auto general_int_handler() { return m_general_int_handler.bind(); }

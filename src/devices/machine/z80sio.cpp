@@ -269,26 +269,26 @@ DEFINE_DEVICE_TYPE(MK68564,         mk68564_device,     "mk68564",         "Most
 //-------------------------------------------------
 void z80sio_device::device_add_mconfig(machine_config &config)
 {
-	Z80SIO_CHANNEL(config, CHANA_TAG, 0);
-	Z80SIO_CHANNEL(config, CHANB_TAG, 0);
+	Z80SIO_CHANNEL(config, CHANA_TAG);
+	Z80SIO_CHANNEL(config, CHANB_TAG);
 }
 
 void z80dart_device::device_add_mconfig(machine_config &config)
 {
-	Z80DART_CHANNEL(config, CHANA_TAG, 0);
-	Z80DART_CHANNEL(config, CHANB_TAG, 0);
+	Z80DART_CHANNEL(config, CHANA_TAG);
+	Z80DART_CHANNEL(config, CHANB_TAG);
 }
 
 void i8274_device::device_add_mconfig(machine_config &config)
 {
-	I8274_CHANNEL(config, CHANA_TAG, 0);
-	I8274_CHANNEL(config, CHANB_TAG, 0);
+	I8274_CHANNEL(config, CHANA_TAG);
+	I8274_CHANNEL(config, CHANB_TAG);
 }
 
 void mk68564_device::device_add_mconfig(machine_config &config)
 {
-	MK68564_CHANNEL(config, CHANA_TAG, 0);
-	MK68564_CHANNEL(config, CHANB_TAG, 0);
+	MK68564_CHANNEL(config, CHANA_TAG);
+	MK68564_CHANNEL(config, CHANB_TAG);
 }
 
 
@@ -397,7 +397,7 @@ void z80dart_channel::tx_setup_idle()
 //-------------------------------------------------
 //  z80sio_device - constructor
 //-------------------------------------------------
-z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
 	m_chanA(*this, CHANA_TAG),
@@ -416,32 +416,32 @@ z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, co
 		elem = 0;
 }
 
-z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	z80sio_device(mconfig, Z80SIO, tag, owner, clock)
 {
 }
 
-z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	z80sio_device(mconfig, Z80DART, tag, owner, clock)
 {
 }
 
-i8274_device::i8274_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+i8274_device::i8274_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	z80sio_device(mconfig, type, tag, owner, clock)
 {
 }
 
-i8274_device::i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i8274_device::i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i8274_device(mconfig, I8274, tag, owner, clock)
 {
 }
 
-upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i8274_device(mconfig, UPD7201, tag, owner, clock)
 {
 }
 
-mk68564_device::mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mk68564_device::mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i8274_device(mconfig, MK68564, tag, owner, clock)
 {
 }
@@ -978,22 +978,22 @@ z80sio_channel::z80sio_channel(
 	m_wr0 = m_wr1 = m_wr2 = m_wr3 = m_wr4 = m_wr5 = m_wr6 = m_wr7 = 0;
 }
 
-z80sio_channel::z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z80sio_channel::z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80sio_channel(mconfig, Z80SIO_CHANNEL, tag, owner, clock, RR1_END_OF_FRAME | RR1_CRC_FRAMING_ERROR | RR1_RESIDUE_CODE_MASK)
 {
 }
 
-z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80sio_channel(mconfig, Z80DART_CHANNEL, tag, owner, clock, RR1_END_OF_FRAME | RR1_CRC_FRAMING_ERROR | RR1_RESIDUE_CODE_MASK)
 {
 }
 
-i8274_channel::i8274_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8274_channel::i8274_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80sio_channel(mconfig, I8274_CHANNEL, tag, owner, clock, RR1_RX_OVERRUN_ERROR)
 {
 }
 
-mk68564_channel::mk68564_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mk68564_channel::mk68564_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80sio_channel(mconfig, MK68564_CHANNEL, tag, owner, clock, RR1_END_OF_FRAME | RR1_CRC_FRAMING_ERROR | RR1_RESIDUE_CODE_MASK)
 	, m_tx_auto_enable(false)
 	, m_brg_tc(0)

@@ -26,7 +26,7 @@ class snes_bcbattle_device : public device_t,
 {
 public:
 	// construction/destruction
-	snes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	snes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

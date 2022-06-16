@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(SNS_HIROM_SPC7110,     sns_rom_spc7110_device,    "sns_rom_sp
 DEFINE_DEVICE_TYPE(SNS_HIROM_SPC7110_RTC, sns_rom_spc7110rtc_device, "sns_rom_spc7110rtc", "SNES Cart + SPC7110 + RTC")
 
 
-sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom21_device(mconfig, type, tag, owner, clock)
 	, m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0), m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0)
 	, m_decomp(nullptr)
@@ -55,12 +55,12 @@ sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, de
 {
 }
 
-sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_spc7110_device(mconfig, SNS_HIROM_SPC7110, tag, owner, clock)
 {
 }
 
-sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_spc7110_device(mconfig, SNS_HIROM_SPC7110_RTC, tag, owner, clock)
 {
 }

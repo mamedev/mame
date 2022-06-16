@@ -914,7 +914,7 @@ GFXDECODE_END
 void mcr68_state::mcr68(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, 7723800);
+	M68000(config, m_maincpu, XTAL::u(7723800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mcr68_state::mcr68_map);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);

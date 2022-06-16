@@ -95,7 +95,7 @@ public:
 	template <typename... T> void set_int_cb(T &&... args) { m_int_func.set(std::forward<T>(args)...); }
 
 protected:
-	hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth);
+	hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint8_t addrwidth);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -230,10 +230,10 @@ private:
 class hp_5061_3011_cpu_device : public hp_hybrid_cpu_device
 {
 public:
-	hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	hp_5061_3011_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth);
+	hp_5061_3011_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint8_t addrwidth);
 	// TODO: fix
 	virtual uint32_t execute_max_cycles() const noexcept override { return 25; }
 	virtual bool execute_no_bpc(uint16_t opcode , uint16_t& next_pc) override;
@@ -248,7 +248,7 @@ protected:
 class hp_5061_3001_cpu_device : public hp_5061_3011_cpu_device
 {
 public:
-	hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Set boot mode of 5061-3001: either normal (false) or as in HP9845 system (true)
 	void set_9845_boot_mode(bool mode) { m_boot_mode = mode; }
@@ -275,7 +275,7 @@ private:
 class hp_09825_67907_cpu_device : public hp_hybrid_cpu_device
 {
 public:
-	hp_09825_67907_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp_09825_67907_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

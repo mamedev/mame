@@ -431,7 +431,7 @@ void _20pacgal_state::_20pacgal(machine_config &config)
 	namco.set_voices(3);
 	namco.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 }
 
 static DEVICE_INPUT_DEFAULTS_START( null_modem_57600 )

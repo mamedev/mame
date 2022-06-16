@@ -29,7 +29,7 @@ public:
 protected:
 	sn76496_base_device(const machine_config &mconfig, device_type type, const char *tag,
 			int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider,
-			bool ncr, bool sega, device_t *owner, uint32_t clock);
+			bool ncr, bool sega, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
@@ -73,70 +73,70 @@ private:
 class sn76496_device : public sn76496_base_device
 {
 public:
-	sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // Y2404 not verified yet. todo: verify; (don't be fooled by the Y, it's a TI chip, not Yamaha)
 class y2404_device : public sn76496_base_device
 {
 public:
-	y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // SN76489 not verified yet. todo: verify;
 class sn76489_device : public sn76496_base_device
 {
 public:
-	sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // SN76489A: whitenoise verified, phase verified, periodic verified (by plgdavid)
 class sn76489a_device : public sn76496_base_device
 {
 public:
-	sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // SN76494 not verified, (according to datasheet: same as sn76489a but without the /8 divider)
 class sn76494_device : public sn76496_base_device
 {
 public:
-	sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // SN94624 whitenoise verified, phase verified, period verified; verified by PlgDavid
 class sn94624_device : public sn76496_base_device
 {
 public:
-	sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // NCR8496 whitenoise verified, phase verified; verified by ValleyBell & NewRisingSun
 class ncr8496_device : public sn76496_base_device
 {
 public:
-	ncr8496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ncr8496_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // PSSJ-3 whitenoise verified, phase verified; verified by ValleyBell & NewRisingSun
 class pssj3_device : public sn76496_base_device
 {
 public:
-	pssj3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pssj3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // Verified by Justin Kerk
 class gamegear_device : public sn76496_base_device
 {
 public:
-	gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // todo: verify; from smspower wiki, assumed to have same invert as gamegear
 class segapsg_device : public sn76496_base_device
 {
 public:
-	segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 #endif // MAME_SOUND_SN76496_H

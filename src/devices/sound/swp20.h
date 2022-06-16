@@ -13,7 +13,7 @@
 class swp20_device : public device_t, public device_sound_interface, public device_rom_interface<23+2, 1, 0, ENDIANNESS_LITTLE>
 {
 public:
-	swp20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 11289600);
+	swp20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = 11289600);
 
 	void map(address_map &map);
 

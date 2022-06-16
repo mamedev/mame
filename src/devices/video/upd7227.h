@@ -23,8 +23,8 @@ class upd7227_device : public device_t, public device_memory_interface
 {
 public:
 	// construction/destruction
-	upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, int sx, int sy) : upd7227_device(mconfig, tag, owner, 0)
+	upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
+	upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, int sx, int sy) : upd7227_device(mconfig, tag, owner)
 	{ set_offsets(sx, sy); }
 
 	// inline configuration helpers

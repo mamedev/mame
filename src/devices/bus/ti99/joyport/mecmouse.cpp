@@ -55,7 +55,7 @@ DEFINE_DEVICE_TYPE(TI99_MECMOUSE, bus::ti99::joyport::mecmouse_device, "ti99_mec
 
 namespace bus::ti99::joyport {
 
-mecmouse_device::mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mecmouse_device::mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TI99_MECMOUSE, tag, owner, clock)
 	, device_ti99_joyport_interface(mconfig, *this)
 	, m_mousex(*this, "MOUSEX")

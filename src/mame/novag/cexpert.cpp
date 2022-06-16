@@ -225,7 +225,7 @@ void cexpert_state::cexpert(machine_config &config)
 	R65C02(config, m_maincpu, 10_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cexpert_state::main_map);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 15440 / 32)); // 555 timer (measured), to 4020
+	auto &irq_clock(CLOCK(config, "irq_clock", XTAL::u(15440) / 32)); // 555 timer (measured), to 4020
 	irq_clock.set_pulse_width(attotime::from_nsec(15200)); // active for 15.2us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 

@@ -171,7 +171,7 @@ const tiny_rom_entry *electron_ap6_device::device_rom_region() const
 //  electron_plus1_device - constructor
 //-------------------------------------------------
 
-electron_plus1_device::electron_plus1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+electron_plus1_device::electron_plus1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_electron_expansion_interface(mconfig, *this)
 	, m_irqs(*this, "irqs")
@@ -188,17 +188,17 @@ electron_plus1_device::electron_plus1_device(const machine_config &mconfig, devi
 {
 }
 
-electron_plus1_device::electron_plus1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_plus1_device::electron_plus1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: electron_plus1_device(mconfig, ELECTRON_PLUS1, tag, owner, clock)
 {
 }
 
-electron_ap1_device::electron_ap1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_ap1_device::electron_ap1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: electron_plus1_device(mconfig, ELECTRON_AP1, tag, owner, clock)
 {
 }
 
-electron_ap6_device::electron_ap6_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+electron_ap6_device::electron_ap6_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
 	: electron_plus1_device(mconfig, ELECTRON_AP6, tag, owner, clock)
 	, m_rom(*this, "rom%u", 1)
 	, m_links(*this, "LINKS")

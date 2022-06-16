@@ -43,7 +43,7 @@ void spectrum_melodik_device::device_add_mconfig(machine_config &config)
 //  spectrum_melodik_device - constructor
 //-------------------------------------------------
 
-spectrum_melodik_device::spectrum_melodik_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_melodik_device::spectrum_melodik_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPECTRUM_MELODIK, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_exp(*this, "exp")

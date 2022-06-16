@@ -62,7 +62,7 @@ do { \
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, CCPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 15, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 32, -1)

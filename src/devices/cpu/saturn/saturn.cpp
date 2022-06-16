@@ -40,7 +40,7 @@
 DEFINE_DEVICE_TYPE(SATURN, saturn_device, "saturn_cpu", "Hewlett-Packard Saturn")
 
 
-saturn_device::saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+saturn_device::saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, SATURN, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_out_func(*this)

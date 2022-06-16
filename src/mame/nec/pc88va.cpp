@@ -1440,7 +1440,7 @@ void pc88va_state::machine_start()
 
 	m_fdd[0]->get_device()->set_rpm(300);
 	m_fdd[1]->get_device()->set_rpm(300);
-	m_fdc->set_rate(250000);
+	m_fdc->set_rate(XTAL::u(250000));
 
 }
 
@@ -1573,7 +1573,7 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 #if TEST_SUBFDC
-	z80_device &fdccpu(Z80(config, "fdccpu", 8000000));        /* 8 MHz */
+	z80_device &fdccpu(Z80(config, "fdccpu", XTAL::u(8000000)));        /* 8 MHz */
 	fdccpu.set_addrmap(AS_PROGRAM, &pc88va_state::pc88va_z80_map);
 	fdccpu.set_addrmap(AS_IO, &pc88va_state::pc88va_z80_io_map);
 
@@ -1610,12 +1610,12 @@ void pc88va_state::pc88va(machine_config &config)
 	d8255_2s.in_pc_callback().set(FUNC(pc88va_state::fdc_8255_c_r));
 	d8255_2s.out_pc_callback().set(FUNC(pc88va_state::fdc_8255_c_w));
 
-	PIC8259(config, m_pic1, 0);
+	PIC8259(config, m_pic1);
 	m_pic1->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic1->in_sp_callback().set_constant(1);
 	m_pic1->read_slave_ack_callback().set(FUNC(pc88va_state::get_slave_ack));
 
-	PIC8259(config, m_pic2, 0);
+	PIC8259(config, m_pic2);
 	m_pic2->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir7_w));
 	m_pic2->in_sp_callback().set_constant(0);
 
@@ -1634,7 +1634,7 @@ void pc88va_state::pc88va(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
 	SOFTWARE_LIST(config, "disk_list").set_original("pc88va");
 
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 	pit8253.set_clk<0>(MASTER_CLOCK); /* general purpose timer 1 */
 	pit8253.out_handler<0>().set(FUNC(pc88va_state::pc88va_pit_out0_changed));
 	pit8253.set_clk<1>(MASTER_CLOCK); /* BEEP frequency setting */

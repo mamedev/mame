@@ -84,7 +84,7 @@ DEFINE_DEVICE_TYPE(KONAMI, konami_cpu_device, "konami_cpu", "KONAMI CPU")
 //  konami_cpu_device - constructor
 //-------------------------------------------------
 
-konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m6809_base_device(mconfig, tag, owner, clock, KONAMI, 1)
 	, m_set_lines(*this)
 {

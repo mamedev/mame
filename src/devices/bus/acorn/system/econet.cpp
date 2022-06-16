@@ -30,7 +30,7 @@ void acorn_econet_device::device_add_mconfig(machine_config &config)
 	m_adlc->out_txd_cb().set(m_econet, FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(acorn_econet_device::bus_irq_w));
 
-	ECONET(config, m_econet, 0);
+	ECONET(config, m_econet);
 	m_econet->clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	m_econet->clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	m_econet->data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
@@ -46,7 +46,7 @@ void acorn_econet_device::device_add_mconfig(machine_config &config)
 //  acorn_econet_device - constructor
 //-------------------------------------------------
 
-acorn_econet_device::acorn_econet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_econet_device::acorn_econet_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACORN_ECONET, tag, owner, clock)
 	, device_acorn_bus_interface(mconfig, *this)
 	, m_adlc(*this, "mc6854")

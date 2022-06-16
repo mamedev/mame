@@ -8,7 +8,7 @@
 class msx_slot_ram_mm_device : public device_t, public msx_internal_slot_interface
 {
 public:
-	msx_slot_ram_mm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_ram_mm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	msx_slot_ram_mm_device &set_total_size(uint32_t total_size) { m_total_size = total_size; return *this; }
 	msx_slot_ram_mm_device &set_ramio_bits(uint8_t ramio_set_bits) { m_ramio_set_bits = ramio_set_bits; return *this; }

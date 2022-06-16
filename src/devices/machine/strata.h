@@ -9,7 +9,7 @@
 class strataflash_device : public device_t, public device_nvram_interface
 {
 public:
-	strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// 8-bit access
 	uint8_t read8(offs_t offset);

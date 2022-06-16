@@ -246,11 +246,11 @@ void ultrsprt_state::machine_reset()
 void ultrsprt_state::ultrsprt(machine_config &config)
 {
 	// basic machine hardware
-	PPC403GA(config, m_maincpu, 25000000);
+	PPC403GA(config, m_maincpu, XTAL::u(25000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ultrsprt_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ultrsprt_state::irq1_line_assert));
 
-	M68000(config, m_audiocpu, 8000000); // Unconfirmed
+	M68000(config, m_audiocpu, XTAL::u(8000000)); // Unconfirmed
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ultrsprt_state::sound_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");

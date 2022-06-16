@@ -138,7 +138,7 @@ void wizard_state::main_map(address_map &map)
 
 void wizard_state::iq7000(machine_config &config)
 {
-	ARM9(config, m_maincpu, 240000000); // actually Sharp SC62015B02, currently unemulated
+	ARM9(config, m_maincpu, XTAL::u(240000000)); // actually Sharp SC62015B02, currently unemulated
 	m_maincpu->set_addrmap(AS_PROGRAM, &wizard_state::main_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // all wrong, TBD

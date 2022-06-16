@@ -118,7 +118,7 @@ const tiny_rom_entry *spectrum_spdos_device::device_rom_region() const
 //  spectrum_kempdisc_device - constructor
 //-------------------------------------------------
 
-spectrum_kempdisc_device::spectrum_kempdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_kempdisc_device::spectrum_kempdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_rom(*this, "rom")
@@ -129,12 +129,12 @@ spectrum_kempdisc_device::spectrum_kempdisc_device(const machine_config &mconfig
 {
 }
 
-spectrum_kempdisc_device::spectrum_kempdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_kempdisc_device::spectrum_kempdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_kempdisc_device(mconfig, SPECTRUM_KEMPDISC, tag, owner, clock)
 {
 }
 
-spectrum_spdos_device::spectrum_spdos_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_spdos_device::spectrum_spdos_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_kempdisc_device(mconfig, SPECTRUM_SPDOS, tag, owner, clock)
 {
 }

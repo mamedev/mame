@@ -17,7 +17,7 @@
 class iop_timer_device : public device_t
 {
 public:
-	iop_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iop_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq() { return m_int_cb.bind(); }
 

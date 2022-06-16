@@ -22,7 +22,7 @@ class z80daisy_generic_device : public device_t, public device_z80daisy_interfac
 {
 public:
 	// construction/destruction
-	z80daisy_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80daisy_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto int_handler() { return m_int_handler.bind(); }

@@ -12,13 +12,13 @@ class saturn_rom_device : public device_t, public device_sat_cart_interface
 {
 public:
 	// construction/destruction
-	saturn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint32_t read_rom(offs_t offset) override;
 
 protected:
-	saturn_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cart_type);
+	saturn_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int cart_type);
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -18,7 +18,7 @@
 
 DEFINE_DEVICE_TYPE(XAVIX_MADFB_BALL, xavix_madfb_ball_device, "xavix_madfb_ball", "XaviX / Radica Football Ball")
 
-xavix_madfb_ball_device::xavix_madfb_ball_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xavix_madfb_ball_device::xavix_madfb_ball_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XAVIX_MADFB_BALL, tag, owner, clock),
 	m_event_out_cb(*this),
 	m_in(*this, "BALL")

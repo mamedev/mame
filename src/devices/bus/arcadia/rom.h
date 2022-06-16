@@ -15,14 +15,14 @@ class arcadia_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	arcadia_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arcadia_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) override;
 	virtual uint8_t extra_rom(offs_t offset) override;
 
 public:
-	arcadia_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	arcadia_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override { }
@@ -35,7 +35,7 @@ class arcadia_golf_device : public arcadia_rom_device
 {
 public:
 	// construction/destruction
-	arcadia_golf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arcadia_golf_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

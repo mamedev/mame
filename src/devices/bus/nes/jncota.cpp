@@ -33,7 +33,7 @@
 DEFINE_DEVICE_TYPE(NES_JNCOTA_KT1001, nes_jncota_kt1001_device, "nes_jncota_kt1001", "NES Cart Shenzhen Jncota KT-1001 PCB")
 
 
-nes_jncota_kt1001_device::nes_jncota_kt1001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jncota_kt1001_device::nes_jncota_kt1001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_JNCOTA_KT1001, tag, owner, clock)
 {
 }

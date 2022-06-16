@@ -15,7 +15,7 @@ TODO:
 #include "dasm900.h"
 
 
-tlcs900_device::tlcs900_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+tlcs900_device::tlcs900_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_am8_16(0),
 	m_mnemonic_80(s_mnemonic_80),
@@ -36,7 +36,7 @@ tlcs900_device::tlcs900_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	tlcs900_device(mconfig, type, tag, owner, clock)
 {
 	m_mnemonic_80 = s_mnemonic_80;

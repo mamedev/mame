@@ -10,7 +10,7 @@ class namco_163_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	namco_163_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	namco_163_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER(disable_w);
 

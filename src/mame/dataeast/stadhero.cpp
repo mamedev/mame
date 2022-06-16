@@ -278,16 +278,16 @@ void stadhero_state::stadhero(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_stadhero);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
-	DECO_BAC06(config, m_tilegen, 0);
+	DECO_BAC06(config, m_tilegen);
 	m_tilegen->set_gfx_region_wide(1, 1, 2);
 	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_MXC06(config, m_spritegen, 0);
+	DECO_MXC06(config, m_spritegen);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch, 0);
+	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	ym2203_device &ym1(YM2203(config, "ym1", 24_MHz_XTAL/16));

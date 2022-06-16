@@ -24,7 +24,7 @@ class basf7100_kbd_device :  public device_t, protected device_matrix_keyboard_i
 {
 public:
 	// construction/destruction
-	basf7100_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	basf7100_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callbacks
 	auto int_handler() { return m_int_handler.bind(); }

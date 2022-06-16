@@ -203,7 +203,7 @@ void kc85_4_state::kc85_4(machine_config &config)
 	m_z80pio->out_pb_callback().set(FUNC(kc_state::pio_portb_w));
 	m_z80pio->out_brdy_callback().set(FUNC(kc_state::pio_brdy_cb));
 
-	Z80CTC(config, m_z80ctc, 0);
+	Z80CTC(config, m_z80ctc);
 	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_z80ctc->zc_callback<0>().set(FUNC(kc_state::ctc_zc0_callback));
 	m_z80ctc->zc_callback<1>().set(FUNC(kc_state::ctc_zc1_callback));

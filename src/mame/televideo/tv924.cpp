@@ -63,7 +63,7 @@ INPUT_PORTS_END
 
 void tv924_state::tv924(machine_config &config)
 {
-	M6502(config, m_maincpu, 1'723'560); // R6502AP (clock guessed)
+	M6502(config, m_maincpu, XTAL::u(1'723'560)); // R6502AP (clock guessed)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tv924_state::mem_map);
 
 	I8049(config, "kbdc", 5.7143_MHz_XTAL).set_disable();
@@ -75,7 +75,7 @@ void tv924_state::tv924(machine_config &config)
 	screen.set_raw(27'576'960, 848 * 2, 0, 640 * 2, 271, 0, 250);
 	screen.set_screen_update("pvtc", FUNC(scn2672_device::screen_update));
 
-	SCN2672(config, m_pvtc, 1'723'560); // SCN2672A (with SCB2673B + AMI gate arrays 130170-00 and 130180-00)
+	SCN2672(config, m_pvtc, XTAL::u(1'723'560)); // SCN2672A (with SCB2673B + AMI gate arrays 130170-00 and 130180-00)
 	m_pvtc->set_screen("screen");
 	m_pvtc->set_character_width(16); // nominally 8, but with half-dot shifting
 	m_pvtc->set_addrmap(0, &tv924_state::char_map);

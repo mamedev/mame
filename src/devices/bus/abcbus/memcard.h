@@ -25,7 +25,7 @@ class abc_memory_card_device : public device_t, public device_abcbus_card_interf
 {
 public:
 	// construction/destruction
-	abc_memory_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc_memory_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

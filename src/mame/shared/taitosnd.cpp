@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(PC060HA, pc060ha_device, "pc060ha", "Taito PC060HA CIU")
 //  tc0140syt_device - constructor
 //-------------------------------------------------
 
-tc0140syt_device::tc0140syt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+tc0140syt_device::tc0140syt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_mainmode(0)
 	, m_submode(0)
@@ -60,7 +60,7 @@ tc0140syt_device::tc0140syt_device(const machine_config &mconfig, device_type ty
 	std::fill(std::begin(m_masterdata), std::end(m_masterdata), 0);
 }
 
-tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tc0140syt_device(mconfig, TC0140SYT, tag, owner, clock)
 {
 }
@@ -302,7 +302,7 @@ u8 tc0140syt_device::slave_comm_r()
 //  pc060ha_device - constructor
 //-------------------------------------------------
 
-pc060ha_device::pc060ha_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pc060ha_device::pc060ha_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tc0140syt_device(mconfig, PC060HA, tag, owner, clock)
 {
 }

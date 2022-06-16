@@ -23,7 +23,7 @@ class datapack_device : public device_t,
 {
 public:
 	// construction/destruction
-	datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~datapack_device();
 
 	// image-level overrides

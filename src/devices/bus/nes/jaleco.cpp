@@ -51,23 +51,23 @@ DEFINE_DEVICE_TYPE(NES_JF29,       nes_jf29_device,       "nes_jf29",     "NES C
 DEFINE_DEVICE_TYPE(NES_JF33,       nes_jf33_device,       "nes_jf33",     "NES Cart Jaleco JF-33 (Moe Pro! Saikyou-hen) PCB")
 
 
-nes_jf11_device::nes_jf11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jf11_device::nes_jf11_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_JF11, tag, owner, clock)
 {
 }
 
-nes_jf13_device::nes_jf13_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jf13_device::nes_jf13_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_JF13, tag, owner, clock)
 	, m_samples(*this, "samples")
 {
 }
 
-nes_jf16_device::nes_jf16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jf16_device::nes_jf16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_JF16, tag, owner, clock)
 {
 }
 
-nes_jf17_device::nes_jf17_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool prg_flip)
+nes_jf17_device::nes_jf17_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool prg_flip)
 	: nes_nrom_device(mconfig, type, tag, owner, clock)
 	, m_samples(*this, "samples")
 	, m_latch(0)
@@ -75,27 +75,27 @@ nes_jf17_device::nes_jf17_device(const machine_config &mconfig, device_type type
 {
 }
 
-nes_jf17_device::nes_jf17_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jf17_device::nes_jf17_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_jf17_device(mconfig, NES_JF17, tag, owner, clock, false)
 {
 }
 
-nes_jf17_adpcm_device::nes_jf17_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jf17_adpcm_device::nes_jf17_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_jf17_device(mconfig, NES_JF17_ADPCM, tag, owner, clock, false)
 {
 }
 
-nes_jf19_device::nes_jf19_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jf19_device::nes_jf19_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_jf17_device(mconfig, NES_JF19, tag, owner, clock, true)
 {
 }
 
-nes_jf19_adpcm_device::nes_jf19_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jf19_adpcm_device::nes_jf19_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_jf17_device(mconfig, NES_JF19_ADPCM, tag, owner, clock, true)
 {
 }
 
-nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock)
 	, m_samples(*this, "samples")
 	, m_irq_count(0)
@@ -107,27 +107,27 @@ nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, device_typ
 {
 }
 
-nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_ss88006_device(mconfig, NES_SS88006, tag, owner, clock)
 {
 }
 
-nes_jf23_device::nes_jf23_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jf23_device::nes_jf23_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_ss88006_device(mconfig, NES_JF23, tag, owner, clock)
 {
 }
 
-nes_jf24_device::nes_jf24_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jf24_device::nes_jf24_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_ss88006_device(mconfig, NES_JF24, tag, owner, clock)
 {
 }
 
-nes_jf29_device::nes_jf29_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jf29_device::nes_jf29_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_ss88006_device(mconfig, NES_JF29, tag, owner, clock)
 {
 }
 
-nes_jf33_device::nes_jf33_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_jf33_device::nes_jf33_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_ss88006_device(mconfig, NES_JF33, tag, owner, clock)
 {
 }

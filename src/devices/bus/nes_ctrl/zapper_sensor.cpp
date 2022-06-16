@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(NES_ZAPPER_SENSOR, nes_zapper_sensor_device, "nes_zapper_sens
 //  constructor
 //-------------------------------------------------
 
-nes_zapper_sensor_device::nes_zapper_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_zapper_sensor_device::nes_zapper_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_ZAPPER_SENSOR, tag, owner, clock)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 {

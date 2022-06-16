@@ -55,7 +55,7 @@ ioport_constructor tanbus_tugpgm_device::device_input_ports() const
 //  tanbus_tugpgm_device - constructor
 //-------------------------------------------------
 
-tanbus_tugpgm_device::tanbus_tugpgm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tanbus_tugpgm_device::tanbus_tugpgm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TANBUS_TUGPGM, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
 	, m_links(*this, "LINKS")

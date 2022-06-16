@@ -44,7 +44,7 @@ DEFINE_DEVICE_TYPE(COCO_WPKRS, coco_wpkrs_device, "coco_wpkrs", "CoCo WordPak RS
 //  coco_wpk_device - constructor
 //-------------------------------------------------
 
-coco_wpk_device::coco_wpk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+coco_wpk_device::coco_wpk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this )
 	, m_crtc(*this, "crtc")
@@ -54,17 +54,17 @@ coco_wpk_device::coco_wpk_device(const machine_config &mconfig, device_type type
 {
 }
 
-coco_wpk_device::coco_wpk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_wpk_device::coco_wpk_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: coco_wpk_device(mconfig, COCO_WPK, tag, owner, clock)
 {
 }
 
-coco_wpk2_device::coco_wpk2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_wpk2_device::coco_wpk2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: coco_wpk_device(mconfig, COCO_WPK2, tag, owner, clock)
 {
 }
 
-coco_wpkrs_device::coco_wpkrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_wpkrs_device::coco_wpkrs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: coco_wpk_device(mconfig, COCO_WPKRS, tag, owner, clock)
 {
 }

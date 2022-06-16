@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(YM2151, ym2151_device, "ym2151", "YM2151 OPM")
 //  ym2151_device - constructor
 //-------------------------------------------------
 
-ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ym2151>(mconfig, tag, owner, clock, YM2151),
 	m_reset_state(1)
 {
@@ -75,7 +75,7 @@ DEFINE_DEVICE_TYPE(YM2164, ym2164_device, "ym2164", "YM2164 OPP")
 //  ym2164_device - constructor
 //-------------------------------------------------
 
-ym2164_device::ym2164_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym2164_device::ym2164_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ym2164>(mconfig, tag, owner, clock, YM2164)
 {
 }

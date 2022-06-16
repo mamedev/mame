@@ -19,7 +19,7 @@ public:
 
 protected:
 	// construction/destruction
-	generic_ram_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t size);
+	generic_ram_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -40,7 +40,7 @@ public:
 
 protected:
 	// construction/destruction
-	generic_ram_linear_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t size);
+	generic_ram_linear_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -56,21 +56,21 @@ class generic_ram_32k_plain_device : public generic_ram_plain_device
 {
 public:
 	// construction/destruction
-	generic_ram_32k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_ram_32k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class generic_ram_64k_plain_device : public generic_ram_plain_device
 {
 public:
 	// construction/destruction
-	generic_ram_64k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_ram_64k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class generic_ram_128k_plain_device : public generic_ram_plain_device
 {
 public:
 	// construction/destruction
-	generic_ram_128k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_ram_128k_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -80,21 +80,21 @@ class generic_ram_32k_linear_device : public generic_ram_linear_device
 {
 public:
 	// construction/destruction
-	generic_ram_32k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_ram_32k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class generic_ram_64k_linear_device : public generic_ram_linear_device
 {
 public:
 	// construction/destruction
-	generic_ram_64k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_ram_64k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class generic_ram_128k_linear_device : public generic_ram_linear_device
 {
 public:
 	// construction/destruction
-	generic_ram_128k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_ram_128k_linear_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

@@ -15,7 +15,7 @@ class sega8_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	sega8_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void late_bank_setup() override;
 
@@ -25,7 +25,7 @@ public:
 	virtual void write_mapper(offs_t offset, uint8_t data) override;
 
 protected:
-	sega8_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sega8_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -45,7 +45,7 @@ class sega8_othello_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_othello_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_othello_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -60,7 +60,7 @@ class sega8_castle_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_castle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_castle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -75,7 +75,7 @@ class sega8_basic_l3_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_basic_l3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_basic_l3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -94,7 +94,7 @@ class sega8_music_editor_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_music_editor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_music_editor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -113,7 +113,7 @@ class sega8_terebi_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_terebi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_terebi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -141,7 +141,7 @@ class sega8_dahjee_typea_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_dahjee_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_dahjee_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -160,7 +160,7 @@ class sega8_dahjee_typeb_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_dahjee_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_dahjee_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -182,7 +182,7 @@ class sega8_eeprom_device : public device_t,
 {
 public:
 	// construction/destruction
-	sega8_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void late_bank_setup() override;
 
@@ -213,7 +213,7 @@ class sega8_codemasters_device : public device_t,
 {
 public:
 	// construction/destruction
-	sega8_codemasters_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_codemasters_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void late_bank_setup() override;
 
@@ -239,7 +239,7 @@ class sega8_4pak_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_4pak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_4pak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -262,7 +262,7 @@ class sega8_zemina_device : public device_t,
 {
 public:
 	// construction/destruction
-	sega8_zemina_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_zemina_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void late_bank_setup() override;
 
@@ -272,7 +272,7 @@ public:
 	// no mapper write for this!
 
 protected:
-	sega8_zemina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sega8_zemina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -290,7 +290,7 @@ class sega8_nemesis_device : public sega8_zemina_device
 {
 public:
 	// construction/destruction
-	sega8_nemesis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_nemesis_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void late_bank_setup() override;
 };
@@ -303,7 +303,7 @@ class sega8_janggun_device : public device_t,
 {
 public:
 	// construction/destruction
-	sega8_janggun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_janggun_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void late_bank_setup() override;
 
@@ -326,7 +326,7 @@ class sega8_hicom_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_hicom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_hicom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void late_bank_setup() override;
 
@@ -349,7 +349,7 @@ class sega8_korean_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_korean_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_korean_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void late_bank_setup() override;
 
@@ -365,7 +365,7 @@ class sega8_korean_188_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_korean_188_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega8_korean_188_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual u8 read_cart(offs_t offset) override;
@@ -387,7 +387,7 @@ class sega8_korean_nb_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_korean_nb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_korean_nb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual void write_mapper(offs_t offset, uint8_t data) override {}
@@ -400,7 +400,7 @@ class sega8_seojin_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_seojin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_seojin_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -425,7 +425,7 @@ class sega8_multicart_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_multicart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_multicart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -452,7 +452,7 @@ class sega8_megacart_device : public sega8_rom_device
 {
 public:
 	// construction/destruction
-	sega8_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -475,7 +475,7 @@ private:
 class sega8_x_terminator_device : public sega8_rom_device
 {
 public:
-	sega8_x_terminator_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_x_terminator_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 

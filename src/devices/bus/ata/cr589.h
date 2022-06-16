@@ -19,7 +19,7 @@ class matsushita_cr589_device : public atapi_cdrom_device,
 	public device_nvram_interface
 {
 public:
-	matsushita_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	matsushita_cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void ExecCommand() override;
 	virtual void WriteData( uint8_t *data, int dataLength ) override;

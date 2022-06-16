@@ -10,14 +10,14 @@ class naomi_m4_board : public naomi_board
 {
 public:
 	template <typename T, typename U>
-	naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&eeprom_tag, U &&keyregion_tag)
+	naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&eeprom_tag, U &&keyregion_tag)
 		: naomi_m4_board(mconfig, tag, owner, clock)
 	{
 		eeprom.set_tag(std::forward<T>(eeprom_tag));
 		m_key_data.set_tag(std::forward<U>(keyregion_tag));
 	}
 
-	naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void submap(address_map &map) override;
 

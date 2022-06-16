@@ -106,16 +106,16 @@ INPUT_PORTS_END
 
 void ncd88k_state::ncd19c(machine_config &config)
 {
-	MC88100(config, m_maincpu, 15'000'000);
+	MC88100(config, m_maincpu, XTAL::u(15'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ncd88k_state::code_map);
 	m_maincpu->set_addrmap(AS_DATA, &ncd88k_state::data_map);
 
-	SCN2681(config, "duart", 3'686'400);
+	SCN2681(config, "duart", XTAL::u(3'686'400));
 
-	BT458(config, m_ramdac, 0);
+	BT458(config, m_ramdac);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(125'000'000, 1680, 0, 1280, 1063, 0, 1024); // 74.4 kHz horizontal, 70 Hz vertical
+	m_screen->set_raw(XTAL::u(125'000'000), 1680, 0, 1280, 1063, 0, 1024); // 74.4 kHz horizontal, 70 Hz vertical
 	m_screen->set_screen_update(FUNC(ncd88k_state::screen_update));
 }
 
@@ -196,13 +196,13 @@ void ncdmcx_state::ncdmcx(machine_config &config)
 	// 4100004
 	AM79C90(config, m_lance, 20_MHz_XTAL);
 
-	SCN2681(config, m_duart, 3'686'400);
+	SCN2681(config, m_duart, XTAL::u(3'686'400));
 
 	// ATT20C497-11
-	BT477(config, m_ramdac, 125'000'000);
+	BT477(config, m_ramdac, XTAL::u(125'000'000));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(125'000'000, 1680, 0, 1280, 1063, 0, 1024); // 74.4 kHz horizontal, 70 Hz vertical
+	m_screen->set_raw(XTAL::u(125'000'000), 1680, 0, 1280, 1063, 0, 1024); // 74.4 kHz horizontal, 70 Hz vertical
 	m_screen->set_screen_update(FUNC(ncdmcx_state::screen_update));
 }
 

@@ -28,7 +28,7 @@ class p1_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	p1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	p1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t d14_r(offs_t offset);
 	uint8_t d16_r(offs_t offset);

@@ -19,7 +19,7 @@ class pasopia_rampac2_device : public device_t, public pac2_card_interface, publ
 {
 protected:
 	// construction/destruction
-	pasopia_rampac2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 ram_size);
+	pasopia_rampac2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 ram_size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -47,7 +47,7 @@ class pasopia_pa7243_device : public pasopia_rampac2_device
 {
 public:
 	// device type constructor
-	pasopia_pa7243_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pasopia_pa7243_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> pasopia_pa7245_device
@@ -56,7 +56,7 @@ class pasopia_pa7245_device : public pasopia_rampac2_device
 {
 public:
 	// device type constructor
-	pasopia_pa7245_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pasopia_pa7245_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> pasopia_pa7248_device
@@ -65,7 +65,7 @@ class pasopia_pa7248_device : public pasopia_rampac2_device
 {
 public:
 	// device type constructor
-	pasopia_pa7248_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pasopia_pa7248_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type declarations

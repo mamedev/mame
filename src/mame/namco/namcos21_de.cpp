@@ -58,7 +58,7 @@ class namco_de_pcbstack_device : public device_t
 {
 public:
 	// construction/destruction
-	namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void configure_c148_standard(machine_config &config);
 
@@ -128,7 +128,7 @@ private:
 DEFINE_DEVICE_TYPE(NAMCO_DE_PCB, namco_de_pcbstack_device, "namco_de_pcb", "Namco Driver's Eyes PCB stack")
 
 
-namco_de_pcbstack_device::namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+namco_de_pcbstack_device::namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NAMCO_DE_PCB, tag, owner, clock),
 	m_maincpu(*this, "maincpu"),
 	m_audiocpu(*this, "audiocpu"),
@@ -162,13 +162,13 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_slave, 49.152_MHz_XTAL / 4); /* Slave */
 	m_slave->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::driveyes_slave_map);
 
-	MC6809E(config, m_audiocpu, 3072000); /* Sound */
+	MC6809E(config, m_audiocpu, XTAL::u(3072000)); /* Sound */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(namco_de_pcbstack_device::irq0_line_hold), attotime::from_hz(2*60));
 
 	configure_c68_namcos21(config);
 
-	NAMCOS21_DSP(config, m_namcos21_dsp, 0);
+	NAMCOS21_DSP(config, m_namcos21_dsp);
 	m_namcos21_dsp->set_renderer_tag("namcos21_3d");
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); /* 100 CPU slices per frame */
@@ -176,7 +176,7 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
@@ -186,13 +186,13 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, 0x10000/2);
 
-	NAMCOS21_3D(config, m_namcos21_3d, 0);
+	NAMCOS21_3D(config, m_namcos21_3d);
 	m_namcos21_3d->set_fixed_palbase(0x3f00);
 	m_namcos21_3d->set_zz_shift_mult(10, 0x100);
 	m_namcos21_3d->set_depth_reverse(false);
 	m_namcos21_3d->set_framebuffer_size(496,480);
 
-	NAMCO_C355SPR(config, m_c355spr, 0);
+	NAMCO_C355SPR(config, m_c355spr);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_palette);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
@@ -318,7 +318,7 @@ void namco_de_pcbstack_device::c140_map(address_map &map)
 
 void namco_de_pcbstack_device::configure_c68_namcos21(machine_config &config)
 {
-	NAMCOC68(config, m_c68, 8000000);
+	NAMCOC68(config, m_c68, XTAL::u(8000000));
 	m_c68->in_pb_callback().set_ioport("MCUB");
 	m_c68->in_pc_callback().set_ioport("MCUC");
 	m_c68->in_ph_callback().set_ioport("MCUH");
@@ -495,11 +495,11 @@ private:
 // driveyes only
 void namcos21_de_state::driveyes(machine_config &config)
 {
-	NAMCO_DE_PCB(config, m_pcb[0], 0);
-	NAMCO_DE_PCB(config, m_pcb[1], 0);
-	NAMCO_DE_PCB(config, m_pcb[2], 0);
+	NAMCO_DE_PCB(config, m_pcb[0]);
+	NAMCO_DE_PCB(config, m_pcb[1]);
+	NAMCO_DE_PCB(config, m_pcb[2]);
 
-	NAMCOIO_GEARBOX(config, m_io_gearbox, 0);
+	NAMCOIO_GEARBOX(config, m_io_gearbox);
 }
 
 // stacks with the DSWs set to left or right screen will show 'receive error' because they want comms from the main screen

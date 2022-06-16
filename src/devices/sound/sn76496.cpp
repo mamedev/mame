@@ -173,52 +173,52 @@ sn76496_base_device::sn76496_base_device(
 {
 }
 
-sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sn76496_base_device(mconfig, SN76496, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
 {
 }
 
-y2404_device::y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+y2404_device::y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sn76496_base_device(mconfig, Y2404, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
 {
 }
 
-sn76489_device::sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sn76489_device::sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sn76496_base_device(mconfig, SN76489, tag, 0x4000, 0x01, 0x02, true, false, 8, false, true, owner, clock)
 {
 }
 
-sn76489a_device::sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sn76489a_device::sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sn76496_base_device(mconfig, SN76489A, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
 {
 }
 
-sn76494_device::sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sn76494_device::sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sn76496_base_device(mconfig, SN76494, tag, 0x10000, 0x04, 0x08, false, false, 1, false, true, owner, clock)
 {
 }
 
-sn94624_device::sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sn94624_device::sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sn76496_base_device(mconfig, SN94624, tag, 0x4000, 0x01, 0x02, true, false, 1, false, true, owner, clock)
 {
 }
 
-ncr8496_device::ncr8496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ncr8496_device::ncr8496_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sn76496_base_device(mconfig, NCR8496, tag, 0x8000, 0x02, 0x20, true, false, 8, true, true, owner, clock)
 {
 }
 
-pssj3_device::pssj3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pssj3_device::pssj3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sn76496_base_device(mconfig, PSSJ3, tag, 0x8000, 0x02, 0x20, false, false, 8, true, true, owner, clock)
 {
 }
 
-gamegear_device::gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gamegear_device::gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sn76496_base_device(mconfig, GAMEGEAR, tag, 0x8000, 0x01, 0x08, true, true, 8, false, false, owner, clock)
 {
 }
 
-segapsg_device::segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segapsg_device::segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sn76496_base_device(mconfig, SEGAPSG, tag, 0x8000, 0x01, 0x08, true, false, 8, false, false, owner, clock)
 {
 }

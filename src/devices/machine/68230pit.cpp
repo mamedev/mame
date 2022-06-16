@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(PIT68230, pit68230_device, "pit68230", "MC68230 PI/T")
 //-------------------------------------------------
 //  pit68230_device - constructors
 //-------------------------------------------------
-pit68230_device::pit68230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+pit68230_device::pit68230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_pa_out_cb(*this)
 	, m_pa_in_cb(*this)
@@ -87,7 +87,7 @@ pit68230_device::pit68230_device(const machine_config &mconfig, device_type type
 }
 
 
-pit68230_device::pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pit68230_device::pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pit68230_device (mconfig, PIT68230, tag, owner, clock, 0)
 {
 }

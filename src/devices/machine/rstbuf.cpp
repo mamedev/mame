@@ -71,7 +71,7 @@ DEFINE_DEVICE_TYPE(RST_NEG_BUFFER, rst_neg_buffer_device, "rst_neg_buffer", "RST
 //  rst_buffer_device - constructor
 //-------------------------------------------------
 
-rst_buffer_device::rst_buffer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+rst_buffer_device::rst_buffer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_int_cb(*this)
 	, m_input_buffer(0)
@@ -83,7 +83,7 @@ rst_buffer_device::rst_buffer_device(const machine_config &mconfig, device_type 
 //  rst_pos_buffer_device - constructor
 //-------------------------------------------------
 
-rst_pos_buffer_device::rst_pos_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rst_pos_buffer_device::rst_pos_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rst_buffer_device(mconfig, RST_POS_BUFFER, tag, owner, clock)
 {
 }
@@ -93,7 +93,7 @@ rst_pos_buffer_device::rst_pos_buffer_device(const machine_config &mconfig, cons
 //  rst_neg_buffer_device - constructor
 //-------------------------------------------------
 
-rst_neg_buffer_device::rst_neg_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rst_neg_buffer_device::rst_neg_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rst_buffer_device(mconfig, RST_NEG_BUFFER, tag, owner, clock)
 {
 }

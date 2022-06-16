@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(AMD_28F020, amd_28f020_device, "amd_28f020", "Am28F020 2 Mega
 
 ALLOW_SAVE_TYPE(base_28fxxx_device::state);
 
-base_28fxxx_device::base_28fxxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 size, u8 manufacturer_code, u8 device_code)
+base_28fxxx_device::base_28fxxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 size, u8 manufacturer_code, u8 device_code)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_region(*this, DEVICE_SELF)
@@ -62,17 +62,17 @@ base_28fxxx_device::base_28fxxx_device(const machine_config &mconfig, device_typ
 		throw emu_fatalerror("%s(%s): memory size must be an exact power of two", type.shortname(), tag);
 }
 
-intel_28f010_device::intel_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+intel_28f010_device::intel_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: base_28fxxx_device(mconfig, INTEL_28F010, tag, owner, clock, 0x20000, MFG_INTEL, 0xb4)
 {
 }
 
-amd_28f010_device::amd_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+amd_28f010_device::amd_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: base_28fxxx_device(mconfig, AMD_28F010, tag, owner, clock, 0x20000, MFG_AMD, 0xa7)
 {
 }
 
-amd_28f020_device::amd_28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+amd_28f020_device::amd_28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: base_28fxxx_device(mconfig, AMD_28F020, tag, owner, clock, 0x40000, MFG_AMD, 0x2a)
 {
 }

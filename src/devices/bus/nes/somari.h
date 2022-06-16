@@ -14,7 +14,7 @@ class nes_somari_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_l(offs_t offset, u8 data) override { write_m(offset + 0x100, data); }
 	virtual void write_m(offs_t offset, u8 data) override;
@@ -24,7 +24,7 @@ public:
 
 protected:
 	// construction/destruction
-	nes_somari_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mmc1_prg_shift);
+	nes_somari_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 mmc1_prg_shift);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -59,7 +59,7 @@ class nes_huang2_device : public nes_somari_device
 {
 public:
 	// construction/destruction
-	nes_huang2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_huang2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

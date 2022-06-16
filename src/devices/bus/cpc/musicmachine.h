@@ -21,7 +21,7 @@ class cpc_musicmachine_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_musicmachine_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cpc_musicmachine_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void dac_w(uint8_t data);
 	uint8_t acia_r(offs_t offset);

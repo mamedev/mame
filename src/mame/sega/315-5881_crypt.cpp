@@ -43,7 +43,7 @@ void sega_315_5881_crypt_device::iomap_le(address_map &map)
 	map(0x000e, 0x000f).r(FUNC(sega_315_5881_crypt_device::decrypt_le_r));
 }
 
-sega_315_5881_crypt_device::sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_315_5881_crypt_device::sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA315_5881_CRYPT, tag, owner, clock)
 	, m_read(*this)
 {

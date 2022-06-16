@@ -82,13 +82,13 @@ class sam6883_device : public device_t, public device_memory_interface, public s
 {
 public:
 	template <typename T>
-	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag)
 		: sam6883_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// CPU read/write handlers
 	uint8_t read(offs_t offset);

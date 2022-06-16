@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(TMS1025, tms1025_device, "tms1025", "TMS1025 I/O Expander")
 //  constructor
 //-------------------------------------------------
 
-tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_h(0), m_s(0), m_std(0), m_ms(0)
 	, m_read_port(*this)
@@ -29,12 +29,12 @@ tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-tms1024_device::tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tms1024_device::tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms1024_device(mconfig, TMS1024, tag, owner, clock)
 {
 }
 
-tms1025_device::tms1025_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tms1025_device::tms1025_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms1024_device(mconfig, TMS1025, tag, owner, clock)
 {
 }

@@ -288,7 +288,7 @@ void miragemj_state::machine_reset()
 void miragemj_state::mirage(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 28000000/2);
+	M68000(config, m_maincpu, XTAL::u(28000000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &miragemj_state::mirage_map);
 	m_maincpu->set_vblank_int("screen", FUNC(miragemj_state::irq6_line_hold));
 
@@ -308,7 +308,7 @@ void miragemj_state::mirage(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_mirage);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024);
 
-	DECO16IC(config, m_deco_tilegen, 0);
+	DECO16IC(config, m_deco_tilegen);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
@@ -321,7 +321,7 @@ void miragemj_state::mirage(machine_config &config)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0);
+	DECO_SPRITE(config, m_sprgen);
 	m_sprgen->set_gfx_region(2);
 	m_sprgen->set_pri_callback(FUNC(miragemj_state::pri_callback));
 	m_sprgen->set_gfxdecode_tag("gfxdecode");
@@ -329,9 +329,9 @@ void miragemj_state::mirage(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki_bgm, 2000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki_bgm, XTAL::u(2000000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30); // clock frequency & pin 7 not verified
 
-	OKIM6295(config, m_oki_sfx, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki_sfx, XTAL::u(1000000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70); // clock frequency & pin 7 not verified
 }
 
 

@@ -579,7 +579,7 @@ void kdt6_state::machine_start()
 	m_cpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(*this, FUNC(kdt6_state::page0_r)));
 	m_cpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8sm_delegate(*this, FUNC(kdt6_state::page1_r)));
 
-	m_fdc->set_rate(250000);
+	m_fdc->set_rate(XTAL::u(250000));
 
 	if (m_floppy[0]->get_device())
 		m_floppy[0]->get_device()->setup_led_cb(floppy_image_device::led_cb(&kdt6_state::drive0_led_cb, this));
@@ -644,7 +644,7 @@ void kdt6_state::psi98(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 1000); // frequency unknown
+	BEEP(config, m_beeper, XTAL::u(1000)); // frequency unknown
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
@@ -714,7 +714,7 @@ void kdt6_state::psi98(machine_config &config)
 
 	UPD1990A(config, m_rtc);
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), true, true);
 	m_fdc->intrq_wr_callback().set("ctc1", FUNC(z80ctc_device::trg0));
 	m_fdc->drq_wr_callback().set(FUNC(kdt6_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", kdt6_floppies, "fd55f", floppy_image_device::default_mfm_floppy_formats);

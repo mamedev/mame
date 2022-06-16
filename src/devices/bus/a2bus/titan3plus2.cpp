@@ -49,14 +49,14 @@ void a2bus_titan3plus2_device::device_add_mconfig(machine_config &config)
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
 }
 
-a2bus_titan3plus2_device::a2bus_titan3plus2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_titan3plus2_device::a2bus_titan3plus2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock), device_a2bus_card_interface(mconfig, *this),
 	m_gameio(*this, "gameio"),
 	m_inh_state(0), m_last_offset(0), m_dxxx_bank(0), m_main_bank(0), m_enabled(false)
 {
 }
 
-a2bus_titan3plus2_device::a2bus_titan3plus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_titan3plus2_device::a2bus_titan3plus2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_titan3plus2_device(mconfig, A2BUS_TITAN3PLUS2, tag, owner, clock)
 {
 }

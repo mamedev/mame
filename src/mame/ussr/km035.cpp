@@ -68,7 +68,7 @@ void km035_device::device_add_mconfig(machine_config &config)
 	m_maincpu->t1_in_cb().set([this] () { return m_rx; });
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_speaker, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_speaker, XTAL::u(3250)).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 const tiny_rom_entry *km035_device::device_rom_region() const
@@ -259,7 +259,7 @@ ioport_constructor km035_device::device_input_ports() const
 //  km035_device - constructor
 //-------------------------------------------------
 
-km035_device::km035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+km035_device::km035_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KM035, tag, owner, clock)
 	, m_maincpu(*this, KM035_CPU_TAG)
 	, m_speaker(*this, KM035_SPK_TAG)

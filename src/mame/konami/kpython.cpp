@@ -218,12 +218,12 @@ INPUT_PORTS_END
 
 void kpython_state::kpython(machine_config &config)
 {
-	R5000LE(config, m_maincpu, 294000000); // imported from namcops2.c driver
+	R5000LE(config, m_maincpu, XTAL::u(294000000)); // imported from namcops2.c driver
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kpython_state::ps2_map);
 
-	//H83664(config, m_io_mcu, 14000000); // from filter board
+	//H83664(config, m_io_mcu, XTAL::u(14000000)); // from filter board
 
 	//DS2430(config, m_ds2430);
 	M48T58(config, m_m48t58);

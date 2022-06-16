@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(HD61603, hd61603_device, "hd61603", "Hitachi HD61603 LCD Driv
 //  constructor
 //-------------------------------------------------
 
-hd61603_device::hd61603_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+hd61603_device::hd61603_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, HD61603, tag, owner, clock),
 	m_write_segs(*this)
 { }

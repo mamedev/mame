@@ -1557,7 +1557,7 @@ void spectar_state::sidetrac(machine_config &config)
 	m_samples->set_samples_names(sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.99);
 }
 
 
@@ -1613,13 +1613,13 @@ void exidy_state::venture(machine_config &config)
 	exidy_video_config(0x04, 0x04, false);
 
 	// audio hardware
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set("soundbd", FUNC(venture_sound_device::pb_w));
 	pia.writepb_handler().set("soundbd", FUNC(venture_sound_device::pa_w));
 	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
 	pia.cb2_handler().set("soundbd", FUNC(venture_sound_device::ca_w));
 
-	venture_sound_device &soundbd(EXIDY_VENTURE(config, "soundbd", 0));
+	venture_sound_device &soundbd(EXIDY_VENTURE(config, "soundbd"));
 	soundbd.pa_callback().set("pia", FUNC(pia6821_device::portb_w));
 	soundbd.pb_callback().set("pia", FUNC(pia6821_device::porta_w));
 	soundbd.ca2_callback().set("pia", FUNC(pia6821_device::cb1_w));
@@ -1652,13 +1652,13 @@ void exidy_state::mtrap(machine_config &config)
 	exidy_video_config(0x14, 0x00, false);
 
 	// audio hardware
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set("soundbd", FUNC(venture_sound_device::pb_w));
 	pia.writepb_handler().set("soundbd", FUNC(venture_sound_device::pa_w));
 	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
 	pia.cb2_handler().set("soundbd", FUNC(venture_sound_device::ca_w));
 
-	mtrap_sound_device &soundbd(EXIDY_MTRAP(config, "soundbd", 0));
+	mtrap_sound_device &soundbd(EXIDY_MTRAP(config, "soundbd"));
 	soundbd.pa_callback().set("pia", FUNC(pia6821_device::portb_w));
 	soundbd.pb_callback().set("pia", FUNC(pia6821_device::porta_w));
 	soundbd.ca2_callback().set("pia", FUNC(pia6821_device::cb1_w));

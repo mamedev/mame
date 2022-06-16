@@ -7,7 +7,7 @@
 #pragma once
 
 // todo, move these back, currently the sprite code needs some of the values tho
-#define NEOGEO_MASTER_CLOCK                     (24000000)
+#define NEOGEO_MASTER_CLOCK                     XTAL::u(24000000)
 #define NEOGEO_MAIN_CPU_CLOCK                   (NEOGEO_MASTER_CLOCK / 2)
 #define NEOGEO_AUDIO_CPU_CLOCK                  (NEOGEO_MASTER_CLOCK / 6)
 #define NEOGEO_YM2610_CLOCK                     (NEOGEO_MASTER_CLOCK / 3)
@@ -98,7 +98,7 @@ protected:
 class neosprite_regular_device : public neosprite_base_device
 {
 public:
-	neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void draw_pixel(int romaddr, uint32_t* dst, const pen_t *line_pens) override;
 	virtual void set_sprite_region(uint8_t* region_sprites, uint32_t region_sprites_size) override;
 
@@ -110,7 +110,7 @@ DECLARE_DEVICE_TYPE(NEOGEO_SPRITE_REGULAR, neosprite_regular_device)
 class neosprite_optimized_device : public neosprite_base_device
 {
 public:
-	neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void optimize_sprite_data() override;
 	virtual void set_optimized_sprite_data(uint8_t* sprdata, uint32_t mask) override;
 	virtual void draw_pixel(int romaddr, uint32_t* dst, const pen_t *line_pens) override;
@@ -127,7 +127,7 @@ DECLARE_DEVICE_TYPE(NEOGEO_SPRITE_OPTIMZIED, neosprite_optimized_device)
 class neosprite_midas_device : public neosprite_base_device
 {
 public:
-	neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void draw_pixel(int romaddr, uint32_t* dst, const pen_t *line_pens) override;
 

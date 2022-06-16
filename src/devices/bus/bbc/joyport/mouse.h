@@ -25,7 +25,7 @@ class bbcmc_mouse_device :
 {
 public:
 	// construction/destruction
-	bbcmc_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbcmc_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

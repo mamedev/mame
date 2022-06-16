@@ -469,13 +469,13 @@ void galpani3_state::galpani3(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x4000);
 
-	SKNS_SPRITE(config, m_spritegen, 0);
+	SKNS_SPRITE(config, m_spritegen);
 
-	KANEKO_GRAP2(config, m_grap2[0], 0).set_device_rom_tag("rlebg");
+	KANEKO_GRAP2(config, m_grap2[0]).set_device_rom_tag("rlebg");
 
-	KANEKO_GRAP2(config, m_grap2[1], 0).set_device_rom_tag("rlebg");
+	KANEKO_GRAP2(config, m_grap2[1]).set_device_rom_tag("rlebg");
 
-	KANEKO_GRAP2(config, m_grap2[2], 0).set_device_rom_tag("rlebg");
+	KANEKO_GRAP2(config, m_grap2[2]).set_device_rom_tag("rlebg");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

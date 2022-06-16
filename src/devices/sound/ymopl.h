@@ -19,7 +19,7 @@ class ym3526_device : public ymfm_device_base<ymfm::ym3526>
 {
 public:
 	// constructor
-	ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -33,7 +33,7 @@ class y8950_device : public ymfm_device_base<ymfm::y8950>, public device_rom_int
 
 public:
 	// constructor
-	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto io_read() { return io_read_handler(0); }
@@ -63,7 +63,7 @@ class ym3812_device : public ymfm_device_base<ymfm::ym3812>
 {
 public:
 	// constructor
-	ym3812_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym3812_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -75,7 +75,7 @@ class ymf262_device : public ymfm_device_base<ymfm::ymf262>
 {
 public:
 	// constructor
-	ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// additional register writes
 	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
@@ -93,7 +93,7 @@ class ymf278b_device : public ymfm_device_base<ymfm::ymf278b>, public device_rom
 
 public:
 	// constructor
-	ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// additional register reads
 	uint8_t data_pcm_r() { return update_streams().read_data_pcm(); }
@@ -128,7 +128,7 @@ class ym2413_device : public ymfm_device_base<ymfm::ym2413>
 
 public:
 	// constructor
-	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -150,7 +150,7 @@ class ym2423_device : public ymfm_device_base<ymfm::ym2423>
 
 public:
 	// constructor
-	ym2423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym2423_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -172,7 +172,7 @@ class ymf281_device : public ymfm_device_base<ymfm::ymf281>
 
 public:
 	// constructor
-	ymf281_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ymf281_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -194,7 +194,7 @@ class ds1001_device : public ymfm_device_base<ymfm::ds1001>
 
 public:
 	// constructor
-	ds1001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds1001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -9,7 +9,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(SEGA_GUNSENSE, sega_gunsense_board_device, "gunsense", "Sega 838-13143 Gun Sense Board")
 
-sega_gunsense_board_device::sega_gunsense_board_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sega_gunsense_board_device::sega_gunsense_board_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA_GUNSENSE, tag, owner, clock)
 {
 }
@@ -27,7 +27,7 @@ void sega_gunsense_board_device::mem_map(address_map &map)
 
 void sega_gunsense_board_device::device_add_mconfig(machine_config &config)
 {
-	upd78213_device &mcu(UPD78213(config, "gunmcu", 12'000'000)); // clock unknown
+	upd78213_device &mcu(UPD78213(config, "gunmcu", XTAL::u(12'000'000))); // clock unknown
 	mcu.set_addrmap(AS_PROGRAM, &sega_gunsense_board_device::mem_map);
 }
 

@@ -651,7 +651,7 @@ void xerox820_state::xerox820(machine_config &config)
 	dbrg.fr_handler().append(m_sio, FUNC(z80sio_device::txca_w));
 	dbrg.ft_handler().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 
-	XEROX_820_KEYBOARD(config, m_kb, 0);
+	XEROX_820_KEYBOARD(config, m_kb);
 	m_kb->kbstb_wr_callback().set(m_kbpio, FUNC(z80pio_device::strobe_b));
 
 	// software lists
@@ -664,7 +664,7 @@ void bigboard_state::bigboard(machine_config &config)
 	xerox820(config);
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* bigboard only */
+	BEEP(config, m_beeper, XTAL::u(950)).add_route(ALL_OUTPUTS, "mono", 1.00); /* bigboard only */
 	TIMER(config, m_beep_timer).configure_generic(FUNC(bigboard_state::beep_timer));
 }
 
@@ -742,11 +742,11 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 	dbrg.fr_handler().append(m_sio, FUNC(z80sio_device::txca_w));
 	dbrg.ft_handler().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 
-	XEROX_820_KEYBOARD(config, m_kb, 0);
+	XEROX_820_KEYBOARD(config, m_kb);
 	m_kb->kbstb_wr_callback().set(m_kbpio, FUNC(z80pio_device::strobe_b));
 
 	// SASI bus
-	SCSI_PORT(config, m_sasibus, 0);
+	SCSI_PORT(config, m_sasibus);
 	m_sasibus->set_data_input_buffer("sasi_data_in");
 	m_sasibus->bsy_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit0)).exor(1);
 	m_sasibus->msg_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit1)).exor(1);
@@ -768,7 +768,7 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 void xerox820ii_state::xerox168(machine_config &config)
 {
 	xerox820ii(config);
-	i8086_cpu_device &i8086(I8086(config, I8086_TAG, 4770000));
+	i8086_cpu_device &i8086(I8086(config, I8086_TAG, XTAL::u(4770000)));
 	i8086.set_addrmap(AS_PROGRAM, &xerox820ii_state::xerox168_mem);
 
 	/* internal ram */

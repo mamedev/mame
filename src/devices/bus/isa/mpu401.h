@@ -20,7 +20,7 @@ class isa8_mpu401_device :
 {
 public:
 	// construction/destruction
-	isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

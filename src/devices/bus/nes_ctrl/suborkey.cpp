@@ -161,7 +161,7 @@ ioport_constructor nes_suborkey_device::device_input_ports() const
 //  nes_suborkey_device - constructor
 //-------------------------------------------------
 
-nes_suborkey_device::nes_suborkey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_suborkey_device::nes_suborkey_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_SUBORKEYBOARD, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_kbd(*this, "SUBOR.%u", 0)

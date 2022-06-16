@@ -506,7 +506,7 @@ void stfight_state::stfight(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &stfight_state::decrypted_opcodes_map);
 	m_maincpu->set_vblank_int("stfight_vid:screen", FUNC(stfight_state::stfight_vb_interrupt));
 
-	STFIGHT_VIDEO(config, "stfight_vid", 0);
+	STFIGHT_VIDEO(config, "stfight_vid");
 }
 
 void stfight_state::cshooter(machine_config &config)
@@ -515,7 +515,7 @@ void stfight_state::cshooter(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stfight_state::cshooter_cpu1_map);
 	m_maincpu->set_vblank_int("airraid_vid:screen", FUNC(stfight_state::stfight_vb_interrupt));
 
-	AIRRAID_VIDEO(config, "airraid_vid", 0);
+	AIRRAID_VIDEO(config, "airraid_vid");
 }
 
 

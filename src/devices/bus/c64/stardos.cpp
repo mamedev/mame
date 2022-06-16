@@ -113,7 +113,7 @@ void c64_stardos_cartridge_device::charge_io2_capacitor()
 //  c64_stardos_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_stardos_cartridge_device::c64_stardos_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_stardos_cartridge_device::c64_stardos_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_STARDOS, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_io1_charge(0),

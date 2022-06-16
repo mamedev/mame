@@ -25,10 +25,10 @@ class a2eaux_ext80col_device:
 {
 public:
 	// construction/destruction
-	a2eaux_ext80col_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2eaux_ext80col_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2eaux_ext80col_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2eaux_ext80col_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

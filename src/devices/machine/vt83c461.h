@@ -18,7 +18,7 @@
 class vt83c461_device : public ide_controller_32_device
 {
 public:
-	vt83c461_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	vt83c461_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T> vt83c461_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
 	{

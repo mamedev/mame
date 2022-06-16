@@ -21,7 +21,7 @@ INPUT_PORTS_EXTERN( generic_terminal );
 class generic_terminal_device : public device_t
 {
 public:
-	generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename... T>
 	void set_keyboard_callback(T &&... args)
@@ -34,7 +34,7 @@ public:
 	void kbd_put(u8 data);
 
 protected:
-	generic_terminal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned w, unsigned h);
+	generic_terminal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, unsigned w, unsigned h);
 
 	virtual void term_write(uint8_t data);
 	virtual void device_start() override;

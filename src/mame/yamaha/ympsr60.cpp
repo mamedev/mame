@@ -660,7 +660,7 @@ void psr60_state::psr_common(machine_config &config)
 	MIXER(config, m_bbd_mixer);
 	m_bbd_mixer->add_route(0, m_postbbd_rc, 1.0);
 
-	MN3204P(config, m_bbd, 50000);
+	MN3204P(config, m_bbd, XTAL::u(50000));
 	m_bbd->set_cv_handler(FUNC(psr60_state::cv_handler));
 	m_bbd->add_route(0, m_bbd_mixer, 0.5);
 	m_bbd->add_route(1, m_bbd_mixer, 0.5);

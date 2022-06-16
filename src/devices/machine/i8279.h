@@ -39,7 +39,7 @@ class i8279_device :  public device_t
 {
 public:
 	// construction/destruction
-	i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_irq_callback() { return m_out_irq_cb.bind(); }
 	auto out_sl_callback() { return m_out_sl_cb.bind(); }

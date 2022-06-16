@@ -75,7 +75,7 @@ protected:
 		u8       filtcount  = 0;         // filter count
 	};
 
-	es550x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	es550x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -159,7 +159,7 @@ protected:
 class es5506_device : public es550x_device
 {
 public:
-	es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~es5506_device() {}
 
 	u8 read(offs_t offset);
@@ -217,7 +217,7 @@ DECLARE_DEVICE_TYPE(ES5506, es5506_device)
 class es5505_device : public es550x_device
 {
 public:
-	es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u16 read(offs_t offset);
 	void write(offs_t offset, u16 data, u16 mem_mask = ~0);

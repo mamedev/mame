@@ -140,7 +140,7 @@ const tiny_rom_entry *a2bus_sider1card_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_sider_device::a2bus_sider_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_sider_device::a2bus_sider_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_sasibus(*this, "sasibus"),
@@ -151,12 +151,12 @@ a2bus_sider_device::a2bus_sider_device(const machine_config &mconfig, device_typ
 {
 }
 
-a2bus_sider2card_device::a2bus_sider2card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_sider2card_device::a2bus_sider2card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_sider_device(mconfig, A2BUS_SIDER2, tag, owner, clock)
 {
 }
 
-a2bus_sider1card_device::a2bus_sider1card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_sider1card_device::a2bus_sider1card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_sider_device(mconfig, A2BUS_SIDER1, tag, owner, clock)
 {
 }

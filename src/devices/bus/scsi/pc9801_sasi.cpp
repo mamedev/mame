@@ -7,7 +7,7 @@
 
 DEFINE_DEVICE_TYPE(PC9801_SASI, pc9801_sasi_device, "pc9801_sasi", "PC9801 SASI Controller")
 
-pc9801_sasi_device::pc9801_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc9801_sasi_device::pc9801_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scsihd_device(mconfig, PC9801_SASI, tag, owner, clock)
 {
 }

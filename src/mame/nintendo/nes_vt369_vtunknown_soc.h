@@ -18,7 +18,7 @@
 class nes_vt369_soc_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt369_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt369_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
@@ -58,7 +58,7 @@ private:
 class nes_vtunknown_soc_bt_device : public nes_vt09_soc_device
 {
 public:
-	nes_vtunknown_soc_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vtunknown_soc_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
@@ -71,10 +71,10 @@ protected:
 class nes_vt369_alt_soc_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt369_alt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt369_alt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 protected:
-	nes_vt369_alt_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt369_alt_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -88,7 +88,7 @@ protected:
 class nes_vt369_alt_swap_d5_d6_soc_device : public nes_vt369_alt_soc_device
 {
 public:
-	nes_vt369_alt_swap_d5_d6_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt369_alt_swap_d5_d6_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -101,10 +101,10 @@ private:
 class nes_vtunknown_soc_dg_device : public nes_vt09_soc_device
 {
 public:
-	nes_vtunknown_soc_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vtunknown_soc_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 protected:
-	nes_vtunknown_soc_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	nes_vtunknown_soc_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -116,7 +116,7 @@ protected:
 class nes_vtunknown_soc_fa_device : public nes_vtunknown_soc_dg_device
 {
 public:
-	nes_vtunknown_soc_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vtunknown_soc_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 protected:
 

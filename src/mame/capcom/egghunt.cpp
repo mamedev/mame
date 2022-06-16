@@ -432,12 +432,12 @@ void egghunt_state::machine_reset()
 void egghunt_state::egghunt(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 12000000/2);      /* 6 MHz ?*/
+	Z80(config, m_maincpu, XTAL::u(12000000)/2);      /* 6 MHz ?*/
 	m_maincpu->set_addrmap(AS_PROGRAM, &egghunt_state::egghunt_map);
 	m_maincpu->set_addrmap(AS_IO, &egghunt_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(egghunt_state::irq0_line_hold)); // or 2 like mitchell.cpp?
 
-	Z80(config, m_audiocpu, 12000000/2);         /* 6 MHz ?*/
+	Z80(config, m_audiocpu, XTAL::u(12000000)/2);         /* 6 MHz ?*/
 	m_audiocpu->set_addrmap(AS_PROGRAM, &egghunt_state::sound_map);
 
 
@@ -459,7 +459,7 @@ void egghunt_state::egghunt(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 ROM_START( egghunt )

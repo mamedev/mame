@@ -36,7 +36,7 @@ public:
 		double gain;
 	};
 
-	filter_biquad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	filter_biquad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// set up the filter with the specified filter parameters and return a pointer to the new device
 	filter_biquad_device& setup(biquad_type type, double fc, double q, double gain);

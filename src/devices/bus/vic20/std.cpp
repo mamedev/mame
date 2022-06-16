@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(VIC20_STD, vic20_standard_cartridge_device, "vic20_standard",
 //  vic20_standard_cartridge_device - constructor
 //-------------------------------------------------
 
-vic20_standard_cartridge_device::vic20_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vic20_standard_cartridge_device::vic20_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VIC20_STD, tag, owner, clock), device_vic20_expansion_card_interface(mconfig, *this)
 {
 }

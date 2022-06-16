@@ -355,7 +355,7 @@ void hk68v10_state::hk68v10(machine_config &config)
 	rs232trm.rxd_handler().set(m_sccterm, FUNC(scc8530_device::rxa_w));
 	rs232trm.cts_handler().set(m_sccterm, FUNC(scc8530_device::ctsa_w));
 
-	VME(config, "vme", 0);
+	VME(config, "vme");
 	VME_SLOT(config, "slot1", hk68_vme_cards, nullptr, 1, "vme");
 }
 

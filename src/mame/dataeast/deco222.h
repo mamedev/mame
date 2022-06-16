@@ -10,7 +10,7 @@
 
 class deco_222_device : public m6502_device {
 public:
-	deco_222_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	deco_222_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	class mi_decrypt : public mi_default {
@@ -38,7 +38,7 @@ protected:
 
 class deco_c10707_device : public m6502_device {
 public:
-	deco_c10707_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	deco_c10707_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	class mi_decrypt : public mi_default {

@@ -75,7 +75,7 @@ void gfamily_state::machine_reset()
 void gfamily_state::gfamily(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM4(config, m_maincpu, 1'700'000'000); // Actually an Intel Celeron SL6SC 1.7GHz (with the config found with the default BIOS)
+	PENTIUM4(config, m_maincpu, XTAL::u(1'700'000'000)); // Actually an Intel Celeron SL6SC 1.7GHz (with the config found with the default BIOS)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gfamily_state::gfamily_map);
 
 	// Video hardware

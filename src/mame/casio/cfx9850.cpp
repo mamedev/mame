@@ -285,7 +285,7 @@ u32 cfx9850_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void cfx9850_state::cfx9850(machine_config &config)
 {
-	HCD62121(config, m_maincpu, 4300000); /* X1 - 4.3 MHz */
+	HCD62121(config, m_maincpu, XTAL::u(4300000)); /* X1 - 4.3 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cfx9850_state::cfx9850_mem);
 	m_maincpu->kol_cb().set(FUNC(cfx9850_state::kol_w));
 	m_maincpu->koh_cb().set(FUNC(cfx9850_state::koh_w));

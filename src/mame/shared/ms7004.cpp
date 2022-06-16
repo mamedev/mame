@@ -72,7 +72,7 @@ void ms7004_device::device_add_mconfig(machine_config &config)
 	m_i8243->p7_out_cb().set(FUNC(ms7004_device::i8243_port_w<3>));
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_speaker, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_speaker, XTAL::u(3250)).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 const tiny_rom_entry *ms7004_device::device_rom_region() const
@@ -350,7 +350,7 @@ ioport_constructor ms7004_device::device_input_ports() const
 //  ms7004_device - constructor
 //-------------------------------------------------
 
-ms7004_device::ms7004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ms7004_device::ms7004_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MS7004, tag, owner, clock)
 	, m_maincpu(*this, MS7004_CPU_TAG)
 	, m_speaker(*this, MS7004_SPK_TAG)

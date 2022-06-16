@@ -268,7 +268,7 @@ void gradius3_state::gradius3(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(gradius3_state::gradius3_sub_scanline), "screen", 0, 1);
 	/* 4 is triggered by cpu A, the others are unknown but required for the game to run. */
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, XTAL::u(3579545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gradius3_state::gradius3_s_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -286,13 +286,13 @@ void gradius3_state::gradius3(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 2048).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(gradius3_state::tile_callback));
 	m_k052109->set_char_ram(true);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(gradius3_state::sprite_callback));
@@ -304,9 +304,9 @@ void gradius3_state::gradius3(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(0, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL::u(3579545)).add_route(0, "lspeaker", 1.0).add_route(0, "rspeaker", 1.0);
 
-	K007232(config, m_k007232, 3579545);
+	K007232(config, m_k007232, XTAL::u(3579545));
 	m_k007232->port_write().set(FUNC(gradius3_state::volume_callback));
 	m_k007232->add_route(0, "lspeaker", 0.20);
 	m_k007232->add_route(0, "rspeaker", 0.20);

@@ -39,27 +39,27 @@ DEFINE_DEVICE_TYPE(NES_DPCMCART, nes_dpcmcart_device, "nes_dpcmcart", "NES Cart 
 DEFINE_DEVICE_TYPE(NES_UNROM512, nes_unrom512_device, "nes_unrom512", "NES Cart Sealie UNROM 512 PCB")
 
 
-nes_cufrom_device::nes_cufrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_cufrom_device::nes_cufrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_CUFROM, tag, owner, clock)
 {
 }
 
-nes_dpcmcart_device::nes_dpcmcart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_dpcmcart_device::nes_dpcmcart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_DPCMCART, tag, owner, clock)
 {
 }
 
-nes_unrom512_device::nes_unrom512_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nes_unrom512_device::nes_unrom512_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_unrom512_device::nes_unrom512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_unrom512_device::nes_unrom512_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_unrom512_device(mconfig, NES_UNROM512, tag, owner, clock)
 {
 }
 
-nes_8bitxmas_device::nes_8bitxmas_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_8bitxmas_device::nes_8bitxmas_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_unrom512_device(mconfig, NES_8BITXMAS, tag, owner, clock), m_led(0)
 {
 }

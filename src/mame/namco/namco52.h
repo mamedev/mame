@@ -9,7 +9,7 @@
 class namco_52xx_device : public device_t
 {
 public:
-	namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_discrete(T &&tag) { m_discrete.set_tag(std::forward<T>(tag)); }
 	void set_basenote(int node) { m_basenode = node; }

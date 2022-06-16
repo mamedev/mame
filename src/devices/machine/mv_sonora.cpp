@@ -20,7 +20,7 @@ const mac_video_sonora_device::modeline mac_video_sonora_device::modelines[5] = 
 	{ 0x0b, "640x480 VGA",           25175000,  800, 16, 96,  48,  525, 10, 2, 33, false },
 };
 
-mac_video_sonora_device::mac_video_sonora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mac_video_sonora_device::mac_video_sonora_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MAC_VIDEO_SONORA, tag, owner, clock),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
@@ -57,7 +57,7 @@ void mac_video_sonora_device::device_add_mconfig(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
-	m_screen->set_raw(31334400, 896, 0, 640, 525, 0, 480);
+	m_screen->set_raw(XTAL::u(31334400), 896, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(mac_video_sonora_device::screen_update));
 	m_screen->screen_vblank().set([this](int state) { m_screen_vblank(state && (m_modeline_id != -1)); });
 

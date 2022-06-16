@@ -34,7 +34,7 @@
 DEFINE_DEVICE_TYPE(PIC17C43, pic17c43_device, "pic17c43", "Microchip PIC17C43")
 DEFINE_DEVICE_TYPE(PIC17C44, pic17c44_device, "pic17c44", "Microchip PIC17C44")
 
-pic17c4x_device::pic17c4x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 rom_size, address_map_constructor data_map)
+pic17c4x_device::pic17c4x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u16 rom_size, address_map_constructor data_map)
 	: pic17_cpu_device(mconfig, type, tag, owner, clock, rom_size, data_map)
 	, m_port_out_cb(*this)
 	, m_rain(0x3f)
@@ -56,17 +56,17 @@ pic17c4x_device::pic17c4x_device(const machine_config &mconfig, device_type type
 {
 }
 
-pic17c43_device::pic17c43_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 rom_size)
+pic17c43_device::pic17c43_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u16 rom_size)
 	: pic17c4x_device(mconfig, type, tag, owner, clock, rom_size, address_map_constructor(FUNC(pic17c43_device::data_map), this))
 {
 }
 
-pic17c43_device::pic17c43_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pic17c43_device::pic17c43_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic17c43_device(mconfig, PIC17C43, tag, owner, clock, 0x1000)
 {
 }
 
-pic17c44_device::pic17c44_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pic17c44_device::pic17c44_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic17c43_device(mconfig, PIC17C44, tag, owner, clock, 0x2000)
 {
 }

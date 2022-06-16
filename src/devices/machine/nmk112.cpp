@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(NMK112, nmk112_device, "nmk112", "NMK112")
 
-nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NMK112, tag, owner, clock)
 	, m_page_mask(0xff)
 	, m_rom0(*this, finder_base::DUMMY_TAG)

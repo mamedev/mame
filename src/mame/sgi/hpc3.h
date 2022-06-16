@@ -31,11 +31,11 @@ public:
 		AS_PIO9
 	};
 
-	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T>
 	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&hal2_tag)
-		: hpc3_device(mconfig, tag, owner, (uint32_t)0)
+		: hpc3_device(mconfig, tag, owner)
 	{
 		set_hal2_tag(std::forward<T>(hal2_tag));
 	}

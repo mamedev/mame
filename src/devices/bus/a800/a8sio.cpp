@@ -51,7 +51,7 @@ DEFINE_DEVICE_TYPE(A8SIO, a8sio_device, "a8sio", "Atari 8 bit SIO Slot")
 //  a8sio_device - constructor
 //-------------------------------------------------
 
-a8sio_device::a8sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a8sio_device::a8sio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, A8SIO, tag, owner, clock)
 	, device_single_card_slot_interface<device_a8sio_card_interface>(mconfig, *this)
 	, m_out_clock_in_cb(*this)

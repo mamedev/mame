@@ -141,7 +141,7 @@ protected:
 	typedef void (mcs48_cpu_device::*mcs48_ophandler)();
 
 	// construction/destruction
-	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_ophandler *opcode_table);
+	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_ophandler *opcode_table);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -516,7 +516,7 @@ public:
 	auto p0_out_cb() { return bus_out_cb(); }
 
 	// construction/destruction
-	i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_execute_interface overrides
@@ -528,7 +528,7 @@ class i8022_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_execute_interface overrides
@@ -540,84 +540,84 @@ class i8035_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8048_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8648_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8748_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8039_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8049_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8749_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8040_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8050_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mb8884_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class n7751_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class m58715_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -630,7 +630,7 @@ public:
 
 protected:
 	// construction/destruction
-	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size);
+	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int rom_size, int ram_size);
 
 	TIMER_CALLBACK_MEMBER( master_callback );
 };
@@ -639,56 +639,56 @@ class i8041a_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8041a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8041a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8741a_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8741a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8741a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8041ah_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8041ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8041ah_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8741ah_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8741ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8741ah_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8042_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8742_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8042ah_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8042ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8042ah_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i8742ah_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8742ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8742ah_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

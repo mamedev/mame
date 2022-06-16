@@ -10,7 +10,7 @@
 
 DEFINE_DEVICE_TYPE(GAMATE_PROT, gamate_protection_device, "gamate_prot", "Gamate Protection Mapper")
 
-gamate_protection_device::gamate_protection_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gamate_protection_device::gamate_protection_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, GAMATE_PROT, tag, owner, clock),
 	m_is_protection_passed(0),
 	m_has_failed(0),

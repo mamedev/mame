@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(DIAG264_SERIAL_LOOPBACK, diag264_serial_loopback_device, "dia
 //  diag264_serial_loopback_device - constructor
 //-------------------------------------------------
 
-diag264_serial_loopback_device::diag264_serial_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+diag264_serial_loopback_device::diag264_serial_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DIAG264_SERIAL_LOOPBACK, tag, owner, clock)
 	, device_cbm_iec_interface(mconfig, *this)
 {

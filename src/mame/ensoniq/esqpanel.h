@@ -34,7 +34,7 @@ public:
 
 protected:
 	// construction/destruction
-	esqpanel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	esqpanel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -77,7 +77,7 @@ private:
 
 class esqpanel1x22_device : public esqpanel_device {
 public:
-	esqpanel1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	esqpanel1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -89,7 +89,7 @@ protected:
 
 class esqpanel2x40_device : public esqpanel_device {
 public:
-	esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -101,7 +101,7 @@ protected:
 
 class esqpanel2x40_vfx_device : public esqpanel_device {
 public:
-	esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -117,7 +117,7 @@ protected:
 
 class esqpanel2x40_sq1_device : public esqpanel_device {
 public:
-	esqpanel2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	esqpanel2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -130,7 +130,7 @@ protected:
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
 class esqpanel2x16_sq1_device : public esqpanel_device {
 public:
-	esqpanel2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	esqpanel2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -2549,10 +2549,10 @@ INPUT_PORTS_END
 void nbmj8688_state::NBMJDRV_4096(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5000000);   /* 5.00 MHz */
+	Z80(config, m_maincpu, XTAL::u(5000000));   /* 5.00 MHz */
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8688_state::irq0_line_hold));
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
@@ -2571,12 +2571,12 @@ void nbmj8688_state::NBMJDRV_4096(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	ay8910_device &psg(AY8910(config, "psg", 1250000));
+	ay8910_device &psg(AY8910(config, "psg", XTAL::u(1250000)));
 	psg.port_a_read_callback().set(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));     // DIPSW-A read
 	psg.port_b_read_callback().set(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));     // DIPSW-B read
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 }
 
 void nbmj8688_state::NBMJDRV_256(machine_config &config)
@@ -2704,12 +2704,12 @@ void nbmj8688_state::mbmj_p16bit(machine_config &config)
 void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5000000);   /* 5.00 MHz */
+	Z80(config, m_maincpu, XTAL::u(5000000));   /* 5.00 MHz */
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8688_state::irq0_line_hold));
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::p16bit_LCD_io_map);
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
@@ -2755,12 +2755,12 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	ay8910_device &psg(AY8910(config, "psg", 1250000));
+	ay8910_device &psg(AY8910(config, "psg", XTAL::u(1250000)));
 	psg.port_a_read_callback().set(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));     // DIPSW-A read
 	psg.port_b_read_callback().set(m_nb1413m3, FUNC(nb1413m3_device::dipsw2_r));     // DIPSW-B read
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 }
 
 void nbmj8688_state::bijokkoy(machine_config &config)

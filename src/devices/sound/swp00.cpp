@@ -8,7 +8,7 @@
 
 DEFINE_DEVICE_TYPE(SWP00, swp00_device, "swp00", "Yamaha SWP00 (TC170C120SF / XQ036A00) sound chip")
 
-swp00_device::swp00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+swp00_device::swp00_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SWP00, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  device_rom_interface(mconfig, *this)

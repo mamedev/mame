@@ -34,7 +34,7 @@ enum {
 DEFINE_DEVICE_TYPE(I860, i860_cpu_device, "i860xr", "Intel i860XR")
 
 
-i860_cpu_device::i860_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i860_cpu_device::i860_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, I860, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 32, 0)
 	, m_pc(0), m_merge(0), m_pin_bus_hold(0), m_pin_reset(0), m_exiting_readmem(0), m_exiting_ifetch(0), m_pc_updated(0), m_pending_trap(0), m_fir_gets_trap_addr(0), m_single_stepping(0), m_program(nullptr), m_icount(0)

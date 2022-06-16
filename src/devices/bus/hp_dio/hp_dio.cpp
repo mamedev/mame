@@ -34,12 +34,12 @@ namespace bus::hp_dio {
 //  LIVE DEVICE
 //**************************************************************************
 
-dio16_slot_device::dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dio16_slot_device::dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dio16_slot_device(mconfig, DIO16_SLOT, tag, owner, clock)
 {
 }
 
-dio16_slot_device::dio16_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dio16_slot_device::dio16_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_dio(*this, finder_base::DUMMY_TAG)
@@ -74,7 +74,7 @@ void dio16_slot_device::device_start()
 //-------------------------------------------------
 //  dio32_slot_device - constructor
 //-------------------------------------------------
-dio32_slot_device::dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dio32_slot_device::dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dio16_slot_device(mconfig, DIO32_SLOT, tag, owner, clock)
 {
 }
@@ -96,12 +96,12 @@ void dio32_slot_device::device_start()
 //  dio16_device - constructor
 //-------------------------------------------------
 
-dio16_device::dio16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dio16_device::dio16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dio16_device(mconfig, DIO16, tag, owner, clock)
 {
 }
 
-dio16_device::dio16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dio16_device::dio16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_prgspace(*this, finder_base::DUMMY_TAG, -1),
 	m_bus_index{0},
@@ -321,7 +321,7 @@ void device_dio16_card_interface::interface_pre_start()
 //  DIO32 DEVICE
 //**************************************************************************
 
-dio32_device::dio32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dio32_device::dio32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dio16_device(mconfig, DIO32, tag, owner, clock)
 {
 }

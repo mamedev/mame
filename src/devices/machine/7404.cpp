@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(TTL7404, ttl7404_device, "7404", "5/7404 Hex Inverters")
 
-ttl7404_device::ttl7404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ttl7404_device::ttl7404_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TTL7404, tag, owner, clock)
 	, m_y_func(*this)
 	, m_a(0)

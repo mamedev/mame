@@ -228,7 +228,7 @@ namespace {
  *
  *************************************/
 
-#define SYSTEM_CLOCK            50000000
+#define SYSTEM_CLOCK            XTAL::u(50000000)
 
 #define PCI_ID_GALILEO  "pci:00.0"
 #define PCI_ID_VIDEO    "pci:08.0"
@@ -2018,7 +2018,7 @@ void seattle_state::seattle_common(machine_config &config)
 	m_maincpu->set_system_clock(SYSTEM_CLOCK);
 
 	// PCI Bus Devices
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 
 	GT64010(config, m_galileo, SYSTEM_CLOCK, m_maincpu, GALILEO_IRQ_NUM);
 	m_galileo->set_map(0, address_map_constructor(&seattle_state::seattle_cs0_map, "seattle_cs0_map", this), this);
@@ -2033,7 +2033,7 @@ void seattle_state::seattle_common(machine_config &config)
 	ide.subdevice<bus_master_ide_controller_device>("ide")->slot(0).set_option_machine_config("hdd", hdd_config);
 
 	// video hardware
-	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
+	VOODOO_1_PCI(config, m_voodoo, m_maincpu, m_screen);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
 	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -2087,7 +2087,7 @@ void seattle_state::seattle150_widget(machine_config &config)
 
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::widget_cs3_map, "widget_cs3_map", this), this);
 
-	SMC91C94(config, m_ethernet, 0);
+	SMC91C94(config, m_ethernet);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 }
 
@@ -2105,7 +2105,7 @@ void seattle_state::seattle200_widget(machine_config &config)
 
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::widget_cs3_map, "widget_cs3_map", this), this);
 
-	SMC91C94(config, m_ethernet, 0);
+	SMC91C94(config, m_ethernet);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 }
 
@@ -2115,7 +2115,7 @@ void seattle_state::flagstaff(machine_config &config)
 
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::flagstaff_cs3_map, "flagstaff_cs3_map", this), this);
 
-	SMC91C94(config, m_ethernet, 0);
+	SMC91C94(config, m_ethernet);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 
 	m_voodoo->set_fbmem(2);
@@ -2128,11 +2128,11 @@ void seattle_state::flagstaff(machine_config &config)
 void seattle_state::wg3dh(machine_config &config)
 {
 	phoenix(config);
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs"));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x3839);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_upper(310); // no alternates
 	m_ioasic->set_yearoffs(80);
@@ -2142,11 +2142,11 @@ void seattle_state::wg3dh(machine_config &config)
 void seattle_state::mace(machine_config &config)
 {
 	seattle150(config);
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs"));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x3839);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
 	m_ioasic->set_upper(319); // or 314
 	m_ioasic->set_yearoffs(80);
@@ -2163,7 +2163,7 @@ void seattle_state::sfrush(machine_config &config)
 	SPEAKER(config, "rrspeaker").headrest_right();
 	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
 
-	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
+	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage"));
 	cage.set_speedup(0x5236);
 	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
@@ -2172,7 +2172,7 @@ void seattle_state::sfrush(machine_config &config)
 	cage.add_route(2, "flspeaker", 1.0); // Foward Left
 	cage.add_route(3, "rrspeaker", 1.0); // Back Right
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_upper(315); // no alternates
 	m_ioasic->set_yearoffs(100);
@@ -2190,7 +2190,7 @@ void seattle_state::sfrushrk(machine_config &config)
 	SPEAKER(config, "rrspeaker").headrest_right();
 	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
 
-	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
+	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage"));
 	cage.set_speedup(0x5329);
 	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
@@ -2200,7 +2200,7 @@ void seattle_state::sfrushrk(machine_config &config)
 	cage.add_route(3, "rrspeaker", 1.0); // Back Right
 
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
 	m_ioasic->set_upper(331); // no alternates
 	m_ioasic->set_yearoffs(100);
@@ -2217,11 +2217,11 @@ void seattle_state::sfrushrkw(machine_config &config)
 void seattle_state::calspeed(machine_config &config)
 {
 	seattle150_widget(config);
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs"));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x39c0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CALSPEED);
 	m_ioasic->set_upper(328); // 328 = 27"; may or may not have a 31" ID
 	m_ioasic->set_yearoffs(100);
@@ -2232,11 +2232,11 @@ void seattle_state::calspeed(machine_config &config)
 void seattle_state::vaportrx(machine_config &config)
 {
 	seattle200_widget(config);
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs"));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x39c2);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_VAPORTRX);
 	m_ioasic->set_upper(324); // or 334
 	m_ioasic->set_yearoffs(100);
@@ -2246,11 +2246,11 @@ void seattle_state::vaportrx(machine_config &config)
 void seattle_state::biofreak(machine_config &config)
 {
 	seattle150(config);
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs"));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x3835);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_upper(231); // no alternates
 	m_ioasic->set_yearoffs(80);
@@ -2260,11 +2260,11 @@ void seattle_state::biofreak(machine_config &config)
 void seattle_state::blitz(machine_config &config)
 {
 	seattle150(config);
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs"));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x39c2);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
 	m_ioasic->set_upper(444); // or 528
 	m_ioasic->set_yearoffs(80);
@@ -2275,11 +2275,11 @@ void seattle_state::blitz(machine_config &config)
 void seattle_state::blitz99(machine_config &config)
 {
 	seattle150(config);
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs"));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0afb);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
 	m_ioasic->set_upper(481); // or 484 or 520
 	m_ioasic->set_yearoffs(80);
@@ -2290,11 +2290,11 @@ void seattle_state::blitz99(machine_config &config)
 void seattle_state::blitz2k(machine_config &config)
 {
 	seattle150(config);
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs"));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0b5d);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
 	m_ioasic->set_upper(494); // or 498
 	m_ioasic->set_yearoffs(80);
@@ -2307,11 +2307,11 @@ void seattle_state::carnevil(machine_config &config)
 	seattle150(config);
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::carnevil_cs3_map, "carnevil_cs3_map", this), this);
 
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs"));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0af7);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CARNEVIL);
 	m_ioasic->set_upper(469); // 469 = 25"; 486 = 39";
 	m_ioasic->set_yearoffs(80);
@@ -2321,11 +2321,11 @@ void seattle_state::carnevil(machine_config &config)
 void seattle_state::hyprdriv(machine_config &config)
 {
 	seattle200_widget(config);
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs"));
 	dcs.set_dram_in_mb(2);
 	dcs.set_polling_offset(0x0af7);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_HYPRDRIV);
 	m_ioasic->set_upper(471); // 471 = 25"; 479 = 31"
 	m_ioasic->set_yearoffs(80);

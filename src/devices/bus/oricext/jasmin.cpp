@@ -37,7 +37,7 @@ void oric_jasmin_device::map(address_map &map)
 	map(0x3f8, 0x3ff).w(m_fdlatch, FUNC(ls259_device::write_d0));
 }
 
-oric_jasmin_device::oric_jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+oric_jasmin_device::oric_jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ORIC_JASMIN, tag, owner, clock),
 	device_oricext_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),

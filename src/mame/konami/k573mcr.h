@@ -17,13 +17,13 @@ class k573mcr_device : public jvs_device
 {
 public:
 	template <typename T>
-	k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag)
-		: k573mcr_device(mconfig, tag, owner, clock)
+	k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&jvs_host_tag)
+		: k573mcr_device(mconfig, tag, owner)
 	{
 		host.set_tag(std::forward<T>(jvs_host_tag));
 	}
 
-	k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual ioport_constructor device_input_ports() const override;
 

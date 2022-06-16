@@ -764,16 +764,16 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_elan_eu3a05_fake);
 
-	ELAN_EU3A05_GPIO(config, m_gpio, 0);
+	ELAN_EU3A05_GPIO(config, m_gpio);
 	m_gpio->read_0_callback().set_ioport("IN0");
 	m_gpio->read_1_callback().set_ioport("IN1");
 	m_gpio->read_2_callback().set_ioport("IN2");
 
-	ELAN_EU3A05_SYS(config, m_sys, 0);
+	ELAN_EU3A05_SYS(config, m_sys);
 	m_sys->set_cpu("maincpu");
 	m_sys->set_addrbank("bank");
 
-	ELAN_EU3A05_VID(config, m_vid, 0);
+	ELAN_EU3A05_VID(config, m_vid);
 	m_vid->set_cpu("maincpu");
 	m_vid->set_addrbank("bank");
 	m_vid->set_palette("palette");
@@ -782,7 +782,7 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ELAN_EU3A05_SOUND(config, m_sound, 8000);
+	ELAN_EU3A05_SOUND(config, m_sound, XTAL::u(8000));
 	m_sound->space_read_callback().set(FUNC(elan_eu3a05_state::read_full_space));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 	/* just causes select sound to loop in Tetris for now!

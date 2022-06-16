@@ -21,7 +21,7 @@ class mephisto_display2_device : public device_t
 {
 public:
 	// construction/destruction
-	mephisto_display2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	mephisto_display2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	hd44780_device *get() { return m_lcd; }
 

@@ -30,7 +30,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(ICS2115, ics2115_device, "ics2115", "ICS2115 WaveFront Synthesizer")
 
-ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ICS2115, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)

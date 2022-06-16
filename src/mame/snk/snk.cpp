@@ -4033,15 +4033,15 @@ GFXDECODE_END
 void snk_state::marvins(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3360000);   /* 3.36 MHz */
+	Z80(config, m_maincpu, XTAL::u(3360000));   /* 3.36 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::marvins_cpuA_map);
 	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 3360000);    /* 3.36 MHz */
+	Z80(config, m_subcpu, XTAL::u(3360000));    /* 3.36 MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::marvins_cpuB_map);
 	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);  /* verified on schematics */
+	Z80(config, m_audiocpu, XTAL::u(4000000));  /* verified on schematics */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::marvins_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &snk_state::marvins_sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(snk_state::nmi_line_assert), attotime::from_hz(244));  // schematics show a separate 244Hz timer
@@ -4069,9 +4069,9 @@ void snk_state::marvins(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
-	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* verified on schematics */
-	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);/* verified on schematics */
-	SNKWAVE(config, "wave", 8000000).add_route(ALL_OUTPUTS, "mono", 0.30);   /* verified on schematics */
+	AY8910(config, "ay1", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 0.35);  /* verified on schematics */
+	AY8910(config, "ay2", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 0.35);/* verified on schematics */
+	SNKWAVE(config, "wave", XTAL::u(8000000)).add_route(ALL_OUTPUTS, "mono", 0.30);   /* verified on schematics */
 }
 
 void snk_state::vangrd2(machine_config &config)
@@ -4095,15 +4095,15 @@ void snk_state::madcrush(machine_config &config)
 void snk_state::jcross(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3350000); /* NOT verified */
+	Z80(config, m_maincpu, XTAL::u(3350000)); /* NOT verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::jcross_cpuA_map);
 	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 3350000);  /* NOT verified */
+	Z80(config, m_subcpu, XTAL::u(3350000));  /* NOT verified */
 	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::jcross_cpuB_map);
 	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 4000000); /* NOT verified */
+	Z80(config, m_audiocpu, XTAL::u(4000000)); /* NOT verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::jcross_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &snk_state::jcross_sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(snk_state::irq0_line_assert), attotime::from_hz(244)); // Marvin's frequency, sounds ok
@@ -4130,8 +4130,8 @@ void snk_state::jcross(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* NOT verified */
-	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* NOT verified */
+	AY8910(config, "ay1", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 0.35);  /* NOT verified */
+	AY8910(config, "ay2", XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 0.35);  /* NOT verified */
 }
 
 void snk_state::sgladiat(machine_config &config)
@@ -4401,15 +4401,15 @@ void snk_state::choppera(machine_config &config)
 void snk_state::tdfever(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::tdfever_cpuA_map);
 	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 4000000);
+	Z80(config, m_subcpu, XTAL::u(4000000));
 	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::tdfever_cpuB_map);
 	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL::u(4000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -4432,11 +4432,11 @@ void snk_state::tdfever(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym3526_device &ym1(YM3526(config, "ym1", 4000000));
+	ym3526_device &ym1(YM3526(config, "ym1", XTAL::u(4000000)));
 	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
 	ym1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	y8950_device &ym2(Y8950(config, "ym2", 4000000));
+	y8950_device &ym2(Y8950(config, "ym2", XTAL::u(4000000)));
 	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }

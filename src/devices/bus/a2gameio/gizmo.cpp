@@ -19,7 +19,7 @@ class apple2_gizmo_device : public device_t, public device_a2gameio_interface
 {
 public:
 	// construction/destruction
-	apple2_gizmo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	apple2_gizmo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -55,7 +55,7 @@ INPUT_PORTS_END
 //  DEVICE IMPLEMENTATION
 //**************************************************************************
 
-apple2_gizmo_device::apple2_gizmo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+apple2_gizmo_device::apple2_gizmo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, APPLE2_GIZMO, tag, owner, clock)
 	, device_a2gameio_interface(mconfig, *this)
 	, m_player1(*this, "joystick_p1")

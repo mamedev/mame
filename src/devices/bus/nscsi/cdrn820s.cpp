@@ -12,14 +12,14 @@
 
 DEFINE_DEVICE_TYPE(CDRN820S, cdrn820s_device, "cdrn820s", "Caravelle CDR-N820s")
 
-cdrn820s_device::cdrn820s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+cdrn820s_device::cdrn820s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, "scsic")
 	, m_h8(*this, "h8")
 {
 }
 
-cdrn820s_device::cdrn820s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cdrn820s_device::cdrn820s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cdrn820s_device(mconfig, CDRN820S, tag, owner, clock)
 {
 }
@@ -35,11 +35,11 @@ void cdrn820s_device::mem_map(address_map &map)
 
 void cdrn820s_device::device_add_mconfig(machine_config &config)
 {
-	H83048(config, m_h8, 8'000'000); // type and clock unknown
+	H83048(config, m_h8, XTAL::u(8'000'000)); // type and clock unknown
 	m_h8->set_addrmap(AS_PROGRAM, &cdrn820s_device::mem_map);
 	m_h8->set_mode_a20();
 
-	WD33C93A(config, "scsic", 10'000'000); // type and clock unknown
+	WD33C93A(config, "scsic", XTAL::u(10'000'000)); // type and clock unknown
 }
 
 ROM_START(cdrn820s)

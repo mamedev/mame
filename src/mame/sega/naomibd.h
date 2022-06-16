@@ -28,7 +28,7 @@ public:
 	uint16_t default_r(offs_t offset);
 
 protected:
-	naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

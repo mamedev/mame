@@ -14,14 +14,14 @@ class nes_tc0190fmc_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_tc0190fmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_tc0190fmc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
 protected:
-	nes_tc0190fmc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_tc0190fmc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -31,7 +31,7 @@ class nes_tc0190fmc_pal16r4_device : public nes_tc0190fmc_device
 {
 public:
 	// construction/destruction
-	nes_tc0190fmc_pal16r4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_tc0190fmc_pal16r4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
@@ -54,7 +54,7 @@ class nes_x1_005_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_x1_005_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_x1_005_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_m(offs_t offset) override;
 	virtual void write_m(offs_t offset, u8 data) override;
@@ -78,7 +78,7 @@ class nes_x1_017_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_x1_017_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_x1_017_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_ex(offs_t offset) override { return 0; } // no open bus
 	virtual u8 read_l(offs_t offset) override { return 0; } // no open bus

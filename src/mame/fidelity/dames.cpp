@@ -224,7 +224,7 @@ void dsc_state::dsc(machine_config &config)
 	Z80(config, m_maincpu, 3.9_MHz_XTAL); // 3.9MHz resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &dsc_state::main_map);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 523)); // from 555 timer (22nF, 120K, 2.7K)
+	auto &irq_clock(CLOCK(config, "irq_clock", XTAL::u(523))); // from 555 timer (22nF, 120K, 2.7K)
 	irq_clock.set_pulse_width(attotime::from_usec(41)); // active for 41us
 	irq_clock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 

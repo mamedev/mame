@@ -66,7 +66,7 @@ public:
 	virtual int clock_state_r();
 
 protected:
-	cvsd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool active_clock_edge, uint8_t shiftreg_mask);
+	cvsd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool active_clock_edge, uint8_t shiftreg_mask);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -108,7 +108,7 @@ protected:
 class hc55516_device : public cvsd_device_base
 {
 public:
-	hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// /FZ (partial reset) pull callback, ok to leave unconnected (we assume it is pulled high)
 	auto fzq_cb() { return m_fzq_pull_cb.bind(); }
@@ -124,7 +124,7 @@ public:
 
 protected:
 	// overridable type for subclass
-	hc55516_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t sylmask, int32_t sylshift, int32_t syladd, int32_t intshift);
+	hc55516_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t sylmask, int32_t sylshift, int32_t syladd, int32_t intshift);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -157,7 +157,7 @@ protected:
 class hc55532_device : public hc55516_device
 {
 public:
-	hc55532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hc55532_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	// device-level overrides
 	virtual void device_reset() override;
@@ -167,14 +167,14 @@ protected:
 class mc3417_device : public cvsd_device_base
 {
 public:
-	mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// override for clock_w
 	//virtual void clock_w(int state) override;
 
 protected:
 	// overridable type for subclass
-	mc3417_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t shiftreg_mask);
+	mc3417_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint8_t shiftreg_mask);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -200,7 +200,7 @@ protected:
 class mc3418_device : public mc3417_device
 {
 public:
-	mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

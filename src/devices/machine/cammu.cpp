@@ -96,7 +96,7 @@ DEFINE_DEVICE_TYPE(CAMMU_C4T, cammu_c4t_device, "c4t", "C4E/C4T CAMMU")
 DEFINE_DEVICE_TYPE(CAMMU_C4I, cammu_c4i_device, "c4i", "C4I CAMMU")
 DEFINE_DEVICE_TYPE(CAMMU_C3,  cammu_c3_device,  "c3",  "C1/C3 CAMMU")
 
-cammu_c4t_device::cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cammu_c4t_device::cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cammu_c4_device(mconfig, CAMMU_C4T, tag, owner, clock)
 	, m_ram_line(0)
 	, m_htlb_offset(0)
@@ -113,7 +113,7 @@ cammu_c4t_device::cammu_c4t_device(const machine_config &mconfig, const char *ta
 {
 }
 
-cammu_c4i_device::cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cammu_c4i_device::cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cammu_c4_device(mconfig, CAMMU_C4I, tag, owner, clock)
 	, m_reset(0)
 	, m_clr_s_data_tlb(0)
@@ -125,7 +125,7 @@ cammu_c4i_device::cammu_c4i_device(const machine_config &mconfig, const char *ta
 {
 }
 
-cammu_c4_device::cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+cammu_c4_device::cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cammu_device(mconfig, type, tag, owner, clock)
 	, m_s_pdo(0)
 	, m_u_pdo(0)
@@ -140,7 +140,7 @@ cammu_c4_device::cammu_c4_device(const machine_config &mconfig, device_type type
 {
 }
 
-cammu_c3_device::cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cammu_c3_device::cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cammu_device(mconfig, CAMMU_C3, tag, owner, clock)
 	, m_linked{ this }
 	, m_s_pdo(0)
@@ -150,7 +150,7 @@ cammu_c3_device::cammu_c3_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-cammu_device::cammu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+cammu_device::cammu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_exception_func(*this)
 {

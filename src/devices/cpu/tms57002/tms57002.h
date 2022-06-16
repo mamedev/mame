@@ -15,7 +15,7 @@
 class tms57002_device : public cpu_device, public device_sound_interface
 {
 public:
-	tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto dready_callback() { return m_dready_callback.bind(); }
 	auto pc0_callback() { return m_pc0_callback.bind(); }

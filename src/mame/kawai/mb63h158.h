@@ -21,7 +21,7 @@ class mb63h158_device : public device_t
 {
 public:
 	// device type constructor
-	mb63h158_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mb63h158_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// CPU read handler
 	u8 read(offs_t offset);

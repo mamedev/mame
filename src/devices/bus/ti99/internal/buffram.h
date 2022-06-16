@@ -20,7 +20,7 @@ namespace bus::ti99::internal {
 class buffered_ram_device : public device_t, public device_nvram_interface
 {
 public:
-	buffered_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	buffered_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	buffered_ram_device &set_size(int size) { m_size = size; return *this; }
 
 	// read/write

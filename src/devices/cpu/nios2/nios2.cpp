@@ -15,7 +15,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(NIOS2, nios2_device, "nios2", "Altera Nios II Processor")
 
-nios2_device::nios2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nios2_device::nios2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, NIOS2, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 {

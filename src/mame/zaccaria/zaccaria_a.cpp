@@ -235,7 +235,7 @@ void zac1b111xx_melody_base::device_add_mconfig(machine_config &config)
 	clock_device &timebase(CLOCK(config, "timebase", XTAL(3'579'545)/4096/2)); // CPU clock divided using 4040 and half of 74LS74
 	timebase.signal_handler().set(m_melodypia, FUNC(pia6821_device::cb1_w));
 
-	PIA6821(config, m_melodypia, 0);
+	PIA6821(config, m_melodypia);
 	m_melodypia->readpa_handler().set(FUNC(zac1b111xx_melody_base::melodypia_porta_r));
 	m_melodypia->writepa_handler().set(FUNC(zac1b111xx_melody_base::melodypia_porta_w));
 	m_melodypia->writepb_handler().set(FUNC(zac1b111xx_melody_base::melodypia_portb_w));
@@ -264,7 +264,7 @@ void zac1b111xx_melody_base::device_reset()
 //  1B11107-SPECIFIC IMPLEMENTATION
 //**************************************************************************
 
-zac1b11107_audio_device::zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+zac1b11107_audio_device::zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: zac1b111xx_melody_base(mconfig, ZACCARIA_1B11107, tag, owner, clock)
 {
 }
@@ -326,7 +326,7 @@ void zac1b11107_audio_device::device_add_mconfig(machine_config &config)
 //  1B11142-SPECIFIC IMPLEMENTATION
 //**************************************************************************
 
-zac1b11142_audio_device::zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+zac1b11142_audio_device::zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: zac1b111xx_melody_base(mconfig, ZACCARIA_1B11142, tag, owner, clock)
 	, m_acs_cb(*this)
 	, m_audiocpu(*this, "audiocpu")
@@ -430,22 +430,22 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	M6802(config, m_audiocpu, XTAL(3'579'545)); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zac1b11142_audio_device::zac1b11142_audio_map);
 
-	PIA6821(config, m_pia_1i, 0);
+	PIA6821(config, m_pia_1i);
 	m_pia_1i->readpa_handler().set(m_speech, FUNC(tms5220_device::status_r));
 	m_pia_1i->writepa_handler().set(m_speech, FUNC(tms5220_device::data_w));
 	m_pia_1i->writepb_handler().set(FUNC(zac1b11142_audio_device::pia_1i_portb_w));
 
-	//MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.30, AUTO_ALLOC_INPUT, 0); // mc1408.1f
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "sound_nl", 1.0, 7); // mc1408.1f
+	//MC1408(config, "dac").add_route(ALL_OUTPUTS, *this, 0.30, AUTO_ALLOC_INPUT, 0); // mc1408.1f
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, "sound_nl", 1.0, 7); // mc1408.1f
 
 	// There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF)
 	// 162kHz measured on pin 3 20 minutes after power on, clock would then be 162.3*4=649.2kHz
-	TMS5200(config, m_speech, 649200); // ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that)
+	TMS5200(config, m_speech, XTAL::u(649200)); // ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that)
 	m_speech->irq_cb().set(m_pia_1i, FUNC(pia6821_device::cb1_w));
 	m_speech->ready_cb().set(m_pia_1i, FUNC(pia6821_device::ca2_w));
 	m_speech->add_route(0, "sound_nl", 1.0, 6);
 
-	NETLIST_SOUND(config, "sound_nl", 48000)
+	NETLIST_SOUND(config, "sound_nl", XTAL::u(48000))
 		.set_source(netlist_zac1b11142)
 		.add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 

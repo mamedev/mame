@@ -835,12 +835,12 @@ void galastrm_state::galastrm(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	adc0809_device &adc(ADC0809(config, "adc", 500'000)); // unknown clock
+	adc0809_device &adc(ADC0809(config, "adc", XTAL::u(500'000))); // unknown clock
 	adc.eoc_ff_callback().set_inputline("maincpu", 6);
 	adc.in_callback<0>().set_ioport("STICKX");
 	adc.in_callback<1>().set_ioport("STICKY");
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_2_callback().set_ioport("IN0");
 	tc0510nio.read_3_callback().set_ioport("IN1");
 	tc0510nio.write_3_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
@@ -860,21 +860,21 @@ void galastrm_state::galastrm(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_galastrm);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(-48, -56);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_tc0110pcr);
 	m_tc0480scp->set_offsets(-40, -3);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "lspeaker", 1.0);
 	taito_en.add_route(1, "rspeaker", 1.0);
 }

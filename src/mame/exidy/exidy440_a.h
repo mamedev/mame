@@ -13,7 +13,7 @@
 class exidy440_sound_device : public device_t, public device_sound_interface
 {
 public:
-	exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~exidy440_sound_device() {}
 
 	void exidy440_sound_command(uint8_t param);

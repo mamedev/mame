@@ -39,11 +39,7 @@ class vgmviz_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	vgmviz_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: vgmviz_device(mconfig, tag, owner, 0)
-	{
-	}
-	vgmviz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	vgmviz_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~vgmviz_device();
 
 	void cycle_viz_mode();

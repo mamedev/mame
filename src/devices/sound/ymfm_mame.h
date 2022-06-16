@@ -30,7 +30,7 @@ class ym_generic_device : public device_t, public device_sound_interface, public
 {
 public:
 	// constructor
-	ym_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
+	ym_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, device_type type) :
 		device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_timer{ nullptr, nullptr },
@@ -177,7 +177,7 @@ protected:
 
 public:
 	// constructor
-	ymfm_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
+	ymfm_device_base(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, device_type type) :
 		ym_generic_device(mconfig, tag, owner, clock, type),
 		m_stream(nullptr),
 		m_chip(*this)
@@ -201,7 +201,7 @@ protected:
 		ym_generic_device::device_start();
 
 		// allocate our stream
-		m_stream = device_sound_interface::stream_alloc(0, OUTPUTS, m_chip.sample_rate(device_t::clock()));
+		m_stream = device_sound_interface::stream_alloc(0, OUTPUTS, XTAL::u(m_chip.sample_rate(device_t::clock().value())));
 
 		// compute the size of the save buffer by doing an initial save
 		ymfm::ymfm_saved_state state(m_save_blob, true);
@@ -221,7 +221,7 @@ protected:
 	virtual void device_clock_changed() override
 	{
 		if (m_stream != nullptr)
-			m_stream->set_sample_rate(m_chip.sample_rate(device_t::clock()));
+			m_stream->set_sample_rate(XTAL::u(m_chip.sample_rate(device_t::clock().value())));
 	}
 
 	// handle pre-saving by filling the blob
@@ -303,7 +303,7 @@ class ymfm_ssg_device_base : public ymfm_device_base<ChipClass>
 
 public:
 	// constructor
-	ymfm_ssg_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
+	ymfm_ssg_device_base(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, device_type type) :
 		ymfm_device_base<ChipClass>(mconfig, tag, owner, clock, type)
 	{
 	}

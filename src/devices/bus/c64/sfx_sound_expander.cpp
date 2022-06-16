@@ -173,7 +173,7 @@ inline offs_t c64_sfx_sound_expander_cartridge_device::get_offset(offs_t offset,
 //  c64_sfx_sound_expander_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_sfx_sound_expander_cartridge_device::c64_sfx_sound_expander_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_sfx_sound_expander_cartridge_device::c64_sfx_sound_expander_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_SFX_SOUND_EXPANDER, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_opl(*this, YM3526_TAG),

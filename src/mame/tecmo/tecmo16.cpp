@@ -688,9 +688,9 @@ void tecmo16_state::base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo16);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 4096);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen);
 
-	TECMO_MIXER(config, m_mixer, 0);
+	TECMO_MIXER(config, m_mixer);
 	m_mixer->set_mixer_shifts(10, 9, 4);
 	m_mixer->set_blendcols(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 );
 	m_mixer->set_regularcols( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );

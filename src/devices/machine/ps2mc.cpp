@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(SONYPS2_MC, ps2_mc_device, "ps2mc", "PlayStation 2 Memory Car
 /*static*/ const size_t ps2_mc_device::BUFFER_SIZE = 512; // Total guess
 /*static*/ const uint8_t ps2_mc_device::DEFAULT_TERMINATOR = 0x55;
 
-ps2_mc_device::ps2_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ps2_mc_device::ps2_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYPS2_MC, tag, owner, clock)
 {
 }

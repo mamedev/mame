@@ -10,7 +10,7 @@
 DEFINE_DEVICE_TYPE(NG_PVC_PROT, pvc_prot_device, "ng_pvc_prot", "Neo Geo PVC Protection")
 
 
-pvc_prot_device::pvc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pvc_prot_device::pvc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NG_PVC_PROT, tag, owner, clock)
 {
 }

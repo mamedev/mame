@@ -19,7 +19,7 @@
 class tmp68301_device : public m68000_device
 {
 public:
-	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto in_parallel_callback() { return m_in_parallel_cb.bind(); }
 	auto out_parallel_callback() { return m_out_parallel_cb.bind(); }

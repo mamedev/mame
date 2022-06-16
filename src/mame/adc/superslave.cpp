@@ -369,7 +369,7 @@ void superslave_state::superslave(machine_config &config)
 	m_maincpu->set_daisy_config(superslave_daisy_chain);
 
 	// devices
-	am9519_device &am9519(AM9519(config, AM9519_TAG, 0));
+	am9519_device &am9519(AM9519(config, AM9519_TAG));
 	am9519.out_int_callback().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
 
 	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, XTAL(8'000'000)/2));

@@ -196,7 +196,7 @@ device_dmvslot_interface::~device_dmvslot_interface()
 //-------------------------------------------------
 //  dmvcart_slot_device - constructor
 //-------------------------------------------------
-dmvcart_slot_device::dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dmvcart_slot_device::dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, DMVCART_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_dmvslot_interface>(mconfig, *this),
 	m_prog_read_cb(*this),

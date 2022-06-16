@@ -26,10 +26,10 @@ class kc_d004_device :
 {
 public:
 	// construction/destruction
-	kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	kc_d004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	kc_d004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -89,7 +89,7 @@ class kc_d004_gide_device :
 {
 public:
 	// construction/destruction
-	kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

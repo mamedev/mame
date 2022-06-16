@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(SVISION_SND, svision_sound_device, "svision_sound", "Super Vi
 //  svision_sound_device - constructor
 //-------------------------------------------------
 
-svision_sound_device::svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+svision_sound_device::svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SVISION_SND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_irq_cb(*this)

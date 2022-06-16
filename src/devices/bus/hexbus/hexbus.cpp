@@ -168,7 +168,7 @@ device_hexbus_interface::device_hexbus_interface(const machine_config &mconfig, 
 }
 
 
-hexbus_device::hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+hexbus_device::hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, HEXBUS, tag, owner, clock),
 	device_single_card_slot_interface<device_hexbus_interface>(mconfig, *this),
 	m_next_dev(nullptr),
@@ -221,7 +221,7 @@ uint8_t hexbus_device::read(int dir)
 
 // ------------------------------------------------------------------------
 
-hexbus_chained_device::hexbus_chained_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
+hexbus_chained_device::hexbus_chained_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock):
 	device_t(mconfig, type, tag, owner, clock),
 	device_hexbus_interface(mconfig, *this),
 	m_hexbus_outbound(nullptr),

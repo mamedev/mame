@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(CD90_015, cd90_015_device, "cd90_015", "Thomson CD90-015 floppy drive selectler")
 
-cd90_015_device::cd90_015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cd90_015_device::cd90_015_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CD90_015, tag, owner, clock),
 	thomson_extension_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),

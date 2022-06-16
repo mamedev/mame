@@ -161,7 +161,7 @@ void mx2178_state::mx2178(machine_config &config)
 	acia_clock.signal_handler().append("acia2", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia2", FUNC(acia6850_device::write_rxc));
 
-	acia6850_device &acia1(ACIA6850(config, "acia1", 0));
+	acia6850_device &acia1(ACIA6850(config, "acia1"));
 	acia1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	acia1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
 	acia1.irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -170,7 +170,7 @@ void mx2178_state::mx2178(machine_config &config)
 	rs232a.rxd_handler().set("acia1", FUNC(acia6850_device::write_rxd));
 	rs232a.cts_handler().set("acia1", FUNC(acia6850_device::write_cts));
 
-	acia6850_device &acia2(ACIA6850(config, "acia2", 0));
+	acia6850_device &acia2(ACIA6850(config, "acia2"));
 	acia2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	acia2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
 	acia2.irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

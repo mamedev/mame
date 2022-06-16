@@ -196,7 +196,7 @@ public:
 	bool memory_translate(const u32 ssw, const int spacenum, const int intention, offs_t &address);
 
 protected:
-	cammu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cammu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -293,7 +293,7 @@ public:
 	void fault_data_2_hi_w(u32 data) { m_fault_data_2_hi = data; }
 
 protected:
-	cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cammu_c4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 
@@ -318,7 +318,7 @@ protected:
 class cammu_c4t_device : public cammu_c4_device
 {
 public:
-	cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cammu_c4t_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 
@@ -408,7 +408,7 @@ private:
 class cammu_c4i_device : public cammu_c4_device
 {
 public:
-	cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cammu_c4i_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 
@@ -505,7 +505,7 @@ private:
 class cammu_c3_device : public cammu_device
 {
 public:
-	cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cammu_c3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void add_linked(cammu_c3_device *child) { m_linked.push_back(child); }
 

@@ -30,7 +30,7 @@ class cms_4080term_device :
 {
 public:
 	// construction/destruction
-	cms_4080term_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cms_4080term_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(update_scanline);
 

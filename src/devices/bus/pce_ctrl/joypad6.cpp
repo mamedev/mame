@@ -131,7 +131,7 @@ ioport_constructor pce_arcade_pad_6_device::device_input_ports() const
 //  pce_joypad6_base_device - constructor
 //-------------------------------------------------
 
-pce_joypad6_base_device::pce_joypad6_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+pce_joypad6_base_device::pce_joypad6_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_pce_control_port_interface(mconfig, *this),
 	m_muxer(*this, "mux_%u", 0U),
@@ -146,7 +146,7 @@ pce_joypad6_base_device::pce_joypad6_base_device(const machine_config &mconfig, 
 //  pce_avenue_pad_6_device - constructor
 //-------------------------------------------------
 
-pce_avenue_pad_6_device::pce_avenue_pad_6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+pce_avenue_pad_6_device::pce_avenue_pad_6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	pce_joypad6_base_device(mconfig, type, tag, owner, clock),
 	m_buttons_io(*this, "BUTTONS_%u", 0U),
 	m_turbo_io(*this, "TURBO")
@@ -154,7 +154,7 @@ pce_avenue_pad_6_device::pce_avenue_pad_6_device(const machine_config &mconfig, 
 }
 
 
-pce_avenue_pad_6_device::pce_avenue_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+pce_avenue_pad_6_device::pce_avenue_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pce_avenue_pad_6_device(mconfig, PCE_AVENUE_PAD_6, tag, owner, clock)
 {
 }
@@ -164,7 +164,7 @@ pce_avenue_pad_6_device::pce_avenue_pad_6_device(const machine_config &mconfig, 
 //  pce_arcade_pad_6_device - constructor
 //-------------------------------------------------
 
-pce_arcade_pad_6_device::pce_arcade_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+pce_arcade_pad_6_device::pce_arcade_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pce_avenue_pad_6_device(mconfig, PCE_ARCADE_PAD_6, tag, owner, clock)
 {
 }

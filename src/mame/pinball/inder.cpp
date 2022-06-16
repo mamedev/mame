@@ -1495,16 +1495,16 @@ void inder_state::inder(machine_config &config)
 	ppi.in_pc_callback().set(FUNC(inder_state::ppic_r));
 	ppi.out_pc_callback().set(FUNC(inder_state::ppic_w));
 
-	TTL7474(config, m_7a, 0);
+	TTL7474(config, m_7a);
 	m_7a->comp_output_cb().set(FUNC(inder_state::qc7a_w));
 
-	TTL7474(config, m_9a, 0); // HCT74
+	TTL7474(config, m_9a); // HCT74
 	m_9a->output_cb().set(FUNC(inder_state::q9a_w));
 
-	TTL7474(config, m_9b, 0); // HCT74
+	TTL7474(config, m_9b); // HCT74
 	m_9b->comp_output_cb().set(FUNC(inder_state::qc9b_w));
 
-	HCT157(config, m_13, 0);
+	HCT157(config, m_13);
 	m_13->out_callback().set("msm", FUNC(msm5205_device::data_w));
 }
 

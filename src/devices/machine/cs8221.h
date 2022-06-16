@@ -24,15 +24,15 @@ class cs8221_device : public device_t
 {
 public:
 	// construction/destruction
-	cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *cputag, const char *isatag, const char *biostag)
-		: cs8221_device(mconfig, tag, owner, clock)
+	cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *cputag, const char *isatag, const char *biostag)
+		: cs8221_device(mconfig, tag, owner)
 	{
 		set_cputag(cputag);
 		set_isatag(isatag);
 		set_biostag(biostag);
 	}
 
-	cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration
 	void set_cputag(const char *tag) { m_cputag = tag; }

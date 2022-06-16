@@ -38,7 +38,7 @@ private:
 
 void ie15_state::ie15(machine_config &config)
 {
-	IE15(config, m_ie15, 0);
+	IE15(config, m_ie15);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	//rs232.dcd_handler().set("ie15", FUNC(ie15_device::rs232_conn_dcd_w));

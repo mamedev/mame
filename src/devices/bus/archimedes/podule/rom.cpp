@@ -25,7 +25,7 @@ class arc_rom_aka05_device :
 {
 public:
 	// construction/destruction
-	arc_rom_aka05_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_rom_aka05_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::ROM; }
 
@@ -112,7 +112,7 @@ void arc_rom_aka05_device::device_add_mconfig(machine_config &config)
 //  arc_rom_aka05_device - constructor
 //-------------------------------------------------
 
-arc_rom_aka05_device::arc_rom_aka05_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_rom_aka05_device::arc_rom_aka05_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_ROM_AKA05, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")

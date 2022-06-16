@@ -30,7 +30,7 @@ class econet_e01_device : public device_t,
 {
 public:
 	// construction/destruction
-	econet_e01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	econet_e01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	enum
@@ -39,7 +39,7 @@ protected:
 		TYPE_E01S
 	};
 
-	econet_e01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
+	econet_e01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -132,7 +132,7 @@ class econet_e01s_device :  public econet_e01_device
 {
 public:
 	// construction/destruction
-	econet_e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	econet_e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

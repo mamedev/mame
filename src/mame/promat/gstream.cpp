@@ -855,9 +855,9 @@ void gstream_state::gstream(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki[0], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
+	OKIM6295(config, m_oki[0], XTAL::u(1000000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
 
-	OKIM6295(config, m_oki[1], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
+	OKIM6295(config, m_oki[1], XTAL::u(1000000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
 }
 
 void gstream_state::x2222(machine_config &config)
@@ -886,7 +886,7 @@ void gstream_state::x2222(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki[0], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
+	OKIM6295(config, m_oki[0], XTAL::u(1000000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
 }
 
 

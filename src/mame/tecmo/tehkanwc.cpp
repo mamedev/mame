@@ -706,7 +706,7 @@ void tehkanwc_state::tehkanwc(machine_config &config)
 	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(tehkanwc_state::adpcm_int));  /* interrupt function */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);

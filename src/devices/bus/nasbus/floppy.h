@@ -26,7 +26,7 @@ class nascom_fdc_device : public device_t, public device_nasbus_card_interface
 {
 public:
 	// construction/destruction
-	nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t select_r();
 	void select_w(uint8_t data);

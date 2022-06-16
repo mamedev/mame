@@ -71,7 +71,7 @@ unknown cycle: CME, SSE, SSS
 #include "emu.h"
 #include "tms1k_base.h"
 
-tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
+tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, rom_width, byte_bits > 8 ? -1 : 0, rom_map),
 	m_data_config("data", ENDIANNESS_BIG, 8, ram_width, 0, ram_map),

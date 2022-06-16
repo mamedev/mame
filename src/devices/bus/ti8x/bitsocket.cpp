@@ -23,7 +23,7 @@ class bit_socket_device
 		, public device_ti8x_link_port_interface
 {
 public:
-	bit_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	bit_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -58,7 +58,7 @@ bit_socket_device::bit_socket_device(
 
 void bit_socket_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config, m_stream, 0);
+	BITBANGER(config, m_stream);
 }
 
 

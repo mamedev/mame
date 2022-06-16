@@ -250,7 +250,7 @@ void apogee_state::apogee(machine_config &config)
 	I8080(config, m_maincpu, XTAL(16'000'000) / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apogee_state::mem_map);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(XTAL(16'000'000)/9);
 	pit.out_handler<0>().set(FUNC(apogee_state::pit8253_out0_changed));
 	pit.set_clk<1>(XTAL(16'000'000)/9);

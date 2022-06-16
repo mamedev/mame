@@ -32,7 +32,7 @@ public:
 	required_device<upd765a_device> fdc;
 
 protected:
-	pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -54,7 +54,7 @@ private:
 
 class pc_fdc_xt_device : public pc_fdc_family_device {
 public:
-	pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 	void dor_fifo_w(uint8_t data);

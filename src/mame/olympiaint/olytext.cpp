@@ -169,7 +169,7 @@ void olytext_state::olytext(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", olytext_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(olytext_state::keyboard_put));
 }
 

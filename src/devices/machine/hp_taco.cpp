@@ -274,7 +274,7 @@ enum cmd_t : uint8_t {
 DEFINE_DEVICE_TYPE(HP_TACO, hp_taco_device, "hp_taco", "HP TACO")
 
 // Constructors
-hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_tape(*this, "drive")
 	, m_irq_handler(*this)
@@ -283,7 +283,7 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hp_taco_device(mconfig, HP_TACO, tag, owner, clock)
 {
 }
@@ -543,7 +543,7 @@ READ_LINE_MEMBER(hp_taco_device::wr_bit_r)
 
 void hp_taco_device::device_add_mconfig(machine_config &config)
 {
-	HP_DC100_TAPE(config, m_tape, 0);
+	HP_DC100_TAPE(config, m_tape);
 	m_tape->set_acceleration(ACCELERATION);
 	m_tape->set_set_points(SLOW_SPEED, FAST_SPEED);
 	m_tape->set_tick_size(TACH_TICK_LEN);

@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(M6502_SWAP_OP_D2_D7, m6502_swap_op_d2_d7, "m6502_swap_op_d2_d7", "M6502 swapped D2/D7")
 
-m6502_swap_op_d2_d7::m6502_swap_op_d2_d7(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m6502_swap_op_d2_d7::m6502_swap_op_d2_d7(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m6502_device(mconfig, M6502_SWAP_OP_D2_D7, tag, owner, clock)
 {
 }

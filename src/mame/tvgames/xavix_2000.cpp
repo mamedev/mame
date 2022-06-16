@@ -219,21 +219,21 @@ void xavix_i2c_state::xavix2000_i2c_24c08(machine_config &config)
 {
 	xavix2000(config);
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix2000_i2c_24c04(machine_config &config)
 {
 	xavix2000(config);
 
-	I2C_24C04(config, "i2cmem", 0);
+	I2C_24C04(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix2000_i2c_24c02(machine_config &config)
 {
 	xavix2000(config);
 
-	I2C_24C02(config, "i2cmem", 0);
+	I2C_24C02(config, "i2cmem");
 }
 
 

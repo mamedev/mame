@@ -616,20 +616,20 @@ void pinball2k_state::ramdac_map(address_map &map)
 void pinball2k_state::mediagx(machine_config &config)
 {
 	/* basic machine hardware */
-	MEDIAGX(config, m_maincpu, 166000000);
+	MEDIAGX(config, m_maincpu, XTAL::u(166000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pinball2k_state::mediagx_map);
 	m_maincpu->set_addrmap(AS_IO, &pinball2k_state::mediagx_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus"));
 	pcibus.set_device(18, FUNC(pinball2k_state::cx5510_pci_r), FUNC(pinball2k_state::cx5510_pci_w));
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	RAMDAC(config, m_ramdac, 0, m_palette);
+	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &pinball2k_state::ramdac_map);
 
 	/* video hardware */

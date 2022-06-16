@@ -21,7 +21,7 @@ namespace bus::ti99::joyport {
 class mecmouse_device : public device_t, public device_ti99_joyport_interface
 {
 public:
-	mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t read_dev() override;
 	void  write_dev(uint8_t data) override;

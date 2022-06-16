@@ -26,7 +26,7 @@
 
 DEFINE_DEVICE_TYPE(CRD254SH, crd254sh_device, "crd254sh", "Sanyo CRD-254SH CD-ROM")
 
-crd254sh_device::crd254sh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+crd254sh_device::crd254sh_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CRD254SH, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, "dummy_scsi")
 	, m_mcu(*this, "mcu")

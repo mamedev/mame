@@ -27,7 +27,7 @@ zeus2_renderer::zeus2_renderer(zeus2_device *state)
 
 DEFINE_DEVICE_TYPE(ZEUS2, zeus2_device, "zeus2", "Midway Zeus2")
 
-zeus2_device::zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+zeus2_device::zeus2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ZEUS2, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_vblank(*this), m_irq(*this), m_atlantis(0)

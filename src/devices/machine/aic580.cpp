@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(AIC580, aic580_device, "aic580", "AIC-580 DMA Bus Master")
 //  aic580_device - constructor
 //-------------------------------------------------
 
-aic580_device::aic580_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+aic580_device::aic580_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AIC580, tag, owner, clock)
 	, m_bdin_callback(*this)
 	, m_bdout_callback(*this)

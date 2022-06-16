@@ -11,7 +11,7 @@
 class midi_keyboard_device : public device_t, public device_serial_interface
 {
 public:
-	midi_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midi_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	ioport_constructor device_input_ports() const override;
 
 	auto tx_callback() { return m_out_tx_func.bind(); }

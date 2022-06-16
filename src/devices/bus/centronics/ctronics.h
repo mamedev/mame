@@ -25,14 +25,14 @@ class centronics_device : public device_t, public device_slot_interface
 public:
 	template <typename T>
 	centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: centronics_device(mconfig, tag, owner, 0)
+		: centronics_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto strobe_handler() { return m_strobe_handler.bind(); }
 

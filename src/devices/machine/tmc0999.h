@@ -27,7 +27,7 @@ quick pinout reference (18-pin DIP)
 class tmc0999_device : public device_t
 {
 public:
-	tmc0999_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	tmc0999_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void di_w(u8 data);
 	u8 do_r();

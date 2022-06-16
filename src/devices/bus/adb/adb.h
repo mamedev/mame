@@ -20,7 +20,7 @@ class adb_connector: public device_t, public device_single_card_slot_interface<a
 public:
 	template <typename T>
 	adb_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false)
-		: adb_connector(mconfig, tag, owner, 0)
+		: adb_connector(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -28,7 +28,7 @@ public:
 		set_fixed(fixed);
 	}
 
-	adb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	adb_connector(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~adb_connector() = default;
 
 	adb_device *get_device();
@@ -58,7 +58,7 @@ public:
 	static void default_devices(device_slot_interface &device);
 
 protected:
-	adb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	adb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

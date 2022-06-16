@@ -33,7 +33,7 @@ class hd61700_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	hd61700_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	hd61700_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, const XTAL &_clock);
 
 	auto lcd_ctrl() { return m_lcd_ctrl_cb.bind(); }
 	auto lcd_write() { return m_lcd_write_cb.bind(); }

@@ -225,13 +225,13 @@ void magtouch_state::magtouch(machine_config &config)
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 	uart.out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
 
-	MICROTOUCH(config, "microtouch", 9600).stx().set("ns16450_0", FUNC(ins8250_uart_device::rx_w));
+	MICROTOUCH(config, "microtouch", XTAL::u(9600)).stx().set("ns16450_0", FUNC(ins8250_uart_device::rx_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(magtouch_state::dma8237_1_dack_w));
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir1_w));
@@ -245,7 +245,7 @@ void magtouch_state::magtouch(machine_config &config)
 	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
-	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, m_isabus, magtouch_isa8_cards, "sb15", true));
+	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", m_isabus, magtouch_isa8_cards, "sb15", true));
 	isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(magtouch_sb_def));
 	isa1.set_option_machine_config("sb15", magtouch_sb_conf);
 }

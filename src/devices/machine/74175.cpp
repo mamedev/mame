@@ -12,7 +12,7 @@
 DEFINE_DEVICE_TYPE(TTL74174, ttl74174_device, "ttl74174", "54/74174 Hex D Flip-Flops with Clear")
 DEFINE_DEVICE_TYPE(TTL74175, ttl74175_device, "ttl74175", "54/74175 Quad D Flip-Flops with Clear")
 
-ttl741745_device::ttl741745_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ttl741745_device::ttl741745_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_q1_func(*this)
 	, m_q2_func(*this)
@@ -31,7 +31,7 @@ ttl741745_device::ttl741745_device(const machine_config &mconfig, device_type ty
 {
 }
 
-ttl74174_device::ttl74174_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ttl74174_device::ttl74174_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ttl741745_device(mconfig, TTL74174, tag, owner, clock)
 	, m_q5_func(*this)
 	, m_q6_func(*this)
@@ -42,7 +42,7 @@ ttl74174_device::ttl74174_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-ttl74175_device::ttl74175_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ttl74175_device::ttl74175_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ttl741745_device(mconfig, TTL74175, tag, owner, clock)
 	, m_not_q1_func(*this)
 	, m_not_q2_func(*this)

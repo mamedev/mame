@@ -103,7 +103,7 @@ void konmedal020_state::gs471(machine_config &config)
 	screen.set_screen_update(m_vga, FUNC(vga_device::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_3);
 
-	OTI111(config, m_vga, 0);
+	OTI111(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x100000);
 

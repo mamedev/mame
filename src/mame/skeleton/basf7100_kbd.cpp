@@ -194,7 +194,7 @@ ioport_constructor basf7100_kbd_device::device_input_ports() const
 //  basf7100_kbd_device - constructor
 //-------------------------------------------------
 
-basf7100_kbd_device::basf7100_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+basf7100_kbd_device::basf7100_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, BASF7100_KBD, tag, owner, clock),
 	device_matrix_keyboard_interface(mconfig, *this, "row_0", "row_1", "row_2", "row_3", "row_4", "row_5", "row_6", "row_7", "row_8"),
 	m_translation(*this, "translation"),

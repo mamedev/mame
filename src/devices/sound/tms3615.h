@@ -19,7 +19,7 @@ public:
 	static constexpr unsigned FOOTAGE_8 = 0;
 	static constexpr unsigned FOOTAGE_16 = 1;
 
-	tms3615_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms3615_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void enable_w(int enable);
 

@@ -36,7 +36,7 @@
 //#####################################
 //                 COMMON
 //#####################################
-cvsd_device_base::cvsd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool active_clock_edge, uint8_t shiftreg_mask)
+cvsd_device_base::cvsd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool active_clock_edge, uint8_t shiftreg_mask)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_clock_state_push_cb(*this)
@@ -215,13 +215,13 @@ void cvsd_device_base::sound_stream_update(sound_stream &stream, std::vector<rea
 //#########################################
 DEFINE_DEVICE_TYPE(HC55516, hc55516_device, "hc55516", "HC-55516")
 
-hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hc55516_device(mconfig, HC55516, tag, owner, clock, 0xfc0, 6, 0xfc1, 4)
 {
 }
 
 // overridable type for hc55532 etc
-hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t sylmask, int32_t sylshift, int32_t syladd, int32_t intshift)
+hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t sylmask, int32_t sylshift, int32_t syladd, int32_t intshift)
 	: cvsd_device_base(mconfig, type, tag, owner, clock, RISING, 0x7)
 	, m_agc_push_cb(*this)
 	, m_fzq_pull_cb(*this)
@@ -414,7 +414,7 @@ void hc55516_device::sound_stream_update(sound_stream &stream, std::vector<read_
 //#########################################
 DEFINE_DEVICE_TYPE(HC55532, hc55532_device, "hc55532", "HC-55532")
 
-hc55532_device::hc55532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hc55532_device::hc55532_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hc55516_device(mconfig, HC55532, tag, owner, clock, 0xf80, 7, 0xfe1, 5)
 {
 }
@@ -440,13 +440,13 @@ void hc55532_device::device_reset()
 //##########################################
 DEFINE_DEVICE_TYPE(MC3417, mc3417_device, "mc3417", "MC3417")
 
-mc3417_device::mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc3417_device::mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc3417_device(mconfig, MC3417, tag, owner, clock, 0x7)
 {
 }
 
 // overridable type for mc3418 etc
-mc3417_device::mc3417_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t shiftreg_mask)
+mc3417_device::mc3417_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint8_t shiftreg_mask)
 	: cvsd_device_base(mconfig, type, tag, owner, clock, FALLING, shiftreg_mask)
 	, m_charge(pow(exp(-1.0), 1.0 / (FILTER_CHARGE_TC * 16000.0)))
 	, m_decay(pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * 16000.0)))
@@ -561,7 +561,7 @@ void mc3417_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 //##########################################
 DEFINE_DEVICE_TYPE(MC3418, mc3418_device, "mc3418", "MC3418")
 
-mc3418_device::mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc3418_device::mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc3417_device(mconfig, MC3418, tag, owner, clock, 0xf)
 {
 }

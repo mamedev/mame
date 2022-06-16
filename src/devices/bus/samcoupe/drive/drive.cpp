@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(SAMCOUPE_DRIVE_PORT, samcoupe_drive_port_device, "samcoupe_dr
 //  samcoupe_drive_port_device - constructor
 //-------------------------------------------------
 
-samcoupe_drive_port_device::samcoupe_drive_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+samcoupe_drive_port_device::samcoupe_drive_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SAMCOUPE_DRIVE_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_samcoupe_drive_interface>(mconfig, *this),
 	m_module(nullptr)

@@ -459,7 +459,7 @@ GFXDECODE_END
 void sprint8_state::sprint8(machine_config &config)
 {
 	/* basic machine hardware */
-	M6800(config, m_maincpu, 11055000 / 11); /* ? */
+	M6800(config, m_maincpu, XTAL::u(11055000) / 11); /* ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sprint8_state::sprint8_map);
 
 	TIMER(config, "input_timer").configure_periodic(FUNC(sprint8_state::input_callback), attotime::from_hz(60));

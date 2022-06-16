@@ -35,7 +35,7 @@ ROM_START( xt446 )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
 ROM_END
 
-xt446_device::xt446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xt446_device::xt446_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XT446, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_maincpu(*this, "maincpu")

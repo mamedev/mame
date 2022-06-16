@@ -60,12 +60,12 @@ public:
 	// construction/destruction
 	template <typename T>
 	qbus_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cputag, int spacenum)
-		: qbus_device(mconfig, tag, owner, (uint32_t)0)
+		: qbus_device(mconfig, tag, owner)
 	{
 		set_cputag(std::forward<T>(cputag), spacenum);
 	}
 
-	qbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	qbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	~qbus_device() { m_device_list.detach_all(); }
 
@@ -135,7 +135,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	qbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	qbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// computer interface
 	DECLARE_WRITE_LINE_MEMBER( biaki_w ) { if (m_card) m_card->biaki_w(state); }

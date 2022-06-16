@@ -8,7 +8,7 @@
 
 DEFINE_DEVICE_TYPE(ISA8_DECTALK, dectalk_isa_device, "dectalk_isa", "DECTalk-PC")
 
-dectalk_isa_device::dectalk_isa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+dectalk_isa_device::dectalk_isa_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	device_t(mconfig, ISA8_DECTALK, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_cmd(0),
@@ -170,7 +170,7 @@ void dectalk_isa_device::device_add_mconfig(machine_config &config)
 	m_dsp->bio().set(FUNC(dectalk_isa_device::bio_line_r));
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_12BIT_R2R(config, m_dac, 0).add_route(0, "speaker", 1.0); // unknown DAC
+	DAC_12BIT_R2R(config, m_dac).add_route(0, "speaker", 1.0); // unknown DAC
 }
 
 void dectalk_isa_device::write(offs_t offset, uint8_t data)

@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(ELECTRON_STDCART, electron_stdcart_device, "electron_stdcart"
 //  electron_stdcart_device - constructor
 //-------------------------------------------------
 
-electron_stdcart_device::electron_stdcart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_stdcart_device::electron_stdcart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_STDCART, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
 {

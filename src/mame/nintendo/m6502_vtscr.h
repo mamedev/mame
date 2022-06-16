@@ -18,7 +18,7 @@
 
 class m6502_vtscr : public m6502_device {
 public:
-	m6502_vtscr(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m6502_vtscr(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_next_scramble(bool scr);
 	void set_scramble(bool scr);

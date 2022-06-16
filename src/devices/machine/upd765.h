@@ -51,7 +51,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tc_line_w) { tc_w(state == ASSERT_LINE); }
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
-	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
+	void set_rate(const XTAL &rate); // rate in bps, to be used when the fdc is externally frequency-controlled
 
 	void set_ready_line_connected(bool ready);
 	void set_select_lines_connected(bool select);
@@ -59,7 +59,7 @@ public:
 	virtual void soft_reset();
 
 protected:
-	upd765_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	upd765_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -353,50 +353,50 @@ protected:
 
 class upd765a_device : public upd765_family_device {
 public:
-	upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool ready, bool select)
+	upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, bool ready, bool select)
 		: upd765a_device(mconfig, tag, owner, clock)
 	{
 		set_ready_line_connected(ready);
 		set_select_lines_connected(select);
 	}
-	upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 };
 
 class upd765b_device : public upd765_family_device {
 public:
-	upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool ready, bool select)
+	upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, bool ready, bool select)
 		: upd765b_device(mconfig, tag, owner, clock)
 	{
 		set_ready_line_connected(ready);
 		set_select_lines_connected(select);
 	}
-	upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 };
 
 class i8272a_device : public upd765_family_device {
 public:
-	i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool ready)
+	i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, bool ready)
 		: i8272a_device(mconfig, tag, owner, clock)
 	{
 		set_ready_line_connected(ready);
 	}
-	i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 };
 
 class i82072_device : public upd765_family_device {
 public:
-	i82072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool ready)
+	i82072_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, bool ready)
 		: i82072_device(mconfig, tag, owner, clock)
 	{
 		set_ready_line_connected(ready);
 	}
-	i82072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82072_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 
@@ -437,7 +437,7 @@ public:
 	uint8_t srb_r();
 
 protected:
-	ps2_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ps2_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -450,63 +450,63 @@ protected:
 
 class smc37c78_device : public ps2_fdc_device {
 public:
-	smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 };
 
 class upd72065_device : public upd765_family_device {
 public:
-	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool ready, bool select)
+	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, bool ready, bool select)
 		: upd72065_device(mconfig, tag, owner, clock)
 	{
 		set_ready_line_connected(ready);
 		set_select_lines_connected(select);
 	}
 
-	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 	virtual void auxcmd_w(uint8_t data);
 
 protected:
-	upd72065_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	upd72065_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class upd72067_device : public upd72065_device {
 public:
-	upd72067_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd72067_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void auxcmd_w(uint8_t data) override;
 };
 
 class upd72069_device : public upd72065_device {
 public:
-	upd72069_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd72069_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class n82077aa_device : public ps2_fdc_device {
 public:
-	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, mode_t mode)
+	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, mode_t mode)
 		: n82077aa_device(mconfig, tag, owner, clock)
 	{
 		set_mode(mode);
 	}
-	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 };
 
 class pc_fdc_superio_device : public upd765_family_device {
 public:
-	pc_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 };
 
 class dp8473_device : public upd765_family_device {
 public:
-	dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 
@@ -516,12 +516,12 @@ protected:
 
 class pc8477a_device : public ps2_fdc_device {
 public:
-	pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, mode_t mode)
+	pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, mode_t mode)
 		: pc8477a_device(mconfig, tag, owner, clock)
 	{
 		set_mode(mode);
 	}
-	pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 };
@@ -540,10 +540,10 @@ public:
 
 class wd37c65c_device : public upd765_family_device {
 public:
-	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename X>
-	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, X &&clock2)
+	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, X &&clock2)
 		: wd37c65c_device(mconfig, tag, owner, clock)
 	{
 		set_clock2(std::forward<X>(clock2));
@@ -561,7 +561,7 @@ private:
 
 class mcs3201_device : public upd765_family_device {
 public:
-	mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto input_handler() { return m_input_handler.bind(); }
@@ -578,7 +578,7 @@ private:
 
 class tc8566af_device : public upd765_family_device {
 public:
-	tc8566af_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc8566af_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 

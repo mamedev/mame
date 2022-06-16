@@ -948,7 +948,7 @@ void mlanding_state::mlanding(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mlanding_state::audio_map_prog);
 	m_audiocpu->set_addrmap(AS_IO, &mlanding_state::audio_map_io);
 
-	Z80(config, m_mechacpu, 4000000); // ?
+	Z80(config, m_mechacpu, XTAL::u(4000000)); // ?
 	m_mechacpu->set_addrmap(AS_PROGRAM, &mlanding_state::mecha_map_prog);
 	m_mechacpu->set_vblank_int("screen", FUNC(mlanding_state::irq0_line_hold));
 
@@ -961,13 +961,13 @@ void mlanding_state::mlanding(machine_config &config)
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
 	m_ctc->zc_callback<0>().set(FUNC(mlanding_state::z80ctc_to0));
 
-	pc060ha_device& ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device& ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TAITOIO_YOKE(config, m_yoke, 0);
+	TAITOIO_YOKE(config, m_yoke);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

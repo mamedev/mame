@@ -660,7 +660,7 @@ void qvt102_state::qvt102(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(qvt102_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(qvt102_state::vsync_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set(FUNC(qvt102_state::acia_txd_w));
 	m_acia->rts_handler().set(FUNC(qvt102_state::acia_rts_w));
 	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));

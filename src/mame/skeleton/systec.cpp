@@ -92,7 +92,7 @@ void systec_state::systec(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &systec_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &systec_state::io_map);
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(153600)));
 	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txca_w));
 	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxca_w));
 

@@ -12,7 +12,7 @@ DECLARE_DEVICE_TYPE(ORIC_MICRODISC, oric_microdisc_device)
 class oric_microdisc_device : public device_t, public device_oricext_interface
 {
 public:
-	oric_microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	oric_microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~oric_microdisc_device();
 
 protected:

@@ -27,7 +27,7 @@ public:
 	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect)> end_update_delegate;
 
 
-	crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto res_out_de_callback() { return m_res_out_de_cb.bind(); }
 	auto res_out_hsync_callback() { return m_res_out_hsync_cb.bind(); }

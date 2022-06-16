@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(M8502, m8502_device, "m8502", "MOS Technology 8502")
 
-m8502_device::m8502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m8502_device::m8502_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m6510_device(mconfig, M8502, tag, owner, clock)
 {
 }

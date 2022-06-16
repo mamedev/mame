@@ -84,7 +84,7 @@ WRITE_LINE_MEMBER(igs_fear_state::sound_irq)
 
 void igs_fear_state::igs_fear(machine_config &config)
 {
-	ARM7(config, m_maincpu, 50000000/2);
+	ARM7(config, m_maincpu, XTAL::u(50000000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::igs_igs_fear_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

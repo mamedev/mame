@@ -33,7 +33,7 @@ class dvk_kgd_device : public device_t,
 {
 public:
 	// construction/destruction
-	dvk_kgd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dvk_kgd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

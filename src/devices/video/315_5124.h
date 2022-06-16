@@ -53,7 +53,7 @@ public:
 
 
 	// construction/destruction
-	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_hcounter_divide(unsigned divide) { m_hcounter_divide = divide; }
 	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
@@ -88,7 +88,7 @@ protected:
 	static constexpr unsigned SEGA315_5377_CRAM_SIZE        = 0x40; /* 32 colors x 2 bytes per color = 64 bytes */
 	static constexpr unsigned SEGA315_5124_CRAM_SIZE        = 0x20; /* 32 colors x 1 bytes per color = 32 bytes */
 
-	sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
+	sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
 
 	// device-level overrides
 	virtual void device_post_load() override;
@@ -211,10 +211,10 @@ protected:
 class sega315_5246_device : public sega315_5124_device
 {
 public:
-	sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
+	sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -233,12 +233,12 @@ private:
 class sega315_5377_device : public sega315_5246_device
 {
 public:
-	sega315_5377_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega315_5377_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void set_sega315_5124_compatibility_mode(bool sega315_5124_compatibility_mode) override;
 
 protected:
-	sega315_5377_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
+	sega315_5377_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
 
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -260,7 +260,7 @@ public:
 	void stop_timers();
 
 protected:
-	sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
+	sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 

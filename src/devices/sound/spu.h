@@ -200,8 +200,8 @@ protected:
 	static reverb_preset *find_reverb_preset(const unsigned short *param);
 
 public:
-	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu);
-	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, psxcpu_device *cpu);
+	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }

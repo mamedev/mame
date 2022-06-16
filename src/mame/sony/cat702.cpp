@@ -89,7 +89,7 @@
 
 DEFINE_DEVICE_TYPE(CAT702, cat702_device, "cat702", "CAT702")
 
-cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cat702_device::cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CAT702, tag, owner, clock),
 	m_region(*this, DEVICE_SELF),
 	m_select(1),

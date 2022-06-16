@@ -29,7 +29,7 @@ class a2bus_iwm_device:
 {
 protected:
 	// construction/destruction
-	a2bus_iwm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_iwm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -50,13 +50,13 @@ private:
 class a2bus_iwm_int_device: public a2bus_iwm_device
 {
 public:
-	a2bus_iwm_int_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_iwm_int_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class a2bus_iwm_card_device: public a2bus_iwm_device
 {
 public:
-	a2bus_iwm_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_iwm_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;

@@ -84,7 +84,7 @@ static constexpr int RATE_MULTIPLIER = 4;
 DEFINE_DEVICE_TYPE(SPEAKER_SOUND, speaker_sound_device, "speaker_sound_device", "Filtered DAC")
 
 
-speaker_sound_device::speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+speaker_sound_device::speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPEAKER_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_num_levels(2)

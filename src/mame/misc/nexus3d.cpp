@@ -314,7 +314,7 @@ WRITE_LINE_MEMBER(nexus3d_state::screen_vblank)
 void nexus3d_state::nexus3d(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM920T(config, m_maincpu, 200000000);
+	ARM920T(config, m_maincpu, XTAL::u(200000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &nexus3d_state::nexus3d_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -325,7 +325,7 @@ void nexus3d_state::nexus3d(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_565);
 
-	SERFLASH(config, m_serflash, 0);
+	SERFLASH(config, m_serflash);
 }
 
 

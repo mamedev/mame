@@ -59,7 +59,7 @@ DEFINE_DEVICE_TYPE(TTL74145, ttl74145_device, "ttl74145", "TTL74145")
 //  ttl74145_device - constructor
 //-------------------------------------------------
 
-ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TTL74145, tag, owner, clock)
 	, m_output_line_cb(*this)
 	, m_number(0)

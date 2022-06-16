@@ -43,7 +43,7 @@
 
 DEFINE_DEVICE_TYPE(CMI_MUSIC_KEYBOARD, cmi_music_keyboard_device, "cmi_mkbd", "Fairlight CMI Music Keyboard")
 
-cmi_music_keyboard_device::cmi_music_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cmi_music_keyboard_device::cmi_music_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CMI_MUSIC_KEYBOARD, tag, owner, clock)
 	, m_cmi_txd(*this)
 	, m_cmi_rts(*this)
@@ -558,11 +558,11 @@ void cmi_music_keyboard_device::device_add_mconfig(machine_config &config)
 	m_acia_kbd->irq_handler().set(FUNC(cmi_music_keyboard_device::kbd_acia_int));
 
 	/* alpha-numeric display */
-	DL1416T(config, m_dp1, u32(0));
+	DL1416T(config, m_dp1);
 	m_dp1->update().set(FUNC(cmi_music_keyboard_device::update_dp<0>));
-	DL1416T(config, m_dp2, u32(0));
+	DL1416T(config, m_dp2);
 	m_dp2->update().set(FUNC(cmi_music_keyboard_device::update_dp<1>));
-	DL1416T(config, m_dp3, u32(0));
+	DL1416T(config, m_dp3);
 	m_dp3->update().set(FUNC(cmi_music_keyboard_device::update_dp<2>));
 }
 

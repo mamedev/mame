@@ -265,7 +265,7 @@ void scramble_state::ad2083_sound_io_map(address_map &map)
 
 void scramble_state::ad2083_audio(machine_config &config)
 {
-	Z80(config, m_audiocpu, 14318000/8);   /* 1.78975 MHz */
+	Z80(config, m_audiocpu, XTAL::u(14318000)/8);   /* 1.78975 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &scramble_state::ad2083_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &scramble_state::ad2083_sound_io_map);
 
@@ -287,11 +287,11 @@ void scramble_state::ad2083_audio(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ay8910_device &ay1(AY8910(config, "ay1", 14318000/8));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL::u(14318000)/8));
 	ay1.port_a_read_callback().set(FUNC(scramble_state::scramble_portB_r));
 	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 14318000/8));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL::u(14318000)/8));
 	ay2.port_a_read_callback().set(FUNC(scramble_state::hotshock_soundlatch_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 1.0);
 

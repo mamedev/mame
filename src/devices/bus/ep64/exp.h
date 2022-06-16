@@ -66,14 +66,14 @@ class ep64_expansion_bus_slot_device : public device_t,
 public:
 	// construction/destruction
 	ep64_expansion_bus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, char const *dflt)
-		: ep64_expansion_bus_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: ep64_expansion_bus_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		ep64_expansion_bus_cards(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	ep64_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ep64_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program_space.set_tag(std::forward<T>(tag), spacenum); }
 	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io_space.set_tag(std::forward<T>(tag), spacenum); }

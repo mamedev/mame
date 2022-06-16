@@ -38,10 +38,10 @@ class c1581_device : public device_t, public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -99,7 +99,7 @@ class c1563_device : public c1581_device
 {
 public:
 	// construction/destruction
-	c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

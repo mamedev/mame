@@ -70,7 +70,7 @@ const tiny_rom_entry *mtx_cfx_device::device_rom_region() const
 //  mtx_cfx_device - constructor
 //-------------------------------------------------
 
-mtx_cfx_device::mtx_cfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mtx_cfx_device::mtx_cfx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MTX_CFX, tag, owner, clock)
 	, device_mtx_exp_interface(mconfig, *this)
 	, m_flash(*this, "flash")

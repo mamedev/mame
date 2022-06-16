@@ -161,7 +161,7 @@ void jensen_state::eisa_io(address_map &map)
 
 void jensen_state::jensen(machine_config &config)
 {
-	DEC_21064(config, m_cpu, 300'000'000).set_clock_scale(0.5);
+	DEC_21064(config, m_cpu, XTAL::u(300'000'000)).set_clock_scale(0.5);
 	m_cpu->set_dasm_type(alpha_disassembler::dasm_type::TYPE_NT);
 	m_cpu->set_addrmap(0, &jensen_state::local_memory);
 	m_cpu->set_addrmap(2, &jensen_state::local_io);
@@ -213,7 +213,7 @@ void jensen_state::jensen(machine_config &config)
 	serial1.ri_handler().set(m_ace[1], FUNC(ns16550_device::ri_w));
 	serial1.rxd_handler().set(m_ace[1], FUNC(ns16550_device::rx_w));
 
-	PC_LPT(config, m_lpt, 0);
+	PC_LPT(config, m_lpt);
 	m_lpt->irq_handler().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<0>));
 #endif
 

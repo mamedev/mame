@@ -582,7 +582,7 @@ INPUT_PORTS_END
 void ti85_state::ti81(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2000000);        /* 2 MHz */
+	Z80(config, m_maincpu, XTAL::u(2000000));        /* 2 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti81_mem);
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti81_io);
 
@@ -604,7 +604,7 @@ void ti85_state::ti81(machine_config &config)
 void ti85_state::ti85(machine_config &config)
 {
 	ti81(config);
-	m_maincpu->set_clock(6000000);        /* 6 MHz */
+	m_maincpu->set_clock(XTAL::u(6000000));        /* 6 MHz */
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti85_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
@@ -627,7 +627,7 @@ void ti85_state::ti85d(machine_config &config)
 void ti85_state::ti82(machine_config &config)
 {
 	ti81(config);
-	m_maincpu->set_clock(6000000);        /* 6 MHz */
+	m_maincpu->set_clock(XTAL::u(6000000));        /* 6 MHz */
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti82_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
@@ -636,7 +636,7 @@ void ti85_state::ti82(machine_config &config)
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
-	T6A04(config, "t6a04", 0).set_size(96, 64);
+	T6A04(config, "t6a04").set_size(96, 64);
 
 	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
 }
@@ -652,7 +652,7 @@ void ti85_state::ti81v2(machine_config &config)
 void ti85_state::ti83(machine_config &config)
 {
 	ti81(config);
-	m_maincpu->set_clock(6000000);        /* 6 MHz */
+	m_maincpu->set_clock(XTAL::u(6000000));        /* 6 MHz */
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
@@ -661,7 +661,7 @@ void ti85_state::ti83(machine_config &config)
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
-	T6A04(config, "t6a04", 0).set_size(96, 64);
+	T6A04(config, "t6a04").set_size(96, 64);
 }
 
 void ti85_state::ti86(machine_config &config)
@@ -679,7 +679,7 @@ void ti85_state::ti86(machine_config &config)
 void ti85_state::ti83p(machine_config &config)
 {
 	ti81(config);
-	m_maincpu->set_clock(6000000);        /* 8 MHz running at 6 MHz */
+	m_maincpu->set_clock(XTAL::u(6000000));        /* 8 MHz running at 6 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti83p_asic_mem);
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83p_io);
 
@@ -695,7 +695,7 @@ void ti85_state::ti83p(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_membank[2]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, m_membank[3]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
-	T6A04(config, "t6a04", 0).set_size(96, 64);
+	T6A04(config, "t6a04").set_size(96, 64);
 
 	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
 
@@ -705,7 +705,7 @@ void ti85_state::ti83p(machine_config &config)
 void ti85_state::ti83pse(machine_config &config)
 {
 	ti83p(config);
-	m_maincpu->set_clock(15000000);
+	m_maincpu->set_clock(XTAL::u(15000000));
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83pse_io);
 
 	m_membank[0]->set_map(&ti85_state::ti83pse_banked_mem);

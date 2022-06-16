@@ -807,17 +807,17 @@ INPUT_PORTS_END
 
 void atarisy4_state::atarisy4(machine_config &config)
 {
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy4_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(atarisy4_state::vblank_int));
 
-	TMS32010(config, m_dsp0, 16000000);
+	TMS32010(config, m_dsp0, XTAL::u(16000000));
 	m_dsp0->set_addrmap(AS_PROGRAM, &atarisy4_state::dsp0_map);
 	m_dsp0->set_addrmap(AS_IO, &atarisy4_state::dsp0_io_map);
 	m_dsp0->bio().set(FUNC(atarisy4_state::dsp0_bio_r));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(32000000/2, 660, 0, 512, 404, 0, 384);
+	m_screen->set_raw(XTAL::u(32000000)/2, 660, 0, 512, 404, 0, 384);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_screen_update(FUNC(atarisy4_state::screen_update_atarisy4));
 
@@ -830,7 +830,7 @@ void airrace_state::airrace(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &airrace_state::airrace_map);
 
-	TMS32010(config, m_dsp1, 16000000);
+	TMS32010(config, m_dsp1, XTAL::u(16000000));
 	m_dsp1->set_addrmap(AS_PROGRAM, &airrace_state::dsp1_map);
 	m_dsp1->set_addrmap(AS_IO, &airrace_state::dsp1_io_map);
 	m_dsp1->bio().set(FUNC(airrace_state::dsp1_bio_r));

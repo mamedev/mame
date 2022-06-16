@@ -30,7 +30,7 @@ class dmac_hdc_device_base : public device_t
 {
 protected:
 	// construction/destruction
-	dmac_hdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	dmac_hdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -75,7 +75,7 @@ class a590_device : public dmac_hdc_device_base, public device_exp_card_interfac
 {
 public:
 	// construction/destruction
-	a590_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a590_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -106,7 +106,7 @@ class a2091_device : public dmac_hdc_device_base, public device_zorro2_card_inte
 {
 public:
 	// construction/destruction
-	a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -48,10 +48,10 @@ public:
 	};
 
 	// construction/destruction
-	pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	pla_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pla_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
+	pla_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t inputs, uint32_t outputs, uint32_t terms)
-		: pla_device(mconfig, tag, owner, (uint32_t)0)
+		: pla_device(mconfig, tag, owner)
 	{
 		set_num_inputs(inputs);
 		set_num_outputs(outputs);
@@ -107,13 +107,13 @@ private:
 class pls100_device : public pla_device
 {
 public:
-	pls100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pls100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class mos8721_device : public pla_device
 {
 public:
-	mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 DECLARE_DEVICE_TYPE(PLA, pla_device)

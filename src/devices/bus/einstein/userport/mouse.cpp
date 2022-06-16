@@ -48,7 +48,7 @@ ioport_constructor einstein_mouse_device::device_input_ports() const
 //  einstein_speech_device - constructor
 //-------------------------------------------------
 
-einstein_mouse_device::einstein_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+einstein_mouse_device::einstein_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, EINSTEIN_MOUSE, tag, owner, clock),
 	device_einstein_userport_interface(mconfig, *this),
 	m_mouse_b(*this, "mouse_b"),

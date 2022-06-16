@@ -126,7 +126,7 @@ INPUT_PORTS_END
 
 void c2_color_state::c2_color(machine_config &config)
 {
-	I8032(config, m_maincpu, 12'000'000); // exact type and clock unknown
+	I8032(config, m_maincpu, XTAL::u(12'000'000)); // exact type and clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &c2_color_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &c2_color_state::ext_map);
 

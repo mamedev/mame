@@ -532,7 +532,7 @@ void qtsbc_state::qtsbc(machine_config &config)
 	m_pit->set_clk<1>(4_MHz_XTAL / 2);
 	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
 
-	I8251(config, m_usart, 0); // U8
+	I8251(config, m_usart); // U8
 	m_usart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");

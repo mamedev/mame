@@ -284,7 +284,7 @@ void ktm3_state::ktm3(machine_config &config)
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
 
-	CLOCK(config, "60hz", 60).signal_handler().set(FUNC(ktm3_state::signal_w));
+	CLOCK(config, "60hz", XTAL::u(60)).signal_handler().set(FUNC(ktm3_state::signal_w));
 }
 
 ROM_START(ktm3)

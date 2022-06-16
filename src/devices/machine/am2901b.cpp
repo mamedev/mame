@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(AM2901B, am2901b_device, "am2901b", "AMD Am2901B Bitslice Pro
 //  am2901b_device - constructor
 //-------------------------------------------------
 
-am2901b_device::am2901b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+am2901b_device::am2901b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AM2901B, tag, owner, clock)
 	, m_d(0)
 	, m_q(0)

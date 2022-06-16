@@ -89,12 +89,12 @@ DEFINE_DEVICE_TYPE(MC14411, mc14411_device, "mc14411", "MC14411 Bit Rate Generat
 //  LIVE DEVICE
 //**************************************************************************
 
-mc14411_device::mc14411_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc14411_device::mc14411_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc14411_device(mconfig, MC14411, tag, owner, clock)
 {
 }
 
-mc14411_device::mc14411_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mc14411_device::mc14411_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_fx_cbs(*this)
 	, m_divider(0)

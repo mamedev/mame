@@ -27,13 +27,13 @@
 class cs8900a_device : public device_t, public device_network_interface {
 public:
 
-	cs8900a_device(machine_config const& mconfig, char const *tag, device_t *owner, u32 clock);
+	cs8900a_device(machine_config const& mconfig, char const *tag, device_t *owner, const XTAL &clock);
 	u8 read(u16 address);
 	void write(u16 address, u8 data);
 
 protected:
 
-	cs8900a_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cs8900a_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

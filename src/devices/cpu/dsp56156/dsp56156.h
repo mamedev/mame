@@ -203,7 +203,7 @@ struct dsp56156_core
 class dsp56156_device : public cpu_device
 {
 public:
-	dsp56156_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	dsp56156_device(const machine_config &mconfig, const char *_tag, device_t *_owner, const XTAL &_clock);
 
 	uint16_t peripheral_register_r(offs_t offset);
 	void peripheral_register_w(offs_t offset, uint16_t data);

@@ -3814,12 +3814,12 @@ void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, cons
 }
 
 
-z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	z80_device(mconfig, Z80, tag, owner, clock)
 {
 }
 
-z80_device::z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+z80_device::z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	z80_daisy_chain_interface(mconfig, *this),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0),
@@ -3849,7 +3849,7 @@ device_memory_interface::space_config_vector z80_device::memory_space_config() c
 
 DEFINE_DEVICE_TYPE(Z80, z80_device, "z80", "Zilog Z80")
 
-nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80_device(mconfig, NSC800, tag, owner, clock)
 {
 }

@@ -74,7 +74,7 @@ void abc_databoard_4112_device::databoard_4112_io(address_map &map)
 
 void abc_databoard_4112_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_memory_map(&abc_databoard_4112_device::databoard_4112_mem);
 	m_maincpu->set_io_map(&abc_databoard_4112_device::databoard_4112_io);
 }
@@ -107,7 +107,7 @@ ioport_constructor abc_databoard_4112_device::device_input_ports() const
 //  abc_databoard_4112_device - constructor
 //-------------------------------------------------
 
-abc_databoard_4112_device::abc_databoard_4112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc_databoard_4112_device::abc_databoard_4112_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, DATABOARD_4112, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG)

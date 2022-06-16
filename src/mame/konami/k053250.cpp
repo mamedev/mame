@@ -7,7 +7,7 @@
 
 DEFINE_DEVICE_TYPE(K053250, k053250_device, "k053250", "K053250 LVC")
 
-k053250_device::k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k053250_device::k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K053250, tag, owner, clock),
 		device_gfx_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),

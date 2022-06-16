@@ -392,7 +392,7 @@ void sshangha_state::sshangha(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4000/4);
 
-	DECO16IC(config, m_tilegen, 0);
+	DECO16IC(config, m_tilegen);
 	// requires pf1 to be 64x64 for the ending screen to be displayed properly
 	// TODO: confirm arrangement, game barely uses scrolling otherwise
 	m_tilegen->set_pf1_size(DECO_64x64);
@@ -408,15 +408,15 @@ void sshangha_state::sshangha(machine_config &config)
 	m_tilegen->set_pf12_16x16_bank(1);
 	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen1, 0);
+	DECO_SPRITE(config, m_sprgen1);
 	m_sprgen1->set_gfx_region(2);
 	m_sprgen1->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen2, 0);
+	DECO_SPRITE(config, m_sprgen2);
 	m_sprgen2->set_gfx_region(3);
 	m_sprgen2->set_gfxdecode_tag("gfxdecode");
 
-	DECO146PROT(config, m_deco146, 0);
+	DECO146PROT(config, m_deco146);
 	m_deco146->port_a_cb().set_ioport("INPUTS");
 	m_deco146->port_b_cb().set_ioport("SYSTEM");
 	m_deco146->port_c_cb().set_ioport("DSW");

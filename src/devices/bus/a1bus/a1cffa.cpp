@@ -38,13 +38,13 @@ class a1bus_cffa_device:
 {
 public:
 	// construction/destruction
-	a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t cffa_r(offs_t offset);
 	void cffa_w(offs_t offset, uint8_t data);
 
 protected:
-	a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -78,12 +78,12 @@ const tiny_rom_entry *a1bus_cffa_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a1bus_cffa_device(mconfig, A1BUS_CFFA, tag, owner, clock)
 {
 }
 
-a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a1bus_card_interface(mconfig, *this)
 	, m_ata(*this, CFFA_ATA_TAG)

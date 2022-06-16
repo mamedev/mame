@@ -20,7 +20,7 @@ class hp_1ma6_device : public device_t
 {
 public:
 	// construction/destruction
-	hp_1ma6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp_1ma6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Register read/write
 	void reg_w(offs_t offset, uint8_t data);

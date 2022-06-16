@@ -95,7 +95,7 @@ const tiny_rom_entry *electron_mode7_device::device_rom_region() const
 //  electron_mode7_device - constructor
 //-------------------------------------------------
 
-electron_mode7_device::electron_mode7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_mode7_device::electron_mode7_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_MODE7, tag, owner, clock)
 	, device_electron_expansion_interface(mconfig, *this)
 	, m_screen(*this, "screen")

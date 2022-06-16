@@ -16,14 +16,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	pc8801_exp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: pc8801_exp_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: pc8801_exp_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	pc8801_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc8801_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~pc8801_exp_slot_device();
 
 	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
@@ -77,7 +77,7 @@ class pc8801_exp_device : public device_t, public device_pc8801_exp_interface
 {
 public:
 	// construction/destruction
-	pc8801_exp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pc8801_exp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 
 protected:

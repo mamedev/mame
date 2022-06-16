@@ -88,7 +88,7 @@ namespace {
 class rom_mbc_device_base : public mbc_ram_device_base<mbc_dual_device_base>
 {
 protected:
-	rom_mbc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+	rom_mbc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock) :
 		mbc_ram_device_base<mbc_dual_device_base>(mconfig, type, tag, owner, clock),
 		m_view_ram(*this, "ram"),
 		m_bank_lines{ 0U, 0U }

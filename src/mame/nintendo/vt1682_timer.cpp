@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(VT_VT1682_TIMER, vrt_vt1682_timer_device, "vt1682timer", "VRT VT1682 Timer")
 
-vrt_vt1682_timer_device::vrt_vt1682_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vrt_vt1682_timer_device::vrt_vt1682_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VT_VT1682_TIMER, tag, owner, clock),
 	m_timer(*this, "snd_timera"),
 	m_irq_cb(*this)

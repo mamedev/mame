@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(PET_USERPORT_DIAGNOSTIC_CONNECTOR, pet_userport_diagnostic_co
 //  pet_userport_diagnostic_connector_t - constructor
 //-------------------------------------------------
 
-pet_userport_diagnostic_connector_device::pet_userport_diagnostic_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pet_userport_diagnostic_connector_device::pet_userport_diagnostic_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PET_USERPORT_DIAGNOSTIC_CONNECTOR, tag, owner, clock),
 	device_pet_user_port_interface(mconfig, *this)
 {

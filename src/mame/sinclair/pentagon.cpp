@@ -204,7 +204,7 @@ void pentagon_state::pentagon(machine_config &config)
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, 320, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pentagon);
 
-	BETA_DISK(config, m_beta, 0);
+	BETA_DISK(config, m_beta);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

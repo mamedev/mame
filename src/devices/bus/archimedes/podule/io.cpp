@@ -42,7 +42,7 @@ class arc_io_aka_device :
 	public device_archimedes_podule_interface
 {
 protected:
-	arc_io_aka_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	arc_io_aka_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -74,7 +74,7 @@ class arc_bbcio_aka10_device : public arc_io_aka_device
 {
 public:
 	// construction/destruction
-	arc_bbcio_aka10_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_bbcio_aka10_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -93,7 +93,7 @@ class arc_upmidi_aka12_device : public arc_io_aka_device
 {
 public:
 	// construction/destruction
-	arc_upmidi_aka12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_upmidi_aka12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -111,7 +111,7 @@ class arc_iomidi_aka15_device : public arc_io_aka_device
 {
 public:
 	// construction/destruction
-	arc_iomidi_aka15_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_iomidi_aka15_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -130,7 +130,7 @@ class arc_midi_aka16_device : public arc_io_aka_device
 {
 public:
 	// construction/destruction
-	arc_midi_aka16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_midi_aka16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -284,7 +284,7 @@ void arc_io_aka_device::add_1mhzbus(machine_config &config)
 
 void arc_io_aka_device::add_midi_6850(machine_config &config)
 {
-	acia6850_device &acia(ACIA6850(config, "acia", 0));
+	acia6850_device &acia(ACIA6850(config, "acia"));
 	acia.irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
 	acia.txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 
@@ -355,7 +355,7 @@ void arc_midi_aka16_device::device_add_mconfig(machine_config &config)
 //  arc_io_aka_device - constructor
 //-------------------------------------------------
 
-arc_io_aka_device::arc_io_aka_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+arc_io_aka_device::arc_io_aka_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")
@@ -366,22 +366,22 @@ arc_io_aka_device::arc_io_aka_device(const machine_config &mconfig, device_type 
 {
 }
 
-arc_bbcio_aka10_device::arc_bbcio_aka10_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_bbcio_aka10_device::arc_bbcio_aka10_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_io_aka_device(mconfig, ARC_BBCIO_AKA10, tag, owner, clock)
 {
 }
 
-arc_upmidi_aka12_device::arc_upmidi_aka12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_upmidi_aka12_device::arc_upmidi_aka12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_io_aka_device(mconfig, ARC_UPMIDI_AKA12, tag, owner, clock)
 {
 }
 
-arc_iomidi_aka15_device::arc_iomidi_aka15_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_iomidi_aka15_device::arc_iomidi_aka15_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_io_aka_device(mconfig, ARC_IOMIDI_AKA15, tag, owner, clock)
 {
 }
 
-arc_midi_aka16_device::arc_midi_aka16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_midi_aka16_device::arc_midi_aka16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_io_aka_device(mconfig, ARC_MIDI_AKA16, tag, owner, clock)
 {
 }

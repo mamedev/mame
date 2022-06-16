@@ -46,7 +46,7 @@ Notes:
 #include "emu.h"
 #include "k573mcr.h"
 
-k573mcr_device::k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+k573mcr_device::k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	jvs_device(mconfig, KONAMI_573_MEMORY_CARD_READER, tag, owner, clock),
 	m_controllers(*this, "controllers"),
 	m_meta(*this, "META")
@@ -87,7 +87,7 @@ void k573mcr_device::device_add_mconfig(machine_config &config)
 	// a controller through the slots menu.
 	// The memory card ports are still usable even without a controller
 	// enabled which is the main reason for using the PSX controller ports.
-	PSXCONTROLLERPORTS(config, m_controllers, 0);
+	PSXCONTROLLERPORTS(config, m_controllers);
 	m_controllers->rxd().set(FUNC(k573mcr_device::write_rxd));
 	PSX_CONTROLLER_PORT(config, "port1", psx_controllers, nullptr);
 	PSX_CONTROLLER_PORT(config, "port2", psx_controllers, nullptr);

@@ -273,13 +273,13 @@ INPUT_PORTS_END
 void sphinx40_state::sphinx40(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sphinx40_state::main_map);
 
 	const attotime irq_period = attotime::from_hz(8000000 / 0x1000);
 	m_maincpu->set_periodic_int(FUNC(sphinx40_state::irq4_line_hold), irq_period);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(sphinx40_state::cb_mux_w));
 	m_pia->writepb_handler().set(FUNC(sphinx40_state::cb_leds_w));
 	m_pia->cb2_handler().set("dac", FUNC(dac_bit_interface::write));
@@ -292,7 +292,7 @@ void sphinx40_state::sphinx40(machine_config &config)
 	m_board->set_nvram_enable(true);
 
 	/* video hardware */
-	HD61603(config, m_lcd, 0);
+	HD61603(config, m_lcd);
 	m_lcd->write_segs().set(FUNC(sphinx40_state::lcd_seg_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 8);

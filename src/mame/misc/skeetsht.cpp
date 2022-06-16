@@ -223,11 +223,11 @@ INPUT_PORTS_END
 
 void skeetsht_state::skeetsht(machine_config &config)
 {
-	MC68HC11A1(config, m_68hc11, 8000000); // ?
+	MC68HC11A1(config, m_68hc11, XTAL::u(8000000)); // ?
 	m_68hc11->set_addrmap(AS_PROGRAM, &skeetsht_state::hc11_pgm_map);
 	m_68hc11->out_pa_callback().set(FUNC(skeetsht_state::hc11_porta_w));
 
-	TMS34010(config, m_tms, 48000000);
+	TMS34010(config, m_tms, XTAL::u(48000000));
 	m_tms->set_addrmap(AS_PROGRAM, &skeetsht_state::tms_program_map);
 	m_tms->set_halt_on_reset(true);
 	m_tms->set_pixel_clock(48000000 / 8);
@@ -235,7 +235,7 @@ void skeetsht_state::skeetsht(machine_config &config)
 	m_tms->set_scanline_rgb32_callback(FUNC(skeetsht_state::scanline_update));
 	m_tms->output_int().set(FUNC(skeetsht_state::tms_irq));
 
-	TLC34076(config, m_tlc34076, 0);
+	TLC34076(config, m_tlc34076);
 	m_tlc34076->set_bits(tlc34076_device::TLC34076_6_BIT);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -244,7 +244,7 @@ void skeetsht_state::skeetsht(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay, 2000000).add_route(ALL_OUTPUTS, "mono", 0.50); // ?
+	AY8910(config, m_ay, XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 0.50); // ?
 }
 
 

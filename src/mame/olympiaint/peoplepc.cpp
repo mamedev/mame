@@ -331,7 +331,7 @@ void peoplepc_state::olypeopl(machine_config &config)
 	kbd.rxd_handler().set(m_8251key, FUNC(i8251_device::write_rxd));
 	kbd.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
-	I8048(config, "kbdmcu", 4'608'000).set_disable(); // XTAL unknown
+	I8048(config, "kbdmcu", XTAL::u(4'608'000)).set_disable(); // XTAL unknown
 
 	I8251(config, m_8251ser, XTAL(14'745'600)/6);
 	m_8251ser->rxrdy_handler().set("pic8259_0", FUNC(pic8259_device::ir5_w));

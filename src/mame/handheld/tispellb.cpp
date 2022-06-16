@@ -327,14 +327,14 @@ INPUT_PORTS_END
 void tispellb_state::rev1(machine_config &config)
 {
 	// basic machine hardware
-	TMS0270(config, m_maincpu, 350000); // approximation
+	TMS0270(config, m_maincpu, XTAL::u(350000)); // approximation
 	m_maincpu->read_k().set(FUNC(tispellb_state::main_read_k));
 	m_maincpu->write_o().set(FUNC(tispellb_state::main_write_o));
 	m_maincpu->write_r().set(FUNC(tispellb_state::main_write_r));
 	m_maincpu->read_ctl().set(FUNC(tispellb_state::rev1_ctl_r));
 	m_maincpu->write_ctl().set(FUNC(tispellb_state::rev1_ctl_w));
 
-	TMS1980(config, m_subcpu, 350000); // approximation
+	TMS1980(config, m_subcpu, XTAL::u(350000)); // approximation
 	m_subcpu->read_k().set(FUNC(tispellb_state::sub_read_k));
 	m_subcpu->write_o().set(FUNC(tispellb_state::sub_write_o));
 	m_subcpu->write_r().set(FUNC(tispellb_state::sub_write_r));
@@ -353,14 +353,14 @@ void tispellb_state::rev1(machine_config &config)
 void tispellb_state::rev2(machine_config &config)
 {
 	// basic machine hardware
-	TMS0270(config, m_maincpu, 350000); // approximation
+	TMS0270(config, m_maincpu, XTAL::u(350000)); // approximation
 	m_maincpu->read_k().set(FUNC(tispellb_state::main_read_k));
 	m_maincpu->write_o().set(FUNC(tispellb_state::rev2_write_o));
 	m_maincpu->write_r().set(FUNC(tispellb_state::rev2_write_r));
 	m_maincpu->read_ctl().set(m_tms6100, FUNC(tms6100_device::data_r));
 	m_maincpu->write_ctl().set(m_tms6100, FUNC(tms6100_device::add_w));
 
-	TMS6100(config, m_tms6100, 350000);
+	TMS6100(config, m_tms6100, XTAL::u(350000));
 	m_tms6100->enable_4bit_mode(true);
 
 	// video hardware

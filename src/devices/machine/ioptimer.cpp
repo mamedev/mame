@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(SONYIOP_TIMER, iop_timer_device, "ioptimer", "PlayStation 2 IOP timer")
 
-iop_timer_device::iop_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iop_timer_device::iop_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYIOP_TIMER, tag, owner, clock)
 	, m_compare_timer(nullptr)
 	, m_overflow_timer(nullptr)

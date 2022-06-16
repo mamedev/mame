@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(SPECIMX_SND, specimx_sound_device, "specimx_sound", "Speciali
 //  specimx_sound_device - constructor
 //-------------------------------------------------
 
-specimx_sound_device::specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+specimx_sound_device::specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPECIMX_SND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_mixer_channel(nullptr)

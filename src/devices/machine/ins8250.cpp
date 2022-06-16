@@ -107,7 +107,7 @@ DEFINE_DEVICE_TYPE(NS16450,  ns16450_device, "ns16450",  "National Semiconductor
 DEFINE_DEVICE_TYPE(NS16550,  ns16550_device, "ns16550",  "National Semiconductor NS16550 UART")
 DEFINE_DEVICE_TYPE(PC16552D, pc16552_device, "pc16552d", "National Semiconductor PC16552D UART")
 
-ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, dev_type device_type)
+ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, dev_type device_type)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_device_type(device_type)
@@ -127,22 +127,22 @@ ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_t
 	m_regs.ier = 0;
 }
 
-ins8250_device::ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ins8250_device::ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ins8250_uart_device(mconfig, INS8250, tag, owner, clock, dev_type::INS8250)
 {
 }
 
-ns16450_device::ns16450_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ns16450_device::ns16450_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ins8250_uart_device(mconfig, NS16450, tag, owner, clock, dev_type::NS16450)
 {
 }
 
-ns16550_device::ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ns16550_device::ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ins8250_uart_device(mconfig, NS16550, tag, owner, clock, dev_type::NS16550)
 {
 }
 
-pc16552_device::pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pc16552_device::pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PC16552D, tag, owner, clock)
 {
 }
@@ -643,8 +643,8 @@ void ins8250_uart_device::device_start()
 	m_out_int_cb.resolve_safe();
 	m_out_out1_cb.resolve_safe();
 	m_out_out2_cb.resolve_safe();
-	set_tra_rate(0);
-	set_rcv_rate(0);
+	set_tra_rate(XTAL::u(0));
+	set_rcv_rate(XTAL::u(0));
 
 	save_item(NAME(m_regs.thr));
 	save_item(NAME(m_regs.rbr));

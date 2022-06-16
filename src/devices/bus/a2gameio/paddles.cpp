@@ -17,7 +17,7 @@ class apple2_paddles_device : public device_t, public device_a2gameio_interface
 {
 public:
 	// construction/destruction
-	apple2_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	apple2_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -68,7 +68,7 @@ INPUT_PORTS_END
 //  DEVICE IMPLEMENTATION
 //**************************************************************************
 
-apple2_paddles_device::apple2_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+apple2_paddles_device::apple2_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, APPLE2_PADDLES, tag, owner, clock)
 	, device_a2gameio_interface(mconfig, *this)
 	, m_pdl(*this, "paddle_%u", 1U)

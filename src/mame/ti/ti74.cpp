@@ -544,7 +544,7 @@ void ti74_state::ti74(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0)); // 270kHz
+	hd44780_device &hd44780(HD44780(config, "hd44780")); // 270kHz
 	hd44780.set_lcd_size(2, 16); // 2*16 internal
 	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti74_pixel_update));
 
@@ -577,7 +577,7 @@ void ti74_state::ti95(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
+	hd44780_device &hd44780(HD44780(config, "hd44780"));
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti95_pixel_update));
 

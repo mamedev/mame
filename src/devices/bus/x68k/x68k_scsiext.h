@@ -19,7 +19,7 @@ class x68k_scsiext_device : public device_t,
 {
 public:
 	// construction/destruction
-	x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t register_r(offs_t offset);
 	void register_w(offs_t offset, uint8_t data);

@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(MOS8726, mos8726_device, "mos8726", "MOS 8726 DMA Controller"
 //  mos8726_device - constructor
 //-------------------------------------------------
 
-mos8726_device::mos8726_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos8726_device::mos8726_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MOS8726, tag, owner, clock)
 	, device_execute_interface(mconfig, *this)
 	, m_icount(0)

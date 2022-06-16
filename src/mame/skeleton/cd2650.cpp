@@ -352,10 +352,10 @@ void cd2650_state::cd2650(machine_config &config)
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
+	BEEP(config, "beeper", XTAL::u(950)).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(cd2650_state::kbd_put));
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);

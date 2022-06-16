@@ -82,7 +82,7 @@ class sega_hangon_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_hangon_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_hangon_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// subclass overrides
@@ -99,7 +99,7 @@ class sega_sharrier_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_sharrier_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_sharrier_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// subclass overrides
@@ -116,9 +116,9 @@ class sega_outrun_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
-	sega_outrun_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool xboard_variant);
+	sega_outrun_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool xboard_variant);
 
 protected:
 	// subclass overrides
@@ -133,7 +133,7 @@ class sega_xboard_sprite_device : public sega_outrun_sprite_device
 {
 public:
 	// construction/destruction
-	sega_xboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_xboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -143,7 +143,7 @@ class sega_sys16a_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// subclass overrides
@@ -160,7 +160,7 @@ class bootleg_sys16a_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int originx,
+	bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, int originx,
 		uint8_t offs0, uint8_t offs1, uint8_t offs2, uint8_t offs3, uint8_t offs4, uint8_t offs5, uint8_t offs6, uint8_t offs7)
 		: bootleg_sys16a_sprite_device(mconfig, tag, owner, clock)
 	{
@@ -168,7 +168,7 @@ public:
 		set_remap(offs0, offs1, offs2, offs3, offs4, offs5, offs6, offs7);
 	}
 
-	bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bootleg_sys16a_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_remap(uint8_t offs0, uint8_t offs1, uint8_t offs2, uint8_t offs3, uint8_t offs4, uint8_t offs5, uint8_t offs6, uint8_t offs7);
@@ -191,7 +191,7 @@ class sega_sys16b_sprite_device : public sega_16bit_sprite_device
 {
 public:
 	// construction/destruction
-	sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// subclass overrides
@@ -210,7 +210,7 @@ public:
 	typedef segaic16_video_device::rotate_info rotate_info;
 
 	// construction/destruction
-	sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void set_rotate_ptr(rotate_info* segaic16_rotate) { m_segaic16_rotate = segaic16_rotate; }
 
 protected:

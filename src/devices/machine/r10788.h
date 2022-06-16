@@ -21,7 +21,7 @@
 class r10788_device : public device_t
 {
 public:
-	r10788_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	r10788_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	enum {
 		KTR = 0xc,  //!< Transfer Keyboard Return

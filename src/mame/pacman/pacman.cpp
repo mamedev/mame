@@ -3874,9 +3874,9 @@ void pacman_state::vanvan(machine_config &config)
 	// Sound hardware
 	config.device_remove("namco");
 
-	SN76496(config, "sn1", 1789750).add_route(ALL_OUTPUTS, "mono", 0.75);
+	SN76496(config, "sn1", XTAL::u(1789750)).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	SN76496(config, "sn2", 1789750).add_route(ALL_OUTPUTS, "mono", 0.75);
+	SN76496(config, "sn2", XTAL::u(1789750)).add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	m_mainlatch->q_out_cb<0>().set(FUNC(pacman_state::nmi_mask_w));
 	m_mainlatch->q_out_cb<1>().set_nop();
@@ -4032,7 +4032,7 @@ void pacman_state::crushs(machine_config &config)
 	m_maincpu->remove_irq_acknowledge_callback();
 
 	// Sound hardware
-	ay8912_device &ay8912(AY8912(config, "ay8912", 1789750));
+	ay8912_device &ay8912(AY8912(config, "ay8912", XTAL::u(1789750)));
 	ay8912.port_a_read_callback().set_ioport("DSW2");
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 }

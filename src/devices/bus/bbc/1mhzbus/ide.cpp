@@ -78,14 +78,14 @@ void bbc_beebide_device::device_add_mconfig(machine_config& config)
 //  bbc_ide_device - constructor
 //-------------------------------------------------
 
-bbc_ide8_device::bbc_ide8_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bbc_ide8_device::bbc_ide8_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
 	: device_t(mconfig, BBC_IDE8, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_ide(*this, "ide")
 {
 }
 
-bbc_beebide_device::bbc_beebide_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bbc_beebide_device::bbc_beebide_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
 	: device_t(mconfig, BBC_BEEBIDE, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_ide(*this, "ide")

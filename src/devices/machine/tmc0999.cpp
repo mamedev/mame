@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(TMC0999, tmc0999_device, "tmc0999", "TI TMC0999 RAM")
 //  constructor
 //-------------------------------------------------
 
-tmc0999_device::tmc0999_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+tmc0999_device::tmc0999_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TMC0999, tag, owner, clock)
 { }
 

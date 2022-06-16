@@ -554,7 +554,7 @@ void gaplus_state::gaplus(machine_config &config)
 {
 	gaplus_base(config);
 
-	NAMCO_56XX(config, m_namco56xx, 0);
+	NAMCO_56XX(config, m_namco56xx);
 	m_namco56xx->in_callback<0>().set_ioport("COINS");
 	m_namco56xx->in_callback<1>().set_ioport("P1");
 	m_namco56xx->in_callback<2>().set_ioport("P2");
@@ -562,7 +562,7 @@ void gaplus_state::gaplus(machine_config &config)
 	m_namco56xx->out_callback<0>().set(FUNC(gaplus_state::out_lamps0));
 	m_namco56xx->out_callback<1>().set(FUNC(gaplus_state::out_lamps1));
 
-	NAMCO_58XX(config, m_namco58xx, 0);
+	NAMCO_58XX(config, m_namco58xx);
 	m_namco58xx->in_callback<0>().set_ioport("DSWA_HIGH");
 	m_namco58xx->in_callback<1>().set_ioport("DSWB_LOW");
 	m_namco58xx->in_callback<2>().set_ioport("DSWB_HIGH");
@@ -573,13 +573,13 @@ void gaplusd_state::gaplusd(machine_config &config)
 {
 	gaplus_base(config);
 
-	NAMCO_58XX(config, m_namco58xx, 0);
+	NAMCO_58XX(config, m_namco58xx);
 	m_namco58xx->in_callback<0>().set_ioport("COINS");
 	m_namco58xx->in_callback<1>().set_ioport("P1");
 	m_namco58xx->in_callback<2>().set_ioport("P2");
 	m_namco58xx->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_56XX(config, m_namco56xx, 0);
+	NAMCO_56XX(config, m_namco56xx);
 	m_namco56xx->in_callback<0>().set_ioport("DSWA_HIGH");
 	m_namco56xx->in_callback<1>().set_ioport("DSWB_LOW");
 	m_namco56xx->in_callback<2>().set_ioport("DSWB_HIGH");
@@ -594,13 +594,13 @@ void gapluso_state::gapluso(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(gaplus_base_state::screen_vblank));
 	m_screen->screen_vblank().append(FUNC(gapluso_state::vblank_irq));
 
-	NAMCO_56XX(config, m_namco56xx, 0);
+	NAMCO_56XX(config, m_namco56xx);
 	m_namco56xx->in_callback<0>().set_ioport("COINS");
 	m_namco56xx->in_callback<1>().set_ioport("P1");
 	m_namco56xx->in_callback<2>().set_ioport("P2");
 	m_namco56xx->in_callback<3>().set_ioport("BUTTONS");
 
-	NAMCO_58XX(config, m_namco58xx, 0);
+	NAMCO_58XX(config, m_namco58xx);
 	m_namco58xx->in_callback<0>().set_ioport("DSWA_HIGH");
 	m_namco58xx->in_callback<1>().set_ioport("DSWB_LOW");
 	m_namco58xx->in_callback<2>().set_ioport("DSWB_HIGH");

@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(AM9519, am9519_device, "am9519", "AMD AM9519 Universal Interrupt Controller")
 
-am9519_device::am9519_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+am9519_device::am9519_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AM9519, tag, owner, clock)
 	, m_out_int_func(*this)
 	, m_irr(0)

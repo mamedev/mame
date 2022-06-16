@@ -15,7 +15,7 @@
 class pc9801_snd_device : public device_t
 {
 public:
-	pc9801_snd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pc9801_snd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	u8 opn_porta_r();

@@ -361,14 +361,14 @@ GFXDECODE_END
 void kpontoon_state::kpontoon(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 21'053'000 / 4); // clock unverified
+	Z80(config, m_maincpu, XTAL::u(21'053'000) / 4); // clock unverified
 	m_maincpu->set_addrmap(AS_PROGRAM, &kpontoon_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(kpontoon_state::ccu_scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 21'053'000 / 3); // clock unverified
+	Z80(config, m_audiocpu, XTAL::u(21'053'000) / 3); // clock unverified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kpontoon_state::sound_map);
 
-	K053252(config, m_k053252, 21'053'000 / 8); // clock unverified
+	K053252(config, m_k053252, XTAL::u(21'053'000) / 8); // clock unverified
 	m_k053252->int1_ack().set(FUNC(kpontoon_state::vbl_ack_w));
 	m_k053252->int2_ack().set(FUNC(kpontoon_state::nmi_ack_w));
 	m_k053252->int_time().set(FUNC(kpontoon_state::ccu_int_time_w));
@@ -390,7 +390,7 @@ void kpontoon_state::kpontoon(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246);
 	//m_k053246.set_sprite_callback(FUNC(kpontoon_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 0, 0); // TODO: verify
 	m_k053246->set_palette(m_palette);

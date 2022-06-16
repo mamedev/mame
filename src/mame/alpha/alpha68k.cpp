@@ -1285,7 +1285,7 @@ void alpha68k_II_state::base_config(machine_config &config)
 	ym2413_device &ym2(YM2413(config, "ym2", 3.579545_MHz_XTAL)); // TODO: verify me
 	ym2.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // ALPHA-VOICE88 custom DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.75); // ALPHA-VOICE88 custom DAC
 }
 
 void alpha68k_II_state::video_config(machine_config &config, u16 num_pens)
@@ -1299,14 +1299,14 @@ void alpha68k_II_state::video_config(machine_config &config, u16 num_pens)
 	// TODO: should really be same as snk68.cpp
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_II_state,alpha68k)
 
-	SNK68_SPR(config, m_sprites, 0);
+	SNK68_SPR(config, m_sprites);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
 	m_sprites->set_tile_indirect_cb(FUNC(alpha68k_II_state::tile_callback));
 	m_sprites->set_xpos_shift(15);
 	m_sprites->set_color_entry_mask((num_pens / 16) - 1);
 
 	// TODO: change into NeoGeo palette format ...
-	ALPHA68K_PALETTE(config, m_palette, 0);
+	ALPHA68K_PALETTE(config, m_palette);
 	m_palette->set_entries(num_pens);
 }
 
@@ -1316,11 +1316,11 @@ void alpha68k_II_state::alpha68k_II(machine_config &config)
 	m_outlatch->parallel_out_cb().set(FUNC(alpha68k_II_state::video_bank_w)).rshift(4).mask(0x07);
 
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000); // TODO: verify me
+	M68000(config, m_maincpu, XTAL::u(8000000)); // TODO: verify me
 	m_maincpu->set_addrmap(AS_PROGRAM, &alpha68k_II_state::alpha68k_II_map);
 	m_maincpu->set_vblank_int("screen", FUNC(alpha68k_state::irq3_line_hold)); /* VBL */
 
-	Z80(config, m_audiocpu, 6000000); // TODO: verify me
+	Z80(config, m_audiocpu, XTAL::u(6000000)); // TODO: verify me
 	m_audiocpu->set_addrmap(AS_PROGRAM, &alpha68k_II_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &alpha68k_II_state::sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(alpha68k_II_state::sound_nmi), attotime::from_hz(7614));

@@ -101,7 +101,7 @@ class sh_common_execution : public cpu_device
 {
 
 public:
-	sh_common_execution(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal)
+	sh_common_execution(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, endianness_t endianness, address_map_constructor internal)
 		: cpu_device(mconfig, type, tag, owner, clock)
 		, m_sh2_state(nullptr)
 		, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))

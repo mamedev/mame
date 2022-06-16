@@ -33,9 +33,9 @@ class upd7001_device : public device_t
 {
 public:
 	// device type constructors
-	upd7001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	upd7001_device(const machine_config &mconfig, const char *tag, device_t *owner, double r, double c)
-		: upd7001_device(mconfig, tag, owner, 0U)
+		: upd7001_device(mconfig, tag, owner)
 	{
 		set_rc(r, c);
 	}

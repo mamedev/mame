@@ -19,7 +19,7 @@
 class isa16_cl_sh260_device : public device_t, public device_isa16_card_interface
 {
 protected:
-	isa16_cl_sh260_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	isa16_cl_sh260_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 
@@ -31,7 +31,7 @@ protected:
 class isa16_ev346_device : public isa16_cl_sh260_device
 {
 public:
-	isa16_ev346_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	isa16_ev346_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
@@ -46,7 +46,7 @@ private:
 class isa16_jc1310_device : public isa16_cl_sh260_device
 {
 public:
-	isa16_jc1310_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	isa16_jc1310_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 

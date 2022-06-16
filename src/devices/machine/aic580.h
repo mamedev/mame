@@ -21,7 +21,7 @@ class aic580_device : public device_t
 {
 public:
 	// construction/destruction
-	aic580_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	aic580_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callback configuration
 	auto bdin_callback() { return m_bdin_callback.bind(); }

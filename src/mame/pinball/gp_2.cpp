@@ -559,7 +559,7 @@ static const z80_daisy_config daisy_chain[] =
 void gp_2_state::gp_2(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2457600);
+	Z80(config, m_maincpu, XTAL::u(2457600));
 	m_maincpu->set_addrmap(AS_PROGRAM, &gp_2_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &gp_2_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
@@ -578,10 +578,10 @@ void gp_2_state::gp_2(machine_config &config)
 	m_ppi->in_pb_callback().set(FUNC(gp_2_state::portb_r));
 	m_ppi->out_pc_callback().set(FUNC(gp_2_state::portc_w));
 
-	Z80CTC(config, m_ctc, 2457600);
+	Z80CTC(config, m_ctc, XTAL::u(2457600));
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // Todo: absence of ints will cause a watchdog reset
 
-	clock_device &cpoint_clock(CLOCK(config, "cpoint_clock", 120)); // crosspoint detector
+	clock_device &cpoint_clock(CLOCK(config, "cpoint_clock", XTAL::u(120))); // crosspoint detector
 	cpoint_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg2));
 }
 

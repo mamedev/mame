@@ -990,7 +990,7 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	m_ga->atn_callback().set(FUNC(c1541_device_base::atn_w));
 	m_ga->byte_callback().set(FUNC(c1541_device_base::byte_w));
 
-	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0", 0));
+	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0"));
 	connector.option_add("525ssqd", ALPS_3255190X);
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);
@@ -1025,7 +1025,7 @@ void c1541_prologic_dos_classic_device::device_add_mconfig(machine_config &confi
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_prologic_dos_classic_device::c1541pdc_mem);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpb_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pb_r));
 	m_pia->writepa_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pa_w));
 	m_pia->writepb_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pb_w));
@@ -1034,7 +1034,7 @@ void c1541_prologic_dos_classic_device::device_add_mconfig(machine_config &confi
 	centronics_device &centronics(CENTRONICS(config, CENTRONICS_TAG, centronics_devices, "printer"));
 	centronics.ack_handler().set(MC6821_TAG, FUNC(pia6821_device::ca1_w));
 
-	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out", 0));
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(cent_data_out);
 }
 
@@ -1089,7 +1089,7 @@ inline void c1541_device_base::set_iec_data()
 //  c1541_device_base - constructor
 //-------------------------------------------------
 
-c1541_device_base::c1541_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+c1541_device_base::c1541_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_cbm_iec_interface(mconfig, *this),
 	device_c64_floppy_parallel_interface(mconfig, *this),
@@ -1111,7 +1111,7 @@ c1541_device_base::c1541_device_base(const machine_config &mconfig, device_type 
 //  c1540_device - constructor
 //-------------------------------------------------
 
-c1540_device::c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+c1540_device::c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, C1540, tag, owner, clock) { }
 
 
@@ -1119,7 +1119,7 @@ c1540_device::c1540_device(const machine_config &mconfig, const char *tag, devic
 //  c1541_device - constructor
 //-------------------------------------------------
 
-c1541_device::c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+c1541_device::c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, C1541, tag, owner, clock) { }
 
 
@@ -1127,7 +1127,7 @@ c1541_device::c1541_device(const machine_config &mconfig, const char *tag, devic
 //  c1541c_device - constructor
 //-------------------------------------------------
 
-c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, C1541C, tag, owner, clock) {  }
 
 
@@ -1135,7 +1135,7 @@ c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, dev
 //  c1541ii_device - constructor
 //-------------------------------------------------
 
-c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, C1541II, tag, owner, clock) {  }
 
 
@@ -1143,7 +1143,7 @@ c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, d
 //  sx1541_device - constructor
 //-------------------------------------------------
 
-sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, SX1541, tag, owner, clock) { }
 
 
@@ -1151,7 +1151,7 @@ sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, dev
 //  fsd1_device - constructor
 //-------------------------------------------------
 
-fsd1_device::fsd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+fsd1_device::fsd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, FSD1, tag, owner, clock) { }
 
 
@@ -1159,7 +1159,7 @@ fsd1_device::fsd1_device(const machine_config &mconfig, const char *tag, device_
 //  fsd2_device - constructor
 //-------------------------------------------------
 
-fsd2_device::fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+fsd2_device::fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, FSD2, tag, owner, clock) { }
 
 
@@ -1167,7 +1167,7 @@ fsd2_device::fsd2_device(const machine_config &mconfig, const char *tag, device_
 //  csd1_device - constructor
 //-------------------------------------------------
 
-csd1_device::csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+csd1_device::csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, CSD1, tag, owner, clock) { }
 
 
@@ -1175,7 +1175,7 @@ csd1_device::csd1_device(const machine_config &mconfig, const char *tag, device_
 //  c1541_dolphin_dos_device - constructor
 //-------------------------------------------------
 
-c1541_dolphin_dos_device::c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+c1541_dolphin_dos_device::c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, C1541_DOLPHIN_DOS, tag, owner, clock) {  }
 
 
@@ -1183,7 +1183,7 @@ c1541_dolphin_dos_device::c1541_dolphin_dos_device(const machine_config &mconfig
 //  c1541_professional_dos_v1_device - constructor
 //-------------------------------------------------
 
-c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, C1541_PROFESSIONAL_DOS_V1, tag, owner, clock) {  }
 
 
@@ -1191,7 +1191,7 @@ c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine
 //  c1541_prologic_dos_classic_device - constructor
 //-------------------------------------------------
 
-c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, C1541_PROLOGIC_DOS_CLASSIC, tag, owner, clock),
 		m_pia(*this, MC6821_TAG),
 		m_cent_data_out(*this, "cent_data_out"),
@@ -1204,7 +1204,7 @@ c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machi
 //  indus_gt_device - constructor
 //-------------------------------------------------
 
-indus_gt_device::indus_gt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+indus_gt_device::indus_gt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, INDUS_GT, tag, owner, clock) { }
 
 
@@ -1212,7 +1212,7 @@ indus_gt_device::indus_gt_device(const machine_config &mconfig, const char *tag,
 //  technica_device - constructor
 //-------------------------------------------------
 
-technica_device::technica_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+technica_device::technica_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, TECHNICA, tag, owner, clock) { }
 
 
@@ -1220,7 +1220,7 @@ technica_device::technica_device(const machine_config &mconfig, const char *tag,
 //  blue_chip_device - constructor
 //-------------------------------------------------
 
-blue_chip_device::blue_chip_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+blue_chip_device::blue_chip_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, BLUE_CHIP, tag, owner, clock) { }
 
 
@@ -1228,7 +1228,7 @@ blue_chip_device::blue_chip_device(const machine_config &mconfig, const char *ta
 //  commander_c2_device - constructor
 //-------------------------------------------------
 
-commander_c2_device::commander_c2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+commander_c2_device::commander_c2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, COMMANDER_C2, tag, owner, clock) { }
 
 
@@ -1236,7 +1236,7 @@ commander_c2_device::commander_c2_device(const machine_config &mconfig, const ch
 //  enhancer_2000_device - constructor
 //-------------------------------------------------
 
-enhancer_2000_device::enhancer_2000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+enhancer_2000_device::enhancer_2000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, ENHANCER_2000, tag, owner, clock) { }
 
 
@@ -1244,7 +1244,7 @@ enhancer_2000_device::enhancer_2000_device(const machine_config &mconfig, const 
 //  fd148_device - constructor
 //-------------------------------------------------
 
-fd148_device::fd148_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+fd148_device::fd148_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, FD148, tag, owner, clock) { }
 
 
@@ -1252,7 +1252,7 @@ fd148_device::fd148_device(const machine_config &mconfig, const char *tag, devic
 //  msd_sd1_device - constructor
 //-------------------------------------------------
 
-msd_sd1_device::msd_sd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+msd_sd1_device::msd_sd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, MSD_SD1, tag, owner, clock) { }
 
 
@@ -1260,7 +1260,7 @@ msd_sd1_device::msd_sd1_device(const machine_config &mconfig, const char *tag, d
 //  msd_sd2_device - constructor
 //-------------------------------------------------
 
-msd_sd2_device::msd_sd2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+msd_sd2_device::msd_sd2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1541_device_base(mconfig, MSD_SD2, tag, owner, clock) { }
 
 

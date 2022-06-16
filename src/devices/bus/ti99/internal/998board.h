@@ -98,7 +98,7 @@ class mainboard8_device;
 class vaquerro_device : public device_t
 {
 public:
-	vaquerro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vaquerro_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void device_start() override;
 	void device_reset() override;
 
@@ -246,7 +246,7 @@ private:
 class mofetta_device : public device_t
 {
 public:
-	mofetta_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mofetta_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void device_start() override;
 	void device_reset() override;
@@ -333,7 +333,7 @@ private:
 class amigo_device : public device_t
 {
 public:
-	amigo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	amigo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void device_start() override;
 	void device_reset() override;
 
@@ -454,7 +454,7 @@ typedef enum
 class oso_device : public bus::hexbus::hexbus_chained_device
 {
 public:
-	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 	void device_start() override;
@@ -540,7 +540,7 @@ private:
 class mainboard8_device : public device_t
 {
 public:
-	mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Memory space
 	uint8_t read(offs_t offset);

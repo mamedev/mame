@@ -43,7 +43,7 @@ enum
 	MDIP8 = 0x80
 };
 
-geneve_memex_device::geneve_memex_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+geneve_memex_device::geneve_memex_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_MEMEX, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_ram(*this, RAMREGION)
@@ -171,7 +171,7 @@ INPUT_PORTS_END
 
 void geneve_memex_device::device_add_mconfig(machine_config &config)
 {
-	RAM(config, m_ram, 0);
+	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
 	m_ram->set_default_value(0);
 }

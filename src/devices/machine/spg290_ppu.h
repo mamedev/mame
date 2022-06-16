@@ -13,10 +13,10 @@
 class spg290_ppu_device : public device_t
 {
 public:
-	spg290_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg290_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T>
-	spg290_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+	spg290_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag)
 		: spg290_ppu_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));

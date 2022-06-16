@@ -142,7 +142,7 @@ const tiny_rom_entry *spectrum_kempcentreu_device::device_rom_region() const
 //  spectrum_lprint_device - constructors
 //-------------------------------------------------
 
-spectrum_lprint_device::spectrum_lprint_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_lprint_device::spectrum_lprint_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPECTRUM_LPRINT, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_rom(*this, "rom")
@@ -150,7 +150,7 @@ spectrum_lprint_device::spectrum_lprint_device(const machine_config &mconfig, co
 {
 }
 
-spectrum_lprint3_device::spectrum_lprint3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_lprint3_device::spectrum_lprint3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPECTRUM_LPRINT3, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_rom(*this, "rom")
@@ -160,14 +160,14 @@ spectrum_lprint3_device::spectrum_lprint3_device(const machine_config &mconfig, 
 {
 }
 
-spectrum_kempcentrs_device::spectrum_kempcentrs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_kempcentrs_device::spectrum_kempcentrs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPECTRUM_KEMPCENTRS, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_centronics(*this, "centronics")
 {
 }
 
-spectrum_kempcentre_device::spectrum_kempcentre_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_kempcentre_device::spectrum_kempcentre_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_rom(*this, "rom")
@@ -175,12 +175,12 @@ spectrum_kempcentre_device::spectrum_kempcentre_device(const machine_config &mco
 {
 }
 
-spectrum_kempcentre_device::spectrum_kempcentre_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_kempcentre_device::spectrum_kempcentre_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_kempcentre_device(mconfig, SPECTRUM_KEMPCENTREF, tag, owner, clock)
 {
 }
 
-spectrum_kempcentreu_device::spectrum_kempcentreu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_kempcentreu_device::spectrum_kempcentreu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_kempcentre_device(mconfig, SPECTRUM_KEMPCENTREU, tag, owner, clock)
 {
 }

@@ -20,7 +20,7 @@ class pinsnd88_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	pinsnd88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pinsnd88_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// overrides
 	virtual void device_reset() override; // power up reset
@@ -38,7 +38,7 @@ public:
 
 protected:
 	// constructor with overridable type for subclass, in case we want to put NARC's sound board in here eventually
-	//pinsnd88_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	//pinsnd88_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// overrides
 	virtual void device_start() override;

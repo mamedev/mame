@@ -18,7 +18,7 @@
 DEFINE_DEVICE_TYPE(SPG290_PPU, spg290_ppu_device, "spg290_ppu", "SPG290 PPU")
 
 
-spg290_ppu_device::spg290_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spg290_ppu_device::spg290_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPG290_PPU, tag, owner, clock)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_sprite_palette_ram(*this, "sprite_palette_ram")

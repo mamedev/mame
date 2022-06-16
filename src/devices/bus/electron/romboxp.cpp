@@ -120,7 +120,7 @@ const tiny_rom_entry *electron_romboxp_device::device_rom_region() const
 //  electron_romboxp_device - constructor
 //-------------------------------------------------
 
-electron_romboxp_device::electron_romboxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_romboxp_device::electron_romboxp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_ROMBOXP, tag, owner, clock)
 	, device_electron_expansion_interface(mconfig, *this)
 	, m_irqs(*this, "irqs")

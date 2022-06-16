@@ -68,7 +68,7 @@ public:
 
 protected:
 	// construction/destruction
-	pace_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	pace_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-specific overrides
 	virtual void device_resolve_objects() override;
@@ -216,7 +216,7 @@ class ins8900_device : public pace_device
 {
 public:
 	// device type constructor
-	ins8900_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ins8900_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type declarations

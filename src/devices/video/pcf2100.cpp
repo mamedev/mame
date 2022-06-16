@@ -27,24 +27,24 @@ DEFINE_DEVICE_TYPE(PCF2112, pcf2112_device, "pcf2112", "Philips PCF2112 LCD Driv
 //  constructor
 //-------------------------------------------------
 
-pcf2100_device::pcf2100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bpmax, u8 smax) :
+pcf2100_device::pcf2100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 bpmax, u8 smax) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_bpmax(bpmax), m_smax(smax), m_write_segs(*this)
 { }
 
-pcf2100_device::pcf2100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+pcf2100_device::pcf2100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pcf2100_device(mconfig, PCF2100, tag, owner, clock, 2, 20)
 { }
 
-pcf2110_device::pcf2110_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+pcf2110_device::pcf2110_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pcf2100_device(mconfig, PCF2110, tag, owner, clock, 2, 32)
 { }
 
-pcf2111_device::pcf2111_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+pcf2111_device::pcf2111_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pcf2100_device(mconfig, PCF2111, tag, owner, clock, 2, 32)
 { }
 
-pcf2112_device::pcf2112_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+pcf2112_device::pcf2112_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pcf2100_device(mconfig, PCF2112, tag, owner, clock, 1, 32)
 { }
 

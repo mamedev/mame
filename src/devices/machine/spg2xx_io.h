@@ -12,7 +12,7 @@
 class spg2xx_io_device : public device_t
 {
 public:
-	spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto porta_out() { return m_porta_out.bind(); }
 	auto portb_out() { return m_portb_out.bind(); }
@@ -54,7 +54,7 @@ public:
 	template <size_t Line> uint16_t adc_r() { return m_adc_in[Line](); }
 
 protected:
-	spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint32_t sprite_limit)
+	spg2xx_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const uint32_t sprite_limit)
 		: spg2xx_io_device(mconfig, type, tag, owner, clock)
 	{
 	}
@@ -275,28 +275,28 @@ class spg24x_io_device : public spg2xx_io_device
 {
 public:
 	template <typename T, typename U>
-	spg24x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
+	spg24x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag, U &&screen_tag)
 		: spg24x_io_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 		m_screen.set_tag(std::forward<U>(screen_tag));
 	}
 
-	spg24x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg24x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class spg28x_io_device : public spg2xx_io_device
 {
 public:
 	template <typename T, typename U>
-	spg28x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
+	spg28x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag, U &&screen_tag)
 		: spg28x_io_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 		m_screen.set_tag(std::forward<U>(screen_tag));
 	}
 
-	spg28x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg28x_io_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void io_extended_w(offs_t offset, uint16_t data) override;
 };

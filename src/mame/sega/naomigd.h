@@ -16,8 +16,8 @@
 
 class idegdrom_device : public pci_device {
 public:
-	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *image_tag, const char *space_tag, int space_id);
-	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, const char *image_tag, const char *space_tag, int space_id);
+	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_callback() { return irq_cb.bind(); }
 
@@ -53,7 +53,7 @@ class naomi_gdrom_board : public naomi_board
 {
 public:
 	template <typename T, typename U>
-	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&eeprom_tag, const char *_image_tag, U &&picregion_tag)
+	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&eeprom_tag, const char *_image_tag, U &&picregion_tag)
 		: naomi_gdrom_board(mconfig, tag, owner, clock)
 	{
 		eeprom.set_tag(std::forward<T>(eeprom_tag));
@@ -62,14 +62,14 @@ public:
 	}
 
 	template <typename T>
-	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *_image_tag, T &&picregion_tag)
+	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, const char *_image_tag, T &&picregion_tag)
 		: naomi_gdrom_board(mconfig, tag, owner, clock)
 	{
 		picdata.set_tag(std::forward<T>(picregion_tag));
 		set_image_tag(_image_tag);
 	}
 
-	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void submap(address_map &map) override;

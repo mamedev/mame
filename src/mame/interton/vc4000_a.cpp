@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(VC4000_SND, vc4000_sound_device, "vc4000_sound", "Interton Electronic VC 4000 Custom Sound")
 
-vc4000_sound_device::vc4000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vc4000_sound_device::vc4000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VC4000_SND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_channel(nullptr)
@@ -65,7 +65,7 @@ void vc4000_sound_device::soundport_w(int offset, int data)
 			m_pos = 0;
 			m_level = true;
 			// frequency 7874/(data+1)
-			m_size = machine().sample_rate() * (data + 1) /7874;
+			m_size = machine().sample_rate().value() * (data + 1) /7874;
 			break;
 	}
 }

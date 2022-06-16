@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(PLUS4_STD, plus4_standard_cartridge_device, "plus4_standard",
 //  plus4_standard_cartridge_device - constructor
 //-------------------------------------------------
 
-plus4_standard_cartridge_device::plus4_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+plus4_standard_cartridge_device::plus4_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PLUS4_STD, tag, owner, clock),
 	device_plus4_expansion_card_interface(mconfig, *this)
 {

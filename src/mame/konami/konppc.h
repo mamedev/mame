@@ -21,7 +21,7 @@ public:
 	static constexpr int MAX_CG_BOARDS        = 2;
 
 	// construction/destruction
-	konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_num_boards(int num) { num_cgboards = num; }
 	void set_cbboard_type(int cgtype) { cgboard_type = cgtype; }

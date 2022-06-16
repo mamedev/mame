@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(TEKRAM_DC320E, tekram_dc320e_device, "dc320e", "Tekram DC-320
 DEFINE_DEVICE_TYPE(TEKRAM_DC820, tekram_dc820_device, "dc820", "Tekram DC-820 SCSI Cache Controller")
 DEFINE_DEVICE_TYPE(TEKRAM_DC820B, tekram_dc820b_device, "dc820b", "Tekram DC-820B SCSI Cache Controller")
 
-tekram_eisa_scsi_device::tekram_eisa_scsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+tekram_eisa_scsi_device::tekram_eisa_scsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_mpu(*this, "mpu")
@@ -46,22 +46,22 @@ tekram_eisa_scsi_device::tekram_eisa_scsi_device(const machine_config &mconfig, 
 {
 }
 
-tekram_dc320b_device::tekram_dc320b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tekram_dc320b_device::tekram_dc320b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tekram_eisa_scsi_device(mconfig, TEKRAM_DC320B, tag, owner, clock)
 {
 }
 
-tekram_dc320e_device::tekram_dc320e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tekram_dc320e_device::tekram_dc320e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tekram_eisa_scsi_device(mconfig, TEKRAM_DC320E, tag, owner, clock)
 {
 }
 
-tekram_dc820_device::tekram_dc820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tekram_dc820_device::tekram_dc820_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tekram_eisa_scsi_device(mconfig, TEKRAM_DC820, tag, owner, clock)
 {
 }
 
-tekram_dc820b_device::tekram_dc820b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tekram_dc820b_device::tekram_dc820b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tekram_eisa_scsi_device(mconfig, TEKRAM_DC820B, tag, owner, clock)
 {
 }
@@ -214,7 +214,7 @@ void tekram_eisa_scsi_device::scsi_add(machine_config &config)
 
 void tekram_dc320b_device::device_add_mconfig(machine_config &config)
 {
-	I80186(config, m_mpu, 25'000'000); // verified for DC-320, but not DC-320B
+	I80186(config, m_mpu, XTAL::u(25'000'000)); // verified for DC-320, but not DC-320B
 	m_mpu->set_addrmap(AS_PROGRAM, &tekram_dc320b_device::mpu_map);
 
 	GENERIC_LATCH_8(config, m_cmdlatch);
@@ -224,17 +224,17 @@ void tekram_dc320b_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	i82355_device &bmic(I82355(config, "bmic", 0));
+	i82355_device &bmic(I82355(config, "bmic"));
 	bmic.lint_callback().set(m_mpu, FUNC(i80186_cpu_device::int2_w));
 
 	scsi_add(config);
 
-	WD37C65C(config, m_fdc, 32'000'000, 9'600'000); // clocks verified for DC-320, but not DC-320B
+	WD37C65C(config, m_fdc, XTAL::u(32'000'000), 9'600'000); // clocks verified for DC-320, but not DC-320B
 }
 
 void tekram_dc320e_device::device_add_mconfig(machine_config &config)
 {
-	I80186(config, m_mpu, 32'000'000); // clock guessed to be same as DC-820B due to identical firmware
+	I80186(config, m_mpu, XTAL::u(32'000'000)); // clock guessed to be same as DC-820B due to identical firmware
 	m_mpu->set_addrmap(AS_PROGRAM, &tekram_dc320e_device::mpu_map);
 
 	GENERIC_LATCH_8(config, m_cmdlatch);
@@ -244,12 +244,12 @@ void tekram_dc320e_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	i82355_device &bmic(I82355(config, "bmic", 0));
+	i82355_device &bmic(I82355(config, "bmic"));
 	bmic.lint_callback().set(m_mpu, FUNC(i80186_cpu_device::int2_w));
 
 	scsi_add(config);
 
-	WD37C65C(config, m_fdc, 32'000'000, 9'600'000); // clocks verified for DC-320, but not DC-320E
+	WD37C65C(config, m_fdc, XTAL::u(32'000'000), 9'600'000); // clocks verified for DC-320, but not DC-320E
 }
 
 void tekram_dc820_device::device_add_mconfig(machine_config &config)
@@ -264,7 +264,7 @@ void tekram_dc820_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	i82355_device &bmic(I82355(config, "bmic", 0));
+	i82355_device &bmic(I82355(config, "bmic"));
 	bmic.lint_callback().set(m_mpu, FUNC(i80186_cpu_device::int2_w));
 
 	scsi_add(config);
@@ -284,7 +284,7 @@ void tekram_dc820b_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	i82355_device &bmic(I82355(config, "bmic", 0));
+	i82355_device &bmic(I82355(config, "bmic"));
 	bmic.lint_callback().set(m_mpu, FUNC(i80186_cpu_device::int2_w));
 
 	scsi_add(config);

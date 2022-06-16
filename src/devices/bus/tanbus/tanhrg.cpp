@@ -161,7 +161,7 @@ void tanbus_tanhrgc_device::device_add_mconfig(machine_config &config)
 //  tanbus_tanhrg_device - constructor
 //-------------------------------------------------
 
-tanbus_tanhrg_device::tanbus_tanhrg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tanbus_tanhrg_device::tanbus_tanhrg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TANBUS_TANHRG, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
 	, m_dsw(*this, "DSW")
@@ -171,7 +171,7 @@ tanbus_tanhrg_device::tanbus_tanhrg_device(const machine_config &mconfig, const 
 }
 
 
-tanbus_tanhrgc_device::tanbus_tanhrgc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tanbus_tanhrgc_device::tanbus_tanhrgc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TANBUS_TANHRGC, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
 	, m_dsw(*this, "DSW_%u", 1)

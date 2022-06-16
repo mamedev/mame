@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(SEGA_315_5195_MEM_MAPPER, sega_315_5195_mapper_device, "sega_
 //  sega_315_5195_mapper_device - constructor
 //-------------------------------------------------
 
-sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, tag, owner, clock)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_cpuregion(*this, finder_base::DUMMY_TAG)

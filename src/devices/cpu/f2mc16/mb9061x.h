@@ -38,7 +38,7 @@ public:
 
 protected:
 	// construction/destruction
-	mb9061x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
+	mb9061x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -81,31 +81,31 @@ private:
 class mb90610_device : public mb9061x_device
 {
 public:
-	mb90610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb90610_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void mb90610_map(address_map &map);
 protected:
-	mb90610_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mb90610_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mb90611_device : public mb9061x_device
 {
 public:
-	mb90611_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb90611_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void mb90611_map(address_map &map);
 protected:
-	mb90611_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mb90611_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mb90641_device : public mb9061x_device
 {
 public:
-	mb90641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb90641_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void mb90641_map(address_map &map);
 protected:
-	mb90641_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mb90641_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(MB90610A, mb90610_device)

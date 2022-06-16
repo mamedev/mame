@@ -27,7 +27,7 @@
 
 class h83003_device : public h8h_device {
 public:
-	h83003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h83003_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto tend0() { return tend0_cb.bind(); }
 	auto tend1() { return tend1_cb.bind(); }

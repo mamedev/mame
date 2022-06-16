@@ -11,7 +11,7 @@ DEFINE_DEVICE_TYPE(ISA16_EX1280, isa16_ex1280_device, "ex1280", "Vectrix EX1280"
 //  isa16_ex1280_device - constructor
 //-------------------------------------------------
 
-isa16_ex1280_device::isa16_ex1280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+isa16_ex1280_device::isa16_ex1280_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISA16_EX1280, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_cpu(*this, "maincpu")
@@ -64,7 +64,7 @@ void isa16_ex1280_device::main_map(address_map &map)
 
 void isa16_ex1280_device::device_add_mconfig(machine_config &config)
 {
-	TMS34010(config, m_cpu, 64000000);
+	TMS34010(config, m_cpu, XTAL::u(64000000));
 	m_cpu->set_addrmap(AS_PROGRAM, &isa16_ex1280_device::main_map);
 	m_cpu->set_halt_on_reset(false);
 	m_cpu->set_pixel_clock(64000000);
@@ -82,7 +82,7 @@ void isa16_ex1280_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update(m_cpu, FUNC(tms34010_device::tms340x0_rgb32));
 	m_screen->screen_vblank().set(FUNC(isa16_ex1280_device::vblank_w));
 
-	BT451(config, m_ramdac, 0);
+	BT451(config, m_ramdac);
 }
 
 

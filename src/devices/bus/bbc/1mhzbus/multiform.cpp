@@ -95,7 +95,7 @@ const tiny_rom_entry *bbc_multiform_device::device_rom_region() const
 //  bbc_multiform_device - constructor
 //-------------------------------------------------
 
-bbc_multiform_device::bbc_multiform_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_multiform_device::bbc_multiform_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_MULTIFORM, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_z80(*this, "z80")

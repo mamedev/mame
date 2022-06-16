@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(IQ151_DISC2, iq151_disc2_device, "iq151_disc2", "IQ151 Disc2"
 //  iq151_disc2_device - constructor
 //-------------------------------------------------
 
-iq151_disc2_device::iq151_disc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iq151_disc2_device::iq151_disc2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IQ151_DISC2, tag, owner, clock)
 	, device_iq151cart_interface(mconfig, *this)
 	, m_fdc(*this, "fdc"), m_rom(nullptr), m_rom_enabled(false)
@@ -76,7 +76,7 @@ void iq151_disc2_device::device_reset()
 
 void iq151_disc2_device::device_add_mconfig(machine_config &config)
 {
-	UPD765A(config, m_fdc, 8'000'000, false, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), false, true);
 	FLOPPY_CONNECTOR(config, "fdc:1", iq151_disc2_floppies, "8sssd", iq151_disc2_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:2", iq151_disc2_floppies, "8sssd", iq151_disc2_device::floppy_formats);
 }

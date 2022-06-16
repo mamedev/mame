@@ -40,12 +40,12 @@ class stepper_device : public device_t
 {
 public:
 	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t init_phase)
-		: stepper_device(mconfig, tag, owner, (uint32_t)0)
+		: stepper_device(mconfig, tag, owner)
 	{
 		set_init_phase(init_phase);
 	}
 
-	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto optic_handler() { return m_optic_cb.bind(); }
 
@@ -77,7 +77,7 @@ public:
 	int get_max()               { return m_max_steps; }
 
 protected:
-	stepper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	stepper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -107,7 +107,7 @@ public:
 	reel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t type, int16_t start_index, int16_t end_index
 		, int16_t index_pattern, uint8_t init_phase, int16_t max_steps = 48*2);
 
-	reel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	reel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

@@ -18,7 +18,7 @@ class acia6850_device :  public device_t
 {
 public:
 	// construction/destruction
-	acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto txd_handler() { return m_txd_handler.bind(); }
 	auto rts_handler() { return m_rts_handler.bind(); }
@@ -38,7 +38,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_txc );
 
 protected:
-	acia6850_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	acia6850_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

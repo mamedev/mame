@@ -18,7 +18,7 @@
 class s_smp_device : public spc700_device
 {
 public:
-	s_smp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	s_smp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto dsp_io_read_callback() { return m_dsp_io_r_cb.bind(); }
 	auto dsp_io_write_callback() { return m_dsp_io_w_cb.bind(); }

@@ -107,12 +107,12 @@ void maygayep_state::init_maygayep()
 
 void maygayep_state::maygayep(machine_config &config)
 {
-	H83002(config, m_maincpu, 16000000);
+	H83002(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &maygayep_state::maygayep_map);
 
 	SPEAKER(config, "mono").front_center();
 
-	YMZ280B(config, "ymz", 10000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YMZ280B(config, "ymz", XTAL::u(10000000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 #define MISSING_SOUND \

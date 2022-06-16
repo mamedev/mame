@@ -21,19 +21,19 @@ DEFINE_DEVICE_TYPE(M5_ROM_STD, m5_rom_device, "m5_rom", "M5 Standard ROM Carts")
 DEFINE_DEVICE_TYPE(M5_ROM_RAM, m5_ram_device, "m5_ram", "M5 Expansion memory cart")
 
 
-m5_rom_device::m5_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+m5_rom_device::m5_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_m5_cart_interface(mconfig, *this)
 {
 }
 
-m5_rom_device::m5_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m5_rom_device::m5_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m5_rom_device(mconfig, M5_ROM_STD, tag, owner, clock)
 {
 }
 
 
-m5_ram_device::m5_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m5_ram_device::m5_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m5_rom_device(mconfig, M5_ROM_RAM, tag, owner, clock)
 {
 }

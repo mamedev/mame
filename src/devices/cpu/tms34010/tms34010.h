@@ -252,7 +252,7 @@ protected:
 	};
 
 	// construction/destruction
-	tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_regs_map, bool is_34020);
+	tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_regs_map, bool is_34020);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -958,7 +958,7 @@ protected:
 class tms34010_device : public tms340x0_device
 {
 public:
-	tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
 	virtual void io_register_w(offs_t offset, u16 data, u16 mem_mask = ~u16(0)) override;
@@ -998,7 +998,7 @@ DECLARE_DEVICE_TYPE(TMS34010, tms34010_device)
 class tms34020_device : public tms340x0_device
 {
 public:
-	tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	/* Reads & writes to the 34020 I/O registers; place at 0xc0000000 */
 	virtual void io_register_w(offs_t offset, u16 data, u16 mem_mask = ~u16(0)) override;

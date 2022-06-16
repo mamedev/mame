@@ -147,16 +147,16 @@ void cucaracha_state::cucaracha(machine_config &config)
 	te7750.out_port8_cb().set(FUNC(cucaracha_state::out8_w));
 	te7750.out_port9_cb().set(FUNC(cucaracha_state::out9_w));
 
-	z80_device &soundcpu(Z80(config, "soundcpu", 4000000));
+	z80_device &soundcpu(Z80(config, "soundcpu", XTAL::u(4000000)));
 	soundcpu.set_addrmap(AS_PROGRAM, &cucaracha_state::sound_map);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag("soundcpu");
 
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 3000000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL::u(3000000)));
 	ymsnd.irq_handler().set_inputline("soundcpu", 0);
 	ymsnd.port_a_write_callback().set(FUNC(cucaracha_state::ym_porta_w));
 	ymsnd.add_route(0, "mono", 0.25);
@@ -164,7 +164,7 @@ void cucaracha_state::cucaracha(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.25);
 	ymsnd.add_route(3, "mono", 0.80);
 
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
 }
 
 INPUT_PORTS_START( cucaracha )

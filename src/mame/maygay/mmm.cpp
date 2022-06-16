@@ -183,17 +183,17 @@ static const z80_daisy_config mmm_daisy_chain[] =
 void mmm_state::mmm(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2000000);         /* ? MHz */
+	Z80(config, m_maincpu, XTAL::u(2000000));         /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmm_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mmm_state::io_map);
 	m_maincpu->set_daisy_config(mmm_daisy_chain);
 
-	Z80CTC(config, m_ctc, 2000000);
+	Z80CTC(config, m_ctc, XTAL::u(2000000));
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device& ay(AY8910(config, "aysnd", 1000000));
+	ay8910_device& ay(AY8910(config, "aysnd", XTAL::u(1000000)));
 	ay.port_a_write_callback().set(FUNC(mmm_state::ay_porta_w));
 	ay.add_route(ALL_OUTPUTS, "mono", 0.30);
 }

@@ -247,7 +247,7 @@ void y532xl_state::y532xl(machine_config &config)
 	m_board->set_nvram_enable(true);
 
 	// video hardware
-	HD61603(config, m_lcd, 0);
+	HD61603(config, m_lcd);
 	m_lcd->write_segs().set(FUNC(y532xl_state::lcd_seg_w));
 
 	PWM_DISPLAY(config, m_display).set_size(9, 8);

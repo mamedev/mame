@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(MICRODRIVE, microdrive_image_device, "microdrive_image", "Sin
 //  microdrive_image_device - constructor
 //-------------------------------------------------
 
-microdrive_image_device::microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+microdrive_image_device::microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	microtape_image_device(mconfig, MICRODRIVE, tag, owner, clock),
 	m_write_comms_out(*this)
 {

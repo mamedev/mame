@@ -65,7 +65,7 @@ DEFINE_DEVICE_TYPE(PIONEER_LDV4200HLE, pioneer_ldv4200hle_device, "ldv4200hle", 
 //  pioneer_ldv4200hle_device - constructor
 //-------------------------------------------------
 
-pioneer_ldv4200hle_device::pioneer_ldv4200hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pioneer_ldv4200hle_device::pioneer_ldv4200hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: laserdisc_device(mconfig, PIONEER_LDV4200HLE, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_serial_tx(*this)

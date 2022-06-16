@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(RIPPLE_COUNTER, ripple_counter_device, "ripple_counter", "Gen
 //  ripple_counter_device - constructor
 //-------------------------------------------------
 
-ripple_counter_device::ripple_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ripple_counter_device::ripple_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RIPPLE_COUNTER, tag, owner, clock),
 		device_rom_interface(mconfig, *this),
 		m_count_out_cb(*this),

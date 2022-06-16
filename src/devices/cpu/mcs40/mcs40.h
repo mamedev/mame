@@ -74,7 +74,7 @@ protected:
 			device_type type,
 			char const *tag,
 			device_t *owner,
-			u32 clock,
+			const XTAL &clock,
 			bool extended_cm,
 			unsigned rom_width,
 			unsigned stack_ptr_mask,
@@ -253,7 +253,7 @@ public:
 	auto cm_rom_cb() { return mcs40_cpu_device_base::cm_rom_cb<0>(); }
 	template <unsigned N> auto cm_ram_cb() { return mcs40_cpu_device_base::cm_ram_cb<N>(); }
 
-	i4004_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	i4004_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	using mcs40_cpu_device_base::mcs40_cpu_device_base;
@@ -282,7 +282,7 @@ public:
 	auto cy_cb() { return i4004_cpu_device::cy_cb(); }
 	using mcs40_cpu_device_base::stp_ack_cb;
 
-	i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface implementation

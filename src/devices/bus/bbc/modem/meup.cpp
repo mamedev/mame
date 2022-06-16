@@ -45,7 +45,7 @@ void bbc_meup_device::device_add_mconfig(machine_config &config)
 //  bbc_meup_device - constructor
 //-------------------------------------------------
 
-bbc_meup_device::bbc_meup_device(const machine_config &mconfig, const char* tag, device_t* owner, uint32_t clock)
+bbc_meup_device::bbc_meup_device(const machine_config &mconfig, const char* tag, device_t* owner, const XTAL &clock)
 	: device_t(mconfig, BBC_MEUP, tag, owner, clock)
 	, device_bbc_modem_interface(mconfig, *this)
 	, m_via(*this, "via")

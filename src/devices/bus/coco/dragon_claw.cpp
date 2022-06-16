@@ -59,7 +59,7 @@ ioport_constructor dragon_claw_device::device_input_ports() const
 //  dragon_claw_device - constructor
 //-------------------------------------------------
 
-dragon_claw_device::dragon_claw_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dragon_claw_device::dragon_claw_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DRAGON_CLAW, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this )
 	, m_via(*this, "via")

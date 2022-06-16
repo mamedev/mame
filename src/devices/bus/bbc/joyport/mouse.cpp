@@ -59,7 +59,7 @@ ioport_constructor bbcmc_mouse_device::device_input_ports() const
 //  bbcmc_mouse_device - constructor
 //-------------------------------------------------
 
-bbcmc_mouse_device::bbcmc_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbcmc_mouse_device::bbcmc_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBCMC_MOUSE, tag, owner, clock)
 	, device_bbc_joyport_interface(mconfig, *this)
 	, m_mouse_x(*this, "mouse_x")

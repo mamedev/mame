@@ -12,13 +12,13 @@ DECLARE_DEVICE_TYPE(VME_MZR8300, vme_mzr8300_card_device)
 class vme_mzr8300_card_device : public device_t, public device_vme_card_interface
 {
 public:
-	vme_mzr8300_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_mzr8300_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 //  virtual uint8_t read8(offs_t offset) override;
 //  virtual void write8(offs_t offset, uint8_t data) override;
 
 protected:
-	vme_mzr8300_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vme_mzr8300_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

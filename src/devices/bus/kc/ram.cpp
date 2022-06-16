@@ -42,12 +42,12 @@ DEFINE_DEVICE_TYPE(KC_M036, kc_m036_device, "kc_m036", "M036 128KB segmented RAM
 //  kc_m011_device - constructor
 //-------------------------------------------------
 
-kc_m011_device::kc_m011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kc_m011_device::kc_m011_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc_m011_device(mconfig, KC_M011, tag, owner, clock)
 {
 }
 
-kc_m011_device::kc_m011_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+kc_m011_device::kc_m011_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_kcexp_interface(mconfig, *this)
 	, m_slot(nullptr), m_mei(0), m_ram(nullptr), m_enabled(0), m_write_enabled(0), m_base(0), m_segment(0)
@@ -147,7 +147,7 @@ WRITE_LINE_MEMBER( kc_m011_device::mei_w )
 //  kc_m022_device - constructor
 //-------------------------------------------------
 
-kc_m022_device::kc_m022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kc_m022_device::kc_m022_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc_m011_device(mconfig, KC_M022, tag, owner, clock)
 {
 }
@@ -192,7 +192,7 @@ void kc_m022_device::write(offs_t offset, uint8_t data)
 //  kc_m032_device - constructor
 //-------------------------------------------------
 
-kc_m032_device::kc_m032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kc_m032_device::kc_m032_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc_m011_device(mconfig, KC_M032, tag, owner, clock)
 {
 }
@@ -261,7 +261,7 @@ void kc_m032_device::write(offs_t offset, uint8_t data)
 //  kc_m034_device - constructor
 //-------------------------------------------------
 
-kc_m034_device::kc_m034_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kc_m034_device::kc_m034_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc_m011_device(mconfig, KC_M034, tag, owner, clock)
 {
 }
@@ -330,7 +330,7 @@ void kc_m034_device::write(offs_t offset, uint8_t data)
 //  kc_m035_device - constructor
 //-------------------------------------------------
 
-kc_m035_device::kc_m035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kc_m035_device::kc_m035_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc_m011_device(mconfig, KC_M035, tag, owner, clock)
 {
 }
@@ -388,7 +388,7 @@ void kc_m035_device::write(offs_t offset, uint8_t data)
 //  kc_m036_device - constructor
 //-------------------------------------------------
 
-kc_m036_device::kc_m036_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kc_m036_device::kc_m036_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc_m011_device(mconfig, KC_M036, tag, owner, clock)
 {
 }

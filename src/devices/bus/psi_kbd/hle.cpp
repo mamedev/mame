@@ -217,7 +217,7 @@ ioport_constructor psi_hle_keyboard_device::device_input_ports() const
 //  psi_hle_keyboard_device - constructor
 //-------------------------------------------------
 
-psi_hle_keyboard_device::psi_hle_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+psi_hle_keyboard_device::psi_hle_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PSI_HLE_KEYBOARD, tag, owner, clock),
 	device_psi_keyboard_interface(mconfig, *this),
 	device_matrix_keyboard_interface(mconfig, *this, "row_0", "row_1", "row_2", "row_3", "row_4", "row_5", "row_6"),

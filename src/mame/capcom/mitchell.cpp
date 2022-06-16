@@ -1906,7 +1906,7 @@ void spangbl_state::spangbl(machine_config &config)
 
 	config.device_remove("scantimer");
 
-	Z80(config, m_audiocpu, 4000000); // Z80A CPU; clock unknown
+	Z80(config, m_audiocpu, XTAL::u(4000000)); // Z80A CPU; clock unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spangbl_state::spangbl_sound_map);
 
 	m_gfxdecode->set_info(gfx_spangbl);
@@ -1914,12 +1914,12 @@ void spangbl_state::spangbl(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	config.device_remove("oki");
-	MSM5205(config, m_msm, 400000); // clock and prescaler unknown
+	MSM5205(config, m_msm, XTAL::u(400000)); // clock and prescaler unknown
 	m_msm->vck_legacy_callback().set(FUNC(spangbl_state::adpcm_int));  // controls music as well as ADCPM rate
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 }
 
@@ -1928,7 +1928,7 @@ void spangbl_state::pangba(machine_config &config)
 	spangbl(config);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spangbl_state::pangba_sound_map);
 
-	YM3812(config.replace(), "ymsnd", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM3812(config.replace(), "ymsnd", XTAL::u(4000000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void spangbl_state::mstworld2(machine_config &config)
@@ -1946,13 +1946,13 @@ void mstworld_state::mstworld(machine_config &config)
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
 	  the interrupt handling (and probably various irq flags / vbl flags handling etc.) is
 	  more likely wrong.. the game appears to run too fast anyway .. */
-	Z80(config, m_maincpu, 6000000 * 4);
+	Z80(config, m_maincpu, XTAL::u(6000000) * 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mstworld_state::mitchell_map);
 	m_maincpu->set_addrmap(AS_IO, &mstworld_state::io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &mstworld_state::decrypted_opcodes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mstworld_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 6000000);   // 6 MHz?
+	Z80(config, m_audiocpu, XTAL::u(6000000));   // 6 MHz?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mstworld_state::sound_map);
 
 	// video hardware
@@ -1972,7 +1972,7 @@ void mstworld_state::mstworld(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	OKIM6295(config, m_oki, 990000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(990000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -2029,10 +2029,10 @@ void pkladiesbl_state::pkladiesbl(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ym2413_device &ymsnd(YM2413(config, "ymsnd", 3750000)); // verified on PCB, read the comments
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL::u(3750000))); // verified on PCB, read the comments
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

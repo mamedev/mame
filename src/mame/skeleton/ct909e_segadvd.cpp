@@ -70,7 +70,7 @@ INPUT_PORTS_END
 
 void ct909e_megatrix_state::megatrix(machine_config &config)
 {
-	SPARCV8(config, m_maincpu, 100'000'000); // unknown frequency
+	SPARCV8(config, m_maincpu, XTAL::u(100'000'000)); // unknown frequency
 	m_maincpu->set_addrmap(0, &ct909e_megatrix_state::mem_map);
 	m_maincpu->set_addrmap(0x19, &ct909e_megatrix_state::mem_map);
 

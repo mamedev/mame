@@ -26,7 +26,7 @@ class arc_rs423_device :
 {
 public:
 	// construction/destruction
-	arc_rs423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_rs423_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -99,7 +99,7 @@ void arc_rs423_device::device_add_mconfig(machine_config &config)
 //  arc_rs423_device - constructor
 //-------------------------------------------------
 
-arc_rs423_device::arc_rs423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_rs423_device::arc_rs423_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_RS423, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")

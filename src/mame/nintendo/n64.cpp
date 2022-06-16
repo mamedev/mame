@@ -433,7 +433,7 @@ INTERRUPT_GEN_MEMBER(n64_mess_state::n64_reset_poll)
 void n64_mess_state::n64(machine_config &config)
 {
 	/* basic machine hardware */
-	VR4300BE(config, m_vr4300, 93750000);
+	VR4300BE(config, m_vr4300, XTAL::u(93750000));
 	m_vr4300->set_force_no_drc(true);
 	//m_vr4300->set_icache_size(16384);
 	//m_vr4300->set_dcache_size(8192);
@@ -441,7 +441,7 @@ void n64_mess_state::n64(machine_config &config)
 	m_vr4300->set_addrmap(AS_PROGRAM, &n64_mess_state::n64_map);
 	m_vr4300->set_vblank_int("screen", FUNC(n64_mess_state::n64_reset_poll));
 
-	RSP(config, m_rsp, 62500000);
+	RSP(config, m_rsp, XTAL::u(62500000));
 	m_rsp->set_force_no_drc(true);
 	m_rsp->dp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_r));
 	m_rsp->dp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_w));
@@ -468,7 +468,7 @@ void n64_mess_state::n64(machine_config &config)
 	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	N64PERIPH(config, m_rcp_periphs, 0);
+	N64PERIPH(config, m_rcp_periphs);
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "n64_cart", "v64,z64,rom,n64,bin"));

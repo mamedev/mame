@@ -55,7 +55,7 @@ protected:
 class zac1b11107_audio_device : public zac1b111xx_melody_base
 {
 public:
-	zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// host interface
 	void sound_w(u8 data);
@@ -76,7 +76,7 @@ class zac1b11142_audio_device : public zac1b111xx_melody_base
 public:
 	auto acs_cb() { return m_acs_cb.bind(); }
 
-	zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// host interface
 	void hs_w(u8 data);

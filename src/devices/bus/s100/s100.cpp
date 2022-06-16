@@ -44,7 +44,7 @@ void device_s100_card_interface::interface_pre_start()
 //-------------------------------------------------
 //  s100_slot_device - constructor
 //-------------------------------------------------
-s100_slot_device::s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+s100_slot_device::s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, S100_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_s100_card_interface>(mconfig, *this),
 	m_bus(*this, DEVICE_SELF_OWNER)
@@ -68,7 +68,7 @@ void s100_slot_device::device_start()
 //  s100_bus_device - constructor
 //-------------------------------------------------
 
-s100_bus_device::s100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+s100_bus_device::s100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, S100_BUS, tag, owner, clock),
 	m_write_irq(*this),
 	m_write_nmi(*this),

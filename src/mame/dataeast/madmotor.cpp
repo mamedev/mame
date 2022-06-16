@@ -241,11 +241,11 @@ uint32_t madmotor_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void madmotor_state::madmotor(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000); /* Custom chip 59, 24 MHz crystal */
+	M68000(config, m_maincpu, XTAL::u(12000000)); /* Custom chip 59, 24 MHz crystal */
 	m_maincpu->set_addrmap(AS_PROGRAM, &madmotor_state::madmotor_map);
 	m_maincpu->set_vblank_int("screen", FUNC(madmotor_state::irq6_line_hold)); /* VBL */
 
-	H6280(config, m_audiocpu, 8053000/2); /* Custom chip 45, Crystal near CPU is 8.053 MHz */
+	H6280(config, m_audiocpu, XTAL::u(8053000)/2); /* Custom chip 45, Crystal near CPU is 8.053 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &madmotor_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
@@ -262,35 +262,35 @@ void madmotor_state::madmotor(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_madmotor);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
-	DECO_BAC06(config, m_tilegen[0], 0);
+	DECO_BAC06(config, m_tilegen[0]);
 	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_BAC06(config, m_tilegen[1], 0);
+	DECO_BAC06(config, m_tilegen[1]);
 	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
 	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_BAC06(config, m_tilegen[2], 0);
+	DECO_BAC06(config, m_tilegen[2]);
 	m_tilegen[2]->set_gfx_region_wide(0, 2, 1);
 	m_tilegen[2]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_MXC06(config, m_spritegen, 0);
+	DECO_MXC06(config, m_spritegen);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	YM2203(config, "ym1", 21470000/6).add_route(ALL_OUTPUTS, "mono", 0.40);
+	YM2203(config, "ym1", XTAL::u(21470000)/6).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	ym2151_device &ym2(YM2151(config, "ym2", 21470000/6));
+	ym2151_device &ym2(YM2151(config, "ym2", XTAL::u(21470000)/6));
 	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
 	ym2.add_route(0, "mono", 0.45);
 	ym2.add_route(1, "mono", 0.45);
 
-	OKIM6295(config, "oki1", 1023924, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki1", XTAL::u(1023924), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
 
-	OKIM6295(config, "oki2", 2047848, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.25); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki2", XTAL::u(2047848), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.25); // clock frequency & pin 7 not verified
 }
 
 /******************************************************************************/

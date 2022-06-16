@@ -651,10 +651,10 @@ void lazercmd_state::lazercmd(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac0, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	DAC_1BIT(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac1).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac2).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac3).add_route(ALL_OUTPUTS, "speaker", 0.99);
 }
 
 
@@ -684,8 +684,8 @@ void lazercmd_state::medlanes(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac2).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac3).add_route(ALL_OUTPUTS, "speaker", 0.99);
 }
 
 
@@ -715,8 +715,8 @@ void lazercmd_state::bbonk(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac2).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac3).add_route(ALL_OUTPUTS, "speaker", 0.99);
 }
 
 /***************************************************************************

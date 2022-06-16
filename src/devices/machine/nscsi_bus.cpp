@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(NSCSI_BUS,       nscsi_bus_device, "nscsi_bus",       "SCSI B
 DEFINE_DEVICE_TYPE(NSCSI_CONNECTOR, nscsi_connector,  "nscsi_connector", "SCSI Connector Abstraction (new)")
 
 
-nscsi_bus_device::nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nscsi_bus_device::nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NSCSI_BUS, tag, owner, clock), data(0), ctrl(0)
 {
 	devcnt = 0;
@@ -139,7 +139,7 @@ void nscsi_bus_device::device_resolve_objects()
 }
 
 
-nscsi_connector::nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nscsi_connector::nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NSCSI_CONNECTOR, tag, owner, clock),
 	device_single_card_slot_interface<nscsi_slot_card_interface>(mconfig, *this)
 {
@@ -168,7 +168,7 @@ nscsi_slot_card_interface::nscsi_slot_card_interface(const machine_config &mconf
 {
 }
 
-nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock)
 {
 	scsi_id = scsi_refid = -1;
@@ -192,7 +192,7 @@ void nscsi_device::device_start()
 }
 
 
-nscsi_full_device::nscsi_full_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nscsi_full_device::nscsi_full_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	nscsi_device(mconfig, type, tag, owner, clock),
 	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 {

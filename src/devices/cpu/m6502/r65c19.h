@@ -18,10 +18,10 @@ public:
 		R65C19_I
 	};
 
-	r65c19_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	r65c19_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	r65c19_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map);
+	r65c19_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -110,7 +110,7 @@ public:
 	};
 
 protected:
-	c39_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map);
+	c39_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map);
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -153,7 +153,7 @@ private:
 class l2800_device : public c39_device
 {
 public:
-	l2800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	l2800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	void internal_map(address_map &map);

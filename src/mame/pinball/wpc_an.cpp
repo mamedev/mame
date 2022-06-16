@@ -424,7 +424,7 @@ void wpc_an_state::wpc_an_base(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(8'000'000) / 4); // 68B09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_an_state::wpc_an_map);
 
-	WPCASIC(config, m_wpc, 0);
+	WPCASIC(config, m_wpc);
 	m_wpc->irq_callback().set(FUNC(wpc_an_state::irq_w));
 	m_wpc->firq_callback().set(FUNC(wpc_an_state::firq_w));
 	m_wpc->bank_write().set(FUNC(wpc_an_state::rombank_w));

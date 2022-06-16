@@ -20,10 +20,10 @@ class nec_p72_device : public device_t,
 {
 public:
 	// construction/destruction
-	nec_p72_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nec_p72_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	nec_p72_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nec_p72_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

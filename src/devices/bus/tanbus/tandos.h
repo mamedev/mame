@@ -28,7 +28,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::DISK; }
 
 	// construction/destruction
-	tanbus_tandos_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tanbus_tandos_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static void floppy_formats(format_registration &fr);
 

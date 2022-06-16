@@ -332,7 +332,7 @@ kaypro_10_keyboard_device::kaypro_10_keyboard_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		std::uint32_t clock)
+		const XTAL &clock)
 	: device_t(mconfig, KAYPRO_10_KEYBOARD, tag, owner, clock)
 	, m_mcu(*this, "mcu")
 	, m_bell(*this, "bell")

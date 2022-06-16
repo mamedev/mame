@@ -16,19 +16,19 @@
 DEFINE_DEVICE_TYPE(EV346, isa16_ev346_device, "ev346", "Everex EV-346 disk controller")
 DEFINE_DEVICE_TYPE(JC1310, isa16_jc1310_device, "jc1310", "Joincom JC-1310 disk controller")
 
-isa16_cl_sh260_device::isa16_cl_sh260_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+isa16_cl_sh260_device::isa16_cl_sh260_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_fdc(*this, "fdc")
 {
 }
 
-isa16_ev346_device::isa16_ev346_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+isa16_ev346_device::isa16_ev346_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: isa16_cl_sh260_device(mconfig, EV346, tag, owner, clock)
 {
 }
 
-isa16_jc1310_device::isa16_jc1310_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+isa16_jc1310_device::isa16_jc1310_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: isa16_cl_sh260_device(mconfig, JC1310, tag, owner, clock)
 {
 }

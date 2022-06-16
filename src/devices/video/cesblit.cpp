@@ -70,7 +70,7 @@ DEFINE_DEVICE_TYPE(CESBLIT, cesblit_device, "cesblit", "CES Blitter FPGA")
 //  cesblit_device - constructor
 //-------------------------------------------------
 
-cesblit_device::cesblit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cesblit_device::cesblit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CESBLIT, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_memory_interface(mconfig, *this),

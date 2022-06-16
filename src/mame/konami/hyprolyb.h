@@ -11,7 +11,7 @@
 class hyprolyb_adpcm_device : public device_t
 {
 public:
-	hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void write(uint8_t data);
 	uint8_t busy_r();

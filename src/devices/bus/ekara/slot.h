@@ -66,10 +66,10 @@ class ekara_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T>
-	ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: ekara_cart_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();

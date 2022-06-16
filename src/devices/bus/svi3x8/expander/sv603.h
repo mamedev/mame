@@ -27,7 +27,7 @@ class sv603_device : public device_t, public device_svi_expander_interface
 {
 public:
 	// construction/destruction
-	sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// from host
 	virtual uint8_t mreq_r(offs_t offset) override;

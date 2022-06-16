@@ -25,7 +25,7 @@ class nes_snesadapter_device : public device_t, public device_nes_control_port_i
 {
 public:
 	// construction/destruction
-	nes_snesadapter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_snesadapter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_bit0() override;
 	virtual void write(u8 data) override;

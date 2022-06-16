@@ -14,7 +14,7 @@ DEFINE_DEVICE_TYPE(MM75, mm75_device, "mm75", "Rockwell MM75 A7500") // stripped
 
 
 // constructor
-mm75_device::mm75_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+mm75_device::mm75_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mm76_device(mconfig, MM75, tag, owner, clock, 10, address_map_constructor(FUNC(mm75_device::program_0_6k), this), 6, address_map_constructor(FUNC(mm75_device::data_48x4), this))
 { }
 

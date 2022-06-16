@@ -11,7 +11,7 @@
 #include "screen.h"
 
 
-#define MASTER_CLOCK 57272700   // main oscillator frequency
+#define MASTER_CLOCK XTAL::u(57272700)   // main oscillator frequency
 
 /* Psikyo PS6406B */
 

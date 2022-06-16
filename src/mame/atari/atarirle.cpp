@@ -67,7 +67,7 @@ inline int atari_rle_objects_device::round_to_powerof2(int value)
 //  atari_rle_objects_device: Constructor
 //-------------------------------------------------
 
-atari_rle_objects_device::atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+atari_rle_objects_device::atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ATARI_RLE_OBJECTS, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_rombase(*this, DEVICE_SELF)

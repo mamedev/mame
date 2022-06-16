@@ -507,7 +507,7 @@ void hexion_state::hexion(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// MSM6295GS @ 5E, clock frequency & pin 7 not verified
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	// KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified
 	K051649(config, "k051649", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.5);
@@ -521,7 +521,7 @@ void hexion_state::hexionb(machine_config &config)
 	config.device_remove("k051649");
 
 	// clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
-	OKIM6295(config, "oki2", 1056000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);
+	OKIM6295(config, "oki2", XTAL::u(1056000), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 

@@ -26,7 +26,7 @@ class tmc208_base_device : public device_t
 {
 public:
 	// construction/destruction
-	tmc208_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	tmc208_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void a_w(uint8_t data);
 	void b_w(uint8_t data);
@@ -79,7 +79,7 @@ class tmc208k_device : public tmc208_base_device<int8_t, int16_t>
 {
 public:
 	// construction/destruction
-	tmc208k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	tmc208k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 
@@ -89,7 +89,7 @@ class tmc28ku_device : public tmc208_base_device<uint8_t, uint16_t>
 {
 public:
 	// construction/destruction
-	tmc28ku_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	tmc28ku_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void clock_b() override;

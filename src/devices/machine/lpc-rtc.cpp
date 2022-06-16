@@ -17,7 +17,7 @@ void lpc_rtc_device::extmap(address_map &map)
 	map(0x70, 0x77).rw(FUNC(lpc_rtc_device::exttarget_r), FUNC(lpc_rtc_device::exttarget_w)).umask32(0xff000000);
 }
 
-lpc_rtc_device::lpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lpc_rtc_device::lpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: lpc_device(mconfig, LPC_RTC, tag, owner, clock), cur_index(0), cur_extindex(0)
 {
 }

@@ -44,7 +44,7 @@
 class b6100_cpu_device : public b6000_cpu_device
 {
 public:
-	b6100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	b6100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides

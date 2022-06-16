@@ -206,7 +206,7 @@ offs_t isbc202_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 }
 
 // isbc202_device
-isbc202_device::isbc202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+isbc202_device::isbc202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig , ISBC202 , tag , owner , DERIVED_CLOCK(1, 4))
 	, device_multibus_interface(mconfig , *this)
 	, m_mcu(*this , "mcu")

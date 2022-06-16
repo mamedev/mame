@@ -489,7 +489,7 @@ void funkybee_state::machine_start()
 void funkybee_state::funkybee(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 3'072'000);   // 3.072 MHz
+	Z80(config, m_maincpu, XTAL::u(3'072'000));   // 3.072 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &funkybee_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &funkybee_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(funkybee_state::irq0_line_hold));
@@ -517,7 +517,7 @@ void funkybee_state::funkybee(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8912_device &ay8912(AY8912(config, "aysnd", 1'500'000)); // AY-3-8912 verified for Sky Lancer
+	ay8912_device &ay8912(AY8912(config, "aysnd", XTAL::u(1'500'000))); // AY-3-8912 verified for Sky Lancer
 	ay8912.port_a_read_callback().set_ioport("DSW");
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.50);
 }

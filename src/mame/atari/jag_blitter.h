@@ -30,7 +30,7 @@ class jag_blitter_device : public device_t,
 {
 public:
 	// construction/destruction
-	jag_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	jag_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// TODO: add which device triggered the I/O
 	void iobus_w(offs_t offset, u32 data, u32 mem_mask = ~0);

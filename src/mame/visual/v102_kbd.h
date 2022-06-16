@@ -38,7 +38,7 @@ protected:
 class v102_keyboard_device : public visual_mcs48_keyboard_device
 {
 public:
-	v102_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	v102_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -49,7 +49,7 @@ protected:
 class v550_keyboard_device : public visual_mcs48_keyboard_device
 {
 public:
-	v550_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	v550_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;

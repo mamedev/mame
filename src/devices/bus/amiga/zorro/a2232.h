@@ -36,7 +36,7 @@ class a2232_device : public device_t, public device_zorro2_card_interface, publi
 {
 public:
 	// construction/destruction
-	a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// zorro slot
 	uint16_t shared_ram_r(offs_t offset, uint16_t mem_mask = ~0);

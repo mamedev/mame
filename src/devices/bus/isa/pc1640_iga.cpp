@@ -66,7 +66,7 @@ const tiny_rom_entry *isa8_pc1640_iga_device::device_rom_region() const
 //  isa8_pc1640_iga_device - constructor
 //-------------------------------------------------
 
-isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: isa8_ega_device(mconfig, ISA8_PC1640_IGA, tag, owner, clock)
 {
 }

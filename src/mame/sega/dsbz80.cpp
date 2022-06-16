@@ -46,15 +46,15 @@ DEFINE_DEVICE_TYPE(DSBZ80, dsbz80_device, "dsbz80_device", "Sega Z80-based Digit
 
 void dsbz80_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_ourcpu, 4000000);     // unknown clock, but probably pretty slow considering the z80 does like nothing
+	Z80(config, m_ourcpu, XTAL::u(4000000));     // unknown clock, but probably pretty slow considering the z80 does like nothing
 	m_ourcpu->set_addrmap(AS_PROGRAM, &dsbz80_device::dsbz80_map);
 	m_ourcpu->set_addrmap(AS_IO, &dsbz80_device::dsbz80io_map);
 
-	I8251(config, m_uart, 4000000);
+	I8251(config, m_uart, XTAL::u(4000000));
 	m_uart->rxrdy_handler().set_inputline(m_ourcpu, INPUT_LINE_IRQ0);
 	m_uart->txd_handler().set(FUNC(dsbz80_device::output_txd));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(500000))); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_rxc));
 	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_txc));
 }
@@ -67,7 +67,7 @@ void dsbz80_device::device_add_mconfig(machine_config &config)
 //  dsbz80_device - constructor
 //-------------------------------------------------
 
-dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, DSBZ80, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_ourcpu(*this, Z80_TAG),

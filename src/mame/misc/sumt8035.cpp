@@ -242,7 +242,7 @@ INPUT_PORTS_END
 void sumt8035_state::summit(machine_config &config)
 {
 	/* basic machine hardware */
-	I8035(config, m_maincpu, 5000000);
+	I8035(config, m_maincpu, XTAL::u(5000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sumt8035_state::sumt_map);
 	m_maincpu->set_addrmap(AS_IO, &sumt8035_state::sumt_portmap);
 }

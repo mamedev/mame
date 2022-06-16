@@ -119,24 +119,24 @@ static const z80_daisy_config daisy_chain[] =
 
 void braiplus_state::braiplus(machine_config &config)
 {
-	Z80(config, m_maincpu, 4'000'000);
+	Z80(config, m_maincpu, XTAL::u(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &braiplus_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &braiplus_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	Z80PIO(config, m_pio[0], 4'000'000);
+	Z80PIO(config, m_pio[0], XTAL::u(4'000'000));
 	m_pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80PIO(config, m_pio[1], 4'000'000);
+	Z80PIO(config, m_pio[1], XTAL::u(4'000'000));
 	m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	i8251_device &usart(I8251(config, "usart", 2'000'000));
+	i8251_device &usart(I8251(config, "usart", XTAL::u(2'000'000)));
 	usart.rxrdy_handler().set(m_pio[1], FUNC(z80pio_device::pa3_w));
 
-	WD2793(config, "fdc", 2'000'000);
+	WD2793(config, "fdc", XTAL::u(2'000'000));
 
 	// HACK: what should be driving this?
-	CLOCK(config, "clock_hack", 100).signal_handler().set(m_pio[0], FUNC(z80pio_device::pa7_w));
+	CLOCK(config, "clock_hack", XTAL::u(100)).signal_handler().set(m_pio[0], FUNC(z80pio_device::pa7_w));
 }
 
 ROM_START( braiplus )

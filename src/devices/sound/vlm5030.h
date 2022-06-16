@@ -10,7 +10,7 @@
 class vlm5030_device : public device_t, public device_sound_interface, public device_rom_interface<16>
 {
 public:
-	vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	/* get BSY pin level */
 	DECLARE_READ_LINE_MEMBER( bsy );

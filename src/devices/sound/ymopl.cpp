@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(YM3526, ym3526_device, "ym3526", "YM3526 OPL")
 //  ym3526_device - constructor
 //-------------------------------------------------
 
-ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ym3526>(mconfig, tag, owner, clock, YM3526)
 {
 }
@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(Y8950, y8950_device, "y8950", "Y8950 OPL MSX-Audio")
 //  y8950_device - constructor
 //-------------------------------------------------
 
-y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::y8950>(mconfig, tag, owner, clock, Y8950),
 	device_rom_interface(mconfig, *this)
 {
@@ -89,7 +89,7 @@ DEFINE_DEVICE_TYPE(YM3812, ym3812_device, "ym3812", "YM3812 OPL2")
 //  ym3812_device - constructor
 //-------------------------------------------------
 
-ym3812_device::ym3812_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym3812_device::ym3812_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ym3812>(mconfig, tag, owner, clock, YM3812)
 {
 }
@@ -106,7 +106,7 @@ DEFINE_DEVICE_TYPE(YMF262, ymf262_device, "ymf262", "YMF262 OPL3")
 //  ymf262_device - constructor
 //-------------------------------------------------
 
-ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ymf262>(mconfig, tag, owner, clock, YMF262)
 {
 }
@@ -123,7 +123,7 @@ DEFINE_DEVICE_TYPE(YMF278B, ymf278b_device, "ymf278b", "YMF278B OPL4")
 //  ymf278b_device - constructor
 //-------------------------------------------------
 
-ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ymf278b>(mconfig, tag, owner, clock, YMF278B),
 	device_rom_interface(mconfig, *this)
 {
@@ -192,7 +192,7 @@ DEFINE_DEVICE_TYPE(YM2413, ym2413_device, "ym2413", "YM2413 OPLL")
 //  ym2413_device - constructor
 //-------------------------------------------------
 
-ym2413_device::ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym2413_device::ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ym2413>(mconfig, tag, owner, clock, YM2413),
 	m_internal(*this, "internal")
 {
@@ -240,7 +240,7 @@ DEFINE_DEVICE_TYPE(YM2423, ym2423_device, "ym2423", "YM2423 OPLL-X")
 //  ym2423_device - constructor
 //-------------------------------------------------
 
-ym2423_device::ym2423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym2423_device::ym2423_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ym2423>(mconfig, tag, owner, clock, YM2423),
 	m_internal(*this, "internal")
 {
@@ -288,7 +288,7 @@ DEFINE_DEVICE_TYPE(YMF281, ymf281_device, "ymf281", "YMF281 OPLLP")
 //  ymf281_device - constructor
 //-------------------------------------------------
 
-ymf281_device::ymf281_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ymf281_device::ymf281_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ymf281>(mconfig, tag, owner, clock, YMF281),
 	m_internal(*this, "internal")
 {
@@ -336,7 +336,7 @@ DEFINE_DEVICE_TYPE(DS1001, ds1001_device, "ds1001", "Yamaha DS1001 / Konami 0539
 //  ds1001_device - constructor
 //-------------------------------------------------
 
-ds1001_device::ds1001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ds1001_device::ds1001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ds1001>(mconfig, tag, owner, clock, DS1001),
 	m_internal(*this, "internal")
 {

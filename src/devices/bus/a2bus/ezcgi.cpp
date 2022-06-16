@@ -36,10 +36,10 @@ class a2bus_ezcgi_device:
 {
 public:
 	// construction/destruction
-	a2bus_ezcgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ezcgi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -61,10 +61,10 @@ class a2bus_ezcgi_9938_device:
 {
 public:
 	// construction/destruction
-	a2bus_ezcgi_9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ezcgi_9938_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -86,10 +86,10 @@ class a2bus_ezcgi_9958_device:
 {
 public:
 	// construction/destruction
-	a2bus_ezcgi_9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ezcgi_9958_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -158,36 +158,36 @@ void a2bus_ezcgi_9958_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ezcgi_device::a2bus_ezcgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ezcgi_device::a2bus_ezcgi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_ezcgi_device(mconfig, A2BUS_EZCGI, tag, owner, clock)
 {
 }
 
-a2bus_ezcgi_device::a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ezcgi_device::a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
-a2bus_ezcgi_9938_device::a2bus_ezcgi_9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ezcgi_9938_device::a2bus_ezcgi_9938_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_ezcgi_9938_device(mconfig, A2BUS_EZCGI_9938, tag, owner, clock)
 {
 }
 
-a2bus_ezcgi_9938_device::a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ezcgi_9938_device::a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
-a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_ezcgi_9958_device(mconfig, A2BUS_EZCGI_9958, tag, owner, clock)
 {
 }
 
-a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)

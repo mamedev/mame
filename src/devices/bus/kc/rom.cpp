@@ -42,12 +42,12 @@ DEFINE_DEVICE_TYPE(KC_M033,     kc_m033_device, "kc_m033", "M033 TypeStar")
 //  kc_8k_device - constructor
 //-------------------------------------------------
 
-kc_8k_device::kc_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kc_8k_device::kc_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc_8k_device(mconfig, KC_STANDARD, tag, owner, clock)
 {
 }
 
-kc_8k_device::kc_8k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+kc_8k_device::kc_8k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_kcexp_interface(mconfig, *this)
 	, m_slot(nullptr), m_mei(0), m_rom(nullptr), m_enabled(0), m_base(0)
@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER( kc_8k_device::mei_w )
 //  kc_m006_device - constructor
 //-------------------------------------------------
 
-kc_m006_device::kc_m006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kc_m006_device::kc_m006_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc_8k_device(mconfig, KC_M006, tag, owner, clock)
 {
 }
@@ -184,7 +184,7 @@ void kc_m006_device::read(offs_t offset, uint8_t &data)
 //  kc_m033_device - constructor
 //-------------------------------------------------
 
-kc_m033_device::kc_m033_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kc_m033_device::kc_m033_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc_8k_device(mconfig, KC_M033, tag, owner, clock)
 	, m_bank(0)
 {

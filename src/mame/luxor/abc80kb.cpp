@@ -128,7 +128,7 @@ void abc80_keyboard_device::abc80_keyboard_io(address_map &map)
 
 void abc80_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	I8048(config, m_maincpu, 4000000);
+	I8048(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_IO, &abc80_keyboard_device::abc80_keyboard_io);
 	m_maincpu->set_disable();
 }
@@ -161,7 +161,7 @@ ioport_constructor abc80_keyboard_device::device_input_ports() const
 //  abc80_keyboard_device - constructor
 //-------------------------------------------------
 
-abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ABC80_KEYBOARD, tag, owner, clock)
 	, m_write_keydown(*this)
 	, m_maincpu(*this, I8048_TAG)

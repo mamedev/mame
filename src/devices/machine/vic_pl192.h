@@ -9,7 +9,7 @@
 class vic_pl190_device : public device_t, public device_memory_interface
 {
 public:
-	vic_pl190_device(const machine_config &mconfig, const char* tag, device_t *owner, uint32_t clock = 0);
+	vic_pl190_device(const machine_config &mconfig, const char* tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto out_irq_cb() { return m_out_irq_func.bind(); }
 	auto out_fiq_cb() { return m_out_fiq_func.bind(); }
@@ -50,7 +50,7 @@ public:
 	void vect_ctl_w(offs_t offset, u32 data);
 
 protected:
-	vic_pl190_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vic_pl190_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -87,7 +87,7 @@ private:
 class vic_upd800468_device : public vic_pl190_device
 {
 public:
-	vic_upd800468_device(const machine_config &mconfig, const char* tag, device_t *owner, uint32_t clock = 0);
+	vic_upd800468_device(const machine_config &mconfig, const char* tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void map(address_map &map);
 
@@ -97,7 +97,7 @@ public:
 class vic_pl192_device : public vic_pl190_device
 {
 public:
-	vic_pl192_device(const machine_config &mconfig, const char* tag, device_t *owner, uint32_t clock = 0);
+	vic_pl192_device(const machine_config &mconfig, const char* tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void map(address_map &map);
 

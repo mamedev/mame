@@ -104,7 +104,7 @@ WRITE_LINE_MEMBER(ncd_mips_state::duart_irq_handler)
 void ncd_mips_state::hmxpro(machine_config &config)
 {
 	/* basic machine hardware */
-	R4600BE(config, m_maincpu, 50000000);
+	R4600BE(config, m_maincpu, XTAL::u(50000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_mips_state::hmxpro_map);
 	m_maincpu->set_periodic_int(FUNC(ncd_mips_state::vblank), attotime::from_hz(70.06));
 

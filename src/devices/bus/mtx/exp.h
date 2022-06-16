@@ -38,7 +38,7 @@ public:
 		set_fixed(false);
 	}
 
-	mtx_exp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	mtx_exp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
 	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }

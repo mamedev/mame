@@ -242,12 +242,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
 void darkmist_state::darkmist(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	Z80(config, m_maincpu, XTAL::u(4000000));         /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &darkmist_state::memmap);
 	m_maincpu->set_addrmap(AS_OPCODES, &darkmist_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(darkmist_state::scanline), "screen", 0, 1);
 
-	T5182(config, m_t5182, 0);
+	T5182(config, m_t5182);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

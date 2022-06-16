@@ -598,7 +598,7 @@ inline void upd7220_device::get_graphics_partition(int index, uint32_t *sad, uin
 //  upd7220_device - constructor
 //-------------------------------------------------
 
-upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, UPD7220, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),

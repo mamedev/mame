@@ -14,7 +14,7 @@ class nes_benshieng_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_benshieng_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_benshieng_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 

@@ -1152,8 +1152,8 @@ void sb_device::common(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_16BIT_R2R(config, m_ldac).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 
 	PC_JOY(config, m_joy);
 
@@ -1203,7 +1203,7 @@ void isa16_sblaster16_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_ldac(*this, "ldac"),
@@ -1214,14 +1214,14 @@ sb_device::sb_device(const machine_config &mconfig, device_type type, const char
 {
 }
 
-sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	sb_device(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_ym3812(*this, "ym3812")
 {
 }
 
-sb16_device::sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+sb16_device::sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	sb_device(mconfig, type, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this)
 {
@@ -1231,19 +1231,19 @@ sb16_device::sb16_device(const machine_config &mconfig, device_type type, const 
 //  isa8_sblaster_device - constructor
 //-------------------------------------------------
 
-isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock),
 	m_saa1099_1(*this, "saa1099.1"),
 	m_saa1099_2(*this, "saa1099.2")
 {
 }
 
-isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_5, tag, owner, clock)
 {
 }
 
-isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	sb16_device(mconfig, ISA16_SOUND_BLASTER_16, tag, owner, clock)
 {
 }
@@ -1425,7 +1425,7 @@ void sb_device::device_reset()
 
 	// MIDI is 31250 baud, 8-N-1
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(31250);
+	set_rate(XTAL::u(31250));
 }
 
 uint8_t sb_device::dack_r(int line)

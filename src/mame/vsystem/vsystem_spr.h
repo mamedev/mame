@@ -28,7 +28,7 @@ public:
 	void set_pal_mask(int pal_mask) { m_pal_mask = pal_mask; }
 	void set_transpen(int transpen) { m_transpen = transpen; }
 
-	vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void draw_sprites(uint16_t const *spriteram, int spriteram_bytes, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask = -1, int prihack_val = -1 );
 

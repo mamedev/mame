@@ -350,7 +350,7 @@ int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
 //  cdp1869_device - constructor
 //-------------------------------------------------
 
-cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CDP1869, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),

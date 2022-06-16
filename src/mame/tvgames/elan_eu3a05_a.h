@@ -15,7 +15,7 @@
 class elan_eu3a05_sound_device : public device_t, public device_sound_interface, public device_memory_interface
 {
 public:
-	elan_eu3a05_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	elan_eu3a05_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 

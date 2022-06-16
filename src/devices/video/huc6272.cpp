@@ -63,7 +63,7 @@ void huc6272_device::kram_map(address_map &map)
 //  huc6272_device - constructor
 //-------------------------------------------------
 
-huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HUC6272, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_huc6271(*this, finder_base::DUMMY_TAG),

@@ -341,7 +341,7 @@ void vcc_state::vcc(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
+	S14001A(config, m_speech, XTAL::u(25000)); // R/C circuit, around 25khz
 	m_speech->ext_read().set(FUNC(vcc_state::speech_r));
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }

@@ -1072,7 +1072,7 @@ void macpdm_state::pdm_map(address_map &map)
 
 void macpdm_state::macpdm(machine_config &config)
 {
-	PPC601(config, m_maincpu, 60000000);
+	PPC601(config, m_maincpu, XTAL::u(60000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpdm_state::pdm_map);
 
 	MAC_VIDEO_SONORA(config, m_video);
@@ -1120,7 +1120,7 @@ void macpdm_state::macpdm(machine_config &config)
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
 	// pclk is maincpu:60MHz/4, RTxCA is IO_CLOCK*2/17 or GPI input, RTxCB is IO_CLOCK*2/17
-	SCC8530(config, m_scc, 60000000/4);
+	SCC8530(config, m_scc, XTAL::u(60000000)/4);
 	m_scc->intrq_callback().set(FUNC(macpdm_state::scc_irq));
 
 	R65NC22(config, m_via1, IO_CLOCK/40);

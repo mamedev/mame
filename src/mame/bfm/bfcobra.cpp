@@ -130,9 +130,9 @@ namespace {
 /*
     Defines
 */
-#define Z8S180_XTAL 24000000
-#define Z80_XTAL    5910000     /* Unconfirmed */
-#define M6809_XTAL  4000000
+#define Z8S180_XTAL XTAL::u(24000000)
+#define Z80_XTAL    XTAL::u(5910000)     /* Unconfirmed */
+#define M6809_XTAL  XTAL::u(4000000)
 
 
 
@@ -1695,7 +1695,7 @@ void bfcobra_state::bfcobra(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 	ramdac.set_addrmap(0, &bfcobra_state::ramdac_map);
 	ramdac.set_split_read(1);
 
@@ -1706,21 +1706,21 @@ void bfcobra_state::bfcobra(machine_config &config)
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	/* ACIAs */
-	ACIA6850(config, m_acia6850_0, 0);
+	ACIA6850(config, m_acia6850_0);
 	m_acia6850_0->txd_handler().set(m_acia6850_1, FUNC(acia6850_device::write_rxd));
 	m_acia6850_0->irq_handler().set(FUNC(bfcobra_state::z80_acia_irq));
 
-	ACIA6850(config, m_acia6850_1, 0);
+	ACIA6850(config, m_acia6850_1);
 	m_acia6850_1->txd_handler().set(m_acia6850_0, FUNC(acia6850_device::write_rxd));
 
-	ACIA6850(config, m_acia6850_2, 0);
+	ACIA6850(config, m_acia6850_2);
 	m_acia6850_2->txd_handler().set(FUNC(bfcobra_state::data_acia_tx_w));
 	m_acia6850_2->irq_handler().set(FUNC(bfcobra_state::m6809_data_irq));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(31250*16))); // What are the correct ACIA clocks ?
 	acia_clock.signal_handler().set(FUNC(bfcobra_state::write_acia_clock));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 }
 
 /***************************************************************************
@@ -2776,7 +2776,7 @@ void bfcobjam_state::bfcobjam(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 	ramdac.set_addrmap(0, &bfcobjam_state::ramdac_map);
 	ramdac.set_split_read(1);
 
@@ -2790,10 +2790,10 @@ void bfcobjam_state::bfcobjam(machine_config &config)
 
 
 	/* ACIAs */
-	ACIA6850(config, m_acia6850_0, 0);
+	ACIA6850(config, m_acia6850_0);
 	m_acia6850_0->irq_handler().set(FUNC(bfcobjam_state::z8s180_acia_irq));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(31250*16))); // What are the correct ACIA clocks ?
 	acia_clock.signal_handler().set(FUNC(bfcobjam_state::write_acia_clock));
 
 	I2C_24C08(config, m_i2cmem);
@@ -2806,7 +2806,7 @@ void bfcobjam_state::bfcobjam_with_dmd(machine_config &config)
 	UPD7759(config, m_aux_upd7759);
 	m_aux_upd7759->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	BFM_DM01(config, m_dm01, 0);
+	BFM_DM01(config, m_dm01);
 }
 
 /***************************************************************************

@@ -1036,14 +1036,14 @@ INPUT_PORTS_END
 void aleck64_state::aleck64(machine_config &config)
 {
 	/* basic machine hardware */
-	VR4300BE(config, m_vr4300, 93750000);
+	VR4300BE(config, m_vr4300, XTAL::u(93750000));
 	m_vr4300->set_icache_size(16384);
 	m_vr4300->set_dcache_size(8192);
 	m_vr4300->set_system_clock(62500000);
 	m_vr4300->set_addrmap(AS_PROGRAM, &aleck64_state::n64_map);
 	m_vr4300->set_force_no_drc(true);
 
-	RSP(config, m_rsp, 62500000);
+	RSP(config, m_rsp, XTAL::u(62500000));
 	m_rsp->dp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_r));
 	m_rsp->dp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_w));
 	m_rsp->sp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_r));
@@ -1068,7 +1068,7 @@ void aleck64_state::aleck64(machine_config &config)
 	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	N64PERIPH(config, m_rcp_periphs, 0);
+	N64PERIPH(config, m_rcp_periphs);
 }
 
 uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

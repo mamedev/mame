@@ -79,7 +79,7 @@
 
 DEFINE_DEVICE_TYPE(MB87078, mb87078_device, "mb87078", "MB87078 Volume Controller")
 
-mb87078_device::mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mb87078_device::mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MB87078, tag, owner, clock),
 	m_gain_changed_cb(*this)
 {

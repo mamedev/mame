@@ -165,7 +165,7 @@ void zexall_state::zexall(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &zexall_state::mem_map);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 }
 
 

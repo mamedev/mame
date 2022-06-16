@@ -30,7 +30,7 @@
 
 DEFINE_DEVICE_TYPE(MBC55X_KEYBOARD, mbc55x_keyboard_device, "mbc55x_kbd", "MBC-55x Keyboard")
 
-mbc55x_keyboard_device::mbc55x_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mbc55x_keyboard_device::mbc55x_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MBC55X_KEYBOARD, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11")
 	, device_serial_interface(mconfig, *this)
@@ -183,7 +183,7 @@ void mbc55x_keyboard_device::device_resolve_objects()
 
 void mbc55x_keyboard_device::device_start()
 {
-	set_tra_rate(1230); // more or less
+	set_tra_rate(XTAL::u(1230)); // more or less
 }
 
 void mbc55x_keyboard_device::device_reset()

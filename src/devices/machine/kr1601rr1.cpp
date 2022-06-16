@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(KR1601RR1, kr1601rr1_device, "kr1601rr1", "KR1601RR1 EAROM")
 //  ctor
 //-------------------------------------------------
 
-kr1601rr1_device::kr1601rr1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kr1601rr1_device::kr1601rr1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KR1601RR1, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 {

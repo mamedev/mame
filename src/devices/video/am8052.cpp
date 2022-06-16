@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(AM8052, am8052_device, "am8052", "Am8052 CRTC")
 //  am8052_device - constructor
 //-------------------------------------------------
 
-am8052_device::am8052_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+am8052_device::am8052_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AM8052, tag, owner, clock)
 	, m_pointer(0x1f)
 {

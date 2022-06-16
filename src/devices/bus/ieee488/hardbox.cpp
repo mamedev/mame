@@ -286,7 +286,7 @@ void hardbox_device::device_add_mconfig(machine_config &config)
 	ppi1.in_pc_callback().set(FUNC(hardbox_device::ppi1_pc_r));
 	ppi1.out_pc_callback().set(FUNC(hardbox_device::ppi1_pc_w));
 
-	CORVUS_HDC(config, m_hdc, 0);
+	CORVUS_HDC(config, m_hdc);
 	HARDDISK(config, "harddisk1", "corvus_hdd");
 	HARDDISK(config, "harddisk2", "corvus_hdd");
 	HARDDISK(config, "harddisk3", "corvus_hdd");
@@ -336,7 +336,7 @@ ioport_constructor hardbox_device::device_input_ports() const
 //  hardbox_device - constructor
 //-------------------------------------------------
 
-hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HARDBOX, tag, owner, clock)
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, Z80_TAG)

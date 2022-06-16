@@ -213,7 +213,7 @@ u32 ut88_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const
 void ut88_state::ut88(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 2000000);
+	I8080(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ut88_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &ut88_state::io_map);
 
@@ -231,7 +231,7 @@ void ut88_state::ut88(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
 	I8255A(config, m_ppi);
@@ -251,7 +251,7 @@ void ut88_state::ut88(machine_config &config)
 void ut88mini_state::ut88mini(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 2000000);
+	I8080(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ut88mini_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &ut88mini_state::io_map);
 

@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(AM79C30A, am79c30a_device, "am79c30a", "Am79C30A DSC")
 //  am79c30a_device - constructor
 //-------------------------------------------------
 
-am79c30a_device::am79c30a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+am79c30a_device::am79c30a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AM79C30A, tag, owner, clock)
 	, m_int_callback(*this)
 	, m_init(0)

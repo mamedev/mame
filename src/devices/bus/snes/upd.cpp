@@ -32,37 +32,37 @@ DEFINE_DEVICE_TYPE(SNS_LOROM_SETA10, sns_rom_seta10dsp_device, "sns_rom_seta10",
 DEFINE_DEVICE_TYPE(SNS_LOROM_SETA11, sns_rom_seta11dsp_device, "sns_rom_seta11",   "SNES Cart (LoROM) + Seta ST011 DSP")
 
 
-sns_rom20_necdsp_device::sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sns_rom20_necdsp_device::sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, type, tag, owner, clock), m_upd7725(*this, "dsp")
 {
 }
 
-sns_rom20_necdsp_device::sns_rom20_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom20_necdsp_device::sns_rom20_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom20_necdsp_device(mconfig, SNS_LOROM_NECDSP, tag, owner, clock)
 {
 }
 
-sns_rom21_necdsp_device::sns_rom21_necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sns_rom21_necdsp_device::sns_rom21_necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom21_device(mconfig, type, tag, owner, clock), m_upd7725(*this, "dsp")
 {
 }
 
-sns_rom21_necdsp_device::sns_rom21_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom21_necdsp_device::sns_rom21_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom21_necdsp_device(mconfig, SNS_HIROM_NECDSP, tag, owner, clock)
 {
 }
 
-sns_rom_setadsp_device::sns_rom_setadsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_setadsp_device::sns_rom_setadsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_device(mconfig, type, tag, owner, clock), m_upd96050(*this, "dsp")
 {
 }
 
-sns_rom_seta10dsp_device::sns_rom_seta10dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_seta10dsp_device::sns_rom_seta10dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_setadsp_device(mconfig, SNS_LOROM_SETA10, tag, owner, clock)
 {
 }
 
-sns_rom_seta11dsp_device::sns_rom_seta11dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_seta11dsp_device::sns_rom_seta11dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_setadsp_device(mconfig, SNS_LOROM_SETA11, tag, owner, clock)
 {
 }
@@ -134,7 +134,7 @@ void sns_rom20_necdsp_device::dsp_data_map_lorom(address_map &map)
 
 void sns_rom20_necdsp_device::device_add_mconfig(machine_config &config)
 {
-	UPD7725(config, m_upd7725, 8000000);
+	UPD7725(config, m_upd7725, XTAL::u(8000000));
 	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom20_necdsp_device::dsp_prg_map_lorom);
 	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp_device::dsp_data_map_lorom);
 }
@@ -192,7 +192,7 @@ void sns_rom21_necdsp_device::dsp_data_map_hirom(address_map &map)
 
 void sns_rom21_necdsp_device::device_add_mconfig(machine_config &config)
 {
-	UPD7725(config, m_upd7725, 8000000);
+	UPD7725(config, m_upd7725, XTAL::u(8000000));
 	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom21_necdsp_device::dsp_prg_map_hirom);
 	m_upd7725->set_addrmap(AS_DATA, &sns_rom21_necdsp_device::dsp_data_map_hirom);
 }
@@ -304,7 +304,7 @@ void sns_rom_setadsp_device::st01x_data_map(address_map &map)
 
 void sns_rom_seta10dsp_device::device_add_mconfig(machine_config &config)
 {
-	UPD96050(config, m_upd96050, 10000000);
+	UPD96050(config, m_upd96050, XTAL::u(10000000));
 	m_upd96050->set_addrmap(AS_PROGRAM, &sns_rom_seta10dsp_device::st01x_prg_map);
 	m_upd96050->set_addrmap(AS_DATA, &sns_rom_seta10dsp_device::st01x_data_map);
 }
@@ -312,7 +312,7 @@ void sns_rom_seta10dsp_device::device_add_mconfig(machine_config &config)
 
 void sns_rom_seta11dsp_device::device_add_mconfig(machine_config &config)
 {
-	UPD96050(config, m_upd96050, 15000000);
+	UPD96050(config, m_upd96050, XTAL::u(15000000));
 	m_upd96050->set_addrmap(AS_PROGRAM, &sns_rom_seta11dsp_device::st01x_prg_map);
 	m_upd96050->set_addrmap(AS_DATA, &sns_rom_seta11dsp_device::st01x_data_map);
 }
@@ -368,42 +368,42 @@ DEFINE_DEVICE_TYPE(SNS_LOROM_SETA10_LEG,   sns_rom_seta10dsp_legacy_device,  "sn
 DEFINE_DEVICE_TYPE(SNS_LOROM_SETA11_LEG,   sns_rom_seta11dsp_legacy_device,  "sns_seta11leg",  "SNES Cart (LoROM) + SETA ST011 DSP Legacy")
 
 
-sns_rom20_necdsp1_legacy_device::sns_rom20_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom20_necdsp1_legacy_device::sns_rom20_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom20_necdsp_device(mconfig, SNS_LOROM_NECDSP1_LEG, tag, owner, clock)
 {
 }
 
-sns_rom20_necdsp1b_legacy_device::sns_rom20_necdsp1b_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom20_necdsp1b_legacy_device::sns_rom20_necdsp1b_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom20_necdsp_device(mconfig, SNS_LOROM_NECDSP1B_LEG, tag, owner, clock)
 {
 }
 
-sns_rom20_necdsp2_legacy_device::sns_rom20_necdsp2_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom20_necdsp2_legacy_device::sns_rom20_necdsp2_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom20_necdsp_device(mconfig, SNS_LOROM_NECDSP2_LEG, tag, owner, clock)
 {
 }
 
-sns_rom20_necdsp3_legacy_device::sns_rom20_necdsp3_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom20_necdsp3_legacy_device::sns_rom20_necdsp3_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom20_necdsp_device(mconfig, SNS_LOROM_NECDSP3_LEG, tag, owner, clock)
 {
 }
 
-sns_rom20_necdsp4_legacy_device::sns_rom20_necdsp4_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom20_necdsp4_legacy_device::sns_rom20_necdsp4_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom20_necdsp_device(mconfig, SNS_LOROM_NECDSP4_LEG, tag, owner, clock)
 {
 }
 
-sns_rom21_necdsp1_legacy_device::sns_rom21_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom21_necdsp1_legacy_device::sns_rom21_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom21_necdsp_device(mconfig, SNS_HIROM_NECDSP1_LEG, tag, owner, clock)
 {
 }
 
-sns_rom_seta10dsp_legacy_device::sns_rom_seta10dsp_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_seta10dsp_legacy_device::sns_rom_seta10dsp_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_setadsp_device(mconfig, SNS_LOROM_SETA10_LEG, tag, owner, clock)
 {
 }
 
-sns_rom_seta11dsp_legacy_device::sns_rom_seta11dsp_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sns_rom_seta11dsp_legacy_device::sns_rom_seta11dsp_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sns_rom_setadsp_device(mconfig, SNS_LOROM_SETA11_LEG, tag, owner, clock)
 {
 }
@@ -411,56 +411,56 @@ sns_rom_seta11dsp_legacy_device::sns_rom_seta11dsp_legacy_device(const machine_c
 
 void sns_rom20_necdsp1_legacy_device::device_add_mconfig(machine_config &config)
 {
-	UPD7725(config, m_upd7725, 8000000);
+	UPD7725(config, m_upd7725, XTAL::u(8000000));
 	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom20_necdsp1_legacy_device::dsp_prg_map_lorom);
 	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp1_legacy_device::dsp_data_map_lorom);
 }
 
 void sns_rom20_necdsp1b_legacy_device::device_add_mconfig(machine_config &config)
 {
-	UPD7725(config, m_upd7725, 8000000);
+	UPD7725(config, m_upd7725, XTAL::u(8000000));
 	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom20_necdsp1b_legacy_device::dsp_prg_map_lorom);
 	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp1b_legacy_device::dsp_data_map_lorom);
 }
 
 void sns_rom20_necdsp2_legacy_device::device_add_mconfig(machine_config &config)
 {
-	UPD7725(config, m_upd7725, 8000000);
+	UPD7725(config, m_upd7725, XTAL::u(8000000));
 	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom20_necdsp2_legacy_device::dsp_prg_map_lorom);
 	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp2_legacy_device::dsp_data_map_lorom);
 }
 
 void sns_rom20_necdsp3_legacy_device::device_add_mconfig(machine_config &config)
 {
-	UPD7725(config, m_upd7725, 8000000);
+	UPD7725(config, m_upd7725, XTAL::u(8000000));
 	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom20_necdsp3_legacy_device::dsp_prg_map_lorom);
 	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp3_legacy_device::dsp_data_map_lorom);
 }
 
 void sns_rom20_necdsp4_legacy_device::device_add_mconfig(machine_config &config)
 {
-	UPD7725(config, m_upd7725, 8000000);
+	UPD7725(config, m_upd7725, XTAL::u(8000000));
 	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom20_necdsp4_legacy_device::dsp_prg_map_lorom);
 	m_upd7725->set_addrmap(AS_DATA, &sns_rom20_necdsp4_legacy_device::dsp_data_map_lorom);
 }
 
 void sns_rom21_necdsp1_legacy_device::device_add_mconfig(machine_config &config)
 {
-	UPD7725(config, m_upd7725, 8000000);
+	UPD7725(config, m_upd7725, XTAL::u(8000000));
 	m_upd7725->set_addrmap(AS_PROGRAM, &sns_rom21_necdsp1_legacy_device::dsp_prg_map_hirom);
 	m_upd7725->set_addrmap(AS_DATA, &sns_rom21_necdsp1_legacy_device::dsp_data_map_hirom);
 }
 
 void sns_rom_seta10dsp_legacy_device::device_add_mconfig(machine_config &config)
 {
-	UPD96050(config, m_upd96050, 10000000);
+	UPD96050(config, m_upd96050, XTAL::u(10000000));
 	m_upd96050->set_addrmap(AS_PROGRAM, &sns_rom_seta10dsp_legacy_device::st01x_prg_map);
 	m_upd96050->set_addrmap(AS_DATA, &sns_rom_seta10dsp_legacy_device::st01x_data_map);
 }
 
 void sns_rom_seta11dsp_legacy_device::device_add_mconfig(machine_config &config)
 {
-	UPD96050(config, m_upd96050, 15000000);
+	UPD96050(config, m_upd96050, XTAL::u(15000000));
 	m_upd96050->set_addrmap(AS_PROGRAM, &sns_rom_seta11dsp_legacy_device::st01x_prg_map);
 	m_upd96050->set_addrmap(AS_DATA, &sns_rom_seta11dsp_legacy_device::st01x_data_map);
 }

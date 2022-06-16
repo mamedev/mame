@@ -34,7 +34,7 @@ class ttl165_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl165_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ttl165_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto data_callback() { return m_data_cb.bind(); }
 	auto qh_callback() { return m_qh_cb.bind(); }

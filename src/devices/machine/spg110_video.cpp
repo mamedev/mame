@@ -9,7 +9,7 @@
 
 DEFINE_DEVICE_TYPE(SPG110_VIDEO, spg110_video_device, "spg110_video", "SPG110 System-on-a-Chip (Video)")
 
-spg110_video_device::spg110_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+spg110_video_device::spg110_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("spg110_video", ENDIANNESS_BIG, 16, 32, 0, address_map_constructor(FUNC(spg110_video_device::map_video), this)),
@@ -26,7 +26,7 @@ spg110_video_device::spg110_video_device(const machine_config &mconfig, device_t
 {
 }
 
-spg110_video_device::spg110_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spg110_video_device::spg110_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spg110_video_device(mconfig, SPG110_VIDEO, tag, owner, clock)
 {
 }

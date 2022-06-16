@@ -28,25 +28,25 @@ DEFINE_DEVICE_TYPE(HLCD0601, hlcd0601_device, "hlcd0601", "Hughes HLCD 0601 LCD 
 //  constructor
 //-------------------------------------------------
 
-hlcd0515_device::hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax) :
+hlcd0515_device::hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 colmax) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_colmax(colmax),
 	m_write_cols(*this), m_write_data(*this)
 { }
 
-hlcd0515_device::hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+hlcd0515_device::hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	hlcd0515_device(mconfig, HLCD0515, tag, owner, clock, 25)
 { }
 
-hlcd0569_device::hlcd0569_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+hlcd0569_device::hlcd0569_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	hlcd0515_device(mconfig, HLCD0569, tag, owner, clock, 24)
 { }
 
-hlcd0530_device::hlcd0530_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+hlcd0530_device::hlcd0530_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	hlcd0515_device(mconfig, HLCD0530, tag, owner, clock, 24)
 { }
 
-hlcd0601_device::hlcd0601_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+hlcd0601_device::hlcd0601_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	hlcd0515_device(mconfig, HLCD0601, tag, owner, clock, 24)
 { }
 

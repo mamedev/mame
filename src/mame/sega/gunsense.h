@@ -7,7 +7,7 @@
 class sega_gunsense_board_device : public device_t
 {
 public:
-	sega_gunsense_board_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	sega_gunsense_board_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void device_start() override;

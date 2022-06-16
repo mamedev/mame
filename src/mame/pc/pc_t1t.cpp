@@ -33,7 +33,7 @@ enum
 DEFINE_DEVICE_TYPE(PCVIDEO_T1000, pcvideo_t1000_device, "tandy_1000_graphics", "Tandy 1000 Graphics Adapter")
 DEFINE_DEVICE_TYPE(PCVIDEO_PCJR,  pcvideo_pcjr_device,  "pcjr_graphics",       "PC Jr Graphics Adapter")
 
-pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_mc6845(*this, T1000_MC6845_NAME),
@@ -57,12 +57,12 @@ pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-pcvideo_t1000_device::pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pcvideo_t1000_device::pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pc_t1t_device(mconfig, PCVIDEO_T1000, tag, owner, clock)
 {
 }
 
-pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock),
 	m_pic8259(*this, ":pic8259"),
 	m_jxkanji(nullptr)

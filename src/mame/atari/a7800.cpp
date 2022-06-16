@@ -110,7 +110,7 @@
 #include "speaker.h"
 
 #define A7800_NTSC_Y1   XTAL(14'318'181)
-#define CLK_PAL 1773447
+#define CLK_PAL XTAL::u(1773447)
 
 
 class a7800_state : public driver_device
@@ -1387,19 +1387,19 @@ void a7800_state::a7800_ntsc(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(7159090, 454, 0, 320, 263, 27, 27 + 192 + 32);
+	m_screen->set_raw(XTAL::u(7159090), 454, 0, 320, 263, 27, 27 + 192 + 32);
 	m_screen->set_screen_update("maria", FUNC(atari_maria_device::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(a7800_state::a7800_palette), std::size(a7800_colors));
 
-	ATARI_MARIA(config, m_maria, 0);
+	ATARI_MARIA(config, m_maria);
 	m_maria->set_dmacpu_tag(m_maincpu);
 	m_maria->set_screen_tag(m_screen);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	TIA(config, "tia", 31400).add_route(ALL_OUTPUTS, "mono", 1.00);
+	TIA(config, "tia", XTAL::u(31400)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* devices */
 	mos6532_new_device &riot(MOS6532_NEW(config, "riot", A7800_NTSC_Y1/8));
@@ -1420,7 +1420,7 @@ void a7800_pal_state::a7800_pal(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_clock(CLK_PAL);
 
-	m_screen->set_raw(7093788, 454, 0, 320, 313, 35, 35 + 228 + 32);
+	m_screen->set_raw(XTAL::u(7093788), 454, 0, 320, 313, 35, 35 + 228 + 32);
 
 	subdevice<palette_device>("palette")->set_init(FUNC(a7800_pal_state::a7800p_palette));
 

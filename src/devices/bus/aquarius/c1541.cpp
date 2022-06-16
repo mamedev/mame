@@ -36,7 +36,7 @@ void aquarius_c1541_device::device_add_mconfig(machine_config &config)
 //  aquarius_c1541_device - constructor
 //-------------------------------------------------
 
-aquarius_c1541_device::aquarius_c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+aquarius_c1541_device::aquarius_c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AQUARIUS_C1541, tag, owner, clock)
 	, device_aquarius_cartridge_interface(mconfig, *this)
 	, m_iec(*this, "iec_bus")

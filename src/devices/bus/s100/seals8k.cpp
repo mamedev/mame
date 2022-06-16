@@ -40,11 +40,11 @@ class s100_8k_sc_device : public device_t, public device_s100_card_interface
 {
 public:
 	// construction/destruction
-	s100_8k_sc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	s100_8k_sc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// delegated construction
-	s100_8k_sc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	s100_8k_sc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-specific overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -71,7 +71,7 @@ class s100_8k_sc_bb_device : public s100_8k_sc_device, public device_nvram_inter
 {
 public:
 	// construction/destruction
-	s100_8k_sc_bb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	s100_8k_sc_bb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_nvram_interface overrides
@@ -112,7 +112,7 @@ INPUT_PORTS_END
 //  s100_8k_sc_device - constructor
 //-------------------------------------------------
 
-s100_8k_sc_device::s100_8k_sc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+s100_8k_sc_device::s100_8k_sc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this),
 	m_dsw(*this, "DSW")
@@ -120,7 +120,7 @@ s100_8k_sc_device::s100_8k_sc_device(const machine_config &mconfig, device_type 
 }
 
 
-s100_8k_sc_device::s100_8k_sc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+s100_8k_sc_device::s100_8k_sc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	s100_8k_sc_device(mconfig, S100_8K_SC, tag, owner, clock)
 {
 }
@@ -130,7 +130,7 @@ s100_8k_sc_device::s100_8k_sc_device(const machine_config &mconfig, const char *
 //  s100_8k_sc_bb_device - constructor
 //-------------------------------------------------
 
-s100_8k_sc_bb_device::s100_8k_sc_bb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+s100_8k_sc_bb_device::s100_8k_sc_bb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	s100_8k_sc_device(mconfig, S100_8K_SC_BB, tag, owner, clock),
 	device_nvram_interface(mconfig, *this)
 {

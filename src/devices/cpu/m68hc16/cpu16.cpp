@@ -181,7 +181,7 @@ enum class cpu16_device::seq : u16
 ALLOW_SAVE_TYPE(cpu16_device::seq)
 
 
-cpu16_device::cpu16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
+cpu16_device::cpu16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 20, 0, map)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 20, 0, map)

@@ -327,13 +327,13 @@ GFXDECODE_END
 
 void tugboat_state::tugboat(machine_config &config)
 {
-	M6502(config, m_maincpu, 2000000); /* 2 MHz ???? */
+	M6502(config, m_maincpu, XTAL::u(2000000)); /* 2 MHz ???? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tugboat_state::main_map);
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia6821_device &pia0(PIA6821(config, "pia0"));
 	pia0.readpa_handler().set(FUNC(tugboat_state::input_r));
 
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia6821_device &pia1(PIA6821(config, "pia1"));
 	pia1.readpa_handler().set_ioport("DSW");
 	pia1.writepb_handler().set(FUNC(tugboat_state::ctrl_w));
 

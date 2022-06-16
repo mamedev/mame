@@ -19,7 +19,7 @@
 DEFINE_DEVICE_TYPE(PALETTE, palette_device, "palette", "palette")
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, init_delegate &&init, u32 entries, u32 indirect)
-	: palette_device(mconfig, tag, owner, 0U)
+	: palette_device(mconfig, tag, owner)
 {
 	set_entries(entries, indirect);
 	m_init = std::move(init);
@@ -101,7 +101,7 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PALETTE, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, m_entries(0)

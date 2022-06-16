@@ -156,43 +156,43 @@ static void cpu21yb_vme_cards(device_slot_interface &device)
 /* Machine configurations */
 void cpu20_state::cpu20(machine_config &config)
 {
-	VME(config, "vme", 0);
+	VME(config, "vme");
 	VME_SLOT(config, "slot1", cpu20_vme_cards, "fccpu20", 1, "vme");
 }
 
 void cpu20_state::cpu21s(machine_config &config)
 {
-	VME(config, "vme", 0);
+	VME(config, "vme");
 	VME_SLOT(config, "slot1", cpu21s_vme_cards, "fccpu21s", 1, "vme");
 }
 
 void cpu20_state::cpu21(machine_config &config)
 {
-	VME(config, "vme", 0);
+	VME(config, "vme");
 	VME_SLOT(config, "slot1", cpu21_vme_cards, "fccpu21", 1, "vme");
 }
 
 void cpu20_state::cpu21a(machine_config &config)
 {
-	VME(config, "vme", 0);
+	VME(config, "vme");
 	VME_SLOT(config, "slot1", cpu21a_vme_cards, "fccpu21a", 1, "vme");
 }
 
 void cpu20_state::cpu21ya(machine_config &config)
 {
-	VME(config, "vme", 0);
+	VME(config, "vme");
 	VME_SLOT(config, "slot1", cpu21ya_vme_cards, "fccpu21ya", 1, "vme");
 }
 
 void cpu20_state::cpu21b(machine_config &config)
 {
-	VME(config, "vme", 0);
+	VME(config, "vme");
 	VME_SLOT(config, "slot1", cpu21b_vme_cards, "fccpu21b", 1, "vme");
 }
 
 void cpu20_state::cpu21yb(machine_config &config)
 {
-	VME(config, "vme", 0);
+	VME(config, "vme");
 	VME_SLOT(config, "slot1", cpu21yb_vme_cards, "fccpu21yb", 1, "vme");
 }
 

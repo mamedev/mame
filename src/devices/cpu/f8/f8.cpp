@@ -63,7 +63,7 @@ static constexpr int cL = 6;
 DEFINE_DEVICE_TYPE(F8, f8_cpu_device, "f8", "Fairchild F8")
 
 
-f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cpu_device(mconfig, F8, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0),
 	m_regs_config("register", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(f8_cpu_device::regs_map), this)),

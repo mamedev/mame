@@ -778,14 +778,14 @@ void ecoinfr_state::machine_reset()
 void ecoinfr_state::ecoinfr(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinfr_state::memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinfr_state::portmap);
 	TIMER(config , "ectimer" , 0).configure_periodic(FUNC(ecoinfr_state::ecoinfr_irq_timer), attotime::from_hz(250));
 
 	config.set_default_layout(layout_ecoinfr);
 
-	I8251(config, UPD8251_TAG, 0);
+	I8251(config, UPD8251_TAG);
 
 	REEL(config, m_reel[0], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
 	m_reel[0]->optic_handler().set(FUNC(ecoinfr_state::reel_optic_cb<0>));

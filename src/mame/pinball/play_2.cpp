@@ -451,14 +451,14 @@ void play_2_state::play_2(machine_config &config)
 	/* Video */
 	config.set_default_layout(layout_play_2);
 
-	CLOCK(config, "xpoint", 60).signal_handler().set(FUNC(play_2_state::clock2_w)); // crossing-point detector
+	CLOCK(config, "xpoint", XTAL::u(60)).signal_handler().set(FUNC(play_2_state::clock2_w)); // crossing-point detector
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
-	TTL7474(config, m_4013a, 0);
+	TTL7474(config, m_4013a);
 	m_4013a->comp_output_cb().set(m_4013a, FUNC(ttl7474_device::d_w));
 	m_4013a->output_cb().set(m_4020, FUNC(ripple_counter_device::reset_w)); // TODO: also CKD for display
 
-	TTL7474(config, m_4013b, 0);
+	TTL7474(config, m_4013b);
 	m_4013b->output_cb().set(m_maincpu, FUNC(cosmac_device::ef2_w));
 	m_4013b->comp_output_cb().set(m_maincpu, FUNC(cosmac_device::int_w)).invert(); // int is reversed in mame
 
@@ -470,7 +470,7 @@ void play_2_state::play_2(machine_config &config)
 	genpin_audio(config);
 
 	SPEAKER(config, "mono").front_center();
-	CDP1863(config, m_1863, 0);
+	CDP1863(config, m_1863);
 	m_1863->set_clock2(2.95_MHz_XTAL / 8);
 	m_1863->add_route(ALL_OUTPUTS, "mono", 0.75);
 	TIMER(config, m_snd_off).configure_generic(FUNC(play_2_state::snd_off_callback));

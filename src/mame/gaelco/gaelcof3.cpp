@@ -99,7 +99,7 @@ INPUT_PORTS_END
 
 void gaelcof3_state::gaelcof3(machine_config &config)
 {
-	PIC16C56(config, m_maincpu, 4000000); // clock not confirmed
+	PIC16C56(config, m_maincpu, XTAL::u(4000000)); // clock not confirmed
 	m_maincpu->read_a().set_ioport("IN0");
 	m_maincpu->write_a().set([this] (uint8_t data) { logerror("port A write: %02x\n", data); });
 	m_maincpu->read_b().set_ioport("DSW1");
@@ -107,7 +107,7 @@ void gaelcof3_state::gaelcof3(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock and pin not confirmed
+	OKIM6295(config, "oki", XTAL::u(1000000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock and pin not confirmed
 }
 
 

@@ -1088,7 +1088,7 @@ void ddragon_state::ddragon2(machine_config &config)
 	Z80(config, m_subcpu, MAIN_CLOCK / 3);      /* 4 MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &ddragon_state::dd2_sub_map);
 
-	Z80(config, m_soundcpu, 3579545);
+	Z80(config, m_soundcpu, XTAL::u(3579545));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &ddragon_state::dd2_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60000)); /* heavy interleaving to sync up sprite<->main CPUs */
@@ -1113,7 +1113,7 @@ void ddragon_state::ddragon2(machine_config &config)
 	fmsnd.add_route(0, "mono", 0.60);
 	fmsnd.add_route(1, "mono", 0.60);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 verified on bootleg PCB by Jose Tejada
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 verified on bootleg PCB by Jose Tejada
 	oki.add_route(ALL_OUTPUTS, "mono", 0.20);
 }
 

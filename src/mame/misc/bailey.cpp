@@ -20,7 +20,7 @@
 
 // copied by Pong, not accurate for this driver!
 // start
-#define MASTER_CLOCK    7159000
+#define MASTER_CLOCK    XTAL::u(7159000)
 #define V_TOTAL         (0x105+1)       // 262
 #define H_TOTAL         (0x1C6+1)       // 454
 
@@ -92,7 +92,7 @@ void bailey_state::video_start()
 void bailey_state::bailey(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_bailey);
+	NETLIST_CPU(config, m_maincpu).set_source(netlist_bailey);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);

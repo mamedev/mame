@@ -118,7 +118,7 @@ public:
 
 protected:
 	// construction/destruction
-	via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -213,7 +213,7 @@ class mos6522_device : public via6522_device
 {
 public:
 	// construction/destruction
-	mos6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6522_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> r65c22_device
@@ -222,7 +222,7 @@ class r65c22_device : public via6522_device
 {
 public:
 	// construction/destruction
-	r65c22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	r65c22_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> r65nc22_device
@@ -231,7 +231,7 @@ class r65nc22_device : public via6522_device
 {
 public:
 	// construction/destruction
-	r65nc22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	r65nc22_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> w65c22s_device
@@ -240,7 +240,7 @@ class w65c22s_device : public via6522_device
 {
 public:
 	// construction/destruction
-	w65c22s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	w65c22s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

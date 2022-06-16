@@ -113,7 +113,7 @@ ioport_constructor bbc_m4000_device::device_input_ports() const
 //  bbc_m4000_device - constructor
 //-------------------------------------------------
 
-bbc_m4000_device::bbc_m4000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_m4000_device::bbc_m4000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_M4000, tag, owner, clock)
 	, device_bbc_userport_interface(mconfig, *this)
 	, m_kbd(*this, "KBLOCK_%u", 1)

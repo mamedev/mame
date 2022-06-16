@@ -43,7 +43,7 @@ ioport_constructor apricot_256k_ram_device::device_input_ports() const
 //  apricot_256k_ram_device - constructor
 //-------------------------------------------------
 
-apricot_256k_ram_device::apricot_256k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apricot_256k_ram_device::apricot_256k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, APRICOT_256K_RAM, tag, owner, clock),
 	device_apricot_expansion_card_interface(mconfig, *this),
 	m_sw(*this, "sw")
@@ -97,7 +97,7 @@ ioport_constructor apricot_128k_ram_device::device_input_ports() const
 //  apricot_128_512k_ram_device - constructor
 //-------------------------------------------------
 
-apricot_128k_ram_device::apricot_128k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apricot_128k_ram_device::apricot_128k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, APRICOT_128K_RAM, tag, owner, clock),
 	device_apricot_expansion_card_interface(mconfig, *this),
 	m_strap(*this, "strap")
@@ -151,7 +151,7 @@ ioport_constructor apricot_512k_ram_device::device_input_ports() const
 //  apricot_128_512k_ram_device - constructor
 //-------------------------------------------------
 
-apricot_512k_ram_device::apricot_512k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apricot_512k_ram_device::apricot_512k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, APRICOT_512K_RAM, tag, owner, clock),
 	device_apricot_expansion_card_interface(mconfig, *this),
 	m_strap(*this, "strap")

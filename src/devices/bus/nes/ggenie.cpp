@@ -35,7 +35,7 @@
 DEFINE_DEVICE_TYPE(NES_GGENIE, nes_ggenie_device, "nes_ggenie", "NES Cart Game Genie PCB")
 
 
-nes_ggenie_device::nes_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ggenie_device::nes_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_GGENIE, tag, owner, clock)
 	, m_ggslot(*this, "gg_slot")
 	, m_gg_bypass(false)

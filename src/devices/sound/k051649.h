@@ -16,7 +16,7 @@ class k051649_device : public device_t,
 						public device_sound_interface
 {
 public:
-	k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void k051649_waveform_w(offs_t offset, u8 data);
 	u8   k051649_waveform_r(offs_t offset);

@@ -9,7 +9,7 @@ class hcd62121_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto kol_cb() { return m_kol_cb.bind(); }
 	auto koh_cb() { return m_koh_cb.bind(); }

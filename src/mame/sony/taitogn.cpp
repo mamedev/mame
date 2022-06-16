@@ -636,7 +636,7 @@ void taitogn_state::coh3002t(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::main_map);
 
-	RF5C296(config, "rf5c296", 0).set_pccard("pccard");
+	RF5C296(config, "rf5c296").set_pccard("pccard");
 
 	PCCARD_SLOT(config, m_pccard, slot_ataflash, nullptr);
 

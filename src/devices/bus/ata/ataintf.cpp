@@ -206,7 +206,7 @@ WRITE_LINE_MEMBER( abstract_ata_interface_device::write_dmack )
 			elem->dev()->write_dmack(state);
 }
 
-abstract_ata_interface_device::abstract_ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+abstract_ata_interface_device::abstract_ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_slot(*this, "%u", 0U),
 	m_irq_handler(*this),
@@ -218,7 +218,7 @@ abstract_ata_interface_device::abstract_ata_interface_device(const machine_confi
 
 DEFINE_DEVICE_TYPE(ATA_INTERFACE, ata_interface_device, "ata_interface", "ATA Interface")
 
-ata_interface_device::ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ata_interface_device::ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	abstract_ata_interface_device(mconfig, ATA_INTERFACE, tag, owner, clock)
 {
 }

@@ -492,12 +492,12 @@ void ssystem3_state::ssystem3(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssystem3_state::ssystem3_map);
 
-	M6808(config, m_subcpu, 6800000); // LC circuit, measured
+	M6808(config, m_subcpu, XTAL::u(6800000)); // LC circuit, measured
 	m_subcpu->set_addrmap(AS_PROGRAM, &ssystem3_state::chessunit_map);
 
 	config.set_perfect_quantum(m_maincpu);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->irqa_handler().set_inputline(m_subcpu, INPUT_LINE_NMI);
 	m_pia->writepa_handler().set(FUNC(ssystem3_state::cu_pia_a_w));
 	m_pia->readpa_handler().set(FUNC(ssystem3_state::cu_pia_a_r));
@@ -509,11 +509,11 @@ void ssystem3_state::ssystem3(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	HLCD0438(config, m_lcd2[0], 0);
+	HLCD0438(config, m_lcd2[0]);
 	m_lcd2[0]->write_segs().set(FUNC(ssystem3_state::lcd2_output_w<0>));
 	m_lcd2[0]->write_data().set(m_lcd2[1], FUNC(hlcd0438_device::data_w));
 
-	HLCD0438(config, m_lcd2[1], 0);
+	HLCD0438(config, m_lcd2[1]);
 	m_lcd2[1]->write_segs().set(FUNC(ssystem3_state::lcd2_output_w<1>));
 
 	screen_device &screen(SCREEN(config, "chessunit", SCREEN_TYPE_SVG));

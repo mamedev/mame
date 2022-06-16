@@ -465,7 +465,7 @@ void korg_dss1_state::klm780(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(korg_dss1_state::palette_init_dss1), 2);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc);
 	m_lcdc->set_lcd_size(2, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(korg_dss1_state::lcd_pixel_update));
 }

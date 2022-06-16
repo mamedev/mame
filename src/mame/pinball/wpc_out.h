@@ -13,13 +13,13 @@ class wpc_out_device : public device_t
 public:
 	typedef delegate<bool (int, bool)> handler_t;
 
-	wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int gi_count)
+	wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, int gi_count)
 		: wpc_out_device(mconfig, tag, owner, clock)
 	{
 		set_gi_count(gi_count);
 	}
 
-	wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~wpc_out_device();
 
 	void out_w(offs_t offset, uint8_t data);

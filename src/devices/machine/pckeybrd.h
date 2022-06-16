@@ -20,7 +20,7 @@
 class pc_keyboard_device : public device_t
 {
 public:
-	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint8_t read();
 	void enable(int state);
@@ -35,7 +35,7 @@ public:
 	};
 
 protected:
-	pc_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pc_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
@@ -80,12 +80,12 @@ class at_keyboard_device : public pc_keyboard_device
 {
 public:
 	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, KEYBOARD_TYPE type, int default_set)
-		: at_keyboard_device(mconfig, tag, owner, 0)
+		: at_keyboard_device(mconfig, tag, owner)
 	{
 		set_type(type, default_set);
 	}
 
-	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void write(uint8_t data);
 

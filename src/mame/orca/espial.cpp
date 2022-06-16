@@ -620,11 +620,11 @@ GFXDECODE_END
 void espial_state::espial(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 3'072'000);   // 3.072 MHz
+	Z80(config, m_maincpu, XTAL::u(3'072'000));   // 3.072 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &espial_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(espial_state::scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 3'072'000);  // 2 MHz??????
+	Z80(config, m_audiocpu, XTAL::u(3'072'000));  // 2 MHz??????
 	m_audiocpu->set_addrmap(AS_PROGRAM, &espial_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &espial_state::sound_io_map);
 	m_audiocpu->set_periodic_int(FUNC(espial_state::sound_nmi_gen), attotime::from_hz(4 * 60));
@@ -649,7 +649,7 @@ void espial_state::espial(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	AY8910(config, "aysnd", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, "aysnd", XTAL::u(1'500'000)).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void netwars_state::netwars(machine_config &config)

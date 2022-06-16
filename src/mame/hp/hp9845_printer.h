@@ -19,7 +19,7 @@ class hp9845_printer_device : public device_t
 {
 public:
 	// construction/destruction
-	hp9845_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp9845_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto irq() { return m_irl_handler.bind(); }

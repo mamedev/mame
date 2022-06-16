@@ -31,7 +31,7 @@ class sk1100_link_cable_device : public device_t,
 {
 public:
 	// construction/destruction
-	sk1100_link_cable_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sk1100_link_cable_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -166,7 +166,7 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::flag_w)
 		BIT_CLR(m_flags, HPHYBRID_FLG_BIT);
 }
 
-hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth)
+hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint8_t addrwidth)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_pa_changed_func(*this)
 	, m_opcode_func(*this)
@@ -1525,12 +1525,12 @@ void hp_hybrid_cpu_device::do_mpy()
 // ********************************************************************************
 // hp_5061_3011_cpu_device
 // ********************************************************************************
-hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hp_hybrid_cpu_device(mconfig, HP_5061_3011, tag, owner, clock, 16)
 {
 }
 
-hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth)
+hp_5061_3011_cpu_device::hp_5061_3011_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint8_t addrwidth)
 	: hp_hybrid_cpu_device(mconfig, type, tag, owner, clock, addrwidth)
 {
 }
@@ -1728,7 +1728,7 @@ std::unique_ptr<util::disasm_interface> hp_5061_3011_cpu_device::create_disassem
 // ********************************************************************************
 // hp_5061_3001_cpu_device
 // ********************************************************************************
-hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hp_5061_3011_cpu_device(mconfig, HP_5061_3001, tag, owner, clock, 22)
 {
 }
@@ -1922,7 +1922,7 @@ void hp_5061_3001_cpu_device::enter_isr()
 // ********************************************************************************
 // hp_09825_67907_cpu_device
 // ********************************************************************************
-hp_09825_67907_cpu_device::hp_09825_67907_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp_09825_67907_cpu_device::hp_09825_67907_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hp_hybrid_cpu_device(mconfig , HP_09825_67907 , tag , owner , clock , 15)
 {
 }

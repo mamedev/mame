@@ -29,7 +29,7 @@ class konami_cpu_device : public m6809_base_device
 {
 public:
 	// construction/destruction
-	konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto line() { return m_set_lines.bind(); }

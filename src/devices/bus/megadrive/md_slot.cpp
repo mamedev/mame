@@ -159,7 +159,7 @@ uint32_t device_md_cart_interface::get_padded_size(uint32_t size)
 //-------------------------------------------------
 //  base_md_cart_slot_device - constructor
 //-------------------------------------------------
-base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_md_cart_interface>(mconfig, *this),
@@ -167,17 +167,17 @@ base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig
 {
 }
 
-md_cart_slot_device::md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+md_cart_slot_device::md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	base_md_cart_slot_device(mconfig, MD_CART_SLOT, tag, owner, clock)
 {
 }
 
-pico_cart_slot_device::pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pico_cart_slot_device::pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	base_md_cart_slot_device(mconfig, PICO_CART_SLOT, tag, owner, clock)
 {
 }
 
-copera_cart_slot_device::copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+copera_cart_slot_device::copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	base_md_cart_slot_device(mconfig, COPERA_CART_SLOT, tag, owner, clock)
 {
 }

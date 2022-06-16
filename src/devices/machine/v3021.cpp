@@ -114,7 +114,7 @@ DEFINE_DEVICE_TYPE(V3021, v3021_device, "v3021", "EM Microelectronic-Marin SA V3
 //  v3021_device - constructor
 //-------------------------------------------------
 
-v3021_device::v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+v3021_device::v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, V3021, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
 {

@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(MIDI_PORT, midi_port_device, "midi_port", "MIDI port")
 
-midi_port_device::midi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+midi_port_device::midi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MIDI_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_midi_port_interface>(mconfig, *this),
 	m_rxd(0),

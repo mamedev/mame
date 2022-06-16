@@ -141,7 +141,7 @@ namespace {
    they were derived from the schematics.  The horizontal synch chain
    counts from 0x0c0-0x1ff and the vertical one from 0x0d8-0x1ff.  */
 
-#define MASTER_CLOCK        (10000000)
+#define MASTER_CLOCK        XTAL::u(10000000)
 #define CPU_CLOCK           (MASTER_CLOCK / 4)
 #define PIXEL_CLOCK         (MASTER_CLOCK / 2)
 #define AY8910_CLOCK        (MASTER_CLOCK / 8)
@@ -715,7 +715,7 @@ void enigma2_state::enigma2(machine_config &config)
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_main_cpu_map);
 
-	Z80(config, m_audiocpu, 2500000);
+	Z80(config, m_audiocpu, XTAL::u(2500000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
 	m_audiocpu->set_periodic_int(FUNC(enigma2_state::irq0_line_hold), attotime::from_hz(8*52));
 
@@ -744,7 +744,7 @@ void enigma2_state::enigma2a(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2a_main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &enigma2_state::enigma2a_main_cpu_io_map);
 
-	Z80(config, m_audiocpu, 2500000);
+	Z80(config, m_audiocpu, XTAL::u(2500000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
 	m_audiocpu->set_periodic_int(FUNC(enigma2_state::irq0_line_hold), attotime::from_hz(8*52));
 

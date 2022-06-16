@@ -62,49 +62,49 @@ DEFINE_DEVICE_TYPE(MD_EEPROM_BLARA,    md_eeprom_blara_device,    "md_eeprom_bla
 DEFINE_DEVICE_TYPE(MD_EEPROM_MODE1,    md_eeprom_mode1_device,    "md_eeprom_mode1",    "MD Serial EEPROM Mode 1")
 
 
-md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_md_cart_interface(mconfig, *this)
 	, m_i2cmem(*this, "i2cmem"), m_i2c_mem(0), m_i2c_clk(0)
 {
 }
 
-md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_eeprom_device(mconfig, MD_STD_EEPROM, tag, owner, clock)
 {
 }
 
-md_eeprom_nbajam_device::md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_eeprom_nbajam_device::md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAM, tag, owner, clock)
 {
 }
 
-md_eeprom_nbajamte_device::md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_eeprom_nbajamte_device::md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAMTE, tag, owner, clock)
 {
 }
 
-md_eeprom_nflqb_device::md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_eeprom_nflqb_device::md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_eeprom_device(mconfig, MD_EEPROM_NFLQB, tag, owner, clock)
 {
 }
 
-md_eeprom_cslam_device::md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_eeprom_cslam_device::md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_eeprom_device(mconfig, MD_EEPROM_CSLAM, tag, owner, clock)
 {
 }
 
-md_eeprom_nhlpa_device::md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_eeprom_nhlpa_device::md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_eeprom_device(mconfig, MD_EEPROM_NHLPA, tag, owner, clock)
 {
 }
 
-md_eeprom_blara_device::md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_eeprom_blara_device::md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_eeprom_device(mconfig, MD_EEPROM_BLARA, tag, owner, clock)
 {
 }
 
-md_eeprom_mode1_device::md_eeprom_mode1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_eeprom_mode1_device::md_eeprom_mode1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_eeprom_device(mconfig, MD_EEPROM_MODE1, tag, owner, clock)
 {
 }
@@ -363,7 +363,7 @@ void md_eeprom_blara_device::write(offs_t offset, uint16_t data, uint16_t mem_ma
 
 DEFINE_DEVICE_TYPE(MD_EEPROM_NBAJAM_ALT, md_eeprom_nbajam_alt_device, "md_eeprom_nbajama", "MD NBA Jam (Alt)")
 
-md_eeprom_nbajam_alt_device::md_eeprom_nbajam_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_eeprom_nbajam_alt_device::md_eeprom_nbajam_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAM_ALT, tag, owner, clock)
 {
 }

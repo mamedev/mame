@@ -166,7 +166,7 @@ const tiny_rom_entry *bbc_opus1770_device::device_rom_region() const
 //  bbc_opusfdc_device - constructor
 //-------------------------------------------------
 
-bbc_opus8272_device::bbc_opus8272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bbc_opus8272_device::bbc_opus8272_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, BBC_OPUS8272, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_fdc(*this, "i8272"),
@@ -174,7 +174,7 @@ bbc_opus8272_device::bbc_opus8272_device(const machine_config &mconfig, const ch
 {
 }
 
-bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),
@@ -183,17 +183,17 @@ bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_typ
 {
 }
 
-bbc_opus2791_device::bbc_opus2791_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_opus2791_device::bbc_opus2791_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_opusfdc_device(mconfig, BBC_OPUS2791, tag, owner, clock)
 {
 }
 
-bbc_opus2793_device::bbc_opus2793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_opus2793_device::bbc_opus2793_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_opusfdc_device(mconfig, BBC_OPUS2793, tag, owner, clock)
 {
 }
 
-bbc_opus1770_device::bbc_opus1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_opus1770_device::bbc_opus1770_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_opusfdc_device(mconfig, BBC_OPUS1770, tag, owner, clock)
 {
 }

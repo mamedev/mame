@@ -829,10 +829,10 @@ void nightgal_state::sexygal(machine_config &config)
 	NSC8105(config, m_audiocpu, MASTER_CLOCK / 8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nightgal_state::sexygal_audio_map);
 
-	clock_device &sampleclk(CLOCK(config, "sampleclk", 6000)); // quite a wild guess
+	clock_device &sampleclk(CLOCK(config, "sampleclk", XTAL::u(6000))); // quite a wild guess
 	sampleclk.signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
 
 	config.device_remove("aysnd");
 

@@ -530,7 +530,7 @@ void sega_16bit_common_base::philko_paletteram_w(offs_t offset, uint16_t data, u
 
 DEFINE_DEVICE_TYPE(SEGAIC16VID, segaic16_video_device, "segaic16_video", "Sega 16-bit Video")
 
-segaic16_video_device::segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segaic16_video_device::segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGAIC16VID, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_display_enable(0)

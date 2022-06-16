@@ -131,10 +131,10 @@ void basic52_state::basic31(machine_config &config)
 	m_maincpu->serial_rx_cb().set(FUNC(basic52_state::from_term));
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(basic52_state::kbd_put));
 
-	I8255(config, "ppi8255", 0);
+	I8255(config, "ppi8255");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(ACORN_MEMC, acorn_memc_device, "memc", "Acorn MEMC")
 //  LIVE DEVICE
 //**************************************************************************
 
-acorn_memc_device::acorn_memc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_memc_device::acorn_memc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACORN_MEMC, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_vidc(*this, finder_base::DUMMY_TAG)

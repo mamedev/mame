@@ -1475,7 +1475,7 @@ void aerofgt_state::pspikes(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikes);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	VSYSTEM_SPR2(config, m_spr_old[0]);
 	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
@@ -1492,7 +1492,7 @@ void aerofgt_state::pspikes(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -1528,7 +1528,7 @@ void aerofgt_state::spikes91(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spikes91);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
@@ -1562,14 +1562,14 @@ void aerofgt_state::pspikesb(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikesb);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_LOW); // clock frequency & pin 7 not verified, pin high causes sound pitch to be too high
+	OKIM6295(config, m_oki, XTAL::u(1056000), okim6295_device::PIN7_LOW); // clock frequency & pin 7 not verified, pin high causes sound pitch to be too high
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -1606,12 +1606,12 @@ void aerofgt_state::kickball(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kickball);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	VSYSTEM_SPR2(config, m_spr_old[0]);
 	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	//VSYSTEM_GGA(config, "gga", 0); // still accessed as if it exists, in clone hardware?
+	//VSYSTEM_GGA(config, "gga"); // still accessed as if it exists, in clone hardware?
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
@@ -1652,9 +1652,9 @@ void aerofgt_state::pspikesc(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikes);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	VSYSTEM_SPR2(config, m_spr_old[0]);
 	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
@@ -1664,7 +1664,7 @@ void aerofgt_state::pspikesc(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(1056000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -1696,12 +1696,12 @@ void aerofgt_state::karatblz(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	VSYSTEM_SPR2(config, m_spr_old[0]);
 	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	VSYSTEM_SPR2(config, m_spr_old[1], 0);
+	VSYSTEM_SPR2(config, m_spr_old[1]);
 	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
@@ -1750,17 +1750,17 @@ void aerofgt_state::karatblzbl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	VSYSTEM_SPR2(config, m_spr_old[0]);
 	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	VSYSTEM_SPR2(config, m_spr_old[1], 0);
+	VSYSTEM_SPR2(config, m_spr_old[1]);
 	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 
@@ -1807,12 +1807,12 @@ void aerofgt_state::spinlbrk(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	VSYSTEM_SPR2(config, m_spr_old[0]);
 	m_spr_old[0]->set_pritype(1);
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	VSYSTEM_SPR2(config, m_spr_old[1], 0);
+	VSYSTEM_SPR2(config, m_spr_old[1]);
 	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::spinbrk_tile_callback)); // rom lookup
 	m_spr_old[1]->set_pritype(1);
 	m_spr_old[1]->set_gfx_region(3);
@@ -1864,12 +1864,12 @@ void aerofgt_state::turbofrc(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	VSYSTEM_SPR2(config, m_spr_old[0]);
 	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	VSYSTEM_SPR2(config, m_spr_old[1], 0);
+	VSYSTEM_SPR2(config, m_spr_old[1]);
 	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
@@ -1920,12 +1920,12 @@ void aerofgt_state::aerofgtb(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	VSYSTEM_SPR2(config, m_spr_old[0]);
 	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	VSYSTEM_SPR2(config, m_spr_old[1], 0);
+	VSYSTEM_SPR2(config, m_spr_old[1]);
 	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
@@ -1940,7 +1940,7 @@ void aerofgt_state::aerofgtb(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -1962,7 +1962,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
-	vs9209_device &io(VS9209(config, "io", 0));
+	vs9209_device &io(VS9209(config, "io"));
 	io.porta_input_cb().set_ioport("P1");
 	io.portb_input_cb().set_ioport("P2");
 	io.portc_input_cb().set_ioport("SYSTEM");
@@ -1972,7 +1972,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	io.portg_output_cb().set("watchdog", FUNC(mb3773_device::write_line_ck)).bit(7);
 	io.porth_input_cb().set_ioport("JP1");
 
-	MB3773(config, "watchdog", 0);
+	MB3773(config, "watchdog");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1986,7 +1986,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerofgt);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	VSYSTEM_SPR(config, m_spr, 0);
+	VSYSTEM_SPR(config, m_spr);
 	m_spr->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_tile_callback));
 	m_spr->set_gfx_region(2);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
@@ -2034,7 +2034,7 @@ void aerofgt_state::aerfboot(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerfboot);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
@@ -2044,7 +2044,7 @@ void aerofgt_state::aerfboot(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(1056000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->set_addrmap(0, &aerofgt_state::oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -2071,14 +2071,14 @@ void aerofgt_state::aerfboo2(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerfboo2);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(1056000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -2105,9 +2105,9 @@ void aerofgt_state::wbbc97(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wbbc97);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	VSYSTEM_SPR2(config, m_spr_old[0]);
 	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
@@ -2120,11 +2120,11 @@ void aerofgt_state::wbbc97(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3579545));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL::u(3579545)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+   	OKIM6295(config, m_oki, XTAL::u(1056000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

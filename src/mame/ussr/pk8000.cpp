@@ -351,7 +351,7 @@ u32 pk8000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 void pk8000_state::pk8000(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 1780000); // pk8002 = 10'220'000 / 8
+	I8080(config, m_maincpu, XTAL::u(1780000)); // pk8002 = 10'220'000 / 8
 	m_maincpu->set_addrmap(AS_PROGRAM, &pk8000_state::pk8000_mem);
 	m_maincpu->set_addrmap(AS_IO, &pk8000_state::pk8000_io);
 	m_maincpu->set_vblank_int("screen", FUNC(pk8000_state::interrupt));

@@ -727,7 +727,7 @@ void vcombat_state::vcombat(machine_config &config)
 	aux.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_aux));
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_10BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_10BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 }
 
 
@@ -760,7 +760,7 @@ void vcombat_state::shadfgtr(machine_config &config)
 	screen.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_main));
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_10BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_10BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 }
 
 

@@ -15,7 +15,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(HD641016, hd641016_device, "hd641016", "Hitachi HD641016")
 
-hd641016_device::hd641016_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hd641016_device::hd641016_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, HD641016, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 24, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 32, 10, 0, address_map_constructor(FUNC(hd641016_device::ram_map), this))

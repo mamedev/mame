@@ -80,7 +80,7 @@ this seems to be the only zoom feature actually used in the games.
 
 DEFINE_DEVICE_TYPE(TC0080VCO, tc0080vco_device, "tc0080vco", "Taito TC0080VCO")
 
-tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TC0080VCO, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, m_ram(nullptr)

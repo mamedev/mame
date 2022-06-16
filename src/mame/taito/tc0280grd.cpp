@@ -29,7 +29,7 @@ control registers:
 
 DEFINE_DEVICE_TYPE(TC0280GRD, tc0280grd_device, "tc0280grd", "Taito TC0280GRD / TC0430GRW")
 
-tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TC0280GRD, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_ram(nullptr)

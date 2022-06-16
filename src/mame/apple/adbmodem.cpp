@@ -95,7 +95,7 @@ void adbmodem_device::adb_change()
 //  adbmodem_device - constructor
 //-------------------------------------------------
 
-adbmodem_device::adbmodem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adbmodem_device::adbmodem_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ADBMODEM, tag, owner, clock),
 	  write_reset(*this),
 	  write_linechange(*this),

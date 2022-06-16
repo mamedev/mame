@@ -11,7 +11,7 @@
 DEFINE_DEVICE_TYPE(NANORESEAU_TO, nanoreseau_to_device, "nanoreseau_to", "Nanoreseau controller (TO rom)")
 DEFINE_DEVICE_TYPE(NANORESEAU_MO, nanoreseau_mo_device, "nanoreseau_mo", "Nanoreseau controller (MO rom)")
 
-	nanoreseau_device::nanoreseau_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool no_id) :
+	nanoreseau_device::nanoreseau_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool no_id) :
 	device_t(mconfig, type, tag, owner, clock),
 	thomson_extension_interface(mconfig, *this),
 	m_mc6854(*this, "mc6854"),
@@ -21,12 +21,12 @@ DEFINE_DEVICE_TYPE(NANORESEAU_MO, nanoreseau_mo_device, "nanoreseau_mo", "Nanore
 {
 }
 
-nanoreseau_to_device::nanoreseau_to_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool no_id) :
+nanoreseau_to_device::nanoreseau_to_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, bool no_id) :
 	nanoreseau_device(mconfig, NANORESEAU_TO, tag, owner, clock)
 {
 }
 
-nanoreseau_mo_device::nanoreseau_mo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool no_id) :
+nanoreseau_mo_device::nanoreseau_mo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, bool no_id) :
 	nanoreseau_device(mconfig, NANORESEAU_MO, tag, owner, clock)
 {
 }

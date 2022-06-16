@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(BBC_DFSE00, bbc_dfse00_device, "bbc_dfse00", "BBC Micro E00 D
 //  bbc_rom_device - constructor
 //-------------------------------------------------
 
-bbc_dfse00_device::bbc_dfse00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_dfse00_device::bbc_dfse00_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_DFSE00, tag, owner, clock)
 	, device_bbc_rom_interface(mconfig, *this)
 {

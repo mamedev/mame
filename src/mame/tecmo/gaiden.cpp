@@ -735,7 +735,7 @@ void gaiden_state::shadoww(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaiden_state::gaiden_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaiden_state::irq5_line_assert));
 
-	Z80(config, m_audiocpu, 4000000);  /* 4 MHz */
+	Z80(config, m_audiocpu, XTAL::u(4000000));  /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gaiden_state::sound_map);  /* IRQs are triggered by the YM2203 */
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -753,9 +753,9 @@ void gaiden_state::shadoww(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaiden);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 4096);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen);
 
-	TECMO_MIXER(config, m_mixer, 0);
+	TECMO_MIXER(config, m_mixer);
 	m_mixer->set_mixer_shifts(10,9,4);
 	m_mixer->set_blendcols(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 );
 	m_mixer->set_regularcols( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
@@ -770,20 +770,20 @@ void gaiden_state::shadoww(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 4000000));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL::u(4000000)));
 	ym1.irq_handler().set_inputline(m_audiocpu, 0);
 	ym1.add_route(0, "mono", 0.15);
 	ym1.add_route(1, "mono", 0.15);
 	ym1.add_route(2, "mono", 0.15);
 	ym1.add_route(3, "mono", 0.60);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 4000000));
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL::u(4000000)));
 	ym2.add_route(0, "mono", 0.15);
 	ym2.add_route(1, "mono", 0.15);
 	ym2.add_route(2, "mono", 0.15);
 	ym2.add_route(3, "mono", 0.60);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH));
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1000000), okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.20);
 }
 
@@ -844,9 +844,9 @@ void gaiden_state::drgnbowl(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	YM2151(config, "ymsnd", 4000000).add_route(ALL_OUTPUTS, "mono", 0.40);
+	YM2151(config, "ymsnd", XTAL::u(4000000)).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50);
+	OKIM6295(config, "oki", XTAL::u(1000000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 /*
@@ -966,11 +966,11 @@ void gaiden_state::mastninj_map(address_map &map)
 void gaiden_state::mastninj(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);   /* 10 MHz? */
+	M68000(config, m_maincpu, XTAL::u(10000000));   /* 10 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaiden_state::mastninj_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaiden_state::irq5_line_assert));
 
-	Z80(config, m_audiocpu, 4000000);  /* ?? MHz */
+	Z80(config, m_audiocpu, XTAL::u(4000000));  /* ?? MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gaiden_state::mastninj_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(gaiden_state,mastninj)
@@ -1001,31 +1001,31 @@ void gaiden_state::mastninj(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	// YM2203 clocks chosen by analogy with Automat; actual rate unknown, but 4 MHz is obviously too fast
-	ym2203_device &ym1(YM2203(config, "ym1", 1250000));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL::u(1250000)));
 	ym1.add_route(0, "mono", 0.15);
 	ym1.add_route(1, "mono", 0.15);
 	ym1.add_route(2, "mono", 0.15);
 	ym1.add_route(3, "mono", 0.60);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 1250000));
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL::u(1250000)));
 	ym2.add_route(0, "mono", 0.15);
 	ym2.add_route(1, "mono", 0.15);
 	ym2.add_route(2, "mono", 0.15);
 	ym2.add_route(3, "mono", 0.60);
 
-	LS157(config, m_adpcm_select[0], 0);
+	LS157(config, m_adpcm_select[0]);
 	m_adpcm_select[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
 
-	LS157(config, m_adpcm_select[1], 0);
+	LS157(config, m_adpcm_select[1]);
 	m_adpcm_select[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
-	MSM5205(config, m_msm[0], 384000);
+	MSM5205(config, m_msm[0], XTAL::u(384000));
 	m_msm[0]->vck_callback().set(m_msm[1], FUNC(msm5205_device::vclk_w));
 	m_msm[0]->vck_callback().append(FUNC(gaiden_state::vck_flipflop_w));
 	m_msm[0]->set_prescaler_selector(msm5205_device::S96_4B);
 	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MSM5205(config, m_msm[1], 384000);
+	MSM5205(config, m_msm[1], XTAL::u(384000));
 	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
 	m_msm[1]->add_route(ALL_OUTPUTS, "mono", 0.20);
 }

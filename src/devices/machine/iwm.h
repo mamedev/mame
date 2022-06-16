@@ -22,8 +22,8 @@ class iwm_device: public applefdintf_device
 {
 public:
 	// construction/destruction
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock = 0);
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, XTAL q3_clock) :
+	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t q3_clock = 0);
+	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, XTAL q3_clock) :
 		iwm_device(mconfig, tag, owner, clock, q3_clock.value()) {}
 
 	virtual u8 read(offs_t offset) override;

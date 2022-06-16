@@ -311,7 +311,7 @@ void d9final_state::machine_start()
 void d9final_state::d9final(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 24000000 / 4); /* ? MHz */
+	Z80(config, m_maincpu, XTAL::u(24000000) / 4); /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &d9final_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &d9final_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(d9final_state::irq0_line_hold));

@@ -471,7 +471,7 @@ void blockout_state::blockout(machine_config &config)
 	ymsnd.add_route(0, "lspeaker", 0.60);
 	ymsnd.add_route(1, "rspeaker", 0.60);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1'056'000, okim6295_device::PIN7_HIGH));
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1'056'000), okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 }

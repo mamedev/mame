@@ -74,7 +74,7 @@ void neomania_state::machine_reset()
 void neomania_state::neomania(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM3(config, m_maincpu, 600'000'000); // Exact hardware not specified
+	PENTIUM3(config, m_maincpu, XTAL::u(600'000'000)); // Exact hardware not specified
 	m_maincpu->set_addrmap(AS_PROGRAM, &neomania_state::neomania_map);
 
 	// Video hardware

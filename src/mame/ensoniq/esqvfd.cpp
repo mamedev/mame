@@ -116,7 +116,7 @@ static const uint16_t font[]=
 	0x0000, // 0000 0000 0000 0000 (DEL)
 };
 
-esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dimensions_param &&dimensions) :
+esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, dimensions_param &&dimensions) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_vfds(std::move(std::get<0>(dimensions))),
 	m_rows(std::get<1>(dimensions)),
@@ -292,7 +292,7 @@ bool esq2x40_device::write_contents(std::ostream &o)
 }
 
 
-esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	esqvfd_device(mconfig, ESQ2X40, tag, owner, clock, make_dimensions<2, 40>(*this))
 {
 }
@@ -341,7 +341,7 @@ void esq1x22_device::write_char(int data)
 	update_display();
 }
 
-esq1x22_device::esq1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+esq1x22_device::esq1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	esqvfd_device(mconfig, ESQ1X22, tag, owner, clock, make_dimensions<1, 22>(*this))
 {
 }
@@ -404,7 +404,7 @@ void esq2x40_sq1_device::write_char(int data)
 	}
 }
 
-esq2x40_sq1_device::esq2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+esq2x40_sq1_device::esq2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	esqvfd_device(mconfig, ESQ2X40_SQ1, tag, owner, clock, make_dimensions<2, 40>(*this))
 {
 	m_wait87shift = false;

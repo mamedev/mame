@@ -32,7 +32,7 @@ public:
 	typedef device_delegate<int (int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank)> draw_delegate;
 
 	// construction/destruction
-	esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration helpers
 	void set_lbrm_prom_region(const char *name) { m_lbrm_prom = name; }

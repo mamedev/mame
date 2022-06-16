@@ -31,7 +31,7 @@ ALLOW_SAVE_TYPE(float32_t);
 
 DEFINE_DEVICE_TYPE(WTL3132, wtl3132_device, "wtl3132", "Weitek 3132")
 
-wtl3132_device::wtl3132_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+wtl3132_device::wtl3132_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, WTL3132, tag, owner, clock)
 	, m_fpcn_cb(*this)
 	, m_fpex_cb(*this)

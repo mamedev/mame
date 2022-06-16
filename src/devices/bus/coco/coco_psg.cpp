@@ -104,7 +104,7 @@ void coco_psg_device::device_add_mconfig(machine_config &config)
 //  coco_psg_device - constructor
 //-------------------------------------------------
 
-coco_psg_device::coco_psg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_psg_device::coco_psg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, COCO_PSG, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_psg(*this, "psg")

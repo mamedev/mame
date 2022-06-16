@@ -17,7 +17,7 @@
 class np600a3_device : public device_t, public device_isa16_card_interface
 {
 public:
-	np600a3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	np600a3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::LAN; }
 

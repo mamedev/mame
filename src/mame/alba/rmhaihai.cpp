@@ -509,7 +509,7 @@ GFXDECODE_END
 void rmhaihai_state::rmhaihai(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 20000000/4);     // 5 MHz ???
+	Z80(config, m_maincpu, XTAL::u(20000000)/4);     // 5 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &rmhaihai_state::rmhaihai_map);
 	m_maincpu->set_addrmap(AS_IO, &rmhaihai_state::rmhaihai_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(rmhaihai_state::irq0_line_hold));
@@ -531,12 +531,12 @@ void rmhaihai_state::rmhaihai(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 20000000/16));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(20000000)/16));
 	aysnd.port_a_read_callback().set_ioport("DSW2");
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MSM5205(config, m_msm, 500000);
+	MSM5205(config, m_msm, XTAL::u(500000));
 	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }

@@ -26,10 +26,10 @@ class abc890_device :  public device_t,
 {
 public:
 	// construction/destruction
-	abc890_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc890_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	abc890_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	abc890_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -58,7 +58,7 @@ class abc_expansion_unit_device :  public abc890_device
 {
 public:
 	// construction/destruction
-	abc_expansion_unit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc_expansion_unit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -72,7 +72,7 @@ class abc894_device :  public abc890_device
 {
 public:
 	// construction/destruction
-	abc894_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc894_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -86,7 +86,7 @@ class abc850_device :  public abc890_device
 {
 public:
 	// construction/destruction
-	abc850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc850_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -100,7 +100,7 @@ class abc852_device :  public abc890_device
 {
 public:
 	// construction/destruction
-	abc852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc852_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -114,7 +114,7 @@ class abc856_device :  public abc890_device
 {
 public:
 	// construction/destruction
-	abc856_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc856_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

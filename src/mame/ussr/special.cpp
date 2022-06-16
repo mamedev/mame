@@ -489,7 +489,7 @@ static void specimx_floppies(device_slot_interface &device)
 void special_state::special(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 2000000);
+	I8080(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &special_state::specialist_mem);
 
 	/* video hardware */
@@ -505,7 +505,7 @@ void special_state::special(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.0625);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.0625);
 
 	/* Devices */
 	I8255(config, m_ppi);
@@ -555,10 +555,10 @@ void special_state::specimx(machine_config &config)
 	m_palette->set_entries(16);
 
 	/* audio hardware */
-	SPECIMX_SND(config, "custom", 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SPECIMX_SND(config, "custom").add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* Devices */
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2000000);
 	m_pit->out_handler<0>().set("custom", FUNC(specimx_sound_device::set_input_ch0));
 	m_pit->set_clk<1>(2000000);
@@ -585,7 +585,7 @@ void special_state::specimx(machine_config &config)
 void special_state::erik(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &special_state::erik_mem);
 	m_maincpu->set_addrmap(AS_IO, &special_state::erik_io);
 
@@ -602,7 +602,7 @@ void special_state::erik(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.0625);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.0625);
 
 	/* Devices */
 	CASSETTE(config, m_cassette);

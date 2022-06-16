@@ -209,7 +209,7 @@ void epic14e_state::epic14e(machine_config &config)
 	MOS6522(config, m_via, 17.01_MHz_XTAL / 9); // SY6522A
 	m_via->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	I8748(config, "keybmcu", 4608000).set_disable();
+	I8748(config, "keybmcu", XTAL::u(4608000)).set_disable();
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());

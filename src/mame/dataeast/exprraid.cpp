@@ -524,7 +524,7 @@ void exprraid_state::exprboot(machine_config &config)
 {
 	exprraid(config);
 
-	M6502(config.replace(), m_maincpu, 1500000);        /* 1.5 MHz ??? */
+	M6502(config.replace(), m_maincpu, XTAL::u(1500000));        /* 1.5 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &exprraid_state::master_map);
 }
 

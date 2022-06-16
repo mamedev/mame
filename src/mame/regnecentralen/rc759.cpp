@@ -586,7 +586,7 @@ static void rc759_floppies(device_slot_interface &device)
 
 void rc759_state::rc759(machine_config &config)
 {
-	I80186(config, m_maincpu, 6000000);
+	I80186(config, m_maincpu, XTAL::u(6000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &rc759_state::rc759_map);
 	m_maincpu->set_addrmap(AS_IO, &rc759_state::rc759_io);
 	m_maincpu->read_slave_ack_callback().set(FUNC(rc759_state::irq_callback));
@@ -635,13 +635,13 @@ void rc759_state::rc759(machine_config &config)
 	m_cas->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// expansion slot
-	ISBX_SLOT(config, m_isbx, 0, isbx_cards, nullptr);
+	ISBX_SLOT(config, m_isbx, isbx_cards, nullptr);
 	m_isbx->mintr0().set("maincpu", FUNC(i80186_cpu_device::int1_w));
 	m_isbx->mintr1().set("maincpu", FUNC(i80186_cpu_device::int3_w));
 	m_isbx->mdrqt().set("maincpu", FUNC(i80186_cpu_device::drq0_w));
 
 	// floppy
-	WD2797(config, m_fdc, 2000000);
+	WD2797(config, m_fdc, XTAL::u(2000000));
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
 

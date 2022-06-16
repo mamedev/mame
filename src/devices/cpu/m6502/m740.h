@@ -51,7 +51,7 @@ protected:
 	virtual void do_exec_partial() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	m740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	m740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 #define O(o) void o ## _full(); void o ## _partial()
 

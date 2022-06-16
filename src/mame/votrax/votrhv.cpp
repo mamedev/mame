@@ -667,7 +667,7 @@ void votrhv_state::votrhv(machine_config &config)
 	/* basic machine hardware */
 	// ~1MHz done using two 74L123 multivibrators with cap 100pf res 11k, which each oscillate at 1.8-2.5mhz
 	// since you need two clock phases for the 6800, each multivibrator does one phase and the falling edge of one triggers the other, so the actual clock rate is half the rate of each
-	M6800(config, m_maincpu, 2'000'000 / 2 );
+	M6800(config, m_maincpu, XTAL::u(2'000'000) / 2 );
 	m_maincpu->set_addrmap(AS_PROGRAM, &votrhv_state::mem_map);
 
 	INPUT_MERGER_ALL_LOW(config, m_reset).output_handler().set(FUNC(votrhv_state::reset_counter));
@@ -680,7 +680,7 @@ void votrhv_state::votrhv(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	// TEMPORARY HACK until 1818c device is done
-	VOTRAX_SC01(config, m_votrax, 720000);
+	VOTRAX_SC01(config, m_votrax, XTAL::u(720000));
 	m_votrax->ar_callback().set(FUNC(votrhv_state::pho_done));
 	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
 }

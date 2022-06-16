@@ -24,7 +24,7 @@ class sam_mouse_device : public device_t, public device_samcoupe_mouse_interface
 {
 public:
 	// construction/destruction
-	sam_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sam_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// from host
 	virtual uint8_t read() override;

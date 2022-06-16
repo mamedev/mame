@@ -466,7 +466,7 @@ void phoenix_state::phoenix(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	tms36xx_device &tms(TMS36XX(config, "tms", 372));
+	tms36xx_device &tms(TMS36XX(config, "tms", XTAL::u(372)));
 	tms.set_subtype(tms36xx_device::subtype::MM6221AA);
 	tms.set_decays(0.50, 0, 0, 1.05, 0, 0);
 	tms.set_tune_speed(0.21);

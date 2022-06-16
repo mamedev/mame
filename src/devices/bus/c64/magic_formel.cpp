@@ -98,7 +98,7 @@ WRITE_LINE_MEMBER( c64_magic_formel_cartridge_device::pia_cb2_w )
 
 void c64_magic_formel_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_pa_w));
 	m_pia->writepb_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_pb_w));
 	m_pia->cb2_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_cb2_w));
@@ -153,7 +153,7 @@ ioport_constructor c64_magic_formel_cartridge_device::device_input_ports() const
 //  c64_magic_formel_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_MAGIC_FORMEL, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_pia(*this, MC6821_TAG),

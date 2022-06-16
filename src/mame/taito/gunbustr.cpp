@@ -542,7 +542,7 @@ void gunbustr_state::gunbustr(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("EXTRA");
 	tc0510nio.read_2_callback().set_ioport("INPUTS");
 	tc0510nio.read_3_callback().set_ioport("SPECIAL");
@@ -564,7 +564,7 @@ void gunbustr_state::gunbustr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gunbustr);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 4096);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x20, 0x07);
 	m_tc0480scp->set_offsets_tx(-1, -1);
@@ -574,7 +574,7 @@ void gunbustr_state::gunbustr(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "lspeaker", 1.0);
 	taito_en.add_route(1, "rspeaker", 1.0);
 }

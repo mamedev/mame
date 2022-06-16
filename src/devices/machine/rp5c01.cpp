@@ -169,12 +169,12 @@ inline void rp5c01_device::check_alarm()
 //  rp5c01_device - constructor
 //-------------------------------------------------
 
-rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rp5c01_device(mconfig, RP5C01, tag, owner, clock)
 {
 }
 
-rp5c01_device::rp5c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+rp5c01_device::rp5c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -428,7 +428,7 @@ void rp5c01_device::write(offs_t offset, uint8_t data)
 //  tc8521_device - constructor
 //-------------------------------------------------
 
-tc8521_device::tc8521_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tc8521_device::tc8521_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rp5c01_device(mconfig, TC8521, tag, owner, clock)
 {
 }

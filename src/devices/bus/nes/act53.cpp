@@ -32,7 +32,7 @@
 DEFINE_DEVICE_TYPE(NES_ACTION53, nes_action53_device, "nes_action53", "NES Cart Action 53 PCB")
 
 
-nes_action53_device::nes_action53_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_action53_device::nes_action53_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_ACTION53, tag, owner, clock)
 	, m_sel(0)
 {

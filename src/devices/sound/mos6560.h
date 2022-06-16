@@ -68,8 +68,8 @@
 
 /* the following values depend on the VIC clock,
  * but to achieve TV-frequency the clock must have a fix frequency */
-#define MOS6560_CLOCK   (14318181/14)
-#define MOS6561_CLOCK   (4433618/4)
+#define MOS6560_CLOCK   (XTAL::u(14318181)/14)
+#define MOS6561_CLOCK   (XTAL::u(4433618)/4)
 
 
 
@@ -85,7 +85,7 @@ class mos6560_device : public device_t,
 						public device_video_interface
 {
 public:
-	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto potx_rd_callback() { return m_read_potx.bind(); }
 	auto poty_rd_callback() { return m_read_poty.bind(); }
@@ -111,7 +111,7 @@ protected:
 		TYPE_ATTACK_UFO     // NTSC-M, less features
 	};
 
-	mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -183,7 +183,7 @@ class mos6561_device : public mos6560_device
 {
 public:
 	// construction/destruction
-	mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -193,7 +193,7 @@ class mos656x_attack_ufo_device : public mos6560_device
 {
 public:
 	// construction/destruction
-	mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

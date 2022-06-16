@@ -24,7 +24,7 @@
 //-------------------------------------------------
 
 eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner)
-	: device_t(mconfig, devtype, tag, owner, 0),
+	: device_t(mconfig, devtype, tag, owner),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_cells(0),

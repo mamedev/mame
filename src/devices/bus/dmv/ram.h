@@ -20,7 +20,7 @@ class dmv_ram_device_base :
 {
 protected:
 	// construction/destruction
-	dmv_ram_device_base(const machine_config &mconfig, device_type type, uint32_t size, const char *tag, device_t *owner, uint32_t clock);
+	dmv_ram_device_base(const machine_config &mconfig, device_type type, uint32_t size, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -39,7 +39,7 @@ class dmv_k200_device : public dmv_ram_device_base
 {
 public:
 	// construction/destruction
-	dmv_k200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dmv_k200_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -47,7 +47,7 @@ class dmv_k202_device : public dmv_ram_device_base
 {
 public:
 	// construction/destruction
-	dmv_k202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dmv_k202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -55,7 +55,7 @@ class dmv_k208_device : public dmv_ram_device_base
 {
 public:
 	// construction/destruction
-	dmv_k208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dmv_k208_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

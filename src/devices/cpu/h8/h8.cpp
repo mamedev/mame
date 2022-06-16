@@ -15,7 +15,7 @@
 #include "h8_dtc.h"
 #include "h8d.h"
 
-h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate) :
+h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map_delegate) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	program_config("program", ENDIANNESS_BIG, 16, 16, 0, map_delegate),
 	io_config("io", ENDIANNESS_BIG, 16, 16, -1), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),

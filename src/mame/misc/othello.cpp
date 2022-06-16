@@ -423,8 +423,8 @@ void othello_state::othello(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, m_ay[0], 2000000).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	AY8910(config, m_ay[1], 2000000).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, m_ay[0], XTAL::u(2000000)).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, m_ay[1], XTAL::u(2000000)).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }

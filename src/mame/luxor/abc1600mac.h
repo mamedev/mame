@@ -33,7 +33,7 @@ class abc1600_mac_device : public device_t,
 							public device_memory_interface
 {
 public:
-	abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto fc_cb() { return m_read_fc.bind(); }
 	auto buserr_cb() { return m_write_buserr.bind(); }

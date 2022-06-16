@@ -87,7 +87,7 @@ void compis_hrg_device::device_add_mconfig(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 400-1);
 	screen.set_screen_update(UPD7220_TAG, FUNC(upd7220_device::screen_update));
 
-	UPD7220(config, m_crtc, 2252500); // unknown clock
+	UPD7220(config, m_crtc, XTAL::u(2252500)); // unknown clock
 	m_crtc->set_addrmap(0, &compis_hrg_device::hrg_map);
 	m_crtc->set_display_pixels(FUNC(compis_hrg_device::display_pixels));
 	m_crtc->set_screen(SCREEN_TAG);
@@ -123,7 +123,7 @@ void compis_uhrg_device::device_add_mconfig(machine_config &config)
 //  compis_hrg_device - constructor
 //-------------------------------------------------
 
-compis_hrg_device::compis_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+compis_hrg_device::compis_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_compis_graphics_card_interface(mconfig, *this),
 	m_crtc(*this, UPD7220_TAG),
@@ -132,12 +132,12 @@ compis_hrg_device::compis_hrg_device(const machine_config &mconfig, device_type 
 {
 }
 
-compis_hrg_device::compis_hrg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+compis_hrg_device::compis_hrg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	compis_hrg_device(mconfig, COMPIS_HRG, tag, owner, clock)
 {
 }
 
-compis_uhrg_device::compis_uhrg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+compis_uhrg_device::compis_uhrg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	compis_hrg_device(mconfig, COMPIS_UHRG, tag, owner, clock)
 {
 }

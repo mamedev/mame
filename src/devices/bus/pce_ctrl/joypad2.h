@@ -28,11 +28,11 @@ class pce_joypad2_device : public device_t,
 {
 public:
 	// construction/destruction
-	pce_joypad2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pce_joypad2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// construction/destruction
-	pce_joypad2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	pce_joypad2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -56,7 +56,7 @@ class pce_joypad2_turbo_device : public pce_joypad2_device
 {
 public:
 	// construction/destruction
-	pce_joypad2_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pce_joypad2_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

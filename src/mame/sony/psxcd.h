@@ -14,13 +14,13 @@ class psxcd_device : public cdrom_image_device
 public:
 	template <typename T, typename U>
 	psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&spu_tag)
-		: psxcd_device(mconfig, tag, owner, (uint32_t)0)
+		: psxcd_device(mconfig, tag, owner)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 		m_spu.set_tag(std::forward<U>(spu_tag));
 	}
 
-	psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }

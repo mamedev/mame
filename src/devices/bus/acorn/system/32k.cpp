@@ -60,7 +60,7 @@ ioport_constructor acorn_32k_device::device_input_ports() const
 //  acorn_32k_device - constructor
 //-------------------------------------------------
 
-acorn_32k_device::acorn_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_32k_device::acorn_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACORN_32K, tag, owner, clock)
 	, device_acorn_bus_interface(mconfig, *this)
 	, m_links(*this, "LINKS")

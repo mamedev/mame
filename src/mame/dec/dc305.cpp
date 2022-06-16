@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(DC305, dc305_device, "dc305", "DC305 Printer Controller")
 //  dc305_device - constructor
 //-------------------------------------------------
 
-dc305_device::dc305_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dc305_device::dc305_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DC305, tag, owner, clock)
 	, m_int_callback(*this)
 	, m_rxc_callback(*this)

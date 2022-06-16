@@ -79,7 +79,7 @@ INPUT_PORTS_END
 
 void hobbyplay_state::hobbyplay(machine_config &config)
 {
-	Z80(config, m_maincpu, 4'433'618);
+	Z80(config, m_maincpu, XTAL::u(4'433'618));
 	m_maincpu->set_addrmap(AS_PROGRAM, &hobbyplay_state::prg_map);
 
 	i8255_device &ppi0(I8255(config, "ppi0"));

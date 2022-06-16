@@ -1936,7 +1936,7 @@ GFXDECODE_END
 void igspoker_state::igspoker(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3579545);
+	Z80(config, m_maincpu, XTAL::u(3579545));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igspoker_state::igspoker_prg_map);
 	m_maincpu->set_addrmap(AS_IO, &igspoker_state::igspoker_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igspoker_state::interrupt), "screen", 0, 1);
@@ -1960,7 +1960,7 @@ void igspoker_state::igspoker(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM2413(config, "ymsnd", XTAL::u(3579545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void igspoker_state::csk227it(machine_config &config)

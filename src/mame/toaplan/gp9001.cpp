@@ -209,7 +209,7 @@ GFXDECODE_END
 
 DEFINE_DEVICE_TYPE(GP9001_VDP, gp9001vdp_device, "gp9001vdp", "GP9001 VDP")
 
-gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, GP9001_VDP, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo)
 	, device_video_interface(mconfig, *this)

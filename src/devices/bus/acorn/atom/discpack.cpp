@@ -67,7 +67,7 @@ const tiny_rom_entry *atom_discpack_device::device_rom_region() const
 //  atom_discpack_device - constructor
 //-------------------------------------------------
 
-atom_discpack_device::atom_discpack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+atom_discpack_device::atom_discpack_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ATOM_DISCPACK, tag, owner, clock)
 	, device_acorn_bus_interface(mconfig, *this)
 	, m_dos_rom(*this, "dos_rom")

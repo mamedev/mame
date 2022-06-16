@@ -278,11 +278,11 @@ void metlclsh_state::machine_reset()
 void metlclsh_state::metlclsh(machine_config &config)
 {
 	/* basic machine hardware */
-	M6809(config, m_maincpu, 1500000);  // ?
+	M6809(config, m_maincpu, XTAL::u(1500000));  // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &metlclsh_state::metlclsh_master_map);
 	// IRQ by YM3526, NMI by CPU #2
 
-	M6809(config, m_subcpu, 1500000);   // ?
+	M6809(config, m_subcpu, XTAL::u(1500000));   // ?
 	m_subcpu->set_addrmap(AS_PROGRAM, &metlclsh_state::metlclsh_slave_map);
 	// IRQ by CPU #1, NMI by coin insertion
 
@@ -301,13 +301,13 @@ void metlclsh_state::metlclsh(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL::u(1500000)));
 	ym1.add_route(0, "mono", 0.10);
 	ym1.add_route(1, "mono", 0.10);
 	ym1.add_route(2, "mono", 0.10);
 	ym1.add_route(3, "mono", 0.50);
 
-	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym3526_device &ym2(YM3526(config, "ym2", XTAL::u(3000000)));
 	ym2.irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.50);
 }

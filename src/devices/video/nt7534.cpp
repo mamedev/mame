@@ -27,12 +27,12 @@ DEFINE_DEVICE_TYPE(NT7534,    nt7534_device,    "nt7534", "NT7534 LCD Controller
 //  nt7534_device - constructor
 //-------------------------------------------------
 
-nt7534_device::nt7534_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nt7534_device::nt7534_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nt7534_device(mconfig, NT7534, tag, owner, clock)
 {
 }
 
-nt7534_device::nt7534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nt7534_device::nt7534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_pixel_update_cb(*this)
 {

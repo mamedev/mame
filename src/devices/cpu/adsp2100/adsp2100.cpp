@@ -127,7 +127,7 @@ DEFINE_DEVICE_TYPE(ADSP2181, adsp2181_device, "adsp2181", "Analog Devices ADSP-2
 //  adsp21xx_device - constructor
 //-------------------------------------------------
 
-adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype)
+adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t chiptype)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 14, -2),
 		m_data_config("data", ENDIANNESS_LITTLE, 16, 14, -1),
@@ -258,31 +258,31 @@ adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type
 	m_shift_xregs[7] = &m_core.sr.srx.sr1;
 }
 
-adsp2100_device::adsp2100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adsp2100_device::adsp2100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adsp21xx_device(mconfig, ADSP2100, tag, owner, clock, CHIP_TYPE_ADSP2100)
 { }
 
-adsp2101_device::adsp2101_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adsp2101_device::adsp2101_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adsp2101_device(mconfig, ADSP2101, tag, owner, clock, CHIP_TYPE_ADSP2101)
 { }
 
-adsp2101_device::adsp2101_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype)
+adsp2101_device::adsp2101_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t chiptype)
 	: adsp21xx_device(mconfig, type, tag, owner, clock, chiptype)
 { }
 
-adsp2104_device::adsp2104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adsp2104_device::adsp2104_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adsp2101_device(mconfig, ADSP2104, tag, owner, clock, CHIP_TYPE_ADSP2104)
 { }
 
-adsp2105_device::adsp2105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adsp2105_device::adsp2105_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adsp2101_device(mconfig, ADSP2105, tag, owner, clock, CHIP_TYPE_ADSP2105)
 { }
 
-adsp2115_device::adsp2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adsp2115_device::adsp2115_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adsp2101_device(mconfig, ADSP2115, tag, owner, clock, CHIP_TYPE_ADSP2115)
 { }
 
-adsp2181_device::adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adsp2181_device::adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: adsp21xx_device(mconfig, ADSP2181, tag, owner, clock, CHIP_TYPE_ADSP2181)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 11, -1)
 { }

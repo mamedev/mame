@@ -103,7 +103,7 @@ static const uint16_t BD1charset[]=
 	0x4406, // 0100 0100 0000 0110 ?
 };
 
-bfm_bd1_device::bfm_bd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bfm_bd1_device::bfm_bd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BFM_BD1, tag, owner, clock)
 	, m_outputs()
 	, m_port_val(0)

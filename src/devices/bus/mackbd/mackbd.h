@@ -33,14 +33,14 @@ class mac_keyboard_port_device : public device_t, public device_single_card_slot
 public:
 	template <typename T>
 	mac_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: mac_keyboard_port_device(mconfig, tag, owner, 0U)
+		: mac_keyboard_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	mac_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0U);
+	mac_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~mac_keyboard_port_device() override;
 
 	auto clock_cb() { return m_clock_cb.bind(); }

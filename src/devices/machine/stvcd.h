@@ -20,7 +20,7 @@ class stvcd_device : public device_t,
 	static constexpr uint32_t MAX_DIR_SIZE = 256*1024;
 
 public:
-	stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t stvcd_r(offs_t offset, uint32_t mem_mask = ~0);
 	void stvcd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

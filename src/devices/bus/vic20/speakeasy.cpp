@@ -37,7 +37,7 @@ void vic20_speakeasy_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	VOTRAX_SC01(config, m_votrax, 720000).add_route(ALL_OUTPUTS, "mono", 0.85);
+	VOTRAX_SC01(config, m_votrax, XTAL::u(720000)).add_route(ALL_OUTPUTS, "mono", 0.85);
 }
 
 
@@ -50,7 +50,7 @@ void vic20_speakeasy_device::device_add_mconfig(machine_config &config)
 //  vic20_speakeasy_device - constructor
 //-------------------------------------------------
 
-vic20_speakeasy_device::vic20_speakeasy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vic20_speakeasy_device::vic20_speakeasy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VIC20_SPEAKEASY, tag, owner, clock),
 	device_vic20_expansion_card_interface(mconfig, *this),
 	m_votrax(*this, SC01A_TAG)

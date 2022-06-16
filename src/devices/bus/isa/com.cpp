@@ -99,12 +99,12 @@ void isa8_com_device::device_add_mconfig(machine_config &config)
 //  isa8_com_device - constructor
 //-------------------------------------------------
 
-isa8_com_device::isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_com_device::isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_com_device(mconfig, ISA8_COM, tag, owner, clock)
 {
 }
 
-isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this)
 {
@@ -187,7 +187,7 @@ void isa8_com_at_device::device_add_mconfig(machine_config &config)
 //  isa8_com_device - constructor
 //-------------------------------------------------
 
-isa8_com_at_device::isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_com_at_device::isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_com_device(mconfig, ISA8_COM_AT, tag, owner, clock)
 {
 }

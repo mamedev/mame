@@ -80,7 +80,7 @@ ioport_constructor vp585_device::device_input_ports() const
 //  vp585_device - constructor
 //-------------------------------------------------
 
-vp585_device::vp585_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vp585_device::vp585_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VP585, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_j1(*this, "J1"),

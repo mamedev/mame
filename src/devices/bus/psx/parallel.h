@@ -20,14 +20,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	psx_parallel_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: psx_parallel_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: psx_parallel_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	psx_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psx_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~psx_parallel_slot_device();
 
 	uint16_t exp_r(offs_t offset);

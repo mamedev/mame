@@ -150,7 +150,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(busy_r) { return 0; } // _BUSY pin - not emulated
 
 protected:
-	dual_port_mailbox_ram_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	dual_port_mailbox_ram_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, type, tag, owner, clock)
 		, m_intl_callback(*this)
 		, m_intr_callback(*this)
@@ -229,7 +229,7 @@ private:
 class cy7c131_device : public dual_port_mailbox_ram_base<u8, 10, 8>
 {
 public:
-	cy7c131_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0)
+	cy7c131_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL())
 		: dual_port_mailbox_ram_base<u8, 10, 8>(mconfig, CY7C131, tag, owner, clock) // 1kx8
 	{
 	}
@@ -240,7 +240,7 @@ public:
 class idt7130_device : public dual_port_mailbox_ram_base<u8, 10, 8>
 {
 public:
-	idt7130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0)
+	idt7130_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL())
 		: dual_port_mailbox_ram_base<u8, 10, 8>(mconfig, IDT7130, tag, owner, clock) // 1kx8
 	{
 	}
@@ -251,7 +251,7 @@ public:
 class idt71321_device : public dual_port_mailbox_ram_base<u8, 11, 8>
 {
 public:
-	idt71321_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0)
+	idt71321_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL())
 		: dual_port_mailbox_ram_base<u8, 11, 8>(mconfig, IDT71321, tag, owner, clock) // 2kx8
 	{
 	}
@@ -262,7 +262,7 @@ public:
 class mb8421_device : public dual_port_mailbox_ram_base<u8, 11, 8>
 {
 public:
-	mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0)
+	mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL())
 		: dual_port_mailbox_ram_base<u8, 11, 8>(mconfig, MB8421, tag, owner, clock) // 2kx8
 	{
 	}
@@ -273,7 +273,7 @@ public:
 class mb8421_mb8431_16_device : public dual_port_mailbox_ram_base<u16, 11, 16>
 {
 public:
-	mb8421_mb8431_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0)
+	mb8421_mb8431_16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL())
 		: dual_port_mailbox_ram_base<u16, 11, 16>(mconfig, MB8421_MB8431_16BIT, tag, owner, clock) // 2kx16
 	{
 	}

@@ -71,7 +71,7 @@ DEFINE_DEVICE_TYPE(COCO_VHD, coco_vhd_image_device, "coco_vhd_image", "CoCo Virt
 //  coco_vhd_image_device - constructor
 //-------------------------------------------------
 
-coco_vhd_image_device::coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+coco_vhd_image_device::coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, COCO_VHD, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)

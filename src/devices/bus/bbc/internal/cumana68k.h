@@ -32,7 +32,7 @@ class bbc_cumana68k_device :
 {
 public:
 	// construction/destruction
-	bbc_cumana68k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_cumana68k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void pia_rtc_pb_w(uint8_t data);
 	void pia_sasi_pb_w(uint8_t data);

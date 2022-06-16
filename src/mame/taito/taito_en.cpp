@@ -21,7 +21,7 @@
 
 DEFINE_DEVICE_TYPE(TAITO_EN, taito_en_device, "taito_en", "Taito Ensoniq Sound System")
 
-taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TAITO_EN, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_audiocpu(*this, "audiocpu")
@@ -235,7 +235,7 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 	MB87078(config, m_mb87078);
 	m_mb87078->gain_changed().set(FUNC(taito_en_device::mb87078_gain_changed));
 
-	MB8421(config, "dpram", 0); // host accesses this from the other side
+	MB8421(config, "dpram"); // host accesses this from the other side
 
 	/* sound hardware */
 	ESQ_5505_5510_PUMP(config, m_pump, XTAL(30'476'180) / (2 * 16 * 32));

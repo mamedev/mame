@@ -11,7 +11,7 @@
 class aw_rom_board : public naomi_g1_device
 {
 public:
-	aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void submap(address_map &map) override;
 

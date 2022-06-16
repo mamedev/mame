@@ -59,7 +59,7 @@ class joyport_device : public device_t, public device_single_card_slot_interface
 {
 public:
 	template <typename U>
-	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, U &&opts, const char *dflt)
 		: joyport_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -68,7 +68,7 @@ public:
 		set_fixed(false);
 	}
 
-	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	uint8_t   read_port();
 	void    write_port(int data);
 	void    set_interrupt(int state);

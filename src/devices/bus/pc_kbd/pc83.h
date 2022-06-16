@@ -28,7 +28,7 @@ class ibm_pc_83_keyboard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ibm_pc_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ibm_pc_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

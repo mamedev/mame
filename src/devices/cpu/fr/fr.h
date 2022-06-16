@@ -21,7 +21,7 @@ public:
 
 protected:
 	// construction/destruction
-	fr_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int addrbits, address_map_constructor map);
+	fr_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int addrbits, address_map_constructor map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -60,7 +60,7 @@ class mb91f155a_device : public fr_cpu_device
 {
 public:
 	// device type constructor
-	mb91f155a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mb91f155a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	void internal_map(address_map &map);

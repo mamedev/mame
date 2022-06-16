@@ -177,7 +177,7 @@ DEFINE_DEVICE_TYPE(PC80S31K, pc80s31k_device, "pc80s31k", "NEC PC-80S31K Mini Di
 //-------------------------------------------------
 
 
-pc80s31_device::pc80s31_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+pc80s31_device::pc80s31_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:%u", 0U)
@@ -190,7 +190,7 @@ pc80s31_device::pc80s31_device(const machine_config &mconfig, device_type type, 
 }
 
 
-pc80s31_device::pc80s31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc80s31_device::pc80s31_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pc80s31_device(mconfig, PC80S31, tag, owner, clock)
 {
 
@@ -338,7 +338,7 @@ void pc80s31_device::device_reset()
 {
 	m_floppy[0]->get_device()->set_rpm(300);
 	m_floppy[1]->get_device()->set_rpm(300);
-	m_fdc->set_rate(250000);
+	m_fdc->set_rate(XTAL::u(250000));
 
 	// TODO: doesn't seem to work for devices?
 	m_fdc_cpu->set_input_line_vector(0, 0);
@@ -416,7 +416,7 @@ void pc80s31_device::motor_control_w(uint8_t data)
 //
 //**************************************************************************
 
-pc80s31k_device::pc80s31k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc80s31k_device::pc80s31k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pc80s31_device(mconfig, PC80S31K, tag, owner, clock)
 {
 

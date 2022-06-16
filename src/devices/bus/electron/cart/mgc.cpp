@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(ELECTRON_MGC, electron_mgc_device, "electron_mgc", "Electron 
 //  electron_mgc_device - constructor
 //-------------------------------------------------
 
-electron_mgc_device::electron_mgc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_mgc_device::electron_mgc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_MGC, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
 	, m_page_latch(0)

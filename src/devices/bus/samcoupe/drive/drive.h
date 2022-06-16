@@ -45,7 +45,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	samcoupe_drive_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, const char *dflt)
-		: samcoupe_drive_port_device(mconfig, tag, owner, uint32_t(0))
+		: samcoupe_drive_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -53,7 +53,7 @@ public:
 		set_fixed(false);
 	}
 
-	samcoupe_drive_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	samcoupe_drive_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~samcoupe_drive_port_device();
 
 	// called from host

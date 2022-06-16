@@ -551,7 +551,7 @@ void ymz280b_device::device_start()
 	compute_tables();
 
 	/* initialize the rest of the structure */
-	m_master_clock = (double)clock() / 384.0;
+	m_master_clock = clock() / 384;
 	m_irq_handler.resolve();
 
 	for (int i = 0; i < 8; i++)
@@ -641,7 +641,7 @@ void ymz280b_device::device_reset()
 
 void ymz280b_device::device_clock_changed()
 {
-	m_master_clock = (double)clock() / 384.0;
+	m_master_clock = clock() / 384;
 	m_stream->set_sample_rate(INTERNAL_SAMPLE_RATE);
 }
 
@@ -908,7 +908,7 @@ void ymz280b_device::write(offs_t offset, u8 data)
 
 DEFINE_DEVICE_TYPE(YMZ280B, ymz280b_device, "ymz280b", "Yamaha YMZ280B PCMD8")
 
-ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, YMZ280B, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)

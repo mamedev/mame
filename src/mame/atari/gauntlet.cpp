@@ -489,7 +489,7 @@ void gauntlet_state::gauntlet_base(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_COLS, 64,64).set_info_callback(FUNC(gauntlet_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(gauntlet_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, gauntlet_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, gauntlet_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -537,7 +537,7 @@ void gauntlet_state::gauntlet_base(machine_config &config)
 void gauntlet_state::gauntlet(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic, 104);
+	SLAPSTIC(config, m_slapstic, XTAL::u(104));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x38000, 0x3ffff, 0x280000);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
@@ -546,7 +546,7 @@ void gauntlet_state::gauntlet(machine_config & config)
 void gauntlet_state::gaunt2p(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic, 107);
+	SLAPSTIC(config, m_slapstic, XTAL::u(107));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x38000, 0x3ffff, 0x280000);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
@@ -555,7 +555,7 @@ void gauntlet_state::gaunt2p(machine_config & config)
 void gauntlet_state::gauntlet2(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic, 106);
+	SLAPSTIC(config, m_slapstic, XTAL::u(106));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x38000, 0x3ffff, 0x280000);
 	m_slapstic->set_bank(m_slapstic_bank);
 }
@@ -564,7 +564,7 @@ void gauntlet_state::gauntlet2(machine_config & config)
 void gauntlet_state::vindctr2(machine_config & config)
 {
 	gauntlet_base(config);
-	SLAPSTIC(config, m_slapstic, 118);
+	SLAPSTIC(config, m_slapstic, XTAL::u(118));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x38000, 0x3ffff, 0x280000);
 	m_slapstic->set_bank(m_slapstic_bank);
 }

@@ -28,7 +28,7 @@ class electron_click_device : public device_t,
 {
 public:
 	// construction/destruction
-	electron_click_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	electron_click_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(click_button);
 

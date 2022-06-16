@@ -74,13 +74,13 @@ void gsz80_state::gsz80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &gsz80_state::gsz80_io);
 
 	// Configure UART (via m_acia)
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_acia->irq_handler().set_inputline("maincpu", INPUT_LINE_IRQ0); // Connect interrupt pin to our Z80 INT line
 
 	// Create a clock device to connect to the transmit and receive clock on the 6850
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 7'372'800));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(7'372'800)));
 	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 

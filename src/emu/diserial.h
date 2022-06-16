@@ -90,13 +90,10 @@ protected:
 
 	void set_rcv_rate(const attotime &rate);
 	void set_tra_rate(const attotime &rate);
-	void set_rcv_rate(u32 clock, int div) { set_rcv_rate((clock && div) ? (attotime::from_hz(clock) * div) : attotime::never); }
-	void set_tra_rate(u32 clock, int div) { set_tra_rate((clock && div) ? (attotime::from_hz(clock) * div) : attotime::never); }
-	void set_rcv_rate(int baud) { set_rcv_rate(baud ? attotime::from_hz(baud) : attotime::never); }
-	void set_tra_rate(int baud) { set_tra_rate(baud ? attotime::from_hz(baud) : attotime::never); }
+	void set_rcv_rate(const XTAL &clock) { set_rcv_rate(clock.disabled() ? attotime::never : attotime::from_seconds(1/clock.dvalue())); }
+	void set_tra_rate(const XTAL &clock) { set_tra_rate(clock.disabled() ? attotime::never : attotime::from_seconds(1/clock.dvalue())); }
 	void set_rate(const attotime &rate) { set_rcv_rate(rate); set_tra_rate(rate); }
-	void set_rate(u32 clock, int div) { set_rcv_rate(clock, div); set_tra_rate(clock, div); }
-	void set_rate(int baud) { set_rcv_rate(baud); set_tra_rate(baud); }
+	void set_rate(const XTAL &clock) { set_rcv_rate(clock); set_tra_rate(clock); }
 
 	void transmit_register_reset();
 	void transmit_register_add_bit(int bit);

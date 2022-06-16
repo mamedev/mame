@@ -27,7 +27,7 @@
 
 DEFINE_DEVICE_TYPE(SERAD, serad_device, "serad", "Siemens S26361-D279 SERAD")
 
-serad_device::serad_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+serad_device::serad_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SERAD, tag, owner, clock)
 	, device_multibus_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")

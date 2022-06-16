@@ -16,10 +16,10 @@ public:
 	template <typename T> void set_mmu(T &&tag) { m_mmu.set_tag(std::forward<T>(tag)); }
 
 	// construction/destruction
-	ns32000_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	ns32000_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	ns32000_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, int databits, int addrbits);
+	ns32000_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock, int databits, int addrbits);
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -191,25 +191,25 @@ private:
 class ns32008_device : public ns32000_device<0>
 {
 public:
-	ns32008_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	ns32008_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 };
 
 class ns32016_device : public ns32000_device<1>
 {
 public:
-	ns32016_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	ns32016_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 };
 
 class ns32032_device : public ns32000_device<2>
 {
 public:
-	ns32032_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	ns32032_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 };
 
 class ns32332_device : public ns32000_device<2>
 {
 public:
-	ns32332_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	ns32332_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(NS32008, ns32008_device)

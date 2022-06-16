@@ -18,7 +18,7 @@
 
 DEFINE_DEVICE_TYPE(YM3802, ym3802_device, "ym3802", "Yamaha YM3802 MCS MIDI Communication and Service Controller")
 
-ym3802_device::ym3802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ym3802_device::ym3802_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, YM3802, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_irq_handler(*this)

@@ -301,22 +301,22 @@ void magnum_state::magnum(machine_config &config)
 	screen2.set_visarea(0, 6*40-1, 0, 8*16-1);
 	screen2.set_palette("palette");
 
-	hd61830_device &lcdc1(HD61830(config, "lcdc1", 1000000)); // unknown clock
+	hd61830_device &lcdc1(HD61830(config, "lcdc1", XTAL::u(1000000))); // unknown clock
 	lcdc1.set_addrmap(0, &magnum_state::magnum_lcdc);
 	lcdc1.set_screen("screen1");
 
-	hd61830_device &lcdc2(HD61830(config, "lcdc2", 1000000)); // unknown clock
+	hd61830_device &lcdc2(HD61830(config, "lcdc2", XTAL::u(1000000))); // unknown clock
 	lcdc2.set_addrmap(0, &magnum_state::magnum_lcdc);
 	lcdc2.set_screen("screen2");
 
-	//I8275(config, "crtc", 3000000); // unknown clock
+	//I8275(config, "crtc", XTAL::u(3000000)); // unknown clock
 
-	//WD1793(config, "fdc", 1000000); // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
+	//WD1793(config, "fdc", XTAL::u(1000000)); // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	SPEAKER(config, "speaker").front_center();
-	BEEP(config, m_beep, 500).add_route(ALL_OUTPUTS, "speaker", 0.50); // frequency is guessed
+	BEEP(config, m_beep, XTAL::u(500)).add_route(ALL_OUTPUTS, "speaker", 0.50); // frequency is guessed
 }
 
 ROM_START( magnum )

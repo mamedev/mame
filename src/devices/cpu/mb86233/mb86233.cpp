@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(MB86233, mb86233_device, "mb86233", "Fujitsu MB86233 (TGP)")
 DEFINE_DEVICE_TYPE(MB86234, mb86234_device, "mb86234", "Fujitsu MB86234 (TGP)")
 
 
-mb86233_device::mb86233_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mb86233_device::mb86233_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 16, -2)
 	, m_data_config("data", ENDIANNESS_LITTLE, 32, 16, -2)
@@ -57,12 +57,12 @@ mb86233_device::mb86233_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-mb86233_device::mb86233_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mb86233_device::mb86233_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mb86233_device(mconfig, MB86233, tag, owner, clock)
 {
 }
 
-mb86234_device::mb86234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mb86234_device::mb86234_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mb86233_device(mconfig, MB86234, tag, owner, clock)
 {
 }

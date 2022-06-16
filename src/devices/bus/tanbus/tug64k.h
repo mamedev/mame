@@ -24,7 +24,7 @@ class tanbus_tug64k_device :
 {
 public:
 	// construction/destruction
-	tanbus_tug64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tanbus_tug64k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

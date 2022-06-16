@@ -72,7 +72,7 @@
 /*
     Constructor
 */
-tms9902_device::tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9902_device::tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TMS9902, tag, owner, clock)
 	, m_int_cb(*this)
 	, m_rcv_cb(*this)

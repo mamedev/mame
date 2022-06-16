@@ -102,7 +102,7 @@ void device_a800_cart_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 //  ****_cart_slot_device - constructor
 //-------------------------------------------------
-a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_a800_cart_interface>(mconfig, *this)
@@ -111,19 +111,19 @@ a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, devi
 {
 }
 
-a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a800_cart_slot_device::a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a800_cart_slot_device(mconfig, A800_CART_SLOT, tag, owner, clock)
 {
 }
 
 
-a5200_cart_slot_device::a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a5200_cart_slot_device::a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a800_cart_slot_device(mconfig, A5200_CART_SLOT, tag, owner, clock)
 {
 }
 
 
-xegs_cart_slot_device::xegs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+xegs_cart_slot_device::xegs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a800_cart_slot_device(mconfig, XEGS_CART_SLOT, tag, owner, clock)
 {
 }

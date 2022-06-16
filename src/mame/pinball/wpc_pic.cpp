@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(WPC_PIC, wpc_pic_device, "wpc_pic", "Williams Pinball Controller PIC Security")
 
-wpc_pic_device::wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wpc_pic_device::wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WPC_PIC, tag, owner, clock),
 	swarray(*this, ":X%u", 0)
 {

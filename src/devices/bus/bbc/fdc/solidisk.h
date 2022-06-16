@@ -33,7 +33,7 @@ public:
 
 protected:
 	// construction/destruction
-	bbc_stlfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_stlfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	DECLARE_WRITE_LINE_MEMBER(side_w);
@@ -48,10 +48,10 @@ protected:
 class bbc_stl1770_1_device : public bbc_stlfdc_device
 {
 public:
-	bbc_stl1770_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_stl1770_1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	bbc_stl1770_1_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	bbc_stl1770_1_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -67,10 +67,10 @@ protected:
 class bbc_stl1770_2_device : public bbc_stlfdc_device
 {
 public:
-	bbc_stl1770_2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_stl1770_2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	bbc_stl1770_2_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	bbc_stl1770_2_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -87,7 +87,7 @@ class bbc_stldfdc_1_device : public bbc_stl1770_1_device
 {
 public:
 	// construction/destruction
-	bbc_stldfdc_1_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	bbc_stldfdc_1_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

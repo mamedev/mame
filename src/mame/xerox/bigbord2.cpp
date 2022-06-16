@@ -646,7 +646,7 @@ void bigbord2_state::bigbord2(machine_config &config)
 	// d0=to U42; d1=DECODE; d3=PGM; d4=VPPENB; d5=STD-B8
 	proglatch.q_out_cb<6>().set("outlatch1", FUNC(ls259_device::clear_w)); // FCRST - also resets the 8877
 
-	LS259(config, m_syslatch1, 0); // U14
+	LS259(config, m_syslatch1); // U14
 	m_syslatch1->q_out_cb<0>().set_membank(m_bankr); // D_S
 	m_syslatch1->q_out_cb<0>().append_membank(m_bankv);
 	m_syslatch1->q_out_cb<0>().append_membank(m_banka);
@@ -661,15 +661,15 @@ void bigbord2_state::bigbord2(machine_config &config)
 	m_syslatch1->q_out_cb<6>().set(FUNC(bigbord2_state::disk_motor_w)); // MOTOR
 	m_syslatch1->q_out_cb<7>().set("beeper", FUNC(beep_device::set_state)); // BELL
 
-	LS259(config, "outlatch1", 0); // U96
+	LS259(config, "outlatch1"); // U96
 
 	/* keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(bigbord2_state::kbd_put));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 0.50); // actual frequency is unknown
+	BEEP(config, "beeper", XTAL::u(950)).add_route(ALL_OUTPUTS, "mono", 0.50); // actual frequency is unknown
 }
 
 

@@ -54,7 +54,7 @@ private:
 class sdlc_logger_device : public device_t, public device_sdlc_consumer_interface
 {
 public:
-	sdlc_logger_device(machine_config const &mconfig, char const *tag, device_t *owner, std::uint32_t clock);
+	sdlc_logger_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// input signals
 	DECLARE_WRITE_LINE_MEMBER(data_w) { m_current_data = state ? 1U : 0U; }

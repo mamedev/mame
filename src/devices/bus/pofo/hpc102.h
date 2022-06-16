@@ -27,7 +27,7 @@ class pofo_hpc102_device : public device_t, public device_portfolio_expansion_sl
 {
 public:
 	// construction/destruction
-	pofo_hpc102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pofo_hpc102_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

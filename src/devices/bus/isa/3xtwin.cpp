@@ -25,7 +25,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(ISA8_3XTWIN, isa8_3xtwin_device, "3xtwin", "Emerald Technology 3XTwin Twinax Emulation Card")
 
-isa8_3xtwin_device::isa8_3xtwin_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+isa8_3xtwin_device::isa8_3xtwin_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISA8_3XTWIN, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 {

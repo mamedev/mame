@@ -16,8 +16,8 @@
 #include "arcadia.h"
 
 //known UVI audio clocks
-#define UVI_NTSC 15734
-#define UVI_PAL  15625
+#define UVI_NTSC XTAL::u(15734)
+#define UVI_PAL  XTAL::u(15625)
 
 /* we need to create pulse transitions that sound 'decent'
    with the current mess/mame interp scheme
@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(ARCADIA_SOUND, arcadia_sound_device, "arcadia_sound", "Arcadi
 //  arcadia_sound_device - constructor
 //-------------------------------------------------
 
-arcadia_sound_device::arcadia_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+arcadia_sound_device::arcadia_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARCADIA_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {

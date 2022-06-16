@@ -86,7 +86,7 @@ const tiny_rom_entry *bbc_stl4m32_device::device_rom_region() const
 //  bbc_stl4m32_device - constructor
 //-------------------------------------------------
 
-bbc_stl4m32_device::bbc_stl4m32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_stl4m32_device::bbc_stl4m32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_STL4M32, tag, owner, clock)
 	, device_bbc_internal_interface(mconfig, *this)
 	, m_rom(*this, "romslot%u", 0U)

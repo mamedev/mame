@@ -139,7 +139,7 @@ void wdxt_gen_device::ram_w(offs_t offset, uint8_t data)
 
 void wdxt_gen_device::device_add_mconfig(machine_config &config)
 {
-	mcs48_cpu_device &cpu(I8049(config, m_maincpu, 5000000));
+	mcs48_cpu_device &cpu(I8049(config, m_maincpu, XTAL::u(5000000)));
 	cpu.set_addrmap(AS_IO, &wdxt_gen_device::wd1015_io);
 	cpu.t0_in_cb().set(m_host, FUNC(wd11c00_17_device::busy_r));
 	cpu.t1_in_cb().set(FUNC(wdxt_gen_device::wd1015_t1_r));
@@ -148,7 +148,7 @@ void wdxt_gen_device::device_add_mconfig(machine_config &config)
 	cpu.p2_in_cb().set(FUNC(wdxt_gen_device::wd1015_p2_r));
 	cpu.p2_out_cb().set(FUNC(wdxt_gen_device::wd1015_p2_w));
 
-	WD11C00_17(config, m_host, 5000000);
+	WD11C00_17(config, m_host, XTAL::u(5000000));
 	m_host->out_irq5_callback().set(FUNC(wdxt_gen_device::irq5_w));
 	m_host->out_drq3_callback().set(FUNC(wdxt_gen_device::drq3_w));
 	m_host->out_mr_callback().set(FUNC(wdxt_gen_device::mr_w));
@@ -159,7 +159,7 @@ void wdxt_gen_device::device_add_mconfig(machine_config &config)
 	m_host->in_cs1010_callback().set(m_hdc, FUNC(wd2010_device::read));
 	m_host->out_cs1010_callback().set(m_hdc, FUNC(wd2010_device::write));
 
-	WD2010(config, m_hdc, 5000000);
+	WD2010(config, m_hdc, XTAL::u(5000000));
 	m_hdc->out_bcr_callback().set(m_host, FUNC(wd11c00_17_device::clct_w));
 	m_hdc->in_bcs_callback().set(m_host, FUNC(wd11c00_17_device::read));
 	m_hdc->out_bcs_callback().set(m_host, FUNC(wd11c00_17_device::write));
@@ -169,8 +169,8 @@ void wdxt_gen_device::device_add_mconfig(machine_config &config)
 	m_hdc->in_tk000_callback().set_constant(1);
 	m_hdc->in_sc_callback().set_constant(1);
 
-	HARDDISK(config, "hard0", 0);
-	HARDDISK(config, "hard1", 0);
+	HARDDISK(config, "hard0");
+	HARDDISK(config, "hard1");
 }
 
 
@@ -182,7 +182,7 @@ void wdxt_gen_device::device_add_mconfig(machine_config &config)
 //  wdxt_gen_device - constructor
 //-------------------------------------------------
 
-wdxt_gen_device::wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+wdxt_gen_device::wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISA8_WDXT_GEN, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_maincpu(*this, WD1015_TAG)

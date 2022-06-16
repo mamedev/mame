@@ -22,7 +22,7 @@ class hp98036_io_card_device : public device_t, public device_hp9845_io_interfac
 {
 public:
 	// construction/destruction
-	hp98036_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp98036_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~hp98036_io_card_device();
 
 	virtual uint16_t reg_r(address_space &space, offs_t offset) override;

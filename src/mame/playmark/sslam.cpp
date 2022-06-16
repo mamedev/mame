@@ -719,11 +719,11 @@ void powerbls_state::machine_start()
 void sslam_state::sslam(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);   /* 12 MHz */
+	M68000(config, m_maincpu, XTAL::u(12000000));   /* 12 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sslam_state::sslam_program_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sslam_state::irq2_line_hold));
 
-	I8051(config, m_audiocpu, 12000000);
+	I8051(config, m_audiocpu, XTAL::u(12000000));
 	m_audiocpu->set_disable(); /* Internal code is not dumped - 2 boards were protected */
 
 	/* video hardware */
@@ -741,18 +741,18 @@ void sslam_state::sslam(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, XTAL::u(1000000), okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 void powerbls_state::powerbls(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);   /* 12 MHz */
+	M68000(config, m_maincpu, XTAL::u(12000000));   /* 12 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &powerbls_state::powerbls_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sslam_state::irq2_line_hold));
 
-	I80C51(config, m_audiocpu, 12000000);      /* 83C751 */
+	I80C51(config, m_audiocpu, XTAL::u(12000000));      /* 83C751 */
 	m_audiocpu->port_out_cb<1>().set(FUNC(powerbls_state::playmark_snd_control_w));
 	m_audiocpu->port_in_cb<3>().set(FUNC(powerbls_state::playmark_snd_command_r));
 	m_audiocpu->port_out_cb<3>().set(FUNC(powerbls_state::playmark_oki_w));
@@ -774,7 +774,7 @@ void powerbls_state::powerbls(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);   /* verified on original PCB */
+	OKIM6295(config, m_oki, XTAL::u(1000000), okim6295_device::PIN7_HIGH);   /* verified on original PCB */
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 

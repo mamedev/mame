@@ -11,7 +11,7 @@
 class pc080sn_device : public device_t
 {
 public:
-	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }

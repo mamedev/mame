@@ -72,7 +72,7 @@ void neogeo_rom_device::banksel_w(uint16_t data)
 
 DEFINE_DEVICE_TYPE(NEOGEO_VLINER_CART, neogeo_vliner_cart_device, "neocart_vliner", "Neo Geo V-Liner Cart")
 
-neogeo_vliner_cart_device::neogeo_vliner_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_vliner_cart_device::neogeo_vliner_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_rom_device(mconfig, NEOGEO_VLINER_CART, tag, owner, clock),
 	m_nvram(*this, "nvram")
 {

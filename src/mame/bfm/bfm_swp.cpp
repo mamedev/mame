@@ -195,7 +195,7 @@ void bfm_swp_state::machine_start()
 void bfm_swp_state::bfm_swp(machine_config &config)
 {
 	/* basic machine hardware */
-	M68340(config, m_maincpu, 16000000);
+	M68340(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_swp_state::bfm_swp_map);
 
 
@@ -208,7 +208,7 @@ void bfm_swp_state::bfm_swp(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	YMZ280B(config, "ymz", 10000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YMZ280B(config, "ymz", XTAL::u(10000000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 ROM_START( c3_rtime )

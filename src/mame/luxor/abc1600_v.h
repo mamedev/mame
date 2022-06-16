@@ -33,7 +33,7 @@ class abc1600_mover_device :  public device_t,
 {
 public:
 	// construction/destruction
-	abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void vram_map(address_map &map);
 	virtual void crtc_map(address_map &map);

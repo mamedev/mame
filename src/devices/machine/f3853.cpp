@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(F38T56, f38t56_device, "f38t56_psu", "Fairchild F38T56 PSU")
 //  constructor
 //-------------------------------------------------
 
-f3853_device::f3853_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+f3853_device::f3853_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_int_req_callback(*this),
 	m_pri_out_callback(*this),
@@ -54,29 +54,29 @@ f3853_device::f3853_device(const machine_config &mconfig, device_type type, cons
 	m_external_interrupt_line(false)
 { }
 
-f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	f3853_device(mconfig, F3853, tag, owner, clock)
 { }
 
-f3851_device::f3851_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+f3851_device::f3851_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	f3853_device(mconfig, type, tag, owner, clock),
 	m_read_port(*this),
 	m_write_port(*this)
 { }
 
-f3851_device::f3851_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+f3851_device::f3851_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	f3851_device(mconfig, F3851, tag, owner, clock)
 { }
 
-f3856_device::f3856_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+f3856_device::f3856_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	f3851_device(mconfig, type, tag, owner, clock)
 { }
 
-f3856_device::f3856_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+f3856_device::f3856_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	f3856_device(mconfig, F3856, tag, owner, clock)
 { }
 
-f38t56_device::f38t56_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+f38t56_device::f38t56_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	f3856_device(mconfig, F38T56, tag, owner, clock)
 { }
 

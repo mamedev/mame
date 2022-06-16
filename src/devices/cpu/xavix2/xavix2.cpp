@@ -9,7 +9,7 @@ DEFINE_DEVICE_TYPE(XAVIX2, xavix2_device, "xavix2", "Xavix 2 CPU")
 
 const u8 xavix2_device::bpo[8] = { 4, 3, 3, 2, 2, 2, 2, 1 };
 
-xavix2_device::xavix2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xavix2_device::xavix2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, XAVIX2, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32)
 {

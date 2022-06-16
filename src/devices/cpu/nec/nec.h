@@ -28,7 +28,7 @@ class nec_common_device : public cpu_device, public nec_disassembler::config
 
 protected:
 	// construction/destruction
-	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type, address_map_constructor internal_port_map = address_map_constructor());
+	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type, address_map_constructor internal_port_map = address_map_constructor());
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -672,21 +672,21 @@ private:
 class v20_device : public nec_common_device
 {
 public:
-	v20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class v30_device : public nec_common_device
 {
 public:
-	v30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v30_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class v33_base_device : public nec_common_device
 {
 protected:
-	v33_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_port_map);
+	v33_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_port_map);
 
 	// device_memory_interface overrides
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
@@ -698,13 +698,13 @@ protected:
 class v33_device : public v33_base_device
 {
 public:
-	v33_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v33_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class v33a_device : public v33_base_device
 {
 public:
-	v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

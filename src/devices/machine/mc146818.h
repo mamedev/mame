@@ -22,7 +22,7 @@ class mc146818_device : public device_t,
 {
 public:
 	// construction/destruction
-	mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto irq() { return m_write_irq.bind(); }
@@ -48,7 +48,7 @@ public:
 	void write_direct(offs_t offset, uint8_t data);
 
 protected:
-	mc146818_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mc146818_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -175,7 +175,7 @@ protected:
 class ds1287_device : public mc146818_device
 {
 public:
-	ds1287_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds1287_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition

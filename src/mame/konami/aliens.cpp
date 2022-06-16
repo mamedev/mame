@@ -315,12 +315,12 @@ void aliens_state::aliens(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(aliens_state::tile_callback));
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(aliens_state::sprite_callback));

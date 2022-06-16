@@ -97,17 +97,17 @@ void ax80_state::ax80(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ax80_state::ax80_map);
 	//m_maincpu->set_addrmap(AS_IO, &ax80_state::ax80_io);
 
-	PIT8253(config, PIT0_TAG, 0);
-	PIT8253(config, PIT1_TAG, 0);
-	PIT8253(config, PIT2_TAG, 0);
-	PIT8253(config, PIT3_TAG, 0);
-	PIT8253(config, PIT4_TAG, 0);
-	PIT8253(config, PIT5_TAG, 0);
+	PIT8253(config, PIT0_TAG);
+	PIT8253(config, PIT1_TAG);
+	PIT8253(config, PIT2_TAG);
+	PIT8253(config, PIT3_TAG);
+	PIT8253(config, PIT4_TAG);
+	PIT8253(config, PIT5_TAG);
 
 	I8255A(config, PPI0_TAG);
 	I8255A(config, PPI1_TAG);
 
-	I8279(config, "kdc", 6554800 / 8); // Keyboard/Display Controller
+	I8279(config, "kdc", XTAL::u(6554800) / 8); // Keyboard/Display Controller
 	//kdc.out_irq_calback().set_inputline("maincpu", UPD7810_INTF1);    // irq
 	//kdc.out_sl_callback().set(FUNC(ax80_state::scanlines_w));         // scan SL lines
 	//kdc.out_disp_callback().set(FUNC(ax80_state::digit_w));           // display A&B

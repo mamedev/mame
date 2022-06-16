@@ -13,13 +13,13 @@ class naomi_m2_board : public naomi_board
 {
 public:
 	template <typename T>
-	naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&eeprom_tag)
+	naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&eeprom_tag)
 		: naomi_m2_board(mconfig, tag, owner, clock)
 	{
 		eeprom.set_tag(std::forward<T>(eeprom_tag));
 	}
 
-	naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	uint32_t rom_cur_address;
 	static const int RAM_SIZE = 65536;
 	std::unique_ptr<uint8_t[]> ram;

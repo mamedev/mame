@@ -171,7 +171,7 @@ dsp16_device_base::dsp16_device_base(
 		device_type type,
 		char const *tag,
 		device_t *owner,
-		u32 clock,
+		const XTAL &clock,
 		u8 yaau_bits,
 		address_map_constructor &&data_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -2075,7 +2075,7 @@ void dsp16_device_base::pio_pdx_write(u16 sel, u16 value)
     DSP16 SPECIALISATION
 ***************************************************************************/
 
-dsp16_device::dsp16_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+dsp16_device::dsp16_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: dsp16_device_base(
 			mconfig, DSP16, tag, owner, clock,
 			9,
@@ -2107,7 +2107,7 @@ void dsp16_device::data_map(address_map &map)
     DSP16A SPECIALISATION
 ***************************************************************************/
 
-dsp16a_device::dsp16a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+dsp16a_device::dsp16a_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: dsp16_device_base(
 			mconfig, DSP16A, tag, owner, clock,
 			16,

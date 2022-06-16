@@ -11,7 +11,7 @@
 
 #include "logmacro.h"
 
-k573fpga_device::k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+k573fpga_device::k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, KONAMI_573_DIGITAL_FPGA, tag, owner, clock),
 	ram(*this, finder_base::DUMMY_TAG),
 	mas3507d(*this, "mpeg"),

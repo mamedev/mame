@@ -41,7 +41,7 @@ class upd7810_device : public cpu_device
 {
 public:
 	// construction/destruction
-	upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto to_func() { return m_to_func.bind(); }
@@ -131,7 +131,7 @@ protected:
 		INTSB  = 0x0010
 	};
 
-	upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
+	upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -1356,10 +1356,10 @@ class upd78c10_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd78c10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd78c10_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	upd78c10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
+	upd78c10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map);
 };
 
 
@@ -1367,7 +1367,7 @@ class upd7807_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7807_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -1379,7 +1379,7 @@ class upd7801_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_reset() override;
@@ -1397,10 +1397,10 @@ class upd78c05_device : public upd7810_device
 {
 public:
 	// construction/destruction
-	upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
+	upd78c05_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -1416,7 +1416,7 @@ class upd78c06_device : public upd78c05_device
 {
 public:
 	// construction/destruction
-	upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd78c06_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void configure_ops() override;
 };
 

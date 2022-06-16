@@ -53,7 +53,7 @@ device_epson_sio_interface::~device_epson_sio_interface()
 //  epson_sio_device - constructor
 //-------------------------------------------------
 
-epson_sio_device::epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+epson_sio_device::epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, EPSON_SIO, tag, owner, clock),
 	device_single_card_slot_interface<device_epson_sio_interface>(mconfig, *this),
 	m_cart(nullptr),

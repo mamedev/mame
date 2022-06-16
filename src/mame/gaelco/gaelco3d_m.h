@@ -23,7 +23,7 @@ class gaelco_serial_device : public device_t
 public:
 	static constexpr unsigned EXT_STATUS_MASK = 0x03;
 
-	gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_handler() { return m_irq_handler.bind(); }
 

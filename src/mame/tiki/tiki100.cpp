@@ -722,7 +722,7 @@ void tiki100_state::tiki100(machine_config &config)
 	m_screen->set_screen_update(FUNC(tiki100_state::screen_update));
 	PALETTE(config, m_palette).set_entries(16);
 
-	TIKI100_BUS(config, m_exp, 0);
+	TIKI100_BUS(config, m_exp);
 	m_exp->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->busrq_wr_callback().set(FUNC(tiki100_state::busrq_w));

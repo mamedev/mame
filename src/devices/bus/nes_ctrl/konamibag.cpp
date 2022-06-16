@@ -50,7 +50,7 @@ ioport_constructor nes_konamibag_device::device_input_ports() const
 //  nes_konamibag_device - constructor
 //-------------------------------------------------
 
-nes_konamibag_device::nes_konamibag_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_konamibag_device::nes_konamibag_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_KONAMIBAG, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_sensor(*this, "BAG.%u", 0)

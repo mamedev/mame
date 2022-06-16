@@ -26,7 +26,7 @@ class nes_turbofile_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_turbofile_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_turbofile_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_exp(offs_t offset) override;
 	virtual void write(u8 data) override;

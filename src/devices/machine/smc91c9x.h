@@ -35,7 +35,7 @@ protected:
 		SMC91C96
 	};
 
-	smc91c9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dev_type device_type);
+	smc91c9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, dev_type device_type);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -305,13 +305,13 @@ private:
 class smc91c94_device : public smc91c9x_device
 {
 public:
-	smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class smc91c96_device : public smc91c9x_device
 {
 public:
-	smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

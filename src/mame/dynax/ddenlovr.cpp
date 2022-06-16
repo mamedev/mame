@@ -4444,12 +4444,12 @@ void htengoku_state::htengoku_banked_map(address_map &map)
 void htengoku_state::htengoku(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 20000000 / 4);
+  Z80(config, m_maincpu, XTAL::u(20000000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &htengoku_state::htengoku_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &htengoku_state::htengoku_io_map);
 	m_maincpu->set_irq_acknowledge_callback("mainirq", FUNC(rst_pos_buffer_device::inta_cb)); // IM 0 needs an opcode on the data bus
 
-	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_addrmap(0, &htengoku_state::htengoku_banked_map);
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(20);
@@ -4460,7 +4460,7 @@ void htengoku_state::htengoku(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	RST_POS_BUFFER(config, "mainirq", 0).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, "mainirq").int_callback().set_inputline(m_maincpu, 0);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w));
@@ -4478,7 +4478,7 @@ void htengoku_state::htengoku(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(FUNC(htengoku_state::sprtmtch_vblank_w));
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(dynax_state::hnoridur_blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(dynax_state::dynax_blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
@@ -4491,12 +4491,12 @@ void htengoku_state::htengoku(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 20000000 / 16));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(20000000) / 16));
 	aysnd.port_a_read_callback().set(FUNC(htengoku_state::htengoku_dsw_r));
 	aysnd.port_b_write_callback().set(FUNC(htengoku_state::htengoku_dsw_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM2413(config, "ym2413", XTAL::u(3579545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* devices */
 	msm6242_device &rtc(MSM6242(config, "rtc", XTAL(32'768)));
@@ -10029,11 +10029,11 @@ WRITE_LINE_MEMBER(mmpanic_state::mmpanic_rtc_irq)
 void mmpanic_state::mmpanic(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000);
+	Z80(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_map);
 	m_maincpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_portmap);
 
-	Z80(config, m_soundcpu, 3579545);
+	Z80(config, m_soundcpu, XTAL::u(3579545));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_sound_portmap);
 
@@ -10062,11 +10062,11 @@ void mmpanic_state::mmpanic(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
+	YM2413(config, "ym2413", XTAL::u(3579545)).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	AY8910(config, "aysnd", 3579545).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8910(config, "aysnd", XTAL::u(3579545)).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	OKIM6295(config, m_oki, 1022720, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(1022720), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
@@ -10090,7 +10090,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 void hanakanz_state::hanakanz(machine_config &config)
 {
 	/* basic machine hardware */
-	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, 20'000'000));
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL::u(20'000'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
 	maincpu.set_addrmap(AS_IO, &hanakanz_state::hanakanz_portmap);
 	maincpu.in_p0_callback().set(FUNC(hanakanz_state::hanakanz_busy_r));
@@ -10122,9 +10122,9 @@ void hanakanz_state::hanakanz(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
+	YM2413(config, "ym2413", XTAL::u(3579545)).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	OKIM6295(config, m_oki, 1022720, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(1022720), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
@@ -10215,7 +10215,7 @@ void hanakanz_state::mjchuuka(machine_config &config)
 	hanakanz(config);
 
 	/* basic machine hardware */
-	tmpz84c015_device &tmpz(TMPZ84C015(config.replace(), m_maincpu, 8000000));
+	tmpz84c015_device &tmpz(TMPZ84C015(config.replace(), m_maincpu, XTAL::u(8000000)));
 	tmpz.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
 	tmpz.set_addrmap(AS_IO, &hanakanz_state::mjchuuka_portmap);
 	tmpz.out_pa_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
@@ -10225,7 +10225,7 @@ void hanakanz_state::mjchuuka(machine_config &config)
 
 	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
 
-	AY8910(config, "aysnd", 1789772).add_route(ALL_OUTPUTS, "mono", 1.0);
+	AY8910(config, "aysnd", XTAL::u(1789772)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -10238,7 +10238,7 @@ WRITE_LINE_MEMBER(mmpanic_state::funkyfig_sound_irq)
 void mmpanic_state::funkyfig(machine_config &config)
 {
 	mmpanic(config);
-	tmpz84c015_device &tmpz(TMPZ84C015(config.replace(), m_maincpu, 8000000));
+	tmpz84c015_device &tmpz(TMPZ84C015(config.replace(), m_maincpu, XTAL::u(8000000)));
 	tmpz.set_addrmap(AS_PROGRAM, &mmpanic_state::funkyfig_map);
 	tmpz.set_addrmap(AS_IO, &mmpanic_state::funkyfig_portmap);
 	tmpz.in_pa_callback().set(FUNC(mmpanic_state::funkyfig_dsw_r));
@@ -10351,7 +10351,7 @@ void ddenlovr_state::mjmyster(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 3579545));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(3579545)));
 	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 }
@@ -10389,7 +10389,7 @@ void ddenlovr_state::hginga(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 3579545));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(3579545)));
 	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::hginga_dsw_r));
 	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
@@ -10416,7 +10416,7 @@ void ddenlovr_state::hgokou(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 3579545));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(3579545)));
 	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::hginga_dsw_r));
 	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
@@ -10463,7 +10463,7 @@ void ddenlovr_state::mjmyuniv(machine_config &config)
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1789772));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(1789772)));
 	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 }
@@ -10490,7 +10490,7 @@ void ddenlovr_state::mjmyornt(machine_config &config)
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1789772));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(1789772)));
 	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 }
@@ -10543,7 +10543,7 @@ void ddenlovr_state::mjflove(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
-	AY8910(config, "aysnd", 28636363/8).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8910(config, "aysnd", XTAL::u(28636363)/8).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
 void ddenlovr_state::hparadis(machine_config &config)

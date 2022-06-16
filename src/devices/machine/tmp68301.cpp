@@ -134,7 +134,7 @@ void tmp68301_device::icr_w(offs_t offset, uint8_t data)
 	m_icr[offset] = data;
 }
 
-tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m68000_device(mconfig, TMP68301, tag, owner, clock),
 		m_in_parallel_cb(*this),
 		m_out_parallel_cb(*this),

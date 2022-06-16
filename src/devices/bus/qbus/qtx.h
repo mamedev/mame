@@ -21,7 +21,7 @@ class qts1_device : public device_t, public device_qbus_card_interface
 {
 public:
 	// device type constructor
-	qts1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	qts1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

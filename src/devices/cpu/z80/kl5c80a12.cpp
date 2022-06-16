@@ -35,7 +35,7 @@ static const z80_daisy_config pseudo_daisy_config[] = { { "kp69" }, { nullptr } 
 //  kl5c80a12_device - constructor
 //-------------------------------------------------
 
-kl5c80a12_device::kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+kl5c80a12_device::kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kc82_device(mconfig, KL5C80A12, tag, owner, clock,
 					address_map_constructor(FUNC(kl5c80a12_device::internal_ram), this),
 					address_map_constructor(FUNC(kl5c80a12_device::internal_io), this))

@@ -114,14 +114,14 @@ INPUT_PORTS_END
 
 void cirsa820xxx_state::cirsa820xxx(machine_config &config)
 {
-	I8085A(config, m_maincpu, 6'000'000); // XTAL value was unreadable, guessed for now
+	I8085A(config, m_maincpu, XTAL::u(6'000'000)); // XTAL value was unreadable, guessed for now
 	m_maincpu->set_addrmap(AS_PROGRAM, &cirsa820xxx_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &cirsa820xxx_state::io_map);
 
 	PIT8254(config, "pit");
 
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &psg(AY8910(config, "psg", 6'000'000 / 4)); // XTAL value was unreadable, guessed for now. Unknown divider
+	ay8910_device &psg(AY8910(config, "psg", XTAL::u(6'000'000) / 4)); // XTAL value was unreadable, guessed for now. Unknown divider
 	psg.port_a_read_callback().set_ioport("DSW1");
 	psg.port_b_read_callback().set_ioport("DSW2");
 	psg.add_route(ALL_OUTPUTS, "mono", 1.0);

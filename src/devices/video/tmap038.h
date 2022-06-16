@@ -12,12 +12,7 @@ class tilemap038_device : public device_t
 public:
 	typedef device_delegate<void (bool tiledim, u32 &color, u32 &pri, u32 &code)> tmap038_cb_delegate;
 
-	tilemap038_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: tilemap038_device(mconfig, tag, owner, (u32)0)
-	{
-	}
-
-	tilemap038_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tilemap038_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configurations
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }

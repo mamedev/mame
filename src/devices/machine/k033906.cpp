@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(K033906, k033906_device, "k033906", "K033906 PCI bridge")
 //  k033906_device - constructor
 //-------------------------------------------------
 
-k033906_device::k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k033906_device::k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K033906, tag, owner, clock)
 	, m_reg_set(0)
 	, m_voodoo(*this, finder_base::DUMMY_TAG)

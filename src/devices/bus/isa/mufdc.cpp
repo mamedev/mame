@@ -128,7 +128,7 @@ const tiny_rom_entry *fdcmag_device::device_rom_region() const
 //  mufdc_device - constructor
 //-------------------------------------------------
 
-mufdc_device::mufdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+mufdc_device::mufdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface( mconfig, *this),
 	m_fdc(*this, "fdc"),
@@ -136,12 +136,12 @@ mufdc_device::mufdc_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-fdc344_device::fdc344_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+fdc344_device::fdc344_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mufdc_device(mconfig, ISA8_FDC344, tag, owner, clock)
 {
 }
 
-fdcmag_device::fdcmag_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+fdcmag_device::fdcmag_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mufdc_device(mconfig, ISA8_FDCMAG, tag, owner, clock)
 {
 }

@@ -111,7 +111,7 @@ void vic1112_device::device_add_mconfig(machine_config &config)
 	m_via1->cb2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
 	m_via1->irq_handler().set(FUNC(vic1112_device::via1_irq_w));
 
-	IEEE488(config, m_bus, 0);
+	IEEE488(config, m_bus);
 	ieee488_slot_device::add_cbm_defaults(config, nullptr);
 	m_bus->srq_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 }
@@ -126,7 +126,7 @@ void vic1112_device::device_add_mconfig(machine_config &config)
 //  vic1112_device - constructor
 //-------------------------------------------------
 
-vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VIC1112, tag, owner, clock)
 	, device_vic20_expansion_card_interface(mconfig, *this)
 	, m_via0(*this, M6522_0_TAG)

@@ -456,9 +456,9 @@ void cop01_state::cop01(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "ay1", 1250000).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider, hand-tuned to match audio reference
-	AY8910(config, "ay2", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); // "
-	AY8910(config, "ay3", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); // "
+	AY8910(config, "ay1", XTAL::u(1250000)).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider, hand-tuned to match audio reference
+	AY8910(config, "ay2", XTAL::u(1250000)).add_route(ALL_OUTPUTS, "mono", 0.25); // "
+	AY8910(config, "ay3", XTAL::u(1250000)).add_route(ALL_OUTPUTS, "mono", 0.25); // "
 }
 
 void mightguy_state::mightguy(machine_config &config)
@@ -495,7 +495,7 @@ void mightguy_state::mightguy(machine_config &config)
 
 	YM3526(config, "ymsnd", AUDIOCPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 1.0); // unknown divider
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.5); // unknown DAC
 }
 
 

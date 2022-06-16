@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(ITT1700_KEYBOARD, itt1700_keyboard_device, "itt1700_kbd", "IT
 //  itt1700_keyboard_device - constructor
 //-------------------------------------------------
 
-itt1700_keyboard_device::itt1700_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+itt1700_keyboard_device::itt1700_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ITT1700_KEYBOARD, tag, owner, clock)
 	, m_clock_state(true)
 	, m_line1_state(true)

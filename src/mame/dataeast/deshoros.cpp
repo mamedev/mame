@@ -286,7 +286,7 @@ void destiny_state::destiny(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 800); // TODO: determine exact frequency thru schematics
+	BEEP(config, m_beeper, XTAL::u(800)); // TODO: determine exact frequency thru schematics
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

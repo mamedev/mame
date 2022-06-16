@@ -85,7 +85,7 @@ void cbm_serial_box_device::device_add_mconfig(machine_config &config)
 //  cbm_serial_box_device - constructor
 //-------------------------------------------------
 
-cbm_serial_box_device::cbm_serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cbm_serial_box_device::cbm_serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CBM_SERIAL_BOX, tag, owner, clock),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG)

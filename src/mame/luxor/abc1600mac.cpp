@@ -93,7 +93,7 @@ const tiny_rom_entry *abc1600_mac_device::device_rom_region() const
 //  abc1600_mac_device - constructor
 //-------------------------------------------------
 
-abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ABC1600_MAC, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 21, 0, address_map_constructor(FUNC(abc1600_mac_device::program_map), this)),

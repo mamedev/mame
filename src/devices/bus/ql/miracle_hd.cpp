@@ -49,7 +49,7 @@ const tiny_rom_entry *miracle_hard_disk_device::device_rom_region() const
 //  miracle_hard_disk_device - constructor
 //-------------------------------------------------
 
-miracle_hard_disk_device::miracle_hard_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+miracle_hard_disk_device::miracle_hard_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MIRACLE_HARD_DISK, tag, owner, clock),
 	device_ql_rom_cartridge_card_interface(mconfig, *this)
 {

@@ -297,7 +297,7 @@ void chessmstdm_state::chessmstdm(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &chessmstdm_state::chessmstdm_io);
 	m_maincpu->set_daisy_config(chessmstdm_daisy_chain);
 
-	auto &strobe(CLOCK(config, "strobe", 500)); // from 555 timer, 50% duty
+	auto &strobe(CLOCK(config, "strobe", XTAL::u(500))); // from 555 timer, 50% duty
 	strobe.signal_handler().set(m_pio[1], FUNC(z80pio_device::strobe_b));
 	strobe.signal_handler().append([this](int) { m_pio[1]->data_b_write(m_matrix); });
 
@@ -326,7 +326,7 @@ void chessmstdm_state::chessmstdm(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	BEEP(config, m_beeper, 1000).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	BEEP(config, m_beeper, XTAL::u(1000)).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "chessmstdm_cart");

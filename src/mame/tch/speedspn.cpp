@@ -284,12 +284,12 @@ void speedspn_state::machine_start()
 void speedspn_state::speedspn(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 6000000);      /* 6 MHz */
+	Z80(config, m_maincpu, XTAL::u(6000000));      /* 6 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &speedspn_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &speedspn_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(speedspn_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 6000000);        /* 6 MHz */
+	Z80(config, m_audiocpu, XTAL::u(6000000));        /* 6 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &speedspn_state::sound_map);
 
 	/* video hardware */
@@ -309,7 +309,7 @@ void speedspn_state::speedspn(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	OKIM6295(config, m_oki, 1122000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL::u(1122000), okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_oki->set_addrmap(0, &speedspn_state::oki_map);
 }

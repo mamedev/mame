@@ -20,7 +20,7 @@ class lr35902_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	lr35902_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	lr35902_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, const XTAL &_clock);
 
 	// configuration helpers
 	auto timer_cb() { return m_timer_func.bind(); }

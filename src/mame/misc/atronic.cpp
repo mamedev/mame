@@ -473,18 +473,18 @@ void atronic_state::atronic(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &atronic_state::atronic_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(atronic_state::irq0_line_hold));
 
-	DS1386_32K(config, "timekpr", 32768);
+	DS1386_32K(config, "timekpr", XTAL::u(32768));
 
-	PCF8584(config, "i2cbc", 3000000);
+	PCF8584(config, "i2cbc", XTAL::u(3000000));
 
-	SCC85C30(config, "scc", 5000000);
+	SCC85C30(config, "scc", XTAL::u(5000000));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224); // ??
 	m_screen->set_screen_update("tms", FUNC(tms34020_device::tms340x0_rgb32));
 
 	PALETTE(config, "palette").set_entries(256);
-	RAMDAC(config, m_ramdac, 0, m_palette);
+	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &atronic_state::ramdac_map);
 
 	TMS34020(config, m_videocpu, VIDEO_CLOCK);

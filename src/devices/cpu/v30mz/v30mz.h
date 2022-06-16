@@ -22,7 +22,7 @@ class v30mz_cpu_device : public cpu_device, public nec_disassembler::config
 {
 public:
 	// construction/destruction
-	v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto vector_cb() { return m_vector_func.bind(); }
 	uint32_t pc();

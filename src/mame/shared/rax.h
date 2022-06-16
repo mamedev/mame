@@ -20,7 +20,7 @@ class acclaim_rax_device : public device_t
 {
 public:
 	// construction/destruction
-	acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t data_r();
 	void data_w(uint16_t data);

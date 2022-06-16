@@ -521,7 +521,7 @@ void undrfire_state::undrfire(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("INPUTS0");
 	tc0510nio.read_1_callback().set_ioport("INPUTS1");
 	tc0510nio.read_2_callback().set_ioport("INPUTS2");
@@ -545,11 +545,11 @@ void undrfire_state::undrfire(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_undrfire);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	TC0620SCC(config, m_tc0620scc, 0);
+	TC0620SCC(config, m_tc0620scc);
 	m_tc0620scc->set_offsets(50, 8);
 	m_tc0620scc->set_palette(m_palette);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x24, 0);
 	m_tc0480scp->set_offsets_tx(-1, 0);
@@ -558,7 +558,7 @@ void undrfire_state::undrfire(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "lspeaker", 1.0);
 	taito_en.add_route(1, "rspeaker", 1.0);
 }
@@ -579,11 +579,11 @@ void undrfire_state::cbombers(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
+	adc0809_device &adc(ADC0809(config, "adc", XTAL::u(500000))); // unknown clock
 	adc.eoc_ff_callback().set_inputline("maincpu", 5);
 	adc.in_callback<0>().set_ioport("STEER");
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("INPUTS0");
 	tc0510nio.read_1_callback().set_ioport("INPUTS1");
 	tc0510nio.read_2_callback().set_ioport("INPUTS2");
@@ -607,23 +607,23 @@ void undrfire_state::cbombers(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_undrfire);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	TC0620SCC(config, m_tc0620scc, 0);
+	TC0620SCC(config, m_tc0620scc);
 	m_tc0620scc->set_offsets(50, 8);
 	m_tc0620scc->set_palette(m_palette);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x24, 0);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_col_base(4096);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "lspeaker", 1.0);
 	taito_en.add_route(1, "rspeaker", 1.0);
 }

@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(MOS8580, mos8580_device, "mos8580", "MOS 8580 SID")
 //  mos6581_device - constructor
 //-------------------------------------------------
 
-mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_read_potx(*this)
@@ -49,7 +49,7 @@ mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-mos6581_device::mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6581_device::mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6581_device(mconfig, MOS6581, tag, owner, clock, TYPE_6581)
 {
 }
@@ -62,7 +62,7 @@ mos6581_device::~mos6581_device()
 //  mos8580_device - constructor
 //-------------------------------------------------
 
-mos8580_device::mos8580_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos8580_device::mos8580_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6581_device(mconfig, MOS8580, tag, owner, clock, TYPE_8580)
 {
 }

@@ -14,7 +14,7 @@ const u16 ks0164_cpu_device::imask[16] = {
 	0x01ff, 0x03ff, 0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff, 0xffff
 };
 
-ks0164_cpu_device::ks0164_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ks0164_cpu_device::ks0164_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, KS0164CPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16)
 {

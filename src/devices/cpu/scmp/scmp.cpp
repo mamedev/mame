@@ -20,13 +20,13 @@ DEFINE_DEVICE_TYPE(SCMP,    scmp_device,    "ins8050", "National Semiconductor I
 DEFINE_DEVICE_TYPE(INS8060, ins8060_device, "ins8060", "National Semiconductor INS 8060 SC/MP II")
 
 
-scmp_device::scmp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scmp_device::scmp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scmp_device(mconfig, SCMP, tag, owner, clock)
 {
 }
 
 
-scmp_device::scmp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+scmp_device::scmp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_AC(0), m_ER(0), m_SR(0), m_icount(0)
@@ -47,7 +47,7 @@ device_memory_interface::space_config_vector scmp_device::memory_space_config() 
 }
 
 
-ins8060_device::ins8060_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ins8060_device::ins8060_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scmp_device(mconfig, INS8060, tag, owner, clock)
 {
 }

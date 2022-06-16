@@ -36,7 +36,7 @@ static INPUT_PORTS_START(interpro_mouse)
 	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_mouse_device, mouse_y, 0)
 INPUT_PORTS_END
 
-interpro_mouse_port_device::interpro_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+interpro_mouse_port_device::interpro_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, INTERPRO_MOUSE_PORT, tag, owner, clock)
 	, device_single_card_slot_interface<device_interpro_mouse_port_interface>(mconfig, *this)
 	, m_state_func(*this)
@@ -60,7 +60,7 @@ device_interpro_mouse_port_interface::device_interpro_mouse_port_interface(machi
 {
 }
 
-interpro_mouse_device::interpro_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+interpro_mouse_device::interpro_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, INTERPRO_MOUSE, tag, owner, clock)
 	, device_interpro_mouse_port_interface(mconfig, *this)
 {

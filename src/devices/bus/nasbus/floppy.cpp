@@ -59,7 +59,7 @@ void nascom_fdc_device::device_add_mconfig(machine_config &config)
 //  wordpro_device - constructor
 //-------------------------------------------------
 
-nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NASCOM_FDC, tag, owner, clock),
 	device_nasbus_card_interface(mconfig, *this),
 	m_fdc(*this, "fd1793"),

@@ -33,12 +33,12 @@
 
 DEFINE_DEVICE_TYPE(XAVIX, xavix_device, "xavix", "XaviX (SSD 97 / SSD 98)")
 
-xavix_device::xavix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+xavix_device::xavix_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	xavix_device(mconfig, XAVIX, tag, owner, clock)
 {
 }
 
-xavix_device::xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+xavix_device::xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	m6502_device(mconfig, type, tag, owner, clock),
 	XPC(0),
 	m_lowbus_config("lowbus", ENDIANNESS_LITTLE, 8, 15),

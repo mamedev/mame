@@ -151,7 +151,7 @@ void c64_xl80_device::device_add_mconfig(machine_config &config)
 //  c64_xl80_device - constructor
 //-------------------------------------------------
 
-c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_XL80, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_crtc(*this, HD46505SP_TAG),

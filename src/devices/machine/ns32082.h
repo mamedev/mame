@@ -14,7 +14,7 @@ class ns32082_device
 	, public ns32000_mmu_interface
 {
 public:
-	ns32082_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	ns32082_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual void state_add(device_state_interface &parent, int &index) override;
 

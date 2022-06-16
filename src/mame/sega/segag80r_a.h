@@ -23,13 +23,13 @@
 class monsterb_sound_device : public device_t
 {
 public:
-	template <typename T> monsterb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&region_tag)
+	template <typename T> monsterb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&region_tag)
 		: monsterb_sound_device(mconfig, tag, owner, clock)
 	{
 		m_audiocpu_region.set_tag(std::forward<T>(region_tag));
 	}
 
-	monsterb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	monsterb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t n7751_status_r();
 	void n7751_command_w(uint8_t data);

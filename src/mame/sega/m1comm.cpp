@@ -104,11 +104,11 @@ DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model-1 Communication Board
 
 void m1comm_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_cpu, 8000000); // 32 MHz / 4
+	Z80(config, m_cpu, XTAL::u(8000000)); // 32 MHz / 4
 	m_cpu->set_memory_map(&m1comm_device::m1comm_mem);
 	m_cpu->set_io_map(&m1comm_device::m1comm_io);
 
-	AM9517A(config, m_dma, 8000000); // 32 MHz / 4
+	AM9517A(config, m_dma, XTAL::u(8000000)); // 32 MHz / 4
 	m_dma->out_hreq_callback().set(FUNC(m1comm_device::dma_hreq_w));
 	m_dma->in_memr_callback().set(FUNC(m1comm_device::dma_mem_r));
 	m_dma->out_memw_callback().set(FUNC(m1comm_device::dma_mem_w));
@@ -118,7 +118,7 @@ void m1comm_device::device_add_mconfig(machine_config &config)
 	m_dma->in_ior_callback<2>().set(m_dlc, FUNC(mb89374_device::dma_r));
 	m_dma->out_iow_callback<3>().set(m_dlc, FUNC(mb89374_device::dma_w));
 
-	MB89374(config, m_dlc, 8000000); // 32 MHz / 4
+	MB89374(config, m_dlc, XTAL::u(8000000)); // 32 MHz / 4
 	m_dlc->out_po_callback<2>().set(m_dma, FUNC(am9517a_device::dreq3_w));
 	m_dlc->out_po_callback<3>().set(m_dma, FUNC(am9517a_device::dreq2_w));
 	m_dlc->out_irq_callback().set(FUNC(m1comm_device::dlc_int7_w));
@@ -140,7 +140,7 @@ const tiny_rom_entry *m1comm_device::device_rom_region() const
 //  m1comm_device - constructor
 //-------------------------------------------------
 
-m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, M1COMM, tag, owner, clock),
 	m_cpu(*this, Z80_TAG),
 	m_dma(*this, "commdma"),

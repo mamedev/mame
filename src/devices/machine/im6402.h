@@ -48,13 +48,13 @@ class im6402_device : public device_t, public device_serial_interface
 public:
 	// construction/destruction
 	im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t rrc, uint32_t trc)
-		: im6402_device(mconfig, tag, owner, 0)
+		: im6402_device(mconfig, tag, owner)
 	{
 		set_rrc(rrc);
 		set_trc(trc);
 	}
 
-	im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void set_rrc(int rrc) { m_rrc = rrc; }
 	void set_trc(int trc) { m_trc = trc; }

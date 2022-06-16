@@ -57,7 +57,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( select_bank );
 
 protected:
-	corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	corcomp_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	void device_start() override;
 	void device_reset() override;
@@ -130,7 +130,7 @@ protected:
 class corcomp_dcc_device : public corcomp_fdc_device
 {
 public:
-	corcomp_dcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	corcomp_dcc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 private:
 	void device_add_mconfig(machine_config &config) override;
 	void device_config_complete() override;
@@ -147,7 +147,7 @@ public:
 	virtual DECLARE_READ_LINE_MEMBER(address9901);
 
 protected:
-	ccfdc_dec_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ccfdc_dec_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	void device_start() override { }
 	void device_config_complete() override;
@@ -167,7 +167,7 @@ public:
 	virtual DECLARE_READ_LINE_MEMBER(ready_out) =0;
 
 protected:
-	ccfdc_sel_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ccfdc_sel_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	void device_start() override { }
 	virtual void device_config_complete() override =0;
@@ -184,7 +184,7 @@ protected:
 class ccdcc_palu2_device : public ccfdc_dec_pal_device
 {
 public:
-	ccdcc_palu2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ccdcc_palu2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // =========== Specific selector PAL circuit of the CCDCC ================
@@ -192,7 +192,7 @@ public:
 class ccdcc_palu1_device : public ccfdc_sel_pal_device
 {
 public:
-	ccdcc_palu1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ccdcc_palu1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	DECLARE_READ_LINE_MEMBER(ready_out) override;
 
 private:
@@ -208,7 +208,7 @@ class corcomp_fdca_device : public corcomp_fdc_device
 	friend class ccfdc_palu6_device;
 
 public:
-	corcomp_fdca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	corcomp_fdca_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 private:
 	void device_add_mconfig(machine_config &config) override;
 	void device_config_complete() override;
@@ -221,7 +221,7 @@ private:
 class ccfdc_palu12_device : public ccfdc_dec_pal_device
 {
 public:
-	ccfdc_palu12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ccfdc_palu12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	DECLARE_READ_LINE_MEMBER(address9901) override;
 };
 
@@ -230,7 +230,7 @@ public:
 class ccfdc_palu6_device : public ccfdc_sel_pal_device
 {
 public:
-	ccfdc_palu6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ccfdc_palu6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	DECLARE_READ_LINE_MEMBER(selectwdc) override;
 	DECLARE_READ_LINE_MEMBER(selectdsr) override;
 

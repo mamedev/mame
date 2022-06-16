@@ -104,7 +104,7 @@ class a2bus_videx160_device:
 {
 protected:
 	// construction/destruction
-	a2bus_videx160_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_videx160_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -135,7 +135,7 @@ private:
 class a2bus_ultraterm_device : public a2bus_videx160_device
 {
 public:
-	a2bus_ultraterm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ultraterm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -143,7 +143,7 @@ public:
 class a2bus_ultratermenh_device : public a2bus_videx160_device
 {
 public:
-	a2bus_ultratermenh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ultratermenh_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -188,7 +188,7 @@ const tiny_rom_entry *a2bus_ultratermenh_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_videx160_device::a2bus_videx160_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_videx160_device::a2bus_videx160_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_framecnt(0), m_ctrl1(0), m_ctrl2(0),
@@ -199,12 +199,12 @@ a2bus_videx160_device::a2bus_videx160_device(const machine_config &mconfig, devi
 {
 }
 
-a2bus_ultraterm_device::a2bus_ultraterm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ultraterm_device::a2bus_ultraterm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_videx160_device(mconfig, A2BUS_ULTRATERM, tag, owner, clock)
 {
 }
 
-a2bus_ultratermenh_device::a2bus_ultratermenh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ultratermenh_device::a2bus_ultratermenh_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_videx160_device(mconfig, A2BUS_ULTRATERMENH, tag, owner, clock)
 {
 }

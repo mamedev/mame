@@ -2209,21 +2209,21 @@ void a400_state::atari_common(machine_config &config)
 	m_pokey->pot_r<6>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_y));
 	m_pokey->pot_r<7>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_x));
 
-	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.03);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("48K");
 
-	ATARI_GTIA(config, m_gtia, 0);
+	ATARI_GTIA(config, m_gtia);
 	m_gtia->read_callback().set_ioport("console");
 	m_gtia->write_callback().set(FUNC(a400_state::gtia_cb));
 	m_gtia->trigger_callback().set(FUNC(a400_state::djoy_b_r));
 
-	ATARI_ANTIC(config, m_antic, 0);
+	ATARI_ANTIC(config, m_antic);
 	m_antic->set_gtia_tag(m_gtia);
 
 	/* devices */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(a400_state::djoy_0_1_r));
 	m_pia->writepa_handler().set(FUNC(a400_state::djoy_0_1_w));
 	m_pia->readpb_handler().set(FUNC(a400_state::djoy_2_3_r));
@@ -2240,7 +2240,7 @@ void a400_state::atari_common(machine_config &config)
 	sio.proceed().set(m_pia, FUNC(pia6821_device::ca1_w));
 	sio.interrupt().set(m_pia, FUNC(pia6821_device::cb1_w));
 
-	ATARI_FDC(config, "fdc", 0);
+	ATARI_FDC(config, "fdc");
 
 	A800_CART_SLOT(config, m_cartleft, a800_left, nullptr);
 
@@ -2368,11 +2368,11 @@ void a800xl_state::a800xlpal(machine_config &config)
 {
 	a800xl(config);
 
-	m_maincpu->set_clock(1773000);
+	m_maincpu->set_clock(XTAL::u(1773000));
 
 	config_pal_screen(config);
 
-	m_pokey->set_clock(1773000);
+	m_pokey->set_clock(XTAL::u(1773000));
 }
 
 // memory map A130XE
@@ -2426,10 +2426,10 @@ void a5200_state::a5200(machine_config &config)
 	m_pokey->set_keyboard_callback(FUNC(a5200_state::a5200_keypads));
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	ATARI_GTIA(config, m_gtia, 0);
+	ATARI_GTIA(config, m_gtia);
 	m_gtia->trigger_callback().set_ioport("djoy_b");
 
-	ATARI_ANTIC(config, m_antic, 0);
+	ATARI_ANTIC(config, m_antic);
 	m_antic->set_gtia_tag(m_gtia);
 
 	config_ntsc_screen(config);

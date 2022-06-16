@@ -46,11 +46,11 @@ class speaker_device : public device_t, public device_mixer_interface
 public:
 	// construction/destruction
 	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, double x, double y, double z)
-		: speaker_device(mconfig, tag, owner, 0)
+	  : speaker_device(mconfig, tag, owner)
 	{
 		set_position(x, y, z);
 	}
-	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~speaker_device();
 
 	// inline configuration helpers

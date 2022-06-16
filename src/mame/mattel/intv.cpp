@@ -492,7 +492,7 @@ void intv_state::intvoice(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intvoice_mem);
 
 	config.device_remove("cartslot");
-	INTV_ROM_VOICE(config, "voice", 0);
+	INTV_ROM_VOICE(config, "voice");
 }
 
 void intv_state::intvecs(machine_config &config)
@@ -501,9 +501,9 @@ void intv_state::intvecs(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intvecs_mem);
 
 	config.device_remove("cartslot");
-	INTV_ROM_ECS(config, "ecs", 0);
+	INTV_ROM_ECS(config, "ecs");
 
-	sp0256_device &speech(SP0256(config, "speech", 3120000));
+	sp0256_device &speech(SP0256(config, "speech", XTAL::u(3120000)));
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
 	speech.add_route(ALL_OUTPUTS, "mono", 1.00);
 

@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(I8089, i8089_device, "i8089", "Intel 8089 I/O Processor")
 //  i8089_device - constructor
 //-------------------------------------------------
 
-i8089_device::i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i8089_device::i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cpu_device(mconfig, I8089, tag, owner, clock),
 	m_icount(0),
 	m_ch1(*this, "1"),
@@ -210,8 +210,8 @@ void i8089_device::state_string_export(const device_state_entry &entry, std::str
 
 void i8089_device::device_add_mconfig(machine_config &config)
 {
-	I8089_CHANNEL(config, m_ch1, 0).sintr().set(FUNC(i8089_device::ch1_sintr_w));
-	I8089_CHANNEL(config, m_ch2, 0).sintr().set(FUNC(i8089_device::ch2_sintr_w));
+	I8089_CHANNEL(config, m_ch1).sintr().set(FUNC(i8089_device::ch1_sintr_w));
+	I8089_CHANNEL(config, m_ch2).sintr().set(FUNC(i8089_device::ch2_sintr_w));
 }
 
 

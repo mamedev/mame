@@ -38,7 +38,7 @@ void c64_rex_ep256_cartridge_device::device_add_mconfig(machine_config &config)
 //  c64_rex_ep256_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_rex_ep256_cartridge_device::c64_rex_ep256_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_rex_ep256_cartridge_device::c64_rex_ep256_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_REX_EP256, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_eproms(*this, "rom%u", 1U)

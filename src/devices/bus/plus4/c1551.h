@@ -30,7 +30,7 @@ class c1551_device : public device_t, public device_plus4_expansion_card_interfa
 {
 public:
 	// construction/destruction
-	c1551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1551_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

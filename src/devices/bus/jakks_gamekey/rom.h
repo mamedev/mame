@@ -15,7 +15,7 @@ class jakks_gamekey_rom_plain_device : public device_t,
 {
 public:
 	// construction/destruction
-	jakks_gamekey_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	jakks_gamekey_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint16_t read_cart(offs_t offset) override;
@@ -28,7 +28,7 @@ public:
 	virtual void write_rom(offs_t offset, uint16_t data);
 
 protected:
-	jakks_gamekey_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	jakks_gamekey_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override { }
@@ -41,10 +41,10 @@ class jakks_gamekey_rom_i2c_base_device : public jakks_gamekey_rom_plain_device
 {
 public:
 	// construction/destruction
-	jakks_gamekey_rom_i2c_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	jakks_gamekey_rom_i2c_base_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	jakks_gamekey_rom_i2c_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	jakks_gamekey_rom_i2c_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint16_t read_rom(offs_t offset) override;
@@ -63,7 +63,7 @@ class jakks_gamekey_rom_i2c_24lc04_device : public jakks_gamekey_rom_i2c_base_de
 {
 public:
 	// construction/destruction
-	jakks_gamekey_rom_i2c_24lc04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	jakks_gamekey_rom_i2c_24lc04_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

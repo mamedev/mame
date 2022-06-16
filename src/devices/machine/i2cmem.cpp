@@ -122,68 +122,68 @@ i2cmem_device::i2cmem_device(
 	assert(!clock);
 }
 
-i2c_x24c01_device::i2c_x24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i2c_x24c01_device::i2c_x24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_X24C01, tag, owner, clock, 0, 8, 0x80)
 {
 	set_devsel_address_low(true);
 }
 
-i2c_24c01_device::i2c_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i2c_24c01_device::i2c_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_24C01, tag, owner, clock, 0, 8, 0x80)
 {
 }
 
-i2c_pcf8570_device::i2c_pcf8570_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+i2c_pcf8570_device::i2c_pcf8570_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_PCF8570, tag, owner, clock, 0, 0, 0x100)
 {
 }
 
-i2c_pcd8572_device::i2c_pcd8572_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+i2c_pcd8572_device::i2c_pcd8572_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_PCD8572, tag, owner, clock, 0, 0, 0x80)
 {
 }
 
-i2c_pcf8582_device::i2c_pcf8582_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+i2c_pcf8582_device::i2c_pcf8582_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_PCF8582, tag, owner, clock, 0, 0, 0x100)
 {
 }
 
-i2c_24c02_device::i2c_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i2c_24c02_device::i2c_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_24C02, tag, owner, clock, 0, 8, 0x100)
 {
 }
 
-i2c_m24c02_device::i2c_m24c02_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+i2c_m24c02_device::i2c_m24c02_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_M24C02, tag, owner, clock, 0, 16, 0x100)
 {
 }
 
-i2c_24c04_device::i2c_24c04_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+i2c_24c04_device::i2c_24c04_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_24C04, tag, owner, clock, 0, 16, 0x200)
 {
 }
 
-i2c_x2404p_device::i2c_x2404p_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+i2c_x2404p_device::i2c_x2404p_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_X2404P, tag, owner, clock, 0x100, 8, 0x200)
 {
 }
 
-i2c_24c08_device::i2c_24c08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i2c_24c08_device::i2c_24c08_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_24C08, tag, owner, clock, 0, 16, 0x400)
 {
 }
 
-i2c_24c16_device::i2c_24c16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i2c_24c16_device::i2c_24c16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_24C16, tag, owner, clock, 0, 16, 0x800)
 {
 }
 
-i2c_24c64_device::i2c_24c64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+i2c_24c64_device::i2c_24c64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_24C64, tag, owner, clock, 0, 32, 0x2000)
 {
 }
 
-i2c_24c512_device::i2c_24c512_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+i2c_24c512_device::i2c_24c512_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	i2cmem_device(mconfig, I2C_24C512, tag, owner, clock, 0, 128, 0x10000)
 {
 }

@@ -505,7 +505,7 @@ void ron_state::ron(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, m_ay, 0); // T0 CLK from I8035 (not verified)
+	AY8910(config, m_ay); // T0 CLK from I8035 (not verified)
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.30);
 	m_ay->port_a_write_callback().set(FUNC(ron_state::ay_pa_w));
 }

@@ -182,7 +182,7 @@ inline void wangpc_mvc_device::set_irq(int state)
 //  wangpc_mvc_device - constructor
 //-------------------------------------------------
 
-wangpc_mvc_device::wangpc_mvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wangpc_mvc_device::wangpc_mvc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WANGPC_MVC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),

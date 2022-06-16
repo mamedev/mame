@@ -23,7 +23,7 @@ class i82371ab_device :  public southbridge_extended_device,
 {
 public:
 	// construction/destruction
-	i82371ab_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82371ab_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) override;

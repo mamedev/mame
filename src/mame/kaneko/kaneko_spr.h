@@ -65,7 +65,7 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			u32 clock);
+			const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -117,12 +117,7 @@ private:
 class kaneko_vu002_sprite_device : public kaneko16_sprite_device
 {
 public:
-	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: kaneko_vu002_sprite_device(mconfig, tag, owner, (u32)0)
-	{
-	}
-
-	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	void get_sprite_attributes(struct tempsprite_t *s, u16 attr) override;
 	int get_sprite_type(void) override{ return 0; }
 
@@ -136,12 +131,7 @@ DECLARE_DEVICE_TYPE(KANEKO_VU002_SPRITE, kaneko_vu002_sprite_device)
 class kaneko_kc002_sprite_device : public kaneko16_sprite_device
 {
 public:
-	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: kaneko_kc002_sprite_device(mconfig, tag, owner, (u32)0)
-	{
-	}
-
-	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	void get_sprite_attributes(struct tempsprite_t *s, u16 attr) override;
 	int get_sprite_type(void) override{ return 1; }
 

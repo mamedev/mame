@@ -41,7 +41,7 @@ INPUT_PORTS_END
 
 void vd56sp_state::vd56sp(machine_config &config)
 {
-	L2800(config, m_maincpu, 8'000'000); // L28L2800-38 (XTAL not readable)
+	L2800(config, m_maincpu, XTAL::u(8'000'000)); // L28L2800-38 (XTAL not readable)
 	m_maincpu->set_addrmap(AS_DATA, &vd56sp_state::exp_map);
 
 	// Modem IC: Conexant R6764-61

@@ -121,13 +121,13 @@ private:
 class bq4842_device : public bq48x2_device
 {
 public:
-	bq4842_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bq4842_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class bq4852_device : public bq48x2_device
 {
 public:
-	bq4852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bq4852_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(BQ4842, bq4842_device)

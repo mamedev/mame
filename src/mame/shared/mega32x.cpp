@@ -213,7 +213,7 @@ GFX check (these don't explicitly fails):
 DEFINE_DEVICE_TYPE(SEGA_32X_NTSC, sega_32x_ntsc_device, "sega_32x_ntsc", "Sega 32X (NTSC)")
 DEFINE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device,  "sega_32x_pal",  "Sega 32X (PAL)")
 
-sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, device_sound_interface(mconfig, *this)
@@ -230,12 +230,12 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type
 {
 }
 
-sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_32x_device(mconfig, SEGA_32X_NTSC, tag, owner, clock)
 {
 }
 
-sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega_32x_device(mconfig, SEGA_32X_PAL, tag, owner, clock)
 {
 }
@@ -1706,8 +1706,8 @@ void sega_32x_ntsc_device::device_add_mconfig(machine_config &config)
 	m_master_cpu->set_addrmap(AS_PROGRAM, &sega_32x_ntsc_device::sh2_main_map);
 	m_slave_cpu->set_addrmap(AS_PROGRAM, &sega_32x_ntsc_device::sh2_slave_map);
 
-	DAC_12BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, *this, 0.4, 0); // unknown DAC
-	DAC_12BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, *this, 0.4, 1); // unknown DAC
+	DAC_12BIT_R2R(config, m_ldac).add_route(ALL_OUTPUTS, *this, 0.4, 0); // unknown DAC
+	DAC_12BIT_R2R(config, m_rdac).add_route(ALL_OUTPUTS, *this, 0.4, 1); // unknown DAC
 }
 
 void sega_32x_pal_device::device_add_mconfig(machine_config &config)
@@ -1717,8 +1717,8 @@ void sega_32x_pal_device::device_add_mconfig(machine_config &config)
 	m_master_cpu->set_addrmap(AS_PROGRAM, &sega_32x_pal_device::sh2_main_map);
 	m_slave_cpu->set_addrmap(AS_PROGRAM, &sega_32x_pal_device::sh2_slave_map);
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, *this, 0.4, 0); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, *this, 0.4, 1); // unknown DAC
+	DAC_16BIT_R2R(config, m_ldac).add_route(ALL_OUTPUTS, *this, 0.4, 0); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac).add_route(ALL_OUTPUTS, *this, 0.4, 1); // unknown DAC
 }
 
 
@@ -1733,7 +1733,7 @@ void sega_32x_device::device_start()
 		set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 
-	m_stream = stream_alloc(2, 2, 48000 * 4);
+	m_stream = stream_alloc(2, 2, XTAL::u(48000) * 4);
 	m_32x_pwm_timer = timer_alloc(FUNC(sega_32x_device::handle_pwm_callback), this);
 
 	m_32x_dram0 = std::make_unique<uint16_t[]>(0x40000/2);

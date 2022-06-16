@@ -35,7 +35,7 @@ device_spc1000_card_interface::~device_spc1000_card_interface()
 //-------------------------------------------------
 //  spc1000_exp_device - constructor
 //-------------------------------------------------
-spc1000_exp_device::spc1000_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spc1000_exp_device::spc1000_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SPC1000_EXP_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_spc1000_card_interface>(mconfig, *this),
 	m_card(nullptr)

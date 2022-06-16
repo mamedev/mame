@@ -29,10 +29,10 @@ class arc_serial_midi_device:
 {
 public:
 	// construction/destruction
-	arc_serial_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_serial_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	arc_serial_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	arc_serial_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -54,7 +54,7 @@ class arc_serial_sampler_device: public arc_serial_midi_device
 {
 public:
 	// construction/destruction
-	arc_serial_sampler_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_serial_sampler_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::CAPTURE; }
 

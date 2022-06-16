@@ -529,8 +529,8 @@ static void vc4000_cart(device_slot_interface &device)
 void vc4000_state::vc4000(machine_config &config)
 {
 	/* basic machine hardware */
-//  S2650(config, m_maincpu, 865000);        /* 3550000/4, 3580000/3, 4430000/3 */
-	S2650(config, m_maincpu, 3546875/4);
+//  S2650(config, m_maincpu, XTAL::u(865000));        /* 3550000/4, 3580000/3, 4430000/3 */
+	S2650(config, m_maincpu, XTAL::u(3546875)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vc4000_state::vc4000_mem);
 	m_maincpu->sense_handler().set(FUNC(vc4000_state::vc4000_vsync_r));
 	m_maincpu->set_periodic_int(FUNC(vc4000_state::vc4000_video_line), attotime::from_hz(312*53));  // GOLF needs this exact value
@@ -548,7 +548,7 @@ void vc4000_state::vc4000(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	VC4000_SND(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	VC4000_SND(config, m_custom).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* quickload */
 	QUICKLOAD(config, "quickload", "pgm,tvc").set_load_callback(FUNC(vc4000_state::quickload_cb));

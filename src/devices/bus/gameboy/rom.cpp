@@ -50,7 +50,7 @@ namespace {
 class sachen_mmc_device_base : public mbc_dual_uniform_device_base
 {
 protected:
-	sachen_mmc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+	sachen_mmc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock) :
 		mbc_dual_uniform_device_base(mconfig, type, tag, owner, clock),
 		m_bank_mux_rom(0U),
 		m_bank_sel_rom{ 0U, 0U }

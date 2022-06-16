@@ -572,12 +572,12 @@ void psion_state::psion_2lines(machine_config &config)
 	PALETTE(config, "palette", FUNC(psion_state::psion_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_psion);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc);
 	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beep, XTAL::u(3250)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	NVRAM(config, "nvram1").set_custom_handler(FUNC(psion_state::nvram_init)); // sys_regs
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
@@ -585,8 +585,8 @@ void psion_state::psion_2lines(machine_config &config)
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(psion_state::nmi_timer), attotime::from_seconds(1));
 
 	/* Datapack */
-	PSION_DATAPACK(config, m_pack1, 0);
-	PSION_DATAPACK(config, m_pack2, 0);
+	PSION_DATAPACK(config, m_pack1);
+	PSION_DATAPACK(config, m_pack2);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "pack_list").set_original("psion2");

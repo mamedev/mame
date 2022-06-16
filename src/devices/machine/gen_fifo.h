@@ -133,7 +133,7 @@ public:
 	}
 
 protected:
-	generic_fifo_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	generic_fifo_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~generic_fifo_device_base() = default;
 
 	/* These used to build memory accessors that can be put in a
@@ -205,7 +205,7 @@ private:
 class generic_fifo_u32_device : public generic_fifo_device_base<u32>
 {
 public:
-	generic_fifo_u32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_fifo_u32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~generic_fifo_u32_device() = default;
 
 	u32 read() { return read_gen<u32>(); }

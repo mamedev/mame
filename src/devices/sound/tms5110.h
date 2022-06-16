@@ -33,7 +33,7 @@ public:
 	static constexpr uint8_t CMD_READ_BRANCH = 12;  /*    1     1     0     x  |     1    */
 	static constexpr uint8_t CMD_TEST_TALK   = 14;  /*    1     1     1     x  |     3    */
 
-	tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto m0() { return m_m0_cb.bind(); }
 	auto m1() { return m_m1_cb.bind(); }
@@ -50,7 +50,7 @@ public:
 	int romclk_hack_r();
 
 protected:
-	tms5110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
+	tms5110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -187,56 +187,56 @@ private:
 class tms5100_device : public tms5110_device
 {
 public:
-	tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tmc0281_device : public tms5110_device
 {
 public:
-	tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms5100a_device : public tms5110_device
 {
 public:
-	tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tmc0281d_device : public tms5110_device
 {
 public:
-	tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class cd2801_device : public tms5110_device
 {
 public:
-	cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class cd2802_device : public tms5110_device
 {
 public:
-	cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class tms5110a_device : public tms5110_device
 {
 public:
-	tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class m58817_device : public tms5110_device
 {
 public:
-	m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t status_r();
 };
@@ -259,7 +259,7 @@ DECLARE_DEVICE_TYPE(M58817,   m58817_device)
 class tmsprom_device : public device_t
 {
 public:
-	tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_region(const char *region) { m_prom.set_tag(region); }
 	void set_rom_size(uint32_t rom_size) { m_rom_size = rom_size; }

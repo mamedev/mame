@@ -43,7 +43,7 @@ device_comx_expansion_card_interface::device_comx_expansion_card_interface(const
 //  comx_expansion_slot_device - constructor
 //-------------------------------------------------
 
-comx_expansion_slot_device::comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+comx_expansion_slot_device::comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COMX_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_comx_expansion_card_interface>(mconfig, *this),
 	m_write_irq(*this), m_card(nullptr)

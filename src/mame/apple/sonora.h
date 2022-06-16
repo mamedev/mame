@@ -19,12 +19,7 @@ class sonora_device :  public device_t
 {
 public:
 	// construction/destruction
-	sonora_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: sonora_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
-	sonora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sonora_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// interface routines
 	auto pb4_callback() { return write_pb4.bind(); }

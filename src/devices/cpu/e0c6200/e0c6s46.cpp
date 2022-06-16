@@ -48,7 +48,7 @@ void e0c6s46_device::e0c6s46_data(address_map &map)
 
 
 // device definitions
-e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: e0c6200_cpu_device(mconfig, E0C6S46, tag, owner, clock, address_map_constructor(FUNC(e0c6s46_device::e0c6s46_program), this), address_map_constructor(FUNC(e0c6s46_device::e0c6s46_data), this))
 	, m_vram1(*this, "vram1")
 	, m_vram2(*this, "vram2")

@@ -44,7 +44,7 @@
 class hlcd0515_device : public device_t
 {
 public:
-	hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto write_cols() { return m_write_cols.bind(); } // COL/ROW pins (offset for ROW)
@@ -56,7 +56,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(data_r) { return m_dataout; }
 
 protected:
-	hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax);
+	hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 colmax);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -92,7 +92,7 @@ protected:
 class hlcd0569_device : public hlcd0515_device
 {
 public:
-	hlcd0569_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hlcd0569_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void set_control() override;
@@ -101,13 +101,13 @@ protected:
 class hlcd0530_device : public hlcd0515_device
 {
 public:
-	hlcd0530_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hlcd0530_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class hlcd0601_device : public hlcd0515_device
 {
 public:
-	hlcd0601_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hlcd0601_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

@@ -18,7 +18,7 @@
 class xt446_device : public device_t, public device_mixer_interface
 {
 public:
-	xt446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	xt446_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void midi_w(int state) { m_midi_serial->rx_w(state); }
 

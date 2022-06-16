@@ -557,10 +557,10 @@ void ajax_state::ajax(machine_config &config)
 	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2 / 4);    // 052001 12/4 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &ajax_state::main_map);
 
-	HD6309E(config, m_subcpu, 3000000); // ?
+	HD6309E(config, m_subcpu, XTAL::u(3000000)); // ?
 	m_subcpu->set_addrmap(AS_PROGRAM, &ajax_state::sub_map);
 
-	Z80(config, m_audiocpu, 3579545);  // 3.58 MHz
+	Z80(config, m_audiocpu, XTAL::u(3579545));  // 3.58 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ajax_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
@@ -578,19 +578,19 @@ void ajax_state::ajax(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(ajax_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_subcpu, M6809_IRQ_LINE);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(ajax_state::sprite_callback));
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K051316(config, m_k051316, 0);
+	K051316(config, m_k051316);
 	m_k051316->set_palette(m_palette);
 	m_k051316->set_bpp(7);
 	m_k051316->set_zoom_callback(FUNC(ajax_state::zoom_callback));
@@ -601,16 +601,16 @@ void ajax_state::ajax(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL::u(3579545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	K007232(config, m_k007232[0], 3579545);
+	K007232(config, m_k007232[0], XTAL::u(3579545));
 	m_k007232[0]->port_write().set(FUNC(ajax_state::volume_callback0));
 	m_k007232[0]->add_route(0, "lspeaker", 0.20);
 	m_k007232[0]->add_route(0, "rspeaker", 0.20);
 	m_k007232[0]->add_route(1, "lspeaker", 0.20);
 	m_k007232[0]->add_route(1, "rspeaker", 0.20);
 
-	K007232(config, m_k007232[1], 3579545);
+	K007232(config, m_k007232[1], XTAL::u(3579545));
 	m_k007232[1]->port_write().set(FUNC(ajax_state::volume_callback1));
 	m_k007232[1]->add_route(0, "lspeaker", 0.50);
 	m_k007232[1]->add_route(1, "rspeaker", 0.50);

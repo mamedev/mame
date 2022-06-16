@@ -124,7 +124,7 @@ DEFINE_DEVICE_TYPE(ATARI_MOTION_OBJECTS, atari_motion_objects_device, "atarimo",
 //  atari_motion_objects_device - constructor
 //-------------------------------------------------
 
-atari_motion_objects_device::atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+atari_motion_objects_device::atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sprite16_device_ind16(mconfig, ATARI_MOTION_OBJECTS, tag, owner)
 	, device_video_interface(mconfig, *this)
 	, m_tilewidth(0)

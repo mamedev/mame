@@ -19,7 +19,7 @@ class remote488_device : public device_t,
 {
 public:
 	// construction/destruction
-	remote488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	remote488_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_ieee488_interface overrides
 	virtual void ieee488_eoi(int state) override;

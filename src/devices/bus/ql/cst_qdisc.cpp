@@ -51,7 +51,7 @@ const tiny_rom_entry *cst_ql_disc_interface_device::device_rom_region() const
 //  cst_ql_disc_interface_device - constructor
 //-------------------------------------------------
 
-cst_ql_disc_interface_device::cst_ql_disc_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cst_ql_disc_interface_device::cst_ql_disc_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CST_QL_DISC_INTERFACE, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this)
 {

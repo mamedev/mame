@@ -1891,7 +1891,7 @@ void fm7_state::fm7(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	AY8913(config, m_psg, 4.9152_MHz_XTAL / 4).add_route(ALL_OUTPUTS,"mono", 1.00);
-	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, "beeper", XTAL::u(1200)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
@@ -1944,7 +1944,7 @@ void fm7_state::fm8(machine_config &config)
 	config.set_perfect_quantum(m_sub);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper, XTAL::u(1200)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
@@ -1998,7 +1998,7 @@ void fm77_state::fm77av(machine_config &config)
 	m_ym->port_a_read_callback().set_ioport("joy1");
 	m_ym->port_b_read_callback().set_ioport("joy2");
 	m_ym->add_route(ALL_OUTPUTS,"mono", 1.00);
-	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, "beeper", XTAL::u(1200)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_MACHINE_START_OVERRIDE(fm77_state,fm77av)
 
@@ -2047,21 +2047,21 @@ void fm77_state::fm77av(machine_config &config)
 void fm11_state::fm11(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 2000000);  // 2MHz 68B09E
+	MC6809E(config, m_maincpu, XTAL::u(2000000));  // 2MHz 68B09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &fm11_state::fm11_mem);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(fm11_state::irq_ack));
 
-	MC6809(config, m_sub, 8000000);  // 2MHz 68B09
+	MC6809(config, m_sub, XTAL::u(8000000));  // 2MHz 68B09
 	m_sub->set_addrmap(AS_PROGRAM, &fm11_state::fm11_sub_mem);
 	m_sub->set_irq_acknowledge_callback(FUNC(fm11_state::sub_irq_ack));
 	config.set_perfect_quantum(m_sub);
 
-	I8088(config, m_x86, 8000000);  // 8MHz i8088
+	I8088(config, m_x86, XTAL::u(8000000));  // 8MHz i8088
 	m_x86->set_addrmap(AS_PROGRAM, &fm11_state::fm11_x86_mem);
 	m_x86->set_addrmap(AS_IO, &fm11_state::fm11_x86_io);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper, XTAL::u(1200)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_MACHINE_START_OVERRIDE(fm11_state,fm11)
 
@@ -2072,7 +2072,7 @@ void fm11_state::fm11(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(16128000, 1024, 0, 640, 262, 0, 200);
+	m_screen->set_raw(XTAL::u(16128000), 1024, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(FUNC(fm11_state::screen_update_fm7));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
@@ -2103,23 +2103,23 @@ void fm11_state::fm11(machine_config &config)
 void fm7_state::fm16beta(machine_config &config)
 {
 	/* basic machine hardware */
-	I8086(config, m_maincpu, 8000000);  // 8MHz i8086
+	I8086(config, m_maincpu, XTAL::u(8000000));  // 8MHz i8086
 	m_maincpu->set_addrmap(AS_PROGRAM, &fm7_state::fm16_mem);
 	m_maincpu->set_addrmap(AS_IO, &fm7_state::fm16_io);
 
-	MC6809(config, m_sub, 8000000);
+	MC6809(config, m_sub, XTAL::u(8000000));
 	m_sub->set_irq_acknowledge_callback(FUNC(fm7_state::sub_irq_ack));
 	m_sub->set_addrmap(AS_PROGRAM, &fm7_state::fm16_sub_mem);
 	config.set_perfect_quantum(m_sub);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper, XTAL::u(1200)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(16128000, 1024, 0, 640, 262, 0, 200);
+	m_screen->set_raw(XTAL::u(16128000), 1024, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(FUNC(fm7_state::screen_update_fm7));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);

@@ -411,7 +411,7 @@ void ppmast93_state::ppmast93(machine_config &config)
 
 	YM2413(config, "ymsnd", 5_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
 }
 
 ROM_START( ppmast93 )

@@ -24,12 +24,12 @@ DEFINE_DEVICE_TYPE(A2EAUXSLOT_SLOT, a2eauxslot_slot_device, "a2eauxslot_slot", "
 //-------------------------------------------------
 //  a2eauxslot_slot_device - constructor
 //-------------------------------------------------
-a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a2eauxslot_slot_device(mconfig, A2EAUXSLOT_SLOT, tag, owner, clock)
 {
 }
 
-a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_single_card_slot_interface<device_a2eauxslot_card_interface>(mconfig, *this)
 	, m_a2eauxslot(*this, finder_base::DUMMY_TAG)
@@ -57,12 +57,12 @@ DEFINE_DEVICE_TYPE(A2EAUXSLOT, a2eauxslot_device, "a2eauxslot", "Apple IIe AUX B
 //  a2eauxslot_device - constructor
 //-------------------------------------------------
 
-a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a2eauxslot_device(mconfig, A2EAUXSLOT, tag, owner, clock)
 {
 }
 
-a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_out_irq_cb(*this)

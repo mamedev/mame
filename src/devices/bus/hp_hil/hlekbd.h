@@ -17,7 +17,7 @@ class hle_hp_ipc_device
 		, protected device_matrix_keyboard_interface<15U>
 {
 public:
-	hle_hp_ipc_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	hle_hp_ipc_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_reset() override;
@@ -50,7 +50,7 @@ class hle_hp_itf_device
 		, protected device_matrix_keyboard_interface<15U>
 {
 public:
-	hle_hp_itf_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	hle_hp_itf_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;
 

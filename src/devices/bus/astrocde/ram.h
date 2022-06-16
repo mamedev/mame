@@ -16,7 +16,7 @@ class astrocade_blueram_4k_device : public device_t, public device_astrocade_exp
 {
 public:
 	// construction/destruction
-	astrocade_blueram_4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	astrocade_blueram_4k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -33,7 +33,7 @@ public:
 	void portb_w(uint8_t data);
 
 protected:
-	astrocade_blueram_4k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	astrocade_blueram_4k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override { m_ram.resize(0x1000); save_item(NAME(m_ram)); }
 	virtual void device_reset() override { }
@@ -51,7 +51,7 @@ class astrocade_blueram_16k_device : public astrocade_blueram_4k_device
 {
 public:
 	// construction/destruction
-	astrocade_blueram_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	astrocade_blueram_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override { m_ram.resize(0x4000); save_item(NAME(m_ram)); }
 };
@@ -62,7 +62,7 @@ class astrocade_blueram_32k_device : public astrocade_blueram_4k_device
 {
 public:
 	// construction/destruction
-	astrocade_blueram_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	astrocade_blueram_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override { m_ram.resize(0x8000); save_item(NAME(m_ram)); }
 };
@@ -73,7 +73,7 @@ class astrocade_viper_sys1_device : public device_t, public device_astrocade_exp
 {
 public:
 	// construction/destruction
-	astrocade_viper_sys1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	astrocade_viper_sys1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -97,7 +97,7 @@ class astrocade_whiteram_device : public device_t, public device_astrocade_exp_i
 {
 public:
 	// construction/destruction
-	astrocade_whiteram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	astrocade_whiteram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -121,7 +121,7 @@ class astrocade_rl64ram_device : public device_t, public device_astrocade_exp_in
 {
 public:
 	// construction/destruction
-	astrocade_rl64ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	astrocade_rl64ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;

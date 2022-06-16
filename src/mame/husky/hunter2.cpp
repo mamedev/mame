@@ -440,7 +440,7 @@ void hunter2_state::hunter2(machine_config &config)
 	rtc.set_mode24(0); // 12 hour
 	rtc.set_day1(1);   // monday
 
-	nsc810_device &iotimer(NSC810(config, "iotimer", 0, 8_MHz_XTAL / 2, 8_MHz_XTAL / 2));
+	nsc810_device &iotimer(NSC810(config, "iotimer", 8_MHz_XTAL / 2, 8_MHz_XTAL / 2));
 	iotimer.portA_read_callback().set(FUNC(hunter2_state::keyboard_r));
 	iotimer.portB_read_callback().set(FUNC(hunter2_state::portb_r));
 	iotimer.portB_write_callback().set(FUNC(hunter2_state::keyboard_w));

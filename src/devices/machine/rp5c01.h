@@ -38,7 +38,7 @@ class rp5c01_device :   public device_t,
 {
 public:
 	// construction/destruction
-	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_alarm_callback() { return m_out_alarm_cb.bind(); }
 	void remove_battery() { m_battery_backed = false; nvram_enable_backup(false); }
@@ -50,7 +50,7 @@ public:
 
 protected:
 	// construction/destruction
-	rp5c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	rp5c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -98,7 +98,7 @@ class tc8521_device : public rp5c01_device
 {
 public:
 	// construction/destruction
-	tc8521_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc8521_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

@@ -51,7 +51,7 @@ Control registers
 
 DEFINE_DEVICE_TYPE(PC080SN, pc080sn_device, "pc080sn", "Taito PC080SN")
 
-pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PC080SN, tag, owner, clock),
 	m_ram(nullptr),
 	m_gfxnum(0),

@@ -18,7 +18,7 @@ class se3208_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callback configuration
 	auto machinex_cb() { return m_machinex_cb.bind(); }

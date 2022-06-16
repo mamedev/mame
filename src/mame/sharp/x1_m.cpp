@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(X1_KEYBOARD, x1_keyboard_device, "x1_keyboard", "Sharp X1 Key
 //  z80ctc_device - constructor
 //-------------------------------------------------
 
-x1_keyboard_device::x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+x1_keyboard_device::x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, X1_KEYBOARD, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
 {

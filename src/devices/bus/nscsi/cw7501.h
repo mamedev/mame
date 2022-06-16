@@ -12,12 +12,12 @@
 class cw7501_device : public device_t, public nscsi_slot_card_interface
 {
 public:
-	cw7501_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cw7501_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	cw7501_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	cw7501_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -38,7 +38,7 @@ private:
 class cdr4210_device : public cw7501_device
 {
 public:
-	cdr4210_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cdr4210_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 

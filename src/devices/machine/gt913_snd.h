@@ -25,7 +25,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 	// construction/destruction
-	gt913_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	gt913_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void data_w(offs_t offset, u16 data);
 	u16 data_r(offs_t offset);

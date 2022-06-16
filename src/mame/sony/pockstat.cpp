@@ -1003,7 +1003,7 @@ void pockstat_state::pockstat(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pockstat_cart", "gme");

@@ -37,7 +37,7 @@ class lc7535_device : public device_t
 {
 public:
 	// construction/destruction
-	lc7535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	lc7535_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	typedef device_delegate<void (int attenuation_right, int attenuation_left, bool loudness)> volume_delegate;
 

@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(TECMO_SPRITE, tecmo_spr_device, "tecmo_spr", "Tecmo Chained Sprites")
 
-tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tecmo_spr_device::tecmo_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TECMO_SPRITE, tag, owner, clock)
 	, m_bootleg(false)
 	, m_yoffset(0)

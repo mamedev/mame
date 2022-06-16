@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "glukrs.h"
 
-glukrs_device::glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+glukrs_device::glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, GLUKRS, tag, owner, clock),
 	  device_rtc_interface(mconfig, *this),
 	  m_nvram(*this, "nvram") {}

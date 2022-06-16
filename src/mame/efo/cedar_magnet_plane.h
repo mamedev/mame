@@ -15,7 +15,7 @@ class cedar_magnet_plane_device : public device_t, public cedar_magnet_board_int
 {
 public:
 	// construction/destruction
-	cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void plane_portcc_w(u8 data);
 	void plane_portcd_w(u8 data);

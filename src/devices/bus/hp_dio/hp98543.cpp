@@ -56,7 +56,7 @@ void dio16_98543_device::device_add_mconfig(machine_config &config)
 	topcat3.set_planemask(8);
 	topcat3.irq_out_cb().set(FUNC(dio16_98543_device::int3_w));
 
-	NEREID(config, m_nereid, 0);
+	NEREID(config, m_nereid);
 }
 
 const tiny_rom_entry *dio16_98543_device::device_rom_region() const
@@ -76,12 +76,12 @@ device_memory_interface::space_config_vector dio16_98543_device::memory_space_co
 		};
 }
 
-dio16_98543_device::dio16_98543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dio16_98543_device::dio16_98543_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dio16_98543_device(mconfig, HPDIO_98543, tag, owner, clock)
 {
 }
 
-dio16_98543_device::dio16_98543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dio16_98543_device::dio16_98543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this),
 	device_memory_interface(mconfig, *this),

@@ -7,7 +7,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(SDK85_I8755, sdk85exp_i8755_device, "sdk85exp_i8755", "SDK-85 PROM I/O Expansion (Intel 8755)")
 
-sdk85exp_i8755_device::sdk85exp_i8755_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sdk85exp_i8755_device::sdk85exp_i8755_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SDK85_I8755, tag, owner, clock)
 	, device_sdk85_romexp_card_interface(mconfig, *this)
 	, m_i8755(*this, "i8755")

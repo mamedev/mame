@@ -38,7 +38,7 @@ device_tmc600_eurobus_card_interface::device_tmc600_eurobus_card_interface(const
 //  tmc600_eurobus_slot_device - constructor
 //-------------------------------------------------
 
-tmc600_eurobus_slot_device::tmc600_eurobus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tmc600_eurobus_slot_device::tmc600_eurobus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TMC600_EUROBUS_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_tmc600_eurobus_card_interface>(mconfig, *this)
 {

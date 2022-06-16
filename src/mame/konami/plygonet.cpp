@@ -1037,7 +1037,7 @@ void polygonet_state::plygonet(machine_config &config)
 	m_dsp->set_addrmap(AS_DATA, &polygonet_state::dsp_data_map);
 	m_dsp->portc_cb().set(FUNC(polygonet_state::dsp_portc_write));
 
-	Z80(config, m_audiocpu, 8000000);
+	Z80(config, m_audiocpu, XTAL::u(8000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &polygonet_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); // occasional lockup in-game otherwise
@@ -1062,7 +1062,7 @@ void polygonet_state::plygonet(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_wrap(true);
 
 	// Sound hardware

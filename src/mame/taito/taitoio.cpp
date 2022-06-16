@@ -66,7 +66,7 @@ Newer version of the I/O chip ?
 
 DEFINE_DEVICE_TYPE(TC0040IOC, tc0040ioc_device, "tc0040ioc", "Taito TC0040IOC")
 
-tc0040ioc_device::tc0040ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tc0040ioc_device::tc0040ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TC0040IOC, tag, owner, clock),
 	m_port(0),
 	m_watchdog(*this, "watchdog"),
@@ -212,7 +212,7 @@ void tc0040ioc_device::portreg_w(u8 data)
 
 DEFINE_DEVICE_TYPE(TC0220IOC, tc0220ioc_device, "tc0220ioc", "Taito TC0220IOC")
 
-tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TC0220IOC, tag, owner, clock),
 	m_watchdog(*this, "watchdog"),
 	m_read_0_cb(*this),
@@ -330,7 +330,7 @@ void tc0220ioc_device::write(offs_t offset, u8 data)
 
 DEFINE_DEVICE_TYPE(TC0510NIO, tc0510nio_device, "tc0510nio", "Taito TC0510NIO")
 
-tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TC0510NIO, tag, owner, clock),
 	m_watchdog(*this, "watchdog"),
 	m_read_0_cb(*this),
@@ -472,7 +472,7 @@ void tc0510nio_device::halfword_wordswap_w(offs_t offset, u16 data, u16 mem_mask
 
 DEFINE_DEVICE_TYPE(TC0640FIO, tc0640fio_device, "tc0640fio", "Taito TC0640FIO")
 
-tc0640fio_device::tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tc0640fio_device::tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TC0640FIO, tag, owner, clock),
 	m_watchdog(*this, "watchdog"),
 	m_read_0_cb(*this),

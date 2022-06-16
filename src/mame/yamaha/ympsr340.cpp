@@ -278,7 +278,7 @@ void psr340_state::psr340(machine_config &config)
 	// SCI0 is externally clocked at the 31250 Hz MIDI rate
 	m_maincpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(31250 * 16));
 
-	KS0066_F05(config, m_lcdc, 0);
+	KS0066_F05(config, m_lcdc);
 	m_lcdc->set_lcd_size(2, 40);
 
 	/* video hardware */

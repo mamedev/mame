@@ -261,7 +261,7 @@ void vcs80_state::machine_start()
 void vcs80_state::vcs80(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5'000'000 /2); // U880D - Uses a LC oscillator rather than a crystal
+	Z80(config, m_maincpu, XTAL::u(5'000'000) /2); // U880D - Uses a LC oscillator rather than a crystal
 	m_maincpu->set_addrmap(AS_PROGRAM, &vcs80_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &vcs80_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
@@ -275,7 +275,7 @@ void vcs80_state::vcs80(machine_config &config)
 	m_display->set_segmask(0xff, 0xff);
 
 	/* devices */
-	Z80PIO(config, m_pio, 5'000'000 /2);
+	Z80PIO(config, m_pio, XTAL::u(5'000'000) /2);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->in_pa_callback().set(FUNC(vcs80_state::pio_pa_r));
 	m_pio->out_pb_callback().set(FUNC(vcs80_state::pio_pb_w));

@@ -37,10 +37,10 @@ class a2bus_midi_device:
 {
 public:
 	// construction/destruction
-	a2bus_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2bus_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -66,11 +66,11 @@ private:
 
 void a2bus_midi_device::device_add_mconfig(machine_config &config)
 {
-	PTM6840(config, m_ptm, 1021800);
-	m_ptm->set_external_clocks(1021800.0f, 1021800.0f, 1021800.0f);
+	PTM6840(config, m_ptm, XTAL::u(1021800));
+	m_ptm->set_external_clocks(XTAL::u(1021800), XTAL::u(1021800), XTAL::u(1021800));
 	m_ptm->irq_callback().set(FUNC(a2bus_midi_device::ptm_irq_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set(FUNC(a2bus_midi_device::acia_irq_w));
 
@@ -78,7 +78,7 @@ void a2bus_midi_device::device_add_mconfig(machine_config &config)
 
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(31250*16)));
 	acia_clock.signal_handler().set(FUNC(a2bus_midi_device::write_acia_clock));
 }
 
@@ -86,12 +86,12 @@ void a2bus_midi_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		a2bus_midi_device(mconfig, A2BUS_MIDI, tag, owner, clock)
 {
 }
 
-a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
 		m_ptm(*this, MIDI_PTM_TAG),

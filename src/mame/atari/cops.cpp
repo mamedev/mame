@@ -915,7 +915,7 @@ void cops_state::base(machine_config &config)
 {
 	M6502(config, m_maincpu, MAIN_CLOCK/2);
 
-	SONY_LDP1450(config, m_ld, 9600);
+	SONY_LDP1450(config, m_ld, XTAL::u(9600));
 	m_ld->set_screen("screen");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

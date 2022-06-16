@@ -11,7 +11,7 @@ Example of usage in a driver.
 
 In the machine config function:
 
-    generic_keyboard_device &kbd(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+    generic_keyboard_device &kbd(GENERIC_KEYBOARD(config, KEYBOARD_TAG));
     kbd.set_keyboard_callback(FUNC(xxx_state::kbd_put));
 
 In the code:
@@ -251,7 +251,7 @@ generic_keyboard_device::generic_keyboard_device(
 		device_type type,
 		char const *tag,
 		device_t *owner,
-		u32 clock)
+		const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "GENKBD_ROW0", "GENKBD_ROW1", "GENKBD_ROW2", "GENKBD_ROW3")
 	, m_config(*this, "GENKBD_CFG")
@@ -262,7 +262,7 @@ generic_keyboard_device::generic_keyboard_device(
 }
 
 
-generic_keyboard_device::generic_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+generic_keyboard_device::generic_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: generic_keyboard_device(mconfig, GENERIC_KEYBOARD, tag, owner, clock)
 {
 }

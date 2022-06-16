@@ -92,11 +92,11 @@ INPUT_PORTS_END
 
 void lms46_state::lms46(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &lms46_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &lms46_state::io_map);
 
-	MSM5832(config, m_rtc, 32768);
+	MSM5832(config, m_rtc, XTAL::u(32768));
 }
 
 

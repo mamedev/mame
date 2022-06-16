@@ -23,7 +23,7 @@ class awacs_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	awacs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	awacs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_out_cb() { return m_irq_out_cb.bind(); }
 	auto irq_in_cb() { return m_irq_in_cb.bind(); }

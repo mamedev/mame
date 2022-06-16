@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(OSA_MAESTROA, saitekosa_maestroa_device, "osa_maestroa", "Mae
 //  initialization
 //-------------------------------------------------
 
-saitekosa_maestroa_device::saitekosa_maestroa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+saitekosa_maestroa_device::saitekosa_maestroa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, OSA_MAESTROA, tag, owner, clock),
 	device_saitekosa_expansion_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu")

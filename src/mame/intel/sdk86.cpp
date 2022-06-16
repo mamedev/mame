@@ -185,7 +185,7 @@ void sdk86_state::sdk86(machine_config &config)
 	config.set_default_layout(layout_sdk86);
 
 	/* Devices */
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set(m_uart, FUNC(i8251_device::write_cts));
@@ -200,7 +200,7 @@ void sdk86_state::sdk86(machine_config &config)
 	usart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	usart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	I8279(config, m_kdc, 2500000);        // based on divider
+	I8279(config, m_kdc, XTAL::u(2500000));        // based on divider
 	m_kdc->out_sl_callback().set(FUNC(sdk86_state::scanlines_w)); // scan SL lines
 	m_kdc->out_disp_callback().set(FUNC(sdk86_state::digit_w));   // display A&B
 	m_kdc->in_rl_callback().set(FUNC(sdk86_state::kbd_r));        // kbd RL lines

@@ -19,8 +19,8 @@
 #include "formats/ap_dsk35.h"
 #include "layout/generic.h"
 
-static constexpr u32 C7M  = 7833600;
-static constexpr u32 C15M = (C7M * 2);
+static constexpr XTAL C7M  = XTAL::u(7833600);
+static constexpr XTAL C15M = (C7M * 2);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -68,7 +68,7 @@ void vasp_device::map(address_map &map)
 void vasp_device::device_add_mconfig(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	m_screen->set_raw(XTAL::u(25175000), 800, 0, 640, 525, 0, 480);
 	m_screen->set_size(1024, 768);
 	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
 	m_screen->set_screen_update(FUNC(vasp_device::screen_update));
@@ -97,7 +97,7 @@ void vasp_device::device_add_mconfig(machine_config &config)
 //  vasp_device - constructor
 //-------------------------------------------------
 
-vasp_device::vasp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vasp_device::vasp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VASP, tag, owner, clock),
 	  write_pb4(*this),
 	  write_pb5(*this),
@@ -575,13 +575,13 @@ void vasp_device::via_sync()
 	u64 cycle = m_maincpu->total_cycles();
 
 	// Get the number of the cycle the via is in at that time
-	u64 via_cycle = cycle * m_via1->clock() / m_maincpu->clock();
+	u64 via_cycle = cycle * m_via1->clock().value() / m_maincpu->clock().value();
 
 	// The access is going to start at via_cycle+1 and end at
 	// via_cycle+1.5, compute what that means in maincpu cycles (the
 	// +1 rounds up, since the clocks are too different to ever be
 	// synced).
-	u64 main_cycle = (via_cycle * 2 + 3) * m_maincpu->clock() / (2 * m_via1->clock()) + 1;
+	u64 main_cycle = (via_cycle * 2 + 3) * m_maincpu->clock().value() / (2 * m_via1->clock().value()) + 1;
 
 	// Finally adjust the main cpu icount as needed.
 	m_maincpu->adjust_icount(-int(main_cycle - cycle));

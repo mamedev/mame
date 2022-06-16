@@ -79,7 +79,7 @@ namespace bus::ti99::peb {
     Modern implementation
 */
 
-snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock):
 	  device_t(mconfig, TI99_BWG, tag, owner, clock),
 	  device_ti99_peribox_card_interface(mconfig, *this),
 	  m_DRQ(), m_IRQ(),
@@ -637,7 +637,7 @@ void snug_bwg_device::device_add_mconfig(machine_config& config)
 	m_crulatch8_15->q_out_cb<2>().set(FUNC(snug_bwg_device::dden_w));
 
 	// TODO: Replace this by the actual 74HC4538
-	TTL74123(config, m_motormf, 0);
+	TTL74123(config, m_motormf);
 	m_motormf->out_cb().set(FUNC(snug_bwg_device::motorona_w));
 	m_motormf->set_connection_type(TTL74123_GROUNDED);
 	m_motormf->set_resistor_value(RES_K(200));

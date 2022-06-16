@@ -30,7 +30,7 @@ void acorn_cass_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	CASSETTE(config, "cassette", 0);
+	CASSETTE(config, "cassette");
 	TIMER(config, "cass_c").configure_periodic(FUNC(acorn_cass_device::cass_c), attotime::from_hz(4800));
 	TIMER(config, "cass_p").configure_periodic(FUNC(acorn_cass_device::cass_p), attotime::from_hz(40000));
 }
@@ -44,7 +44,7 @@ void acorn_cass_device::device_add_mconfig(machine_config &config)
 //  acorn_cass_device - constructor
 //-------------------------------------------------
 
-acorn_cass_device::acorn_cass_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_cass_device::acorn_cass_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACORN_CASS, tag, owner, clock)
 	, device_acorn_bus_interface(mconfig, *this)
 	, m_cass(*this, "cassette")

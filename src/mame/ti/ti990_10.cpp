@@ -333,22 +333,22 @@ void ti990_10_state::ti990_10(machine_config &config)
 {
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
-	TI990_10(config, m_maincpu, 4000000);
+	TI990_10(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti990_10_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &ti990_10_state::io_map);
 
 	// VDT 911 terminal
-	VDT911(config, m_terminal, 0);
+	VDT911(config, m_terminal);
 	m_terminal->keyint_cb().set(FUNC(ti990_10_state::key_interrupt));
 	m_terminal->lineint_cb().set(FUNC(ti990_10_state::line_interrupt));
 
 	// Hard disk
-	ti990_hdc_device &hdc(TI990_HDC(config, "hdc", 0));
+	ti990_hdc_device &hdc(TI990_HDC(config, "hdc"));
 	hdc.set_memory_space(m_maincpu, AS_PROGRAM);
 	hdc.int_cb().set(FUNC(ti990_10_state::set_int13));
 
 	// Tape controller
-	tap_990_device &tpc(TI990_TAPE_CTRL(config, "tpc", 0));
+	tap_990_device &tpc(TI990_TAPE_CTRL(config, "tpc"));
 	tpc.set_memory_space(m_maincpu, AS_PROGRAM);
 	tpc.int_cb().set(FUNC(ti990_10_state::tape_interrupt));
 }

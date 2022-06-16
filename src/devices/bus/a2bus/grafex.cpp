@@ -46,10 +46,10 @@ class a2bus_grafex_device : public device_t,
 {
 public:
 	// construction/destruction
-	a2bus_grafex_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_grafex_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	a2bus_grafex_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_grafex_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -89,12 +89,12 @@ void a2bus_grafex_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_grafex_device::a2bus_grafex_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_grafex_device::a2bus_grafex_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_grafex_device(mconfig, A2BUS_GRAFEX, tag, owner, clock)
 {
 }
 
-a2bus_grafex_device::a2bus_grafex_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_grafex_device::a2bus_grafex_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_gdc(*this, "upd7220"),

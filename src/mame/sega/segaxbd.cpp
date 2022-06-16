@@ -279,12 +279,12 @@ ROMs:
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_PCB, segaxbd_state, "segaxbd_pcb", "Sega X-Board PCB")
 
-segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segaxbd_state(mconfig, SEGA_XBD_PCB, tag, owner, clock)
 {
 }
 
-segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_maincpu(*this, "maincpu")
 	, m_subcpu(*this, "subcpu")
@@ -1677,16 +1677,16 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 
 	MB3773(config, "watchdog");
 
-	SEGA_315_5248_MULTIPLIER(config, "multiplier_main", 0);
-	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx", 0);
-	SEGA_315_5249_DIVIDER(config, "divider_main", 0);
-	SEGA_315_5249_DIVIDER(config, "divider_subx", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_main");
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx");
+	SEGA_315_5249_DIVIDER(config, "divider_main");
+	SEGA_315_5249_DIVIDER(config, "divider_subx");
 
-	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1);
 	m_cmptimer_1->m68kint_callback().set(FUNC(segaxbd_state::timer_irq_w));
 	m_cmptimer_1->zint_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	SEGA_315_5250_COMPARE_TIMER(config, "cmptimer_subx", 0);
+	SEGA_315_5250_COMPARE_TIMER(config, "cmptimer_subx");
 
 	CXD1095(config, m_iochip[0]); // IC160
 	m_iochip[0]->in_porta_cb().set_ioport("IO0PORTA");
@@ -1712,11 +1712,11 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 	m_screen->set_screen_update(FUNC(segaxbd_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	SEGA_XBOARD_SPRITES(config, m_sprites, 0);
+	SEGA_XBOARD_SPRITES(config, m_sprites);
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 	m_segaic16vid->set_screen(m_screen);
 
-	SEGAIC16_ROAD(config, m_segaic16road, 0);
+	SEGAIC16_ROAD(config, m_segaic16road);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -1736,7 +1736,7 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_REGULAR, segaxbd_regular_state, "segaxbd_pcb_reg", "Sega X-Board PCB (regular)")
 
-segaxbd_regular_state::segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segaxbd_regular_state::segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segaxbd_state(mconfig, SEGA_XBD_REGULAR, tag, owner, clock)
 {
 }
@@ -1748,13 +1748,13 @@ void segaxbd_regular_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_xboard(machine_config &config)
 {
-	SEGA_XBD_REGULAR(config, "mainpcb", 0);
+	SEGA_XBD_REGULAR(config, "mainpcb");
 }
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_FD1094, segaxbd_fd1094_state, "segaxbd_pcb_fd1094", "Sega X-Board PCB (FD1094)")
 
-segaxbd_fd1094_state::segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segaxbd_fd1094_state::segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segaxbd_state(mconfig, SEGA_XBD_FD1094, tag, owner, clock)
 {
 }
@@ -1770,13 +1770,13 @@ void segaxbd_fd1094_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_xboard_fd1094(machine_config &config)
 {
-	SEGA_XBD_FD1094(config, "mainpcb", 0);
+	SEGA_XBD_FD1094(config, "mainpcb");
 }
 
 void segaxbd_new_state_double::sega_xboard_fd1094_double(machine_config &config)
 {
-	SEGA_XBD_FD1094(config, "mainpcb", 0);
-	SEGA_XBD_FD1094(config, "subpcb", 0);
+	SEGA_XBD_FD1094(config, "mainpcb");
+	SEGA_XBD_FD1094(config, "subpcb");
 
 	//config.m_perfect_cpu_quantum = subtag("mainpcb:maincpu"); // doesn't help..
 }
@@ -1788,7 +1788,7 @@ void segaxbd_new_state_double::sega_xboard_fd1094_double(machine_config &config)
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_ABURNER2_DEVICE, segaxbd_aburner2_state, "segaxbd_pcb_aburner2", "Sega X-Board PCB (After Burner)")
 
-segaxbd_aburner2_state::segaxbd_aburner2_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segaxbd_aburner2_state::segaxbd_aburner2_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segaxbd_state(mconfig, SEGA_XBD_ABURNER2_DEVICE, tag, owner, clock)
 {
 }
@@ -1803,13 +1803,13 @@ void segaxbd_aburner2_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_aburner2(machine_config &config)
 {
-	SEGA_XBD_ABURNER2_DEVICE(config, "mainpcb", 0);
+	SEGA_XBD_ABURNER2_DEVICE(config, "mainpcb");
 }
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_LASTSURV_FD1094, segaxbd_lastsurv_fd1094_state, "segaxbd_pcb_lastsurv_fd1094", "Sega X-Board PCB (Last Survivor, FD1094)")
 
-segaxbd_lastsurv_fd1094_state::segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segaxbd_lastsurv_fd1094_state::segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segaxbd_state(mconfig, SEGA_XBD_LASTSURV_FD1094, tag, owner, clock)
 {
 }
@@ -1836,13 +1836,13 @@ void segaxbd_lastsurv_fd1094_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_lastsurv_fd1094(machine_config &config)
 {
-	SEGA_XBD_LASTSURV_FD1094(config, "mainpcb", 0);
+	SEGA_XBD_LASTSURV_FD1094(config, "mainpcb");
 }
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_LASTSURV, segaxbd_lastsurv_state, "segaxbd_pcb_lastsurv", "Sega X-Board PCB (Last Survivor)")
 
-segaxbd_lastsurv_state::segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segaxbd_lastsurv_state::segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segaxbd_state(mconfig, SEGA_XBD_LASTSURV, tag, owner, clock)
 {
 }
@@ -1865,13 +1865,13 @@ void segaxbd_lastsurv_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_lastsurv(machine_config &config)
 {
-	SEGA_XBD_LASTSURV(config, "mainpcb", 0);
+	SEGA_XBD_LASTSURV(config, "mainpcb");
 }
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_SMGP_FD1094, segaxbd_smgp_fd1094_state, "segaxbd_pcb_smgp_fd1094", "Sega X-Board PCB (SMGP, FD1094)")
 
-segaxbd_smgp_fd1094_state::segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segaxbd_smgp_fd1094_state::segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segaxbd_state(mconfig, SEGA_XBD_SMGP_FD1094, tag, owner, clock)
 {
 }
@@ -1914,13 +1914,13 @@ void segaxbd_smgp_fd1094_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_smgp_fd1094(machine_config &config)
 {
-	SEGA_XBD_SMGP_FD1094(config, "mainpcb", 0);
+	SEGA_XBD_SMGP_FD1094(config, "mainpcb");
 }
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_SMGP, segaxbd_smgp_state, "segaxbd_pcb_smgp", "Sega X-Board PCB (SMGP)")
 
-segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segaxbd_state(mconfig, SEGA_XBD_SMGP, tag, owner, clock)
 {
 }
@@ -1959,13 +1959,13 @@ void segaxbd_smgp_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_smgp(machine_config &config)
 {
-	SEGA_XBD_SMGP(config, "mainpcb", 0);
+	SEGA_XBD_SMGP(config, "mainpcb");
 }
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_RASCOT, segaxbd_rascot_state, "segaxbd_pcb_rascot", "Sega X-Board PCB (Royal Ascot)")
 
-segaxbd_rascot_state::segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segaxbd_rascot_state::segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: segaxbd_state(mconfig, SEGA_XBD_RASCOT, tag, owner, clock)
 	, m_commram(*this, "commram")
 	, m_usart(*this, "usart")
@@ -1986,17 +1986,17 @@ void segaxbd_rascot_state::device_add_mconfig(machine_config &config)
 	config.device_remove("rspeaker");
 	m_cmptimer_1->zint_callback().set_nop();
 
-	cpu_device &commcpu(Z80(config, "commcpu", 8'000'000)); // clock unknown
+	cpu_device &commcpu(Z80(config, "commcpu", XTAL::u(8'000'000))); // clock unknown
 	commcpu.set_addrmap(AS_PROGRAM, &segaxbd_rascot_state::comm_map);
 
 	MB8421(config, m_commram).intl_callback().set_inputline("commcpu", INPUT_LINE_IRQ0);
 
-	I8251(config, m_usart, 2'000'000); // clock unknown
+	I8251(config, m_usart, XTAL::u(2'000'000)); // clock unknown
 }
 
 void segaxbd_new_state::sega_rascot(machine_config &config)
 {
-	SEGA_XBD_RASCOT(config, "mainpcb", 0);
+	SEGA_XBD_RASCOT(config, "mainpcb");
 }
 
 

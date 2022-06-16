@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE(ADC1038, adc1038_device, "adc1038", "ADC1038")
 
-adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ADC1038, tag, owner, clock)
 	, m_cycle(0)
 	, m_clk(0)

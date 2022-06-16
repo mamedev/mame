@@ -138,7 +138,7 @@ void vtech_innotv_innotabmax_state::main_map(address_map &map)
 
 void vtech_innotv_innotabmax_state::vtech_innotv_innotabmax(machine_config &config)
 {
-	ARM9(config, m_maincpu, 240000000); // unknown core type / frequency, but confirmed as ARM based
+	ARM9(config, m_maincpu, XTAL::u(240000000)); // unknown core type / frequency, but confirmed as ARM based
 	m_maincpu->set_addrmap(AS_PROGRAM, &vtech_innotv_innotabmax_state::main_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

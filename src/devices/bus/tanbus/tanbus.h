@@ -39,7 +39,7 @@ public:
 		set_fixed(false);
 		set_tanbus_slot(num);
 	}
-	tanbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tanbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration
 	void set_tanbus_slot(int num) { m_bus_num = num; }
@@ -65,7 +65,7 @@ class tanbus_device : public device_t
 {
 public:
 	// construction/destruction
-	tanbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tanbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~tanbus_device() { m_device_list.detach_all(); }
 
 	// inline configuration

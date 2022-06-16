@@ -31,7 +31,7 @@ class jpmtouch_device : public device_t,
 	public device_serial_interface
 {
 public:
-	jpmtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	jpmtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto rxd_handler() { return m_rxd_handler.bind(); }
 
@@ -40,7 +40,7 @@ public:
 	void touched(uint8_t x, uint8_t y);
 
 protected:
-	jpmtouch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	jpmtouch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

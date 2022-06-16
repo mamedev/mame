@@ -88,7 +88,7 @@ const tiny_rom_entry *a2bus_cmsscsi_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_cmsscsi_device::a2bus_cmsscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_cmsscsi_device::a2bus_cmsscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ncr5380(*this, SCSI_5380_TAG),
@@ -96,7 +96,7 @@ a2bus_cmsscsi_device::a2bus_cmsscsi_device(const machine_config &mconfig, device
 {
 }
 
-a2bus_cmsscsi_device::a2bus_cmsscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_cmsscsi_device::a2bus_cmsscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_cmsscsi_device(mconfig, A2BUS_CMSSCSI, tag, owner, clock)
 {
 }

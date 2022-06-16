@@ -82,16 +82,16 @@ emu::detail::device_registrar const registered_device_types;
 //  from the provided config
 //-------------------------------------------------
 
-device_t::device_t(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+device_t::device_t(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: m_type(type)
 	, m_owner(owner)
 	, m_next(nullptr)
 
-	, m_configured_clock(clock)
-	, m_unscaled_clock(clock)
-	, m_clock(clock)
+	, m_configured_clock(clock.dvalue())
+	, m_unscaled_clock(clock.dvalue())
+	, m_clock(clock.dvalue())
 	, m_clock_scale(1.0)
-	, m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock))
+	, m_attoseconds_per_clock(clock.disabled() ? 0 : HZ_TO_ATTOSECONDS(clock))
 
 	, m_machine_config(mconfig)
 	, m_input_defaults(nullptr)
@@ -234,7 +234,7 @@ void device_t::add_machine_configuration(machine_config &config)
 //  a device
 //-------------------------------------------------
 
-void device_t::set_clock(u32 clock)
+void device_t::internal_set_clock(u32 clock)
 {
 	m_configured_clock = clock;
 
@@ -242,7 +242,7 @@ void device_t::set_clock(u32 clock)
 	if ((clock & 0xff000000) == 0xff000000)
 		calculate_derived_clock();
 	else
-		set_unscaled_clock(clock);
+		internal_set_unscaled_clock(clock);
 }
 
 
@@ -365,7 +365,7 @@ void device_t::reset()
 //  unscaled clock
 //-------------------------------------------------
 
-void device_t::set_unscaled_clock(u32 clock, bool sync_on_new_clock_domain)
+void device_t::internal_set_unscaled_clock(u32 clock, bool sync_on_new_clock_domain)
 {
 	// do nothing if no actual change
 	if (clock == m_unscaled_clock)
@@ -420,7 +420,7 @@ void device_t::calculate_derived_clock()
 	if ((m_configured_clock & 0xff000000) == 0xff000000)
 	{
 		assert(m_owner != nullptr);
-		set_unscaled_clock(m_owner->m_clock * ((m_configured_clock >> 12) & 0xfff) / ((m_configured_clock >> 0) & 0xfff));
+		internal_set_unscaled_clock(m_owner->m_clock * ((m_configured_clock >> 12) & 0xfff) / ((m_configured_clock >> 0) & 0xfff));
 	}
 }
 

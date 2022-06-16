@@ -485,11 +485,11 @@ void jp_state::jps(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &jp_state::audio_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(jp_state::sound_int_cb));
 
-	LS157(config, m_adpcm_select, 0); // not labeled in manual; might even be a CD4019
+	LS157(config, m_adpcm_select); // not labeled in manual; might even be a CD4019
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	SPEAKER(config, "msmvol").front_center();
-	MSM5205(config, m_msm, 384'000); // not labeled in manual; clock unknown
+	MSM5205(config, m_msm, XTAL::u(384'000)); // not labeled in manual; clock unknown
 	m_msm->vck_callback().set(FUNC(jp_state::vck_w));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // unknown
 	m_msm->add_route(ALL_OUTPUTS, "msmvol", 1.0);

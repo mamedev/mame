@@ -206,7 +206,7 @@ void alinvade_state::vblank_irq(int state)
 void alinvade_state::alinvade(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 2000000);         /* ? MHz */
+	M6502(config, m_maincpu, XTAL::u(2000000));         /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &alinvade_state::alinvade_map);
 
 	/* video hardware */

@@ -44,7 +44,7 @@ void bbc_autocue_device::device_add_mconfig(machine_config &config)
 //  bbc_autocue_device - constructor
 //-------------------------------------------------
 
-bbc_autocue_device::bbc_autocue_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_autocue_device::bbc_autocue_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_AUTOCUE, tag, owner, clock)
 	, device_bbc_exp_interface(mconfig, *this)
 	, m_nvram(*this, "nvram")

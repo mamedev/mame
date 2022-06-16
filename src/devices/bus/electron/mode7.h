@@ -27,7 +27,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	// construction/destruction
-	electron_mode7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	electron_mode7_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(break_button);
 

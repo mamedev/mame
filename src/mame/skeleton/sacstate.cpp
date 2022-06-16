@@ -144,12 +144,12 @@ void sacstate_state::machine_start()
 void sacstate_state::sacstate(machine_config &config)
 {
 	/* basic machine hardware */
-	I8008(config, m_maincpu, 800000);
+	I8008(config, m_maincpu, XTAL::u(800000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sacstate_state::sacstate_mem);
 	m_maincpu->set_addrmap(AS_IO, &sacstate_state::sacstate_io);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(sacstate_state::kbd_put));
 }
 

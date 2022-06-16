@@ -297,7 +297,7 @@ GFXDECODE_END
 void photoply_state::photoply(machine_config &config)
 {
 	// Basic machine hardware
-	I486DX4(config, m_maincpu, 75000000); // I486DX4, 75 or 100 Mhz
+	I486DX4(config, m_maincpu, XTAL::u(75000000)); // I486DX4, 75 or 100 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &photoply_state::photoply_map);
 	m_maincpu->set_addrmap(AS_IO, &photoply_state::photoply_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
@@ -312,14 +312,14 @@ void photoply_state::photoply(machine_config &config)
 	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
 	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus"));
 	pcibus.set_device(5, FUNC(photoply_state::sis_pcm_r), FUNC(photoply_state::sis_pcm_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5446_device::screen_update));
 
-	cirrus_gd5446_device &vga(CIRRUS_GD5446(config, "vga", 0));
+	cirrus_gd5446_device &vga(CIRRUS_GD5446(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 
@@ -333,7 +333,7 @@ void photoply_state::photoply(machine_config &config)
 void photoply_state::photoply_dx4_100(machine_config &config)
 {
 	photoply(config);
-	m_maincpu->set_clock(100000000); // 100MHz
+	m_maincpu->set_clock(XTAL::u(100000000)); // 100MHz
 }
 
 ROM_START(photoply98sp)

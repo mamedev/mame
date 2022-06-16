@@ -106,7 +106,7 @@ enum : unsigned {
 // device type definition
 DEFINE_DEVICE_TYPE(HP2640_TAPE, hp2640_tape_device, "hp2640_tape" , "HP2640 tape subsystem")
 
-hp2640_tape_device::hp2640_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp2640_tape_device::hp2640_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HP2640_TAPE, tag, owner, clock)
 	, m_irq_handler(*this)
 	, m_led0_handler(*this)
@@ -225,7 +225,7 @@ void hp2640_tape_device::device_add_mconfig(machine_config &config)
 	for (unsigned i = 0; i < 2; i++) {
 		auto& finder = m_drives[ i ];
 
-		HP_DC100_TAPE(config , finder , 0);
+		HP_DC100_TAPE(config , finder);
 		// Acceleration: 2000 in/s^2
 		finder->set_acceleration(ACCELERATION);
 		// Slow speed: 10 ips, Fast speed: 60 ips

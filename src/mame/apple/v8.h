@@ -20,7 +20,7 @@ class v8_device :  public device_t
 {
 public:
 	// construction/destruction
-	v8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	v8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// interface routines
 	auto pb4_callback() { return write_pb4.bind(); }
@@ -53,7 +53,7 @@ protected:
 	u8 m_pseudovia_regs[256];
 	u32 *m_ram_ptr;
 
-	v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -115,7 +115,7 @@ private:
 class eagle_device : public v8_device
 {
 public:
-	eagle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	eagle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -132,7 +132,7 @@ private:
 class spice_device : public v8_device
 {
 public:
-	spice_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	spice_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 

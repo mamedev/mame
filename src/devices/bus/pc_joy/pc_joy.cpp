@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(PC_JOY, pc_joy_device, "pc_joy", "PC joystick port")
 
-pc_joy_device::pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pc_joy_device::pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PC_JOY, tag, owner, clock),
 	device_single_card_slot_interface<device_pc_joy_interface>(mconfig, *this),
 	m_dev(nullptr)
@@ -84,7 +84,7 @@ ioport_constructor pc_basic_joy_device::device_input_ports() const
 
 DEFINE_DEVICE_TYPE(PC_BASIC_JOY, pc_basic_joy_device, "pc_basic_joy", "PC basic joystick")
 
-pc_basic_joy_device::pc_basic_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pc_basic_joy_device::pc_basic_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PC_BASIC_JOY, tag, owner, clock),
 	device_pc_joy_interface(mconfig, *this),
 	m_btn(*this, "btn"),

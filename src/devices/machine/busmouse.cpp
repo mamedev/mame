@@ -118,7 +118,7 @@ ioport_constructor bus_mouse_device::device_input_ports() const
 //  bus_mouse_device - constructor
 //-------------------------------------------------
 
-bus_mouse_device::bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bus_mouse_device::bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BUS_MOUSE, tag, owner, clock)
 	, m_write_extint(*this)
 	, m_buttons(*this, "mouse_buttons")

@@ -608,7 +608,7 @@ void a5105_state::a5105(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 500).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, "beeper", XTAL::u(500)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	UPD7220(config, m_hgdc, XTAL(15'000'000) / 16); // unk clock
@@ -629,7 +629,7 @@ void a5105_state::a5105(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), true, true);
 	FLOPPY_CONNECTOR(config, "upd765a:0", a5105_floppies, "525qd", a5105_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765a:1", a5105_floppies, "525qd", a5105_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765a:2", a5105_floppies, "525qd", a5105_state::floppy_formats);

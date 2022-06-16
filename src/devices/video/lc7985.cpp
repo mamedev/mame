@@ -17,7 +17,7 @@ ROM_START( lc7985 )
   ROM_LOAD( "lc7985.bin", 0x0000, 0x1000,  BAD_DUMP CRC(fdc64160) SHA1(8e6b54f8fb7c4c15aab2e65dd1a44729b97423b1)) // from page 12 of the LC7985D datasheet
 ROM_END
 
-lc7985_device::lc7985_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lc7985_device::lc7985_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LC7985, tag, owner, clock),
 	  m_cgrom_region(*this, DEVICE_SELF)
 {

@@ -25,13 +25,13 @@ class a2bus_uthernet_device:
 {
 public:
 	// construction/destruction
-	a2bus_uthernet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_uthernet_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		a2bus_uthernet_device(mconfig, A2BUS_UTHERNET, tag, owner, clock)
 	{
 	}
 
 protected:
-	a2bus_uthernet_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_uthernet_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
 		m_netinf(*this, "cs8900a")

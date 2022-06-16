@@ -212,7 +212,7 @@ INPUT_PORTS_END
 void schess_state::schess(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 2000000); // approximation, no XTAL
+	M6502(config, m_maincpu, XTAL::u(2000000)); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &schess_state::main_map);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);

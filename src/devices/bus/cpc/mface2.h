@@ -37,7 +37,7 @@ class cpc_multiface2_device :   public device_t,
 {
 public:
 	// construction/destruction
-	cpc_multiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cpc_multiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	int multiface_hardware_enabled();
 	void multiface_rethink_memory();

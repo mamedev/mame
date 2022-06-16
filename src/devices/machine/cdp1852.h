@@ -30,7 +30,7 @@ class cdp1852_device : public device_t
 {
 public:
 	// construction/destruction
-	cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto mode_cb() { return m_read_mode.bind(); }
 	auto sr_cb() { return m_write_sr.bind(); }

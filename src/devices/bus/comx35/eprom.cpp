@@ -57,7 +57,7 @@ const tiny_rom_entry *comx_epr_device::device_rom_region() const
 //  comx_epr_device - constructor
 //-------------------------------------------------
 
-comx_epr_device::comx_epr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+comx_epr_device::comx_epr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COMX_EPR, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "f800"),

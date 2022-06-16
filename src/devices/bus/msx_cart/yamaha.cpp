@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(MSX_CART_SFG01, msx_cart_sfg01_device, "msx_cart_sfg01", "MSX
 DEFINE_DEVICE_TYPE(MSX_CART_SFG05, msx_cart_sfg05_device, "msx_cart_sfg05", "MSX Cartridge - SFG05")
 
 
-msx_cart_sfg_device::msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_sfg_device::msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_region_sfg(*this, "sfg")
@@ -31,13 +31,13 @@ msx_cart_sfg_device::msx_cart_sfg_device(const machine_config &mconfig, const de
 }
 
 
-msx_cart_sfg01_device::msx_cart_sfg01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_sfg01_device::msx_cart_sfg01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_cart_sfg_device(mconfig, MSX_CART_SFG01, tag, owner, clock)
 {
 }
 
 
-msx_cart_sfg05_device::msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_sfg05_device::msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_cart_sfg_device(mconfig, MSX_CART_SFG05, tag, owner, clock)
 {
 }

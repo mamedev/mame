@@ -28,7 +28,7 @@ public:
 
 protected:
 	// construction/destruction
-	nes_4score_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_4score_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -43,7 +43,7 @@ class nes_4score_p1p3_device : public nes_4score_device
 {
 public:
 	// construction/destruction
-	nes_4score_p1p3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_4score_p1p3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write(uint8_t data) override;
 
@@ -62,7 +62,7 @@ class nes_4score_p2p4_device : public nes_4score_device
 {
 public:
 	// construction/destruction
-	nes_4score_p2p4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_4score_p2p4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write(uint8_t data) override;
 

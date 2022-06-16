@@ -468,7 +468,7 @@ DEFINE_DEVICE_TYPE(PIC8259, pic8259_device, "pic8259", "Intel 8259 PIC")
 DEFINE_DEVICE_TYPE(V5X_ICU, v5x_icu_device, "v5x_icu", "NEC V5X ICU")
 DEFINE_DEVICE_TYPE(MK98PIC, mk98pic_device, "mk98pic", "Elektronika MK-98 PIC")
 
-pic8259_device::pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+pic8259_device::pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_int_func(*this)
 	, m_in_sp_func(*this)
@@ -479,17 +479,17 @@ pic8259_device::pic8259_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic8259_device(mconfig, PIC8259, tag, owner, clock)
 {
 }
 
-v5x_icu_device::v5x_icu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+v5x_icu_device::v5x_icu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic8259_device(mconfig, V5X_ICU, tag, owner, clock)
 {
 }
 
-mk98pic_device::mk98pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mk98pic_device::mk98pic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic8259_device(mconfig, MK98PIC, tag, owner, clock)
 {
 }

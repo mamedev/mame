@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(KBDC8042, kbdc8042_device, "kbdc8042", "8042 Keyboard/Mouse C
 //  kbdc8042_device - constructor
 //-------------------------------------------------
 
-kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KBDC8042, tag, owner, clock)
 	, m_keyboard_dev(*this, "at_keyboard")
 	, m_mousex_port(*this, "MOUSEX")

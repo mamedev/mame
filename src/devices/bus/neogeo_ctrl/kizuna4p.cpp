@@ -95,7 +95,7 @@ ioport_constructor neogeo_kizuna4p_device::device_input_ports() const
 //  neogeo_kizuna4p_device - constructor
 //-------------------------------------------------
 
-neogeo_kizuna4p_device::neogeo_kizuna4p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_kizuna4p_device::neogeo_kizuna4p_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NEOGEO_KIZ4P, tag, owner, clock),
 	device_neogeo_ctrl_edge_interface(mconfig, *this),
 	m_joy(*this, "JOY%u", 1U),

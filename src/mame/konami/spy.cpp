@@ -511,13 +511,13 @@ void spy_state::spy(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0); // 051961 on schematics
+	K052109(config, m_k052109); // 051961 on schematics
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(spy_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(spy_state::sprite_callback));
@@ -527,16 +527,16 @@ void spy_state::spy(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3579545));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL::u(3579545)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	K007232(config, m_k007232_1, 3579545);
+	K007232(config, m_k007232_1, XTAL::u(3579545));
 	m_k007232_1->port_write().set(FUNC(spy_state::volume_callback0));
 	m_k007232_1->add_route(0, "mono", 0.20);
 	m_k007232_1->add_route(1, "mono", 0.20);
 
-	K007232(config, m_k007232_2, 3579545);
+	K007232(config, m_k007232_2, XTAL::u(3579545));
 	m_k007232_2->port_write().set(FUNC(spy_state::volume_callback1));
 	m_k007232_2->add_route(0, "mono", 0.20);
 	m_k007232_2->add_route(1, "mono", 0.20);

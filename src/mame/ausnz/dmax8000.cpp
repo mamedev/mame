@@ -155,7 +155,7 @@ static void floppies(device_slot_interface &device)
 void dmax8000_state::dmax8000(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4'000'000); // no idea what crystal is used, but 4MHz clock is confirmed
+	Z80(config, m_maincpu, XTAL::u(4'000'000)); // no idea what crystal is used, but 4MHz clock is confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &dmax8000_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dmax8000_state::io_map);
 
@@ -170,7 +170,7 @@ void dmax8000_state::dmax8000(machine_config &config)
 	ctc.set_clk<2>(4_MHz_XTAL / 2); // 2MHz
 	ctc.zc_callback<2>().set("dart1", FUNC(z80dart_device::rxtxcb_w));
 
-	z80dart_device& dart1(Z80DART(config, "dart1", 4'000'000)); // A = terminal; B = aux
+	z80dart_device& dart1(Z80DART(config, "dart1", XTAL::u(4'000'000))); // A = terminal; B = aux
 	dart1.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	dart1.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	dart1.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -181,20 +181,20 @@ void dmax8000_state::dmax8000(machine_config &config)
 	rs232.ri_handler().set("dart1", FUNC(z80dart_device::ria_w));
 	rs232.cts_handler().set("dart1", FUNC(z80dart_device::ctsa_w));
 
-	Z80DART(config, "dart2", 4'000'000); // RS232 ports
+	Z80DART(config, "dart2", XTAL::u(4'000'000)); // RS232 ports
 
-	z80pio_device& pio1(Z80PIO(config, "pio1", 4'000'000));
+	z80pio_device& pio1(Z80PIO(config, "pio1", XTAL::u(4'000'000)));
 	pio1.out_pa_callback().set(FUNC(dmax8000_state::port0c_w));
 	pio1.out_pb_callback().set(FUNC(dmax8000_state::port0d_w));
 
-	Z80PIO(config, "pio2", 4'000'000);
+	Z80PIO(config, "pio2", XTAL::u(4'000'000));
 
-	FD1793(config, m_fdc, 2'000'000); // no idea
+	FD1793(config, m_fdc, XTAL::u(2'000'000)); // no idea
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_fdc->drq_wr_callback().set(FUNC(dmax8000_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	MM58174(config, "rtc", 0);
+	MM58174(config, "rtc");
 }
 
 

@@ -38,7 +38,7 @@ class wdxt_gen_device : public device_t,
 {
 public:
 	// construction/destruction
-	wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

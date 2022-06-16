@@ -122,7 +122,7 @@ const tiny_rom_entry *victor_9000_fdc_device::device_rom_region() const
 
 void victor_9000_fdc_device::add_floppy_drive(machine_config &config, const char *_tag)
 {
-	floppy_connector &connector(FLOPPY_CONNECTOR(config, _tag, 0));
+	floppy_connector &connector(FLOPPY_CONNECTOR(config, _tag));
 	connector.option_add("525ssqd", FLOPPY_525_SSQD); // Tandon TM100-3 with custom electronics
 	connector.option_add("525qd", FLOPPY_525_QD); // Tandon TM100-4 with custom electronics
 	connector.set_default_option("525qd");
@@ -212,7 +212,7 @@ void victor_9000_fdc_device::device_add_mconfig(machine_config &config)
 //  victor_9000_fdc_device - constructor
 //-------------------------------------------------
 
-victor_9000_fdc_device::victor_9000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+victor_9000_fdc_device::victor_9000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VICTOR_9000_FDC, tag, owner, clock),
 	m_irq_cb(*this),
 	m_syn_cb(*this),

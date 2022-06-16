@@ -47,14 +47,14 @@ void a2bus_softcard_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_softcard_device::a2bus_softcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_softcard_device::a2bus_softcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_z80(*this, Z80_TAG), m_bEnabled(false), m_FirstZ80Boot(false)
 {
 }
 
-a2bus_softcard_device::a2bus_softcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_softcard_device::a2bus_softcard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_softcard_device(mconfig, A2BUS_SOFTCARD, tag, owner, clock)
 {
 }

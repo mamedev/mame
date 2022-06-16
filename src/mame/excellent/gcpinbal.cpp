@@ -337,7 +337,7 @@ void gcpinbal_state::gcpinbal(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -351,7 +351,7 @@ void gcpinbal_state::gcpinbal(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gcpinbal);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x1000/2);
 
-	EXCELLENT_SPRITE(config, m_sprgen, 0);
+	EXCELLENT_SPRITE(config, m_sprgen);
 	m_sprgen->set_palette(m_palette);
 	m_sprgen->set_color_base(0x600);
 	m_sprgen->set_colpri_callback(FUNC(gcpinbal_state::gcpinbal_colpri_cb));
@@ -361,7 +361,7 @@ void gcpinbal_state::gcpinbal(machine_config &config)
 
 	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	ES8712(config, m_essnd, 0);
+	ES8712(config, m_essnd);
 	m_essnd->reset_handler().set_inputline("maincpu", 3);
 	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
 	m_essnd->set_msm_tag("msm");

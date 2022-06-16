@@ -19,12 +19,12 @@ class dio16_98265a_device :
 {
 public:
 	// construction/destruction
-	dio16_98265a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dio16_98265a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void mb87030(device_t *device);
 
 protected:
-	dio16_98265a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	dio16_98265a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 
 	// device-level overrides

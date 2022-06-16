@@ -37,7 +37,7 @@
 
 DEFINE_DEVICE_TYPE(UTS_EXTW_KEYBOARD, uts_extw_keyboard_device, "uts_extw", "UTS Expanded Typewriter Keyboard (F4725-25)")
 
-uts_extw_keyboard_device::uts_extw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+uts_extw_keyboard_device::uts_extw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UTS_EXTW_KEYBOARD, tag, owner, clock)
 	, device_uts_keyboard_interface(mconfig, *this)
 	, m_keys(*this, "KEY%X", 0U)

@@ -407,7 +407,7 @@ void slapshot_state::slapshot(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0640FIO(config, m_tc0640fio, 0);
+	TC0640FIO(config, m_tc0640fio);
 	m_tc0640fio->read_1_callback().set_ioport("COINS");
 	m_tc0640fio->read_2_callback().set_ioport("BUTTONS");
 	m_tc0640fio->read_3_callback().set_ioport("SYSTEM");
@@ -427,14 +427,14 @@ void slapshot_state::slapshot(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(30 + 3, 9);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(0, 2);
 	m_tc0480scp->set_col_base(4096);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -447,9 +447,9 @@ void slapshot_state::slapshot(machine_config &config)
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
-	MK48T08(config, "mk48t08", 0);
+	MK48T08(config, "mk48t08");
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->set_master_tag(m_maincpu);
 	m_tc0140syt->set_slave_tag("audiocpu");
 }
@@ -466,14 +466,14 @@ void slapshot_state::opwolf3(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
+	adc0809_device &adc(ADC0809(config, "adc", XTAL::u(500000))); // unknown clock
 	adc.eoc_ff_callback().set_inputline("maincpu", 3);
 	adc.in_callback<0>().set_ioport("GUN1X");
 	adc.in_callback<1>().set_ioport("GUN1Y");
 	adc.in_callback<2>().set_ioport("GUN2X");
 	adc.in_callback<3>().set_ioport("GUN2Y");
 
-	TC0640FIO(config, m_tc0640fio, 0);
+	TC0640FIO(config, m_tc0640fio);
 	m_tc0640fio->read_1_callback().set_ioport("COINS");
 	m_tc0640fio->read_2_callback().set_ioport("BUTTONS");
 	m_tc0640fio->read_3_callback().set_ioport("SYSTEM");
@@ -493,14 +493,14 @@ void slapshot_state::opwolf3(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(30 + 3, 9);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(0, 2);
 	m_tc0480scp->set_col_base(4096);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -513,9 +513,9 @@ void slapshot_state::opwolf3(machine_config &config)
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
-	MK48T08(config, "mk48t08", 0);
+	MK48T08(config, "mk48t08");
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->set_master_tag(m_maincpu);
 	m_tc0140syt->set_slave_tag("audiocpu");
 }

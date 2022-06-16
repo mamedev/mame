@@ -20,7 +20,7 @@ class isa8_adlib_device :
 {
 public:
 	// construction/destruction
-	isa8_adlib_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_adlib_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t ym3812_16_r(offs_t offset);
 	void ym3812_16_w(offs_t offset, uint8_t data);

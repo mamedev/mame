@@ -41,24 +41,24 @@ DEFINE_DEVICE_TYPE(A78_ROM_MEGACART, a78_megacart_device, "a78_megacart", "Atari
 DEFINE_DEVICE_TYPE(A78_ROM_P450_VB, a78_rom_p450_vb_device, "a78_versapokey", "Atari 7800 VersaBoard + POKEY @ 0x450 Cart")
 
 
-a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_rom_sg_device(mconfig, type, tag, owner, clock), m_ram_bank(0)
 {
 }
 
-a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_versaboard_device(mconfig, A78_ROM_VERSABOARD, tag, owner, clock)
 {
 }
 
 
-a78_megacart_device::a78_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_megacart_device::a78_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_versaboard_device(mconfig, A78_ROM_MEGACART, tag, owner, clock)
 {
 }
 
 
-a78_rom_p450_vb_device::a78_rom_p450_vb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a78_rom_p450_vb_device::a78_rom_p450_vb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a78_versaboard_device(mconfig, A78_ROM_P450_VB, tag, owner, clock)
 	, m_pokey450(*this, "pokey450")
 {

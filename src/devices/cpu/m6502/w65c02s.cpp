@@ -15,12 +15,12 @@
 
 DEFINE_DEVICE_TYPE(W65C02S, w65c02s_device, "w65c02s", "WDC W65C02S")
 
-w65c02s_device::w65c02s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+w65c02s_device::w65c02s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	w65c02s_device(mconfig, W65C02S, tag, owner, clock)
 {
 }
 
-w65c02s_device::w65c02s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+w65c02s_device::w65c02s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	m65c02_device(mconfig, type, tag, owner, clock)
 {
 }

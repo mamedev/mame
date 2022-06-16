@@ -6,7 +6,7 @@ DEFINE_DEVICE_TYPE(H8_WATCHDOG, h8_watchdog_device, "h8_watchdog", "H8 watchdog"
 const int h8_watchdog_device::div_bh[8] = { 1, 6, 7, 9, 11, 13, 15, 17 };
 const int h8_watchdog_device::div_s [8] = { 1, 5, 6, 7,  8,  9, 11, 12 };
 
-h8_watchdog_device::h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_watchdog_device::h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, H8_WATCHDOG, tag, owner, clock),
 	cpu(*this, DEVICE_SELF_OWNER)
 {

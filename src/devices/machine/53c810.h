@@ -15,7 +15,7 @@ public:
 	typedef device_delegate<uint32_t (uint32_t dsp)> fetch_delegate;
 
 	// construction/destruction
-	lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename... T> void set_irq_callback(T &&... args)
 	{

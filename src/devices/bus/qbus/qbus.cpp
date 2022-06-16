@@ -53,7 +53,7 @@ device_qbus_card_interface::device_qbus_card_interface(const machine_config &mco
 //-------------------------------------------------
 //  qbus_slot_device - constructor
 //-------------------------------------------------
-qbus_slot_device::qbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+qbus_slot_device::qbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, QBUS_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_write_birq4(*this),
@@ -88,7 +88,7 @@ void qbus_slot_device::device_start()
 //  qbus_device - constructor
 //-------------------------------------------------
 
-qbus_device::qbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+qbus_device::qbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, QBUS, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_z80daisy_interface(mconfig, *this),

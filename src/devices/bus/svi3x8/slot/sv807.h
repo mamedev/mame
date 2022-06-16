@@ -24,7 +24,7 @@ class sv807_device : public device_t, public device_svi_slot_interface
 {
 public:
 	// construction/destruction
-	sv807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sv807_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

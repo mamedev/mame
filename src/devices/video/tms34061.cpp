@@ -32,7 +32,7 @@
 
 DEFINE_DEVICE_TYPE(TMS34061, tms34061_device, "tms34061", "TI TMS34061 VSC")
 
-tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TMS34061, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_rowshift(0),

@@ -76,7 +76,7 @@ class c64h156_device :  public device_t
 {
 public:
 	// construction/destruction
-	c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto atn_callback() { return m_write_atn.bind(); }
 	auto sync_callback() { return m_write_sync.bind(); }

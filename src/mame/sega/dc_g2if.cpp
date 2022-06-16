@@ -55,7 +55,7 @@ DEFINE_DEVICE_TYPE(DC_G2IF, dc_g2if_device, "dc_g2if", "Sega Dreamcast G2 I/F Sy
 //-------------------------------------------------
 
 
-dc_g2if_device::dc_g2if_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dc_g2if_device::dc_g2if_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DC_G2IF, tag, owner, clock)
 	, m_host_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_int_w(*this)

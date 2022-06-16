@@ -11,7 +11,7 @@
 class nscsi_callback_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
-	nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto rst_callback() { return m_write_rst.bind(); }
 	auto atn_callback() { return m_write_atn.bind(); }

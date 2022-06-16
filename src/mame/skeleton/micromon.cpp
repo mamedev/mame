@@ -76,7 +76,7 @@ void micromon_state::machine_reset()
 void micromon_state::micromon(machine_config &config)
 {
 	// basic machine hardware
-	CDP1802(config, m_maincpu, 2457600);
+	CDP1802(config, m_maincpu, XTAL::u(2457600));
 	m_maincpu->set_addrmap(AS_PROGRAM, &micromon_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &micromon_state::io_map);
 	m_maincpu->wait_cb().set_constant(1);

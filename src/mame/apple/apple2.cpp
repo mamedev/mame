@@ -1235,11 +1235,11 @@ INPUT_PORTS_END
 void apple2_state::apple2_common(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1021800);
+	M6502(config, m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2_state::apple2_map);
 	m_maincpu->set_dasm_override(FUNC(apple2_state::dasm_trampoline));
 
-	TIMER(config, m_scantimer, 0);
+	TIMER(config, m_scantimer);
 	m_scantimer->configure_scanline(FUNC(apple2_state::apple2_interrupt), "screen", 0, 1);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -1247,7 +1247,7 @@ void apple2_state::apple2_common(machine_config &config)
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
+	m_screen->set_raw(XTAL::u(1021800)*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(apple2_state::screen_update_tt));
 	m_screen->set_palette(m_video);
 
@@ -1270,7 +1270,7 @@ void apple2_state::apple2_common(machine_config &config)
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::iiandplus_options, nullptr);
 
 	/* keyboard controller */
-	AY3600(config, m_ay3600, 0);
+	AY3600(config, m_ay3600);
 	m_ay3600->x0().set_ioport("X0");
 	m_ay3600->x1().set_ioport("X1");
 	m_ay3600->x2().set_ioport("X2");
@@ -1286,10 +1286,10 @@ void apple2_state::apple2_common(machine_config &config)
 	m_ay3600->ako().set(FUNC(apple2_state::ay3600_ako_w));
 
 	/* repeat timer.  15 Hz from page 90 of "The Apple II Circuit Description */
-	TIMER(config, "repttmr", 0).configure_periodic(FUNC(apple2_state::ay3600_repeat), attotime::from_hz(15));
+	TIMER(config, "repttmr").configure_periodic(FUNC(apple2_state::ay3600_repeat), attotime::from_hz(15));
 
 	/* slot devices */
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2_state::a2bus_nmi_w));

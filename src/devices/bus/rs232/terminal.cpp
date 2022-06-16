@@ -13,7 +13,7 @@ class serial_terminal_device : public generic_terminal_device,
 	public device_rs232_port_interface
 {
 public:
-	serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_buffered_serial_interface::rx_w(state); }
 
@@ -36,7 +36,7 @@ private:
 	required_ioport m_rs232_stopbits;
 };
 
-serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_terminal_device(mconfig, SERIAL_TERMINAL, tag, owner, clock, TERMINAL_WIDTH, TERMINAL_HEIGHT)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_rs232_port_interface(mconfig, *this)

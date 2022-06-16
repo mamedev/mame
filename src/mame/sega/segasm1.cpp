@@ -615,10 +615,10 @@ INPUT_PORTS_END
 
 void systemm1_state::m1base(machine_config &config)
 {
-	M68000(config, m_maincpu, 10'000'000);
+	M68000(config, m_maincpu, XTAL::u(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &systemm1_state::mem_map);
 
-	Z80(config, m_soundcpu, 4'000'000);
+	Z80(config, m_soundcpu, XTAL::u(4'000'000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &systemm1_state::z80_map);
 	m_soundcpu->set_addrmap(AS_IO, &systemm1_state::z80_io_map);
 
@@ -635,7 +635,7 @@ void systemm1_state::m1base(machine_config &config)
 	S24TILE(config, m_tiles, 0, 0x3fff);
 	m_tiles->set_palette(m_palette);
 
-	S24MIXER(config, m_mixer, 0);
+	S24MIXER(config, m_mixer);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -666,10 +666,10 @@ void systemm1_state::m1comm(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &systemm1_state::mem_comm_map);
 
-	Z80(config, m_commcpu, 4'000'000); // unknown clock
+	Z80(config, m_commcpu, XTAL::u(4'000'000)); // unknown clock
 	m_commcpu->set_addrmap(AS_PROGRAM, &systemm1_state::comm_map);
 
-	I8251(config, "uart", 4000000); // unknown clock
+	I8251(config, "uart", XTAL::u(4000000)); // unknown clock
 
 	mb8421_device &dpram(MB8421(config, "dpram"));
 	dpram.intl_callback().set_inputline("m1comm", 0);

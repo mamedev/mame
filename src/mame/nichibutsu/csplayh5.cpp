@@ -357,11 +357,11 @@ void csplayh5_state::tmp68301_parallel_port_w(uint16_t data)
 void csplayh5_state::csplayh5(machine_config &config)
 {
 	/* basic machine hardware */
-	TMP68301(config, m_maincpu, 16000000); /* TMP68301-16 */
+	TMP68301(config, m_maincpu, XTAL::u(16000000)); /* TMP68301-16 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &csplayh5_state::csplayh5_map);
 	m_maincpu->out_parallel_callback().set(FUNC(csplayh5_state::tmp68301_parallel_port_w));
 
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(csplayh5_state::csplayh5_irq), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(csplayh5_state::csplayh5_irq), "screen", 0, 1);
 
 #if USE_H8
 	h830002_device &subcpu(H83002(config, "subcpu", DVD_CLOCK/2));    /* unknown divider */
@@ -382,7 +382,7 @@ void csplayh5_state::csplayh5(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	NICHISND(config, m_nichisnd, 0);
+	NICHISND(config, m_nichisnd);
 }
 
 /***************************************************************************

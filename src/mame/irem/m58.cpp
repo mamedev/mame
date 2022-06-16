@@ -209,7 +209,7 @@ void m58_state::yard(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	/* sound hardware */
-	IREM_M52_LARGE_AUDIO(config, "irem_audio", 0);
+	IREM_M52_LARGE_AUDIO(config, "irem_audio");
 }
 
 

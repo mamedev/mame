@@ -1143,7 +1143,7 @@ void smc777_state::smc777(machine_config &config)
 
 	SN76489A(config, "sn1", MASTER_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
 
-	BEEP(config, m_beeper, 300); // TODO: correct frequency
+	BEEP(config, m_beeper, XTAL::u(300)); // TODO: correct frequency
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(smc777_state::keyboard_callback), attotime::from_hz(240/32));

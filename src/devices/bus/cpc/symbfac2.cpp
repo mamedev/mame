@@ -68,7 +68,7 @@ ioport_constructor cpc_symbiface2_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_symbiface2_device::cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cpc_symbiface2_device::cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CPC_SYMBIFACE2, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_slot(nullptr),

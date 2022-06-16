@@ -28,7 +28,7 @@ class a2bus_ace2x00_device:
 {
 public:
 	// construction/destruction
-	a2bus_ace2x00_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ace2x00_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -47,7 +47,7 @@ protected:
 class a2bus_ace2x00_slot1_device : public a2bus_ace2x00_device
 {
 public:
-	a2bus_ace2x00_slot1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ace2x00_slot1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 };
@@ -55,7 +55,7 @@ protected:
 class a2bus_ace2x00_slot6_device : public a2bus_ace2x00_device
 {
 public:
-	a2bus_ace2x00_slot6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ace2x00_slot6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

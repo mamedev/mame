@@ -1912,7 +1912,7 @@ void vegas_state::vegascore(machine_config &config)
 	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 
 	// PCI Bus Devices
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 
 	VRC5074(config, m_nile, 100000000, m_maincpu);
 	m_nile->set_sdram_size(0, 0x00800000);
@@ -1923,13 +1923,13 @@ void vegas_state::vegascore(machine_config &config)
 	m_nile->set_map(6, address_map_constructor(&vegas_state::vegas_cs6_map, "vegas_cs6_map", this), this);
 	m_nile->set_map(7, address_map_constructor(&vegas_state::vegas_cs7_map, "vegas_cs7_map", this), this);
 
-	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x10950646, 0x05, 0x0));
+	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0x10950646, 0x05, 0x0));
 	ide.irq_handler().set(PCI_ID_NILE, FUNC(vrc5074_device::pci_intr_d));
 	//ide.set_pif(0x8f);
 	ide.subdevice<bus_master_ide_controller_device>("ide")->slot(0).set_option_machine_config("hdd", hdd_config);
 
 	// video hardware
-	voodoo_2_pci_device &voodoo(VOODOO_2_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo_2_pci_device &voodoo(VOODOO_2_PCI(config, PCI_ID_VIDEO, m_maincpu, "screen"));
 	voodoo.set_fbmem(2);
 	voodoo.set_tmumem(4, 4);
 	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -1939,7 +1939,7 @@ void vegas_state::vegascore(machine_config &config)
 	m_timekeeper->reset_cb().set(FUNC(vegas_state::watchdog_reset));
 	m_timekeeper->irq_cb().set(FUNC(vegas_state::watchdog_irq));
 
-	SMC91C94(config, m_ethernet, 0);
+	SMC91C94(config, m_ethernet);
 	m_ethernet->irq_handler().set(FUNC(vegas_state::ethernet_interrupt));
 
 	// screen
@@ -1985,7 +1985,7 @@ void vegas_state::vegas32m(machine_config &config)
 void vegas_state::vegasban(machine_config &config)
 {
 	vegas32m(config);
-	voodoo_banshee_pci_device &voodoo(VOODOO_BANSHEE_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo_banshee_pci_device &voodoo(VOODOO_BANSHEE_PCI(config.replace(), PCI_ID_VIDEO, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
 	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
@@ -2000,7 +2000,7 @@ void vegas_state::vegasv3(machine_config &config)
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 
-	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
 	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
@@ -2018,7 +2018,7 @@ void vegas_state::denver(machine_config &config)
 	m_nile->set_sdram_size(0, 0x02000000);
 	m_nile->set_map(8, address_map_constructor(&vegas_state::vegas_cs8_map, "vegas_cs8_map", this), this);
 
-	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
 	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
@@ -2061,11 +2061,11 @@ void vegas_state::gauntleg(machine_config &config)
 	// Needs 250MHz MIPS or screen tearing occurs (See MT8064)
 	// Firmware frequency detection seems to have a bug, console reports 220MHz for a 200MHz cpu and 260MHz for a 250MHz cpu
 	vegas250(config);
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs"));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CALSPEED);
 	m_ioasic->set_upper(340); // 340=39", 322=27" others?
 	m_ioasic->set_yearoffs(80);
@@ -2077,11 +2077,11 @@ void vegas_state::gauntdl(machine_config &config)
 {
 	// Needs 250MHz MIPS or screen tearing occurs (See MT8064)
 	vegas250(config);
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs"));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_GAUNTDL);
 	m_ioasic->set_upper(346); // others?
 	m_ioasic->set_yearoffs(80);
@@ -2092,11 +2092,11 @@ void vegas_state::gauntdl(machine_config &config)
 void vegas_state::warfa(machine_config &config)
 {
 	vegas250(config);
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs"));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
 	m_ioasic->set_upper(337); // others?
 	m_ioasic->set_yearoffs(80);
@@ -2107,11 +2107,11 @@ void vegas_state::warfa(machine_config &config)
 void vegas_state::tenthdeg(machine_config &config)
 {
 	vegas(config);
-	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs"));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0afb);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_GAUNTDL);
 	m_ioasic->set_upper(330); // others?
 	m_ioasic->set_yearoffs(80);
@@ -2122,11 +2122,11 @@ void vegas_state::tenthdeg(machine_config &config)
 void vegas_state::roadburn(machine_config &config)
 {
 	vegas32m(config);
-	dcs2_audio_dsio_device &dcs(DCS2_AUDIO_DSIO(config, "dcs", 0));
+	dcs2_audio_dsio_device &dcs(DCS2_AUDIO_DSIO(config, "dcs"));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0ddd);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_upper(325); // others?
 	m_ioasic->set_yearoffs(80);
@@ -2137,11 +2137,11 @@ void vegas_state::roadburn(machine_config &config)
 void vegas_state::nbashowt(machine_config &config)
 {
 	vegasban(config);
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs"));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
 	// 528 494 478 development pic, 487 NBA
 	m_ioasic->set_upper(487); // or 478 or 487
@@ -2154,11 +2154,11 @@ void vegas_state::nbashowt(machine_config &config)
 void vegas_state::nbanfl(machine_config &config)
 {
 	vegasban(config);
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs"));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
 	m_ioasic->set_upper(498); // or 478 or 487
 	m_ioasic->set_yearoffs(80);
@@ -2175,11 +2175,11 @@ void vegas_state::nbagold(machine_config &config)
 	m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 	m_nile->set_sdram_size(0, 0x00800000);
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs"));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_GAUNTDL);
 	m_ioasic->set_upper(109); // 494 109 ???
 	m_ioasic->set_yearoffs(80);
@@ -2191,11 +2191,11 @@ void vegas_state::nbagold(machine_config &config)
 void vegas_state::sf2049(machine_config &config)
 {
 	denver(config);
-	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
+	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs"));
 	dcs.set_dram_in_mb(8);
 	dcs.set_polling_offset(0x872);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
 	m_ioasic->set_upper(336); // others?
 	m_ioasic->set_yearoffs(80);
@@ -2207,11 +2207,11 @@ void vegas_state::sf2049(machine_config &config)
 void vegas_state::sf2049se(machine_config &config)
 {
 	denver(config);
-	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
+	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs"));
 	dcs.set_dram_in_mb(8);
 	dcs.set_polling_offset(0x872);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
 	m_ioasic->set_upper(352); // 352 336 others?
 	m_ioasic->set_yearoffs(80);
@@ -2223,11 +2223,11 @@ void vegas_state::sf2049se(machine_config &config)
 void vegas_state::sf2049te(machine_config &config)
 {
 	denver(config);
-	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs", 0));
+	dcs2_audio_denver_5ch_device &dcs(DCS2_AUDIO_DENVER_5CH(config, "dcs"));
 	dcs.set_dram_in_mb(8);
 	dcs.set_polling_offset(0x872);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
 	m_ioasic->set_upper(348); // others?
 	m_ioasic->set_yearoffs(80);
@@ -2239,11 +2239,11 @@ void vegas_state::sf2049te(machine_config &config)
 void vegas_state::cartfury(machine_config &config)
 {
 	vegasv3(config);
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs"));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_CARNEVIL);
 	// 433, 495, 490 Development PIC
 	m_ioasic->set_upper(495/*433,  495 others? */);

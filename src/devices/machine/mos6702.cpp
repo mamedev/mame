@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(MOS6702, mos6702_device, "mos6702", "MOS 6702")
 //  mos6702_device - constructor
 //-------------------------------------------------
 
-mos6702_device::mos6702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6702_device::mos6702_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MOS6702, tag, owner, clock)
 {
 }

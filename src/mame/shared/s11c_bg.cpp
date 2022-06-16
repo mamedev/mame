@@ -224,7 +224,7 @@ DEFINE_DEVICE_TYPE(S11_OBG, s11_obg_device, "s11_obg", "Williams System 11 (Olde
 DEFINE_DEVICE_TYPE(S11_BGM, s11_bgm_device, "s11_bgm", "Williams System 11 Background Sound/Music Board") // D-11197
 DEFINE_DEVICE_TYPE(S11_BGS, s11_bgs_device, "s11_bgs", "Williams System 11 Background Sound Board") // C-11029 or C-11030
 
-s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig,S11C_BG,tag,owner,clock)
 	, device_mixer_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
@@ -242,7 +242,7 @@ s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, d
 }
 
 // constructor with overridable type for subclass
-s11c_bg_device::s11c_bg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+s11c_bg_device::s11c_bg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig,type,tag,owner,clock)
 	, device_mixer_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
@@ -260,22 +260,22 @@ s11c_bg_device::s11c_bg_device(const machine_config &mconfig, device_type type, 
 }
 
 // subclass definitions
-s11_bg_device::s11_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s11_bg_device::s11_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: s11c_bg_device(mconfig,S11_BG,tag,owner,clock)
 {
 }
 
-s11_obg_device::s11_obg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s11_obg_device::s11_obg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: s11c_bg_device(mconfig,S11_OBG,tag,owner,clock)
 {
 }
 
-s11_bgm_device::s11_bgm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s11_bgm_device::s11_bgm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: s11c_bg_device(mconfig,S11_BGM,tag,owner,clock)
 {
 }
 
-s11_bgs_device::s11_bgs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s11_bgs_device::s11_bgs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: s11c_bg_device(mconfig,S11_BGS,tag,owner,clock)
 {
 }
@@ -367,9 +367,9 @@ void s11c_bg_device::s11_bg_base(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &s11c_bg_device::s11c_bg_map); // override this as needed
 	config.set_maximum_quantum(attotime::from_hz(50));
 
-	MC1408(config, m_dac, 0);
+	MC1408(config, m_dac);
 
-	PIA6821(config, m_pia40, 0);
+	PIA6821(config, m_pia40);
 	m_pia40->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia40->writepb_handler().set(FUNC(s11c_bg_device::pia40_pb_w));
 	// ca2 handler is set in the s11_bg_ym function
@@ -401,7 +401,7 @@ void s11c_bg_device::s11_bg_cvsd(machine_config &config)
 	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(27), RES_K(15), RES_K(27), CAP_P(4700), CAP_P(1200));
 	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(43), RES_K(36), RES_K(180), CAP_P(0), CAP_P(180)); // note the first capacitor is 0pf meaning it doesn't exist
 	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
-	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0/4.0); // to prevent massive clipping issues, we divide the signal by 4 here before going into the filters, then multiply it by 4 after it comes out the other end
+	HC55516(config, m_cvsd).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0/4.0); // to prevent massive clipping issues, we divide the signal by 4 here before going into the filters, then multiply it by 4 after it comes out the other end
 }
 
 

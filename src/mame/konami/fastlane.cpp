@@ -388,10 +388,10 @@ void fastlane_state::fastlane(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fastlane);
 	PALETTE(config, m_palette, FUNC(fastlane_state::palette)).set_format(palette_device::xBGR_555, 1024*16, 0x400);
 
-	K007121(config, m_k007121, 0);
+	K007121(config, m_k007121);
 	m_k007121->set_palette_tag(m_palette);
 
-	K051733(config, "k051733", 0);
+	K051733(config, "k051733");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

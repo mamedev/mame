@@ -94,7 +94,7 @@ void bbc_atplswp_device::device_add_mconfig(machine_config &config)
 //  bbc_atplsw_device - constructor
 //-------------------------------------------------
 
-bbc_atplsw_device::bbc_atplsw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_atplsw_device::bbc_atplsw_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_ATPLSW, tag, owner, clock)
 	, device_bbc_internal_interface(mconfig, *this)
 	, m_rom(*this, "romslot%u", 0U)
@@ -102,7 +102,7 @@ bbc_atplsw_device::bbc_atplsw_device(const machine_config &mconfig, const char *
 {
 }
 
-bbc_atplswp_device::bbc_atplswp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_atplswp_device::bbc_atplswp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_ATPLSWP, tag, owner, clock)
 	, device_bbc_internal_interface(mconfig, *this)
 	, m_rom(*this, "romslot%u", 0U)

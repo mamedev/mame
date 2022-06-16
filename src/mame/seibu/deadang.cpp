@@ -369,7 +369,7 @@ void deadang_state::deadang(machine_config &config)
 	m_audiocpu->set_addrmap(AS_OPCODES, &deadang_state::sound_decrypted_opcodes_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
+	SEI80BU(config, "sei80bu").set_device_rom_tag("audiocpu");
 
 	config.set_maximum_quantum(attotime::from_hz(60)); // the game stops working with higher interleave rates..
 
@@ -390,7 +390,7 @@ void deadang_state::deadang(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->set_rom_tag("audiocpu");
 	m_seibu_sound->set_rombank_tag("seibu_bank1");

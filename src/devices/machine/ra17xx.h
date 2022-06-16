@@ -22,7 +22,7 @@
 class ra17xx_device : public device_t
 {
 public:
-	ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t io_r(offs_t offset);
 	void io_w(address_space &space, offs_t offset, uint8_t data);

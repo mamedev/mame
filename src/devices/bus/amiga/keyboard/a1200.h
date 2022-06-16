@@ -24,7 +24,7 @@ class a1200_kbd_device : public device_t, public device_amiga_keyboard_interface
 {
 public:
 	// construction/destruction
-	a1200_kbd_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	a1200_kbd_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// from host
 	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override;

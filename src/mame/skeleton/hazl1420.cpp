@@ -360,7 +360,7 @@ void hazl1420_state::hazl1420(machine_config &config)
 	m_ioexp[1]->p6_in_cb().set_ioport("INP6");
 	m_ioexp[1]->p7_in_cb().set_ioport("INP7");
 
-	ins8250_device &ace(INS8250(config, "ace", 2'764'800));
+	ins8250_device &ace(INS8250(config, "ace", XTAL::u(2'764'800)));
 	ace.out_int_callback().set(m_mainint, FUNC(input_merger_device::in_w<1>));
 	ace.out_tx_callback().set("eia", FUNC(rs232_port_device::write_txd));
 	ace.out_rts_callback().set("eia", FUNC(rs232_port_device::write_rts));
@@ -375,7 +375,7 @@ void hazl1420_state::hazl1420(machine_config &config)
 	screen.set_screen_update(FUNC(hazl1420_state::screen_update));
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 1000).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beeper, XTAL::u(1000)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	rs232_port_device &eia(RS232_PORT(config, "eia", default_rs232_devices, nullptr));
 	eia.rxd_handler().set("ace", FUNC(ins8250_device::rx_w));

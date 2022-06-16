@@ -61,7 +61,7 @@ device_c64_floppy_parallel_interface::~device_c64_floppy_parallel_interface()
 //  c64_bn1541_device - constructor
 //-------------------------------------------------
 
-c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_BN1541, tag, owner, clock),
 	device_pet_user_port_interface(mconfig, *this),
 	device_c64_floppy_parallel_interface(mconfig, *this), m_parallel_output(0)

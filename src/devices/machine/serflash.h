@@ -21,7 +21,7 @@ public:
 	typedef device_delegate<void (serflash_device &, void *, size_t)> init_delegate;
 
 	// construction/destruction
-	serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_flash_page_size(uint16_t size) { m_flash_page_size = size; }

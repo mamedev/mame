@@ -55,28 +55,28 @@ void voodoo_pci_device::config_map(address_map &map)
 	map(0x40, 0x5f).rw(FUNC(voodoo_pci_device::pcictrl_r), FUNC(voodoo_pci_device::pcictrl_w));
 }
 
-voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, type, tag, owner, clock),
 	  m_generic_voodoo(*this, "voodoo"), m_cpu(*this, finder_base::DUMMY_TAG), m_screen(*this, finder_base::DUMMY_TAG), m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
 {
 }
 
-voodoo_1_pci_device::voodoo_1_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+voodoo_1_pci_device::voodoo_1_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: voodoo_pci_device(mconfig, VOODOO_1_PCI, tag, owner, clock), m_voodoo(*this, "voodoo")
 {
 }
 
-voodoo_2_pci_device::voodoo_2_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+voodoo_2_pci_device::voodoo_2_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: voodoo_pci_device(mconfig, VOODOO_2_PCI, tag, owner, clock), m_voodoo(*this, "voodoo")
 {
 }
 
-voodoo_banshee_pci_device::voodoo_banshee_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+voodoo_banshee_pci_device::voodoo_banshee_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: voodoo_pci_device(mconfig, VOODOO_BANSHEE_PCI, tag, owner, clock), m_voodoo(*this, "voodoo")
 {
 }
 
-voodoo_3_pci_device::voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+voodoo_3_pci_device::voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: voodoo_pci_device(mconfig, VOODOO_3_PCI, tag, owner, clock), m_voodoo(*this, "voodoo")
 {
 }

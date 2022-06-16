@@ -42,7 +42,7 @@ public:
 	typedef device_delegate<void (int16_t, int16_t, int16_t, int16_t, uint8_t)> vector_delegate;
 
 	// construction/destruction
-	ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto external_func() { return m_external_input.bind(); }

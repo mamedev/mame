@@ -217,7 +217,7 @@ void lk201_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lk201_device::lk201_map);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_speaker, 2000); // clocked by a 555 timer at E8, the volume of the beep is controllable by: (8051 model) P2.0 thru P2.3, or (6805 model) the upper 4 bits of the LED data latch
+	BEEP(config, m_speaker, XTAL::u(2000)); // clocked by a 555 timer at E8, the volume of the beep is controllable by: (8051 model) P2.0 thru P2.3, or (6805 model) the upper 4 bits of the LED data latch
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -503,7 +503,7 @@ ioport_constructor lk201_device::device_input_ports() const
 //  lk201_device - constructor
 //-------------------------------------------------
 
-lk201_device::lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lk201_device::lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LK201, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_maincpu(*this, LK201_CPU_TAG),
@@ -550,7 +550,7 @@ void lk201_device::device_reset()
 	ports[0] = ports[1] = ports[2] = 0;
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(4800);
+	set_rate(XTAL::u(4800));
 	m_count->adjust(attotime::from_hz(1200), 0, attotime::from_hz(1200));
 	memset(m_timer.regs, 0, sizeof(m_timer.regs));
 

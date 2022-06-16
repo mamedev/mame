@@ -710,12 +710,12 @@ ioport_constructor abc850_floppy_device::device_input_ports() const
 //  luxor_55_21046_device - constructor
 //-------------------------------------------------
 
-luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	luxor_55_21046_device(mconfig, LUXOR_55_21046, tag, owner, clock)
 {
 }
 
-luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	m_floppy0(*this, SAB1793_TAG":0"),
@@ -738,27 +738,27 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, devi
 {
 }
 
-abc830_device::abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc830_device::abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	luxor_55_21046_device(mconfig, ABC830, tag, owner, clock)
 {
 }
 
-abc832_device::abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc832_device::abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	luxor_55_21046_device(mconfig, ABC832, tag, owner, clock)
 {
 }
 
-abc834_device::abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc834_device::abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	luxor_55_21046_device(mconfig, ABC834, tag, owner, clock)
 {
 }
 
-abc838_device::abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc838_device::abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	luxor_55_21046_device(mconfig, ABC838, tag, owner, clock)
 {
 }
 
-abc850_floppy_device::abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc850_floppy_device::abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	luxor_55_21046_device(mconfig, ABC850_FLOPPY, tag, owner, clock)
 {
 }

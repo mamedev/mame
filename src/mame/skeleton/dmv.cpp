@@ -810,7 +810,7 @@ void dmv_state::dmv(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	DMV_KEYBOARD(config, m_keyboard, 0);
+	DMV_KEYBOARD(config, m_keyboard);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -844,13 +844,13 @@ void dmv_state::dmv(machine_config &config)
 	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(i8272a_device::dma_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(dmv_state::dmac_dack3));
 
-	I8272A(config, m_fdc, 8'000'000, true);
+	I8272A(config, m_fdc, XTAL::u(8'000'000), true);
 	m_fdc->intrq_wr_callback().set(FUNC(dmv_state::fdc_irq));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 	FLOPPY_CONNECTOR(config, "i8272:0", dmv_floppies, "525dd", dmv_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "i8272:1", dmv_floppies, "525dd", dmv_state::floppy_formats);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(50);
 	m_pit->out_handler<0>().set(FUNC(dmv_state::pit_out0));
 	m_pit->set_clk<2>(XTAL(24'000'000) / 3 / 16);

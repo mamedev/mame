@@ -19,7 +19,7 @@ void mb8795_device::map(address_map &map)
 	map(0x8, 0xf).rw(FUNC(mb8795_device::mac_r), FUNC(mb8795_device::mac_w)); // Mapping limitation, real is up to 0xd
 }
 
-mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MB8795, tag, owner, clock),
 	device_network_interface(mconfig, *this, 10),
 	txstat(0), txmask(0), rxstat(0), rxmask(0), txmode(0), rxmode(0), txlen(0), rxlen(0), txcount(0),

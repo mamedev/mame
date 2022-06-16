@@ -317,7 +317,7 @@ void pkscram_state::machine_reset()
 void pkscram_state::pkscramble(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pkscram_state::pkscramble_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(pkscram_state::irq1_line_hold)); /* only valid irq */
 

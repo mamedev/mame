@@ -47,7 +47,7 @@ INPUT_PORTS_END
 
 void terminal_state::terminal(machine_config &config)
 {
-	I8031(config, m_maincpu, 12'000'000);
+	I8031(config, m_maincpu, XTAL::u(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &terminal_state::mem_map);
 }
 

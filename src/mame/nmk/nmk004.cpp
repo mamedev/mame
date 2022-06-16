@@ -86,7 +86,7 @@ ROM_END
 
 DEFINE_DEVICE_TYPE(NMK004, nmk004_device, "nmk004", "NMK004")
 
-nmk004_device::nmk004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nmk004_device::nmk004_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NMK004, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_reset_cb(*this),

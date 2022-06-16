@@ -14,7 +14,7 @@ class rtpc_kbd_device
 	, public device_rtpc_kbd_interface
 {
 public:
-	rtpc_kbd_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	rtpc_kbd_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides

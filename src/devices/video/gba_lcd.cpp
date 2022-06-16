@@ -147,7 +147,7 @@ private:
 
 DEFINE_DEVICE_TYPE(GBA_LCD, gba_lcd_device, "gba_lcd", "GBA LCD")
 
-gba_lcd_device::gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gba_lcd_device::gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, GBA_LCD, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_int_hblank_cb(*this)

@@ -283,7 +283,7 @@ void vroulet_state::ppi8255_c_w(uint8_t data) {}
 void vroulet_state::vroulet(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4000000);   //???
+	Z80(config, m_maincpu, XTAL::u(4000000));   //???
 	m_maincpu->set_addrmap(AS_PROGRAM, &vroulet_state::vroulet_map);
 	m_maincpu->set_addrmap(AS_IO, &vroulet_state::vroulet_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vroulet_state::irq0_line_hold));
@@ -315,7 +315,7 @@ void vroulet_state::vroulet(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2149_device &aysnd(YM2149(config, "aysnd", 2000000));
+	ym2149_device &aysnd(YM2149(config, "aysnd", XTAL::u(2000000)));
 	aysnd.port_a_read_callback().set_ioport("DSWA");
 	aysnd.port_b_read_callback().set_ioport("DSWB");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);

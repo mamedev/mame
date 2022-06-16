@@ -18,7 +18,7 @@
 
 DEFINE_DEVICE_TYPE(K054539, k054539_device, "k054539", "K054539 ADPCM")
 
-k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K054539, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)

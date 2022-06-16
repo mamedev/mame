@@ -1301,7 +1301,7 @@ void fhawk_state::fhawk(machine_config &config)
 
 	config.set_perfect_quantum(m_main_cpu);
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1326,7 +1326,7 @@ void fhawk_state::fhawk(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.20);
 	ymsnd.add_route(3, "mono", 0.80);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag("slave");
 	ciu.set_slave_tag(m_audio_cpu);
 }
@@ -1366,7 +1366,7 @@ void taitol_2cpu_state::raimais(machine_config &config)
 
 	config.set_perfect_quantum(m_main_cpu);
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -1391,7 +1391,7 @@ void taitol_2cpu_state::raimais(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag("slave");
 	tc0140syt.set_slave_tag(m_audio_cpu);
 }
@@ -1409,7 +1409,7 @@ void taitol_2cpu_state::kurikint(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -1437,11 +1437,11 @@ void taitol_2cpu_state::kurikint(machine_config &config)
 
 void taitol_1cpu_state::add_muxes(machine_config &config)
 {
-	LS157_X2(config, m_mux[0], 0);
+	LS157_X2(config, m_mux[0]);
 	m_mux[0]->a_in_callback().set_ioport("DSWA");
 	m_mux[0]->b_in_callback().set_ioport("DSWB");
 
-	LS157_X2(config, m_mux[1], 0);
+	LS157_X2(config, m_mux[1]);
 	m_mux[1]->a_in_callback().set_ioport("IN0");
 	m_mux[1]->b_in_callback().set_ioport("IN1");
 }
@@ -1511,7 +1511,7 @@ void horshoes_state::horshoes(machine_config &config)
 	m_main_cpu->set_addrmap(AS_PROGRAM, &horshoes_state::horshoes_map);
 	m_main_cpu->set_tile_callback(FUNC(horshoes_state::horshoes_tile_cb));
 
-	UPD4701A(config, m_upd4701, 0);
+	UPD4701A(config, m_upd4701);
 	m_upd4701->set_portx_tag("AN0");
 	m_upd4701->set_porty_tag("AN1");
 }
@@ -1524,7 +1524,7 @@ void taitol_1cpu_state::palamed(machine_config &config)
 	/* basic machine hardware */
 	m_main_cpu->set_addrmap(AS_PROGRAM, &taitol_1cpu_state::palamed_map);
 
-	i8255_device &ppi(I8255(config, "ppi", 0)); // Toshiba TMP8255AP-5
+	i8255_device &ppi(I8255(config, "ppi")); // Toshiba TMP8255AP-5
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("IN1");
 	ppi.in_pc_callback().set_ioport("IN2");
@@ -1554,7 +1554,7 @@ void taitol_2cpu_state::evilston(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("DSWA");
 	tc0510nio.read_1_callback().set_ioport("DSWB");
 	tc0510nio.read_2_callback().set_ioport("IN0");

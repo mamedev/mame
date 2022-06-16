@@ -426,11 +426,11 @@ void trs80m3_state::model4(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80m3_state::m4_mem);
 	m_maincpu->set_addrmap(AS_IO, &trs80m3_state::m4_io);
 
-	RAM(config, m_mainram, 0);
+	RAM(config, m_mainram);
 	m_mainram->set_default_size("64K");
 	m_mainram->set_extra_options("16K,128K");
 
-	ADDRESS_MAP_BANK(config, m_m4_bank, 0);
+	ADDRESS_MAP_BANK(config, m_m4_bank);
 	m_m4_bank->set_map(&trs80m3_state::m4_banked_mem);
 	m_m4_bank->set_endianness(ENDIANNESS_LITTLE);
 	m_m4_bank->set_data_width(8);
@@ -449,11 +449,11 @@ void trs80m3_state::model4p(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80m3_state::m4p_mem);
 	m_maincpu->set_addrmap(AS_IO, &trs80m3_state::m4p_io);
 
-	RAM(config, m_mainram, 0);
+	RAM(config, m_mainram);
 	m_mainram->set_default_size("64K");
 	m_mainram->set_extra_options("128K");
 
-	ADDRESS_MAP_BANK(config, m_m4p_bank, 0);
+	ADDRESS_MAP_BANK(config, m_m4p_bank);
 	m_m4p_bank->set_map(&trs80m3_state::m4p_banked_mem);
 	m_m4p_bank->set_endianness(ENDIANNESS_LITTLE);
 	m_m4p_bank->set_data_width(8);

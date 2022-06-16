@@ -44,7 +44,7 @@ static constexpr u8 DATA_RESPONSE_IO_ERROR  = 0x0d;
 DEFINE_DEVICE_TYPE(SPI_SDCARD, spi_sdcard_sdhc_device, "spi_sdhccard", "SDHC Card (SPI Interface)")
 DEFINE_DEVICE_TYPE(SPI_SDCARDV2, spi_sdcard_sdv2_device, "spi_sdv2card", "SDV2 Card (SPI Interface)")
 
-spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	write_miso(*this),
 	m_image(*this, "image"),
@@ -57,13 +57,13 @@ spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type 
 {
 }
 
-spi_sdcard_sdv2_device::spi_sdcard_sdv2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spi_sdcard_sdv2_device::spi_sdcard_sdv2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	spi_sdcard_device(mconfig, SPI_SDCARDV2, tag, owner, clock)
 {
 	m_type = SD_TYPE_V2;
 }
 
-spi_sdcard_sdhc_device::spi_sdcard_sdhc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spi_sdcard_sdhc_device::spi_sdcard_sdhc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	spi_sdcard_device(mconfig, SPI_SDCARD, tag, owner, clock)
 {
 	m_type = SD_TYPE_HC;

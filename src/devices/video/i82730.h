@@ -29,12 +29,12 @@ public:
 
 	// construction/destruction
 	template <typename T>
-	i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag)
 		: i82730_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 	}
-	i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto sint() { return m_sint_handler.bind(); }

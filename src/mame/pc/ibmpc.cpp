@@ -312,11 +312,11 @@ void ibmpc_state::ibm5150(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(cga));
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "com", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "hdc", false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa4", "mb:isa", pc_isa8_cards, "hdc", false);
+	ISA8_SLOT(config, "isa5", "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
@@ -357,14 +357,14 @@ void ibmpc_state::ibm5160(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(cga));
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "com", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "hdc", false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa7", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa8", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa4", "mb:isa", pc_isa8_cards, "hdc", false);
+	ISA8_SLOT(config, "isa5", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa7", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa8", "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
@@ -587,7 +587,7 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                            FULLNAME                   FLAGS
-COMP( 1981, ibm5150, 0,       0,      ibm5150, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM PC 5150",             0 )
+COMP( 1981, ibm5150,       0, 0,      ibm5150, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM PC 5150",             0 )
 COMP( 1982, ibm5155, ibm5150, 0,      ibm5150, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM PC 5155",             0 )
 COMP( 1985, ibm5140, ibm5150, 0,      ibm5140, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM PC 5140 Convertible", MACHINE_NOT_WORKING )
 COMP( 1982, ibm5160, ibm5150, 0,      ibm5160, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM XT 5160",             0 )

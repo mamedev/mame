@@ -7,7 +7,7 @@
 DEFINE_DEVICE_TYPE(MSX_CART_NOMAPPER, msx_cart_nomapper_device, "msx_cart_nomapper", "MSX Cartridge - ROM")
 
 
-msx_cart_nomapper_device::msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_nomapper_device::msx_cart_nomapper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_NOMAPPER, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_start_address(0)

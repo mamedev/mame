@@ -262,8 +262,8 @@ void tsconf_state::tsconf(machine_config &config)
 	m_dma->out_sfile_callback().set(FUNC(tsconf_state::sfile_write16));
 	m_dma->on_ready_callback().set(FUNC(tsconf_state::dma_ready));
 
-	BETA_DISK(config, m_beta, 0);
-	SPI_SDCARD(config, m_sdcard, 0);
+	BETA_DISK(config, m_beta);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->spi_miso_callback().set(FUNC(tsconf_state::tsconf_spi_miso_w));
 
 	SPEAKER(config, "lspeaker").front_left();

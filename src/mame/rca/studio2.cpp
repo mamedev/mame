@@ -692,7 +692,7 @@ void studio2_state::studio2_cartslot(machine_config &config)
 void studio2_state::studio2(machine_config &config)
 {
 	/* basic machine hardware */
-	CDP1802(config, m_maincpu, 1760000); /* the real clock is derived from an oscillator circuit */
+	CDP1802(config, m_maincpu, XTAL::u(1760000)); /* the real clock is derived from an oscillator circuit */
 	m_maincpu->set_addrmap(AS_PROGRAM, &studio2_state::studio2_map);
 	m_maincpu->set_addrmap(AS_IO, &studio2_state::studio2_io_map);
 	m_maincpu->wait_cb().set_constant(1);
@@ -704,14 +704,14 @@ void studio2_state::studio2(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	CDP1861(config, m_vdc, 1760000).set_screen(m_screen);
+	CDP1861(config, m_vdc, XTAL::u(1760000)).set_screen(m_screen);
 	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
 	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beeper, XTAL::u(300)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	studio2_cartslot(config);
 }
@@ -740,7 +740,7 @@ void visicom_state::visicom(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beeper, XTAL::u(300)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "visicom_cart", "bin,rom");
 
@@ -763,7 +763,7 @@ void mpt02_state::mpt02(machine_config &config)
 
 	/* video/sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beeper, XTAL::u(300)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(m_screen);

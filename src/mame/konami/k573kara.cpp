@@ -67,7 +67,7 @@ void k573kara_device::amap(address_map &map)
 	map(0xf8, 0xf9).rw(FUNC(k573kara_device::coin_box_r), FUNC(k573kara_device::coin_box_w));
 }
 
-k573kara_device::k573kara_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k573kara_device::k573kara_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KONAMI_573_KARAOKE_IO_BOARD, tag, owner, clock),
 	digital_id(*this, "digital_id"),
 	m_duart_com(*this, "duart_com"),
@@ -99,7 +99,7 @@ void k573kara_device::device_add_mconfig(machine_config &config)
 	DS2401(config, digital_id);
 
 	// The PC Helper RS232 and the PC16552D are right next to each other but they may possibly be separate.
-	PC16552D(config, m_duart_com, 0);
+	PC16552D(config, m_duart_com);
 	auto& duart_chan0(NS16550(config, "duart_com:chan0", clock() / 2));
 	auto& rs232_chan0(RS232_PORT(config, "rs232_chan0", default_rs232_devices, nullptr));
 	rs232_chan0.rxd_handler().set("duart_com:chan0", FUNC(ins8250_uart_device::rx_w));

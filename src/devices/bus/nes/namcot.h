@@ -15,7 +15,7 @@ class nes_namcot3433_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot3433_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_namcot3433_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void dxrom_write(offs_t offset, uint8_t data);
 	virtual void write_h(offs_t offset, uint8_t data) override { dxrom_write(offset, data); }
@@ -23,7 +23,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_namcot3433_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_namcot3433_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -39,7 +39,7 @@ class nes_namcot3446_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot3446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_namcot3446_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 
@@ -60,7 +60,7 @@ class nes_namcot3425_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot3425_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_namcot3425_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
 
@@ -82,7 +82,7 @@ class nes_namcot340_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot340_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_namcot340_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t n340_loread(offs_t offset);
 	void n340_lowrite(offs_t offset, uint8_t data);
@@ -94,7 +94,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_namcot340_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_namcot340_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -118,7 +118,7 @@ class nes_namcot175_device : public nes_namcot340_device
 {
 public:
 	// construction/destruction
-	nes_namcot175_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_namcot175_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -139,7 +139,7 @@ class nes_namcot163_device : public nes_namcot340_device
 {
 public:
 	// construction/destruction
-	nes_namcot163_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_namcot163_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read_l(offs_t offset) override;
 	virtual uint8_t read_m(offs_t offset) override;

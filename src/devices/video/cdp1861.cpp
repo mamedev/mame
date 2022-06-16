@@ -70,7 +70,7 @@ DEFINE_DEVICE_TYPE(CDP1861, cdp1861_device, "cdp1861", "RCA CDP1861")
 //  cdp1861_device - constructor
 //-------------------------------------------------
 
-cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CDP1861, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_write_int(*this)

@@ -24,7 +24,7 @@ const tiny_rom_entry *omti5100_device::device_rom_region() const
 }
 #endif
 
-omti5100_device::omti5100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+omti5100_device::omti5100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scsihd_device(mconfig, OMTI5100, tag, owner, clock)
 	, m_image0(*this, "image0")
 	, m_image1(*this, "image1")

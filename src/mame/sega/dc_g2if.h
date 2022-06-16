@@ -19,7 +19,7 @@ class dc_g2if_device : public device_t
 {
 public:
 	// construction/destruction
-	dc_g2if_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dc_g2if_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	template <typename T> void set_host_space(T &&tag, int index) { m_host_space.set_tag(std::forward<T>(tag), index); }
 	auto int_cb() { return m_int_w.bind(); }
 	auto error_ia_cb() { return m_error_ia_w.bind(); }

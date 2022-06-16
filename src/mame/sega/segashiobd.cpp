@@ -93,7 +93,7 @@ void sega_837_14438_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega_837_14438_device::sh4_map);
 }
 
-sega_837_14438_device::sega_837_14438_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_837_14438_device::sega_837_14438_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA837_14438, tag, owner, clock),
 	m_maincpu(*this, "shiobdcpu")
 {

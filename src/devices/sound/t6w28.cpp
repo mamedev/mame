@@ -347,7 +347,7 @@ void t6w28_device::set_enable(bool enable)
 
 DEFINE_DEVICE_TYPE(T6W28, t6w28_device, "t6w28", "T6W28")
 
-t6w28_device::t6w28_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+t6w28_device::t6w28_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, T6W28, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_channel(nullptr)

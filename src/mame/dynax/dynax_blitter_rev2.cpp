@@ -54,12 +54,12 @@ DEFINE_DEVICE_TYPE(CDRACULA_BLITTER, cdracula_blitter_device, "cdracula_blitter"
 //  dynax_blitter_rev2_device - constructor
 //-------------------------------------------------
 
-dynax_blitter_rev2_device::dynax_blitter_rev2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dynax_blitter_rev2_device::dynax_blitter_rev2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dynax_blitter_rev2_device(mconfig, DYNAX_BLITTER_REV2, tag, owner, clock)
 {
 }
 
-dynax_blitter_rev2_device::dynax_blitter_rev2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+dynax_blitter_rev2_device::dynax_blitter_rev2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_rom_interface(mconfig, *this)
 	, m_vram_out_cb(*this)
@@ -325,7 +325,7 @@ void dynax_blitter_rev2_device::regs_w(offs_t offset, uint8_t data)
 //  cdracula_blitter_device - constructor
 //-------------------------------------------------
 
-cdracula_blitter_device::cdracula_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cdracula_blitter_device::cdracula_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dynax_blitter_rev2_device(mconfig, CDRACULA_BLITTER, tag, owner, clock)
 	, m_blit_dest_cb(*this)
 {

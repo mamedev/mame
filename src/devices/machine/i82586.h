@@ -163,7 +163,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 protected:
-	i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth, u8 addrwidth);
+	i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, endianness_t endian, u8 datawidth, u8 addrwidth);
 
 	// standard device_* overrides
 	virtual void device_start() override;
@@ -261,7 +261,7 @@ protected:
 class i82586_device : public i82586_base_device
 {
 public:
-	i82586_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82586_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static const int CFG_SIZE = 12;
 	static const int DUMP_SIZE = 170;
@@ -324,7 +324,7 @@ public:
 	void port(u32 data); // cpu access interface
 
 protected:
-	i82596_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth);
+	i82596_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, endianness_t endian, u8 datawidth);
 
 	// standard device_* overrides
 	virtual void device_start() override;
@@ -372,25 +372,25 @@ private:
 class i82596_le16_device : public i82596_device
 {
 public:
-	i82596_le16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82596_le16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i82596_be16_device : public i82596_device
 {
 public:
-	i82596_be16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82596_be16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i82596_le32_device : public i82596_device
 {
 public:
-	i82596_le32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82596_le32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class i82596_be32_device : public i82596_device
 {
 public:
-	i82596_be32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82596_be32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(I82586, i82586_device)

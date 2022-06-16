@@ -86,7 +86,7 @@
 DEFINE_DEVICE_TYPE(SNS_LOROM_SA1, sns_sa1_device, "sns_rom_sa1", "SNES Cart + SA-1")
 
 
-sns_sa1_device::sns_sa1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sns_sa1_device::sns_sa1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SNS_LOROM_SA1, tag, owner, clock)
 	, device_sns_cart_interface(mconfig, *this)
 	, m_sa1(*this, "sa1cpu")

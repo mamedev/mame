@@ -24,7 +24,7 @@
 //  hd63484_device - constructor
 //-------------------------------------------------
 
-hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, HD63484, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),

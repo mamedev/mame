@@ -372,7 +372,7 @@ void ampex_state::ampex(machine_config &config)
 	m_vtac->vsyn_callback().set(FUNC(ampex_state::vsyn_w));
 	m_vtac->set_screen("screen");
 
-	AY31015(config, m_uart, 0); // COM8017, actually
+	AY31015(config, m_uart); // COM8017, actually
 	m_uart->write_so_callback().set(FUNC(ampex_state::so_w));
 	m_uart->write_dav_callback().set(FUNC(ampex_state::dav_w));
 	m_uart->set_auto_rdav(true);

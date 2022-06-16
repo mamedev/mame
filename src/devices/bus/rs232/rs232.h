@@ -108,14 +108,14 @@ class rs232_port_device : public device_t, public device_single_card_slot_interf
 public:
 	template <typename T>
 	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: rs232_port_device(mconfig, tag, owner, 0)
+		: rs232_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~rs232_port_device();
 
 	// static configuration helpers
@@ -144,7 +144,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( txc_r ) { return m_dce_txc; } // DB25 pin 15  V.24 circuit 114   Transmitter signal element timing (DCE)
 
 protected:
-	rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_resolve_objects() override;
 	virtual void device_reset() override;
@@ -283,7 +283,7 @@ public:
 	}
 
 protected:
-	buffered_rs232_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	buffered_rs232_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL())
 		: device_t(mconfig, type, tag, owner, clock)
 		, device_buffered_serial_interface<FIFO_LENGTH>(mconfig, *this)
 		, device_rs232_port_interface(mconfig, *this)

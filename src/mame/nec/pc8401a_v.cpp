@@ -91,7 +91,7 @@ void pc8500_state::pc8500_video(machine_config &config)
 	m_screen_lcd->set_visarea(0, 480-1, 0, 200-1);
 	m_screen_lcd->set_palette("palette");
 
-	SED1330(config, m_lcdc, 8000000);
+	SED1330(config, m_lcdc, XTAL::u(8000000));
 	m_lcdc->set_screen(SCREEN_TAG);
 	m_lcdc->set_addrmap(0, &pc8500_state::pc8500_lcdc);
 
@@ -104,7 +104,7 @@ void pc8500_state::pc8500_video(machine_config &config)
 	screen.set_refresh_hz(50);
 	screen.set_palette("palette");
 
-	MC6845(config, m_crtc, 400000);
+	MC6845(config, m_crtc, XTAL::u(400000));
 	m_crtc->set_screen(CRT_SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(6);

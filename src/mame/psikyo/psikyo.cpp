@@ -1123,7 +1123,7 @@ void psikyo_state::s1945n(machine_config &config)
 void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
 {
 	/* basic machine hardware */
-	M68EC020(config, m_maincpu, 16000000);
+	M68EC020(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::psikyo_bootleg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 

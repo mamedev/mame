@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(SMOC501, smoc501_device, "smoc501", "Sony SMO-C501 MO Disk Controller")
 
-smoc501_device::smoc501_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+smoc501_device::smoc501_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SMOC501, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, "scsic")
 {
@@ -73,10 +73,10 @@ ioport_constructor smoc501_device::device_input_ports() const
 
 void smoc501_device::device_add_mconfig(machine_config &config)
 {
-	v40_device &mpu(V40(config, "mpu", 16'000'000)); // clock is guessed
+	v40_device &mpu(V40(config, "mpu", XTAL::u(16'000'000))); // clock is guessed
 	mpu.set_addrmap(AS_PROGRAM, &smoc501_device::mem_map);
 
-	wd33c93_device &scsic(WD33C93(config, "scsic", 10'000'000)); // clock is guessed
+	wd33c93_device &scsic(WD33C93(config, "scsic", XTAL::u(10'000'000))); // clock is guessed
 	scsic.irq_cb().set_inputline("mpu", INPUT_LINE_IRQ5);
 }
 

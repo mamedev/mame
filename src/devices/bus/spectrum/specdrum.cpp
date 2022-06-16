@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_SPECDRUM, spectrum_specdrum_device, "spectrum_specdr
 void spectrum_specdrum_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "speaker").front_center();
-	ZN428E(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	ZN428E(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -37,7 +37,7 @@ void spectrum_specdrum_device::device_add_mconfig(machine_config &config)
 //  spectrum_specdrum_device - constructor
 //-------------------------------------------------
 
-spectrum_specdrum_device::spectrum_specdrum_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_specdrum_device::spectrum_specdrum_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPECTRUM_SPECDRUM, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_dac(*this, "dac")

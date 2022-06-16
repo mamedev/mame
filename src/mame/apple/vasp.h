@@ -18,12 +18,7 @@ class vasp_device :  public device_t
 {
 public:
 	// construction/destruction
-	vasp_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: vasp_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
-	vasp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vasp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// interface routines
 	auto pb4_callback() { return write_pb4.bind(); }

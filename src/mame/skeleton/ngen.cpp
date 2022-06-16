@@ -936,10 +936,10 @@ void ngen_state::ngen(machine_config &config)
 	m_maincpu->tmrout0_handler().set(FUNC(ngen_state::cpu_timer_w));
 	m_maincpu->read_slave_ack_callback().set(FUNC(ngen_state::irq_cb));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(78120/4);  // 19.53kHz, /4 of the CPU timer output?
 	m_pit->out_handler<0>().set(FUNC(ngen_state::pit_out0_w));  // RS232 channel B baud rate
 	m_pit->set_clk<1>(14.7456_MHz_XTAL / 12);  // correct? - based on patent
@@ -966,7 +966,7 @@ void ngen_state::ngen(machine_config &config)
 	m_dmac->out_iow_callback<3>().set(FUNC(ngen_state::dma_3_dack_w));
 
 	// I/O board
-	UPD7201(config, m_iouart, 0); // clocked by PIT channel 2?
+	UPD7201(config, m_iouart); // clocked by PIT channel 2?
 	m_iouart->out_txda_callback().set("rs232_a", FUNC(rs232_port_device::write_txd));
 	m_iouart->out_txdb_callback().set("rs232_b", FUNC(rs232_port_device::write_txd));
 	m_iouart->out_dtra_callback().set("rs232_a", FUNC(rs232_port_device::write_dtr));
@@ -1002,13 +1002,13 @@ void ngen_state::ngen(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(ngen_state::crtc_update_row));
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
-	I8251(config, m_viduart, 0);  // main clock unknown, Rx/Tx clocks are 19.53kHz
+	I8251(config, m_viduart);  // main clock unknown, Rx/Tx clocks are 19.53kHz
 //  m_viduart->txempty_handler().set(m_pic, FUNC(pic8259_device::ir4_w));
 	m_viduart->txd_handler().set("keyboard", FUNC(rs232_port_device::write_txd));
 	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
 	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
-	CLOCK(config, "refresh_clock", 19200*16).signal_handler().set(FUNC(ngen_state::timer_clk_out)); // should be 19530Hz
+	CLOCK(config, "refresh_clock", XTAL::u(19200*16)).signal_handler().set(FUNC(ngen_state::timer_clk_out)); // should be 19530Hz
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
@@ -1016,7 +1016,7 @@ void ngen_state::ngen(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 	m_fdc->set_force_ready(true);
 
-	PIT8253(config, m_fdc_timer, 0);
+	PIT8253(config, m_fdc_timer);
 	m_fdc_timer->set_clk<0>(0);
 	m_fdc_timer->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir5_w));  // clocked on FDC data register access
 	m_fdc_timer->set_clk<1>(20_MHz_XTAL / 20);
@@ -1035,11 +1035,11 @@ void ngen_state::ngen(machine_config &config)
 	m_hdc->in_tk000_callback().set_constant(1);
 	m_hdc->in_sc_callback().set_constant(1);
 
-	PIT8253(config, m_hdc_timer, 0);
+	PIT8253(config, m_hdc_timer);
 	m_hdc_timer->set_clk<2>(20_MHz_XTAL / 10);  // 2MHz
 
 	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
-	HARDDISK(config, "hard0", 0);
+	HARDDISK(config, "hard0");
 }
 
 void ngen386_state::ngen386(machine_config &config)
@@ -1049,10 +1049,10 @@ void ngen386_state::ngen386(machine_config &config)
 	m_i386cpu->set_addrmap(AS_IO, &ngen386_state::ngen386_io);
 	m_i386cpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_i386cpu, 0);
 
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(78120/4);  // 19.53kHz, /4 of the CPU timer output?
 	m_pit->out_handler<0>().set(FUNC(ngen386_state::pit_out0_w));  // RS232 channel B baud rate
 	m_pit->set_clk<1>(14.7456_MHz_XTAL / 12);  // correct? - based on patent
@@ -1079,7 +1079,7 @@ void ngen386_state::ngen386(machine_config &config)
 	m_dmac->out_iow_callback<3>().set(FUNC(ngen386_state::dma_3_dack_w));
 
 	// I/O board
-	UPD7201(config, m_iouart, 0); // clocked by PIT channel 2?
+	UPD7201(config, m_iouart); // clocked by PIT channel 2?
 	m_iouart->out_txda_callback().set("rs232_a", FUNC(rs232_port_device::write_txd));
 	m_iouart->out_txdb_callback().set("rs232_b", FUNC(rs232_port_device::write_txd));
 	m_iouart->out_dtra_callback().set("rs232_a", FUNC(rs232_port_device::write_dtr));
@@ -1115,13 +1115,13 @@ void ngen386_state::ngen386(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(ngen386_state::crtc_update_row));
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
-	I8251(config, m_viduart, 0);  // main clock unknown, Rx/Tx clocks are 19.53kHz
+	I8251(config, m_viduart);  // main clock unknown, Rx/Tx clocks are 19.53kHz
 //  m_viduart->txempty_handler().set("pic", FUNC(pic8259_device::ir4_w));
 	m_viduart->txd_handler().set("keyboard", FUNC(rs232_port_device::write_txd));
 	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
 	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
-	CLOCK(config, "refresh_clock", 19200*16).signal_handler().set(FUNC(ngen386_state::timer_clk_out)); // should be 19530Hz
+	CLOCK(config, "refresh_clock", XTAL::u(19200*16)).signal_handler().set(FUNC(ngen386_state::timer_clk_out)); // should be 19530Hz
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
@@ -1129,7 +1129,7 @@ void ngen386_state::ngen386(machine_config &config)
 	//m_fdc->drq_wr_callback().set(m_i386cpu, FUNC(i80186_cpu_device_device::drq1_w));
 	m_fdc->set_force_ready(true);
 
-	PIT8253(config, m_fdc_timer, 0);
+	PIT8253(config, m_fdc_timer);
 	m_fdc_timer->set_clk<0>(0);
 	m_fdc_timer->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir5_w));  // clocked on FDC data register access
 	m_fdc_timer->set_clk<1>(20_MHz_XTAL / 20);
@@ -1148,11 +1148,11 @@ void ngen386_state::ngen386(machine_config &config)
 	m_hdc->in_tk000_callback().set_constant(1);
 	m_hdc->in_sc_callback().set_constant(1);
 
-	PIT8253(config, m_hdc_timer, 0);
+	PIT8253(config, m_hdc_timer);
 	m_hdc_timer->set_clk<2>(20_MHz_XTAL / 10);  // 2MHz
 
 	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
-	HARDDISK(config, "hard0", 0);
+	HARDDISK(config, "hard0");
 }
 
 void ngen386_state::_386i(machine_config &config)

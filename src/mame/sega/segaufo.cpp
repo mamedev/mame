@@ -854,7 +854,7 @@ void ufo_state::ufo21(machine_config &config)
 	m_io2->out_pf_callback().set(FUNC(ufo_state::ex_crane_xyz_w));
 	m_io2->out_pg_callback().set_nop();
 
-	sega_315_5338a_device &io3(SEGA_315_5338A(config, "io3", 0));
+	sega_315_5338a_device &io3(SEGA_315_5338A(config, "io3"));
 	io3.out_pa_callback().set(FUNC(ufo_state::ex_upd_start_w));
 	io3.in_pb_callback().set(FUNC(ufo_state::ex_upd_busy_r));
 	io3.out_pe_callback().set(FUNC(ufo_state::ex_ufo21_lamps1_w));

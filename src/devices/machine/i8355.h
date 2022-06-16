@@ -38,7 +38,7 @@ class i8355_device : public device_t
 {
 public:
 	// construction/destruction
-	i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto in_pa() { return m_in_pa_cb.bind(); }
 	auto out_pa() { return m_out_pa_cb.bind(); }

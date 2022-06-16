@@ -81,7 +81,7 @@ protected:
 	};
 
 	// construction/destruction
-	ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -269,21 +269,21 @@ protected:
 class upd546_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd546_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd546_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class upd553_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class upd557l_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd557l_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual u8 input_r(int index) override;
@@ -294,14 +294,14 @@ protected:
 class upd650_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class upd552_cpu_device : public ucom4_cpu_device
 {
 public:
-	upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

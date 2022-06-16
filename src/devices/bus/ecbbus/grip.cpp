@@ -459,7 +459,7 @@ void ecb_grip21_device::device_add_mconfig(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(ecb_grip21_device::kb_w));
 }
 
@@ -558,7 +558,7 @@ ioport_constructor ecb_grip21_device::device_input_ports() const
 //  ecb_grip21_device - constructor
 //-------------------------------------------------
 
-ecb_grip21_device::ecb_grip21_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ecb_grip21_device::ecb_grip21_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ECB_GRIP21, tag, owner, clock),
 	device_ecbbus_card_interface(mconfig, *this),
 	m_ppi(*this, I8255A_TAG),

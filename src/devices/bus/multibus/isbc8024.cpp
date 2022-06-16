@@ -22,7 +22,7 @@
 
 DEFINE_DEVICE_TYPE(ISBC8024, isbc8024_device, "isbc8024", "Intel iSBC 80/24 Single Board Computer")
 
-isbc8024_device::isbc8024_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+isbc8024_device::isbc8024_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISBC8024, tag, owner, clock)
 	, device_multibus_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
@@ -108,10 +108,10 @@ void isbc8024_device::device_add_mconfig(machine_config &config)
 	m_pit->out_handler<2>().append(m_pci, FUNC(i8251_device::write_rxc));
 	m_pit->out_handler<2>().append(m_pci, FUNC(i8251_device::write_txc));
 
-	I8251(config, m_pci, 0);
+	I8251(config, m_pci);
 
-	I8255(config, m_ppi[0], 0); // j1
-	I8255(config, m_ppi[1], 0); // j2
+	I8255(config, m_ppi[0]); // j1
+	I8255(config, m_ppi[1]); // j2
 
 	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_cpu, I8085_INTR_LINE);

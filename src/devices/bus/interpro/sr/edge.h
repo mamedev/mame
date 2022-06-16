@@ -21,7 +21,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
 protected:
-	edge1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	edge1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 	virtual void map_dynamic(address_map &map);
@@ -77,7 +77,7 @@ private:
 class edge2_processor_device_base : public device_t, public device_srx_card_interface
 {
 protected:
-	edge2_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	edge2_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 
@@ -87,7 +87,7 @@ protected:
 class edge2_framebuffer_device_base : public device_t, public device_srx_card_interface
 {
 protected:
-	edge2_framebuffer_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	edge2_framebuffer_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 
@@ -101,7 +101,7 @@ public:
 	required_device<tms3203x_device> m_dsp1;
 
 protected:
-	edge2plus_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	edge2plus_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 
@@ -150,7 +150,7 @@ class edge2plus_framebuffer_device_base : public device_t, public device_srx_car
 protected:
 	friend class edge2plus_processor_device_base;
 
-	edge2plus_framebuffer_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	edge2plus_framebuffer_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 	virtual void device_start() override;
@@ -179,7 +179,7 @@ private:
 class mpcb828_device : public edge1_device_base
 {
 public:
-	mpcb828_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcb828_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -189,7 +189,7 @@ protected:
 class mpcb849_device : public edge1_device_base
 {
 public:
-	mpcb849_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcb849_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -201,7 +201,7 @@ protected:
 class mpcb030_device : public edge2_processor_device_base
 {
 public:
-	mpcb030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcb030_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -211,7 +211,7 @@ protected:
 class msmt094_device : public edge2plus_processor_device_base
 {
 public:
-	msmt094_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msmt094_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -221,7 +221,7 @@ protected:
 class mpcba63_device : public edge2_framebuffer_device_base
 {
 public:
-	mpcba63_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcba63_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -233,7 +233,7 @@ protected:
 class mpcb896_device : public edge2plus_framebuffer_device_base
 {
 public:
-	mpcb896_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcb896_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

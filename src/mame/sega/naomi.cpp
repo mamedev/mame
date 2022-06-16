@@ -2434,7 +2434,7 @@ void dc_state::naomi_aw_base(machine_config &config)
 	screen.set_raw(13458568*2, 820, 0, 640, 532, 0, 480);
 	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
 
-	POWERVR2(config, m_powervr2, 0);
+	POWERVR2(config, m_powervr2);
 	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -2468,7 +2468,7 @@ void naomi_state::naomi_base(machine_config &config)
 	mie_device &mie(MIE(config, "mie" "_maple", 16000000, m_maple, 0, "mie"));
 	mie.set_gpio_name<3>("MIE.3");
 	mie.set_gpio_name<5>("MIE.5");
-	MIE_JVS(config, "mie", 16000000);
+	MIE_JVS(config, "mie", XTAL::u(16000000));
 
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "mie"));
 	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
@@ -2476,7 +2476,7 @@ void naomi_state::naomi_base(machine_config &config)
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
 	X76F100(config, "naomibd_eeprom");
-	M3COMM(config, "comm_board", 0);
+	M3COMM(config, "comm_board");
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 }
@@ -2547,7 +2547,7 @@ void naomi_state::naomim4(machine_config &config)
 void naomi_state::naomim1_hop(machine_config &config)
 {
 	naomim1(config);
-	SEGA837_14438(config, "hopperbd", 0);
+	SEGA837_14438(config, "hopperbd");
 }
 
 /*
@@ -2603,7 +2603,7 @@ void naomi2_state::naomi2(machine_config &config)
 
 void naomi2_state::naomi2_base(machine_config &config)
 {
-	POWERVR2(config, m_powervr2_slave, 0);
+	POWERVR2(config, m_powervr2_slave);
 	m_powervr2_slave->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	// TODO: ELAN device

@@ -727,7 +727,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 
 	//config.set_maximum_quantum(attotime::from_hz(12000));
 
-	adc0808_device &adc(ADC0808(config, "adc", 500000)); // unknown clock
+	adc0808_device &adc(ADC0808(config, "adc", XTAL::u(500000))); // unknown clock
 	adc.eoc_ff_callback().set(FUNC(wheelfir_state::adc_eoc_w));
 	adc.in_callback<0>().set_ioport("STEERING");
 	adc.in_callback<1>().set_ioport("ACCELERATOR");
@@ -744,7 +744,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(NUM_COLORS);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &wheelfir_state::ramdac_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -754,8 +754,8 @@ void wheelfir_state::wheelfir(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DAC_10BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
-	DAC_10BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	DAC_10BIT_R2R(config, "ldac").add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
+	DAC_10BIT_R2R(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
 ;
 }
 

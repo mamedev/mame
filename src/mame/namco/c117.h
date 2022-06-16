@@ -19,7 +19,7 @@ class namco_c117_device :
 {
 public:
 	//construction/destruction
-	namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <typename T, typename U> void set_cpu_tags(T &&maintag, U &&subtag)

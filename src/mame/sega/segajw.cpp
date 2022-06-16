@@ -376,11 +376,11 @@ void segajw_state::ramdac_map(address_map &map)
 void segajw_state::segajw(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000); // unknown clock
+	M68000(config, m_maincpu, XTAL::u(8000000)); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &segajw_state::segajw_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segajw_state::irq4_line_hold));
 
-	Z80(config, m_audiocpu, 4000000); // unknown clock
+	Z80(config, m_audiocpu, XTAL::u(4000000)); // unknown clock
 	m_audiocpu->set_addrmap(AS_PROGRAM, &segajw_state::segajw_audiocpu_map);
 	m_audiocpu->set_addrmap(AS_IO, &segajw_state::segajw_audiocpu_io_map);
 
@@ -388,14 +388,14 @@ void segajw_state::segajw(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	sega_315_5296_device &io1a(SEGA_315_5296(config, "io1a", 0)); // unknown clock
+	sega_315_5296_device &io1a(SEGA_315_5296(config, "io1a")); // unknown clock
 	io1a.out_pa_callback().set(FUNC(segajw_state::coin_counter_w));
 	io1a.out_pb_callback().set(FUNC(segajw_state::lamps1_w));
 	io1a.out_pc_callback().set(FUNC(segajw_state::lamps2_w));
 	io1a.out_pd_callback().set(FUNC(segajw_state::hopper_w));
 	io1a.in_pf_callback().set(FUNC(segajw_state::coin_counter_r));
 
-	sega_315_5296_device &io1c(SEGA_315_5296(config, "io1c", 0)); // unknown clock
+	sega_315_5296_device &io1c(SEGA_315_5296(config, "io1c")); // unknown clock
 	io1c.in_pa_callback().set_ioport("IN0");
 	io1c.in_pb_callback().set_ioport("IN1");
 	io1c.in_pc_callback().set_ioport("IN2");
@@ -412,10 +412,10 @@ void segajw_state::segajw(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(16);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &segajw_state::ramdac_map);
 
-	hd63484_device &hd63484(HD63484(config, "hd63484", 8000000));
+	hd63484_device &hd63484(HD63484(config, "hd63484", XTAL::u(8000000)));
 	hd63484.set_addrmap(0, &segajw_state::segajw_hd63484_map); // unknown clock
 
 	/* sound hardware */
@@ -426,7 +426,7 @@ void segajw_state::segajw(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	ym3438_device &ymsnd(YM3438(config, "ymsnd", 8000000));   // unknown clock
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", XTAL::u(8000000)));   // unknown clock
 	ymsnd.irq_handler().set_inputline("maincpu", 5);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }

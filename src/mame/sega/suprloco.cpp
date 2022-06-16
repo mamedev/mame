@@ -472,13 +472,13 @@ GFXDECODE_END
 void suprloco_state::suprloco(machine_config &config)
 {
 	// basic machine hardware
-	sega_315_5015_device &maincpu(SEGA_315_5015(config, m_maincpu, 4'000'000));   // 4 MHz (?)
+	sega_315_5015_device &maincpu(SEGA_315_5015(config, m_maincpu, XTAL::u(4'000'000)));   // 4 MHz (?)
 	maincpu.set_addrmap(AS_PROGRAM, &suprloco_state::main_map);
 	maincpu.set_addrmap(AS_OPCODES, &suprloco_state::decrypted_opcodes_map);
 	maincpu.set_vblank_int("screen", FUNC(suprloco_state::irq0_line_hold));
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
-	Z80(config, m_audiocpu, 4'000'000);
+	Z80(config, m_audiocpu, XTAL::u(4'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &suprloco_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(suprloco_state::irq0_line_hold), attotime::from_hz(4 * 60));          // NMIs are caused by the main CPU
 
@@ -503,9 +503,9 @@ void suprloco_state::suprloco(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76496(config, "sn1", 4'000'000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76496(config, "sn1", XTAL::u(4'000'000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	SN76496(config, "sn2", 2'000'000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76496(config, "sn2", XTAL::u(2'000'000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

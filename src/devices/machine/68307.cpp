@@ -56,7 +56,7 @@ void m68307_cpu_device::device_add_mconfig(machine_config &config)
 }
 
 
-m68307_cpu_device::m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m68307_cpu_device::m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m68000_device(mconfig, tag, owner, clock, M68307, 16, 24, address_map_constructor(FUNC(m68307_cpu_device::internal_map), this)),
 	m_write_irq(*this),
 	m_write_a_tx(*this),

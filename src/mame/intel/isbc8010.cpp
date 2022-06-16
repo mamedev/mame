@@ -177,7 +177,7 @@ void isbc8010_state::isbc8010(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &isbc8010_state::isbc8010_mem);
 	m_maincpu->set_addrmap(AS_IO, &isbc8010_state::isbc8010_io);
 
-	I8251(config, m_usart, 0);
+	I8251(config, m_usart);
 	m_usart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_usart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
@@ -217,7 +217,7 @@ void isbc8010_state::isbc8010(machine_config &config)
 //  PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// Video board UART
-//  ay31015_device &hd6402(AY31015(config, "hd6402", 0));
+//  ay31015_device &hd6402(AY31015(config, "hd6402"));
 //  MCFG_AY31015_TX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
 //  MCFG_AY31015_RX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
 //  hd6402.read_si_callback().set(FUNC(sdk80_state::nascom1_hd6402_si));
@@ -228,7 +228,7 @@ void isbc8010_state::isbc8010(machine_config &config)
 //  uart_clock.signal_handler().append("hd6402", FUNC(ay31015_device::write_rcp));
 
 	/* Devices */
-//  i8279_device &kbdc(I8279(config, "i8279", 3100000)); // based on divider
+//  i8279_device &kbdc(I8279(config, "i8279", XTAL::u(3100000))); // based on divider
 //  kbdc.out_irq_callback().set_inputline("maincpu", I8085_RST55_LINE); // irq
 //  kbdc.out_sl_callback().set(FUNC(sdk80_state::scanlines_w));         // scan SL lines
 //  kbdc.out_disp_callback().set(FUNC(sdk80_state::digit_w));           // display A&B

@@ -61,7 +61,7 @@ void spectrum_uspeech_device::device_add_mconfig(machine_config &config)
 //  spectrum_uspeech_device - constructor
 //-------------------------------------------------
 
-spectrum_uspeech_device::spectrum_uspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spectrum_uspeech_device::spectrum_uspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SPECTRUM_USPEECH, tag, owner, clock),
 	device_spectrum_expansion_interface(mconfig, *this),
 	m_nsp(*this, "sp0256"),
@@ -151,12 +151,12 @@ void spectrum_uspeech_device::mreq_w(offs_t offset, uint8_t data)
 
 		case 0x3000:
 			// intonation low
-			m_nsp->set_clock(3050000); // oscillator frequency read from hardware
+			m_nsp->set_clock(XTAL::u(3050000)); // oscillator frequency read from hardware
 			break;
 
 		case 0x3001:
 			// intonation high
-			m_nsp->set_clock(3260000); // oscillator frequency read from hardware
+			m_nsp->set_clock(XTAL::u(3260000)); // oscillator frequency read from hardware
 			break;
 		}
 	}

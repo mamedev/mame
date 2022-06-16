@@ -38,7 +38,7 @@ device_abcbus_card_interface::device_abcbus_card_interface(const machine_config 
 //  abcbus_slot_device - constructor
 //-------------------------------------------------
 
-abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ABCBUS_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_abcbus_card_interface>(mconfig, *this),
 	m_write_irq(*this),

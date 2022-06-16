@@ -39,17 +39,17 @@ DEFINE_DEVICE_TYPE(NES_TENGEN_800032, nes_tengen032_device, "nes_tengen032", "NE
 DEFINE_DEVICE_TYPE(NES_TENGEN_800037, nes_tengen037_device, "nes_tengen037", "NES Cart Tengen 800037 PCB")
 
 
-nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_reset(0), m_irq_enable(0), m_irq_pending(0), irq_timer(nullptr)
 {
 }
 
-nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_tengen032_device(mconfig, NES_TENGEN_800032, tag, owner, clock)
 {
 }
 
-nes_tengen037_device::nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_tengen037_device::nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_tengen032_device(mconfig, NES_TENGEN_800037, tag, owner, clock)
 {
 }

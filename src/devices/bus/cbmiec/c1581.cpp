@@ -320,7 +320,7 @@ ioport_constructor c1581_device::device_input_ports() const
 //  c1581_device - constructor
 //-------------------------------------------------
 
-c1581_device::c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+c1581_device::c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
@@ -337,7 +337,7 @@ c1581_device::c1581_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-c1581_device::c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c1581_device::c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1581_device(mconfig, C1581, tag, owner, clock)
 {
 }
@@ -347,7 +347,7 @@ c1581_device::c1581_device(const machine_config &mconfig, const char *tag, devic
 //  c1563_device - constructor
 //-------------------------------------------------
 
-c1563_device::c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c1563_device::c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1581_device(mconfig, C1563, tag, owner, clock) { }
 
 

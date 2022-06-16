@@ -292,7 +292,7 @@ void vme_fcisio1_card_device::device_add_mconfig(machine_config &config)
 #define RS232P8_TAG      "rs232p8"
 
 	DUSCC68562(config, m_duscc0, DUSCC_CLOCK);
-	m_duscc0->configure_channels(0, 0, 0, 0);
+	m_duscc0->configure_channels(XTAL(), XTAL(), XTAL(), XTAL());
 	/* Port 1 on DUSCC 0 Port A */
 	m_duscc0->out_txda_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_txd));
 	m_duscc0->out_dtra_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_dtr));
@@ -311,7 +311,7 @@ void vme_fcisio1_card_device::device_add_mconfig(machine_config &config)
 	rs232p2.cts_handler().set(m_duscc0, FUNC(duscc68562_device::ctsb_w));
 
 	DUSCC68562(config, m_duscc1, DUSCC_CLOCK);
-	m_duscc1->configure_channels(0, 0, 0, 0);
+	m_duscc1->configure_channels(XTAL(), XTAL(), XTAL(), XTAL());
 	/* Port 3 on DUSCC 1 Port A */
 	m_duscc1->out_txda_callback().set(RS232P3_TAG, FUNC(rs232_port_device::write_txd));
 	m_duscc1->out_dtra_callback().set(RS232P3_TAG, FUNC(rs232_port_device::write_dtr));
@@ -330,7 +330,7 @@ void vme_fcisio1_card_device::device_add_mconfig(machine_config &config)
 	rs232p4.cts_handler().set(m_duscc1, FUNC(duscc68562_device::ctsb_w));
 
 	DUSCC68562(config, m_duscc2, DUSCC_CLOCK);
-	m_duscc2->configure_channels(0, 0, 0, 0);
+	m_duscc2->configure_channels(XTAL(), XTAL(), XTAL(), XTAL());
 	/* Port 5 on DUSCC 2 Port A */
 	m_duscc2->out_txda_callback().set(RS232P5_TAG, FUNC(rs232_port_device::write_txd));
 	m_duscc2->out_dtra_callback().set(RS232P5_TAG, FUNC(rs232_port_device::write_dtr));
@@ -349,7 +349,7 @@ void vme_fcisio1_card_device::device_add_mconfig(machine_config &config)
 	rs232p6.cts_handler().set(m_duscc2, FUNC(duscc68562_device::ctsb_w));
 
 	DUSCC68562(config, m_duscc3, DUSCC_CLOCK);
-	m_duscc3->configure_channels(0, 0, 0, 0);
+	m_duscc3->configure_channels(XTAL(), XTAL(), XTAL(), XTAL());
 	/* Port 7 on DUSCC 3 Port A */
 	m_duscc3->out_txda_callback().set(RS232P7_TAG, FUNC(rs232_port_device::write_txd));
 	m_duscc3->out_dtra_callback().set(RS232P7_TAG, FUNC(rs232_port_device::write_dtr));
@@ -382,7 +382,7 @@ const tiny_rom_entry *vme_fcisio1_card_device::device_rom_region() const
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
-vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_maincpu (*this, "maincpu")
@@ -396,7 +396,7 @@ vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, 
 	LOG("%s\n", FUNCNAME);
 }
 
-vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vme_fcisio1_card_device(mconfig, VME_FCISIO1, tag, owner, clock)
 {
 }

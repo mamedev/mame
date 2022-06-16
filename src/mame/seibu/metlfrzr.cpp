@@ -386,7 +386,7 @@ void metlfrzr_state::metlfrzr(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &metlfrzr_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(metlfrzr_state::scanline), "screen", 0, 1);
 
-	T5182(config, "t5182", 0);
+	T5182(config, "t5182");
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x200).set_indirect_entries(256 * 2);
 

@@ -649,7 +649,7 @@ void cm32p_state::cm32p(machine_config &config)
 	screen.set_visarea(0, 16*6-2, 0, (16*6-1)*3/4-1);
 	screen.set_palette("palette");
 	PALETTE(config, "palette", FUNC(cm32p_state::mt32_palette), 2);
-	MSM6222B_01(config, lcd, 0);
+	MSM6222B_01(config, lcd);
 
 	generic_cartslot_device &cardslot(GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "u110_card", "bin"));
 	cardslot.set_device_load(FUNC(cm32p_state::card_load));

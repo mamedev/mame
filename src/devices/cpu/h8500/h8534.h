@@ -12,8 +12,8 @@ class h8534_device : public h8500_device
 {
 protected:
 	// delegating constructors
-	h8534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-	h8534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map);
+	h8534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
+	h8534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map);
 
 	void register_field_map(address_map &map);
 
@@ -25,20 +25,20 @@ class hd6435348_device : public h8534_device
 {
 public:
 	// device type constructor
-	hd6435348_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd6435348_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class hd6475348_device : public h8534_device
 {
 public:
 	// device type constructor
-	hd6475348_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd6475348_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class h8536_device : public h8534_device
 {
 protected:
-	h8536_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	h8536_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	void internal_map(address_map &map);
@@ -48,14 +48,14 @@ class hd6435368_device : public h8536_device
 {
 public:
 	// device type constructor
-	hd6435368_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd6435368_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class hd6475368_device : public h8536_device
 {
 public:
 	// device type constructor
-	hd6475368_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd6475368_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(HD6435348, hd6435348_device)

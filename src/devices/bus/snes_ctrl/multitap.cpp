@@ -64,7 +64,7 @@ void snes_multitap_device::device_add_mconfig(machine_config &config)
 //  snes_multitap_device - constructor
 //-------------------------------------------------
 
-snes_multitap_device::snes_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+snes_multitap_device::snes_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SNES_MULTITAP, tag, owner, clock),
 	device_snes_control_port_interface(mconfig, *this),
 	m_port1(*this, "port1"),

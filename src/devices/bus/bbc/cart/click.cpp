@@ -54,7 +54,7 @@ ioport_constructor bbc_click_device::device_input_ports() const
 //  bbc_click_device - constructor
 //-------------------------------------------------
 
-bbc_click_device::bbc_click_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_click_device::bbc_click_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_CLICK, tag, owner, clock)
 	, device_bbc_cart_interface(mconfig, *this)
 {

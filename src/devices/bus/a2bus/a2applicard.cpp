@@ -41,13 +41,13 @@ class a2bus_applicard_device:
 {
 public:
 	// construction/destruction
-	a2bus_applicard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_applicard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t z80_io_r(offs_t offset);
 	void z80_io_w(offs_t offset, uint8_t data);
 
 protected:
-	a2bus_applicard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_applicard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -95,7 +95,7 @@ void a2bus_applicard_device::z80_io(address_map &map)
 
 void a2bus_applicard_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_z80, 6000000); // Z80 runs at 6 MHz
+	Z80(config, m_z80, XTAL::u(6000000)); // Z80 runs at 6 MHz
 	m_z80->set_addrmap(AS_PROGRAM, &a2bus_applicard_device::z80_mem);
 	m_z80->set_addrmap(AS_IO, &a2bus_applicard_device::z80_io);
 }
@@ -113,7 +113,7 @@ const tiny_rom_entry *a2bus_applicard_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_applicard_device::a2bus_applicard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_applicard_device::a2bus_applicard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_z80(*this, Z80_TAG),
@@ -122,7 +122,7 @@ a2bus_applicard_device::a2bus_applicard_device(const machine_config &mconfig, de
 {
 }
 
-a2bus_applicard_device::a2bus_applicard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_applicard_device::a2bus_applicard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_applicard_device(mconfig, A2BUS_APPLICARD, tag, owner, clock)
 {
 }

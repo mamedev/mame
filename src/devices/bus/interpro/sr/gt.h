@@ -15,7 +15,7 @@
 class gt_device_base : public device_t
 {
 protected:
-	gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool double_buffered, const bool masked_reads);
+	gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const bool double_buffered, const bool masked_reads);
 
 	virtual void map(address_map &map);
 
@@ -248,7 +248,7 @@ private:
 class gt_device : public gt_device_base, public device_cbus_card_interface
 {
 protected:
-	gt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool double_buffered);
+	gt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const bool double_buffered);
 
 	virtual void map(address_map &map) override;
 };
@@ -256,7 +256,7 @@ protected:
 class gtdb_device : public gt_device_base, public device_srx_card_interface
 {
 protected:
-	gtdb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gtdb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 	virtual void map_dynamic(address_map &map);
@@ -306,7 +306,7 @@ private:
 class mpcb963_device : public gt_device
 {
 public:
-	mpcb963_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcb963_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -316,7 +316,7 @@ protected:
 class mpcba79_device : public gt_device
 {
 public:
-	mpcba79_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcba79_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -327,7 +327,7 @@ protected:
 class msmt070_device : public gt_device
 {
 public:
-	msmt070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msmt070_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -337,7 +337,7 @@ protected:
 class msmt071_device : public gt_device
 {
 public:
-	msmt071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msmt071_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -347,7 +347,7 @@ protected:
 class msmt081_device : public gt_device
 {
 public:
-	msmt081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msmt081_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -357,7 +357,7 @@ protected:
 class mpcbb68_device : public gtdb_device
 {
 public:
-	mpcbb68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcbb68_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -367,7 +367,7 @@ protected:
 class mpcbb92_device : public gtdb_device
 {
 public:
-	mpcbb92_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpcbb92_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

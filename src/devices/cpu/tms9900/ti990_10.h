@@ -16,7 +16,7 @@
 class ti990_10_device : public cpu_device
 {
 public:
-	ti990_10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti990_10_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~ti990_10_device();
 
 protected:

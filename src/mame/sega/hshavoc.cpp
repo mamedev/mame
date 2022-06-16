@@ -121,7 +121,7 @@ void hshavoc_state::hshavoc(machine_config &config)
 {
 	md_bootleg(config);
 
-	PIC16C55(config, "pic", 4'000'000); // clock unknown
+	PIC16C55(config, "pic", XTAL::u(4'000'000)); // clock unknown
 }
 
 

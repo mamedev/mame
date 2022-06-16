@@ -18,12 +18,12 @@ class crime_device : public device_t
 public:
 	template <typename T>
 	crime_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
-		: crime_device(mconfig, tag, owner, (uint32_t)0)
+		: crime_device(mconfig, tag, owner)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	crime_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	crime_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void map(address_map &map);
 

@@ -10,7 +10,7 @@
 class snk_bbusters_spr_device : public device_t, public device_gfx_interface
 {
 public:
-	snk_bbusters_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	snk_bbusters_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <typename T> void set_spriteram_tag(T &&tag) { m_spriteram.set_tag(std::forward<T>(tag)); }

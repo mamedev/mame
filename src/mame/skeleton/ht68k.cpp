@@ -129,7 +129,7 @@ void ht68k_state::ht68k(machine_config &config)
 
 	/* video hardware */
 	MC68681(config, m_duart, 8_MHz_XTAL / 2);
-	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
+	m_duart->set_clocks(XTAL::u(500000), XTAL::u(500000), XTAL::u(1000000), XTAL::u(1000000));
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_duart->a_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_duart->b_tx_cb().set(FUNC(ht68k_state::duart_txb));

@@ -53,7 +53,7 @@ class z80scc_channel : public device_t,
 	friend class z80scc_device;
 
 public:
-	z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -330,12 +330,12 @@ public:
 
 	void set_cputag(const char *tag) { m_cputag = tag; }
 
-	void configure_channels(int rxa, int txa, int rxb, int txb)
+	void configure_channels(const XTAL &rxa, const XTAL &txa, const XTAL &rxb, const XTAL &txb)
 	{
-		m_rxca = rxa;
-		m_txca = txa;
-		m_rxcb = rxb;
-		m_txcb = txb;
+		m_rxca = rxa.value();
+		m_txca = txa.value();
+		m_rxcb = rxb.value();
+		m_txcb = txb.value();
 	}
 
 	uint8_t dc_ab_r(offs_t offset);
@@ -380,7 +380,7 @@ public:
 	int get_extint_priority(int type);
 
 protected:
-	z80scc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	z80scc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -460,49 +460,49 @@ protected:
 class scc8030_device : public z80scc_device
 {
 public:
-	scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class scc80c30_device : public z80scc_device
 {
 public:
-	scc80c30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc80c30_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class scc80230_device : public z80scc_device
 {
 public:
-	scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class scc8530_device : public z80scc_device
 {
 public:
-	scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class scc85c30_device : public z80scc_device
 {
 public:
-	scc85c30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc85c30_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class scc85230_device : public z80scc_device
 {
 public:
-	scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class scc85233_device : public z80scc_device
 {
 public:
-	scc85233_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc85233_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class scc8523l_device : public z80scc_device
 {
 public:
-	scc8523l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc8523l_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition

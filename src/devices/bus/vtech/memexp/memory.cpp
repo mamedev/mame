@@ -38,7 +38,7 @@ void vtech_laser110_16k_device::mem_map(address_map &map)
 //  laser110_16k_device - constructor
 //-------------------------------------------------
 
-vtech_laser110_16k_device::vtech_laser110_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vtech_laser110_16k_device::vtech_laser110_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vtech_memexp_device(mconfig, VTECH_LASER110_16K, tag, owner, clock)
 {
 }
@@ -71,7 +71,7 @@ void vtech_laser210_16k_device::mem_map(address_map &map)
 //  vtech_laser210_16k_device - constructor
 //-------------------------------------------------
 
-vtech_laser210_16k_device::vtech_laser210_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vtech_laser210_16k_device::vtech_laser210_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vtech_memexp_device(mconfig, VTECH_LASER210_16K, tag, owner, clock)
 {
 }
@@ -104,7 +104,7 @@ void vtech_laser310_16k_device::mem_map(address_map &map)
 //  vtech_laser310_16k_device - constructor
 //-------------------------------------------------
 
-vtech_laser310_16k_device::vtech_laser310_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vtech_laser310_16k_device::vtech_laser310_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vtech_memexp_device(mconfig, VTECH_LASER310_16K, tag, owner, clock)
 {
 }
@@ -148,7 +148,7 @@ void vtech_laser_64k_device::io_map(address_map &map)
 //  vtech_laser_64k_device - constructor
 //-------------------------------------------------
 
-vtech_laser_64k_device::vtech_laser_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vtech_laser_64k_device::vtech_laser_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vtech_memexp_device(mconfig, VTECH_LASER_64K, tag, owner, clock),
 	m_fixed_bank(*this, "fixed_bank"),
 	m_bank(*this, "bank")

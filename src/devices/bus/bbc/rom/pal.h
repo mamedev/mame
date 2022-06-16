@@ -25,7 +25,7 @@ class bbc_pal_device : public device_t,
 {
 protected:
 	// construction/destruction
-	bbc_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -42,7 +42,7 @@ class bbc_cciword_device : public bbc_pal_device
 {
 public:
 	// construction/destruction
-	bbc_cciword_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_cciword_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_bbc_rom_interface overrides
@@ -55,7 +55,7 @@ class bbc_ccibase_device : public bbc_pal_device
 {
 public:
 	// construction/destruction
-	bbc_ccibase_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_ccibase_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_bbc_rom_interface overrides
@@ -68,7 +68,7 @@ class bbc_ccispell_device : public bbc_pal_device
 {
 public:
 	// construction/destruction
-	bbc_ccispell_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_ccispell_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_bbc_rom_interface overrides
@@ -80,7 +80,7 @@ protected:
 class bbc_palqst_device : public bbc_pal_device
 {
 public:
-	bbc_palqst_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_palqst_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_bbc_rom_interface overrides
@@ -92,7 +92,7 @@ protected:
 class bbc_palwap_device : public bbc_pal_device
 {
 public:
-	bbc_palwap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_palwap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_bbc_rom_interface overrides
@@ -105,7 +105,7 @@ class bbc_palted_device : public bbc_pal_device
 {
 public:
 	// construction/destruction
-	bbc_palted_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_palted_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_bbc_rom_interface overrides
@@ -118,7 +118,7 @@ class bbc_palabep_device : public bbc_pal_device
 {
 public:
 	// construction/destruction
-	bbc_palabep_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_palabep_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_bbc_rom_interface overrides
@@ -131,7 +131,7 @@ class bbc_palabe_device : public bbc_pal_device
 {
 public:
 	// construction/destruction
-	bbc_palabe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_palabe_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_bbc_rom_interface overrides
@@ -144,7 +144,7 @@ class bbc_palmo2_device : public bbc_pal_device
 {
 public:
 	// construction/destruction
-	bbc_palmo2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_palmo2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_bbc_rom_interface overrides

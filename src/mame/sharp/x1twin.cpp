@@ -434,7 +434,7 @@ void x1twin_state::x1twin(machine_config &config)
 	ctc.zc_callback<1>().set("ctc", FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg2));
 
-	X1_KEYBOARD(config, "x1kb", 0);
+	X1_KEYBOARD(config, "x1kb");
 
 	i8255_device &ppi(I8255A(config, "ppi8255_0"));
 	ppi.in_pa_callback().set(FUNC(x1_state::x1_porta_r));

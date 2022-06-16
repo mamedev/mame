@@ -159,7 +159,7 @@ constexpr unsigned VIDEO_CHAR_HEIGHT = 15;
 constexpr uint16_t START_DMA_ADDR   = 0xffff;
 constexpr unsigned MAX_DMA_CYCLES   = 450;
 constexpr unsigned CURSOR_BLINK_INH_MS  = 110;
-constexpr unsigned BEEP_FREQUENCY   = 650;
+constexpr XTAL BEEP_FREQUENCY   = XTAL::u(650);
 constexpr unsigned BEEP_DURATION_MS = 100;
 
 // ************
@@ -354,7 +354,7 @@ void hp2640_base_state::machine_reset()
 	m_uart->write_cs(1);
 	m_uart->write_nb2(1);
 	m_async_control = 0;
-	m_uart_clock->set_unscaled_clock(0);
+	m_uart_clock->set_unscaled_clock(XTAL());
 	update_async_control(0x00);
 	m_rs232->write_dtr(0);
 	async_txd_w(0);
@@ -810,15 +810,15 @@ void hp2640_base_state::update_async_control(uint8_t new_control)
 	if (diff & 0x0e) {
 		unsigned new_rate_idx = (m_async_control >> 1) & 0x07;
 		// Set baud rate
-		double rxc_txc_freq;
+		XTAL rxc_txc_freq;
 		if (new_rate_idx == 0) {
-			rxc_txc_freq = 0.0;
+			rxc_txc_freq = XTAL();
 		} else {
-			rxc_txc_freq = SYS_CLOCK.dvalue() / baud_rate_divisors[ new_rate_idx ];
+			rxc_txc_freq = SYS_CLOCK / baud_rate_divisors[ new_rate_idx ];
 		}
 		m_uart_clock->set_unscaled_clock(rxc_txc_freq);
 		m_uart->write_tsb(new_rate_idx == 1);
-		LOG("ASYNC freq=%f\n" , rxc_txc_freq);
+		LOG("ASYNC freq=%f\n" , rxc_txc_freq.value());
 	}
 	if (diff & 0x30) {
 		m_uart->write_np(BIT(new_control , 5));
@@ -1134,7 +1134,7 @@ void hp2640_base_state::hp2640_base(machine_config &config)
 	m_uart->write_dav_callback().set(FUNC(hp2640_base_state::async_dav_w));
 	m_uart->set_auto_rdav(true);
 
-	CLOCK(config, m_uart_clock, 19200 * 16);
+	CLOCK(config, m_uart_clock, XTAL::u(19200 * 16));
 	m_uart_clock->signal_handler().set(m_uart, FUNC(ay51013_device::write_rcp));
 	m_uart_clock->signal_handler().append(m_uart, FUNC(ay51013_device::write_tcp));
 

@@ -19,7 +19,7 @@ class coco_pak_device :
 {
 public:
 	// construction/destruction
-	coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -30,7 +30,7 @@ public:
 	virtual memory_region *get_cart_memregion() override;
 
 protected:
-	coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -50,10 +50,10 @@ class coco_pak_banked_device : public coco_pak_device
 {
 public:
 	// construction/destruction
-	coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

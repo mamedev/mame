@@ -28,12 +28,12 @@ class cuda_device :  public device_t, public device_nvram_interface
 public:
 	// construction/destruction
 	cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, int type)
-		: cuda_device(mconfig, tag, owner, (uint32_t)0)
+		: cuda_device(mconfig, tag, owner)
 	{
 		set_type(type);
 	}
 
-	cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration helpers
 	void set_type(int type) { rom_offset = type; }

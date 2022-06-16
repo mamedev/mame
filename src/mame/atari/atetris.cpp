@@ -596,7 +596,7 @@ void atetris_state::atetris(machine_config &config)
 {
 	atetris_pokey(config);
 
-	SLAPSTIC(config, m_slapstic, 101);
+	SLAPSTIC(config, m_slapstic, XTAL::u(101));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x6000, 0x7fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 }

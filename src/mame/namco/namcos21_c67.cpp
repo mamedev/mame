@@ -510,7 +510,7 @@ void namcos21_c67_state::c140_map(address_map &map)
 
 void namcos21_c67_state::configure_c68_namcos21(machine_config &config)
 {
-	NAMCOC68(config, m_c68, 8000000);
+	NAMCOC68(config, m_c68, XTAL::u(8000000));
 	m_c68->in_pb_callback().set_ioport("MCUB");
 	m_c68->in_pc_callback().set_ioport("MCUC");
 	m_c68->in_ph_callback().set_ioport("MCUH");
@@ -805,7 +805,7 @@ void namcos21_c67_state::namcos21(machine_config &config)
 
 	configure_c68_namcos21(config);
 
-	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67, 0);
+	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67);
 	m_namcos21_dsp_c67->set_renderer_tag("namcos21_3d");
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
@@ -818,17 +818,17 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	m_screen->set_screen_update(FUNC(namcos21_c67_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	NAMCOS21_3D(config, m_namcos21_3d, 0);
+	NAMCOS21_3D(config, m_namcos21_3d);
 	m_namcos21_3d->set_zz_shift_mult(11, 0x200);
 	m_namcos21_3d->set_depth_reverse(false);
 	m_namcos21_3d->set_framebuffer_size(496,480);
 
 	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, 0x10000/2);
 
-	NAMCO_C355SPR(config, m_c355spr, 0);
+	NAMCO_C355SPR(config, m_c355spr);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_palette);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);

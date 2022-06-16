@@ -56,7 +56,7 @@ class hexbus_chained_device : public device_t, public device_hexbus_interface
 	friend class hexbus_device;
 
 protected:
-	hexbus_chained_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	hexbus_chained_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_outbound_hexbus(hexbus_device *outbound) { m_hexbus_outbound = outbound; }
 
@@ -142,7 +142,7 @@ class hexbus_device : public device_t, public device_single_card_slot_interface<
 {
 public:
 	template <typename U>
-	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, U &&opts, const char *dflt)
 		: hexbus_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -151,7 +151,7 @@ public:
 		set_fixed(false);
 	}
 
-	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Used to establish the reverse link (inbound)
 	void set_chain_element(hexbus_chained_device* chain) { m_chain_element = chain; }

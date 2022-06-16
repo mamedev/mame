@@ -26,7 +26,7 @@ class aquarius_sc1_device :
 {
 public:
 	// construction/destruction
-	aquarius_sc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	aquarius_sc1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

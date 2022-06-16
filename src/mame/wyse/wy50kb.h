@@ -26,7 +26,7 @@ private:
 class wy50_keyboard_device : public wyse_parallel_keyboard_device
 {
 public:
-	wy50_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	wy50_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -35,7 +35,7 @@ protected:
 class wy100_keyboard_device : public wyse_parallel_keyboard_device
 {
 public:
-	wy100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	wy100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;

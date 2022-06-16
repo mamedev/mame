@@ -13,7 +13,7 @@
 class micro3d_sound_device : public device_t, public device_sound_interface
 {
 public:
-	micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void dac_w(u8 data) { m_dac_data = data; }
 	void noise_sh_w(u8 data);

@@ -31,7 +31,7 @@
 DEFINE_DEVICE_TYPE(NES_BENSHIENG, nes_benshieng_device, "nes_benshieng", "NES Cart Benshieng PCB")
 
 
-nes_benshieng_device::nes_benshieng_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_benshieng_device::nes_benshieng_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_BENSHIENG, tag, owner, clock), m_dipsetting(0)
 {
 }

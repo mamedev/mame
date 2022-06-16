@@ -10,7 +10,7 @@
 
 DEFINE_DEVICE_TYPE(CEDAR_MAGNET_FLOP, cedar_magnet_flop_device, "cedmag_flop", "Cedar Floppy Simulation")
 
-cedar_magnet_flop_device::cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cedar_magnet_flop_device::cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CEDAR_MAGNET_FLOP, tag, owner, clock)
 	, m_disk(*this, "disk")
 {

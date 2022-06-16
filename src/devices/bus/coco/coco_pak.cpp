@@ -55,14 +55,14 @@ DEFINE_DEVICE_TYPE(COCO_PAK, coco_pak_device, "cocopak", "CoCo Program PAK")
 //-------------------------------------------------
 //  coco_pak_device - constructor
 //-------------------------------------------------
-coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_cart(nullptr), m_eprom(*this, CARTSLOT_TAG), m_autostart(*this, CART_AUTOSTART_TAG)
 {
 }
 
-coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: coco_pak_device(mconfig, COCO_PAK, tag, owner, clock)
 {
 }
@@ -171,12 +171,12 @@ DEFINE_DEVICE_TYPE(COCO_PAK_BANKED, coco_pak_banked_device, "cocopak_banked", "C
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
-coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: coco_pak_device(mconfig, type, tag, owner, clock)
 	, m_pos(0)
 {
 }
-coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: coco_pak_banked_device(mconfig, COCO_PAK_BANKED, tag, owner, clock)
 {
 }

@@ -404,7 +404,7 @@ void ravens2_state::ravens2(machine_config &config)
 	m_maincpu->flag_handler().set(FUNC(ravens2_state::cass_w));
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(ravens2_state::kbd_put));
 
 	/* quickload */

@@ -16,7 +16,7 @@ TODO:
 DEFINE_DEVICE_TYPE(YM2148, ym2148_device, "ym2148", "Yamaha YM2148 MIDI/Keyboard Interface")
 
 
-ym2148_device::ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ym2148_device::ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, YM2148, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_txd_handler(*this)

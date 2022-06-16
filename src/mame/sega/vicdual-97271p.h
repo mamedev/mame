@@ -15,7 +15,7 @@ class s97271p_device : public device_t
 {
 public:
 	// construction/destruction
-	s97271p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s97271p_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// daughterboard logic
 	void port_w(uint8_t data);

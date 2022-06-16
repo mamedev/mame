@@ -15,13 +15,13 @@ class vectrex_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	vectrex_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vectrex_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) override;
 
 protected:
-	vectrex_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vectrex_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override { }
@@ -34,7 +34,7 @@ class vectrex_rom64k_device : public vectrex_rom_device
 {
 public:
 	// construction/destruction
-	vectrex_rom64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vectrex_rom64k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) override;
@@ -55,7 +55,7 @@ class vectrex_sram_device : public vectrex_rom_device
 {
 public:
 	// construction/destruction
-	vectrex_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vectrex_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual void write_ram(offs_t offset, uint8_t data) override;

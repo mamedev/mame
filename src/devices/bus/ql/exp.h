@@ -84,7 +84,7 @@ class ql_expansion_slot_device : public device_t, public device_single_card_slot
 public:
 	// construction/destruction
 	template <typename T>
-	ql_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	ql_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: ql_expansion_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -92,7 +92,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	ql_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ql_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto ipl0l_wr_callback() { return m_write_ipl0l.bind(); }
 	auto ipl1l_wr_callback() { return m_write_ipl1l.bind(); }

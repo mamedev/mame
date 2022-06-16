@@ -102,7 +102,7 @@ void newton_state::mp130(machine_config &config)
 
 void newton_state::emate(machine_config &config)
 {
-	ARM710A(config, m_maincpu, 162000000);
+	ARM710A(config, m_maincpu, XTAL::u(162000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &newton_state::mem_map);
 
 	RAM(config, m_ram);
@@ -112,7 +112,7 @@ void newton_state::emate(machine_config &config)
 
 void newton_state::mp2000(machine_config &config)
 {
-	ARM710A(config, m_maincpu, 162000000); // really SA110
+	ARM710A(config, m_maincpu, XTAL::u(162000000)); // really SA110
 	m_maincpu->set_addrmap(AS_PROGRAM, &newton_state::mem_map);
 
 	RAM(config, m_ram);

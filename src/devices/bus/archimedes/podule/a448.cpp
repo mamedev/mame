@@ -28,10 +28,10 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::CAPTURE; }
 
 	// construction/destruction
-	arc_a448_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_a448_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	arc_a448_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	arc_a448_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -54,7 +54,7 @@ class arc_a448b_device : public arc_a448_device
 {
 public:
 	// construction/destruction
-	arc_a448b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_a448b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -100,7 +100,7 @@ const tiny_rom_entry *arc_a448b_device::device_rom_region() const
 
 void arc_a448_device::device_add_mconfig(machine_config &config)
 {
-	//ZN448(config, "zn448", 0);
+	//ZN448(config, "zn448");
 }
 
 void arc_a448b_device::device_add_mconfig(machine_config &config)
@@ -122,19 +122,19 @@ void arc_a448b_device::device_add_mconfig(machine_config &config)
 //  arc_a448_device - constructor
 //-------------------------------------------------
 
-arc_a448_device::arc_a448_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+arc_a448_device::arc_a448_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")
 {
 }
 
-arc_a448_device::arc_a448_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_a448_device::arc_a448_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_a448_device(mconfig, ARC_A448, tag, owner, clock)
 {
 }
 
-arc_a448b_device::arc_a448b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_a448b_device::arc_a448b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_a448_device(mconfig, ARC_A448B, tag, owner, clock)
 {
 }

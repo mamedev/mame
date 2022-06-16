@@ -39,7 +39,7 @@
 
 DEFINE_DEVICE_TYPE(MATHBOX, mathbox_device, "mathbox", "Atari MATHBOX")
 
-mathbox_device::mathbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mathbox_device::mathbox_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MATHBOX, tag, owner, clock)
 {
 }

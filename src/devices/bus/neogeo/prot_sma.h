@@ -14,7 +14,7 @@ class sma_prot_device : public device_t
 {
 public:
 	// construction/destruction
-	sma_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sma_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	//void kof99_bankswitch_w(uint16_t data);
 	//void garou_bankswitch_w(uint16_t data);

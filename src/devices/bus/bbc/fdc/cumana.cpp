@@ -106,7 +106,7 @@ const tiny_rom_entry *bbc_cumana2_device::device_rom_region() const
 //  bbc_cumanafdc_device - constructor
 //-------------------------------------------------
 
-bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_fdc(*this, "mb8877a"),
@@ -115,13 +115,13 @@ bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device
 {
 }
 
-bbc_cumana1_device::bbc_cumana1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bbc_cumana1_device::bbc_cumana1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	bbc_cumanafdc_device(mconfig, BBC_CUMANA1, tag, owner, clock)
 {
 	m_invert = true;
 }
 
-bbc_cumana2_device::bbc_cumana2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bbc_cumana2_device::bbc_cumana2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	bbc_cumanafdc_device(mconfig, BBC_CUMANA2, tag, owner, clock)
 {
 	m_invert = false;

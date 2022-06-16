@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(C352, c352_device, "c352", "Namco C352")
 //  c352_device - constructor
 //-------------------------------------------------
 
-c352_device::c352_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+c352_device::c352_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, C352, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)

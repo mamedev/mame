@@ -21,7 +21,7 @@ void ac97_device::bus_mastering_map(address_map &map)
 {
 }
 
-ac97_device::ac97_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ac97_device::ac97_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, AC97, tag, owner, clock)
 {
 }

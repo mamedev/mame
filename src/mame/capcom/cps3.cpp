@@ -2513,14 +2513,14 @@ void cps3_state::simm6_128mbit(machine_config &config)
 void cps3_state::cps3(machine_config &config)
 {
 	/* basic machine hardware */
-	SH2(config, m_maincpu, 6250000*4); // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
+	SH2(config, m_maincpu, XTAL::u(6250000)*4); // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps3_state::cps3_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps3_state::decrypted_opcodes_map);
 	m_maincpu->set_dma_kludge_callback(FUNC(cps3_state::dma_callback));
 
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:1").option_set("cdrom", NSCSI_CDROM);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93", WD33C93A).clock(10'000'000);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93", WD33C93A).clock(XTAL::u(10'000'000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

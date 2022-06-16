@@ -422,7 +422,7 @@ void advision_state::advision(machine_config &config)
 	m_maincpu->p2_out_cb().set(FUNC(advision_state::av_control_w));
 	m_maincpu->t1_in_cb().set(FUNC(advision_state::vsync_r));
 
-	COP411(config, m_soundcpu, 200000); // COP411L-KCN/N, R11=82k, C8=56pF
+	COP411(config, m_soundcpu, XTAL::u(200000)); // COP411L-KCN/N, R11=82k, C8=56pF
 	m_soundcpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_RAM_POWER_SUPPLY, false);
 	m_soundcpu->read_l().set(FUNC(advision_state::sound_cmd_r));
 	m_soundcpu->write_g().set(FUNC(advision_state::sound_g_w));

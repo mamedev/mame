@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(SONYPS2_VIF1, ps2_vif1_device, "ps2vif1", "PlayStation 2 VIF1
 	4, 2, 1, 2
 };
 
-ps2_vif1_device::ps2_vif1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ps2_vif1_device::ps2_vif1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYPS2_VIF1, tag, owner, clock)
 	, device_execute_interface(mconfig, *this)
 	, m_gs(*this, finder_base::DUMMY_TAG)

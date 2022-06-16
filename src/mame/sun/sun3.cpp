@@ -980,7 +980,7 @@ void sun3_state::machine_reset()
 void sun3_state::sun3(machine_config &config)
 {
 	/* basic machine hardware */
-	M68020(config, m_maincpu, 16670000);
+	M68020(config, m_maincpu, XTAL::u(16670000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
 	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
@@ -1029,7 +1029,7 @@ void sun3_state::sun3(machine_config &config)
 	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
-	AM79C90(config, m_lance, 10'000'000); // clock is a guess
+	AM79C90(config, m_lance, XTAL::u(10'000'000)); // clock is a guess
 
 	NSCSI_BUS(config, "scsibus");
 	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, nullptr);
@@ -1084,10 +1084,10 @@ void sun3_state::sun3200(machine_config &config)
 void sun3_state::sun3_50(machine_config &config)
 {
 	/* basic machine hardware */
-	M68020(config, m_maincpu, 15700000);
+	M68020(config, m_maincpu, XTAL::u(15700000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
-	AM79C90(config, m_lance, 10'000'000); // clock is a guess
+	AM79C90(config, m_lance, XTAL::u(10'000'000)); // clock is a guess
 
 	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
 	bwtwo.set_screen_update(FUNC(sun3_state::bw2_350_update));

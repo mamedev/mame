@@ -959,18 +959,18 @@ MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
 void mystwarr_state::mystwarr(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);   /* 16 MHz (confirmed) */
+	M68000(config, m_maincpu, XTAL::u(16000000));   /* 16 MHz (confirmed) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::mystwarr_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(mystwarr_state::mystwarr_interrupt), "screen", 0, 1);
 
-	Z80(config, m_soundcpu, 8000000);
+	Z80(config, m_soundcpu, XTAL::u(8000000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mystwarr_state::mystwarr_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(1920));
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	K053252(config, m_k053252, 6000000); // 6 MHz?
+	K053252(config, m_k053252, XTAL::u(6000000)); // 6 MHz?
 	m_k053252->set_offsets(24, 16);
 
 	MCFG_MACHINE_START_OVERRIDE(mystwarr_state,mystwarr)
@@ -980,7 +980,7 @@ void mystwarr_state::mystwarr(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 //  m_screen->set_refresh_hz(60);
-	m_screen->set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
+	m_screen->set_raw(XTAL::u(6000000), 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(600));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(24, 24+288-1, 16, 16+224-1);
@@ -990,19 +990,19 @@ void mystwarr_state::mystwarr(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(mystwarr_state::mystwarr_tile_callback));
 	m_k056832->set_config(K056832_BPP_5, 0, 0);
 	m_k056832->set_palette(m_palette);
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(mystwarr_state::mystwarr_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX, -48, -24);
 	m_k055673->set_palette(m_palette);
 
-	K054338(config, m_k054338, 0, m_k055555);
+	K054338(config, m_k054338, m_k055555);
 	m_k054338->set_alpha_invert(1);
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
@@ -1031,7 +1031,7 @@ void mystwarr_state::viostorm(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,viostorm)
 
-	m_k053252->set_clock(16000000/2);
+		m_k053252->set_clock(XTAL::u(16000000)/2);
 	m_k053252->set_offsets(40, 16);
 
 	/* basic machine hardware */
@@ -1067,7 +1067,7 @@ void mystwarr_state::viostormbl(machine_config &config)
 	config.device_remove("k054539_1");
 	config.device_remove("k054539_2");
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1'056'000, okim6295_device::PIN7_HIGH)); // frequency and pin 7 unverified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1'056'000), okim6295_device::PIN7_HIGH)); // frequency and pin 7 unverified
 	oki.set_addrmap(0, &mystwarr_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -1085,7 +1085,7 @@ void mystwarr_state::metamrph(machine_config &config)
 
 	m_k053252->set_offsets(24, 15);
 
-	K053250(config, m_k053250_1, 0, m_palette, m_screen, -7, 0);
+	K053250(config, m_k053250_1, m_palette, m_screen, -7, 0);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, metamrph)
@@ -1142,7 +1142,7 @@ void mystwarr_state::gaiapols(machine_config &config)
 
 	m_k053252->set_offsets(40, 16);
 
-	K054000(config, "k054000", 0);
+	K054000(config, "k054000");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaiapols);
 
@@ -1150,7 +1150,7 @@ void mystwarr_state::gaiapols(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, gaiapols)
 
 	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_dadandrn));
-	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
+	m_screen->set_raw(XTAL::u(8000000), 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(600));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(40, 40+376-1, 16, 16+224-1);
@@ -1173,7 +1173,7 @@ void mystwarr_state::martchmp(machine_config &config)
 
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mystwarr_state::martchmp_sound_map);
 
-	m_k053252->set_clock(16000000/2);
+	m_k053252->set_clock(XTAL::u(16000000)/2);
 	m_k053252->set_offsets(32, 24-1);
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, martchmp)

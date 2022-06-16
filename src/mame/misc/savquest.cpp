@@ -844,7 +844,7 @@ void savquest_isa16_cards(device_slot_interface &device)
 
 void savquest_state::savquest(machine_config &config)
 {
-	PENTIUM2(config, m_maincpu, 450000000); // actually Pentium II 450
+	PENTIUM2(config, m_maincpu, XTAL::u(450000000)); // actually Pentium II 450
 	m_maincpu->set_addrmap(AS_PROGRAM, &savquest_state::savquest_map);
 	m_maincpu->set_addrmap(AS_IO, &savquest_state::savquest_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
@@ -852,7 +852,7 @@ void savquest_state::savquest(machine_config &config)
 	pcat_common(config);
 	DS12885(config.replace(), "rtc");
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus"));
 	pcibus.set_device( 0, FUNC(savquest_state::intel82439tx_pci_r), FUNC(savquest_state::intel82439tx_pci_w));
 	pcibus.set_device( 7, FUNC(savquest_state::intel82371ab_pci_r), FUNC(savquest_state::intel82371ab_pci_w));
 	pcibus.set_device(13, FUNC(savquest_state::pci_3dfx_r), FUNC(savquest_state::pci_3dfx_w));
@@ -865,10 +865,10 @@ void savquest_state::savquest(machine_config &config)
 
 	/* sound hardware */
 
-	isa16_device &isa(ISA16(config, "isa", 0)); // FIXME: determine ISA bus clock
+	isa16_device &isa(ISA16(config, "isa")); // FIXME: determine ISA bus clock
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
-	ISA16_SLOT(config, "isa1", 0, "isa", savquest_isa16_cards, "sb16", false);
+	ISA16_SLOT(config, "isa1", "isa", savquest_isa16_cards, "sb16", false);
 
 	/* video hardware */
 	pcvideo_s3_vga(config);

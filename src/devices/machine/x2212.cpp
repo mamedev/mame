@@ -26,12 +26,12 @@ DEFINE_DEVICE_TYPE(X2210, x2210_device, "x2210", "Xicor X2210 64x4 NOVRAM")
 //  x2212_device - constructor
 //-------------------------------------------------
 
-x2212_device::x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+x2212_device::x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: x2212_device(mconfig, X2212, tag, owner, clock, 0x100)
 {
 }
 
-x2212_device::x2212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int size_data)
+x2212_device::x2212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int size_data)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_auto_save(false)
@@ -183,7 +183,7 @@ void x2212_device::recall(int state)
 }
 
 
-x2210_device::x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+x2210_device::x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: x2212_device(mconfig, X2210, tag, owner, clock, 0x40)
 {
 }

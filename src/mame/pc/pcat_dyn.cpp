@@ -167,7 +167,7 @@ void pcat_dyn_state::pcat_dyn_sb_conf(device_t *device)
 void pcat_dyn_state::pcat_dyn(machine_config &config)
 {
 	/* basic machine hardware */
-	I486(config, m_maincpu, 40000000); /* Am486 DX-40 */
+	I486(config, m_maincpu, XTAL::u(40000000)); /* Am486 DX-40 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcat_dyn_state::pcat_map);
 	m_maincpu->set_addrmap(AS_IO, &pcat_dyn_state::pcat_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
@@ -185,7 +185,7 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	m_mc146818->irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
 	m_mc146818->set_century_index(0x32);
 
-	ad1848_device &ad1848(AD1848(config, "ad1848", 0));
+	ad1848_device &ad1848(AD1848(config, "ad1848"));
 	ad1848.irq().set("pic8259_1", FUNC(pic8259_device::ir5_w));
 	ad1848.drq().set("dma8237_1", FUNC(am9517a_device::dreq0_w));
 
@@ -208,7 +208,7 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	serport.ri_handler().set("ns16550", FUNC(ins8250_uart_device::ri_w));
 	serport.cts_handler().set("ns16550", FUNC(ins8250_uart_device::cts_w));
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir1_w));
@@ -222,7 +222,7 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
-	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, "isa", pcat_dyn_isa8_cards, "sb15", true));
+	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", "isa", pcat_dyn_isa8_cards, "sb15", true));
 	isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(pcat_dyn_sb_def));
 	isa1.set_option_machine_config("sb15", pcat_dyn_sb_conf);
 }
@@ -250,7 +250,7 @@ ROM_START(toursol)
 	ROM_FILL(0x51bd2, 2, 0x90) // opl2 probe expects timer expiration too quickly
 
 	ROM_REGION(0x2000, "nvram", 0)
-	ROM_LOAD("sol.u28", 0, 0x2000, CRC(c9374d50) SHA1(49173bc69f70bb2a7e8af9d03e2538b34aa881d8))
+	ROM_LOAD("sol.u28", 0x2000, CRC(c9374d50) SHA1(49173bc69f70bb2a7e8af9d03e2538b34aa881d8))
 
 	ROM_REGION(128, "rtc", 0)
 	ROM_LOAD("rtc", 0, 128, BAD_DUMP CRC(732f64c8) SHA1(5386eac3afef9b16af8dd7766e577f7ac700d9cc))
@@ -273,7 +273,7 @@ ROM_START(toursol1)
 	ROM_FILL(0x334f6, 1, 0xeb) // skip prot(?) check
 
 	ROM_REGION(0x2000, "nvram", 0)
-	ROM_LOAD("prom.7", 0, 0x2000, CRC(154c8092) SHA1(4439ee82f36d5d5c334494ba7bb4848e839213a7))
+	ROM_LOAD("prom.7", 0x2000, CRC(154c8092) SHA1(4439ee82f36d5d5c334494ba7bb4848e839213a7))
 
 	ROM_REGION(128, "rtc", 0)
 	ROM_LOAD("rtc", 0, 128, BAD_DUMP CRC(732f64c8) SHA1(5386eac3afef9b16af8dd7766e577f7ac700d9cc))

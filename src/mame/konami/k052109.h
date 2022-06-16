@@ -20,7 +20,7 @@ class k052109_device : public device_t, public device_gfx_interface, public devi
 public:
 	using tile_delegate = device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)>;
 
-	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~k052109_device() {}
 
 	auto irq_handler() { return m_irq_handler.bind(); }

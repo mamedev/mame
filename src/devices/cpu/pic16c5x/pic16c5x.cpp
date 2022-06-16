@@ -123,7 +123,7 @@ void pic16c5x_device::ram_7(address_map &map)
 }
 
 
-pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, int picmodel)
+pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int program_width, int data_width, int picmodel)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1
 					   , ( ( program_width == 9 ) ? address_map_constructor(FUNC(pic16c5x_device::rom_9), this): ( ( program_width == 10 ) ? address_map_constructor(FUNC(pic16c5x_device::rom_10), this) : address_map_constructor(FUNC(pic16c5x_device::rom_11), this) )))
@@ -147,42 +147,42 @@ pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type
 }
 
 
-pic16c54_device::pic16c54_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic16c54_device::pic16c54_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c5x_device(mconfig, PIC16C54, tag, owner, clock, 9, 5, 0x16C54)
 {
 }
 
-pic16c55_device::pic16c55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic16c55_device::pic16c55_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c5x_device(mconfig, PIC16C55, tag, owner, clock, 9, 5, 0x16C55)
 {
 }
 
-pic16c56_device::pic16c56_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic16c56_device::pic16c56_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c5x_device(mconfig, PIC16C56, tag, owner, clock, 10, 5, 0x16C56)
 {
 }
 
-pic16c57_device::pic16c57_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic16c57_device::pic16c57_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c5x_device(mconfig, PIC16C57, tag, owner, clock, 11, 7, 0x16C57)
 {
 }
 
-pic16c58_device::pic16c58_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic16c58_device::pic16c58_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c5x_device(mconfig, PIC16C58, tag, owner, clock, 11, 7, 0x16C58)
 {
 }
 
-pic1650_device::pic1650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic1650_device::pic1650_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c5x_device(mconfig, PIC1650, tag, owner, clock, 9, 5, 0x1650)
 {
 }
 
-pic1654s_device::pic1654s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic1654s_device::pic1654s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c5x_device(mconfig, PIC1654S, tag, owner, clock, 9, 5, 0x1654)
 {
 }
 
-pic1655_device::pic1655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic1655_device::pic1655_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c5x_device(mconfig, PIC1655, tag, owner, clock, 9, 5, 0x1655)
 {
 }

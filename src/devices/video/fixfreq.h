@@ -255,12 +255,12 @@ public:
 	using time_type = fixedfreq_monitor_state::time_type;
 
 	// construction/destruction
-	fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration helpers
-	fixedfreq_device &set_monitor_clock(uint32_t clock)
+	fixedfreq_device &set_monitor_clock(const XTAL &clock)
 	{
-		m_monitor.m_monitor_clock = clock;
+		m_monitor.m_monitor_clock = clock.value();
 		return *this;
 	}
 	fixedfreq_device &set_fieldcount(int count)
@@ -304,7 +304,7 @@ public:
 										 // 799 858 480 486 492 525 interlace
 										 // -hsync -vsync
 	{
-		set_monitor_clock(13500000);
+		set_monitor_clock(XTAL::u(13500000));
 		set_horz_params(720, 736, 799, 858);
 		set_vert_params(480, 486, 492, 525);
 		set_fieldcount(2);
@@ -314,7 +314,7 @@ public:
 	fixedfreq_device &set_mode_ntsc704() // ModeLine "704x480@30i" 13.5 704 728
 										 // 791 858 480 486 492 525
 	{
-		set_monitor_clock(13500000);
+		set_monitor_clock(XTAL::u(13500000));
 		set_horz_params(704, 728, 791, 858);
 		set_vert_params(480, 486, 492, 525);
 		set_fieldcount(2);
@@ -340,7 +340,7 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock);
+			const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_config_complete() override;

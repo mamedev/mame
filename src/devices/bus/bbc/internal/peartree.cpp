@@ -101,19 +101,19 @@ void bbc_mr4800_device::device_add_mconfig(machine_config &config)
 //  bbc_mr3000_device - constructor
 //-------------------------------------------------
 
-bbc_mr3000_device::bbc_mr3000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_mr3000_device::bbc_mr3000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_internal_interface(mconfig, *this)
 	, m_rom(*this, "romslot%u", 0U)
 {
 }
 
-bbc_mr3000_device::bbc_mr3000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_mr3000_device::bbc_mr3000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_mr3000_device(mconfig, BBC_MR3000, tag, owner, clock)
 {
 }
 
-bbc_mr4200_device::bbc_mr4200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_mr4200_device::bbc_mr4200_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_mr3000_device(mconfig, BBC_MR4200, tag, owner, clock)
 	, m_wp(*this, "wp")
 {
@@ -123,7 +123,7 @@ bbc_mr4200_device::bbc_mr4200_device(const machine_config &mconfig, const char *
 //  bbc_mr4300_device - constructor
 //-------------------------------------------------
 
-bbc_mr4300_device::bbc_mr4300_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_mr4300_device::bbc_mr4300_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_internal_interface(mconfig, *this)
 	, m_rom(*this, "romslot%u", 0U)
@@ -131,12 +131,12 @@ bbc_mr4300_device::bbc_mr4300_device(const machine_config &mconfig, device_type 
 {
 }
 
-bbc_mr4300_device::bbc_mr4300_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_mr4300_device::bbc_mr4300_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_mr4300_device(mconfig, BBC_MR4300, tag, owner, clock)
 {
 }
 
-bbc_mr4800_device::bbc_mr4800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_mr4800_device::bbc_mr4800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_mr4300_device(mconfig, BBC_MR4800, tag, owner, clock)
 {
 }

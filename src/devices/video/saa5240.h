@@ -58,7 +58,7 @@ class saa5240_device :
 {
 public:
 	// construction/destruction
-	saa5240_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa5240_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER(write_scl);
 	DECLARE_WRITE_LINE_MEMBER(write_sda);
@@ -71,7 +71,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	saa5240_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	saa5240_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -183,7 +183,7 @@ class saa5240a_device :  public saa5240_device
 {
 public:
 	// construction/destruction
-	saa5240a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa5240a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -196,7 +196,7 @@ class saa5240b_device :  public saa5240_device
 {
 public:
 	// construction/destruction
-	saa5240b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa5240b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -209,7 +209,7 @@ class saa5243e_device :  public saa5240_device
 {
 public:
 	// construction/destruction
-	saa5243e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saa5243e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

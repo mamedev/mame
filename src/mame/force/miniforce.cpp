@@ -187,7 +187,7 @@ static void miniforce_vme_cards(device_slot_interface &device)
 void miniforce_state::miniforce(machine_config &config)
 {
 //  ->set_addrmap(AS_PROGRAM, &miniforce_state::miniforce_mem);
-	VME(config, "vme", 0);
+	VME(config, "vme");
 	VME_SLOT(config, "slot1", miniforce_vme_cards, "fccpu21", 1, "vme");
 	VME_SLOT(config, "slot2", miniforce_vme_cards, nullptr, 2, "vme");
 	VME_SLOT(config, "slot3", miniforce_vme_cards, nullptr, 3, "vme");

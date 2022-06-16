@@ -19,7 +19,7 @@
 
 class h8_intc_device : public device_t {
 public:
-	h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	int interrupt_taken(int vector);
 	void internal_interrupt(int vector);
@@ -50,7 +50,7 @@ protected:
 	uint16_t iscr;
 	int icr_filter, ipr_filter;
 
-	h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -63,18 +63,18 @@ protected:
 
 class gt913_intc_device : public h8_intc_device {
 public:
-	gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void clear_interrupt(int vector);
 protected:
-	gt913_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gt913_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_reset() override;
 };
 
 class h8h_intc_device : public h8_intc_device {
 public:
-	h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint8_t isr_r();
 	void isr_w(uint8_t data);
@@ -92,7 +92,7 @@ protected:
 
 	uint32_t icr;
 
-	h8h_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	h8h_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -103,7 +103,7 @@ protected:
 
 class h8s_intc_device : public h8h_intc_device {
 public:
-	h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint8_t ipr_r(offs_t offset);
 	void ipr_w(offs_t offset, uint8_t data);

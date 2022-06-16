@@ -14,10 +14,10 @@
 class jx8p_synth_device : public device_t
 {
 public:
-	jx8p_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	jx8p_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	jx8p_synth_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	jx8p_synth_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -36,7 +36,7 @@ protected:
 class superjx_synth_device : public jx8p_synth_device
 {
 public:
-	superjx_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	superjx_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

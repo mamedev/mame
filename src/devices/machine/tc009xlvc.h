@@ -19,7 +19,7 @@ class tc0090lvc_device : public z80_device, public device_gfx_interface
 public:
 	typedef device_delegate<void (u32 &code)> tc009xlvc_cb_delegate;
 
-	tc0090lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0090lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <typename... T> void set_tile_callback(T &&... args) { m_tile_cb.set(std::forward<T>(args)...); }
@@ -54,7 +54,7 @@ public:
 	void cpu_map(address_map &map);
 
 protected:
-	tc0090lvc_device(const machine_config &mconfig, device_type &type, const char *tag, device_t *owner, u32 clock);
+	tc0090lvc_device(const machine_config &mconfig, device_type &type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -123,7 +123,7 @@ protected:
 class tc0091lvc_device : public tc0090lvc_device
 {
 public:
-	tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void screen_eof() override;

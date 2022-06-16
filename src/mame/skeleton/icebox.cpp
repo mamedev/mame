@@ -324,7 +324,7 @@ void icebox_state::icebox(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &icebox_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &icebox_state::io_map);
 
-	I8251(config, m_uart0, 0);
+	I8251(config, m_uart0);
 	m_uart0->txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_uart0->dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	m_uart0->rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -335,7 +335,7 @@ void icebox_state::icebox(machine_config &config)
 	rs232a.cts_handler().set(m_uart0, FUNC(i8251_device::write_cts));
 	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be exactly here
 
-	I8251(config, m_uart1, 0);
+	I8251(config, m_uart1);
 	m_uart1->txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	m_uart1->dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	m_uart1->rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));

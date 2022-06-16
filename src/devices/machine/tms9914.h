@@ -39,7 +39,7 @@ class tms9914_device : public device_t
 {
 public:
 	// construction/destruction
-	tms9914_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9914_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// See ieee488.h
 	enum ieee_488_signal_t {

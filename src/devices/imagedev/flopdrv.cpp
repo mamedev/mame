@@ -614,12 +614,12 @@ DEFINE_DEVICE_TYPE(LEGACY_FLOPPY, legacy_floppy_image_device, "legacy_floppy_ima
 //  legacy_floppy_image_device - constructor
 //-------------------------------------------------
 
-legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: legacy_floppy_image_device(mconfig, LEGACY_FLOPPY, tag, owner, clock)
 {
 }
 
-legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		m_out_idx_func(*this),

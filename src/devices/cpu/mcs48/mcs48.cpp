@@ -199,7 +199,7 @@ void mcs48_cpu_device::data_8bit(address_map &map)
 }
 
 
-mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_cpu_device::mcs48_ophandler *opcode_table)
+mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_cpu_device::mcs48_ophandler *opcode_table)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, (feature_mask & MB_FEATURE) != 0 ? 12 : 11, 0
 					   , (rom_size == 1024) ? address_map_constructor(FUNC(mcs48_cpu_device::program_10bit), this) : (rom_size == 2048) ? address_map_constructor(FUNC(mcs48_cpu_device::program_11bit), this) : (rom_size == 4096) ? address_map_constructor(FUNC(mcs48_cpu_device::program_12bit), this) : address_map_constructor())
@@ -231,117 +231,117 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 	}
 }
 
-i8021_device::i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8021_device::i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, I8021, tag, owner, clock, 1024, 64, I802X_FEATURE, s_i8021_opcodes)
 {
 }
 
-i8022_device::i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8022_device::i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, I8022, tag, owner, clock, 2048, 128, I802X_FEATURE, s_i8022_opcodes)
 {
 }
 
-i8035_device::i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8035_device::i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, I8035, tag, owner, clock, 0, 64, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
-i8048_device::i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8048_device::i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, I8048, tag, owner, clock, 1024, 64, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
-i8648_device::i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8648_device::i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, I8648, tag, owner, clock, 1024, 64, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
-i8748_device::i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8748_device::i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, I8748, tag, owner, clock, 1024, 64, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
-i8039_device::i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8039_device::i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, I8039, tag, owner, clock, 0, 128, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
-i8049_device::i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8049_device::i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, I8049, tag, owner, clock, 2048, 128, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
-i8749_device::i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8749_device::i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, I8749, tag, owner, clock, 2048, 128, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
-i8040_device::i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8040_device::i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, I8040, tag, owner, clock, 0, 256, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
-i8050_device::i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8050_device::i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, I8050, tag, owner, clock, 4096, 256, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
-mb8884_device::mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mb8884_device::mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, MB8884, tag, owner, clock, 0, 64, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
-n7751_device::n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+n7751_device::n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, N7751, tag, owner, clock, 1024, 64, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
-m58715_device::m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m58715_device::m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mcs48_cpu_device(mconfig, M58715, tag, owner, clock, 2048, 128, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
-upi41_cpu_device::upi41_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size)
+upi41_cpu_device::upi41_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int rom_size, int ram_size)
 	: mcs48_cpu_device(mconfig, type, tag, owner, clock, rom_size, ram_size, UPI41_FEATURE, s_upi41_opcodes)
 {
 }
 
-i8041a_device::i8041a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8041a_device::i8041a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upi41_cpu_device(mconfig, I8041A, tag, owner, clock, 1024, 64)
 {
 }
 
-i8741a_device::i8741a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8741a_device::i8741a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upi41_cpu_device(mconfig, I8741A, tag, owner, clock, 1024, 64)
 {
 }
 
-i8041ah_device::i8041ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8041ah_device::i8041ah_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upi41_cpu_device(mconfig, I8041AH, tag, owner, clock, 1024, 128)
 {
 }
 
-i8741ah_device::i8741ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8741ah_device::i8741ah_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upi41_cpu_device(mconfig, I8741AH, tag, owner, clock, 1024, 128)
 {
 }
 
-i8042_device::i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8042_device::i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upi41_cpu_device(mconfig, I8042, tag, owner, clock, 2048, 128)
 {
 }
 
-i8742_device::i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8742_device::i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upi41_cpu_device(mconfig, I8742, tag, owner, clock, 2048, 128)
 {
 }
 
-i8042ah_device::i8042ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8042ah_device::i8042ah_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upi41_cpu_device(mconfig, I8042AH, tag, owner, clock, 2048, 256)
 {
 }
 
-i8742ah_device::i8742ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8742ah_device::i8742ah_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upi41_cpu_device(mconfig, I8742AH, tag, owner, clock, 2048, 256)
 {
 }
@@ -1226,7 +1226,7 @@ void mcs48_cpu_device::device_reset()
 	m_flags_enabled = false;
 	m_dma_enabled = false;
 	if (!m_t0_clk_func.isnull())
-		m_t0_clk_func(0);
+		m_t0_clk_func(XTAL());
 
 	// confirmed from interrupt logic description
 	m_irq_in_progress = false;

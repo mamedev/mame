@@ -141,7 +141,7 @@
 #include "machine/rescap.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK 20000000 /* 20Mhz Main Clock Xtal */
+#define MASTER_CLOCK XTAL::u(20000000) /* 20Mhz Main Clock Xtal */
 
 
 void liberatr_state::machine_start()

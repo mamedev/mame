@@ -201,7 +201,7 @@ INPUT_PORTS_END
 void capr1_state::cspin2(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000); // clock frequency unknown
+	Z80(config, m_maincpu, XTAL::u(4000000)); // clock frequency unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &capr1_state::cspin2_map);
 	//m_maincpu->set_periodic_int(FUNC(capr1_state::nmi_line_pulse), attotime::from_hz(20));
 
@@ -222,7 +222,7 @@ void capr1_state::cspin2(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ym(YM2203(config, "ym", 4000000)); // clock frequency unknown
+	ym2203_device &ym(YM2203(config, "ym", XTAL::u(4000000))); // clock frequency unknown
 	ym.irq_handler().set_inputline(m_maincpu, 0);
 	ym.port_a_read_callback().set_ioport("INA");
 	ym.port_b_read_callback().set_ioport("INB");
@@ -231,7 +231,7 @@ void capr1_state::cspin2(machine_config &config)
 	ym.add_route(2, "mono", 0.15);
 	ym.add_route(3, "mono", 0.40);
 
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
 }
 
 

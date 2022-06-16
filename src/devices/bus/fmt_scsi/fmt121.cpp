@@ -59,7 +59,7 @@ DEFINE_DEVICE_TYPE(FMT121, fmt121_device, "fmt121", "FMT-121 SCSI Card")
 //  fmt121_device - construction
 //-------------------------------------------------
 
-fmt121_device::fmt121_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+fmt121_device::fmt121_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, FMT121, tag, owner, clock)
 	, fmt_scsi_card_interface(mconfig, *this)
 	, m_scsi_ctlr(*this, "fmscsi")
@@ -74,14 +74,14 @@ fmt121_device::fmt121_device(const machine_config &mconfig, const char *tag, dev
 
 void fmt121_device::device_add_mconfig(machine_config &config)
 {
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
 	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
 	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
 	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
 
-	FMSCSI(config, m_scsi_ctlr, 0);
+	FMSCSI(config, m_scsi_ctlr);
 	m_scsi_ctlr->set_scsi_port("scsi");
 	m_scsi_ctlr->irq_handler().set(FUNC(fmt121_device::irq_w));
 	m_scsi_ctlr->drq_handler().set(FUNC(fmt121_device::drq_w));

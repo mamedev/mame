@@ -63,7 +63,7 @@ void c64_supercpu_device::c64_supercpu_map(address_map &map)
 
 void c64_supercpu_device::device_add_mconfig(machine_config &config)
 {
-	G65816(config, m_maincpu, 1000000);
+	G65816(config, m_maincpu, XTAL::u(1000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_supercpu_device::c64_supercpu_map);
 
 	C64_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), c64_expansion_cards, nullptr);
@@ -111,7 +111,7 @@ ioport_constructor c64_supercpu_device::device_input_ports() const
 //  c64_supercpu_device - constructor
 //-------------------------------------------------
 
-c64_supercpu_device::c64_supercpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_supercpu_device::c64_supercpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_SUPERCPU, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, G65816_TAG),

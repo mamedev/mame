@@ -320,8 +320,8 @@ void seibucats_state::seibucats(machine_config &config)
 
 	//JRC6355E(config, m_rtc, XTAL(32'768));
 
-	I8251(config, "usart1", 0);
-	I8251(config, "usart2", 0);
+	I8251(config, "usart1");
+	I8251(config, "usart2");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

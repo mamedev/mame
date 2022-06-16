@@ -51,7 +51,7 @@ ioport_constructor nes_rob_device::device_input_ports() const
 //  constructor
 //-------------------------------------------------
 
-nes_rob_device::nes_rob_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_rob_device::nes_rob_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_ROB, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
@@ -121,7 +121,7 @@ void nes_rob_device::device_add_mconfig(machine_config &config)
 	m_maincpu->write_r<2>().set(FUNC(nes_rob_device::output_w));
 	m_maincpu->write_r<3>().set(FUNC(nes_rob_device::output_w));
 
-	NES_ZAPPER_SENSOR(config, m_sensor, 0);
+	NES_ZAPPER_SENSOR(config, m_sensor);
 	if (m_port != nullptr)
 		m_sensor->set_screen_tag(m_port->m_screen);
 

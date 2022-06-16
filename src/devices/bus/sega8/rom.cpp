@@ -50,7 +50,7 @@ DEFINE_DEVICE_TYPE(SEGA8_ROM_MULTICART,    sega8_multicart_device,    "sega8_mul
 DEFINE_DEVICE_TYPE(SEGA8_ROM_MEGACART,     sega8_megacart_device,     "sega8_megacart",    "SC-3000 Megacart Cart")
 
 
-sega8_rom_device::sega8_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sega8_rom_device::sega8_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sega8_cart_interface(mconfig, *this)
 	, m_ram_base(0)
@@ -58,7 +58,7 @@ sega8_rom_device::sega8_rom_device(const machine_config &mconfig, device_type ty
 {
 }
 
-sega8_rom_device::sega8_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_rom_device::sega8_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_STD, tag, owner, clock)
 {
 }
@@ -66,31 +66,31 @@ sega8_rom_device::sega8_rom_device(const machine_config &mconfig, const char *ta
 
 
 
-sega8_othello_device::sega8_othello_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_othello_device::sega8_othello_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_OTHELLO, tag, owner, clock)
 {
 }
 
 
-sega8_castle_device::sega8_castle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_castle_device::sega8_castle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_CASTLE, tag, owner, clock)
 {
 }
 
 
-sega8_basic_l3_device::sega8_basic_l3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_basic_l3_device::sega8_basic_l3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_BASIC_L3, tag, owner, clock)
 {
 }
 
 
-sega8_music_editor_device::sega8_music_editor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_music_editor_device::sega8_music_editor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_MUSIC_EDITOR, tag, owner, clock)
 {
 }
 
 
-sega8_terebi_device::sega8_terebi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_terebi_device::sega8_terebi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_TEREBI, tag, owner, clock)
 	, m_tvdraw_x(*this, "TVDRAW_X")
 	, m_tvdraw_y(*this, "TVDRAW_Y")
@@ -100,13 +100,13 @@ sega8_terebi_device::sega8_terebi_device(const machine_config &mconfig, const ch
 }
 
 
-sega8_dahjee_typea_device::sega8_dahjee_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_dahjee_typea_device::sega8_dahjee_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_DAHJEE_TYPEA, tag, owner, clock)
 {
 }
 
 
-sega8_dahjee_typeb_device::sega8_dahjee_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_dahjee_typeb_device::sega8_dahjee_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_DAHJEE_TYPEB, tag, owner, clock)
 {
 }
@@ -114,7 +114,7 @@ sega8_dahjee_typeb_device::sega8_dahjee_typeb_device(const machine_config &mconf
 
 
 
-sega8_eeprom_device::sega8_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_eeprom_device::sega8_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA8_ROM_EEPROM, tag, owner, clock)
 	, device_sega8_cart_interface(mconfig, *this)
 	, m_eeprom(*this, "eeprom")
@@ -124,7 +124,7 @@ sega8_eeprom_device::sega8_eeprom_device(const machine_config &mconfig, const ch
 }
 
 
-sega8_codemasters_device::sega8_codemasters_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_codemasters_device::sega8_codemasters_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA8_ROM_CODEMASTERS, tag, owner, clock)
 	, device_sega8_cart_interface(mconfig, *this)
 	, m_ram_base(0)
@@ -133,13 +133,13 @@ sega8_codemasters_device::sega8_codemasters_device(const machine_config &mconfig
 }
 
 
-sega8_4pak_device::sega8_4pak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_4pak_device::sega8_4pak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_4PAK, tag, owner, clock)
 {
 }
 
 
-sega8_zemina_device::sega8_zemina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sega8_zemina_device::sega8_zemina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sega8_cart_interface(mconfig, *this)
 	, m_ram_base(0)
@@ -147,64 +147,64 @@ sega8_zemina_device::sega8_zemina_device(const machine_config &mconfig, device_t
 {
 }
 
-sega8_zemina_device::sega8_zemina_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_zemina_device::sega8_zemina_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_zemina_device(mconfig, SEGA8_ROM_ZEMINA, tag, owner, clock)
 {
 }
 
 
-sega8_nemesis_device::sega8_nemesis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_nemesis_device::sega8_nemesis_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_zemina_device(mconfig, SEGA8_ROM_NEMESIS, tag, owner, clock)
 {
 }
 
 
-sega8_janggun_device::sega8_janggun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_janggun_device::sega8_janggun_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGA8_ROM_JANGGUN, tag, owner, clock)
 	, device_sega8_cart_interface(mconfig, *this)
 {
 }
 
 
-sega8_hicom_device::sega8_hicom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_hicom_device::sega8_hicom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_HICOM, tag, owner, clock)
 	, m_rom_bank_base(0)
 {
 }
 
 
-sega8_korean_device::sega8_korean_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_korean_device::sega8_korean_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_KOREAN, tag, owner, clock)
 {
 }
 
 
-sega8_korean_188_device::sega8_korean_188_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sega8_korean_188_device::sega8_korean_188_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_KOREAN_188, tag, owner, clock)
 	, m_rom_bank_base(0)
 {
 }
 
 
-sega8_korean_nb_device::sega8_korean_nb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_korean_nb_device::sega8_korean_nb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_KOREAN_NB, tag, owner, clock)
 {
 }
 
 
-sega8_seojin_device::sega8_seojin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_seojin_device::sega8_seojin_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_SEOJIN, tag, owner, clock)
 {
 }
 
 
-sega8_multicart_device::sega8_multicart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_multicart_device::sega8_multicart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_MULTICART, tag, owner, clock)
 {
 }
 
 
-sega8_megacart_device::sega8_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_megacart_device::sega8_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_MEGACART, tag, owner, clock)
 {
 }
@@ -1208,7 +1208,7 @@ into the X-Terminator to search for cheat codes.
 
  -------------------------------------------------*/
 
-sega8_x_terminator_device::sega8_x_terminator_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega8_x_terminator_device::sega8_x_terminator_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sega8_rom_device(mconfig, SEGA8_ROM_X_TERMINATOR, tag, owner, clock)
 	, m_subslot(*this, "subslot")
 	, m_switch(*this, "SWITCH")

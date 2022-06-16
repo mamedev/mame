@@ -19,13 +19,13 @@ class decodmd_type1_device : public device_t
 {
 public:
 	template <typename T>
-	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gfxregion_tag)
+	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&gfxregion_tag)
 		: decodmd_type1_device(mconfig, tag, owner, clock)
 	{
 		set_gfxregion(std::forward<T>(gfxregion_tag));
 	}
 
-	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t latch_r();
 	void data_w(uint8_t data);

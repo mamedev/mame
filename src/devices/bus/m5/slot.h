@@ -68,7 +68,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	m5_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: m5_cart_slot_device(mconfig, tag, owner, 0)
+		: m5_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -76,7 +76,7 @@ public:
 		set_fixed(false);
 	}
 
-	m5_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	m5_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~m5_cart_slot_device();
 
 	// image-level overrides

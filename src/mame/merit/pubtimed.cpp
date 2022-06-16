@@ -48,11 +48,11 @@ INPUT_PORTS_END
 
 void pubtimed_state::pubtimed(machine_config &config)
 {
-	M6802(config, m_maincpu, 4'000'000); // clock unknown
+	M6802(config, m_maincpu, XTAL::u(4'000'000)); // clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &pubtimed_state::mem_map);
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 

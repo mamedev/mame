@@ -185,7 +185,7 @@ ioport_constructor e22_kbd_hle_device::device_input_ports() const
 //  e22_kbd_hle_device - constructor
 //-------------------------------------------------
 
-e22_kbd_hle_device::e22_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+e22_kbd_hle_device::e22_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, E22_KBD_HLE, tag, owner, clock),
 	device_buffered_serial_interface(mconfig, *this),
 	device_matrix_keyboard_interface(mconfig, *this, "row_0", "row_1", "row_2", "row_3", "row_4", "row_5", "row_6", "row_7"),
@@ -220,8 +220,8 @@ void e22_kbd_hle_device::device_reset()
 	transmit_register_reset();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rcv_rate(1200);
-	set_tra_rate(1200);
+	set_rcv_rate(XTAL::u(1200));
+	set_tra_rate(XTAL::u(1200));
 
 	reset_key_state();
 	start_processing(attotime::from_hz(1200));

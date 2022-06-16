@@ -663,7 +663,7 @@ void scv_state::scv_pal(machine_config &config)
 {
 	scv(config);
 
-	m_maincpu->set_clock(3780000);
+	m_maincpu->set_clock(XTAL::u(3780000));
 
 	// Video chip is EPOCH TV-1A
 	m_screen->set_raw(13.4_MHz_XTAL/2, 456, 24, 24+192, 342, 23, 23+222);     // TODO: Verify

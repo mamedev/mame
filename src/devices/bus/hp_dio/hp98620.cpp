@@ -17,12 +17,12 @@ DEFINE_DEVICE_TYPE(HPDIO_98620, bus::hp_dio::dio16_98620_device, "hp98620", "HP9
 
 namespace bus::hp_dio {
 
-dio16_98620_device::dio16_98620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dio16_98620_device::dio16_98620_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dio16_98620_device(mconfig, HPDIO_98620, tag, owner, clock)
 {
 }
 
-dio16_98620_device::dio16_98620_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dio16_98620_device::dio16_98620_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t{mconfig, type, tag, owner, clock},
 	device_dio32_card_interface{mconfig, *this},
 	m_installed_io{false},

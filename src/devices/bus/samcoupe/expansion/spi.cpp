@@ -38,7 +38,7 @@ void sam_spi_device::device_add_mconfig(machine_config &config)
 //  sambus_device - constructor
 //-------------------------------------------------
 
-sam_spi_device::sam_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sam_spi_device::sam_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SAM_SPI, tag, owner, clock),
 	device_samcoupe_expansion_interface(mconfig, *this),
 	m_data_out(*this, "data_out"),

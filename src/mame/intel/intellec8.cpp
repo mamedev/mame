@@ -60,7 +60,7 @@ void intlc8_state::machine_start()
 void intlc8_state::intlc8(machine_config &config)
 {
 	/* basic machine hardware */
-	I8008(config, m_maincpu, 800000);   // no idea of clock
+	I8008(config, m_maincpu, XTAL::u(800000));   // no idea of clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &intlc8_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &intlc8_state::io_map);
 }

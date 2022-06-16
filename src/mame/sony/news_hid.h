@@ -13,7 +13,7 @@ class news_hid_hle_device
 	, public device_matrix_keyboard_interface<8U>
 {
 public:
-	news_hid_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	news_hid_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	enum news_hid_device : unsigned
 	{

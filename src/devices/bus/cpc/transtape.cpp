@@ -42,7 +42,7 @@ ioport_constructor cpc_transtape_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_transtape_device::cpc_transtape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cpc_transtape_device::cpc_transtape_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CPC_TRANSTAPE, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_slot(nullptr), m_space(nullptr), m_ram(nullptr),

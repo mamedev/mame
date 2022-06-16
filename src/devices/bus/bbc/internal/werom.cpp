@@ -94,20 +94,20 @@ void bbc_we13rom_device::device_add_mconfig(machine_config &config)
 //  bbc_werom_device - constructor
 //-------------------------------------------------
 
-bbc_werom_device::bbc_werom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_werom_device::bbc_werom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_internal_interface(mconfig, *this)
 	, m_rom(*this, "romslot%u", 0U)
 {
 }
 
-bbc_we12rom_device::bbc_we12rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_we12rom_device::bbc_we12rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_werom_device(mconfig, BBC_WE12ROM, tag, owner, clock)
 	, m_wp(*this, "wp")
 {
 }
 
-bbc_we13rom_device::bbc_we13rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_we13rom_device::bbc_we13rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_werom_device(mconfig, BBC_WE13ROM, tag, owner, clock)
 {
 }

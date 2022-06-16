@@ -27,7 +27,7 @@ public:
 
 
 protected:
-	rocvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	rocvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	std::unique_ptr<output_finder<16> > m_outputs;
 	std::unique_ptr<output_finder<1> > m_brightness;
@@ -59,29 +59,29 @@ private:
 
 class roc10937_device : public rocvfd_device {
 public:
-	roc10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
+	roc10937_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(60));
 };
 
 class msc1937_device : public rocvfd_device {
 public:
-	msc1937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
+	msc1937_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(60));
 };
 
 class mic10937_device : public rocvfd_device {
 public:
-	mic10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
+	mic10937_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(60));
 };
 
 class roc10957_device : public rocvfd_device {
 public:
-	roc10957_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
+	roc10957_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(60));
 
 	void write_char(int data);
 };
 
 class s16lf01_device : public rocvfd_device {
 public:
-	s16lf01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
+	s16lf01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(60));
 };
 
 

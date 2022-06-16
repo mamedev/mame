@@ -29,7 +29,7 @@ class s100_am310_device : public device_t, public device_s100_card_interface
 {
 public:
 	// construction/destruction
-	s100_am310_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	s100_am310_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -69,7 +69,7 @@ private:
 
 DEFINE_DEVICE_TYPE_PRIVATE(S100_AM310, device_s100_card_interface, s100_am310_device, "s100_am310", "Alpha Micro AM-310 Communications Controller")
 
-s100_am310_device::s100_am310_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+s100_am310_device::s100_am310_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S100_AM310, tag, owner, clock)
 	, device_s100_card_interface(mconfig, *this)
 	, m_z80(*this, "z80")

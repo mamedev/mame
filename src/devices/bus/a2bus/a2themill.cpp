@@ -68,7 +68,7 @@ ioport_constructor a2bus_themill_device::device_input_ports() const
 
 void a2bus_themill_device::device_add_mconfig(machine_config &config)
 {
-	MC6809E(config, m_6809, 1021800);   // 6809E runs at ~1 MHz as per Stellation Two's print ads
+	MC6809E(config, m_6809, XTAL::u(1021800));   // 6809E runs at ~1 MHz as per Stellation Two's print ads
 	m_6809->set_addrmap(AS_PROGRAM, &a2bus_themill_device::m6809_mem);
 }
 
@@ -76,7 +76,7 @@ void a2bus_themill_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
 	, m_6809(*this, "m6809")
@@ -88,7 +88,7 @@ a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device
 {
 }
 
-a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_themill_device(mconfig, A2BUS_THEMILL, tag, owner, clock)
 {
 }

@@ -121,7 +121,7 @@ protected:
 		ALARM_PER_MINUTE    = 0x7
 	};
 
-	ds1386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, size_t size);
+	ds1386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, size_t size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -212,19 +212,19 @@ protected:
 class ds1286_device : public ds1386_device
 {
 public:
-	ds1286_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds1286_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class ds1386_8k_device : public ds1386_device
 {
 public:
-	ds1386_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds1386_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class ds1386_32k_device : public ds1386_device
 {
 public:
-	ds1386_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds1386_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(DS1286,     ds1286_device)

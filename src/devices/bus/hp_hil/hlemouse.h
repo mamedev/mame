@@ -16,7 +16,7 @@ class hle_hp_46060b_device
 		: public hle_device_base
 {
 public:
-	hle_hp_46060b_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	hle_hp_46060b_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual int hil_poll() override;

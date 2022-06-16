@@ -60,7 +60,7 @@ device_cbm2_expansion_card_interface::~device_cbm2_expansion_card_interface()
 //  cbm2_expansion_slot_device - constructor
 //-------------------------------------------------
 
-cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CBM2_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_cbm2_expansion_card_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),

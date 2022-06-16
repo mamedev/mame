@@ -54,7 +54,7 @@ constexpr unsigned P1_DAV_BIT = 2;
 constexpr unsigned P1_NDAC_BIT = 1;
 constexpr unsigned P1_NRFD_BIT = 0;
 
-hp82937_io_card_device::hp82937_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp82937_io_card_device::hp82937_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig , HP82937_IO_CARD , tag , owner , clock),
 	  device_hp80_io_interface(mconfig, *this),
 	  m_cpu(*this , "cpu"),
@@ -337,17 +337,17 @@ void hp82937_io_card_device::device_add_mconfig(machine_config &config)
 	m_cpu->p2_in_cb().set(FUNC(hp82937_io_card_device::dio_r));
 	m_cpu->p2_out_cb().set(FUNC(hp82937_io_card_device::dio_w));
 
-	HP_1MB5(config, m_translator, 0);
+	HP_1MB5(config, m_translator);
 	m_translator->irl_handler().set(FUNC(hp82937_io_card_device::irl_w));
 	m_translator->halt_handler().set(FUNC(hp82937_io_card_device::halt_w));
 	m_translator->reset_handler().set(FUNC(hp82937_io_card_device::reset_w));
 
-	ieee488_slot_device &ieee_dev(IEEE488_SLOT(config, "ieee_dev", 0));
+	ieee488_slot_device &ieee_dev(IEEE488_SLOT(config, "ieee_dev"));
 	hp_ieee488_devices(ieee_dev);
-	ieee488_slot_device &ieee_rem(IEEE488_SLOT(config, "ieee_rem", 0));
+	ieee488_slot_device &ieee_rem(IEEE488_SLOT(config, "ieee_rem"));
 	remote488_devices(ieee_rem);
 
-	IEEE488(config, m_ieee488, 0);
+	IEEE488(config, m_ieee488);
 	m_ieee488->ifc_callback().set(FUNC(hp82937_io_card_device::ieee488_ctrl_w));
 	m_ieee488->atn_callback().set(FUNC(hp82937_io_card_device::ieee488_ctrl_w));
 	m_ieee488->ren_callback().set(FUNC(hp82937_io_card_device::ieee488_ctrl_w));

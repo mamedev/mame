@@ -69,7 +69,7 @@ static const offs_t RCR_TOP_ADDRESS[4] =    { 0xf000, 0xf000, 0xe000, 0xc000 };
 //  mos8722_device - constructor
 //-------------------------------------------------
 
-mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MOS8722, tag, owner, clock),
 	m_write_z80en(*this),
 	m_write_fsdir(*this),

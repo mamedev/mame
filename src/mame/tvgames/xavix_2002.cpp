@@ -332,7 +332,7 @@ void xavix_state::xavix2002(machine_config &config)
 
 	m_palette->set_entries(512);
 
-	XAVIX2002IO(config, m_xavix2002io, 0);
+	XAVIX2002IO(config, m_xavix2002io);
 }
 
 
@@ -363,21 +363,21 @@ void xavix_i2c_state::xavix2002_i2c_24c08(machine_config &config)
 {
 	xavix2002(config);
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix2002_i2c_24c04(machine_config &config)
 {
 	xavix2002(config);
 
-	I2C_24C04(config, "i2cmem", 0);
+	I2C_24C04(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix2002_i2c_mrangbat(machine_config &config)
 {
 	xavix2002(config);
 
-	I2C_24C02(config, "i2cmem", 0); // 24C02?
+	I2C_24C02(config, "i2cmem"); // 24C02?
 
 	m_xavix2002io->read_0_callback().set_ioport("EX0");
 	m_xavix2002io->read_1_callback().set_ioport("EX1");

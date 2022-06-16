@@ -12,7 +12,7 @@
 class okim6376_device : public device_t, public device_sound_interface, public device_rom_interface<23, 0, 0, ENDIANNESS_BIG>
 {
 public:
-	okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void write(uint8_t data);
 
@@ -23,7 +23,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( nar_r );
 
 protected:
-	okim6376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits);
+	okim6376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int addrbits);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -84,7 +84,7 @@ protected:
 class okim6650_device : public okim6376_device
 {
 public:
-	okim6650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	okim6650_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER( cmd_w );
 

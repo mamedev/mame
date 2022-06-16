@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(TAITO_ZOOM, taito_zoom_device, "taito_zoom", "Taito Zoom Soun
 //  taito_zoom_device - constructor
 //-------------------------------------------------
 
-taito_zoom_device::taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+taito_zoom_device::taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TAITO_ZOOM, tag, owner, clock),
 	device_mixer_interface(mconfig, *this, 2),
 	m_soundcpu(*this, "mn10200"),

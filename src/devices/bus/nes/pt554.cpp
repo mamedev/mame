@@ -32,7 +32,7 @@
 DEFINE_DEVICE_TYPE(NES_BANDAI_PT554, nes_bandai_pt554_device, "nes_bandai_pt554", "NES Cart Bandai PT-554 PCB")
 
 
-nes_bandai_pt554_device::nes_bandai_pt554_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bandai_pt554_device::nes_bandai_pt554_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_cnrom_device(mconfig, NES_BANDAI_PT554, tag, owner, clock)
 	, m_samples(*this, "samples")
 {

@@ -468,7 +468,7 @@ void cgc7900_state::cgc7900(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cgc7900_state::cgc7900_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cgc7900_state::cpu_space_map);
 
-	i8035_device &kbmcu(I8035(config, I8035_TAG, 1000000));
+	i8035_device &kbmcu(I8035(config, I8035_TAG, XTAL::u(1000000)));
 	kbmcu.set_addrmap(AS_PROGRAM, &cgc7900_state::keyboard_mem);
 	kbmcu.set_disable();
 
@@ -484,7 +484,7 @@ void cgc7900_state::cgc7900(machine_config &config)
 	AY8910(config, AY8910_TAG, XTAL(28'480'000)/16).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(cgc7900_state::kbd_put));
 
 	mm58167_device &rtc(MM58167(config, MM58167_TAG, XTAL(32'768)));
@@ -496,7 +496,7 @@ void cgc7900_state::cgc7900(machine_config &config)
 	k1135a.ft_handler().set(m_i8251_1, FUNC(i8251_device::write_txc));
 	k1135a.ft_handler().append(m_i8251_1, FUNC(i8251_device::write_rxc));
 
-	I8251(config, m_i8251_0, 0);
+	I8251(config, m_i8251_0);
 	m_i8251_0->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_i8251_0->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_i8251_0->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -507,7 +507,7 @@ void cgc7900_state::cgc7900(machine_config &config)
 	rs232.rxd_handler().set(m_i8251_0, FUNC(i8251_device::write_rxd));
 	rs232.dsr_handler().set(m_i8251_0, FUNC(i8251_device::write_dsr));
 
-	I8251(config, m_i8251_1, 0);
+	I8251(config, m_i8251_1);
 	m_i8251_1->txd_handler().set("rs449", FUNC(rs232_port_device::write_txd));
 	m_i8251_1->dtr_handler().set("rs449", FUNC(rs232_port_device::write_dtr));
 	m_i8251_1->rts_handler().set("rs449", FUNC(rs232_port_device::write_rts));

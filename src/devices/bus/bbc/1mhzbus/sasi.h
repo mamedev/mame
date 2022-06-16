@@ -24,13 +24,13 @@ class bbc_sasi_device:
 {
 public:
 	// construction/destruction
-	bbc_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_sasi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER(req_w);
 	DECLARE_WRITE_LINE_MEMBER(sel_w);
 
 protected:
-	bbc_sasi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_sasi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -55,7 +55,7 @@ class bbc_torchhd_device : public bbc_sasi_device
 {
 public:
 	// construction/destruction
-	bbc_torchhd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_torchhd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

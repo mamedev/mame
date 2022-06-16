@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(PCF8573, pcf8573_device, "pcf8573", "PCF8573 RTC with Power F
 //  pcf8573_device - constructor
 //-------------------------------------------------
 
-pcf8573_device::pcf8573_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pcf8573_device::pcf8573_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PCF8573, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
 	, m_comp_cb(*this)

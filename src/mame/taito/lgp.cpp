@@ -413,7 +413,7 @@ void lgp_state::lgp(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &lgp_state::sound_program_map);
 	audiocpu.set_addrmap(AS_IO, &lgp_state::sound_io_map);
 
-	PIONEER_LDV1000(config, m_laserdisc, 0);
+	PIONEER_LDV1000(config, m_laserdisc);
 	m_laserdisc->command_strobe_callback().set(FUNC(lgp_state::ld_command_strobe_cb));
 	m_laserdisc->set_overlay(256, 256, FUNC(lgp_state::screen_update_lgp));
 	m_laserdisc->add_route(0, "lspeaker", 1.0);

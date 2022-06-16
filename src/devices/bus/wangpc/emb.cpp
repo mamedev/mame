@@ -44,7 +44,7 @@ DEFINE_DEVICE_TYPE(WANGPC_EMB, wangpc_emb_device, "wangpc_emb", "Wang PC-PM031-B
 //  wangpc_emb_device - constructor
 //-------------------------------------------------
 
-wangpc_emb_device::wangpc_emb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wangpc_emb_device::wangpc_emb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WANGPC_EMB, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_ram(*this, "ram", RAM_SIZE, ENDIANNESS_LITTLE),

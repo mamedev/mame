@@ -171,9 +171,9 @@ void informer_207_100_state::informer_207_100(machine_config &config)
 	MC6809(config, m_maincpu, 19.7184_MHz_XTAL / 4); // unknown clock divisor
 	m_maincpu->set_addrmap(AS_PROGRAM, &informer_207_100_state::mem_map);
 
-	ACIA6850(config, m_acia, 0); // unknown clock
+	ACIA6850(config, m_acia); // unknown clock
 
-	SCN2681(config, m_duart, 0); // unknown clock
+	SCN2681(config, m_duart); // unknown clock
 
 	MSM58321(config, m_rtc, 32.768_kHz_XTAL);
 

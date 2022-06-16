@@ -21,12 +21,12 @@ class spectrum_mface_base_device :
 {
 public:
 	// construction/destruction
-	spectrum_mface_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface_base_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(magic_button) { m_slot->nmi_w(newval ? CLEAR_LINE : ASSERT_LINE); }
 
 protected:
-	spectrum_mface_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -61,12 +61,12 @@ protected:
 class spectrum_mface1v2_device : public spectrum_mface_base_device
 {
 public:
-	spectrum_mface1v2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface1v2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(magic_button) override;
 
 protected:
-	spectrum_mface1v2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface1v2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -85,7 +85,7 @@ protected:
 class spectrum_mface1v1_device : public spectrum_mface1v2_device
 {
 public:
-	spectrum_mface1v1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface1v1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -101,10 +101,10 @@ protected:
 class spectrum_mface1v3_device : public spectrum_mface1v2_device
 {
 public:
-	spectrum_mface1v3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface1v3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	spectrum_mface1v3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface1v3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -116,7 +116,7 @@ protected:
 class spectrum_mface1_device : public spectrum_mface1v3_device
 {
 public:
-	spectrum_mface1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(magic_button) override;
 
@@ -132,12 +132,12 @@ protected:
 class spectrum_mface128_base_device : public spectrum_mface_base_device
 {
 public:
-	spectrum_mface128_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface128_base_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(magic_button) override;
 
 protected:
-	spectrum_mface128_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface128_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -149,10 +149,10 @@ protected:
 class spectrum_mface128v1_device : public spectrum_mface128_base_device
 {
 public:
-	spectrum_mface128v1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface128v1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	spectrum_mface128v1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface128v1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -169,7 +169,7 @@ protected:
 class spectrum_mface128_device : public spectrum_mface128v1_device
 {
 public:
-	spectrum_mface128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -183,7 +183,7 @@ protected:
 class spectrum_mface3_device : public spectrum_mface128_base_device
 {
 public:
-	spectrum_mface3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mface3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(magic_button) override;
 
@@ -207,7 +207,7 @@ private:
 class spectrum_mprint_device : public spectrum_mface128_base_device
 {
 public:
-	spectrum_mprint_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mprint_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

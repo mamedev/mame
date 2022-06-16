@@ -21,12 +21,12 @@ class ps2_sif_device : public device_t
 public:
 	template <typename T>
 	ps2_sif_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&intc_tag)
-		: ps2_sif_device(mconfig, tag, owner, (uint32_t)0)
+		: ps2_sif_device(mconfig, tag, owner)
 	{
 		m_intc.set_tag(std::forward<T>(intc_tag));
 	}
 
-	ps2_sif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ps2_sif_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~ps2_sif_device() override;
 
 	uint32_t ee_r(offs_t offset, uint32_t mem_mask = ~0);

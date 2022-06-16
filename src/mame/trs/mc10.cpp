@@ -494,7 +494,7 @@ void mc10_state::mc10_base(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.0625);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.0625);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(alice32_cassette_formats);
@@ -563,7 +563,7 @@ void alice32_state::alice32(machine_config &config)
 	screen.set_visarea(00, 336-1, 00, 270-1);
 	PALETTE(config, "palette").set_entries(8);
 
-	EF9345(config, m_ef9345, 0);
+	EF9345(config, m_ef9345);
 	m_ef9345->set_screen("screen");
 	m_ef9345->set_palette_tag("palette");
 	TIMER(config, "alice32_sl").configure_scanline(FUNC(alice32_state::alice32_scanline), "screen", 0, 10);

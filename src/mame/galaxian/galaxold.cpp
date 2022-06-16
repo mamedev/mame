@@ -1550,10 +1550,10 @@ void galaxold_state::galaxold_base(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,galaxold)
 
-	TTL7474(config, m_7474_9m_1, 0);
+	TTL7474(config, m_7474_9m_1);
 	m_7474_9m_1->output_cb().set(FUNC(galaxold_state::galaxold_7474_9m_1_callback));
 
-	TTL7474(config, m_7474_9m_2, 0);
+	TTL7474(config, m_7474_9m_2);
 	m_7474_9m_2->comp_output_cb().set(FUNC(galaxold_state::galaxold_7474_9m_2_q_callback));
 
 	TIMER(config, "int_timer").configure_generic(FUNC(galaxold_state::galaxold_interrupt_timer));
@@ -1577,12 +1577,12 @@ void galaxold_state::galaxold_base(machine_config &config)
 
 void galaxold_state::galaxian_audio(machine_config &config)
 {
-	GALAXIAN_SOUND(config, "cust", 0);
+	GALAXIAN_SOUND(config, "cust");
 }
 
 void galaxold_state::mooncrst_audio(machine_config &config)
 {
-	MOONCRST_SOUND(config, "cust", 0);
+	MOONCRST_SOUND(config, "cust");
 }
 
 

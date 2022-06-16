@@ -27,7 +27,7 @@ class atom_discpack_device :
 {
 public:
 	// construction/destruction
-	atom_discpack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atom_discpack_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static void floppy_formats(format_registration &fr);
 

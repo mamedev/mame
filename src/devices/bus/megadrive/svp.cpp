@@ -58,7 +58,7 @@
 
 DEFINE_DEVICE_TYPE(MD_ROM_SVP, md_rom_svp_device, "md_rom_svp", "MD Virtua Racing")
 
-md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_md_cart_interface(mconfig, *this)
 	, m_svp(*this, "svp")
@@ -67,7 +67,7 @@ md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, device_type 
 {
 }
 
-md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: md_rom_svp_device(mconfig, MD_ROM_SVP, tag, owner, clock)
 {
 }
@@ -86,7 +86,7 @@ tiny_rom_entry const *md_rom_svp_device::device_rom_region() const
 #define SSP_PMC_HAVE_ADDR  1  // address written to PMAC, waiting for mode
 #define SSP_PMC_SET        2  // PMAC is set, PMx can be programmed
 
-#define MASTER_CLOCK_NTSC 53693175
+#define MASTER_CLOCK_NTSC XTAL::u(53693175)
 
 // HELPERS
 

@@ -61,7 +61,7 @@ void interpro_arbga_device::map(address_map &map)
 
 DEFINE_DEVICE_TYPE(INTERPRO_ARBGA, interpro_arbga_device, "arbga", "SRX Arbiter Gate Array")
 
-interpro_arbga_device::interpro_arbga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+interpro_arbga_device::interpro_arbga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, INTERPRO_ARBGA, tag, owner, clock)
 {
 }

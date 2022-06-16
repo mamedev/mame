@@ -746,7 +746,7 @@ void darius_state::darius(machine_config &config)
 	rscreen.set_screen_update(FUNC(darius_state::screen_update_right));
 	rscreen.set_palette(m_palette);
 
-	PC080SN(config, m_pc080sn, 0);
+	PC080SN(config, m_pc080sn);
 	m_pc080sn->set_gfx_region(1);
 	m_pc080sn->set_offsets(-16, 8);
 	m_pc080sn->set_yinvert(0);
@@ -800,7 +800,7 @@ void darius_state::darius(machine_config &config)
 	FILTER_VOLUME(config, m_msm5205_l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, m_msm5205_r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 }

@@ -90,7 +90,7 @@ INPUT_PORTS_END
 void globalvr_state::globalvr(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM(config, m_maincpu, 100000000);      /* ? MHz */
+	PENTIUM(config, m_maincpu, XTAL::u(100000000));      /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &globalvr_state::globalvr_map);
 }
 

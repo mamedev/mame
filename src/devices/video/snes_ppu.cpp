@@ -189,7 +189,7 @@ DEFINE_DEVICE_TYPE(SNES_PPU, snes_ppu_device, "snes_ppu", "SNES PPU")
 //  snes_ppu_device - constructor
 //-------------------------------------------------
 
-snes_ppu_device::snes_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+snes_ppu_device::snes_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SNES_PPU, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)

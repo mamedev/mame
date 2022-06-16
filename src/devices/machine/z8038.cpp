@@ -32,7 +32,7 @@
 
 DEFINE_DEVICE_TYPE(Z8038, z8038_device, "z8038", "FIFO Input/Output Interface Unit")
 
-z8038_device::z8038_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z8038_device::z8038_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, Z8038, tag, owner, clock)
 	, m_out_int_cb(*this)
 	, m_out_E_cb(*this)

@@ -34,7 +34,7 @@ class mufdc_device : public device_t, public device_isa8_card_interface
 {
 protected:
 	// construction/destruction
-	mufdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mufdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -65,7 +65,7 @@ class fdc344_device : public mufdc_device
 {
 public:
 	// construction/destruction
-	fdc344_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fdc344_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -74,7 +74,7 @@ class fdcmag_device : public mufdc_device
 {
 public:
 	// construction/destruction
-	fdcmag_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fdcmag_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };

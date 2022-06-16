@@ -968,7 +968,7 @@ void gameplan_state::gameplan(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch, 0);
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", GAMEPLAN_AY8910_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW2");

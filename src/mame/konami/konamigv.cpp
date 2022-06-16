@@ -456,14 +456,14 @@ void konamigv_state::konamigv(machine_config &config)
 	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, this));
 	m_maincpu->subdevice<ram_device>("ram")->set_default_size("2M");
 
-	MB89371(config, "mb89371", 0);
+	MB89371(config, "mb89371");
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
 	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
 	scsi.slot(1).set_option_machine_config("cdrom", cdrom_config);
 
-	AM53CF96(config, m_am53cf96, 0);
+	AM53CF96(config, m_am53cf96);
 	m_am53cf96->set_scsi_port("scsi");
 	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 

@@ -94,7 +94,7 @@ public:
 	deco146port_xx const *m_lookup_table;
 
 protected:
-	deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -128,7 +128,7 @@ private:
 class deco146_device : public deco_146_base_device
 {
 public:
-	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(DECO146PROT, deco146_device)

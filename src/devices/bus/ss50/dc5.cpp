@@ -40,7 +40,7 @@
 class ss50_dc5_device : public device_t, public ss50_card_interface
 {
 public:
-	ss50_dc5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	ss50_dc5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, SS50_DC5, tag, owner, clock)
 		, ss50_card_interface(mconfig, *this)
 		, m_fdc(*this, "fdc")
@@ -786,7 +786,7 @@ void ss50_dc5_device::register_write(offs_t offset, uint8_t data)
 			uint32_t expected_clock_div = m_expected_clock->read();
 			if (expected_clock_div && clock_div != expected_clock_div)
 			{
-				logerror("%s Unexpected clock rate of %dHz expected %dHz.\n", machine().describe_context(), 12'000'000 / clock_div, 12'000'000 / expected_clock_div);
+				logerror("%s Unexpected clock rate of %dHz expected %dHz.\n", machine().describe_context(), XTAL::u(12'000'000) / clock_div, 12'000'000 / expected_clock_div);
 				clock_div = expected_clock_div;
 			}
 

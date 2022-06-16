@@ -39,7 +39,7 @@ ALLOW_SAVE_TYPE(adc0808_device::state);
 //  adc0808_device - constructor
 //-------------------------------------------------
 
-adc0808_device::adc0808_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+adc0808_device::adc0808_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_eoc_cb(*this), m_eoc_ff_cb(*this),
 	m_in_cb(*this),
@@ -49,7 +49,7 @@ adc0808_device::adc0808_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-adc0808_device::adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+adc0808_device::adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	adc0808_device(mconfig, ADC0808, tag, owner, clock)
 {
 }
@@ -58,7 +58,7 @@ adc0808_device::adc0808_device(const machine_config &mconfig, const char *tag, d
 //  adc0809_device - constructor
 //-------------------------------------------------
 
-adc0809_device::adc0809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+adc0809_device::adc0809_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	adc0808_device(mconfig, ADC0809, tag, owner, clock)
 {
 }
@@ -67,7 +67,7 @@ adc0809_device::adc0809_device(const machine_config &mconfig, const char *tag, d
 //  m58990_device - constructor
 //-------------------------------------------------
 
-m58990_device::m58990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m58990_device::m58990_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	adc0808_device(mconfig, M58990, tag, owner, clock)
 {
 }

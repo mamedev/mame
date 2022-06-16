@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(CBM2_STD, cbm2_standard_cartridge_device, "cbm2_standard", "C
 //  cbm2_standard_cartridge_device - constructor
 //-------------------------------------------------
 
-cbm2_standard_cartridge_device::cbm2_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cbm2_standard_cartridge_device::cbm2_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CBM2_STD, tag, owner, clock),
 	device_cbm2_expansion_card_interface(mconfig, *this)
 {

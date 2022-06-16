@@ -323,7 +323,7 @@ WRITE_LINE_MEMBER(igs_m027_state::vblank_irq)
 
 void igs_m027_state::igs_mahjong(machine_config &config)
 {
-	ARM7(config, m_maincpu, 20000000);
+	ARM7(config, m_maincpu, XTAL::u(20000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -338,7 +338,7 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 	screen.set_palette("igs017_igs031:palette");
 	screen.screen_vblank().set(FUNC(igs_m027_state::vblank_irq));
 
-	IGS017_IGS031(config, m_igs017_igs031, 0);
+	IGS017_IGS031(config, m_igs017_igs031);
 	m_igs017_igs031->set_text_reverse_bits();
 	//m_igs017_igs031->set_i8255_tag("ppi8255");
 
@@ -351,7 +351,7 @@ void igs_m027_state::igs_mahjong(machine_config &config)
 
 void igs_m027_state::amazonia(machine_config &config)
 {
-	ARM7(config, m_maincpu, 20000000);
+	ARM7(config, m_maincpu, XTAL::u(20000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_mahjong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -365,7 +365,7 @@ void igs_m027_state::amazonia(machine_config &config)
 	screen.set_palette("igs017_igs031:palette");
 	screen.screen_vblank().set(FUNC(igs_m027_state::vblank_irq));
 
-	IGS017_IGS031(config, m_igs017_igs031, 0);
+	IGS017_IGS031(config, m_igs017_igs031);
 	m_igs017_igs031->set_text_reverse_bits();
 	//m_igs017_igs031->set_i8255_tag("ppi8255");
 

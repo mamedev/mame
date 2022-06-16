@@ -15,7 +15,7 @@ class fatfury2_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint16_t protection_r(offs_t offset);
 	void protection_w(offs_t offset, uint16_t data);

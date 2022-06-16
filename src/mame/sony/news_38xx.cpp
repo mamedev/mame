@@ -181,7 +181,7 @@ void news_38xx_state::machine_reset()
 void news_38xx_state::init_common()
 {
 	// HACK: hardwire the rate
-	m_fdc->set_rate(500000);
+	m_fdc->set_rate(XTAL::u(500000));
 }
 
 void news_38xx_state::cpu_map(address_map &map)
@@ -326,10 +326,10 @@ void news_38xx_state::common(machine_config &config)
 
 	RTC62421(config, m_rtc, 32.768_kHz_XTAL);
 
-	DMAC_0266(config, m_dma[0], 0);
+	DMAC_0266(config, m_dma[0]);
 	m_dma[0]->set_bus(m_iop, 0);
 
-	DMAC_0266(config, m_dma[1], 0);
+	DMAC_0266(config, m_dma[1]);
 	m_dma[1]->set_bus(m_iop, 0);
 
 	INPUT_MERGER_ANY_HIGH(config, m_serial_irq);

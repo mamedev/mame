@@ -204,7 +204,7 @@ void mccpm_state::mccpm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mccpm_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mccpm_state::io_map);
 
-	ADDRESS_MAP_BANK(config, m_bank, 0);
+	ADDRESS_MAP_BANK(config, m_bank);
 	m_bank->set_addrmap(0, &mccpm_state::bankdev_map);
 	m_bank->set_data_width(8);
 	m_bank->set_addr_width(16);

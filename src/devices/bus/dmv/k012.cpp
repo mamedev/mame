@@ -40,12 +40,12 @@ DEFINE_DEVICE_TYPE(DMV_C3282, dmv_c3282_device, "dmv_c3282", "C3282 External HD 
 //  dmv_k012_device - constructor
 //-------------------------------------------------
 
-dmv_k012_device::dmv_k012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k012_device::dmv_k012_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_k012_device(mconfig, DMV_K012, tag, owner, clock)
 {
 }
 
-dmv_k012_device::dmv_k012_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+dmv_k012_device::dmv_k012_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_dmvslot_interface( mconfig, *this )
 	, m_hdc(*this, "hdc")
@@ -57,7 +57,7 @@ dmv_k012_device::dmv_k012_device(const machine_config &mconfig, device_type type
 //  dmv_c3282_device - constructor
 //-------------------------------------------------
 
-dmv_c3282_device::dmv_c3282_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_c3282_device::dmv_c3282_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_k012_device(mconfig, DMV_C3282, tag, owner, clock)
 {
 }
@@ -97,10 +97,10 @@ void dmv_k012_device::device_add_mconfig(machine_config &config)
 	m_hdc->intrq_wr_callback().set(FUNC(dmv_k012_device::out_int));
 
 	// default drive is 10MB (306,4,17)
-	HARDDISK(config, "hdc:0", 0);
-	HARDDISK(config, "hdc:1", 0);
-	HARDDISK(config, "hdc:2", 0);
-	HARDDISK(config, "hdc:3", 0);
+	HARDDISK(config, "hdc:0");
+	HARDDISK(config, "hdc:1");
+	HARDDISK(config, "hdc:2");
+	HARDDISK(config, "hdc:3");
 }
 
 void dmv_k012_device::io_read(int ifsel, offs_t offset, uint8_t &data)

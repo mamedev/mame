@@ -14,12 +14,12 @@ DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BL, mpu4_characteriser_bl, "xmpu4chrpalboo
 
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BL_BLASTBANK, mpu4_characteriser_bl_blastbank, "mpu4chrboot_blast", "MPU4 bootleg Characteriser (Bank A Blast)")
 
-mpu4_characteriser_bl::mpu4_characteriser_bl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mpu4_characteriser_bl::mpu4_characteriser_bl(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mpu4_characteriser_bl(mconfig, MPU4_CHARACTERISER_BL, tag, owner, clock)
 {
 }
 
-mpu4_characteriser_bl::mpu4_characteriser_bl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+mpu4_characteriser_bl::mpu4_characteriser_bl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock)
 {
 }
@@ -32,7 +32,7 @@ void mpu4_characteriser_bl::device_reset()
 {
 }
 
-mpu4_characteriser_bl_blastbank::mpu4_characteriser_bl_blastbank(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mpu4_characteriser_bl_blastbank::mpu4_characteriser_bl_blastbank(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MPU4_CHARACTERISER_BL_BLASTBANK, tag, owner, clock)
 {
 }

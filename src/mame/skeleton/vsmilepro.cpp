@@ -55,7 +55,7 @@ INPUT_PORTS_END
 void vsmilpro_state::vsmilpro(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM9(config, m_maincpu, 150000000);
+	ARM9(config, m_maincpu, XTAL::u(150000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsmilpro_state::vsmilpro_map);
 
 	CDROM(config, "cdrom").set_interface("vsmile_vdisk");

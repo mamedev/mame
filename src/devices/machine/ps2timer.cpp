@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(SONYPS2_TIMER, ps2_timer_device, "ps2timer", "PlayStation 2 EE Core Timer")
 
-ps2_timer_device::ps2_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ps2_timer_device::ps2_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYPS2_TIMER, tag, owner, clock)
 	, m_compare_timer(nullptr)
 	, m_overflow_timer(nullptr)

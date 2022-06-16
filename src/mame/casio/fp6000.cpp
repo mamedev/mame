@@ -453,26 +453,26 @@ void fp6000_state::machine_reset()
 
 void fp6000_state::fp6000(machine_config &config)
 {
-	I8086(config, m_maincpu, 16000000 / 2); // 8 Mhz?
+	I8086(config, m_maincpu, XTAL::u(16000000) / 2); // 8 Mhz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &fp6000_state::fp6000_map);
 	m_maincpu->set_addrmap(AS_IO, &fp6000_state::fp6000_io);
 	m_maincpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	PIT8253(config, m_pit, 0);
-	m_pit->set_clk<0>(16000000 / 16); // 1 MHz
+	PIT8253(config, m_pit);
+	m_pit->set_clk<0>(XTAL::u(16000000) / 16); // 1 MHz
 	m_pit->out_handler<0>().set(FUNC(fp6000_state::pit_timer0_w)).invert();
-	m_pit->set_clk<2>(16000000 / 8); // 2 MHz?
+	m_pit->set_clk<2>(XTAL::u(16000000) / 8); // 2 MHz?
 	m_pit->out_handler<2>().set(FUNC(fp6000_state::pit_timer2_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(16000000, 1024, 0, 640, 272, 0, 200); // 16 MHz?
+	screen.set_raw(XTAL::u(16000000), 1024, 0, 640, 272, 0, 200); // 16 MHz?
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MC6845(config, m_crtc, 16000000 / 8); // unknown variant, 2 MHz?
+	MC6845(config, m_crtc, XTAL::u(16000000) / 8); // unknown variant, 2 MHz?
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

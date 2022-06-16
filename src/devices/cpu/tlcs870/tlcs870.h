@@ -42,7 +42,7 @@ public:
 
 protected:
 	// construction/destruction
-	tlcs870_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map);
+	tlcs870_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor program_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -550,7 +550,7 @@ class tmp87ph40an_device : public tlcs870_device
 {
 public:
 	// construction/destruction
-	tmp87ph40an_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmp87ph40an_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

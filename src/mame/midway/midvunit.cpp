@@ -1108,7 +1108,7 @@ void midvunit_state::midvunit(machine_config &config)
 	m_adc->ch3_callback().set_ioport("BRAKE");
 
 	/* sound hardware */
-	DCS_AUDIO_2K(config, "dcs", 0);
+	DCS_AUDIO_2K(config, "dcs");
 }
 
 
@@ -1116,7 +1116,7 @@ void midvunit_state::crusnwld(machine_config &config)
 {
 	midvunit(config);
 	/* valid values are 450 or 460 */
-	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2, 0);
+	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2);
 	m_midway_serial_pic2->set_upper(450);
 	m_midway_serial_pic2->set_yearoffs(94);
 }
@@ -1125,7 +1125,7 @@ void midvunit_state::offroadc(machine_config &config)
 {
 	midvunit(config);
 	/* valid values are 230 or 234 */
-	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2, 0);
+	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2);
 	m_midway_serial_pic2->set_upper(230);
 	m_midway_serial_pic2->set_yearoffs(94);
 }
@@ -1143,13 +1143,13 @@ void midvunit_state::midvplus(machine_config &config)
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	MIDWAY_IOASIC(config, m_midway_ioasic, 0);
+	MIDWAY_IOASIC(config, m_midway_ioasic);
 	m_midway_ioasic->set_shuffle(0);
 	m_midway_ioasic->set_upper(452); /* no alternates */
 	m_midway_ioasic->set_yearoffs(94);
 
 	/* sound hardware */
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3839);
 }

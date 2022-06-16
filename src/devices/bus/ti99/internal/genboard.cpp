@@ -440,7 +440,7 @@ DEFINE_DEVICE_TYPE(GENEVE_PAL,        bus::ti99::internal::geneve_pal_device, "g
 
 namespace bus::ti99::internal {
 
-geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	m_have_waitstate(false),
 	m_have_extra_waitstate(false),
@@ -473,7 +473,7 @@ geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig
 {
 }
 
-geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: geneve_gate_array_device(mconfig, GENEVE_GATE_ARRAY, tag, owner, clock)
 {
 }
@@ -1173,7 +1173,7 @@ void geneve_gate_array_device::device_reset()
 
     ======================================================================== */
 
-geneve_pal_device::geneve_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+geneve_pal_device::geneve_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, GENEVE_PAL, tag, owner, clock),
 	  m_pin3(true),
 	  m_pin4(true),
@@ -1409,7 +1409,7 @@ void geneve_pal_device::device_start()
 
 ********************************************************************/
 
-genmod_decoder_device::genmod_decoder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+genmod_decoder_device::genmod_decoder_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, GENMOD_DECODER, tag, owner, clock),
 	m_debug(false),
 	m_turbo(false),

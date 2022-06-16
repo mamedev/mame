@@ -110,7 +110,7 @@
 
 DEFINE_DEVICE_TYPE(PINSND88, pinsnd88_device, "pinsnd88", "Williams Pin Sound '88 Audio Board")
 
-pinsnd88_device::pinsnd88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pinsnd88_device::pinsnd88_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig,PINSND88,tag,owner,clock)
 	, device_mixer_interface(mconfig, *this, 2) // 2 channels
 	, m_cpu(*this, "cpu")
@@ -207,7 +207,7 @@ void pinsnd88_device::device_add_mconfig(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(50));
 
 	// TODO: analog filters and "volume" controls for the two channels
-	AD7224(config, m_dac, 0);
+	AD7224(config, m_dac);
 	m_dac->add_route(ALL_OUTPUTS, *this, 0.41/2.0, AUTO_ALLOC_INPUT, 0); // 470K
 	m_dac->add_route(ALL_OUTPUTS, *this, 0.5/2.0, AUTO_ALLOC_INPUT, 1); // 330K
 

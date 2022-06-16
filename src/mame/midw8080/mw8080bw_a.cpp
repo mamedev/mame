@@ -630,7 +630,7 @@ static discrete_op_amp_tvca_info const midway_music_tvca_info =
 	DISC_OP_AMP_TRIGGER_FUNCTION_NONE
 };
 
-midway_tone_generator_device_base::midway_tone_generator_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+midway_tone_generator_device_base::midway_tone_generator_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_discrete(*this, "discrete")
 {
@@ -660,7 +660,7 @@ void midway_tone_generator_device_base::tone_generator_hi_w(u8 data)
  *
  *************************************/
 
-seawolf_audio_device::seawolf_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+seawolf_audio_device::seawolf_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SEAWOLF_AUDIO, tag, owner, clock),
 	m_samples(*this, "samples"),
 	m_prev(0U)
@@ -734,7 +734,7 @@ static INPUT_PORTS_START(gunfight_audio)
 	PORT_ADJUSTER( 50, "Pot: Right Hit Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_right_hit_vol")
 INPUT_PORTS_END
 
-gunfight_audio_device::gunfight_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+gunfight_audio_device::gunfight_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, GUNFIGHT_AUDIO, tag, owner, clock),
 	m_left_shot(*this, "sound_nl:left_shot"),
 	m_right_shot(*this, "sound_nl:right_shot"),
@@ -779,7 +779,7 @@ void gunfight_audio_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	netlist_mame_sound_device &nl_sound =
-		NETLIST_SOUND(config, "sound_nl", 48000)
+		NETLIST_SOUND(config, "sound_nl", XTAL::u(48000))
 			.set_source(NETLIST_NAME(gunfight));
 	nl_sound.add_route(0, "lspeaker", 0.5);
 	nl_sound.add_route(1, "rspeaker", 0.5);
@@ -1036,7 +1036,7 @@ static INPUT_PORTS_START(boothill_audio)
 	PORT_ADJUSTER( 35, "Music Volume" )
 INPUT_PORTS_END
 
-boothill_audio_device::boothill_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+boothill_audio_device::boothill_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	midway_tone_generator_device_base(mconfig, BOOTHILL_AUDIO, tag, owner, clock)
 {
 }
@@ -1268,7 +1268,7 @@ INPUT_PORTS_START(desertgu_audio)
 	PORT_ADJUSTER( 60, "Music Volume" )
 INPUT_PORTS_END
 
-desertgu_audio_device::desertgu_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+desertgu_audio_device::desertgu_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	midway_tone_generator_device_base(mconfig, DESERTGU_AUDIO, tag, owner, clock),
 	m_ctrl_sel_out(*this),
 	m_recoil(*this, "Player1_Gun_Recoil"),
@@ -1547,7 +1547,7 @@ static INPUT_PORTS_START(dplay_audio)
 	PORT_ADJUSTER( 60, "Music Volume" )
 INPUT_PORTS_END
 
-dplay_audio_device::dplay_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+dplay_audio_device::dplay_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	midway_tone_generator_device_base(mconfig, DPLAY_AUDIO, tag, owner, clock)
 {
 }
@@ -1593,7 +1593,7 @@ void dplay_audio_device::device_start()
  *
  *************************************/
 
-gmissile_audio_device::gmissile_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+gmissile_audio_device::gmissile_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, GMISSILE_AUDIO, tag, owner, clock),
 	m_samples(*this, "samples%u", 1U),
 	m_l_exp(*this, "L_EXP_LIGHT"),
@@ -1693,7 +1693,7 @@ void gmissile_audio_device::device_start()
 
 // Noise clock was breadboarded and measured at 3760Hz
 
-m4_audio_device::m4_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+m4_audio_device::m4_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, M4_AUDIO, tag, owner, clock),
 	m_samples(*this, "samples%u", 1U),
 	m_p1(0U),
@@ -1947,7 +1947,7 @@ static INPUT_PORTS_START(clowns_audio)
 	PORT_ADJUSTER( 40, "R507 - Music Volume" )
 INPUT_PORTS_END
 
-clowns_audio_device::clowns_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+clowns_audio_device::clowns_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	midway_tone_generator_device_base(mconfig, CLOWNS_AUDIO, tag, owner, clock),
 	m_samples(*this, "samples"),
 	m_ctrl_sel_out(*this),
@@ -2349,7 +2349,7 @@ static INPUT_PORTS_START(spacwalk_audio)
 	PORT_ADJUSTER( 40, "R507 - Music Volume" )
 INPUT_PORTS_END
 
-spacwalk_audio_device::spacwalk_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+spacwalk_audio_device::spacwalk_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	midway_tone_generator_device_base(mconfig, SPACWALK_AUDIO, tag, owner, clock),
 	m_ctrl_sel_out(*this),
 	m_p1(0U)
@@ -2539,7 +2539,7 @@ static DISCRETE_SOUND_START(dogpatch_discrete)
 	DISCRETE_OUTPUT(NODE_92, 32760.0 / 5.8)
 DISCRETE_SOUND_END
 
-dogpatch_audio_device::dogpatch_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+dogpatch_audio_device::dogpatch_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	midway_tone_generator_device_base(mconfig, DOGPATCH_AUDIO, tag, owner, clock)
 {
 }
@@ -3030,7 +3030,7 @@ static DISCRETE_SOUND_START(spcenctr_discrete)
 	DISCRETE_OUTPUT(NODE_91, 20000)
 DISCRETE_SOUND_END
 
-spcenctr_audio_device::spcenctr_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+spcenctr_audio_device::spcenctr_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SPCENCTR_AUDIO, tag, owner, clock),
 	m_sn(*this, "snsnd"),
 	m_discrete(*this, "discrete"),
@@ -3136,7 +3136,7 @@ TIMER_CALLBACK_MEMBER(spcenctr_audio_device::strobe_callback)
  *
  *************************************/
 
-phantom2_audio_device::phantom2_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+phantom2_audio_device::phantom2_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PHANTOM2_AUDIO, tag, owner, clock),
 	m_samples(*this, "samples"),
 	m_exp(*this, "EXPLAMP"),
@@ -3259,7 +3259,7 @@ static DISCRETE_SOUND_START(invaders_discrete)
 	INVADERS_MIXER(1, invaders)
 DISCRETE_SOUND_END
 
-invaders_audio_device::invaders_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+invaders_audio_device::invaders_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, INVADERS_AUDIO, tag, owner, clock),
 	m_sn(*this, "snsnd"),
 	m_discrete(*this, "discrete"),
@@ -3457,7 +3457,7 @@ static DISCRETE_SOUND_START(invad2ct_discrete)
 	INVADERS_MIXER(2, invaders)
 DISCRETE_SOUND_END
 
-invad2ct_audio_device::invad2ct_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+invad2ct_audio_device::invad2ct_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, INVAD2CT_AUDIO, tag, owner, clock),
 	m_discrete(*this, "discrete"),
 	m_sn(*this, "sn%u", 1U)
@@ -3656,7 +3656,7 @@ static INPUT_PORTS_START(zzzap_audio)
 	PORT_ADJUSTER( 50, "Pot: Master Volume" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot_master_vol")
 INPUT_PORTS_END
 
-zzzap_common_audio_device::zzzap_common_audio_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, void (*netlist)(netlist::nlparse_t &)) :
+zzzap_common_audio_device::zzzap_common_audio_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock, void (*netlist)(netlist::nlparse_t &)) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_netlist(netlist),
 	m_pedal_bit0(*this, "sound_nl:pedal_bit0"),
@@ -3734,7 +3734,7 @@ void zzzap_common_audio_device::device_add_mconfig(machine_config &config)
 
 	if (m_netlist != nullptr) {
 
-		NETLIST_SOUND(config, "sound_nl", 48000)
+		NETLIST_SOUND(config, "sound_nl", XTAL::u(48000))
 			.set_source(m_netlist)
 			.add_route(ALL_OUTPUTS, "mono", 1.0);
 
@@ -3787,13 +3787,13 @@ void zzzap_common_audio_device::device_start()
 }
 
 
-zzzap_audio_device::zzzap_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+zzzap_audio_device::zzzap_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 		zzzap_common_audio_device(mconfig, ZZZAP_AUDIO, tag, owner, clock, NETLIST_NAME(280zzzap))
 {
 }
 
 
-lagunar_audio_device::lagunar_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+lagunar_audio_device::lagunar_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 		zzzap_common_audio_device(mconfig, LAGUNAR_AUDIO, tag, owner, clock, NETLIST_NAME(lagunar))
 {
 }

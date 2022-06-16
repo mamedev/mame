@@ -63,7 +63,7 @@ void agat9video_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-agat9video_device::agat9video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+agat9video_device::agat9video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AGAT9VIDEO, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, m_screen(*this, "a9screen")

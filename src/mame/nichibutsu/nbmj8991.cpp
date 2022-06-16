@@ -1325,7 +1325,7 @@ void nbmj8991_state::nbmjdrv1(machine_config &config) // galkoku
 	m_maincpu->set_addrmap(AS_IO, &nbmj8991_state::galkoku_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8991_state::irq0_line_hold));
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1342,7 +1342,7 @@ void nbmj8991_state::nbmjdrv1(machine_config &config) // galkoku
 	SPEAKER(config, "speaker").front_center();
 	YM3812(config, "fmsnd", 25000000/10).add_route(ALL_OUTPUTS, "speaker", 0.7);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 
@@ -1354,9 +1354,9 @@ void nbmj8991_state::nbmjdrv2(machine_config &config) // pstadium
 	m_maincpu->set_addrmap(AS_IO, &nbmj8991_state::pstadium_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8991_state::irq0_line_hold));
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 
-	Z80(config, m_audiocpu, 4000000);                  /* 4.00 MHz */
+	Z80(config, m_audiocpu, XTAL::u(4000000));                  /* 4.00 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nbmj8991_state::nbmj8991_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nbmj8991_state::nbmj8991_sound_io_map);
 	m_audiocpu->set_periodic_int(FUNC(nbmj8991_state::irq0_line_hold), attotime::from_hz(128*60)); // ?
@@ -1379,8 +1379,8 @@ void nbmj8991_state::nbmjdrv2(machine_config &config) // pstadium
 
 	YM3812(config, "fmsnd", 25000000/6.25).add_route(ALL_OUTPUTS, "speaker", 0.7);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 

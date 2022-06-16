@@ -111,14 +111,14 @@ void gammagic_state::machine_start()
 void gammagic_state::gammagic(machine_config &config)
 {
 	// TODO: convert to a m55hipl state machine derivative
-	PENTIUM(config, m_maincpu, 133000000); // Intel Pentium 133
+	PENTIUM(config, m_maincpu, XTAL::u(133000000)); // Intel Pentium 133
 	m_maincpu->set_addrmap(AS_PROGRAM, &gammagic_state::gammagic_map);
 	m_maincpu->set_addrmap(AS_IO, &gammagic_state::gammagic_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 
 	/* video hardware */

@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(IDE_PCI, ide_pci_device, "ide_pci", "PCI IDE interface")
 
-ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pci_device(mconfig, IDE_PCI, tag, owner, clock),
 	m_ide(*this, "ide"),
 	m_ide2(*this, "ide2"),

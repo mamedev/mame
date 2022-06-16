@@ -21,12 +21,12 @@ DEFINE_DEVICE_TYPE(CDROM, cdrom_image_device, "cdrom_image", "CD-ROM Image")
 //  cdrom_image_device - constructor
 //-------------------------------------------------
 
-cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cdrom_image_device(mconfig, CDROM, tag, owner, clock)
 {
 }
 
-cdrom_image_device::cdrom_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+cdrom_image_device::cdrom_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type,  tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		m_cdrom_handle(nullptr),

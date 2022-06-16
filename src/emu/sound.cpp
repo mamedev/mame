@@ -55,12 +55,12 @@ const attotime sound_manager::STREAMS_UPDATE_ATTOTIME = attotime::from_hz(STREAM
 //  stream_buffer - constructor
 //-------------------------------------------------
 
-stream_buffer::stream_buffer(u32 sample_rate) :
+stream_buffer::stream_buffer(const XTAL &sample_rate) :
 	m_end_second(0),
 	m_end_sample(0),
 	m_sample_rate(sample_rate),
-	m_sample_attos((sample_rate == 0) ? ATTOSECONDS_PER_SECOND : ((ATTOSECONDS_PER_SECOND + sample_rate - 1) / sample_rate)),
-	m_buffer(sample_rate)
+	m_sample_attos(sample_rate.disabled() ? ATTOSECONDS_PER_SECOND : ((ATTOSECONDS_PER_SECOND + sample_rate.value() - 1) / sample_rate.value())),
+	m_buffer(sample_rate.disabled() ? 1 : sample_rate.value())
 {
 }
 
@@ -83,15 +83,16 @@ stream_buffer::~stream_buffer()
 //  this buffer
 //-------------------------------------------------
 
-void stream_buffer::set_sample_rate(u32 rate, bool resample)
+void stream_buffer::set_sample_rate(const XTAL &rate, bool resample)
 {
 	// skip if nothing is actually changing
 	if (rate == m_sample_rate)
 		return;
 
+	u32 irate = rate.value();
+
 	// force resampling off if coming to or from an invalid rate, or if we're at time 0 (startup)
-	sound_assert(rate >= SAMPLE_RATE_MINIMUM - 1);
-	if (rate < SAMPLE_RATE_MINIMUM || m_sample_rate < SAMPLE_RATE_MINIMUM || (m_end_second == 0 && m_end_sample == 0))
+	if (rate.disabled() || !m_sample_rate.disabled() || (m_end_second == 0 && m_end_sample == 0))
 		resample = false;
 
 	// note the time and period of the current buffer (end_time is AFTER the final sample)
@@ -99,7 +100,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	attotime prevend = end_time();
 
 	// compute the time and period of the new buffer
-	attotime newperiod = attotime(0, (ATTOSECONDS_PER_SECOND + rate - 1) / rate);
+	attotime newperiod = attotime(0, (ATTOSECONDS_PER_SECOND + irate - 1) / irate);
 	attotime newend = attotime(prevend.seconds(), (prevend.attoseconds() / newperiod.attoseconds()) * newperiod.attoseconds());
 
 	// buffer a short runway of previous samples; in order to support smooth
@@ -109,11 +110,11 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	// voice when jumping off the edge in Q*Bert; without this extra effort
 	// it is crackly and/or glitchy at times
 	sample_t buffer[64];
-	int buffered_samples = std::min(m_sample_rate, std::min(rate, u32(std::size(buffer))));
+	int buffered_samples = std::min(m_sample_rate.value(), std::min(irate, u32(std::size(buffer))));
 
 	// if the new rate is lower, downsample into our holding buffer;
 	// otherwise just copy into our holding buffer for later upsampling
-	bool new_rate_higher = (rate > m_sample_rate);
+	bool new_rate_higher = (irate > m_sample_rate.value());
 	if (resample)
 	{
 		if (!new_rate_higher)
@@ -137,8 +138,8 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	}
 
 	// ensure our buffer is large enough to hold a full second at the new rate
-	if (m_buffer.size() < rate)
-		m_buffer.resize(rate);
+	if (m_buffer.size() < irate)
+		m_buffer.resize(irate);
 
 	// set the new rate
 	m_sample_rate = rate;
@@ -529,7 +530,7 @@ read_stream_view sound_stream_input::update(attotime start, attotime end)
 //  them of our current rate
 //-------------------------------------------------
 
-void sound_stream_input::apply_sample_rate_changes(u32 updatenum, u32 downstream_rate)
+void sound_stream_input::apply_sample_rate_changes(u32 updatenum, const XTAL &downstream_rate)
 {
 	// shouldn't get here unless valid
 	sound_assert(valid());
@@ -553,21 +554,21 @@ void sound_stream_input::apply_sample_rate_changes(u32 updatenum, u32 downstream
 //  sound_stream - private common constructor
 //-------------------------------------------------
 
-sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, sound_stream_flags flags) :
+sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, const XTAL &sample_rate, u32 flags) :
 	m_device(device),
 	m_next(nullptr),
-	m_sample_rate((sample_rate < SAMPLE_RATE_MINIMUM) ? (SAMPLE_RATE_MINIMUM - 1) : (sample_rate < SAMPLE_RATE_OUTPUT_ADAPTIVE) ? sample_rate : 48000),
-	m_pending_sample_rate(SAMPLE_RATE_INVALID),
+	m_sample_rate(sample_rate),
+	m_pending_sample_rate(),
 	m_last_sample_rate_update(0),
-	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE),
-	m_output_adaptive(sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE),
+	m_input_adaptive(flags & SAMPLE_RATE_INPUT_ADAPTIVE),
+	m_output_adaptive(flags & SAMPLE_RATE_OUTPUT_ADAPTIVE),
 	m_synchronous((flags & STREAM_SYNCHRONOUS) != 0),
 	m_resampling_disabled((flags & STREAM_DISABLE_INPUT_RESAMPLING) != 0),
 	m_sync_timer(nullptr),
 	m_last_update_end_time(attotime::zero),
 	m_input(inputs),
 	m_input_view(inputs),
-	m_empty_buffer(100),
+	m_empty_buffer(),
 	m_output_base(output_base),
 	m_output(outputs),
 	m_output_view(outputs)
@@ -620,7 +621,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 //  sound_stream - constructor
 //-------------------------------------------------
 
-sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags) :
+sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output_base, const XTAL &sample_rate, stream_update_delegate callback, u32 flags) :
 	sound_stream(device, inputs, outputs, output_base, sample_rate, flags)
 {
 	m_callback_ex = std::move(callback);
@@ -641,7 +642,7 @@ sound_stream::~sound_stream()
 //  given stream
 //-------------------------------------------------
 
-void sound_stream::set_sample_rate(u32 new_rate)
+void sound_stream::set_sample_rate(const XTAL &new_rate)
 {
 	// we will update this on the next global update
 	if (new_rate != sample_rate())
@@ -724,7 +725,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 		// skip if nothing to do
 		u32 samples = m_output_view[0].samples();
 		sound_assert(samples >= 0);
-		if (samples != 0 && m_sample_rate >= SAMPLE_RATE_MINIMUM)
+		if (samples != 0 && m_sample_rate.enabled())
 		{
 			sound_assert(!synchronous() || samples == 1);
 
@@ -771,16 +772,11 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 //  pending sample rate change, apply it now
 //-------------------------------------------------
 
-void sound_stream::apply_sample_rate_changes(u32 updatenum, u32 downstream_rate)
+void sound_stream::apply_sample_rate_changes(u32 updatenum, const XTAL &downstream_rate)
 {
 	// grab the new rate and invalidate
-	u32 new_rate = (m_pending_sample_rate != SAMPLE_RATE_INVALID) ? m_pending_sample_rate : m_sample_rate;
-	m_pending_sample_rate = SAMPLE_RATE_INVALID;
-
-	// clamp to the minimum - 1 (anything below minimum means "off" and
-	// will not call the sound callback at all)
-	if (new_rate < SAMPLE_RATE_MINIMUM)
-		new_rate = SAMPLE_RATE_MINIMUM - 1;
+	XTAL new_rate = m_pending_sample_rate.enabled() ? m_pending_sample_rate : m_sample_rate;
+	m_pending_sample_rate = XTAL();
 
 	// if we're input adaptive, override with the rate of our input
 	if (input_adaptive() && m_input.size() > 0 && m_input[0].valid())
@@ -797,11 +793,11 @@ void sound_stream::apply_sample_rate_changes(u32 updatenum, u32 downstream_rate)
 	}
 
 	// if something is different, process the change
-	if (new_rate != SAMPLE_RATE_INVALID && new_rate != m_sample_rate)
+	if (new_rate.enabled() && new_rate != m_sample_rate)
 	{
 		// update to the new rate and notify everyone
 #if (SOUND_DEBUG)
-		printf("stream %s changing rates %d -> %d\n", name().c_str(), m_sample_rate, new_rate);
+		printf("stream %s changing rates %d -> %d\n", name().c_str(), m_sample_rate.value(), new_rate.value());
 #endif
 		m_sample_rate = new_rate;
 		sample_rate_changed();
@@ -845,7 +841,7 @@ void sound_stream::print_graph_recursive(int indent, int index)
 void sound_stream::sample_rate_changed()
 {
 	// if invalid, just punt
-	if (m_sample_rate == SAMPLE_RATE_INVALID)
+	if (m_sample_rate.disabled())
 		return;
 
 	// update all output buffers
@@ -938,7 +934,7 @@ read_stream_view sound_stream::empty_view(attotime start, attotime end)
 //-------------------------------------------------
 
 default_resampler_stream::default_resampler_stream(device_t &device) :
-	sound_stream(device, 1, 1, 0, SAMPLE_RATE_OUTPUT_ADAPTIVE, stream_update_delegate(&default_resampler_stream::resampler_sound_update, this), STREAM_DISABLE_INPUT_RESAMPLING),
+	sound_stream(device, 1, 1, 0, XTAL(), stream_update_delegate(&default_resampler_stream::resampler_sound_update, this), STREAM_DISABLE_INPUT_RESAMPLING|SAMPLE_RATE_OUTPUT_ADAPTIVE),
 	m_max_latency(0)
 {
 	// create a name
@@ -963,7 +959,7 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 	auto &output = outputs[0];
 
 	// if the input has an invalid rate, just fill with zeros
-	if (input.sample_rate() <= 1)
+	if (input.sample_rate().disabled())
 	{
 		output.fill(0);
 		return;
@@ -973,7 +969,7 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 	sound_assert(input.sample_rate() != output.sample_rate());
 
 	// compute the stepping value and the inverse
-	stream_buffer::sample_t step = stream_buffer::sample_t(input.sample_rate()) / stream_buffer::sample_t(output.sample_rate());
+	stream_buffer::sample_t step = stream_buffer::sample_t(input.sample_rate().value()) / stream_buffer::sample_t(output.sample_rate().value());
 	stream_buffer::sample_t stepinv = 1.0 / step;
 
 	// determine the latency we need to introduce, in input samples:
@@ -1080,9 +1076,9 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_last_update(attotime::zero),
 	m_finalmix_leftover(0),
 	m_samples_this_update(0),
-	m_finalmix(machine.sample_rate()),
-	m_leftmix(machine.sample_rate()),
-	m_rightmix(machine.sample_rate()),
+	m_finalmix(machine.sample_rate().value()),
+	m_leftmix(machine.sample_rate().value()),
+	m_rightmix(machine.sample_rate().value()),
 	m_compressor_scale(1.0),
 	m_compressor_counter(0),
 	m_compressor_enabled(machine.options().compressor()),
@@ -1135,7 +1131,7 @@ sound_manager::~sound_manager()
 //  new-style callback and flags
 //-------------------------------------------------
 
-sound_stream *sound_manager::stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags)
+sound_stream *sound_manager::stream_alloc(device_t &device, u32 inputs, u32 outputs, const XTAL &sample_rate, stream_update_delegate callback, u32 flags)
 {
 	// determine output base
 	u32 output_base = 0;
@@ -1156,7 +1152,7 @@ bool sound_manager::start_recording(std::string_view filename)
 {
 	if (m_wavfile)
 		return false;
-	m_wavfile = util::wav_open(filename, machine().sample_rate(), 2);
+	m_wavfile = util::wav_open(filename, machine().sample_rate().value(), 2);
 	return bool(m_wavfile);
 }
 

@@ -378,7 +378,7 @@ void mario_state::mario(machine_config &config)
 void mario_state::masao(machine_config &config)
 {
 	mario_base(config);
-	m_maincpu->set_clock(4000000);        /* 4.000 MHz (?) */
+	m_maincpu->set_clock(XTAL::u(4000000));        /* 4.000 MHz (?) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mario_state::masao_map);
 
 	/* sound hardware */

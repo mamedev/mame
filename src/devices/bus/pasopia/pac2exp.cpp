@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(PASOPIA_PA7234, pasopia_pa7234_device, "pa7234", "PA7234 Paso
 //  pasopia_pa7234_device - construction
 //-------------------------------------------------
 
-pasopia_pa7234_device::pasopia_pa7234_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pasopia_pa7234_device::pasopia_pa7234_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PASOPIA_PA7234, tag, owner, clock)
 	, pac2_card_interface(mconfig, *this)
 	, m_slot(*this, "slot%u", 1U)

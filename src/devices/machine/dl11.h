@@ -29,7 +29,7 @@ class dl11_device : public device_t,
 {
 public:
 	// construction/destruction
-	dl11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dl11_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_rxc(int clock) { m_rxc = clock; }
 	void set_txc(int clock) { m_txc = clock; }

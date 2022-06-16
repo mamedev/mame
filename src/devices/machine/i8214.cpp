@@ -113,7 +113,7 @@ void i8214_device::check_interrupt()
 //  i8214_device - constructor
 //-------------------------------------------------
 
-i8214_device::i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8214_device::i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, I8214, tag, owner, clock)
 	, m_write_int(*this)
 	, m_write_enlg(*this)

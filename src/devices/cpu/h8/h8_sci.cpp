@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(H8_SCI, h8_sci_device, "h8_sci", "H8 Serial Communications In
 
 const char *const h8_sci_device::state_names[] = { "idle", "start", "bit", "parity", "stop", "last-tick" };
 
-h8_sci_device::h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_sci_device::h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, H8_SCI, tag, owner, clock),
 	cpu(*this, DEVICE_SELF_OWNER),
 	tx_cb(*this),

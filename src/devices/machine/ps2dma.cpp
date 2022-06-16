@@ -18,7 +18,7 @@
 
 DEFINE_DEVICE_TYPE(SONYPS2_DMAC, ps2_dmac_device, "ps2dmac", "PlayStation 2 EE DMAC")
 
-ps2_dmac_device::ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ps2_dmac_device::ps2_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SONYPS2_DMAC, tag, owner, clock)
 	, device_execute_interface(mconfig, *this)
 	, m_ee(*this, finder_base::DUMMY_TAG)

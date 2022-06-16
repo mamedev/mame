@@ -44,7 +44,7 @@ class am9513_device : public device_t
 {
 public:
 	// device type constructor
-	am9513_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	am9513_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// static configuration
 	auto out1_cb() { return m_out_cb[0].bind(); }
@@ -88,7 +88,7 @@ public:
 
 protected:
 	// base constructor
-	am9513_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_am9513a);
+	am9513_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool is_am9513a);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -175,7 +175,7 @@ class am9513a_device : public am9513_device
 {
 public:
 	// device type constructor
-	am9513a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	am9513a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type declarations

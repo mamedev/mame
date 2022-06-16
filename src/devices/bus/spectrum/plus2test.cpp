@@ -42,7 +42,7 @@ const tiny_rom_entry *spectrum_plus2test_device::device_rom_region() const
 //  spectrum_plus2test_device - constructor
 //-------------------------------------------------
 
-spectrum_plus2test_device::spectrum_plus2test_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_plus2test_device::spectrum_plus2test_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPECTRUM_PLUS2TEST, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_rom(*this, "rom")

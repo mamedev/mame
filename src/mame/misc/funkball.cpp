@@ -744,14 +744,14 @@ DEVICE_INPUT_DEFAULTS_END
 
 void funkball_state::funkball(machine_config &config)
 {
-	MEDIAGX(config, m_maincpu, 66666666*3.5); // 66,6 MHz x 3.5
+	MEDIAGX(config, m_maincpu, XTAL::u(66666666)*7/2); // 66,6 MHz x 3.5
 	m_maincpu->set_addrmap(AS_PROGRAM, &funkball_state::funkball_map);
 	m_maincpu->set_addrmap(AS_IO, &funkball_state::funkball_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus"));
 	pcibus.set_device(7, FUNC(funkball_state::voodoo_0_pci_r), FUNC(funkball_state::voodoo_0_pci_w));
 	pcibus.set_device(18, FUNC(funkball_state::cx5510_pci_r), FUNC(funkball_state::cx5510_pci_w));
 
@@ -775,7 +775,7 @@ void funkball_state::funkball(machine_config &config)
 	screen.set_size(1024, 1024);
 	screen.set_visarea(0, 511, 16, 447);
 
-	ns16550_device &uart(NS16550(config, "uart", 1843200)); // exact type unknown
+	ns16550_device &uart(NS16550(config, "uart", XTAL::u(1843200))); // exact type unknown
 	uart.out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.out_dtr_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.out_rts_callback().set("rs232", FUNC(rs232_port_device::write_rts));

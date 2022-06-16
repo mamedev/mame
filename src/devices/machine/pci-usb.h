@@ -9,12 +9,12 @@
 
 class usb_ohci_device : public pci_device {
 public:
-	usb_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
+	usb_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
 		: usb_ohci_device(mconfig, tag, owner, clock)
 	{
 		set_ids(main_id, revision, 0x0c0310, subdevice_id);
 	}
-	usb_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	usb_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -26,12 +26,12 @@ private:
 
 class usb_uhci_device : public pci_device {
 public:
-	usb_uhci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
+	usb_uhci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
 		: usb_uhci_device(mconfig, tag, owner, clock)
 	{
 		set_ids(main_id, revision, 0x0c0300, subdevice_id);
 	}
-	usb_uhci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	usb_uhci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -43,12 +43,12 @@ private:
 
 class usb_ehci_device : public pci_device {
 public:
-	usb_ehci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
+	usb_ehci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
 		: usb_ehci_device(mconfig, tag, owner, clock)
 	{
 		set_ids(main_id, revision, 0x0c0320, subdevice_id);
 	}
-	usb_ehci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	usb_ehci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

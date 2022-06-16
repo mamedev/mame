@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(MTX_ROMPAK, mtx_rompak_device, "rompak", "MTX ROMPAK")
 //  mtx_rompak_device - constructor
 //-------------------------------------------------
 
-mtx_rompak_device::mtx_rompak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mtx_rompak_device::mtx_rompak_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MTX_ROMPAK, tag, owner, clock)
 	, device_mtx_exp_interface(mconfig, *this)
 {

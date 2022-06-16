@@ -11,7 +11,7 @@
 class rs232_loopback_device : public device_t, public device_rs232_port_interface
 {
 public:
-	rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual WRITE_LINE_MEMBER( input_txd ) override;
 	virtual WRITE_LINE_MEMBER( input_rts ) override;
@@ -24,7 +24,7 @@ protected:
 class dec_rs232_loopback_device : public device_t, public device_rs232_port_interface
 {
 public:
-	dec_rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dec_rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual WRITE_LINE_MEMBER( input_txd ) override;
 	virtual WRITE_LINE_MEMBER( input_rts ) override;

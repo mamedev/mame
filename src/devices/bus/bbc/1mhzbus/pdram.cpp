@@ -44,7 +44,7 @@ const tiny_rom_entry* bbc_pdram_device::device_rom_region() const
 //  bbc_pdram_device - constructor
 //-------------------------------------------------
 
-bbc_pdram_device::bbc_pdram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_pdram_device::bbc_pdram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_PDRAM, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_ram_page(0)

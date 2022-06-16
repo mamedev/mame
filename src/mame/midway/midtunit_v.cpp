@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(MIDXUNIT_VIDEO, midxunit_video_device, "xunitvid", "Midway X-
 /* compile-time options */
 #define LOG_DMA             0       /* DMAs are logged if the 'L' key is pressed */
 
-midtunit_video_device::midtunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+midtunit_video_device::midtunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, finder_base::DUMMY_TAG)
@@ -41,22 +41,22 @@ midtunit_video_device::midtunit_video_device(const machine_config &mconfig, devi
 {
 }
 
-midtunit_video_device::midtunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+midtunit_video_device::midtunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: midtunit_video_device(mconfig, MIDTUNIT_VIDEO, tag, owner, clock)
 {
 }
 
-midwunit_video_device::midwunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+midwunit_video_device::midwunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: midtunit_video_device(mconfig, type, tag, owner, clock)
 {
 }
 
-midwunit_video_device::midwunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+midwunit_video_device::midwunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: midtunit_video_device(mconfig, MIDWUNIT_VIDEO, tag, owner, clock)
 {
 }
 
-midxunit_video_device::midxunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+midxunit_video_device::midxunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: midwunit_video_device(mconfig, MIDXUNIT_VIDEO, tag, owner, clock)
 {
 }

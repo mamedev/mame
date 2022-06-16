@@ -28,7 +28,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	apricot_video_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, const char *dflt)
-		: apricot_video_slot_device(mconfig, tag, owner, uint32_t(0))
+		: apricot_video_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -36,7 +36,7 @@ public:
 		set_fixed(false);
 	}
 
-	apricot_video_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apricot_video_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~apricot_video_slot_device();
 
 	// callbacks

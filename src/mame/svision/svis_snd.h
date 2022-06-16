@@ -18,14 +18,14 @@ class svision_sound_device : public device_t, public device_sound_interface
 {
 public:
 	template <typename T, typename U>
-	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&region_tag)
+	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag, U &&region_tag)
 		: svision_sound_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 		m_cartrom.set_tag(std::forward<U>(region_tag));
 	}
 
-	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto irq_cb() { return m_irq_cb.bind(); }

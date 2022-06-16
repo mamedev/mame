@@ -509,7 +509,7 @@ void gotya_state::machine_reset()
 void gotya_state::gotya(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 18432000 / 6); // 3.072 MHz ???
+	Z80(config, m_maincpu, XTAL::u(18432000) / 6); // 3.072 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &gotya_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gotya_state::irq0_line_hold));
 

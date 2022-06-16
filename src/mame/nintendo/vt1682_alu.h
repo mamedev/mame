@@ -12,7 +12,7 @@ class vrt_vt1682_alu_device : public device_t
 {
 public:
 	// construction/destruction
-	vrt_vt1682_alu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vrt_vt1682_alu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// so that we can filter logging, sound ALU gets used hundreds of times a frame, so logging it is unwise
 	void set_sound_alu() { m_is_sound_alu = true; }

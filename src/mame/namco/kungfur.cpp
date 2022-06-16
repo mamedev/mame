@@ -276,7 +276,7 @@ INPUT_PORTS_END
 void kungfur_state::kungfur(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809(config, m_maincpu, 4000000); // 4MHz?
+	MC6809(config, m_maincpu, XTAL::u(4000000)); // 4MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &kungfur_state::main_map);
 
 	const attotime irq_period = attotime::from_hz(4000000 / 0x1000); // = 976.5Hz, accurate

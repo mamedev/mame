@@ -16,7 +16,7 @@ class ds6417_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ds6417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds6417_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }

@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(MSM6253, msm6253_device, "msm6253", "OKI MSM6253 A/D Converte
 //  msm6253_device - constructor
 //-------------------------------------------------
 
-msm6253_device::msm6253_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+msm6253_device::msm6253_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSM6253, tag, owner, clock)
 	, m_analog_ports(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 	, m_analog_input_cb(*this)

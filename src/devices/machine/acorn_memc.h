@@ -22,10 +22,10 @@
 class acorn_memc_device : public device_t, public device_memory_interface
 {
 public:
-	acorn_memc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	acorn_memc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T>
-	acorn_memc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&vidc_tag)
+	acorn_memc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&vidc_tag)
 		: acorn_memc_device(mconfig, tag, owner, clock)
 	{
 		m_vidc.set_tag(std::forward<T>(vidc_tag));

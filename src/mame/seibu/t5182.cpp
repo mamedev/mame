@@ -153,7 +153,7 @@ rom.
 
 DEFINE_DEVICE_TYPE(T5182, t5182_device, "t5182", "T5182 MCU")
 
-t5182_device::t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+t5182_device::t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, T5182, tag, owner, clock),
 	m_ourcpu(*this, "t5182_z80"),
 	m_sharedram(*this, "sharedram"),

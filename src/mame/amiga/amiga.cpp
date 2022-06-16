@@ -98,7 +98,7 @@ DECLARE_DEVICE_TYPE(A1000_KBRESET, a1000_kbreset_device)
 class a1000_kbreset_device : public device_t
 {
 public:
-	a1000_kbreset_device(machine_config const &config, char const *tag, device_t *owner, u32 clock = 0U) :
+	a1000_kbreset_device(machine_config const &config, char const *tag, device_t *owner, const XTAL &clock = XTAL()) :
 		device_t(config, A1000_KBRESET, tag, owner, clock),
 		m_kbrst_cb(*this)
 	{
@@ -1707,11 +1707,11 @@ void a2000_state::a2000(machine_config &config)
 	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cpu slot
-	EXP_SLOT(config, EXP_SLOT_TAG, 0).set_space(m_maincpu, AS_PROGRAM);
+	EXP_SLOT(config, EXP_SLOT_TAG).set_space(m_maincpu, AS_PROGRAM);
 	ZORRO_SLOT(config, "slot", EXP_SLOT_TAG, a2000_expansion_cards, nullptr);
 
 	// zorro slots
-	ZORRO2(config, m_zorro, 0);
+	ZORRO2(config, m_zorro);
 	m_zorro->set_space(m_maincpu, AS_PROGRAM);
 	m_zorro->int2_handler().set(FUNC(a2000_state::zorro2_int2_w));
 	m_zorro->int6_handler().set(FUNC(a2000_state::zorro2_int6_w));
@@ -1754,7 +1754,7 @@ void a500_state::a500(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a500_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
 
 	// cpu slot
-	EXP_SLOT(config, m_side, 0).set_space(m_maincpu, AS_PROGRAM);
+	EXP_SLOT(config, m_side).set_space(m_maincpu, AS_PROGRAM);
 	m_side->int2_handler().set(FUNC(a500_state::side_int2_w));
 	m_side->int6_handler().set(FUNC(a500_state::side_int6_w));
 	ZORRO_SLOT(config, "slot", m_side, a500_expansion_cards, nullptr);
@@ -1823,12 +1823,12 @@ void cdtv_state::cdtv(machine_config &config)
 	m_dmac->io_write_handler().set(m_cdrom, FUNC(cr511b_device::write));
 	m_dmac->int_handler().set(FUNC(cdtv_state::dmac_int_w));
 
-	TPI6525(config, m_tpi, 0);
+	TPI6525(config, m_tpi);
 	m_tpi->out_irq_cb().set(FUNC(cdtv_state::tpi_int_w));
 	m_tpi->out_pb_cb().set(FUNC(cdtv_state::tpi_port_b_write));
 
 	// cd-rom
-	CR511B(config, m_cdrom, 0);
+	CR511B(config, m_cdrom);
 	m_cdrom->scor_handler().set(m_tpi, FUNC(tpi6525_device::i1_w)).invert();
 	m_cdrom->stch_handler().set(m_tpi, FUNC(tpi6525_device::i2_w)).invert();
 	m_cdrom->sten_handler().set(m_tpi, FUNC(tpi6525_device::i3_w));
@@ -1914,7 +1914,7 @@ void a500p_state::a500p(machine_config &config)
 	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cpu slot
-	EXP_SLOT(config, m_side, 0).set_space(m_maincpu, AS_PROGRAM);
+	EXP_SLOT(config, m_side).set_space(m_maincpu, AS_PROGRAM);
 	ZORRO_SLOT(config, "slot", m_side, a500_expansion_cards, nullptr);
 
 	// software
@@ -2134,9 +2134,9 @@ void cd32_state::cd32(machine_config &config)
 	// disable floppy as default (available only via back port as expansion)
 	subdevice<floppy_connector>("fdc:0")->set_default_option(nullptr);
 
-	I2C_24C08(config, "i2cmem", 0); // AT24C08N
+	I2C_24C08(config, "i2cmem"); // AT24C08N
 
-	akiko_device &akiko(AKIKO(config, "akiko", 0));
+	akiko_device &akiko(AKIKO(config, "akiko"));
 	akiko.mem_r_callback().set(FUNC(amiga_state::chip_ram_r));
 	akiko.mem_w_callback().set(FUNC(amiga_state::chip_ram_w));
 	akiko.int_callback().set(FUNC(cd32_state::akiko_int_w));

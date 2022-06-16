@@ -38,17 +38,17 @@
 
 DEFINE_DEVICE_TYPE(DEC_21064, dec_21064_device, "21064", "DEC Alpha 21064")
 
-dec_21064_device::dec_21064_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dec_21064_device::dec_21064_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: alpha_ev4_device(mconfig, DEC_21064, tag, owner, clock)
 {
 }
 
-alpha_ev4_device::alpha_ev4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+alpha_ev4_device::alpha_ev4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: alpha_device(mconfig, type, tag, owner, clock)
 {
 }
 
-alpha_device::alpha_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+alpha_device::alpha_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_dasm_type(alpha_disassembler::dasm_type::TYPE_UNKNOWN)
 	, m_as_config

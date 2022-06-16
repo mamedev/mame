@@ -20,7 +20,7 @@
 
 DEFINE_DEVICE_TYPE(K054338, k054338_device, "k054338", "K054338 Mixer")
 
-k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K054338, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_alpha_inv(0),

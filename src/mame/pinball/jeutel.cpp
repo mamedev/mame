@@ -468,13 +468,13 @@ void jeutel_state::jeutel(machine_config &config)
 	aysnd.port_b_read_callback().set(FUNC(jeutel_state::portb_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	TMS5110A(config, m_tms, 640000);
+	TMS5110A(config, m_tms, XTAL::u(640000));
 	m_tms->m0().set(FUNC(jeutel_state::tminc_w));
 	m_tms->data().set(FUNC(jeutel_state::tmdata_r));
 	//m_tms->irq().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);  // emulation doesn't support INT pin
 	m_tms->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5);  // NE5018
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.5);  // NE5018
 
 	/* Devices */
 	I8255A(config, m_ppi[0]);   // IC31
@@ -501,7 +501,7 @@ void jeutel_state::jeutel(machine_config &config)
 	//m_ppi[2]->in_pc_callback().set(FUNC(jeutel_state::ppi2c_r));
 	m_ppi[2]->out_pc_callback().set(FUNC(jeutel_state::ppi2c_w));
 
-	CLOCK(config, "rclock", 2000).signal_handler().set(FUNC(jeutel_state::clock_w));
+	CLOCK(config, "rclock", XTAL::u(2000)).signal_handler().set(FUNC(jeutel_state::clock_w));
 }
 
 } // Anonymous namespace

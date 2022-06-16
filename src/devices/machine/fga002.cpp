@@ -74,7 +74,7 @@ DEFINE_DEVICE_TYPE(FGA002, fga002_device, "fga002", "Force FGA-002")
 //  fga002_device - constructor
 //-------------------------------------------------
 
-fga002_device::fga002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+fga002_device::fga002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_int_cb(*this)
 	, m_liack4_cb(*this)
@@ -87,7 +87,7 @@ fga002_device::fga002_device(const machine_config &mconfig, device_type type, co
 		elem = 0;
 }
 
-fga002_device::fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+fga002_device::fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: fga002_device(mconfig, FGA002, tag, owner, clock)
 {
 }

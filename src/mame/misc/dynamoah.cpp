@@ -75,7 +75,7 @@ void dynamoah_state::i8031_ext_mem(address_map &map)
 
 void dynamoah_state::dynamoah(machine_config &config)
 {
-	i80c31_device &maincpu(I80C31(config, "maincpu", 6'144'000)); // SC80C31BCCN40
+	i80c31_device &maincpu(I80C31(config, "maincpu", XTAL::u(6'144'000))); // SC80C31BCCN40
 	// clock needs verification, being the XTAL value from a different board
 	maincpu.set_addrmap(AS_PROGRAM, &dynamoah_state::i8031_mem);
 	maincpu.set_addrmap(AS_IO, &dynamoah_state::i8031_ext_mem);

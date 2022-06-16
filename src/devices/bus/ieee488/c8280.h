@@ -30,7 +30,7 @@ class c8280_device : public device_t, public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

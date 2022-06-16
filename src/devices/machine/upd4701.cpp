@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(UPD4701A, upd4701_device, "upd4701a", "uPD4701A Incremental Encoder")
 
-upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UPD4701A, tag, owner, clock)
 	, m_cs(true)
 	, m_xy(false)

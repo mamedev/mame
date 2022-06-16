@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(COLECOVISION_STANDARD, colecovision_standard_cartridge_device
 //  colecovision_standard_cartridge_device - constructor
 //-------------------------------------------------
 
-colecovision_standard_cartridge_device::colecovision_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+colecovision_standard_cartridge_device::colecovision_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COLECOVISION_STANDARD, tag, owner, clock),
 	device_colecovision_cartridge_interface(mconfig, *this)
 {

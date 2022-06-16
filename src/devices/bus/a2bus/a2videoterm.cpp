@@ -106,7 +106,7 @@ class a2bus_videx80_device:
 {
 protected:
 	// construction/destruction
-	a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -134,7 +134,7 @@ protected:
 class a2bus_videoterm_device : public a2bus_videx80_device
 {
 public:
-	a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -142,7 +142,7 @@ public:
 class a2bus_ap16_device : public a2bus_videx80_device
 {
 public:
-	a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -155,7 +155,7 @@ protected:
 class a2bus_ap16alt_device : public a2bus_videx80_device
 {
 public:
-	a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -167,7 +167,7 @@ protected:
 class a2bus_vtc1_device : public a2bus_videx80_device
 {
 public:
-	a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -176,7 +176,7 @@ public:
 class a2bus_aevm80_device : public a2bus_videx80_device
 {
 public:
-	a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -275,7 +275,7 @@ const tiny_rom_entry *a2bus_aevm80_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_crtc(*this, VIDEOTERM_MC6845_NAME),
@@ -286,28 +286,28 @@ a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device
 {
 }
 
-a2bus_videoterm_device::a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_videoterm_device::a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_videx80_device(mconfig, A2BUS_VIDEOTERM, tag, owner, clock)
 {
 }
 
-a2bus_ap16_device::a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ap16_device::a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_videx80_device(mconfig, A2BUS_IBSAP16, tag, owner, clock)
 {
 }
 
-a2bus_ap16alt_device::a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_ap16alt_device::a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_videx80_device(mconfig, A2BUS_IBSAP16ALT, tag, owner, clock)
 {
 }
 
-a2bus_vtc1_device::a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_vtc1_device::a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_videx80_device(mconfig, A2BUS_VTC1, tag, owner, clock)
 {
 	m_char_width = 11;
 }
 
-a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_videx80_device(mconfig, A2BUS_AEVIEWMASTER80, tag, owner, clock)
 {
 	m_char_width = 10;

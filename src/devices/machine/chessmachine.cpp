@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(CHESSMACHINE, chessmachine_device, "chessmachine", "Tasc Ches
 //  constructor
 //-------------------------------------------------
 
-chessmachine_device::chessmachine_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+chessmachine_device::chessmachine_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CHESSMACHINE, tag, owner, clock),
 	m_maincpu(*this, "maincpu"),
 	m_bootrom(*this, "bootrom"),

@@ -82,7 +82,7 @@ void device_bbc_rom_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 //  bbc_romslot_device - constructor
 //-------------------------------------------------
-bbc_romslot_device::bbc_romslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_romslot_device::bbc_romslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_rom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_bbc_rom_interface>(mconfig, *this)
@@ -90,12 +90,12 @@ bbc_romslot_device::bbc_romslot_device(const machine_config &mconfig, device_typ
 {
 }
 
-bbc_romslot16_device::bbc_romslot16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_romslot16_device::bbc_romslot16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_romslot_device(mconfig, BBC_ROMSLOT16, tag, owner, clock)
 {
 }
 
-bbc_romslot32_device::bbc_romslot32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_romslot32_device::bbc_romslot32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_romslot_device(mconfig, BBC_ROMSLOT32, tag, owner, clock)
 {
 }

@@ -37,7 +37,7 @@
 
 DEFINE_DEVICE_TYPE(MCT_ADR, mct_adr_device, "mct_adr", "MCT-ADR Address Path Controller")
 
-mct_adr_device::mct_adr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mct_adr_device::mct_adr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MCT_ADR, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, 0)

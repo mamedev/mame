@@ -230,11 +230,11 @@ void mc8030_state::mc8030(machine_config &config)
 	// ZC1: to SIO CLK CH B
 	// ZC2: KMBG (??)
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(153600)));
 	uart_clock.signal_handler().set("asp_sio", FUNC(z80sio_device::txca_w));
 	uart_clock.signal_handler().append("asp_sio", FUNC(z80sio_device::rxca_w));
 
-	z80sio_device& sio(Z80SIO(config, "asp_sio", 4800));
+	z80sio_device& sio(Z80SIO(config, "asp_sio", XTAL::u(4800)));
 	// SIO CH A in = keyboard; out = beeper; CH B = IFSS (??)
 	sio.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));

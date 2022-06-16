@@ -36,7 +36,7 @@ class sis950_lpc_device : public pci_device
 {
 public:
 	template <typename T, typename U> sis950_lpc_device(
-		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+		const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock,
 		T &&cpu_tag, U &&flash_tag
 	) : sis950_lpc_device(mconfig, tag, owner, clock)
 	{
@@ -47,7 +47,7 @@ public:
 		m_flash_rom.set_tag(std::forward<U>(flash_tag));
 	}
 
-	sis950_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis950_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::MOUSE; }
 

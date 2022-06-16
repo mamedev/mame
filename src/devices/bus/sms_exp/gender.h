@@ -28,7 +28,7 @@ class sms_gender_adapter_device : public device_t,
 {
 public:
 	// construction/destruction
-	sms_gender_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sms_gender_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_sms_expansion_slot_interface overrides
 	virtual uint8_t read(offs_t offset) override;

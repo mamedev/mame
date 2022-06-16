@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(M20_8086, m20_8086_device, "m20_8086", "Olivetti M20 8086 Adapter")
 
-m20_8086_device::m20_8086_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m20_8086_device::m20_8086_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, M20_8086, tag, owner, clock),
 	m_8086(*this, "8086"),
 	m_maincpu(*this, finder_base::DUMMY_TAG),

@@ -29,13 +29,13 @@ class sandy_superqboard_device : public device_t, public device_ql_expansion_car
 {
 public:
 	// construction/destruction
-	sandy_superqboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sandy_superqboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );
 
 protected:
-	sandy_superqboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int ram_size);
+	sandy_superqboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int ram_size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -91,7 +91,7 @@ class sandy_superqboard_512k_device :  public sandy_superqboard_device
 {
 public:
 	// construction/destruction
-	sandy_superqboard_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sandy_superqboard_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -101,7 +101,7 @@ class sandy_superqmouse_device :  public sandy_superqboard_device
 {
 public:
 	// construction/destruction
-	sandy_superqmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sandy_superqmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -114,7 +114,7 @@ class sandy_superqmouse_512k_device :  public sandy_superqboard_device
 {
 public:
 	// construction/destruction
-	sandy_superqmouse_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sandy_superqmouse_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

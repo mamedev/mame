@@ -10,7 +10,7 @@ class pc090oj_device : public device_t, public device_gfx_interface
 public:
 	typedef device_delegate<void (u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl)> colpri_cb_delegate;
 
-	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_usebuffer(bool use_buf) { m_use_buffer = use_buf; }

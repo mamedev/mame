@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(AY3600, ay3600_device, "ay3600", "AY-5-3600 Keyboard Encoder"
 //  ay3600_device - constructor
 //-------------------------------------------------
 
-ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AY3600, tag, owner, clock),
 	m_read_x0(*this),
 	m_read_x1(*this),

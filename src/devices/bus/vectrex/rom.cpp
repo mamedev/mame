@@ -25,22 +25,22 @@ DEFINE_DEVICE_TYPE(VECTREX_ROM_64K,  vectrex_rom64k_device, "vectrex_64k",  "Vec
 DEFINE_DEVICE_TYPE(VECTREX_ROM_SRAM, vectrex_sram_device,   "vectrex_sram", "Vectrex Carts w/SRAM")
 
 
-vectrex_rom_device::vectrex_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vectrex_rom_device::vectrex_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock), device_vectrex_cart_interface(mconfig, *this)
 {
 }
 
-vectrex_rom_device::vectrex_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vectrex_rom_device::vectrex_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vectrex_rom_device(mconfig, VECTREX_ROM_STD, tag, owner, clock)
 {
 }
 
-vectrex_rom64k_device::vectrex_rom64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vectrex_rom64k_device::vectrex_rom64k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vectrex_rom_device(mconfig, VECTREX_ROM_64K, tag, owner, clock), m_bank(0)
 {
 }
 
-vectrex_sram_device::vectrex_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vectrex_sram_device::vectrex_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vectrex_rom_device(mconfig, VECTREX_ROM_SRAM, tag, owner, clock)
 {
 }

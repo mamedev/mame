@@ -558,7 +558,7 @@ void ms0515_state::ms0515(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(ms0515_state::ms0515_palette), 16);
 
-	KR1818VG93(config, m_fdc, 1000000);
+	KR1818VG93(config, m_fdc, XTAL::u(1000000));
 	FLOPPY_CONNECTOR(config, "vg93:0", ms0515_floppies, "525qd", ms0515_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "vg93:1", ms0515_floppies, "525qd", ms0515_state::floppy_formats).enable_sound(true);
 
@@ -568,7 +568,7 @@ void ms0515_state::ms0515(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(ms0515_state::ms0515_portc_w));
 
 	// serial connection to printer
-	I8251(config, m_i8251line, 0);
+	I8251(config, m_i8251line);
 	m_i8251line->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_i8251line->rxrdy_handler().set(FUNC(ms0515_state::irq9_w));
 	m_i8251line->txrdy_handler().set(FUNC(ms0515_state::irq8_w));
@@ -578,23 +578,23 @@ void ms0515_state::ms0515(machine_config &config)
 	m_rs232->cts_handler().set(m_i8251line, FUNC(i8251_device::write_cts));
 	m_rs232->dsr_handler().set(m_i8251line, FUNC(i8251_device::write_dsr));
 
-//  clock_device &line_clock(CLOCK(config, "line_clock", 4800*16)); // 8251 is set to /16 on the clock input
+//  clock_device &line_clock(CLOCK(config, "line_clock", XTAL::u(4800*16))); // 8251 is set to /16 on the clock input
 //  line_clock.signal_handler().set(FUNC(ms0515_state::write_line_clock));
 
 	// serial connection to MS7004 keyboard
-	I8251(config, m_i8251kbd, 0);
+	I8251(config, m_i8251kbd);
 	m_i8251kbd->rxrdy_handler().set(FUNC(ms0515_state::irq5_w));
 	m_i8251kbd->txd_handler().set("ms7004", FUNC(ms7004_device::write_rxd));
 
-	MS7004(config, m_ms7004, 0);
+	MS7004(config, m_ms7004);
 	m_ms7004->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
 	m_ms7004->rts_handler().set(m_i8251kbd, FUNC(i8251_device::write_cts));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
-	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4960*16));
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", XTAL::u(4960*16)));
 	keyboard_clock.signal_handler().set(FUNC(ms0515_state::write_keyboard_clock));
 
-	PIT8253(config, m_pit8253, 0);
+	PIT8253(config, m_pit8253);
 	m_pit8253->set_clk<0>(XTAL(2'000'000));
 //  m_pit8253->out_handler<0>().set(FUNC(ms0515_state::write_keyboard_clock));
 	m_pit8253->set_clk<1>(XTAL(2'000'000));

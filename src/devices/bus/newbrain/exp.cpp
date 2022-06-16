@@ -43,7 +43,7 @@ device_newbrain_expansion_slot_interface::device_newbrain_expansion_slot_interfa
 //  newbrain_expansion_slot_device - constructor
 //-------------------------------------------------
 
-newbrain_expansion_slot_device::newbrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+newbrain_expansion_slot_device::newbrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NEWBRAIN_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_newbrain_expansion_slot_interface>(mconfig, *this),
 	m_card(nullptr)

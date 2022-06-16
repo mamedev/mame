@@ -669,7 +669,7 @@ public:
 	template <typename T>
 	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gfxtag, int entrybytes
 		, u16 tilewidth, u16 tileheight, tilemap_standard_mapper mapper, u32 columns, u32 rows, pen_t transpen)
-		: tilemap_device(mconfig, tag, owner, (u32)0)
+		: tilemap_device(mconfig, tag, owner)
 	{
 		set_gfxdecode(std::forward<T>(gfxtag));
 		set_bytes_per_entry(entrybytes);
@@ -681,7 +681,7 @@ public:
 	template <typename T>
 	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gfxtag, int entrybytes
 		, u16 tilewidth, u16 tileheight, tilemap_standard_mapper mapper, u32 columns, u32 rows)
-		: tilemap_device(mconfig, tag, owner, (u32)0)
+		: tilemap_device(mconfig, tag, owner)
 	{
 		set_gfxdecode(std::forward<T>(gfxtag));
 		set_bytes_per_entry(entrybytes);
@@ -691,14 +691,14 @@ public:
 
 	template <typename T>
 	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gfxtag, int entrybytes, u16 tilewidth, u16 tileheight)
-		: tilemap_device(mconfig, tag, owner, (u32)0)
+		: tilemap_device(mconfig, tag, owner)
 	{
 		set_gfxdecode(std::forward<T>(gfxtag));
 		set_bytes_per_entry(entrybytes);
 		set_tile_size(tilewidth, tileheight);
 	}
 
-	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_bytes_per_entry(int bpe) { m_bytes_per_entry = bpe; }

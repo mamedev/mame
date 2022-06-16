@@ -17,7 +17,7 @@
 class tms1000c_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms1000c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1000c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// overrides

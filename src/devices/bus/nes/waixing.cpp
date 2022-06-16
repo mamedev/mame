@@ -54,122 +54,122 @@ DEFINE_DEVICE_TYPE(NES_WAIXING_WXZS2, nes_waixing_wxzs2_device, "nes_waixing_wxz
 DEFINE_DEVICE_TYPE(NES_WAIXING_FS304, nes_waixing_fs304_device, "nes_waixing_fs304", "NES Cart Waixing FS-304 PCB")
 
 
-nes_waixing_a_device::nes_waixing_a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_a_device::nes_waixing_a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_waixing_a_device::nes_waixing_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_a_device::nes_waixing_a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_a_device(mconfig, NES_WAIXING_A, tag, owner, clock)
 {
 }
 
-nes_waixing_a1_device::nes_waixing_a1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_a1_device::nes_waixing_a1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_a_device(mconfig, NES_WAIXING_A1, tag, owner, clock)
 {
 }
 
-nes_waixing_b_device::nes_waixing_b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_b_device::nes_waixing_b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_a_device(mconfig, NES_WAIXING_B, tag, owner, clock)
 {
 }
 
-nes_waixing_c_device::nes_waixing_c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_c_device::nes_waixing_c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_a_device(mconfig, NES_WAIXING_C, tag, owner, clock)
 {
 }
 
-nes_waixing_d_device::nes_waixing_d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_d_device::nes_waixing_d_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_a_device(mconfig, NES_WAIXING_D, tag, owner, clock)
 {
 }
 
-nes_waixing_e_device::nes_waixing_e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_e_device::nes_waixing_e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_a_device(mconfig, NES_WAIXING_E, tag, owner, clock)
 {
 }
 
-nes_waixing_f_device::nes_waixing_f_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nes_waixing_f_device::nes_waixing_f_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_waixing_f_device::nes_waixing_f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_waixing_f_device::nes_waixing_f_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_f_device(mconfig, NES_WAIXING_F, tag, owner, clock)
 {
 }
 
-nes_waixing_f1_device::nes_waixing_f1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_waixing_f1_device::nes_waixing_f1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_f_device(mconfig, NES_WAIXING_F1, tag, owner, clock)
 {
 }
 
-nes_waixing_g_device::nes_waixing_g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_g_device::nes_waixing_g_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_a_device(mconfig, NES_WAIXING_G, tag, owner, clock)
 {
 }
 
-nes_waixing_h_device::nes_waixing_h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_h_device::nes_waixing_h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_waixing_h_device::nes_waixing_h_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_h_device::nes_waixing_h_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_h_device(mconfig, NES_WAIXING_H, tag, owner, clock)
 {
 }
 
-nes_waixing_h1_device::nes_waixing_h1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_h1_device::nes_waixing_h1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_h_device(mconfig, NES_WAIXING_H1, tag, owner, clock)
 {
 }
 
-nes_waixing_i_device::nes_waixing_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_i_device::nes_waixing_i_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_a_device(mconfig, NES_WAIXING_I, tag, owner, clock)
 {
 }
 
-nes_waixing_j_device::nes_waixing_j_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_j_device::nes_waixing_j_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_waixing_a_device(mconfig, NES_WAIXING_J, tag, owner, clock)
 {
 }
 
-nes_waixing_sh2_device::nes_waixing_sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_waixing_sh2_device::nes_waixing_sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_WAIXING_SH2, tag, owner, clock)
 {
 }
 
-nes_waixing_sec_device::nes_waixing_sec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_sec_device::nes_waixing_sec_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_WAIXING_SEC, tag, owner, clock), m_reg(0)
 {
 }
 
-nes_waixing_sgzlz_device::nes_waixing_sgzlz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_sgzlz_device::nes_waixing_sgzlz_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_WAIXING_SGZLZ, tag, owner, clock), m_reg{ 0, 0, 0, 0 }
 {
 }
 
-nes_waixing_ffv_device::nes_waixing_ffv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_ffv_device::nes_waixing_ffv_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_WAIXING_FFV, tag, owner, clock)
 {
 }
 
-nes_waixing_wxzs_device::nes_waixing_wxzs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_wxzs_device::nes_waixing_wxzs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_WAIXING_WXZS, tag, owner, clock)
 {
 }
 
-nes_waixing_dq8_device::nes_waixing_dq8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_dq8_device::nes_waixing_dq8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_WAIXING_DQ8, tag, owner, clock)
 {
 }
 
-nes_waixing_wxzs2_device::nes_waixing_wxzs2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_wxzs2_device::nes_waixing_wxzs2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_WAIXING_WXZS2, tag, owner, clock)
 {
 }
 
-nes_waixing_fs304_device::nes_waixing_fs304_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_waixing_fs304_device::nes_waixing_fs304_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_WAIXING_FS304, tag, owner, clock)
 {
 }

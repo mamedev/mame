@@ -72,7 +72,7 @@ void device_vc4000_cart_interface::ram_alloc(uint32_t size)
 //-------------------------------------------------
 //  vc4000_cart_slot_device - constructor
 //-------------------------------------------------
-vc4000_cart_slot_device::vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vc4000_cart_slot_device::vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vc4000_cart_slot_device(mconfig, VC4000_CART_SLOT, tag, owner, clock)
 {
 }
@@ -113,7 +113,7 @@ void vc4000_cart_slot_device::device_start()
 //  trq h-21 slot
 //-------------------------------------------------
 
-h21_cart_slot_device::h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+h21_cart_slot_device::h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vc4000_cart_slot_device(mconfig, H21_CART_SLOT, tag, owner, clock)
 {
 }

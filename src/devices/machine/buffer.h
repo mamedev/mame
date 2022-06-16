@@ -6,7 +6,7 @@
 class input_buffer_device : public device_t
 {
 public:
-	input_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	input_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint8_t read() { return m_input_data; }
 

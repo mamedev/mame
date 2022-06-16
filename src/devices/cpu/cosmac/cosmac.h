@@ -183,7 +183,7 @@ public:
 
 protected:
 	// construction/destruction
-	cosmac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cosmac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -457,7 +457,7 @@ class cdp1801_device : public cosmac_device
 {
 public:
 	// construction/destruction
-	cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides
@@ -478,10 +478,10 @@ class cdp1802_device : public cosmac_device
 {
 public:
 	// construction/destruction
-	cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	cdp1802_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cdp1802_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -499,10 +499,10 @@ class cdp1804_device : public cdp1802_device
 {
 public:
 	// construction/destruction
-	cdp1804_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdp1804_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	cdp1804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cdp1804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual cosmac_device::ophandler get_ophandler(uint16_t opcode) const override;
 	virtual bool has_extended_opcodes() override { return true; }
@@ -520,10 +520,10 @@ class cdp1805_device : public cdp1804_device
 {
 public:
 	// construction/destruction
-	cdp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	cdp1805_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cdp1805_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -536,7 +536,7 @@ class cdp1806_device : public cdp1805_device
 {
 public:
 	// construction/destruction
-	cdp1806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdp1806_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

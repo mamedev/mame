@@ -19,13 +19,13 @@ class c352_device : public device_t,
 {
 public:
 	// construction/destruction
-	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, int divider)
+	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, int divider)
 		: c352_device(mconfig, tag, owner, clock)
 	{
 		set_divider(divider);
 	}
 
-	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_divider(int divider) { m_divider = divider; }
 

@@ -27,7 +27,7 @@ class tiki100_8088_device : public device_t,
 {
 public:
 	// construction/destruction
-	tiki100_8088_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tiki100_8088_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

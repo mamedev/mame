@@ -10,7 +10,7 @@
 class dw_keyboard_device :  public device_t
 {
 public:
-	dw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_data_handler() { return m_out_data.bind(); }
 	auto out_clock_handler() { return m_out_clock.bind(); }

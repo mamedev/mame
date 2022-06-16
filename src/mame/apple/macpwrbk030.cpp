@@ -357,13 +357,14 @@ void macpb030_state::mac_via_sync()
 	u64 cycle = m_maincpu->total_cycles();
 
 	// Get the number of the cycle the via is in at that time
-	u64 via_cycle = cycle * m_via1->clock() / m_maincpu->clock();
+
+	u64 via_cycle = cycle * m_via1->clock().value() / m_maincpu->clock().value();
 
 	// The access is going to start at via_cycle+1 and end at
 	// via_cycle+1.5, compute what that means in maincpu cycles (the
 	// +1 rounds up, since the clocks are too different to ever be
 	// synced).
-	u64 main_cycle = (via_cycle * 2 + 3) * m_maincpu->clock() / (2 * m_via1->clock()) + 1;
+	u64 main_cycle = (via_cycle * 2 + 3) * m_maincpu->clock().value() / (2 * m_via1->clock().value()) + 1;
 
 	// Finally adjust the main cpu icount as needed.
 	m_maincpu->adjust_icount(-int(main_cycle - cycle));
@@ -988,7 +989,7 @@ void macpb030_state::macpb140(machine_config &config)
 void macpb030_state::macpb145(machine_config &config)
 {
 	macpb140(config);
-	m_maincpu->set_clock(25000000);
+	m_maincpu->set_clock(XTAL::u(25000000));
 
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("6M,8M");
@@ -998,7 +999,7 @@ void macpb030_state::macpb145(machine_config &config)
 void macpb030_state::macpb170(machine_config &config)
 {
 	macpb140(config);
-	m_maincpu->set_clock(25000000);
+	m_maincpu->set_clock(XTAL::u(25000000));
 
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("6M,8M");
@@ -1006,7 +1007,7 @@ void macpb030_state::macpb170(machine_config &config)
 
 void macpb030_state::macpb160(machine_config &config)
 {
-	M68030(config, m_maincpu, 25000000);
+	M68030(config, m_maincpu, XTAL::u(25000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb160_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -1100,13 +1101,13 @@ void macpb030_state::macpb160(machine_config &config)
 void macpb030_state::macpb180(machine_config &config)
 {
 	macpb160(config);
-	m_maincpu->set_clock(33000000);
+	m_maincpu->set_clock(XTAL::u(33000000));
 }
 
 void macpb030_state::macpb180c(machine_config &config)
 {
 	macpb160(config);
-	m_maincpu->set_clock(33000000);
+	m_maincpu->set_clock(XTAL::u(33000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb165c_map);
 
 	m_screen->set_size(800, 525);

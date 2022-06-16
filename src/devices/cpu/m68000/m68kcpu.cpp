@@ -2257,7 +2257,7 @@ void m68000_base_device::m68ki_exception_interrupt(u32 int_level)
 //  m68000_base_device - constructor
 //-------------------------------------------------
 
-m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
+m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock,
 										const device_type type, u32 prg_data_width, u32 prg_address_bits, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
@@ -2274,7 +2274,7 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 }
 
 
-m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock,
+m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock,
 										const device_type type, u32 prg_data_width, u32 prg_address_bits)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits),

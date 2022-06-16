@@ -542,7 +542,7 @@ void bloodbro_state::bloodbro(machine_config &config)
 	m_screen->set_screen_update(FUNC(bloodbro_state::screen_update_bloodbro));
 	m_screen->set_palette(m_palette);
 
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
 	crtc.layer_en_callback().set(FUNC(bloodbro_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(bloodbro_state::layer_scroll_w));
 
@@ -559,7 +559,7 @@ void bloodbro_state::bloodbro(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->set_rom_tag("audiocpu");
 	m_seibu_sound->set_rombank_tag("seibu_bank1");

@@ -10,7 +10,7 @@
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
 
-#define MHAVOC_CLOCK        10000000
+#define MHAVOC_CLOCK        XTAL::u(10000000)
 #define MHAVOC_CLOCK_5M     (MHAVOC_CLOCK/2)
 #define MHAVOC_CLOCK_2_5M   (MHAVOC_CLOCK/4)
 #define MHAVOC_CLOCK_1_25M  (MHAVOC_CLOCK/8)

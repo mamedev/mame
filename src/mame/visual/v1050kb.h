@@ -25,7 +25,7 @@ class v1050_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device flags
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }

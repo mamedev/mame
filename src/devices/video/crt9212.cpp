@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(CRT9212, crt9212_device, "crt9212", "SMC CRT9212 DRB")
 //  crt9212_device - constructor
 //-------------------------------------------------
 
-crt9212_device::crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+crt9212_device::crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CRT9212, tag, owner, clock),
 	m_write_dout(*this),
 	m_write_rof(*this),

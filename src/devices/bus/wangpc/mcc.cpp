@@ -57,8 +57,8 @@ DEFINE_DEVICE_TYPE(WANGPC_MCC, wangpc_mcc_device, "wangpc_mcc", "Wang PC-PM043 M
 
 void wangpc_mcc_device::device_add_mconfig(machine_config &config)
 {
-	Z80SIO(config, m_sio, 4000000); // SIO/2?
-	Z80DART(config, m_dart, 4000000);
+	Z80SIO(config, m_sio, XTAL::u(4000000)); // SIO/2?
+	Z80DART(config, m_dart, XTAL::u(4000000));
 }
 
 
@@ -93,7 +93,7 @@ inline void wangpc_mcc_device::set_irq(int state)
 //  wangpc_mcc_device - constructor
 //-------------------------------------------------
 
-wangpc_mcc_device::wangpc_mcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wangpc_mcc_device::wangpc_mcc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, WANGPC_MCC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_sio(*this, Z80SIO2_TAG),

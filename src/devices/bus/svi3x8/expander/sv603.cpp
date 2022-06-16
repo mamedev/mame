@@ -61,7 +61,7 @@ void sv603_device::device_add_mconfig(machine_config &config)
 //  sv603_device - constructor
 //-------------------------------------------------
 
-sv603_device::sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sv603_device::sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SV603, tag, owner, clock),
 	device_svi_expander_interface(mconfig, *this),
 	m_bios(*this, "bios"),

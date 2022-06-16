@@ -44,7 +44,7 @@ protected:
 class seibu_sound_device : public device_t
 {
 public:
-	seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~seibu_sound_device() { }
 
 	//  configuration
@@ -119,7 +119,7 @@ DECLARE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device)
 class sei80bu_device : public device_t, public device_rom_interface<16>
 {
 public:
-	sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 data_r(offs_t offset);
 	u8 opcode_r(offs_t offset);
@@ -136,12 +136,12 @@ DECLARE_DEVICE_TYPE(SEI80BU, sei80bu_device)
 class seibu_adpcm_device : public device_t
 {
 public:
-	template <typename T> seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&msm5205_tag)
+	template <typename T> seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&msm5205_tag)
 		: seibu_adpcm_device(mconfig, tag, owner, clock)
 	{
 		m_msm.set_tag(std::forward<T>(msm5205_tag));
 	}
-	seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~seibu_adpcm_device() { }
 
 	void decrypt();

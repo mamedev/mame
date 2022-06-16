@@ -26,7 +26,7 @@ public:
 
 protected:
 	// construction/destruction
-	interpro_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	interpro_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, type, tag, owner, clock)
 		, m_main_space(*this, finder_base::DUMMY_TAG, -1)
 		, m_io_space(*this, finder_base::DUMMY_TAG, -1)
@@ -57,7 +57,7 @@ class cbus_bus_device : public interpro_bus_device
 {
 public:
 	// construction/destruction
-	cbus_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cbus_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static const u32 CBUS_BASE = 0x87000000;
 	static const u32 CBUS_SIZE = 0x01000000;
@@ -100,8 +100,8 @@ class cbus_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	template <typename T, typename U>
-	cbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, T &&bus_tag, U &&slot_options, const char *default_option, const bool fixed)
-		: cbus_slot_device(mconfig, tag, owner, clock)
+	cbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, const char *default_option, const bool fixed)
+		: cbus_slot_device(mconfig, tag, owner)
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
 		option_reset();
@@ -109,7 +109,7 @@ public:
 		set_default_option(default_option);
 		set_fixed(fixed);
 	}
-	cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides
@@ -154,7 +154,7 @@ class srx_bus_device : public interpro_bus_device
 {
 public:
 	// construction/destruction
-	srx_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	srx_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static const u32 SRX_BASE = 0x8f000000;
 	static const u32 SRX_SIZE = 0x8000;
@@ -212,8 +212,8 @@ class srx_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	template <typename T, typename U>
-	srx_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, T &&bus_tag, U &&slot_options, const char *default_option, const bool fixed)
-		: srx_slot_device(mconfig, tag, owner, clock)
+	srx_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, const char *default_option, const bool fixed)
+		: srx_slot_device(mconfig, tag, owner)
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
 		option_reset();
@@ -221,7 +221,7 @@ public:
 		set_default_option(default_option);
 		set_fixed(fixed);
 	}
-	srx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	srx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides

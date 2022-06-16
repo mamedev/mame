@@ -35,7 +35,7 @@ public:
 
 protected:
 	// construction/destruction
-	tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map);
+	tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor program_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -198,7 +198,7 @@ class tmp90840_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides
@@ -210,7 +210,7 @@ class tmp90841_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides
@@ -222,7 +222,7 @@ class tmp90845_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides
@@ -234,7 +234,7 @@ class tmp91640_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides
@@ -246,7 +246,7 @@ class tmp91641_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides
@@ -258,7 +258,7 @@ class tmp90ph44_device : public tlcs90_device
 {
 public:
 	// construction/destruction
-	tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides

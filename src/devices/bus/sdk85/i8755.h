@@ -15,7 +15,7 @@ class sdk85exp_i8755_device : public device_t, public device_sdk85_romexp_card_i
 {
 public:
 	// construction/destruction
-	sdk85exp_i8755_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sdk85exp_i8755_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

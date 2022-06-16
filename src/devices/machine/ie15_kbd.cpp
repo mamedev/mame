@@ -18,7 +18,7 @@
 
 DEFINE_DEVICE_TYPE(IE15_KEYBOARD, ie15_keyboard_device, "ie15kbd", "15WWW-97-006 Keyboard")
 
-ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "TERM_LINE0", "TERM_LINE1", "TERM_LINE2", "TERM_LINE3")
 	, m_io_kbdc(*this, "TERM_LINEC")
@@ -27,7 +27,7 @@ ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device
 {
 }
 
-ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ie15_keyboard_device(mconfig, IE15_KEYBOARD, tag, owner, clock)
 {
 }

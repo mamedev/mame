@@ -25,7 +25,7 @@ class labtam_z80sbc_device
 	, public device_multibus_interface
 {
 public:
-	labtam_z80sbc_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	labtam_z80sbc_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides

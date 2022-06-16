@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(CENTRONICS, centronics_device, "centronics", "Centronics")
 
-centronics_device::centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+centronics_device::centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CENTRONICS, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_strobe_handler(*this),

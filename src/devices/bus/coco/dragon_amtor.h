@@ -19,7 +19,7 @@ class dragon_amtor_device :
 {
 public:
 	// construction/destruction
-	dragon_amtor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dragon_amtor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

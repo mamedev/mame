@@ -27,11 +27,15 @@ DEFINE_DEVICE_TYPE(VTECH_IOEXP_SLOT, vtech_ioexp_slot_device, "vtech_ioexp_slot"
 //  vtech_ioexp_slot_device - constructor
 //-------------------------------------------------
 
-vtech_ioexp_slot_device::vtech_ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vtech_ioexp_slot_device::vtech_ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VTECH_IOEXP_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_vtech_ioexp_interface>(mconfig, *this),
 	m_iospace(*this, finder_base::DUMMY_TAG, -1)
 {
+	option_reset();
+	vtech_ioexp_slot_carts(*this);
+	set_default_option(nullptr);
+	set_fixed(false);
 }
 
 //-------------------------------------------------
@@ -100,7 +104,7 @@ device_vtech_ioexp_interface::~device_vtech_ioexp_interface()
 //  vtech_ioexp_device - constructor
 //-------------------------------------------------
 
-vtech_ioexp_device::vtech_ioexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+vtech_ioexp_device::vtech_ioexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_vtech_ioexp_interface(mconfig, *this),
 	m_io(*this, "iospace")

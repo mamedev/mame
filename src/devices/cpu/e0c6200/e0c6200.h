@@ -14,7 +14,7 @@ class e0c6200_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	e0c6200_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor program, address_map_constructor data);
+	e0c6200_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor program, address_map_constructor data);
 
 protected:
 	// device-level overrides

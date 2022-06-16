@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(I8008, i8008_device, "i8008", "Intel 8008")
 //-------------------------------------------------
 //  i8008_device - constructor
 //-------------------------------------------------
-i8008_device::i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8008_device::i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, I8008, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 14)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16)

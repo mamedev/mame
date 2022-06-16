@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(AQUARIUS_ROM, aquarius_rom_device, "aquarius_rom", "Aquarius 
 //  aquarius_rom_device - constructor
 //-------------------------------------------------
 
-aquarius_rom_device::aquarius_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+aquarius_rom_device::aquarius_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AQUARIUS_ROM, tag, owner, clock)
 	, device_aquarius_cartridge_interface(mconfig, *this)
 {

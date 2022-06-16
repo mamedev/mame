@@ -12,7 +12,7 @@
 class vicdual_audio_device_base : public device_t, public device_mixer_interface
 {
 protected:
-	vicdual_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale);
+	vicdual_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 inputs_mask, void (*netlist)(netlist::nlparse_t &), double output_scale);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -32,14 +32,14 @@ private:
 class borderline_audio_device : public vicdual_audio_device_base
 {
 public:
-	borderline_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	borderline_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class frogs_audio_device : public vicdual_audio_device_base
 {
 public:
-	frogs_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	frogs_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

@@ -166,7 +166,7 @@ void pce_state::pce_common(machine_config &config)
 	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
 	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
 
-	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
+	huc6270_device &huc6270(HUC6270(config, "huc6270"));
 	huc6270.set_vram_size(0x10000);
 	huc6270.irq().set_inputline(m_maincpu, 0);
 
@@ -176,7 +176,7 @@ void pce_state::pce_common(machine_config &config)
 	PCE_CONTROL_PORT(config, m_port_ctrl, pce_control_port_devices, "joypad2");
 
 	// TODO: expansion port not emulated
-	PCE_CD(config, m_cd, 0);
+	PCE_CD(config, m_cd);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("pcecd");
 }
@@ -228,15 +228,15 @@ void pce_state::sgx(machine_config &config)
 	m_huc6260->vsync_changed().set("huc6202", FUNC(huc6202_device::vsync_changed));
 	m_huc6260->hsync_changed().set("huc6202", FUNC(huc6202_device::hsync_changed));
 
-	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0", 0));
+	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0"));
 	huc6270_0.set_vram_size(0x10000);
 	huc6270_0.irq().set_inputline(m_maincpu, 0); // needs input merger?
 
-	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1", 0));
+	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1"));
 	huc6270_1.set_vram_size(0x10000);
 	huc6270_1.irq().set_inputline(m_maincpu, 0); // needs input merger?
 
-	huc6202_device &huc6202(HUC6202(config, "huc6202", 0 ));
+	huc6202_device &huc6202(HUC6202(config, "huc6202"));
 	huc6202.next_pixel_0_callback().set("huc6270_0", FUNC(huc6270_device::next_pixel));
 	huc6202.time_til_next_event_0_callback().set("huc6270_0", FUNC(huc6270_device::time_until_next_event));
 	huc6202.vsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::vsync_changed));
@@ -261,7 +261,7 @@ void pce_state::sgx(machine_config &config)
 	SOFTWARE_LIST(config, "pce_list").set_compatible("pce");
 
 	// TODO: expansion port not emulated
-	PCE_CD(config, m_cd, 0);
+	PCE_CD(config, m_cd);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("pcecd");
 }

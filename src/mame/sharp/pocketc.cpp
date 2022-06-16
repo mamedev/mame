@@ -741,7 +741,7 @@ void pocketc_state::pocketc_base(machine_config &config)
 void pc1401_state::pc1401(machine_config &config)
 {
 	pocketc_base(config);
-	SC61860(config, m_maincpu, 192000);        /* 7.8336 MHz */
+	SC61860(config, m_maincpu, XTAL::u(192000));        /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc1401_state::pc1401_mem);
 	m_maincpu->reset_cb().set(FUNC(pc1401_state::reset_r));
 	m_maincpu->brk_cb().set(FUNC(pc1401_state::brk_r));
@@ -764,7 +764,7 @@ void pc1401_state::pc1402(machine_config &config)
 void pc1251_state::pc1250(machine_config &config)
 {
 	pocketc_base(config);
-	SC61860(config, m_maincpu, 192000);        /* 7.8336 MHz */
+	SC61860(config, m_maincpu, XTAL::u(192000));        /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc1251_state::pc1250_mem);
 	m_maincpu->reset_cb().set_constant(0);
 	m_maincpu->brk_cb().set(FUNC(pc1251_state::brk_r));
@@ -809,7 +809,7 @@ void pc1260_state::pc1261(machine_config &config)
 void pc1350_state::pc1350(machine_config &config)
 {
 	pocketc_base(config);
-	SC61860(config, m_maincpu, 192000);        /* 7.8336 MHz */
+	SC61860(config, m_maincpu, XTAL::u(192000));        /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc1350_state::pc1350_mem);
 	m_maincpu->reset_cb().set_constant(0);
 	m_maincpu->brk_cb().set(FUNC(pc1350_state::brk_r));
@@ -832,7 +832,7 @@ void pc1350_state::pc1350(machine_config &config)
 void pc1403_state::pc1403(machine_config &config)
 {
 	pocketc_base(config);
-	SC61860(config, m_maincpu, 256000);
+	SC61860(config, m_maincpu, XTAL::u(256000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc1403_state::pc1403_mem);
 	m_maincpu->reset_cb().set_constant(0);
 	m_maincpu->brk_cb().set(FUNC(pc1403_state::brk_r));

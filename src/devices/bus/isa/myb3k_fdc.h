@@ -20,7 +20,7 @@ class isa8_myb3k_fdc471x_device_base :
 	public device_isa8_card_interface
 {
 protected:
-	isa8_myb3k_fdc471x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_myb3k_fdc471x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -67,11 +67,11 @@ class isa8_myb3k_fdc4710_device : public isa8_myb3k_fdc471x_device_base
 {
 public:
 	// construction/destruction
-	isa8_myb3k_fdc4710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_myb3k_fdc4710_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// construction/destruction
-	isa8_myb3k_fdc4710_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_myb3k_fdc4710_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -81,11 +81,11 @@ class isa8_myb3k_fdc4711_device : public isa8_myb3k_fdc471x_device_base
 {
 public:
 	// construction/destruction
-	isa8_myb3k_fdc4711_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_myb3k_fdc4711_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// construction/destruction
-	isa8_myb3k_fdc4711_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_myb3k_fdc4711_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -95,11 +95,11 @@ class isa8_myb3k_fdc4712_device : public isa8_myb3k_fdc471x_device_base
 {
 public:
 	// construction/destruction
-	isa8_myb3k_fdc4712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_myb3k_fdc4712_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// construction/destruction
-	isa8_myb3k_fdc4712_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_myb3k_fdc4712_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(TIMER, timer_device, "timer", "Timer")
 //  timer_device - constructor
 //-------------------------------------------------
 
-timer_device::timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+timer_device::timer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TIMER, tag, owner, clock),
 		m_type(TIMER_TYPE_GENERIC),
 		m_callback(*this),

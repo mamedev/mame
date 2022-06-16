@@ -175,7 +175,7 @@ DEFINE_DEVICE_TYPE(ROSETTA, rosetta_device, "rosetta", "IBM Rosetta")
 
 ALLOW_SAVE_TYPE(rosetta_device::mear_state)
 
-rosetta_device::rosetta_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, ram_size ram)
+rosetta_device::rosetta_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, ram_size ram)
 	: device_t(mconfig, ROSETTA, tag, owner, clock)
 	, rsc_cpu_interface(mconfig, *this)
 	, m_mem_space(*this, finder_base::DUMMY_TAG, -1, 32)

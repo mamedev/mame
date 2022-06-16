@@ -61,7 +61,7 @@ ioport_constructor neogeo_joystick_device::device_input_ports() const
 //  neogeo_joystick_device - constructor
 //-------------------------------------------------
 
-neogeo_joystick_device::neogeo_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_joystick_device::neogeo_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NEOGEO_JOY, tag, owner, clock),
 	device_neogeo_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),
@@ -169,7 +169,7 @@ ioport_constructor neogeo_joy_ac_device::device_input_ports() const
 //  neogeo_joy_ac_device / neogeo_joystick_device - constructor
 //-------------------------------------------------
 
-neogeo_joy_ac_device::neogeo_joy_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_joy_ac_device::neogeo_joy_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NEOGEO_JOY_AC, tag, owner, clock),
 	device_neogeo_ctrl_edge_interface(mconfig, *this),
 	m_joy(*this, "JOY%u", 1U),

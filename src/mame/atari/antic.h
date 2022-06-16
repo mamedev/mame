@@ -43,7 +43,7 @@ public:
 	static constexpr unsigned   MAX_Y               = VDATA_END - 1;
 
 	// construction/destruction
-	antic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	antic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

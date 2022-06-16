@@ -199,7 +199,7 @@ ioport_constructor mm1_keyboard_device::device_input_ports() const
 //  mm1_keyboard_device - constructor
 //-------------------------------------------------
 
-mm1_keyboard_device::mm1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mm1_keyboard_device::mm1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MM1_KEYBOARD, tag, owner, clock),
 	m_write_kbst(*this),
 	m_samples(*this, "keyboard_and_chassis_sounds"),

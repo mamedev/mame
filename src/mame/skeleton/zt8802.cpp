@@ -85,11 +85,11 @@ INPUT_PORTS_END
 
 void zt8802_state::zt8802(machine_config &config)
 {
-	V40(config, m_maincpu, 16'000'000);
+	V40(config, m_maincpu, XTAL::u(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &zt8802_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &zt8802_state::io_map);
 
-	DS1202(config, m_rtc, 32'768);
+	DS1202(config, m_rtc, XTAL::u(32'768));
 }
 
 ROM_START( zt8802 )

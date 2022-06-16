@@ -18,7 +18,7 @@
 #include "screen.h"
 
 
-#define GRIDLEE_MASTER_CLOCK    (20000000)
+#define GRIDLEE_MASTER_CLOCK    XTAL::u(20000000)
 #define GRIDLEE_CPU_CLOCK       (GRIDLEE_MASTER_CLOCK / 16)
 #define GRIDLEE_PIXEL_CLOCK     (GRIDLEE_MASTER_CLOCK / 4)
 #define GRIDLEE_HTOTAL          (0x140)
@@ -93,7 +93,7 @@ private:
 class gridlee_sound_device : public device_t, public device_sound_interface
 {
 public:
-	gridlee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gridlee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~gridlee_sound_device() { }
 
 protected:

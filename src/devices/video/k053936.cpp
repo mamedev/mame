@@ -229,7 +229,7 @@ void K053936_set_offset(int chip, int xoffs, int yoffs)
 
 DEFINE_DEVICE_TYPE(K053936, k053936_device, "k053936", "K053936 Video Controller")
 
-k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K053936, tag, owner, clock),
 	m_ctrl(nullptr),
 	m_linectrl(nullptr),

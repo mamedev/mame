@@ -14,7 +14,7 @@ DEFINE_DEVICE_TYPE(TTL74161, ttl74161_device, "ttl74161", "54/74161 Binary Count
 DEFINE_DEVICE_TYPE(TTL74162, ttl74162_device, "ttl74162", "54/74162 Decade Counter")
 DEFINE_DEVICE_TYPE(TTL74163, ttl74163_device, "ttl74163", "54/74163 Binary Counter")
 
-ttl7416x_device::ttl7416x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool synchronous_reset, uint8_t limit)
+ttl7416x_device::ttl7416x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool synchronous_reset, uint8_t limit)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_qa_func(*this)
 	, m_qb_func(*this)
@@ -36,22 +36,22 @@ ttl7416x_device::ttl7416x_device(const machine_config &mconfig, device_type type
 {
 }
 
-ttl74160_device::ttl74160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ttl74160_device::ttl74160_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ttl7416x_device(mconfig, TTL74160, tag, owner, clock, false, 10)
 {
 }
 
-ttl74161_device::ttl74161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ttl74161_device::ttl74161_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ttl7416x_device(mconfig, TTL74161, tag, owner, clock, false, 16)
 {
 }
 
-ttl74162_device::ttl74162_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ttl74162_device::ttl74162_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ttl7416x_device(mconfig, TTL74162, tag, owner, clock, true, 10)
 {
 }
 
-ttl74163_device::ttl74163_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ttl74163_device::ttl74163_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ttl7416x_device(mconfig, TTL74163, tag, owner, clock, true, 16)
 {
 }

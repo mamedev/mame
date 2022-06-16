@@ -530,7 +530,7 @@ void flower_state::flower(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	FLOWER_CUSTOM(config, "flower", 96000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	FLOWER_CUSTOM(config, "flower", XTAL::u(96000)).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

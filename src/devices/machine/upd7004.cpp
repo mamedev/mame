@@ -37,7 +37,7 @@ ALLOW_SAVE_TYPE(upd7004_device::state);
 //  upd7004_device - constructor
 //-------------------------------------------------
 
-upd7004_device::upd7004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+upd7004_device::upd7004_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, UPD7004, tag, owner, clock),
 	m_eoc_cb(*this), m_eoc_ff_cb(*this),
 	m_in_cb(*this),

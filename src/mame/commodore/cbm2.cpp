@@ -2269,7 +2269,7 @@ void p500_state::p500_ntsc(machine_config &config)
 	PLS100(config, m_pla1);
 	PLS100(config, m_pla2);
 
-	TPI6525(config, m_tpi1, 0);
+	TPI6525(config, m_tpi1);
 	m_tpi1->out_irq_cb().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_tpi1->in_pa_cb().set(FUNC(cbm2_state::tpi1_pa_r));
 	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pa_w));
@@ -2278,7 +2278,7 @@ void p500_state::p500_ntsc(machine_config &config)
 	m_tpi1->out_ca_cb().set(FUNC(p500_state::tpi1_ca_w));
 	m_tpi1->out_cb_cb().set(FUNC(p500_state::tpi1_cb_w));
 
-	TPI6525(config, m_tpi2, 0);
+	TPI6525(config, m_tpi2);
 	m_tpi2->out_pa_cb().set(FUNC(cbm2_state::tpi2_pa_w));
 	m_tpi2->out_pb_cb().set(FUNC(cbm2_state::tpi2_pb_w));
 	m_tpi2->in_pc_cb().set(FUNC(p500_state::tpi2_pc_r));
@@ -2303,11 +2303,11 @@ void p500_state::p500_ntsc(machine_config &config)
 	m_cia->pb_wr_callback().set(m_user, FUNC(cbm2_user_port_device::d2_w));
 	m_cia->pc_wr_callback().set(m_user, FUNC(cbm2_user_port_device::pc_w));
 
-	DS75160A(config, m_ieee1, 0);
+	DS75160A(config, m_ieee1);
 	m_ieee1->read_callback().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_ieee1->write_callback().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 
-	DS75161A(config, m_ieee2, 0);
+	DS75161A(config, m_ieee2);
 	m_ieee2->in_ren().set(IEEE488_TAG, FUNC(ieee488_device::ren_r));
 	m_ieee2->in_ifc().set(IEEE488_TAG, FUNC(ieee488_device::ifc_r));
 	m_ieee2->in_ndac().set(IEEE488_TAG, FUNC(ieee488_device::ndac_r));
@@ -2325,7 +2325,7 @@ void p500_state::p500_ntsc(machine_config &config)
 	m_ieee2->out_atn().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	m_ieee2->out_srq().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
 
-	IEEE488(config, m_ieee, 0);
+	IEEE488(config, m_ieee);
 	ieee488_slot_device::add_cbm_defaults(config, "c8050");
 	m_ieee->srq_callback().set(m_tpi1, FUNC(tpi6525_device::i1_w));
 
@@ -2402,7 +2402,7 @@ void p500_state::p500_pal(machine_config &config)
 	PLS100(config, m_pla1);
 	PLS100(config, m_pla2);
 
-	TPI6525(config, m_tpi1, 0);
+	TPI6525(config, m_tpi1);
 	m_tpi1->out_irq_cb().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_tpi1->in_pa_cb().set(FUNC(cbm2_state::tpi1_pa_r));
 	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pa_w));
@@ -2411,13 +2411,13 @@ void p500_state::p500_pal(machine_config &config)
 	m_tpi1->out_ca_cb().set(FUNC(p500_state::tpi1_ca_w));
 	m_tpi1->out_cb_cb().set(FUNC(p500_state::tpi1_cb_w));
 
-	TPI6525(config, m_tpi2, 0);
+	TPI6525(config, m_tpi2);
 	m_tpi2->out_pa_cb().set(FUNC(cbm2_state::tpi2_pa_w));
 	m_tpi2->out_pb_cb().set(FUNC(cbm2_state::tpi2_pb_w));
 	m_tpi2->in_pc_cb().set(FUNC(p500_state::tpi2_pc_r));
 	m_tpi2->out_pc_cb().set(FUNC(p500_state::tpi2_pc_w));
 
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(XTAL(1'843'200));
 	m_acia->irq_handler().set(m_tpi1, FUNC(tpi6525_device::i4_w));
 	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -2433,11 +2433,11 @@ void p500_state::p500_pal(machine_config &config)
 	m_cia->pb_wr_callback().set(m_user, FUNC(cbm2_user_port_device::d2_w));
 	m_cia->pc_wr_callback().set(m_user, FUNC(cbm2_user_port_device::pc_w));
 
-	DS75160A(config, m_ieee1, 0);
+	DS75160A(config, m_ieee1);
 	m_ieee1->read_callback().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_ieee1->write_callback().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 
-	DS75161A(config, m_ieee2, 0);
+	DS75161A(config, m_ieee2);
 	m_ieee2->in_ren().set(IEEE488_TAG, FUNC(ieee488_device::ren_r));
 	m_ieee2->in_ifc().set(IEEE488_TAG, FUNC(ieee488_device::ifc_r));
 	m_ieee2->in_ndac().set(IEEE488_TAG, FUNC(ieee488_device::ndac_r));
@@ -2455,7 +2455,7 @@ void p500_state::p500_pal(machine_config &config)
 	m_ieee2->out_atn().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	m_ieee2->out_srq().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
 
-	IEEE488(config, m_ieee, 0);
+	IEEE488(config, m_ieee);
 	ieee488_slot_device::add_cbm_defaults(config, "c8050");
 	m_ieee->srq_callback().set(m_tpi1, FUNC(tpi6525_device::i1_w));
 
@@ -2534,7 +2534,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	// devices
 	PLS100(config, m_pla1);
 
-	TPI6525(config, m_tpi1, 0);
+	TPI6525(config, m_tpi1);
 	m_tpi1->out_irq_cb().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_tpi1->in_pa_cb().set(FUNC(cbm2_state::tpi1_pa_r));
 	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pa_w));
@@ -2542,12 +2542,12 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	m_tpi1->out_pb_cb().set(FUNC(cbm2_state::tpi1_pb_w));
 	m_tpi1->out_ca_cb().set(FUNC(cbm2_state::tpi1_ca_w));
 
-	TPI6525(config, m_tpi2, 0);
+	TPI6525(config, m_tpi2);
 	m_tpi2->out_pa_cb().set(FUNC(cbm2_state::tpi2_pa_w));
 	m_tpi2->out_pb_cb().set(FUNC(cbm2_state::tpi2_pb_w));
 	m_tpi2->in_pc_cb().set(FUNC(cbm2_state::tpi2_pc_r));
 
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(XTAL(1'843'200));
 	m_acia->irq_handler().set(m_tpi1, FUNC(tpi6525_device::i4_w));
 	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -2563,11 +2563,11 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	m_cia->pb_wr_callback().set(m_user, FUNC(cbm2_user_port_device::d2_w));
 	m_cia->pc_wr_callback().set(m_user, FUNC(cbm2_user_port_device::pc_w));
 
-	DS75160A(config, m_ieee1, 0);
+	DS75160A(config, m_ieee1);
 	m_ieee1->read_callback().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_ieee1->write_callback().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 
-	DS75161A(config, m_ieee2, 0);
+	DS75161A(config, m_ieee2);
 	m_ieee2->in_ren().set(IEEE488_TAG, FUNC(ieee488_device::ren_r));
 	m_ieee2->in_ifc().set(IEEE488_TAG, FUNC(ieee488_device::ifc_r));
 	m_ieee2->in_ndac().set(IEEE488_TAG, FUNC(ieee488_device::ndac_r));
@@ -2585,7 +2585,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	m_ieee2->out_atn().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	m_ieee2->out_srq().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
 
-	IEEE488(config, m_ieee, 0);
+	IEEE488(config, m_ieee);
 	ieee488_slot_device::add_cbm_defaults(config, "c8050");
 	m_ieee->srq_callback().set(m_tpi1, FUNC(tpi6525_device::i1_w));
 
@@ -2720,10 +2720,10 @@ void cbm2hp_state::bx256hp(machine_config &config)
 	m_ext_cpu->set_addrmap(AS_IO, &cbm2hp_state::ext_io);
 	m_ext_cpu->set_irq_acknowledge_callback(EXT_I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_ext_pic, 0);
+	PIC8259(config, m_ext_pic);
 	m_ext_pic->out_int_callback().set_inputline(m_ext_cpu, INPUT_LINE_IRQ0);
 
-	TPI6525(config, m_ext_tpi, 0);
+	TPI6525(config, m_ext_tpi);
 	m_ext_tpi->in_pa_cb().set(m_ext_cia, FUNC(mos6526_device::pa_r));
 	m_ext_tpi->in_pb_cb().set(FUNC(cbm2_state::ext_tpi_pb_r));
 	m_ext_tpi->out_pb_cb().set(FUNC(cbm2_state::ext_tpi_pb_w));
@@ -2791,10 +2791,10 @@ void cbm2hp_state::cbm730(machine_config &config)
 	m_ext_cpu->set_addrmap(AS_IO, &cbm2hp_state::ext_io);
 	m_ext_cpu->set_irq_acknowledge_callback(EXT_I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_ext_pic, 0);
+	PIC8259(config, m_ext_pic);
 	m_ext_pic->out_int_callback().set_inputline(m_ext_cpu, INPUT_LINE_IRQ0);
 
-	TPI6525(config, m_ext_tpi, 0);
+	TPI6525(config, m_ext_tpi);
 	m_ext_tpi->in_pa_cb().set(EXT_MOS6526_TAG, FUNC(mos6526_device::pa_r));
 	m_ext_tpi->in_pb_cb().set(FUNC(cbm2_state::ext_tpi_pb_r));
 	m_ext_tpi->out_pb_cb().set(FUNC(cbm2_state::ext_tpi_pb_w));

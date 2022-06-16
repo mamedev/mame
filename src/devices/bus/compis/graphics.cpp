@@ -38,7 +38,7 @@ device_compis_graphics_card_interface::device_compis_graphics_card_interface(con
 //  compis_graphics_slot_device - constructor
 //-------------------------------------------------
 
-compis_graphics_slot_device::compis_graphics_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+compis_graphics_slot_device::compis_graphics_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COMPIS_GRAPHICS_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_compis_graphics_card_interface>(mconfig, *this),
 	m_write_dma_request(*this),

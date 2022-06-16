@@ -126,7 +126,7 @@
 
 DEFINE_DEVICE_TYPE(RAIDEN2COP, raiden2cop_device, "raiden2cop", "Seibu COP (Raiden 2)")
 
-raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RAIDEN2COP, tag, owner, clock),
 	cop_latch_addr(0),
 	cop_latch_trigger(0),

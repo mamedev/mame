@@ -8,7 +8,7 @@ DEFINE_DEVICE_TYPE(H8H_INTC,   h8h_intc_device,   "h8h_intc",   "H8H interrupt c
 DEFINE_DEVICE_TYPE(H8S_INTC,   h8s_intc_device,   "h8s_intc",   "H8S interrupt controller")
 DEFINE_DEVICE_TYPE(GT913_INTC, gt913_intc_device, "gt913_intc", "Casio GT913F interrupt controller")
 
-h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8_intc_device(mconfig, H8_INTC, tag, owner, clock)
 {
 	irq_vector_base = 4;
@@ -16,7 +16,7 @@ h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, d
 	irq_vector_nmi = 3;
 }
 
-h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock), irq_vector_base(0), irq_vector_count(0), irq_vector_nmi(0),
 	cpu(*this, DEVICE_SELF_OWNER), nmi_input(false), irq_input(0), ier(0), isr(0), iscr(0), icr_filter(0), ipr_filter(0)
 {
@@ -199,7 +199,7 @@ void h8_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 }
 
 
-gt913_intc_device::gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gt913_intc_device::gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	gt913_intc_device(mconfig, GT913_INTC, tag, owner, clock)
 {
 	irq_vector_base = 4;
@@ -207,7 +207,7 @@ gt913_intc_device::gt913_intc_device(const machine_config &mconfig, const char *
 	irq_vector_nmi = 3;
 }
 
-gt913_intc_device::gt913_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+gt913_intc_device::gt913_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	h8_intc_device(mconfig, type, tag, owner, clock)
 {
 }
@@ -226,7 +226,7 @@ void gt913_intc_device::clear_interrupt(int vector)
 }
 
 
-h8h_intc_device::h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8h_intc_device::h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8h_intc_device(mconfig, H8H_INTC, tag, owner, clock)
 {
 	irq_vector_base = 12;
@@ -234,7 +234,7 @@ h8h_intc_device::h8h_intc_device(const machine_config &mconfig, const char *tag,
 	irq_vector_nmi = 7;
 }
 
-h8h_intc_device::h8h_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+h8h_intc_device::h8h_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	h8_intc_device(mconfig, type, tag, owner, clock)
 {
 }
@@ -353,7 +353,7 @@ void h8h_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 	icr_pri = (icr >> (slot ^ 7)) & 1;
 }
 
-h8s_intc_device::h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s_intc_device::h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8h_intc_device(mconfig, H8S_INTC, tag, owner, clock)
 {
 	irq_vector_base = 16;

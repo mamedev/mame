@@ -17,7 +17,7 @@ class vsmile_pad_device : public vsmile_ctrl_device_base
 {
 public:
 	// construction/destruction
-	vsmile_pad_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
+	vsmile_pad_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~vsmile_pad_device();
 
 	// input handlers
@@ -42,7 +42,7 @@ public:
 	};
 
 protected:
-	vsmile_pad_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock = 0U);
+	vsmile_pad_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;

@@ -48,7 +48,7 @@ class mc6844_device : public device_t, public device_execute_interface
 {
 public:
 	// construction/destruction
-	mc6844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc6844_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_int_callback() { return m_out_int_cb.bind(); }
 	auto out_txak_callback() { return m_out_txak_cb.bind(); }

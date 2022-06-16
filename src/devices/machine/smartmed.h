@@ -34,7 +34,7 @@ public:
 	};
 
 	// construction/destruction
-	nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nand_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto rnb_wr_callback() { return m_write_rnb.bind(); }
 
@@ -143,7 +143,7 @@ protected:
 		SM_PM_C         // accessing spare field
 	};
 
-	nand_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nand_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -199,7 +199,7 @@ class smartmedia_image_device : public nand_device, public device_memcard_image_
 {
 public:
 	// construction/destruction
-	smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// image-level overrides
 	virtual bool is_creatable() const noexcept override { return false; }

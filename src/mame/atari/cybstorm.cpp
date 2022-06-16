@@ -241,12 +241,12 @@ void cybstorm_state::round2(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	ATARI_VAD(config, m_vad, 0, m_screen);
+	ATARI_VAD(config, m_vad, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(cybstorm_state::get_playfield_tile_info));
 	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(cybstorm_state::get_playfield2_tile_info));
 	TILEMAP(config, "vad:alpha", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(cybstorm_state::get_alpha_tile_info));
-	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, cybstorm_state::s_mob_config).set_gfxdecode(m_gfxdecode);
+	ATARI_MOTION_OBJECTS(config, "vad:mob", m_screen, cybstorm_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
 	ADDRESS_MAP_BANK(config, "vadbank").set_map(&cybstorm_state::vadbank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x90000);
 
@@ -271,7 +271,7 @@ void cybstorm_state::cybstorm(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ATARI_JSA_IIIS(config, m_jsa, 0);
+	ATARI_JSA_IIIS(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("9F0010").bit(22);
 	m_jsa->add_route(0, "lspeaker", 0.9);

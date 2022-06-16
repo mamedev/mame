@@ -53,19 +53,19 @@ void rp2a03_device::rp2a03_map(address_map &map)
 
 
 
-rp2a03_core_device::rp2a03_core_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+rp2a03_core_device::rp2a03_core_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: m6502_device(mconfig, type, tag, owner, clock)
 {
 }
 
-rp2a03_core_device::rp2a03_core_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rp2a03_core_device::rp2a03_core_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rp2a03_core_device(mconfig, RP2A03_CORE, tag, owner, clock)
 {
 }
 
 
 
-rp2a03_device::rp2a03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+rp2a03_device::rp2a03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: rp2a03_core_device(mconfig, type, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 1)
 	, m_apu(*this, "nesapu")
@@ -73,12 +73,12 @@ rp2a03_device::rp2a03_device(const machine_config &mconfig, device_type type, co
 	program_config.m_internal_map = address_map_constructor(FUNC(rp2a03_device::rp2a03_map), this);
 }
 
-rp2a03_device::rp2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rp2a03_device::rp2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rp2a03_device(mconfig, RP2A03, tag, owner, clock)
 {
 }
 
-rp2a03g_device::rp2a03g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rp2a03g_device::rp2a03g_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rp2a03_device(mconfig, RP2A03G, tag, owner, clock)
 {
 }

@@ -27,7 +27,7 @@ const u8 awacs_device::divider[4] = { 16, 12, 8, 16 };
 //  awacs_device - constructor
 //-------------------------------------------------
 
-awacs_device::awacs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+awacs_device::awacs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AWACS, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_irq_out_cb(*this)

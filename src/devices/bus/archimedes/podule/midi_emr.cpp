@@ -25,7 +25,7 @@ class arc_midi2_emr_device :
 {
 public:
 	// construction/destruction
-	arc_midi2_emr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_midi2_emr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -54,7 +54,7 @@ class arc_midi4_emr_device :
 {
 public:
 	// construction/destruction
-	arc_midi4_emr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_midi4_emr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -159,7 +159,7 @@ void arc_midi4_emr_device::device_add_mconfig(machine_config &config)
 //  arc_midi_emr_device - constructor
 //-------------------------------------------------
 
-arc_midi2_emr_device::arc_midi2_emr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_midi2_emr_device::arc_midi2_emr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_MIDI2_EMR, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")
@@ -167,7 +167,7 @@ arc_midi2_emr_device::arc_midi2_emr_device(const machine_config &mconfig, const 
 {
 }
 
-arc_midi4_emr_device::arc_midi4_emr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_midi4_emr_device::arc_midi4_emr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_MIDI4_EMR, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 {

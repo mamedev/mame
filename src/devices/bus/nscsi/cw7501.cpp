@@ -13,19 +13,19 @@
 DEFINE_DEVICE_TYPE(CW7501, cw7501_device, "cw7501", "Panasonic CW-7501 CD-R")
 DEFINE_DEVICE_TYPE(CDR4210, cdr4210_device, "cdr4210", "Creative Technology Blaster CD-R 4210")
 
-cw7501_device::cw7501_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+cw7501_device::cw7501_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, "scsic")
 	, m_cdcpu(*this, "cdcpu")
 {
 }
 
-cw7501_device::cw7501_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cw7501_device::cw7501_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cw7501_device(mconfig, CW7501, tag, owner, clock)
 {
 }
 
-cdr4210_device::cdr4210_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cdr4210_device::cdr4210_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cw7501_device(mconfig, CDR4210, tag, owner, clock)
 {
 }
@@ -67,10 +67,10 @@ void cw7501_device::mem_map(address_map &map)
 
 void cw7501_device::device_add_mconfig(machine_config &config)
 {
-	M37710S4(config, m_cdcpu, 12'500'000); // type and clock are total guesses
+	M37710S4(config, m_cdcpu, XTAL::u(12'500'000)); // type and clock are total guesses
 	m_cdcpu->set_addrmap(AS_PROGRAM, &cw7501_device::mem_map);
 
-	NCR53CF94(config, "scsic", 25'000'000); // type and clock guessed
+	NCR53CF94(config, "scsic", XTAL::u(25'000'000)); // type and clock guessed
 }
 
 ROM_START(cw7501)

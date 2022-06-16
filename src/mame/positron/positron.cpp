@@ -867,7 +867,7 @@ void positron_state::positron(machine_config &config)
 	acia1.rts_handler().set("serial1", FUNC(rs232_port_device::write_rts));
 	acia1.irq_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 
-	clock_device &acia1_clock(CLOCK(config, "acia1_clock", 4800));
+	clock_device &acia1_clock(CLOCK(config, "acia1_clock", XTAL::u(4800)));
 	acia1_clock.signal_handler().set("acia1", FUNC(acia6850_device::write_txc));
 	acia1_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_rxc));
 
@@ -880,7 +880,7 @@ void positron_state::positron(machine_config &config)
 	acia2.rts_handler().set("serial2", FUNC(rs232_port_device::write_rts));
 	acia2.irq_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 
-	clock_device &acia2_clock(CLOCK(config, "acia2_clock", 4800));
+	clock_device &acia2_clock(CLOCK(config, "acia2_clock", XTAL::u(4800)));
 	acia2_clock.signal_handler().set("acia2", FUNC(acia6850_device::write_txc));
 	acia2_clock.signal_handler().append("acia2", FUNC(acia6850_device::write_rxc));
 
@@ -893,7 +893,7 @@ void positron_state::positron(machine_config &config)
 	acia3.rts_handler().set("serial3", FUNC(rs232_port_device::write_rts));
 	acia3.irq_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 
-	clock_device &acia3_clock(CLOCK(config, "acia3_clock", 4800));
+	clock_device &acia3_clock(CLOCK(config, "acia3_clock", XTAL::u(4800)));
 	acia3_clock.signal_handler().set("acia3", FUNC(acia6850_device::write_txc));
 	acia3_clock.signal_handler().append("acia3", FUNC(acia6850_device::write_rxc));
 
@@ -906,7 +906,7 @@ void positron_state::positron(machine_config &config)
 	acia4.rts_handler().set("serial4", FUNC(rs232_port_device::write_rts));
 	acia4.irq_handler().set("irqs", FUNC(input_merger_device::in_w<4>));
 
-	clock_device &acia4_clock(CLOCK(config, "acia4_clock", 4800));
+	clock_device &acia4_clock(CLOCK(config, "acia4_clock", XTAL::u(4800)));
 	acia4_clock.signal_handler().set("acia4", FUNC(acia6850_device::write_txc));
 	acia4_clock.signal_handler().append("acia4", FUNC(acia6850_device::write_rxc));
 
@@ -927,7 +927,7 @@ void positron_state::positron(machine_config &config)
 	hpib.atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	hpib.ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
 
-	//DS75160A(config, m_ieee1, 0);
+	//DS75160A(config, m_ieee1);
 	//m_ieee1->read_callback().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	//m_ieee1->write_callback().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 

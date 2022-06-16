@@ -398,7 +398,7 @@ void v100_state::v100(machine_config &config)
 	I8214(config, m_picu, 47.736_MHz_XTAL / 20);
 	m_picu->int_wr_callback().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
-	i8255_device &ppi(I8255(config, "ppi", 0));
+	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(v100_state::ppi_porta_w));
 	ppi.out_pb_callback().set(m_earom, FUNC(er1400_device::c3_w)).bit(6).invert();
 	ppi.out_pb_callback().append(m_earom, FUNC(er1400_device::c2_w)).bit(5).invert();

@@ -24,7 +24,7 @@
 class micropolis_device : public device_t
 {
 public:
-	micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto dden_rd_callback() { return m_read_dden.bind(); }
 	auto intrq_wr_callback() { return m_write_intrq.bind(); }

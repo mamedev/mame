@@ -287,7 +287,7 @@ void hp49gp_state::init_hp49gp()
 
 void hp49gp_state::hp49gp(machine_config &config)
 {
-	ARM9(config, m_maincpu, 400000000);
+	ARM9(config, m_maincpu, XTAL::u(400000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp49gp_state::hp49gp_map);
 
 	PALETTE(config, "palette").set_entries(32768);
@@ -299,7 +299,7 @@ void hp49gp_state::hp49gp(machine_config &config)
 	screen.set_visarea(0, 131 - 1, 0, 80 - 1);
 	screen.set_screen_update("s3c2410", FUNC(s3c2410_device::screen_update));
 
-	S3C2410(config, m_s3c2410, 12000000);
+	S3C2410(config, m_s3c2410, XTAL::u(12000000));
 	m_s3c2410->set_palette_tag("palette");
 	m_s3c2410->set_screen_tag("screen");
 	m_s3c2410->gpio_port_r_callback().set(FUNC(hp49gp_state::s3c2410_gpio_port_r));

@@ -21,7 +21,7 @@ class m1comm_device : public device_t
 {
 public:
 	// construction/destruction
-	m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// public API - stuff that gets called from the model1
 	// shared memory 4k

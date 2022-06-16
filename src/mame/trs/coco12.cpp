@@ -426,10 +426,10 @@ void coco_state::coco_sound(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
-	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
+	DAC_6BIT_BINARY_WEIGHTED(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 
 	// Single-bit sound: R22 = 10K
-	DAC_1BIT(config, "sbs", 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "speaker", 0.125);
+	DAC_1BIT(config, "sbs").set_output_range(-1, 1).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 
@@ -478,7 +478,7 @@ void coco12_state::coco(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
-	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
+	pia6821_device &pia0(PIA6821(config, PIA0_TAG));
 	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
 	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
 	pia0.tspb_handler().set_constant(0xff);
@@ -487,7 +487,7 @@ void coco12_state::coco(machine_config &config)
 	pia0.irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 	pia0.irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
-	pia6821_device &pia1(PIA6821(config, PIA1_TAG, 0));
+	pia6821_device &pia1(PIA6821(config, PIA1_TAG));
 	pia1.readpa_handler().set(FUNC(coco_state::pia1_pa_r));
 	pia1.readpb_handler().set(FUNC(coco_state::pia1_pb_r));
 	pia1.writepa_handler().set(FUNC(coco_state::pia1_pa_w));
@@ -508,7 +508,7 @@ void coco12_state::coco(machine_config &config)
 	m_sam->set_addrmap(7, &coco12_state::coco_ff60);
 
 	// Becker Port device
-	COCO_DWSOCK(config, DWSOCK_TAG, 0);
+	COCO_DWSOCK(config, DWSOCK_TAG);
 
 	// sound hardware
 	coco_sound(config);

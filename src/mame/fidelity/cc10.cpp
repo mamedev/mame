@@ -321,7 +321,7 @@ void ccx_state::ccx(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	BEEP(config, m_beeper, 1360); // approximation, from 556 timer ic
+	BEEP(config, m_beeper, XTAL::u(1360)); // approximation, from 556 timer ic
 	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
 	TIMER(config, "beeper_off").configure_generic(FUNC(ccx_state::beeper_off));
 }

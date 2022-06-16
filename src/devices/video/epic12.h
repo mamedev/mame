@@ -11,7 +11,7 @@
 class epic12_device : public device_t, public device_video_interface
 {
 public:
-	epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_cpu(T &&maintag) { m_maincpu.set_tag(std::forward<T>(maintag)); }
 	auto port_r_callback() { return m_port_r_cb.bind(); }

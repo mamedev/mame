@@ -145,7 +145,7 @@ void microdar_state::microdv5(machine_config &config)
 
 void microdar_state::covidarts(machine_config &config)
 {
-	I80C31(config, m_maincpu, 16'000'000); // Philips PCB80C31BH-3-16P (Internal MCU osc.)
+	I80C31(config, m_maincpu, XTAL::u(16'000'000)); // Philips PCB80C31BH-3-16P (Internal MCU osc.)
 
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6264ALP-12 + battery
 	I2C_24C04(config, m_eeprom); // Microchip 24LC04B

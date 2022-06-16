@@ -41,7 +41,7 @@ class cmc_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	cmc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	cmc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void decrypt(uint8_t *r0, uint8_t *r1,
 		uint8_t c0, uint8_t c1,

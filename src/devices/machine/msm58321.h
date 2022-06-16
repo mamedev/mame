@@ -47,7 +47,7 @@ class msm58321_device : public device_t,
 {
 public:
 	// construction/destruction
-	msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto d0_handler() { return m_d0_handler.bind(); }

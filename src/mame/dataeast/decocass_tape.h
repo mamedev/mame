@@ -8,7 +8,7 @@
 class decocass_tape_device : public device_t
 {
 public:
-	decocass_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	decocass_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~decocass_tape_device() {}
 
 	uint8_t get_status_bits();

@@ -32,7 +32,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 DEFINE_DEVICE_TYPE(PSX_MDEC, psxmdec_device, "psxmdec", "Sony PSX MDEC")
 
-psxmdec_device::psxmdec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+psxmdec_device::psxmdec_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PSX_MDEC, tag, owner, clock), n_decoded(0), n_offset(0), n_0_command(0), n_0_address(0), n_0_size(0), n_1_command(0), n_1_status(0)
 {
 }

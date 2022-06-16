@@ -114,7 +114,7 @@ enum
 class s3c44b0_device : public device_t, public device_video_interface
 {
 public:
-	s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <class T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	auto gpio_port_r_cb() { return m_port_r_cb.bind(); }

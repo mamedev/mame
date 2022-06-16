@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(TIKI100_HDC, tiki100_hdc_device, "tiki100_hdc", "TIKI-100 Win
 
 void tiki100_hdc_device::device_add_mconfig(machine_config & config)
 {
-	WD2010(config, m_hdc, 5000000);
+	WD2010(config, m_hdc, XTAL::u(5000000));
 	//m_hdc->out_intr_callback().set();
 	m_hdc->in_drdy_callback().set_constant(1);
 	m_hdc->in_index_callback().set_constant(1);
@@ -40,8 +40,8 @@ void tiki100_hdc_device::device_add_mconfig(machine_config & config)
 	m_hdc->in_tk000_callback().set_constant(1);
 	m_hdc->in_sc_callback().set_constant(1);
 
-	HARDDISK(config, "hard0", 0);
-	HARDDISK(config, "hard1", 0);
+	HARDDISK(config, "hard0");
+	HARDDISK(config, "hard1");
 }
 
 
@@ -54,7 +54,7 @@ void tiki100_hdc_device::device_add_mconfig(machine_config & config)
 //  tiki100_hdc_device - constructor
 //-------------------------------------------------
 
-tiki100_hdc_device::tiki100_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tiki100_hdc_device::tiki100_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TIKI100_HDC, tag, owner, clock),
 	device_tiki100bus_card_interface(mconfig, *this),
 	m_hdc(*this, WD1010_TAG)

@@ -48,7 +48,7 @@
 class ttl74148_device : public device_t
 {
 public:
-	ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~ttl74148_device() {}
 
 	auto out_cb() { return m_output_cb.bind(); }

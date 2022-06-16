@@ -147,7 +147,7 @@ inline void mb_vcu_device::write_io(offs_t address, uint8_t data)
 //  mb_vcu_device - constructor
 //-------------------------------------------------
 
-mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MB_VCU, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)

@@ -48,7 +48,7 @@ ioport_constructor spectrum_kempjoy_device::device_input_ports() const
 //  spectrum_kempjoy_device - constructor
 //-------------------------------------------------
 
-spectrum_kempjoy_device::spectrum_kempjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_kempjoy_device::spectrum_kempjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPECTRUM_KEMPJOY, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_joy(*this, "JOY")

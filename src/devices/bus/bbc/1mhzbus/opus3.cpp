@@ -126,7 +126,7 @@ const tiny_rom_entry *bbc_opusa_device::device_rom_region() const
 //  bbc_opus3_device - constructor
 //-------------------------------------------------
 
-bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_ramdisk(*this, "ramdisk")
@@ -136,12 +136,12 @@ bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, device_type ty
 {
 }
 
-bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_opus3_device(mconfig, BBC_OPUS3, tag, owner, clock)
 {
 }
 
-bbc_opusa_device::bbc_opusa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_opusa_device::bbc_opusa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_opus3_device(mconfig, BBC_OPUSA, tag, owner, clock)
 {
 }

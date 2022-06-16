@@ -31,7 +31,7 @@ public:
 	typedef device_delegate<void (int bank, uint16_t page, int rams)> memory_update_delegate;
 
 	// construction/destruction
-	upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto kb_rd_callback() { return m_read_kb.bind(); }
 	auto int_wr_callback() { return m_write_int.bind(); }

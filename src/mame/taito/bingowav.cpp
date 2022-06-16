@@ -113,7 +113,7 @@ INPUT_PORTS_END
 
 void bingowav_state::bingowav(machine_config &config)
 {
-	TMP68301(config, m_maincpu, 12000000); // actually TMP63803F-16
+	TMP68301(config, m_maincpu, XTAL::u(12000000)); // actually TMP63803F-16
 	m_maincpu->set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_main_map);
 
 	te7750_device &mainioh(TE7750(config, "mainioh"));
@@ -122,21 +122,21 @@ void bingowav_state::bingowav(machine_config &config)
 	te7750_device &mainiol(TE7750(config, "mainiol"));
 	mainiol.ios_cb().set_constant(4);
 
-	Z80(config, "audiocpu", 4000000).set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_audio_map);
+	Z80(config, "audiocpu", XTAL::u(4000000)).set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_audio_map);
 
 	SPEAKER(config, "mono").front_center();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag("audiocpu");
 
-	m68000_device &termcpu(M68000(config, "termcpu", 12000000)); // actually TMP63803F-16
+	m68000_device &termcpu(M68000(config, "termcpu", XTAL::u(12000000))); // actually TMP63803F-16
 	termcpu.set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_drive_map);
 	termcpu.set_disable();
 

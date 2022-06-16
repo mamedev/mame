@@ -621,7 +621,7 @@ void lsi53c810_device::add_opcode(uint8_t op, uint8_t mask, opcode_handler_deleg
 	}
 }
 
-lsi53c810_device::lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lsi53c810_device::lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: legacy_scsi_host_adapter(mconfig, LSI53C810, tag, owner, clock)
 	, m_irq_cb(*this)
 	, m_dma_cb(*this)

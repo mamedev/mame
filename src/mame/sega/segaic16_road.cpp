@@ -8,7 +8,7 @@
 
 DEFINE_DEVICE_TYPE(SEGAIC16_ROAD, segaic16_road_device, "segaic16_road", "Sega 16-bit Road Generator")
 
-segaic16_road_device::segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+segaic16_road_device::segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SEGAIC16_ROAD, tag, owner, clock)
 	, m_gfx_region(*this, DEVICE_SELF)
 	, m_roadram(*this, "roadram")

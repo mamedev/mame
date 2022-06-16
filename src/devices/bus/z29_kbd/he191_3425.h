@@ -14,7 +14,7 @@ class he191_3425_device : public device_t, public device_z29_keyboard_interface
 {
 public:
 	// device type constructor
-	he191_3425_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	he191_3425_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// miscellanous handlers
 	DECLARE_WRITE_LINE_MEMBER(shift_reset);

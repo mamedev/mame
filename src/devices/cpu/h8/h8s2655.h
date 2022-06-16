@@ -28,7 +28,7 @@
 
 class h8s2655_device : public h8s2600_device {
 public:
-	h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t syscr_r();
 	void syscr_w(uint8_t data);
@@ -65,7 +65,7 @@ protected:
 
 	uint8_t syscr;
 
-	h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual bool exr_in_stack() const override;
 	virtual void update_irq_filter() override;
@@ -84,7 +84,7 @@ protected:
 
 class h8s2653_device : public h8s2655_device {
 public:
-	h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(H8S2655, h8s2655_device)

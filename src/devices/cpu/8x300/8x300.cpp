@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(N8X300, n8x300_cpu_device, "8x300", "Signetics 8X300")
 DEFINE_DEVICE_TYPE(N8X305, n8x305_cpu_device, "8x305", "Signetics 8X305")
 
 
-n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 13, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
@@ -54,12 +54,12 @@ n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, device_type 
 {
 }
 
-n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: n8x300_cpu_device(mconfig, N8X300, tag, owner, clock)
 {
 }
 
-n8x305_cpu_device::n8x305_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+n8x305_cpu_device::n8x305_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: n8x300_cpu_device(mconfig, N8X305, tag, owner, clock)
 {
 }

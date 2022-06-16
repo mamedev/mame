@@ -15,7 +15,7 @@ class mb89352_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 	auto drq_cb() { return m_drq_cb.bind(); }

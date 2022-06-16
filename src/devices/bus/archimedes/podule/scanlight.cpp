@@ -36,12 +36,12 @@ class arc_scanlight_device :
 {
 public:
 	// construction/destruction
-	arc_scanlight_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_scanlight_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::CAPTURE; }
 
 protected:
-	arc_scanlight_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	arc_scanlight_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -68,7 +68,7 @@ class arc_scanjunior_device : public arc_scanlight_device
 {
 public:
 	// construction/destruction
-	arc_scanjunior_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_scanjunior_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -82,7 +82,7 @@ class arc_scanjunior3_device : public arc_scanlight_device
 {
 public:
 	// construction/destruction
-	arc_scanjunior3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_scanjunior3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -96,7 +96,7 @@ class arc_scanvideo_device : public arc_scanlight_device
 {
 public:
 	// construction/destruction
-	arc_scanvideo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_scanvideo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -199,7 +199,7 @@ void arc_scanvideo_device::device_add_mconfig(machine_config &config)
 //  arc_scanlight_device - constructor
 //-------------------------------------------------
 
-arc_scanlight_device::arc_scanlight_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+arc_scanlight_device::arc_scanlight_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")
@@ -208,22 +208,22 @@ arc_scanlight_device::arc_scanlight_device(const machine_config &mconfig, device
 {
 }
 
-arc_scanlight_device::arc_scanlight_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_scanlight_device::arc_scanlight_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_scanlight_device(mconfig, ARC_SCANLIGHT, tag, owner, clock)
 {
 }
 
-arc_scanjunior_device::arc_scanjunior_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_scanjunior_device::arc_scanjunior_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_scanlight_device(mconfig, ARC_SCANJUNIOR, tag, owner, clock)
 {
 }
 
-arc_scanjunior3_device::arc_scanjunior3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_scanjunior3_device::arc_scanjunior3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_scanlight_device(mconfig, ARC_SCANJUNIOR3, tag, owner, clock)
 {
 }
 
-arc_scanvideo_device::arc_scanvideo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_scanvideo_device::arc_scanvideo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_scanlight_device(mconfig, ARC_SCANVIDEO, tag, owner, clock)
 	, m_avivideo(*this, "srcavi")
 {

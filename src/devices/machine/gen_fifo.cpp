@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "gen_fifo.h"
 
-template<typename T> generic_fifo_device_base<T>::generic_fifo_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+template<typename T> generic_fifo_device_base<T>::generic_fifo_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_empty_cb(*this),
 	m_full_cb(*this),
@@ -192,7 +192,7 @@ template<typename T> void generic_fifo_device_base<T>::push(T t)
 
 template class generic_fifo_device_base<u32>;
 
-generic_fifo_u32_device::generic_fifo_u32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+generic_fifo_u32_device::generic_fifo_u32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	generic_fifo_device_base<u32>(mconfig, GENERIC_FIFO_U32, tag, owner, clock)
 {
 }

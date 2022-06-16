@@ -1467,7 +1467,7 @@ uint32_t cdicdic_device::lba_from_time()
 //  cdicdic_device - constructor
 //-------------------------------------------------
 
-cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CDI_CDIC, tag, owner, clock)
 	, m_intreq_callback(*this)
 	, m_memory_space(*this, ":maincpu", AS_PROGRAM)

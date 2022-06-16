@@ -1699,9 +1699,9 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 void amiga_state::serial_adjust()
 {
 	uint32_t divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
-	uint32_t baud = m_paula->clock() / divisor;
+	XTAL baud = m_paula->clock() / divisor;
 
-	m_serial_timer->adjust(attotime::from_hz(baud) / 2, 0, attotime::from_hz(baud));
+	m_serial_timer->adjust(attotime::from_hz(baud.value()) / 2, 0, attotime::from_hz(baud.value()));
 }
 
 TIMER_CALLBACK_MEMBER(amiga_state::serial_shift)

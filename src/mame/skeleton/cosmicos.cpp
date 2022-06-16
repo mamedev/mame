@@ -526,7 +526,7 @@ void cosmicos_state::cosmicos(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_cosmicos);
-	DM9368(config, m_led, 0);
+	DM9368(config, m_led);
 	TIMER(config, "digit").configure_periodic(FUNC(cosmicos_state::digit_tick), attotime::from_hz(100));
 	TIMER(config, "interrupt").configure_periodic(FUNC(cosmicos_state::int_tick), attotime::from_hz(1000));
 

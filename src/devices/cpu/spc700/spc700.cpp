@@ -202,12 +202,12 @@ Address  Function Register  R/W  When Reset          Remarks
 DEFINE_DEVICE_TYPE(SPC700, spc700_device, "spc700", "Sony SPC700")
 
 
-spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spc700_device(mconfig, SPC700, tag, owner, clock)
 {
 }
 
-spc700_device::spc700_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
+spc700_device::spc700_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
 	, m_a(0)

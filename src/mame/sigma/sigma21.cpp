@@ -80,16 +80,16 @@ GFXDECODE_END
 
 void sigma21_state::sigma21(machine_config &config)
 {
-	MC6809(config, m_maincpu, 5600000); // exact type and clock unknown
+	MC6809(config, m_maincpu, XTAL::u(5600000)); // exact type and clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigma21_state::mem_map);
 
 	PIA6821(config, "pia");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(5600000, 360, 0, 256, 276, 0, 224); // copied from r2dtank; actual params are in badly dumped ROM
+	screen.set_raw(XTAL::u(5600000), 360, 0, 256, 276, 0, 224); // copied from r2dtank; actual params are in badly dumped ROM
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	mc6845_device &crtc(MC6845(config, "crtc", 700000));
+	mc6845_device &crtc(MC6845(config, "crtc", XTAL::u(700000)));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

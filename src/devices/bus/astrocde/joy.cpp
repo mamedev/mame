@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(ASTROCADE_JOY, astrocade_joy_device, "astrocade_joy", "Bally 
 //    Bally Astrocade joystick control
 //**************************************************************************
 
-astrocade_joy_device::astrocade_joy_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+astrocade_joy_device::astrocade_joy_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ASTROCADE_JOY, tag, owner, clock)
 	, device_astrocade_ctrl_interface(mconfig, *this)
 	, m_handle(*this, "HANDLE")

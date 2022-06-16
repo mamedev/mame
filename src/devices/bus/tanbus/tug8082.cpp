@@ -113,12 +113,12 @@ void tanbus_tug8082_device::device_add_mconfig(machine_config &config)
 	M6502(config, m_maincpu, DERIVED_CLOCK(1, 4));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tanbus_tug8082_device::vid8082_map);
 
-	I8212(config, m_iop[0], 0);
+	I8212(config, m_iop[0]);
 	//m_iop[0]->md_rd_callback().set(CONSTANT(0));
 	m_iop[0]->int_wr_callback().set(FUNC(tanbus_tug8082_device::bus_irq_w));
 	//m_iop->do_wr_callback().set(FUNC(tanbus_tug8082_device::write));
 
-	I8212(config, m_iop[1], 0);
+	I8212(config, m_iop[1]);
 	//m_iop[1]->md_rd_callback().set(CONSTANT(0));
 	m_iop[1]->int_wr_callback().set(FUNC(tanbus_tug8082_device::vdu_irq_w));
 	//m_iop->di_rd_callback().set(FUNC(tanbus_tug8082_device::read));
@@ -150,7 +150,7 @@ const tiny_rom_entry *tanbus_tug8082_device::device_rom_region() const
 //  tanbus_tug8082_device - constructor
 //-------------------------------------------------
 
-tanbus_tug8082_device::tanbus_tug8082_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tanbus_tug8082_device::tanbus_tug8082_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TANBUS_TUG8082, tag, owner, clock)
 	, device_tanbus_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")

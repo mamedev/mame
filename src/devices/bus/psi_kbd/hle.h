@@ -27,7 +27,7 @@ class psi_hle_keyboard_device : public device_t,
 {
 public:
 	// construction/destruction
-	psi_hle_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psi_hle_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides

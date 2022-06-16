@@ -44,7 +44,7 @@ class pit_counter_device : public device_t
 
 public:
 	// construction/destruction
-	pit_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pit_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -109,7 +109,7 @@ class pit8253_device : public device_t
 
 public:
 	// construction/destruction
-	pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	template <unsigned N> void set_clk(double clk) { m_clk[N] = clk; }
@@ -140,7 +140,7 @@ public:
 	void set_clockin(int timer, double new_clockin) { m_counter[timer]->set_clockin(new_clockin); }
 
 protected:
-	pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, pit_type chip_type);
+	pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, pit_type chip_type);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -162,7 +162,7 @@ DECLARE_DEVICE_TYPE(PIT8253, pit8253_device)
 class pit8254_device : public pit8253_device
 {
 public:
-	pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual void readback_command(uint8_t data) override;
@@ -173,7 +173,7 @@ DECLARE_DEVICE_TYPE(PIT8254, pit8254_device)
 class fe2010_pit_device : public pit8253_device
 {
 public:
-	fe2010_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fe2010_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 DECLARE_DEVICE_TYPE(FE2010_PIT, fe2010_pit_device)

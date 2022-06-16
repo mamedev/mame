@@ -17,7 +17,7 @@ TODO: the device must be able to know a 32-bit write was from the same
 DEFINE_DEVICE_TYPE(GAELCO_VRAM_ENCRYPTION, gaelco_vram_encryption_device, "gaelco_vram_crypt", "Gaelco VRAM Encryption")
 
 
-gaelco_vram_encryption_device::gaelco_vram_encryption_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gaelco_vram_encryption_device::gaelco_vram_encryption_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, GAELCO_VRAM_ENCRYPTION, tag, owner, clock),
 	m_param1(0),
 	m_param2(0)

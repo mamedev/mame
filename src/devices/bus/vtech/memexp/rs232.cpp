@@ -67,7 +67,7 @@ void vtech_rs232_interface_device::device_add_mconfig(machine_config &config)
 //  vtech_rs232_interface_device - constructor
 //-------------------------------------------------
 
-vtech_rs232_interface_device::vtech_rs232_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vtech_rs232_interface_device::vtech_rs232_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vtech_memexp_device(mconfig, VTECH_RS232_INTERFACE, tag, owner, clock),
 	m_rs232(*this, "rs232"),
 	m_rx(1)

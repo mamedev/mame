@@ -372,7 +372,7 @@ void vme_fccpu21yb_card_device::device_add_mconfig(machine_config &config)
 //**************************************************************************
 //  Base Device
 //**************************************************************************
-vme_fccpu20_device::vme_fccpu20_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, fc_board_t board_id) :
+vme_fccpu20_device::vme_fccpu20_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, fc_board_t board_id) :
 	device_t(mconfig, type, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_maincpu (*this, "maincpu")
@@ -389,46 +389,46 @@ vme_fccpu20_device::vme_fccpu20_device(const machine_config &mconfig, device_typ
 //**************************************************************************
 //  Card Devices
 //**************************************************************************
-vme_fccpu20_card_device::vme_fccpu20_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_fccpu20_card_device::vme_fccpu20_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_fccpu20_card_device(mconfig, VME_FCCPU20, tag, owner, clock)
 {
 	LOG("vme_fccpu20_card_device ctor: %s\n", tag);
 }
 
 
-vme_fccpu21s_card_device::vme_fccpu21s_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_fccpu21s_card_device::vme_fccpu21s_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vme_fccpu21s_card_device(mconfig, VME_FCCPU21S, tag, owner, clock)
 {
 	LOG("vme_fccpu21s_card_device ctor: %s\n", tag);
 }
 
-vme_fccpu21_card_device::vme_fccpu21_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_fccpu21_card_device::vme_fccpu21_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vme_fccpu21_card_device(mconfig, VME_FCCPU21, tag, owner, clock)
 {
 	LOG("vme_fccpu21_card_device ctor: %s\n", tag);
 }
 
-vme_fccpu21a_card_device::vme_fccpu21a_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_fccpu21a_card_device::vme_fccpu21a_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vme_fccpu21a_card_device(mconfig, VME_FCCPU21A, tag, owner, clock)
 {
 	LOG("vme_fccpu21a_card_device ctor: %s\n", tag);
 }
 
 // TODO: Change to 2MB on board RAM and move FLME memory and find/verify memory map
-vme_fccpu21ya_card_device::vme_fccpu21ya_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_fccpu21ya_card_device::vme_fccpu21ya_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vme_fccpu21ya_card_device(mconfig, VME_FCCPU21YA, tag, owner, clock)
 {
 	LOG("vme_fccpu21ya_card_device ctor: %s\n", tag);
 }
 
-vme_fccpu21b_card_device::vme_fccpu21b_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_fccpu21b_card_device::vme_fccpu21b_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vme_fccpu21b_card_device(mconfig, VME_FCCPU21B, tag, owner, clock)
 {
 	LOG("vme_fccpu21b_card_device ctor: %s\n", tag);
 }
 
 // TODO: Change to 2MB on board RAM and move FLME memory and find/verify memory map
-vme_fccpu21yb_card_device::vme_fccpu21yb_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vme_fccpu21yb_card_device::vme_fccpu21yb_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vme_fccpu21yb_card_device(mconfig, VME_FCCPU21YB, tag, owner, clock)
 {
 	LOG("vme_fccpu21yb_card_device ctor: %s\n", tag);

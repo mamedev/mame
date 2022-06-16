@@ -51,7 +51,7 @@ INPUT_PORTS_END
 
 void tek43xx_state::tek4319(machine_config &config)
 {
-	M68020(config, m_maincpu, 20'000'000);
+	M68020(config, m_maincpu, XTAL::u(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tek43xx_state::mem_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

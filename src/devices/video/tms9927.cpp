@@ -36,12 +36,12 @@ DEFINE_DEVICE_TYPE(CRT5027, crt5027_device, "crt5027", "CRT5027 VTAC")
 DEFINE_DEVICE_TYPE(CRT5037, crt5037_device, "crt5037", "CRT5037 VTAC")
 DEFINE_DEVICE_TYPE(CRT5057, crt5057_device, "crt5057", "CRT5057 VTAC")
 
-tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9927_device(mconfig, TMS9927, tag, owner, clock)
 {
 }
 
-tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_write_vsyn(*this)
@@ -59,17 +59,17 @@ tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, 
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
 
-crt5027_device::crt5027_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+crt5027_device::crt5027_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9927_device(mconfig, CRT5027, tag, owner, clock)
 {
 }
 
-crt5037_device::crt5037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+crt5037_device::crt5037_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9927_device(mconfig, CRT5037, tag, owner, clock)
 {
 }
 
-crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9927_device(mconfig, CRT5057, tag, owner, clock)
 {
 }
@@ -81,7 +81,7 @@ crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, d
 
 void tms9927_device::device_start()
 {
-	assert(clock() > 0);
+	assert(!clock().disabled());
 	if (!(m_hpixels_per_column > 0)) fatalerror("TMS9927: number of pixels per column must be explicitly set using set_char_width()!\n");
 
 	// resolve callbacks
@@ -127,7 +127,7 @@ void tms9927_device::device_clock_changed()
 void tms9927_device::device_stop()
 {
 	osd_printf_debug("TMS9927: Final params: (%d, %d, %d, %d, %d, %d, %d)\n",
-						clock() * m_hpixels_per_column,
+					 clock().value() * m_hpixels_per_column,
 						m_total_hpix,
 						0, m_visible_hpix,
 						m_total_vpix,
@@ -331,7 +331,7 @@ void tms9927_device::recompute_parameters(bool postload)
 		logerror("tms9927: invalid visible size (%dx%d) versus total size (%dx%d)\n", m_visible_hpix, m_visible_vpix, m_total_hpix, m_total_vpix);
 	}
 
-	if (clock() == 0)
+	if (clock().disabled())
 	{
 		m_valid_config = false;
 		// TODO: make the screen refresh never, and disable the vblank and odd/even interrupts here!

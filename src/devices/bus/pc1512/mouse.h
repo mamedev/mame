@@ -56,7 +56,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	pc1512_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: pc1512_mouse_port_device(mconfig, tag, owner, 0)
+		: pc1512_mouse_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -64,7 +64,7 @@ public:
 		set_fixed(false);
 	}
 
-	pc1512_mouse_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pc1512_mouse_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// static configuration helpers
 	auto x_wr_callback() { return m_write_x.bind(); }
@@ -97,7 +97,7 @@ class pc1512_mouse_device : public device_t, public device_pc1512_mouse_port_int
 {
 public:
 	// construction/destruction
-	pc1512_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc1512_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

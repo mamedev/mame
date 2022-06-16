@@ -188,7 +188,7 @@ DEFINE_DEVICE_TYPE(TE7752, te7752_device, "te7752", "TE7752 Super I/O Expander")
 //  te7750_device - constructor
 //-------------------------------------------------
 
-te7750_device::te7750_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+te7750_device::te7750_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_input_cb(*this)
 	, m_output_cb(*this)
@@ -197,7 +197,7 @@ te7750_device::te7750_device(const machine_config &mconfig, device_type type, co
 	std::fill(std::begin(m_data_dir), std::end(m_data_dir), 0xff);
 }
 
-te7750_device::te7750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+te7750_device::te7750_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: te7750_device(mconfig, TE7750, tag, owner, clock)
 {
 }
@@ -206,7 +206,7 @@ te7750_device::te7750_device(const machine_config &mconfig, const char *tag, dev
 //  te7751_device - constructor
 //-------------------------------------------------
 
-te7751_device::te7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+te7751_device::te7751_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: te7750_device(mconfig, TE7751, tag, owner, clock)
 {
 }
@@ -215,7 +215,7 @@ te7751_device::te7751_device(const machine_config &mconfig, const char *tag, dev
 //  te7752_device - constructor
 //-------------------------------------------------
 
-te7752_device::te7752_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+te7752_device::te7752_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: te7750_device(mconfig, TE7752, tag, owner, clock)
 {
 }

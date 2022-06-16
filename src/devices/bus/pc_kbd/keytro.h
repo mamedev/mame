@@ -25,7 +25,7 @@ class pc_kbd_keytronic_pc3270_device :  public device_t,
 {
 public:
 	// construction/destruction
-	pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	pc_kbd_keytronic_pc3270_device(
@@ -73,7 +73,7 @@ class pc_kbd_keytronic_pc3270_at_device : public pc_kbd_keytronic_pc3270_device
 {
 public:
 	// construction/destruction
-	pc_kbd_keytronic_pc3270_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_kbd_keytronic_pc3270_at_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };

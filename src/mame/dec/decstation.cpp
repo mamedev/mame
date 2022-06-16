@@ -104,9 +104,9 @@ public:
 	{
 	}
 
-	void kn01(machine_config &config, u32 clock);
-	void pmax(machine_config &config) { kn01(config, (33.3_MHz_XTAL / 2).value()); }
-	void pmin(machine_config &config) { kn01(config, 12'000'000); }
+	void kn01(machine_config &config, const XTAL &clock);
+	void pmax(machine_config &config) { kn01(config, 33.3_MHz_XTAL / 2); }
+	void pmin(machine_config &config) { kn01(config, XTAL::u(12'000'000)); }
 
 	void init();
 
@@ -216,10 +216,10 @@ public:
 	{
 	}
 
-	void kn02ba(machine_config &config, u32 clock);
-	void m120(machine_config &config) { kn02ba(config, 20'000'000); }
-	void m125(machine_config &config) { kn02ba(config, 25'000'000); }
-	void m133(machine_config &config) { kn02ba(config, 33'300'000); }
+	void kn02ba(machine_config &config, const XTAL & clock);
+	void m120(machine_config &config) { kn02ba(config, XTAL::u(20'000'000)); }
+	void m125(machine_config &config) { kn02ba(config, XTAL::u(25'000'000)); }
+	void m133(machine_config &config) { kn02ba(config, XTAL::u(33'300'000)); }
 
 	void init() {}
 
@@ -545,7 +545,7 @@ static void dec_scsi_devices(device_slot_interface &device)
 	device.option_add("harddisk", NSCSI_HARDDISK);
 }
 
-void kn01_state::kn01(machine_config &config, u32 clock)
+void kn01_state::kn01(machine_config &config, const XTAL &clock)
 {
 	R2000(config, m_cpu, clock, 65536, 131072);
 	m_cpu->set_endianness(ENDIANNESS_LITTLE);
@@ -558,13 +558,13 @@ void kn01_state::kn01(machine_config &config, u32 clock)
 	m_mram->set_extra_options("4MiB,8MiB,12MiB,16MiB,20MiB");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(69169800, 1280, 212, 1024+212, 901, 34, 864+34);
+	m_screen->set_raw(XTAL::u(69169800), 1280, 212, 1024+212, 901, 34, 864+34);
 	m_screen->set_screen_update(FUNC(kn01_state::screen_update));
 
-	TIMER(config, m_scantimer, 0);
+	TIMER(config, m_scantimer);
 	m_scantimer->configure_scanline(FUNC(kn01_state::scanline_timer), "screen", 0, 1);
 
-	BT478(config, m_vdac, 69169800);
+	BT478(config, m_vdac, XTAL::u(69169800));
 
 	AM79C90(config, m_lance, XTAL(12'500'000));
 	m_lance->intr_out().set_inputline(m_cpu, INPUT_LINE_IRQ1).invert();
@@ -584,7 +584,7 @@ void kn01_state::kn01(machine_config &config, u32 clock)
 	DC7085(config, m_dz, 15.2064_MHz_XTAL);
 	m_dz->int_cb().set_inputline(m_cpu, INPUT_LINE_IRQ2);
 
-	LK201(config, m_lk201, 0);
+	LK201(config, m_lk201);
 	m_dz->tx_cb<0>().set([this](int state) { if (!(m_status & TXDIS)) m_lk201->rx_w(state); });
 	m_lk201->tx_handler().set(m_dz, FUNC(dc7085_device::rx_w<0>));
 
@@ -638,7 +638,7 @@ void kn01_state::kn01(machine_config &config, u32 clock)
 	config.set_default_layout(layout_kn01);
 }
 
-void kn02ba_state::kn02ba(machine_config &config, u32 clock)
+void kn02ba_state::kn02ba(machine_config &config, const XTAL &clock)
 {
 	R3000A(config, m_cpu, clock, 65536, 131072);
 	m_cpu->set_endianness(ENDIANNESS_LITTLE);
@@ -647,13 +647,13 @@ void kn02ba_state::kn02ba(machine_config &config, u32 clock)
 	m_cpu->set_addrmap(AS_PROGRAM, &kn02ba_state::map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(130000000, 1704, 32, (1280+32), 1064, 3, (1024+3));
+	m_screen->set_raw(XTAL::u(130000000), 1704, 32, (1280+32), 1064, 3, (1024+3));
 	m_screen->set_screen_update(FUNC(kn02ba_state::screen_update));
 
-	DECSFB(config, m_sfb, 25'000'000);  // clock based on white paper which quotes "40ns" gate array cycle times
+	DECSFB(config, m_sfb, XTAL::u(25'000'000));  // clock based on white paper which quotes "40ns" gate array cycle times
 //  m_sfb->int_cb().set(FUNC(dec_ioga_device::slot0_irq_w));
 
-	BT459(config, m_bt459, 83'020'800);
+	BT459(config, m_bt459, XTAL::u(83'020'800));
 
 	AM79C90(config, m_lance, XTAL(12'500'000));
 	m_lance->intr_out().set("ioga", FUNC(dec_ioga_device::lance_irq_w));
@@ -676,7 +676,7 @@ void kn02ba_state::kn02ba(machine_config &config, u32 clock)
 	m_scc[1]->out_int_callback().set("ioga", FUNC(dec_ioga_device::scc1_irq_w));
 	m_scc[1]->out_txdb_callback().set(m_lk201, FUNC(lk201_device::rx_w));
 
-	LK201(config, m_lk201, 0);
+	LK201(config, m_lk201);
 	m_lk201->tx_handler().set(m_scc[1], FUNC(z80scc_device::rxb_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));

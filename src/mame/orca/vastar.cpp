@@ -776,7 +776,7 @@ void dogfightp_state::dogfightp(machine_config &config)
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	orca_ovg_40c_device& videopcb(ORCA_OVG_40C(config, "videopcb", 0));
+	orca_ovg_40c_device& videopcb(ORCA_OVG_40C(config, "videopcb"));
 	videopcb.set_screen("screen");
 	videopcb.set_percuss_hardware(true);
 }

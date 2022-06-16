@@ -20,10 +20,10 @@ class nubus_bootbug_device :
 {
 public:
 	// construction/destruction
-	nubus_bootbug_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_bootbug_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	nubus_bootbug_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nubus_bootbug_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_device<ns16450_device> m_uart;
 

@@ -27,7 +27,7 @@ public:
 	static constexpr int BANK_MASKF  = 0xf0 << 16;
 	static constexpr int BANK_MASKF8 = 0xf8 << 16;
 
-	segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_bank(int bank) { m_bankshift = (bank & 0xf); m_bankmask = (0x70|((bank >> 16) & 0xfc)); }

@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(ACORN_BMU, acorn_bmu_device, "acorn_bmu", "Acorn Battery Mana
 //  acorn_bmu_device - constructor
 //-------------------------------------------------
 
-acorn_bmu_device::acorn_bmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_bmu_device::acorn_bmu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACORN_BMU, tag, owner, clock)
 	, m_slave_address(BMU_SLAVE_ADDRESS)
 	, m_scl(0)

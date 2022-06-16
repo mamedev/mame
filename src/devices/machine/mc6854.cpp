@@ -139,7 +139,7 @@ static const int word_length[4] = { 5, 6, 7, 8 }; /* transmit / receive word len
 
 DEFINE_DEVICE_TYPE(MC6854, mc6854_device, "mc6854", "Motorola MC6854 ADLC")
 
-mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MC6854, tag, owner, clock),
 	m_out_irq_cb(*this),
 	m_out_rdsr_cb(*this),

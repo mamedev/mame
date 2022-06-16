@@ -96,7 +96,7 @@ class unsp_device : public cpu_device
 
 public:
 	// construction/destruction
-	unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~unsp_device();
 
 	void set_vectorbase(uint16_t vector) { m_vectorbase = vector; }
@@ -121,7 +121,7 @@ public:
 	void cfunc_muls();
 
 protected:
-	unsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
+	unsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -358,10 +358,10 @@ class unsp_11_device : public unsp_device
 {
 public:
 	// construction/destruction
-	unsp_11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	unsp_11_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	unsp_11_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
+	unsp_11_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal);
 
 private:
 };
@@ -370,10 +370,10 @@ class unsp_12_device : public unsp_11_device
 {
 public:
 	// construction/destruction
-	unsp_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	unsp_12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	unsp_12_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
+	unsp_12_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal);
 
 	virtual void execute_fxxx_101_group(uint16_t op) override;
 	virtual void execute_exxx_group(uint16_t op) override;
@@ -387,10 +387,10 @@ class unsp_20_device : public unsp_12_device
 {
 public:
 	// construction/destruction
-	unsp_20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	unsp_20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	unsp_20_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
+	unsp_20_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_extended_group(uint16_t op) override;

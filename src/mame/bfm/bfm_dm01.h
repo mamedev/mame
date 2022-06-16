@@ -16,7 +16,7 @@
 class bfm_dm01_device : public device_t
 {
 public:
-	bfm_dm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bfm_dm01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto busy_callback() { return m_busy_cb.bind(); }
 

@@ -58,11 +58,11 @@ void strkzn_state::light_io(address_map &map)
 
 void strkzn_state::strkzn(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &strkzn_state::main_mem);
 	m_maincpu->set_addrmap(AS_IO, &strkzn_state::main_io);
 
-	I80188(config, m_lightcpu, 10000000);
+	I80188(config, m_lightcpu, XTAL::u(10000000));
 	m_lightcpu->set_addrmap(AS_PROGRAM, &strkzn_state::light_mem);
 	m_lightcpu->set_addrmap(AS_IO, &strkzn_state::light_io);
 }

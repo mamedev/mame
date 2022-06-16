@@ -58,7 +58,7 @@ void cms_ieee_device::device_add_mconfig(machine_config &config)
 //  cms_ieee_device - constructor
 //-------------------------------------------------
 
-cms_ieee_device::cms_ieee_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cms_ieee_device::cms_ieee_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CMS_IEEE, tag, owner, clock)
 	, device_acorn_bus_interface(mconfig, *this)
 	, m_ieee(*this, IEEE488_TAG)

@@ -94,7 +94,7 @@ void st17xx_state::machine_start()
 void st17xx_state::st17xx(machine_config &config)
 {
 	/* basic machine hardware */
-	arm7_cpu_device &maincpu(ARM7(config, "maincpu", 50000000)); /* speed unknown */
+	arm7_cpu_device &maincpu(ARM7(config, "maincpu", XTAL::u(50000000))); /* speed unknown */
 	maincpu.set_addrmap(AS_PROGRAM, &st17xx_state::cpu_map);
 
 	/* video hardware */

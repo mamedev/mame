@@ -23,7 +23,7 @@ class ioport_device;
 class ioport_attached_device : public device_t
 {
 public:
-	ioport_attached_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	ioport_attached_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 		device_t(mconfig, type, tag, owner, clock),
 		m_ioport(nullptr)
 	{ }
@@ -59,7 +59,7 @@ class ioport_device : public device_t, public device_slot_interface
 
 public:
 	template <typename U>
-	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, U &&opts, const char *dflt)
 		: ioport_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -68,7 +68,7 @@ public:
 		set_fixed(false);
 	}
 
-	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Methods called from the console
 	void readz(offs_t offset, uint8_t *value);

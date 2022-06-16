@@ -37,7 +37,7 @@ class com8116_device :  public device_t
 {
 public:
 	// construction/destruction
-	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto fx4_handler() { return m_fx4_handler.bind(); }
 	auto fr_handler() { return m_fr_handler.bind(); }
@@ -49,7 +49,7 @@ public:
 	void stt_str_w(uint8_t data);
 
 protected:
-	com8116_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int *divisors);
+	com8116_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const int *divisors);
 
 	static const int divisors_16X_5_0688MHz[16];
 	static const int divisors_16X_6_01835MHz[16];
@@ -92,7 +92,7 @@ class com8116_003_device : public com8116_device
 {
 public:
 	// construction/destruction
-	com8116_003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	com8116_003_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -102,7 +102,7 @@ class com5016_5_device : public com8116_device
 {
 public:
 	// construction/destruction
-	com5016_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	com5016_5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -112,7 +112,7 @@ class com5016_013_device : public com8116_device
 {
 public:
 	// construction/destruction
-	com5016_013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	com5016_013_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -122,7 +122,7 @@ class com8116_020_device : public com8116_device
 {
 public:
 	// construction/destruction
-	com8116_020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	com8116_020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -132,7 +132,7 @@ class k1135ab_device : public com8116_device
 {
 public:
 	// construction/destruction
-	k1135ab_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k1135ab_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

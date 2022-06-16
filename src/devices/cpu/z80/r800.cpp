@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(R800, r800_device, "r800", "ASCII R800")
 //  r800_device - constructor
 //-------------------------------------------------
 
-r800_device::r800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+r800_device::r800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80_device(mconfig, R800, tag, owner, clock)
 {
 }

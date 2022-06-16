@@ -115,7 +115,7 @@ u16 esqasr_state::esq5506_read_adc()
 
 void esqasr_state::es5506_clock_changed(u32 data)
 {
-	m_pump->set_unscaled_clock(data);
+	m_pump->set_unscaled_clock(XTAL::u(data));
 }
 
 void esqasr_state::asr(machine_config &config)
@@ -126,7 +126,7 @@ void esqasr_state::asr(machine_config &config)
 	ES5510(config, m_esp, XTAL(10'000'000));
 	m_esp->set_disable();
 
-	ESQ2X40_SQ1(config, m_sq1vfd, 60);
+	ESQ2X40_SQ1(config, m_sq1vfd, XTAL::u(60));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -163,7 +163,7 @@ void esqasr_state::asrx(machine_config &config)
 	ES5510(config, m_esp, XTAL(10'000'000)); // Actually ES5511
 	m_esp->set_disable();
 
-	ESQ2X40_SQ1(config, m_sq1vfd, 60);
+	ESQ2X40_SQ1(config, m_sq1vfd, XTAL::u(60));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

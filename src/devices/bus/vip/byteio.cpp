@@ -43,7 +43,7 @@ device_vip_byteio_port_interface::device_vip_byteio_port_interface(const machine
 //  vip_byteio_port_device - constructor
 //-------------------------------------------------
 
-vip_byteio_port_device::vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vip_byteio_port_device::vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VIP_BYTEIO_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_vip_byteio_port_interface>(mconfig, *this),
 	m_write_inst(*this),

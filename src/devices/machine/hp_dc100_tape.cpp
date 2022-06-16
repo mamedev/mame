@@ -71,7 +71,7 @@ DEFINE_DEVICE_TYPE(HP_DC100_TAPE, hp_dc100_tape_device, "hp_dc100_tape", "HP DC1
 constexpr double MOTION_MARGIN = 1e-5;  // Margin to ensure motion events have passed when timer expires (10 µs)
 constexpr hti_format_t::tape_pos_t TAPE_INIT_POS = 80 * hti_format_t::ONE_INCH_POS; // Initial tape position: 80" from beginning (just past the punched part)
 
-hp_dc100_tape_device::hp_dc100_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp_dc100_tape_device::hp_dc100_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: microtape_image_device(mconfig, HP_DC100_TAPE, tag, owner, clock)
 	, m_cart_out_handler(*this)
 	, m_hole_handler(*this)

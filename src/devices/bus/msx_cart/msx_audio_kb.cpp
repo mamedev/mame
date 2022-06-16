@@ -13,7 +13,7 @@ msx_audio_kb_port_interface::msx_audio_kb_port_interface(machine_config const &m
 }
 
 
-msx_audio_kbdc_port_device::msx_audio_kbdc_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_audio_kbdc_port_device::msx_audio_kbdc_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_AUDIO_KBDC_PORT, tag, owner, clock)
 	, device_single_card_slot_interface<msx_audio_kb_port_interface>(mconfig, *this)
 	, m_keyboard(nullptr)
@@ -50,7 +50,7 @@ DECLARE_DEVICE_TYPE(MSX_AUDIO_KB_NMS1160, msx_nms1160_device)
 class msx_hxmu901_device : public device_t, public msx_audio_kb_port_interface
 {
 public:
-	msx_hxmu901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	msx_hxmu901_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, MSX_AUDIO_KB_HXMU901, tag, owner, clock)
 		, msx_audio_kb_port_interface(mconfig, *this)
 		, m_row(0)
@@ -180,7 +180,7 @@ ioport_constructor msx_hxmu901_device::device_input_ports() const
 class msx_nms1160_device : public device_t, public msx_audio_kb_port_interface
 {
 public:
-	msx_nms1160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	msx_nms1160_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, MSX_AUDIO_KB_NMS1160, tag, owner, clock)
 		, msx_audio_kb_port_interface(mconfig, *this)
 		, m_row(0)

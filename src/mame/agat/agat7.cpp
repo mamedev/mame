@@ -53,7 +53,7 @@ void agat7video_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-agat7video_device::agat7video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+agat7video_device::agat7video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AGAT7VIDEO, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, m_ram_dev(*this, finder_base::DUMMY_TAG)

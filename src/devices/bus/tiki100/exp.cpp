@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(TIKI100_BUS_SLOT, tiki100_bus_slot_device, "tiki100bus_slot",
 //  tiki100_bus_slot_device - constructor
 //-------------------------------------------------
 
-tiki100_bus_slot_device::tiki100_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tiki100_bus_slot_device::tiki100_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TIKI100_BUS_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_tiki100bus_card_interface>(mconfig, *this),
 	device_z80daisy_interface(mconfig, *this),
@@ -53,7 +53,7 @@ void tiki100_bus_slot_device::device_start()
 //  tiki100_bus_device - constructor
 //-------------------------------------------------
 
-tiki100_bus_device::tiki100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tiki100_bus_device::tiki100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TIKI100_BUS, tag, owner, clock),
 	m_irq_cb(*this),
 	m_nmi_cb(*this),

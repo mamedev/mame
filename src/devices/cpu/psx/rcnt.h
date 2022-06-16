@@ -27,7 +27,7 @@ DECLARE_DEVICE_TYPE(PSX_RCNT, psxrcnt_device)
 class psxrcnt_device : public device_t
 {
 public:
-	psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq0() { return m_irq0_handler.bind(); }

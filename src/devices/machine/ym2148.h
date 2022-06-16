@@ -23,7 +23,7 @@ class ym2148_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto txd_handler() { return m_txd_handler.bind(); }

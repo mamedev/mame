@@ -58,14 +58,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	vsmile_ctrl_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: vsmile_ctrl_port_device(mconfig, tag, owner, 0U)
+		: vsmile_ctrl_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	vsmile_ctrl_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
+	vsmile_ctrl_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~vsmile_ctrl_port_device();
 
 	// input signals
@@ -96,7 +96,7 @@ public:
 
 protected:
 	// construction
-	vsmile_ctrl_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
+	vsmile_ctrl_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device_t implementation
 	virtual void device_start() override;

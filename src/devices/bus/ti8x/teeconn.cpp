@@ -13,7 +13,7 @@ namespace {
 class tee_connector_device : public device_t, public device_ti8x_link_port_interface
 {
 public:
-	tee_connector_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	tee_connector_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

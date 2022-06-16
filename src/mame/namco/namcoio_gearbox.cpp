@@ -50,7 +50,7 @@ DEFINE_DEVICE_TYPE(NAMCOIO_GEARBOX, namcoio_gearbox_device, "namcoio_gearbox", "
 //  namcoio_gearbox_device - constructor
 //-------------------------------------------------
 
-namcoio_gearbox_device::namcoio_gearbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+namcoio_gearbox_device::namcoio_gearbox_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NAMCOIO_GEARBOX, tag, owner, clock)
 {
 }

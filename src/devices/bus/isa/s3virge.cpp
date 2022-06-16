@@ -35,28 +35,28 @@ DEFINE_DEVICE_TYPE(S3VIRGE,    s3virge_vga_device,        "virge_vga",      "S3 
 DEFINE_DEVICE_TYPE(S3VIRGEDX,  s3virgedx_vga_device,      "virgedx_vga",    "S3 86C375")
 DEFINE_DEVICE_TYPE(S3VIRGEDX1, s3virgedx_rev1_vga_device, "virgedx_vga_r1", "S3 86C375 (rev 1)")
 
-s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: s3virge_vga_device(mconfig, S3VIRGE, tag, owner, clock)
 {
 }
 
-s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: s3_vga_device(mconfig, type, tag, owner, clock)
 	, m_linear_config_changed_cb(*this)
 {
 }
 
-s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: s3virgedx_vga_device(mconfig, S3VIRGEDX, tag, owner, clock)
 {
 }
 
-s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: s3virge_vga_device(mconfig, type, tag, owner, clock)
 {
 }
 
-s3virgedx_rev1_vga_device::s3virgedx_rev1_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s3virgedx_rev1_vga_device::s3virgedx_rev1_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: s3virgedx_vga_device(mconfig, S3VIRGEDX1, tag, owner, clock)
 {
 }

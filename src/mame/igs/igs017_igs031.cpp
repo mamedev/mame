@@ -59,7 +59,7 @@ GFXDECODE_END
 
 DEFINE_DEVICE_TYPE(IGS017_IGS031, igs017_igs031_device, "igs017_031", "IGS017_IGS031")
 
-igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IGS017_IGS031, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo, "palette")
 	, device_video_interface(mconfig, *this)

@@ -187,7 +187,7 @@ INPUT_PORTS_END
 void prschess_state::prschess(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 2000000);
+	M6502(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &prschess_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(prschess_state::nmi_line_pulse), attotime::from_hz(100)); // guessed
 

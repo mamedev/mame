@@ -14,7 +14,7 @@ DEFINE_DEVICE_TYPE(YM2154, ym2154_device, "ym2154", "YM2154 (RYP4)")
 //  ym2154_device - constructor
 //-------------------------------------------------
 
-ym2154_device::ym2154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym2154_device::ym2154_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, YM2154, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	device_memory_interface(mconfig, *this),

@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(HP9122C, hp9122c_device, "hp9122c", "HP9122C Dual High density disk drive")
 
-hp9122c_device::hp9122c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp9122c_device::hp9122c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t{mconfig, HP9122C, tag, owner, clock},
 	  device_ieee488_interface{mconfig, *this},
 	  m_cpu{*this , "cpu"},

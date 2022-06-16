@@ -25,7 +25,7 @@ class cgenie_printer_device : public device_t, public device_cg_parallel_interfa
 {
 public:
 	// construction/destruction
-	cgenie_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cgenie_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

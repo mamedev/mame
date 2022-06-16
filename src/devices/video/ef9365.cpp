@@ -193,7 +193,7 @@ device_memory_interface::space_config_vector ef9365_device::memory_space_config(
 //  ef9365_device - constructor
 //-------------------------------------------------
 
-ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, EF9365, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),

@@ -38,8 +38,8 @@
 
 namespace {
 
-static constexpr u32 C7M = 7833600;
-static constexpr u32 C15M = (C7M * 2);
+  static constexpr XTAL C7M = XTAL::u(7833600);
+static constexpr XTAL C15M = (C7M * 2);
 
 class macvail_state : public driver_device
 {
@@ -213,7 +213,7 @@ INPUT_PORTS_END
 
 void macvail_state::maclc3_base(machine_config &config)
 {
-	M68030(config, m_maincpu, 25000000);
+	M68030(config, m_maincpu, XTAL::u(25000000));
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	RAM(config, m_ram);
@@ -246,7 +246,7 @@ void macvail_state::maclc3_base(machine_config &config)
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 
 	SCC85C30(config, m_scc, C7M);
-	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
+	m_scc->configure_channels(XTAL::u(3'686'400), XTAL::u(3'686'400), XTAL::u(3'686'400), XTAL::u(3'686'400));
 	m_scc->out_int_callback().set(m_sonora, FUNC(sonora_device::scc_irq_w));
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));

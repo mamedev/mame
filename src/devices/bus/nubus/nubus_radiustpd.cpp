@@ -63,14 +63,14 @@ const tiny_rom_entry *nubus_radiustpd_device::device_rom_region() const
 //  nubus_radiustpd_device - constructor
 //-------------------------------------------------
 
-nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	nubus_radiustpd_device(mconfig, NUBUS_RADIUSTPD, tag, owner, clock)
 {
 	(void)m_toggle;
 	(void)&m_colors[0];
 }
 
-nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),

@@ -25,13 +25,13 @@ class nes_vaus_device : public device_t, public device_nes_control_port_interfac
 {
 public:
 	// construction/destruction
-	nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_bit34() override;
 	virtual void write(u8 data) override;
 
 protected:
-	nes_vaus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_vaus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -49,7 +49,7 @@ class nes_vausfc_device : public nes_vaus_device
 {
 public:
 	// construction/destruction
-	nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 read_bit34() override { return 0; }
 	virtual u8 read_exp(offs_t offset) override;

@@ -17,7 +17,7 @@ class itt1700_keyboard_device : public device_t
 {
 public:
 	// device constructor
-	itt1700_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	itt1700_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// host interface
 	DECLARE_WRITE_LINE_MEMBER(line1_w);

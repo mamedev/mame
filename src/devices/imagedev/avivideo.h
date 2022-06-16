@@ -26,7 +26,7 @@ class avivideo_image_device : public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
-	avivideo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	avivideo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~avivideo_image_device();
 
 	// image-level overrides

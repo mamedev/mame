@@ -795,7 +795,7 @@ void tubep_state::tubep(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &tubep_state::tubep_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &tubep_state::tubep_sound_portmap);
 
-	NSC8105(config, m_mcu, 6000000);        /* 6 MHz Xtal - divided internally ??? */
+	NSC8105(config, m_mcu, XTAL::u(6000000));        /* 6 MHz Xtal - divided internally ??? */
 	m_mcu->set_ram_enable(false);
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 

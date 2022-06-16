@@ -40,32 +40,32 @@ DEFINE_DEVICE_TYPE(NES_G101,     nes_g101_device,     "nes_g101",     "NES Cart 
 DEFINE_DEVICE_TYPE(NES_H3001,    nes_h3001_device,    "ns_h3001",     "NES Cart Irem H-3001 PCB")
 
 
-nes_lrog017_device::nes_lrog017_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_lrog017_device::nes_lrog017_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_LROG017, tag, owner, clock)
 {
 }
 
-nes_holydivr_device::nes_holydivr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_holydivr_device::nes_holydivr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_HOLYDIVR, tag, owner, clock)
 {
 }
 
-nes_tam_s1_device::nes_tam_s1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_tam_s1_device::nes_tam_s1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_TAM_S1, tag, owner, clock)
 {
 }
 
-nes_g101_device::nes_g101_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 prg_mask)
+nes_g101_device::nes_g101_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 prg_mask)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_reg(0), m_prg_mask(prg_mask)
 {
 }
 
-nes_g101_device::nes_g101_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_g101_device::nes_g101_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_g101_device(mconfig, NES_G101, tag, owner, clock, 0x1f)
 {
 }
 
-nes_h3001_device::nes_h3001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_h3001_device::nes_h3001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_g101_device(mconfig, NES_H3001, tag, owner, clock, 0x3f), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }

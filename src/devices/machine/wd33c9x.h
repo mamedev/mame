@@ -39,7 +39,7 @@ public:
 	void dma_w(const uint8_t data);
 
 protected:
-	wd33c9x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	wd33c9x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -112,45 +112,25 @@ private:
 class wd33c92_device : public wd33c9x_base_device
 {
 public:
-	wd33c92_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: wd33c92_device(mconfig, tag, owner, 0)
-	{
-	}
-
-	wd33c92_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd33c92_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class wd33c93_device : public wd33c9x_base_device
 {
 public:
-	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: wd33c93_device(mconfig, tag, owner, 0)
-	{
-	}
-
-	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class wd33c93a_device : public wd33c9x_base_device
 {
 public:
-	wd33c93a_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: wd33c93a_device(mconfig, tag, owner, 0)
-	{
-	}
-
-	wd33c93a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd33c93a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class wd33c93b_device : public wd33c9x_base_device
 {
 public:
-	wd33c93b_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: wd33c93b_device(mconfig, tag, owner, 0)
-	{
-	}
-
-	wd33c93b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd33c93b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 

@@ -132,7 +132,7 @@ DEFINE_DEVICE_TYPE(IBC, bus::hexbus::ibc_device,  "hexbus_ibc",  "Intelligent Pe
 
 namespace bus::hexbus {
 
-ibc_device::ibc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ibc_device::ibc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, IBC, tag, owner, clock),
 	m_int(*this),
 	m_hexout(*this),

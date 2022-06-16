@@ -99,14 +99,14 @@ ioport_constructor pce_joypad2_turbo_device::device_input_ports() const
 //  pce_joypad2_device - constructor
 //-------------------------------------------------
 
-pce_joypad2_device::pce_joypad2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+pce_joypad2_device::pce_joypad2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_pce_control_port_interface(mconfig, *this),
 	m_muxer(*this, "mux")
 {
 }
 
-pce_joypad2_device::pce_joypad2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+pce_joypad2_device::pce_joypad2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pce_joypad2_device(mconfig, PCE_JOYPAD2, tag, owner, clock)
 {
 }
@@ -116,7 +116,7 @@ pce_joypad2_device::pce_joypad2_device(const machine_config &mconfig, const char
 //  pce_joypad2_turbo_device - constructor
 //-------------------------------------------------
 
-pce_joypad2_turbo_device::pce_joypad2_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+pce_joypad2_turbo_device::pce_joypad2_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pce_joypad2_device(mconfig, PCE_JOYPAD2_TURBO, tag, owner, clock),
 	m_buttons_io(*this, "BUTTONS"),
 	m_turbo_io(*this, "TURBO"),

@@ -51,7 +51,7 @@ DEFINE_DEVICE_TYPE(SP0256, sp0256_device, "sp0256", "GI SP0256 Narrator Speech P
 //  LIVE DEVICE
 //**************************************************************************
 
-sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SP0256, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_rom(*this, DEVICE_SELF)

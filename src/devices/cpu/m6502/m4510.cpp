@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(M4510, m4510_device, "m4510", "CSG 4510")
 
-m4510_device::m4510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m4510_device::m4510_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m65ce02_device(mconfig, M4510, tag, owner, clock),
 	map_enable(0),
 	nomap(false)

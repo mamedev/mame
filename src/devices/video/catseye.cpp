@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(CATSEYE, catseye_device, "catseye", "HP Catseye ASIC")
 
-catseye_device::catseye_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+catseye_device::catseye_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t{mconfig, type, tag, owner, clock},
 	m_vram{*this, { "^vram_video", "^vram_overlay"}},
 	m_int_write_func{*this},
@@ -60,7 +60,7 @@ catseye_device::catseye_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-catseye_device::catseye_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+catseye_device::catseye_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	catseye_device(mconfig, CATSEYE, tag, owner, clock)
 {
 }

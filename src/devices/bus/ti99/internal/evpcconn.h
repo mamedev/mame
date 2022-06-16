@@ -18,7 +18,7 @@ namespace bus::ti99::internal {
 class evpc_clock_connector : public device_t
 {
 public:
-	evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER( vclock_line );
 	void device_start() override;

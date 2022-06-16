@@ -26,42 +26,42 @@ DEFINE_DEVICE_TYPE(SCV_ROM128K,       scv_rom128_device,     "scv_rom128",      
 DEFINE_DEVICE_TYPE(SCV_ROM128K_RAM4K, scv_rom128ram4_device, "scv_rom128_ram4", "SCV 128K + RAM 4K Carts")
 
 
-scv_rom8_device::scv_rom8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+scv_rom8_device::scv_rom8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock), device_scv_cart_interface(mconfig, *this)
 {
 }
 
-scv_rom8_device::scv_rom8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scv_rom8_device::scv_rom8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scv_rom8_device(mconfig, SCV_ROM8K, tag, owner, clock)
 {
 }
 
-scv_rom16_device::scv_rom16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scv_rom16_device::scv_rom16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scv_rom8_device(mconfig, SCV_ROM16K, tag, owner, clock)
 {
 }
 
-scv_rom32_device::scv_rom32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scv_rom32_device::scv_rom32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scv_rom8_device(mconfig, SCV_ROM32K, tag, owner, clock)
 {
 }
 
-scv_rom32ram8_device::scv_rom32ram8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scv_rom32ram8_device::scv_rom32ram8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scv_rom8_device(mconfig, SCV_ROM32K_RAM8K, tag, owner, clock), m_ram_enabled(0)
 {
 }
 
-scv_rom64_device::scv_rom64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scv_rom64_device::scv_rom64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scv_rom8_device(mconfig, SCV_ROM64K, tag, owner, clock), m_bank_base(0)
 {
 }
 
-scv_rom128_device::scv_rom128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scv_rom128_device::scv_rom128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scv_rom8_device(mconfig, SCV_ROM128K, tag, owner, clock), m_bank_base(0)
 {
 }
 
-scv_rom128ram4_device::scv_rom128ram4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scv_rom128ram4_device::scv_rom128ram4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scv_rom8_device(mconfig, SCV_ROM128K_RAM4K, tag, owner, clock), m_bank_base(0), m_ram_enabled(0)
 {
 }

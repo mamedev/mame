@@ -30,7 +30,7 @@ class epson_tf20_device : public device_t,
 {
 public:
 	// construction/destruction
-	epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

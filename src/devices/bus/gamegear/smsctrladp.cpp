@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(SMS_CTRL_ADAPTOR, sms_ctrl_adaptor_device, "sms_ctrl_adaptor"
 //  sms_ctrl_adaptor_device - constructor
 //-------------------------------------------------
 
-sms_ctrl_adaptor_device::sms_ctrl_adaptor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sms_ctrl_adaptor_device::sms_ctrl_adaptor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SMS_CTRL_ADAPTOR, tag, owner, clock),
 	device_gg_ext_port_interface(mconfig, *this),
 	m_subctrl_port(*this, "ctrl")

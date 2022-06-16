@@ -564,7 +564,7 @@ void st0016_state::mayjinsn(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_IO, &st0016_state::st0016_m2_io);
 
-	V810(config, m_subcpu, 10000000); //25 Mhz ?
+	V810(config, m_subcpu, XTAL::u(10000000)); //25 Mhz ?
 	m_subcpu->set_addrmap(AS_PROGRAM, &st0016_state::v810_mem);
 
 	config.set_maximum_quantum(attotime::from_hz(60));

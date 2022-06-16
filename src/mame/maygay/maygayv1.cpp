@@ -893,7 +893,7 @@ void maygayv1_state::maygayv1(machine_config &config)
 	m_soundcpu->serial_rx_cb().set(FUNC(maygayv1_state::data_to_i8031));
 
 	/* U25 ST 2 9148 EF68B21P */
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.readpa_handler().set(FUNC(maygayv1_state::b_read));
 	pia.readpb_handler().set(FUNC(maygayv1_state::b_read));
 	pia.writepa_handler().set(FUNC(maygayv1_state::b_writ));

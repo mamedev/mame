@@ -24,7 +24,7 @@ Memo: The NB1413M3 is a Fujitsu ULA
 
 DEFINE_DEVICE_TYPE(NB1413M3, nb1413m3_device, "nb1413m3", "NB1413 Mahjong Custom")
 
-nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NB1413M3, tag, owner, clock),
 	m_maincpu(*this, "^maincpu"),
 	m_sndromrgntag("voice"),

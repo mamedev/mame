@@ -2284,7 +2284,7 @@ void system1_state::sys1ppi(machine_config &config)
 	Z80(config, m_soundcpu, SOUND_CLOCK/2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &system1_state::sound_map);
 
-	TIMER(config, "soundirq", 0).configure_scanline(FUNC(system1_state::soundirq_gen), "screen", 32, 64);
+	TIMER(config, "soundirq").configure_scanline(FUNC(system1_state::soundirq_gen), "screen", 32, 64);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -2588,7 +2588,7 @@ void system1_state::mcu(machine_config &config)
 	// This interrupt is driven by pin 15 of a PAL16R4 (315-5138 on Choplifter), based on the vertical count.
 	// The actual duty cycle likely differs from VBLANK, which is another output from the same PAL.
 
-	TIMER(config, "mcu_t0", 0).configure_periodic(FUNC(system1_state::mcu_t0_callback), attotime::from_usec(2500));
+	TIMER(config, "mcu_t0").configure_periodic(FUNC(system1_state::mcu_t0_callback), attotime::from_usec(2500));
 }
 
 /* alternate program map with RAM/collision swapped */

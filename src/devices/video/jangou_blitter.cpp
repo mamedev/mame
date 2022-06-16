@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(JANGOU_BLITTER, jangou_blitter_device, "jangou_blitter", "Jan
 //  jangou_blitter_device - constructor
 //-------------------------------------------------
 
-jangou_blitter_device::jangou_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+jangou_blitter_device::jangou_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, JANGOU_BLITTER, tag, owner, clock)
 {
 }

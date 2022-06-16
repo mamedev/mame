@@ -760,7 +760,7 @@ void atom_state::atom(machine_config &config)
 	atom_common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atom_state::atom_mem);
 
-	I8271(config, m_fdc, 0);
+	I8271(config, m_fdc);
 	m_fdc->intrq_wr_callback().set(FUNC(atom_state::atom_8271_interrupt_callback));
 	m_fdc->hdl_wr_callback().set(FUNC(atom_state::motor_w));
 	FLOPPY_CONNECTOR(config, I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats).enable_sound(true);

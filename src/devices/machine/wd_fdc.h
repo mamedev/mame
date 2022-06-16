@@ -93,7 +93,7 @@ public:
 
 	void index_callback(floppy_image_device *floppy, int state);
 protected:
-	wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Chip-specific configuration flags
 	bool disable_mfm;
@@ -373,7 +373,7 @@ private:
 
 class wd_fdc_analog_device_base : public wd_fdc_device_base {
 protected:
-	wd_fdc_analog_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	wd_fdc_analog_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void pll_reset(bool fm, bool enmf, const attotime &when) override;
 	virtual void pll_start_writing(const attotime &tm) override;
@@ -390,7 +390,7 @@ private:
 
 class wd_fdc_digital_device_base : public wd_fdc_device_base {
 protected:
-	wd_fdc_digital_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	wd_fdc_digital_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr int wd_digital_step_times[4] = { 12000, 24000, 40000, 60000 };
 
@@ -433,7 +433,7 @@ private:
 
 class fd1771_device : public wd_fdc_analog_device_base {
 public:
-	fd1771_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1771_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int calc_sector_size(uint8_t size, uint8_t command) const override;
@@ -441,7 +441,7 @@ protected:
 
 class fd1781_device : public wd_fdc_analog_device_base {
 public:
-	fd1781_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1781_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int calc_sector_size(uint8_t size, uint8_t command) const override;
@@ -449,32 +449,32 @@ protected:
 
 class fd1791_device : public wd_fdc_analog_device_base {
 public:
-	fd1791_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1791_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class fd1792_device : public wd_fdc_analog_device_base {
 public:
-	fd1792_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1792_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class fd1793_device : public wd_fdc_analog_device_base {
 public:
-	fd1793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1793_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class kr1818vg93_device : public wd_fdc_analog_device_base {
 public:
-	kr1818vg93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kr1818vg93_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class fd1794_device : public wd_fdc_analog_device_base {
 public:
-	fd1794_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1794_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class fd1795_device : public wd_fdc_analog_device_base {
 public:
-	fd1795_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1795_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int calc_sector_size(uint8_t size, uint8_t command) const override;
@@ -482,7 +482,7 @@ protected:
 
 class fd1797_device : public wd_fdc_analog_device_base {
 public:
-	fd1797_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1797_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int calc_sector_size(uint8_t size, uint8_t command) const override;
@@ -490,32 +490,32 @@ protected:
 
 class mb8866_device : public wd_fdc_analog_device_base {
 public:
-	mb8866_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb8866_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mb8876_device : public wd_fdc_analog_device_base {
 public:
-	mb8876_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb8876_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mb8877_device : public wd_fdc_analog_device_base {
 public:
-	mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class fd1761_device : public wd_fdc_analog_device_base {
 public:
-	fd1761_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1761_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class fd1763_device : public wd_fdc_analog_device_base {
 public:
-	fd1763_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1763_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class fd1765_device : public wd_fdc_analog_device_base {
 public:
-	fd1765_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1765_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int calc_sector_size(uint8_t size, uint8_t command) const override;
@@ -523,7 +523,7 @@ protected:
 
 class fd1767_device : public wd_fdc_analog_device_base {
 public:
-	fd1767_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1767_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int calc_sector_size(uint8_t size, uint8_t command) const override;
@@ -531,19 +531,19 @@ protected:
 
 class wd2791_device : public wd_fdc_analog_device_base {
 public:
-	wd2791_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd2791_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	DECLARE_WRITE_LINE_MEMBER(enmf_w) { enmf = state ? false : true; }
 };
 
 class wd2793_device : public wd_fdc_analog_device_base {
 public:
-	wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	DECLARE_WRITE_LINE_MEMBER(enmf_w) { enmf = state ? false : true; }
 };
 
 class wd2795_device : public wd_fdc_analog_device_base {
 public:
-	wd2795_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd2795_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int calc_sector_size(uint8_t size, uint8_t command) const override;
@@ -551,7 +551,7 @@ protected:
 
 class wd2797_device : public wd_fdc_analog_device_base {
 public:
-	wd2797_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd2797_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int calc_sector_size(uint8_t size, uint8_t command) const override;
@@ -559,12 +559,12 @@ protected:
 
 class wd1770_device : public wd_fdc_digital_device_base {
 public:
-	wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class wd1772_device : public wd_fdc_digital_device_base {
 public:
-	wd1772_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd1772_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual int settle_time() const override;
@@ -572,7 +572,7 @@ protected:
 
 class wd1773_device : public wd_fdc_digital_device_base {
 public:
-	wd1773_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd1773_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(FD1771,     fd1771_device)

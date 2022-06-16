@@ -132,7 +132,7 @@ enum
 #define GKRACKER_NVRAM_TAG "gkracker_nvram"
 #define GKRACKER_ROM_TAG "gkracker_rom"
 
-ti99_gkracker_device::ti99_gkracker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ti99_gkracker_device::ti99_gkracker_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	:   cartridge_connector_device(mconfig, TI99_GROMPORT_GK, tag, owner, clock),
 		device_nvram_interface(mconfig, *this),
 		m_romspace_selected(false),
@@ -439,7 +439,7 @@ const tiny_rom_entry *ti99_gkracker_device::device_rom_region() const
 
 void ti99_gkracker_device::device_add_mconfig(machine_config &config)
 {
-	TI99_CART(config, "cartridge", 0);
+	TI99_CART(config, "cartridge");
 }
 
 INPUT_PORTS_START(gkracker)

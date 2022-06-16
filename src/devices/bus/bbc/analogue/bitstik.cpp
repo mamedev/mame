@@ -89,7 +89,7 @@ const tiny_rom_entry *bbc_bitstik2_device::device_rom_region() const
 //  bbc_bitstik_device - constructor
 //-------------------------------------------------
 
-bbc_bitstik_device::bbc_bitstik_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+bbc_bitstik_device::bbc_bitstik_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_analogue_interface(mconfig, *this),
 	m_channel(*this, "CHANNEL%u", 0),
@@ -97,12 +97,12 @@ bbc_bitstik_device::bbc_bitstik_device(const machine_config &mconfig, device_typ
 {
 }
 
-bbc_bitstik1_device::bbc_bitstik1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bbc_bitstik1_device::bbc_bitstik1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	bbc_bitstik_device(mconfig, BBC_BITSTIK1, tag, owner, clock)
 {
 }
 
-bbc_bitstik2_device::bbc_bitstik2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bbc_bitstik2_device::bbc_bitstik2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	bbc_bitstik_device(mconfig, BBC_BITSTIK2, tag, owner, clock)
 {
 }

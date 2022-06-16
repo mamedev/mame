@@ -20,7 +20,7 @@ public:
 	void transmit_byte(uint8_t byte);
 protected:
 	// constructor/destructor
-	hle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
+	hle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device overrides
 	virtual void device_start() override;

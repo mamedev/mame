@@ -82,10 +82,10 @@ INPUT_PORTS_END
 
 void itt9216_state::itt9216(machine_config &config)
 {
-	M68008(config, m_maincpu, 8000000); // clock unknown
+	M68008(config, m_maincpu, XTAL::u(8000000)); // clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &itt9216_state::mem_map);
 
-	I8741A(config, "upi", 6000000).set_disable(); // clock unknown
+	I8741A(config, "upi", XTAL::u(6000000)).set_disable(); // clock unknown
 }
 
 // XTALs: 38.080 MHz (U7), 11.250(?) MHz (U1)

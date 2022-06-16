@@ -19,7 +19,7 @@ class a2_video_device : public device_t, public device_palette_interface, public
 {
 public:
 	// construction/destruction
-	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	bool m_page2 = false;
 	bool m_flash = false;

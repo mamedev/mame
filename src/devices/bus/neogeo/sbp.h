@@ -15,7 +15,7 @@
 class neogeo_sbp_cart_device : public neogeo_rom_device
 {
 public:
-	neogeo_sbp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_sbp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 	virtual uint16_t protection_r(address_space &space, offs_t offset) override;

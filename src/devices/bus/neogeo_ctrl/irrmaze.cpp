@@ -45,7 +45,7 @@ INPUT_PORTS_END
 //  neogeo_irrmaze_device - constructor
 //-------------------------------------------------
 
-neogeo_irrmaze_device::neogeo_irrmaze_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_irrmaze_device::neogeo_irrmaze_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NEOGEO_IRRMAZE, tag, owner, clock),
 	device_neogeo_ctrl_edge_interface(mconfig, *this),
 	m_tx(*this, "TRACK_X"),

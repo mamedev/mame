@@ -53,7 +53,7 @@ public:
 
 protected:
 	// construction/destruction
-	m3745x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
+	m3745x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -88,11 +88,11 @@ private:
 class m37450_device : public m3745x_device
 {
 public:
-	m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void m37450_map(address_map &map);
 protected:
-	m37450_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	m37450_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(M37450, m37450_device)

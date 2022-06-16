@@ -120,7 +120,7 @@ DEFINE_DEVICE_TYPE(DMV_K220, dmv_k220_device, "dmv_k220", "K220 diagnostic")
 //  dmv_k220_device - constructor
 //-------------------------------------------------
 
-dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DMV_K220, tag, owner, clock)
 	, device_dmvslot_interface(mconfig, *this)
 	, m_pit(*this, "pit8253")
@@ -172,7 +172,7 @@ void dmv_k220_device::device_add_mconfig(machine_config &config)
 	m_ppi->in_pb_callback().set_ioport("SWITCH");
 	m_ppi->out_pc_callback().set(FUNC(dmv_k220_device::portc_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(XTAL(1'000'000));  // CLK1
 	m_pit->out_handler<0>().set(FUNC(dmv_k220_device::write_out0));
 	m_pit->out_handler<1>().set(FUNC(dmv_k220_device::write_out1));

@@ -23,7 +23,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(M50734, m50734_device, "m50734", "Mitsubishi M50734")
 
-m50734_device::m50734_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+m50734_device::m50734_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m740_device(mconfig, M50734, tag, owner, clock)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_port_in_cb(*this)

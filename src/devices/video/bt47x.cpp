@@ -65,7 +65,7 @@ void bt475_device_base::map(address_map &map)
 	map(0x06, 0x06).rw(FUNC(bt475_device_base::command_r), FUNC(bt475_device_base::command_w));
 }
 
-bt47x_device_base::bt47x_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, unsigned const palette_colors, unsigned const overlay_colors, unsigned const color_bits)
+bt47x_device_base::bt47x_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock, unsigned const palette_colors, unsigned const overlay_colors, unsigned const color_bits)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, m_palette_colors(palette_colors)
@@ -74,32 +74,32 @@ bt47x_device_base::bt47x_device_base(machine_config const &mconfig, device_type 
 {
 }
 
-bt475_device_base::bt475_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, unsigned const palette_colors, unsigned const overlay_colors, unsigned const color_bits)
+bt475_device_base::bt475_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock, unsigned const palette_colors, unsigned const overlay_colors, unsigned const color_bits)
 	: bt47x_device_base(mconfig, type, tag, owner, clock, palette_colors, overlay_colors, color_bits)
 {
 }
 
-bt471_device::bt471_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+bt471_device::bt471_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: bt47x_device_base(mconfig, BT471, tag, owner, clock, 256, 16, 6)
 {
 }
 
-bt475_device::bt475_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+bt475_device::bt475_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: bt475_device_base(mconfig, BT475, tag, owner, clock, 256, 16, 6)
 {
 }
 
-bt476_device::bt476_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+bt476_device::bt476_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: bt47x_device_base(mconfig, BT476, tag, owner, clock, 256, 0, 6)
 {
 }
 
-bt477_device::bt477_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+bt477_device::bt477_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: bt475_device_base(mconfig, BT477, tag, owner, clock, 256, 16, 8)
 {
 }
 
-bt478_device::bt478_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+bt478_device::bt478_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: bt47x_device_base(mconfig, BT478, tag, owner, clock, 256, 16, 8)
 {
 }

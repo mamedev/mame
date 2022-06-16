@@ -20,7 +20,7 @@ class hle_device : public device_t
 {
 public:
 	// constructor/destructor
-	hle_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	hle_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual ~hle_device() override;
 

@@ -46,7 +46,7 @@ DEFINE_DEVICE_TYPE(HP98032_GPIO_LOOPBACK , hp98032_gpio_loopback_device , "hp980
 // |hp98032_io_card_device|
 // +----------------------+
 
-hp98032_io_card_device::hp98032_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp98032_io_card_device::hp98032_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HP98032_IO_CARD, tag, owner, clock)
 	, device_hp9845_io_interface(mconfig, *this)
 	, m_gpio(*this, "gpio")
@@ -347,7 +347,7 @@ void hp98032_io_card_device::latch_input_LSB()
 // |hp98032_gpio_slot_device|
 // +------------------------+
 
-hp98032_gpio_slot_device::hp98032_gpio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp98032_gpio_slot_device::hp98032_gpio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig , HP98032_GPIO_SLOT , tag , owner , clock)
 	, device_single_card_slot_interface<device_hp98032_gpio_interface>(mconfig , *this)
 	, m_pflg_handler(*this)
@@ -502,7 +502,7 @@ WRITE_LINE_MEMBER(device_hp98032_gpio_interface::eir_w)
 // |hp98032_gpio_loopback_device|
 // +----------------------------+
 
-hp98032_gpio_loopback_device::hp98032_gpio_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp98032_gpio_loopback_device::hp98032_gpio_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HP98032_GPIO_LOOPBACK, tag, owner, clock)
 	, device_hp98032_gpio_interface(mconfig, *this)
 {

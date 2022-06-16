@@ -31,7 +31,7 @@
 class ds8874_device : public device_t
 {
 public:
-	ds8874_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	ds8874_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	auto write_output() { return m_write_output.bind(); } // OUT pins

@@ -116,7 +116,7 @@ constexpr unsigned USEC_1_STEP          = 3456; // microseconds for 1 motor step
 // Device type definition
 DEFINE_DEVICE_TYPE(HP9845_PRINTER, hp9845_printer_device, "hp9845_prt", "HP9845 internal printer")
 
-hp9845_printer_device::hp9845_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp9845_printer_device::hp9845_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 : device_t(mconfig , HP9845_PRINTER , tag , owner , clock),
 	m_irl_handler(*this),
 	m_flg_handler(*this),
@@ -139,8 +139,8 @@ const tiny_rom_entry *hp9845_printer_device::device_rom_region() const
 
 void hp9845_printer_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config, m_prt_alpha_out, 0);
-	BITBANGER(config, m_prt_graph_out, 0);
+	BITBANGER(config, m_prt_alpha_out);
+	BITBANGER(config, m_prt_graph_out);
 }
 
 void hp9845_printer_device::device_start()

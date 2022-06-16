@@ -18,7 +18,7 @@
 class cmi_music_keyboard_device : public device_t
 {
 public:
-	cmi_music_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	cmi_music_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto cmi_txd_handler() { return m_cmi_txd.bind(); }
 	auto cmi_rts_handler() { return m_cmi_rts.bind(); }

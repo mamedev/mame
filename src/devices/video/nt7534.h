@@ -27,7 +27,7 @@ public:
 	typedef device_delegate<void (bitmap_ind16 &bitmap, uint8_t line, uint8_t pos, uint8_t y, uint8_t x, int state)> pixel_update_delegate;
 
 	// construction/destruction
-	nt7534_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	nt7534_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb.set(std::forward<T>(args)...); }
 
@@ -43,7 +43,7 @@ public:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	nt7534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nt7534_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

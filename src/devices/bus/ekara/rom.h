@@ -15,7 +15,7 @@ class ekara_rom_plain_device : public device_t,
 {
 public:
 	// construction/destruction
-	ekara_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ekara_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -28,7 +28,7 @@ public:
 	virtual void write_rom(offs_t offset, uint8_t data);
 
 protected:
-	ekara_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ekara_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override { }
@@ -41,10 +41,10 @@ class ekara_rom_i2c_base_device : public ekara_rom_plain_device
 {
 public:
 	// construction/destruction
-	ekara_rom_i2c_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ekara_rom_i2c_base_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	ekara_rom_i2c_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ekara_rom_i2c_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) override;
@@ -70,7 +70,7 @@ class ekara_rom_i2c_24c08_epitch_device : public ekara_rom_i2c_base_device
 {
 public:
 	// construction/destruction
-	ekara_rom_i2c_24c08_epitch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ekara_rom_i2c_24c08_epitch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual bool is_read_access_not_rom(void) override;
@@ -86,7 +86,7 @@ class ekara_rom_i2c_24lc04_device : public ekara_rom_i2c_base_device
 {
 public:
 	// construction/destruction
-	ekara_rom_i2c_24lc04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ekara_rom_i2c_24lc04_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -98,7 +98,7 @@ class ekara_rom_i2c_24lc02_device : public ekara_rom_i2c_base_device
 {
 public:
 	// construction/destruction
-	ekara_rom_i2c_24lc02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ekara_rom_i2c_24lc02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -111,7 +111,7 @@ class ekara_rom_i2c_24lc02_gc0010_device : public ekara_rom_i2c_base_device
 {
 public:
 	// construction/destruction
-	ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

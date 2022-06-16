@@ -7,7 +7,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(FULL_MEMORY, full_memory_device, "full_memory", "SunPlus Full CS Memory Map")
 
-full_memory_device::full_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+full_memory_device::full_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, FULL_MEMORY, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_program(nullptr)

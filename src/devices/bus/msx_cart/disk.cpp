@@ -125,7 +125,7 @@ static void msx_floppies(device_slot_interface &device)
 }
 
 
-msx_cart_disk_device::msx_cart_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_disk_device::msx_cart_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_floppy0(*this, "fdc:0")
@@ -135,14 +135,14 @@ msx_cart_disk_device::msx_cart_disk_device(const machine_config &mconfig, device
 }
 
 
-msx_cart_disk_wd_device::msx_cart_disk_wd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_disk_wd_device::msx_cart_disk_wd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_cart_disk_device(mconfig, type, tag, owner, clock)
 	, m_fdc(*this, "fdc")
 {
 }
 
 
-msx_cart_disk_type1_device::msx_cart_disk_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_disk_type1_device::msx_cart_disk_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_cart_disk_wd_device(mconfig, type, tag, owner, clock)
 	, m_led(*this, "led0")
 	, m_side_control(0)
@@ -151,7 +151,7 @@ msx_cart_disk_type1_device::msx_cart_disk_type1_device(const machine_config &mco
 }
 
 
-msx_cart_disk_type2_device::msx_cart_disk_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_disk_type2_device::msx_cart_disk_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_cart_disk_wd_device(mconfig, type, tag, owner, clock)
 	, m_led(*this, "led0")
 	, m_control(0)
@@ -159,32 +159,32 @@ msx_cart_disk_type2_device::msx_cart_disk_type2_device(const machine_config &mco
 }
 
 
-msx_cart_vy0010_device::msx_cart_vy0010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_vy0010_device::msx_cart_vy0010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_cart_disk_type1_device(mconfig, MSX_CART_VY0010, tag, owner, clock)
 {
 }
 
 
-msx_cart_fsfd1_device::msx_cart_fsfd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_fsfd1_device::msx_cart_fsfd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_cart_disk_type1_device(mconfig, MSX_CART_FSFD1, tag, owner, clock)
 {
 }
 
 
-msx_cart_fscf351_device::msx_cart_fscf351_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_fscf351_device::msx_cart_fscf351_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_cart_disk_type2_device(mconfig, MSX_CART_FSCF351, tag, owner, clock)
 {
 }
 
 
-msx_cart_disk_tc8566_device::msx_cart_disk_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_disk_tc8566_device::msx_cart_disk_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_cart_disk_device(mconfig, type, tag, owner, clock)
 	, m_fdc(*this, "fdc")
 {
 }
 
 
-msx_cart_fsfd1a_device::msx_cart_fsfd1a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_fsfd1a_device::msx_cart_fsfd1a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_cart_disk_tc8566_device(mconfig, MSX_CART_FSFD1A, tag, owner, clock)
 {
 }
@@ -237,7 +237,7 @@ void msx_cart_fsfd1_device::device_add_mconfig(machine_config &config)
 
 void msx_cart_fsfd1a_device::device_add_mconfig(machine_config &config)
 {
-	TC8566AF(config, m_fdc, 16'000'000);
+	TC8566AF(config, m_fdc, XTAL::u(16'000'000));
 
 	// Double sided 3.5" floppy drive
 	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, "35dd", msx_cart_disk_device::floppy_formats);

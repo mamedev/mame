@@ -98,7 +98,7 @@ class a2bus_zipdrivebase_device:
 {
 protected:
 	// construction/destruction
-	a2bus_zipdrivebase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_zipdrivebase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -120,13 +120,13 @@ protected:
 class a2bus_zipdrive_device : public a2bus_zipdrivebase_device
 {
 public:
-	a2bus_zipdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_zipdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class a2bus_focusdrive_device : public a2bus_zipdrivebase_device
 {
 public:
-	a2bus_focusdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_focusdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_reset() override;
@@ -166,7 +166,7 @@ const tiny_rom_entry *a2bus_focusdrive_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_zipdrivebase_device::a2bus_zipdrivebase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_zipdrivebase_device::a2bus_zipdrivebase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ata(*this, ZIPDRIVE_ATA_TAG),
@@ -175,12 +175,12 @@ a2bus_zipdrivebase_device::a2bus_zipdrivebase_device(const machine_config &mconf
 {
 }
 
-a2bus_zipdrive_device::a2bus_zipdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_zipdrive_device::a2bus_zipdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_zipdrivebase_device(mconfig, A2BUS_ZIPDRIVE, tag, owner, clock)
 {
 }
 
-a2bus_focusdrive_device::a2bus_focusdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_focusdrive_device::a2bus_focusdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_zipdrivebase_device(mconfig, A2BUS_FOCUSDRIVE, tag, owner, clock)
 {
 }

@@ -38,7 +38,7 @@ void bbc_pms64k_device::device_add_mconfig(machine_config &config)
 //  bbc_pms64k_device - constructor
 //-------------------------------------------------
 
-bbc_pms64k_device::bbc_pms64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_pms64k_device::bbc_pms64k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_PMS64K, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_nvram(*this, "nvram")

@@ -15,14 +15,14 @@ class sns_rom21_device : public device_t,
 {
 public:
 	// construction/destruction
-	sns_rom21_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom21_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_l(offs_t offset) override;
 	virtual uint8_t read_h(offs_t offset) override;
 
 protected:
-	sns_rom21_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom21_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -35,7 +35,7 @@ class sns_rom21_srtc_device : public sns_rom21_device
 {
 public:
 	// construction/destruction
-	sns_rom21_srtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom21_srtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t chip_read(offs_t offset) override;

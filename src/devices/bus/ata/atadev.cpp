@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(ATA_SLOT, ata_slot_device, "ata_slot", "ATA Connector")
 //  ata_slot_device - constructor
 //-------------------------------------------------
 
-ata_slot_device::ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ata_slot_device::ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ATA_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_ata_interface>(mconfig, *this),
 	m_dev(nullptr)

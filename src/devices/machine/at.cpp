@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(AT_MB, at_mb_device, "at_mb", "PC/AT Motherboard")
 
-at_mb_device::at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+at_mb_device::at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, AT_MB, tag, owner, clock),
 	m_maincpu(*this, ":maincpu"),
 	m_isabus(*this, "isabus"),
@@ -107,7 +107,7 @@ void at_mb_device::device_add_mconfig(machine_config &config)
 	m_pic8259_slave->out_int_callback().set("pic8259_master", FUNC(pic8259_device::ir2_w));
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace(":maincpu", AS_PROGRAM);
 	m_isabus->set_iospace(":maincpu", AS_IO);
 	m_isabus->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir1_w)); // in place of irq 2 on at irq 9 is used

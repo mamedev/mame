@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(SN74S381, sn74s381_device, "sn74s381", "TI SN74S381 ALU / Fun
 //  sn74s381_device - constructor
 //-------------------------------------------------
 
-sn74s381_device::sn74s381_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sn74s381_device::sn74s381_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SN74S381, tag, owner, clock)
 	, m_a(0)
 	, m_b(0)

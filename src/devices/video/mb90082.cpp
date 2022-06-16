@@ -91,7 +91,7 @@ inline void mb90082_device::write_word(offs_t address, uint16_t data)
 //  mb90082_device - constructor
 //-------------------------------------------------
 
-mb90082_device::mb90082_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mb90082_device::mb90082_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MB90082, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(mb90082_device::mb90082_vram), this))

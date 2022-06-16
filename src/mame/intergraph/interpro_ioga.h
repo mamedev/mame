@@ -9,7 +9,7 @@
 class interpro_ioga_device : public device_t
 {
 protected:
-	interpro_ioga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	interpro_ioga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	enum interrupt_type
 	{
@@ -377,7 +377,7 @@ private:
 class emerald_ioga_device : public interpro_ioga_device
 {
 public:
-	emerald_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	emerald_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 
@@ -419,7 +419,7 @@ private:
 class turquoise_ioga_device : public interpro_ioga_device
 {
 public:
-	turquoise_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	turquoise_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 
@@ -461,7 +461,7 @@ private:
 class sapphire_ioga_device : public interpro_ioga_device
 {
 public:
-	sapphire_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sapphire_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 

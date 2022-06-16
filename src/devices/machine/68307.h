@@ -18,7 +18,7 @@ public:
 	typedef device_delegate<uint16_t (address_space &space, bool dedicated, uint16_t line_mask)> portb_read_delegate;
 	typedef device_delegate<void (address_space &space, bool dedicated, uint16_t data, uint16_t line_mask)> portb_write_delegate;
 
-	m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	/* trampolines so we can specify the 68681 serial configuration when adding the CPU  */
 	auto serial_a_tx_callback() { return m_write_a_tx.bind(); }

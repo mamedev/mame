@@ -280,13 +280,13 @@ void cp1_state::cp1(machine_config &config)
 	maincpu.t0_in_cb().set_log("t0_r");
 	maincpu.t1_in_cb().set_log("t1_r");
 
-	i8155_device &i8155(I8155(config, "i8155", 0));
+	i8155_device &i8155(I8155(config, "i8155"));
 	i8155.out_pa_callback().set(FUNC(cp1_state::i8155_porta_w));
 	i8155.in_pb_callback().set(FUNC(cp1_state::i8155_portb_r));
 	i8155.out_pb_callback().set(FUNC(cp1_state::i8155_portb_w));
 	i8155.out_pc_callback().set(FUNC(cp1_state::i8155_portc_w));
 
-	I8155(config, "i8155_cp3", 0);
+	I8155(config, "i8155_cp3");
 
 	PWM_DISPLAY(config, m_display).set_size(6, 7);
 	m_display->set_segmask(0x3f, 0x7f);

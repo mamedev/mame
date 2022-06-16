@@ -65,7 +65,7 @@ void bbc_ramamp_device::device_add_mconfig(machine_config &config)
 //  bbc_ramamp_device - constructor
 //-------------------------------------------------
 
-bbc_ramamp_device::bbc_ramamp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_ramamp_device::bbc_ramamp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_RAMAMP, tag, owner, clock)
 	, device_bbc_internal_interface(mconfig, *this)
 	, m_rom(*this, "romslot%u", 0U)

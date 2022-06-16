@@ -1566,7 +1566,7 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	X1_001(config, m_spritegen, 12'000'000, m_palette, gfx_tnzs);
+	X1_001(config, m_spritegen, XTAL::u(12'000'000), m_palette, gfx_tnzs);
 	m_spritegen->set_fg_yoffsets( -0x12, 0x0e );
 	m_spritegen->set_bg_yoffsets( 0x1, -0x1 );
 
@@ -1720,7 +1720,7 @@ void kabukiz_state::kabukiz(machine_config &config)
 	ymsnd.port_a_write_callback().set(FUNC(kabukiz_state::sound_bank_w));
 	ymsnd.port_b_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 }
 
 void jpopnics_state::jpopnics(machine_config &config)

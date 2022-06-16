@@ -51,7 +51,7 @@ public:
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, uint8_t video, int intout)> draw_character_delegate;
 
 	// construction/destruction
-	crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 

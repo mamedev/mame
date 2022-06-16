@@ -1691,7 +1691,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::interrupt)
 void kaneko16_berlwall_state::berlwall(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000); /* MC68000P12 */
+	M68000(config, m_maincpu, XTAL::u(12000000)); /* MC68000P12 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_berlwall_state::berlwall_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(kaneko16_berlwall_state::interrupt), "screen", 0, 1);
 
@@ -1724,15 +1724,15 @@ void kaneko16_berlwall_state::berlwall(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2149(config, m_ym2149[0], 1000000);
+	YM2149(config, m_ym2149[0], XTAL::u(1000000));
 	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 	m_ym2149[0]->port_a_read_callback().set_ioport("DSW1");
 	m_ym2149[0]->port_b_read_callback().set_ioport("DSW2");
 
-	YM2149(config, m_ym2149[1], 1000000);
+	YM2149(config, m_ym2149[1], XTAL::u(1000000));
 	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	OKIM6295(config, m_oki[0], 12000000/6, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], XTAL::u(12000000)/6, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
@@ -1822,11 +1822,11 @@ void kaneko16_state::bakubrkr(machine_config &config)
 void kaneko16_state::blazeon(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);    /* TMP68HC000-12 */
+	M68000(config, m_maincpu, XTAL::u(12000000));    /* TMP68HC000-12 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaneko16_state::blazeon_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(kaneko16_state::interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 4000000);   /* D780C-2 (6 MHz) */
+	Z80(config, m_audiocpu, XTAL::u(4000000));   /* D780C-2 (6 MHz) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kaneko16_state::blazeon_soundmem);
 	m_audiocpu->set_addrmap(AS_IO, &kaneko16_state::blazeon_soundport);
 
@@ -1843,7 +1843,7 @@ void kaneko16_state::blazeon(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 2048);
 
-	KANEKO_TMAP(config, m_view2[0], 0);
+	KANEKO_TMAP(config, m_view2[0]);
 	m_view2[0]->set_colbase(0x40 * 16);
 	m_view2[0]->set_offset(0x33, 0x8, 320, 240);
 	m_view2[0]->set_palette(m_palette);
@@ -1863,7 +1863,7 @@ void kaneko16_state::blazeon(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	YM2151(config, m_ymsnd, 4000000);
+	YM2151(config, m_ymsnd, XTAL::u(4000000));
 	m_ymsnd->add_route(0, "lspeaker", 1.0);
 	m_ymsnd->add_route(1, "rspeaker", 1.0);
 }

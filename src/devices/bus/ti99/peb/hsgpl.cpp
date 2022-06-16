@@ -151,7 +151,7 @@ namespace bus::ti99::peb {
 #define GROM_A_EEPROM "u1_grom"
 #define ROM6_EEPROM "u6_rom6"
 
-snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_HSGPL, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_dsr_eeprom(*this, DSR_EEPROM),

@@ -486,9 +486,9 @@ void wildpkr_state::wildpkr(machine_config &config)
 	screen.set_screen_update("acrtc", FUNC(hd63484_device::update_screen));
 	screen.set_palette("palette");
 
-	HD63484(config, "acrtc", 0).set_addrmap(0, &wildpkr_state::hd63484_map);
+	HD63484(config, "acrtc").set_addrmap(0, &wildpkr_state::hd63484_map);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &wildpkr_state::ramdac_map);
 
 	PALETTE(config, "palette", FUNC(wildpkr_state::wildpkr_palette), 256);
@@ -509,12 +509,12 @@ void wildpkr_state::tabpkr(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // DS1220Y
 
-	MC68681(config, m_duart, 3686400);
+	MC68681(config, m_duart, XTAL::u(3686400));
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
 
-	DS2401(config, m_id, 0);
+	DS2401(config, m_id);
 
-	CLOCK(config, m_dac_clock, 1500000); // base rate derived from program code
+	CLOCK(config, m_dac_clock, XTAL::u(1500000)); // base rate derived from program code
 	m_dac_clock->signal_handler().set_inputline(m_maincpu, M68K_IRQ_5, ASSERT_LINE);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -526,16 +526,16 @@ void wildpkr_state::tabpkr(machine_config &config)
 	screen.set_palette("palette");
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
-	HD63484(config, "acrtc", 0).set_addrmap(0, &wildpkr_state::hd63484_map);
+	HD63484(config, "acrtc").set_addrmap(0, &wildpkr_state::hd63484_map);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &wildpkr_state::ramdac_map);
 
 	PALETTE(config, "palette", FUNC(wildpkr_state::wildpkr_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	AD557(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AD557(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 

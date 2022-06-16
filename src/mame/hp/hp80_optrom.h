@@ -23,12 +23,7 @@ class hp80_optrom_device : public device_t,
 {
 public:
 	// construction/destruction
-	hp80_optrom_device(machine_config const &mconfig, char const *tag, device_t *owner)
-		: hp80_optrom_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
-	hp80_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp80_optrom_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~hp80_optrom_device();
 
 	void install_read_handler(address_space& space);

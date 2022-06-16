@@ -24,7 +24,7 @@
 DEFINE_DEVICE_TYPE(UDA1344, uda1344_device, "ud1344", "Philips UDA1344 Codec")
 
 
-uda1344_device::uda1344_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+uda1344_device::uda1344_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UDA1344, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)

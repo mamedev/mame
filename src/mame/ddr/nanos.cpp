@@ -522,7 +522,7 @@ void nanos_state::nanos(machine_config &config)
 	m_pio->out_pb_callback().set(FUNC(nanos_state::port_b_w));
 
 	/* UPD765 */
-	UPD765A(config, m_fdc, 8'000'000, false, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), false, true);
 	FLOPPY_CONNECTOR(config, m_floppy, nanos_floppies, "525hd", nanos_state::floppy_formats);
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(nanos_state::keyboard_callback), attotime::from_hz(240));

@@ -29,13 +29,13 @@ class spectrum_plusd_device: public device_t, public device_spectrum_expansion_i
 {
 public:
 	// construction/destruction
-	spectrum_plusd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_plusd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static void floppy_formats(format_registration &fr);
 	DECLARE_INPUT_CHANGED_MEMBER(snapshot_button);
 
 protected:
-	spectrum_plusd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_plusd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -69,7 +69,7 @@ class spectrum_disciple_device: public spectrum_plusd_device
 {
 public:
 	// construction/destruction
-	spectrum_disciple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_disciple_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(inhibit_button) { if (!newval) m_romcs = 0; }
 

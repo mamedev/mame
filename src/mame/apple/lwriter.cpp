@@ -545,7 +545,7 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
 }*/
 
 #define CPU_CLK (22.321_MHz_XTAL / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
-#define RXC_CLK ((CPU_CLK.value() - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
+#define RXC_CLK XTAL::u((CPU_CLK.value() - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
 /* These are from LBP-CX Series Video Interface Manual:
  * http://beefchicken.com/retro/laserwriter/LBP-CX%20Series%20Video%20Interface%20Service%20Manual.pdf
  */
@@ -662,7 +662,7 @@ void lwriter_state::lwriter(machine_config &config)
 	m_screen->set_screen_update(FUNC(lwriter_state::screen_update));
 
 	SCC8530N(config, m_scc, CPU_CLK);
-	m_scc->configure_channels(RXC_CLK, 0, RXC_CLK, 0);
+	m_scc->configure_channels(RXC_CLK, XTAL(), RXC_CLK, XTAL());
 	/* Port A */
 	m_scc->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));

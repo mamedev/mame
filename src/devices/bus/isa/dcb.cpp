@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(NOVELL_DCB, novell_dcb_device, "novell_dcb", "Novell Disk Coprocessor Board (#738-133-001)")
 
-novell_dcb_device::novell_dcb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+novell_dcb_device::novell_dcb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NOVELL_DCB, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_localcpu(*this, "localcpu")

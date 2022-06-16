@@ -52,7 +52,7 @@ ioport_constructor a9m0331_device::device_input_ports() const
 -------------------------------------------------*/
 void a9m0331_device::device_add_mconfig(machine_config &config)
 {
-	M68705P3(config, m_mcu, 2048000);
+	M68705P3(config, m_mcu, XTAL::u(2048000));
 	m_mcu->porta_r().set(FUNC(a9m0331_device::mcu_port_a_r));
 	m_mcu->portb_r().set(FUNC(a9m0331_device::mcu_port_b_r));
 	m_mcu->portc_r().set(FUNC(a9m0331_device::mcu_port_c_r));
@@ -73,7 +73,7 @@ const tiny_rom_entry *a9m0331_device::device_rom_region() const
     DEVICE IMPLEMENTATION
 ***************************************************************************/
 
-a9m0331_device::a9m0331_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a9m0331_device::a9m0331_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	adb_device(mconfig, ADB_A9M0331, tag, owner, clock),
 	adb_slot_card_interface(mconfig, *this, DEVICE_SELF),
 	m_mcu(*this, "mcu")

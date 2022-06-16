@@ -15,7 +15,7 @@ class msx_matsushita_device : public device_t,
 	public device_nvram_interface
 {
 public:
-	msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto turbo_callback() { return m_turbo_out_cb.bind(); }
 

@@ -48,7 +48,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	, m_perfect_quantum_device(nullptr, "")
 {
 	// add the root device
-	device_add("root", gamedrv.type, 0);
+	device_add("root", gamedrv.type, XTAL());
 
 	// intialize slot devices - make sure that any required devices have been allocated
 	for (device_slot_interface &slot : slot_interface_enumerator(root_device()))
@@ -195,8 +195,9 @@ void machine_config::set_maximum_quantum(attotime const &quantum)
 //  new device
 //-------------------------------------------------
 
-device_t *machine_config::device_add(const char *tag, device_type type, u32 clock)
+device_t *machine_config::device_add(const char *tag, device_type type, const XTAL &clock)
 {
+	clock.validate(std::string("Instanciating device ") + tag);
 	std::pair<const char *, device_t *> const owner(resolve_owner(tag));
 	return &add_device(type.create(*this, owner.first, owner.second, clock), owner.second);
 }
@@ -207,8 +208,9 @@ device_t *machine_config::device_add(const char *tag, device_type type, u32 cloc
 //  replace one device with a new device
 //-------------------------------------------------
 
-device_t *machine_config::device_replace(const char *tag, device_type type, u32 clock)
+device_t *machine_config::device_replace(const char *tag, device_type type, const XTAL &clock)
 {
+	clock.validate(std::string("Replacing device ") + tag);
 	std::tuple<const char *, device_t *, device_t *> const existing(prepare_replace(tag));
 	std::unique_ptr<device_t> device(type.create(*this, std::get<0>(existing), std::get<1>(existing), clock));
 	return &replace_device(std::move(device), *std::get<1>(existing), std::get<2>(existing));

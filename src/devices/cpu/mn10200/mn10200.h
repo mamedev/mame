@@ -51,7 +51,7 @@ protected:
 
 
 	// construction/destruction
-	mn10200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program);
+	mn10200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor program);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -189,7 +189,7 @@ private:
 class mn1020012a_device : public mn10200_device
 {
 public:
-	mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

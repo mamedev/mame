@@ -35,7 +35,7 @@ class ds75160a_device : public device_t
 {
 public:
 	// construction/destruction
-	ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto read_callback() { return m_read.bind(); }
 	auto write_callback() { return m_write.bind(); }

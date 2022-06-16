@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(AIC565, aic565_device, "aic565", "AIC-565 Bus Auxiliary Inter
 //  aic565_device - constructor
 //-------------------------------------------------
 
-aic565_device::aic565_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+aic565_device::aic565_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AIC565, tag, owner, clock)
 	, m_hrst_callback(*this)
 	, m_srst_callback(*this)

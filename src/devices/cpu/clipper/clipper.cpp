@@ -51,28 +51,28 @@ DEFINE_DEVICE_TYPE(CLIPPER_C100, clipper_c100_device, "clipper_c100", "C100 CLIP
 DEFINE_DEVICE_TYPE(CLIPPER_C300, clipper_c300_device, "clipper_c300", "C300 CLIPPER")
 DEFINE_DEVICE_TYPE(CLIPPER_C400, clipper_c400_device, "clipper_c400", "C400 CLIPPER")
 
-clipper_c100_device::clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+clipper_c100_device::clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: clipper_device(mconfig, CLIPPER_C100, tag, owner, clock, ENDIANNESS_LITTLE, SSW_ID_C1R1)
 	, m_icammu(*this, "^cammu_i")
 	, m_dcammu(*this, "^cammu_d")
 {
 }
 
-clipper_c300_device::clipper_c300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+clipper_c300_device::clipper_c300_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: clipper_device(mconfig, CLIPPER_C300, tag, owner, clock, ENDIANNESS_LITTLE, SSW_ID_C3R1)
 	, m_icammu(*this, "^cammu_i")
 	, m_dcammu(*this, "^cammu_d")
 {
 }
 
-clipper_c400_device::clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+clipper_c400_device::clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: clipper_device(mconfig, CLIPPER_C400, tag, owner, clock, ENDIANNESS_LITTLE, SSW_ID_C4R4)
 	, m_db_pc(0)
 	, m_cammu(*this, "^cammu")
 {
 }
 
-clipper_device::clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const endianness_t endianness, const u32 cpuid)
+clipper_device::clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const endianness_t endianness, const u32 cpuid)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_main_config("main", endianness, 32, 32, 0)
 	, m_io_config("io", endianness, 32, 32, 0)

@@ -66,7 +66,7 @@ DEFINE_DEVICE_TYPE(SENSORBOARD, sensorboard_device, "sensorboard", "Sensorboard"
 //  constructor
 //-------------------------------------------------
 
-sensorboard_device::sensorboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sensorboard_device::sensorboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SENSORBOARD, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_out_piece(*this, "piece_%c%u", 0U + 'a', 1U),

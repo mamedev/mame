@@ -29,14 +29,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	pc_kbdc_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: pc_kbdc_device(mconfig, tag, owner, (uint32_t)0)
+		: pc_kbdc_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto out_clock_cb() { return m_out_clock_cb.bind(); }
 	auto out_data_cb() { return m_out_data_cb.bind(); }

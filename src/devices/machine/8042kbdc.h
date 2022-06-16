@@ -37,7 +37,7 @@ public:
 	};
 
 	// construction/destruction
-	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void set_keyboard_type(kbdc8042_type_t keybtype) { m_keybtype = keybtype; }
 	void set_interrupt_type(kbdc8042_interrupt_type_t interrupttype) { m_interrupttype = interrupttype; }

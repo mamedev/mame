@@ -299,7 +299,7 @@ void kminus_state::kminus(machine_config &config)
 	rs232_port_device &rs232b(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set("dart", FUNC(z80dart_device::rxb_w));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(kminus_state::kbd_put));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

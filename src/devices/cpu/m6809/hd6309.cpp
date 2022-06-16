@@ -132,19 +132,19 @@ DEFINE_DEVICE_TYPE(HD6309E, hd6309e_device, "hd6309e", "Hitachi HD6309E")
 //  hd6309_device - constructor
 //-------------------------------------------------
 
-hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int divider) :
+hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, device_type type, int divider) :
 	m6809_base_device(mconfig, tag, owner, clock, type, divider),
 	m_md(0),
 	m_temp_im(0)
 {
 }
 
-hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	hd6309_device(mconfig, tag, owner, clock, HD6309, 4)
 {
 }
 
-hd6309e_device::hd6309e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+hd6309e_device::hd6309e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	hd6309_device(mconfig, tag, owner, clock, HD6309E, 1)
 {
 }

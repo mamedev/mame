@@ -516,7 +516,7 @@ void mc68340_timer_module_device::tout_clear()
 	}
 }
 
-mc68340_timer_module_device::mc68340_timer_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68340_timer_module_device::mc68340_timer_module_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
   : device_t(mconfig, MC68340_TIMER_MODULE, tag, owner, clock)
   , m_tout_out_cb(*this)
   , m_tin_in_cb(*this)

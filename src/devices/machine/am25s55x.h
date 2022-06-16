@@ -22,7 +22,7 @@ class am25s55x_device : public device_t
 {
 public:
 	// construction/destruction
-	am25s55x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	am25s55x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void x_w(uint8_t data);
 	void y_w(uint8_t data);
@@ -74,7 +74,7 @@ class am25s557_device : public am25s55x_device
 {
 public:
 	// construction/destruction
-	am25s557_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	am25s557_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual void xm_w(int state) override;
 	virtual void ym_w(int state) override;
@@ -97,7 +97,7 @@ class am25s558_device : public am25s55x_device
 {
 public:
 	// construction/destruction
-	am25s558_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	am25s558_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void rs_w(int state);
 	void ru_w(int state);

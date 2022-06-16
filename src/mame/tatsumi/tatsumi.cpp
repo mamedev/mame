@@ -886,7 +886,7 @@ void apache3_state::apache3(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_MACHINE_RESET_OVERRIDE(apache3_state, apache3)
 
-	m58990_device &adc(M58990(config, "adc", 1000000)); // unknown clock
+	m58990_device &adc(M58990(config, "adc", XTAL::u(1000000))); // unknown clock
 	adc.in_callback<0>().set_ioport("STICK_X");
 	adc.in_callback<1>().set_ioport("STICK_Y");
 	adc.in_callback<2>().set_constant(0); // VSP1

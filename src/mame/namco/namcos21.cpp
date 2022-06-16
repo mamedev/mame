@@ -630,7 +630,7 @@ void namcos21_state::c140_map(address_map &map)
 
 void namcos21_state::configure_c65_namcos21(machine_config &config)
 {
-	NAMCOC65(config, m_c65, 2048000);
+	NAMCOC65(config, m_c65, XTAL::u(2048000));
 	m_c65->in_pb_callback().set_ioport("MCUB");
 	m_c65->in_pc_callback().set_ioport("MCUC");
 	m_c65->in_ph_callback().set_ioport("MCUH");
@@ -895,7 +895,7 @@ void namcos21_state::winrun(machine_config &config)
 
 	configure_c65_namcos21(config);
 
-	NAMCOS21_DSP(config, m_namcos21_dsp, 0);
+	NAMCOS21_DSP(config, m_namcos21_dsp);
 	m_namcos21_dsp->set_renderer_tag("namcos21_3d");
 
 	m68000_device &gpu(M68000(config, "gpu", 49.152_MHz_XTAL / 4)); /* graphics coprocessor */
@@ -903,7 +903,7 @@ void namcos21_state::winrun(machine_config &config)
 
 	configure_c148_standard(config);
 	NAMCO_C148(config, m_gpu_intc, 0, "gpu", false);
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); /* 100 CPU slices per frame */
 
@@ -917,7 +917,7 @@ void namcos21_state::winrun(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, 0x10000/2);
 
-	NAMCOS21_3D(config, m_namcos21_3d, 0);
+	NAMCOS21_3D(config, m_namcos21_3d);
 	m_namcos21_3d->set_fixed_palbase(0x4000);
 	m_namcos21_3d->set_zz_shift_mult(10, 0x100);
 	m_namcos21_3d->set_depth_reverse(true);

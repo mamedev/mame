@@ -27,7 +27,7 @@
 
 DEFINE_DEVICE_TYPE(CDU75S, cdu75s_device, "cdu75s", "Sony/Apple CDU75S CD-R")
 
-cdu75s_device::cdu75s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cdu75s_device::cdu75s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CDU75S, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, "fas204")
 	, m_mcu(*this, "mcu")
@@ -61,7 +61,7 @@ void cdu75s_device::device_add_mconfig(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &cdu75s_device::mem_map);
 	m_mcu->set_addrmap(AS_IO, &cdu75s_device::io_map);
 
-	NCR53C94(config, m_scsi, 25'000'000); // FAS204, compatible
+	NCR53C94(config, m_scsi, XTAL::u(25'000'000)); // FAS204, compatible
 }
 
 ROM_START(cdu75s)

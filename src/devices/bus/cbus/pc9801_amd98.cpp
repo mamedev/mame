@@ -47,17 +47,17 @@ void pc9801_amd98_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	AY8910(config, m_ay1, 1'996'800);
+	AY8910(config, m_ay1, XTAL::u(1'996'800));
 	m_ay1->port_a_read_callback().set_ioport("OPN_PA1");
 	m_ay1->port_b_write_callback().set(FUNC(pc9801_amd98_device::ay3_address_w));
 	m_ay1->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 
-	AY8910(config, m_ay2, 1'996'800);
+	AY8910(config, m_ay2, XTAL::u(1'996'800));
 	m_ay2->port_a_read_callback().set_ioport("OPN_PA2");
 	m_ay2->port_b_write_callback().set(FUNC(pc9801_amd98_device::ay3_data_latch_w));
 	m_ay2->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	AY8910(config, m_ay3, 1'996'800);
+	AY8910(config, m_ay3, XTAL::u(1'996'800));
 	m_ay3->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_ay3->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 }
@@ -100,7 +100,7 @@ ioport_constructor pc9801_amd98_device::device_input_ports() const
 //  pc9801_amd98_device - constructor
 //-------------------------------------------------
 
-pc9801_amd98_device::pc9801_amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc9801_amd98_device::pc9801_amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PC9801_AMD98, tag, owner, clock)
 	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_ay1(*this, "ay1")

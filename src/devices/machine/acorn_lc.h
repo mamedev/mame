@@ -24,7 +24,7 @@ class acorn_lc_device : public device_t
 						//public device_video_interface
 {
 public:
-	acorn_lc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	acorn_lc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);

@@ -21,7 +21,7 @@ Connector pinout:
 
 DEFINE_DEVICE_TYPE(TV955_KEYBOARD, tv955kb_device, "tv955kb", "TeleVideo 955 Keyboard")
 
-tv955kb_device::tv955kb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tv955kb_device::tv955kb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TV955_KEYBOARD, tag, owner, clock)
 	, m_txd_cb(*this)
 	, m_reset_cb(*this)

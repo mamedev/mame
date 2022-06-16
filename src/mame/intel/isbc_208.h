@@ -13,13 +13,13 @@ class isbc_208_device : public device_t
 {
 public:
 	template <typename T>
-	isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: isbc_208_device(mconfig, tag, owner, clock)
+	isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: isbc_208_device(mconfig, tag, owner)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void map(address_map &map);
 	uint8_t stat_r(offs_t offset);

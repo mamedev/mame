@@ -757,7 +757,7 @@ void dwarfd_state::dwarfd(machine_config &config)
 	PALETTE(config, m_palette, FUNC(dwarfd_state::dwarfd_palette), 32);
 
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(1500000)));
 	aysnd.port_a_read_callback().set_ioport("IN2");
 	aysnd.port_b_read_callback().set_ioport("IN1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);

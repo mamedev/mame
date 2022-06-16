@@ -186,7 +186,7 @@ DEFINE_DEVICE_TYPE(APOLLO_KBD, apollo_kbd_device, "apollo_kbd", "Apollo Keyboard
 // apollo_kbd_device - constructor
 //-------------------------------------------------
 
-apollo_kbd_device::apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+apollo_kbd_device::apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, APOLLO_KBD, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_beep(*this, "beep")
@@ -206,7 +206,7 @@ void apollo_kbd_device::device_add_mconfig(machine_config &config)
 {
 	/* keyboard beeper */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beep, XTAL::u(1000)).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 //-------------------------------------------------
@@ -269,8 +269,8 @@ void apollo_kbd_device::device_reset()
 
 	// keyboard comms is at 8E1, 1200 baud
 	set_data_frame(1, 8, PARITY_EVEN, STOP_BITS_1);
-	set_rcv_rate(1200);
-	set_tra_rate(1200);
+	set_rcv_rate(XTAL::u(1200));
+	set_tra_rate(XTAL::u(1200));
 
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;

@@ -24,7 +24,7 @@ public:
 class thomson_extension_device : public device_t, public device_single_card_slot_interface<thomson_extension_interface>
 {
 public:
-	thomson_extension_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	thomson_extension_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~thomson_extension_device() = default;
 
 	void rom_map(address_space_installer &space, offs_t start, offs_t end);

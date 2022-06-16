@@ -17,7 +17,7 @@ class rtc65271_device : public device_t,
 {
 public:
 	// construction/destruction
-	rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto interrupt_cb() { return m_interrupt_cb.bind(); }
 

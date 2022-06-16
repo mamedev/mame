@@ -79,7 +79,7 @@ void ncd_ppc_state::explorapro_map(address_map &map)
 void ncd_ppc_state::explorapro(machine_config &config)
 {
 	/* basic machine hardware */
-	PPC403GA(config, m_maincpu, 50000000);
+	PPC403GA(config, m_maincpu, XTAL::u(50000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_ppc_state::explorapro_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

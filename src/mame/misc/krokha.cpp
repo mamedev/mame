@@ -134,7 +134,7 @@ uint32_t krokha_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void krokha_state::krokha(machine_config &config)
 {
-	I8080(config, m_maincpu, 2000000);
+	I8080(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &krokha_state::krokha_mem);
 	m_maincpu->out_status_func().set(FUNC(krokha_state::status_callback));
 

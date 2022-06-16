@@ -146,7 +146,7 @@ void easy_karaoke_state::arm_map(address_map &map)
 
 void easy_karaoke_state::easy_karaoke_base(machine_config &config)
 {
-	ARM9(config, m_maincpu, 72000000); // ARM 720 core
+	ARM9(config, m_maincpu, XTAL::u(72000000)); // ARM 720 core
 	m_maincpu->set_addrmap(AS_PROGRAM, &easy_karaoke_state::arm_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

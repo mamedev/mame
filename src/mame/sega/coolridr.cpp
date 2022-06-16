@@ -3241,7 +3241,7 @@ void coolridr_state::coolridr(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	sega_315_5649_device &io(SEGA_315_5649(config, "io"));
 	io.out_pb_callback().set(FUNC(coolridr_state::lamps_w));
 	io.in_pc_callback().set_ioport("IN0");
 	io.in_pd_callback().set_ioport("P1");

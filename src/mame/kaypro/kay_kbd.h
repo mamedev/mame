@@ -15,7 +15,7 @@ public:
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
-			std::uint32_t clock = 0);
+			const XTAL &clock = XTAL());
 
 	auto rxd_cb() { return m_rxd_cb.bind(); }
 

@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(AQUARIUS_SC1, aquarius_sc1_device, "aquarius_sc1", "Aquarius 
 //  aquarius_sc1_device - constructor
 //-------------------------------------------------
 
-aquarius_sc1_device::aquarius_sc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+aquarius_sc1_device::aquarius_sc1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AQUARIUS_SC1, tag, owner, clock)
 	, device_aquarius_cartridge_interface(mconfig, *this)
 	, m_bank(0)

@@ -12,14 +12,14 @@ class m20_8086_device :  public device_t
 public:
 	template <typename T, typename U, typename V>
 	m20_8086_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&maincpu_tag, U &&pic_tag, V &&ram_tag)
-		: m20_8086_device(mconfig, tag, owner, (uint32_t)0)
+		: m20_8086_device(mconfig, tag, owner)
 	{
 		m_maincpu.set_tag(std::forward<T>(maincpu_tag));
 		m_pic.set_tag(std::forward<U>(pic_tag));
 		m_ram.set_tag(std::forward<V>(ram_tag));
 	}
 
-	m20_8086_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m20_8086_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t z8000_io_r(offs_t offset, uint16_t mem_mask = ~0);
 	void z8000_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

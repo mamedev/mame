@@ -42,32 +42,32 @@ DEFINE_DEVICE_TYPE(NES_TF9IN1,  nes_tf9_device,     "nes_tetrisfam", "NES Cart R
 DEFINE_DEVICE_TYPE(NES_3DBLOCK, nes_3dblock_device, "nes_3dblock",   "NES Cart RCM 3D Block PCB")
 
 
-nes_gs2015_device::nes_gs2015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_gs2015_device::nes_gs2015_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_GS2015, tag, owner, clock)
 {
 }
 
-nes_gs2004_device::nes_gs2004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int bank)
+nes_gs2004_device::nes_gs2004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int bank)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_base(bank * 0x2000)
 {
 }
 
-nes_gs2004_device::nes_gs2004_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_gs2004_device::nes_gs2004_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_gs2004_device(mconfig, NES_GS2004, tag, owner, clock, 0x20)
 {
 }
 
-nes_gs2013_device::nes_gs2013_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_gs2013_device::nes_gs2013_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_gs2004_device(mconfig, NES_GS2013, tag, owner, clock, 0x1f)
 {
 }
 
-nes_tf9_device::nes_tf9_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_tf9_device::nes_tf9_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_TF9IN1, tag, owner, clock)
 {
 }
 
-nes_3dblock_device::nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_3dblock_device::nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_3DBLOCK, tag, owner, clock)
 {
 }

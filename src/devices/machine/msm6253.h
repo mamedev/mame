@@ -35,7 +35,7 @@ public:
 	typedef device_delegate<ioport_value ()> port_read_delegate;
 
 	// construction/destruction
-	msm6253_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msm6253_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	template <unsigned P> void set_input_tag(const char *tag) { m_analog_ports[P].set_tag(tag); }

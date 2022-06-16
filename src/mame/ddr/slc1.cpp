@@ -212,7 +212,7 @@ INPUT_PORTS_END
 void slc1_state::slc1(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2500000);
+	Z80(config, m_maincpu, XTAL::u(2500000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &slc1_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &slc1_state::io_map);
 

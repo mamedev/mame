@@ -35,7 +35,7 @@ class pioneer_pr7820_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	pioneer_pr7820_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pioneer_pr7820_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// input/output
 	uint8_t data_available_r() { return CLEAR_LINE; }
@@ -58,7 +58,7 @@ class philips_22vp932_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	philips_22vp932_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	philips_22vp932_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// input/output
 	uint8_t data_r() { return 0; }

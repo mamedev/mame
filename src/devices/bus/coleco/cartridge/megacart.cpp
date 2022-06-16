@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(COLECOVISION_MEGACART, colecovision_megacart_cartridge_device
 //  colecovision_megacart_cartridge_device - constructor
 //-------------------------------------------------
 
-colecovision_megacart_cartridge_device::colecovision_megacart_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+colecovision_megacart_cartridge_device::colecovision_megacart_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COLECOVISION_MEGACART, tag, owner, clock),
 	device_colecovision_cartridge_interface(mconfig, *this),
 	m_bankcount(0),

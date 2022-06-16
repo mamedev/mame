@@ -206,7 +206,7 @@ ioport_constructor saturn_keybd_device::device_input_ports() const
 //  saturn_keybd_device - constructor
 //-------------------------------------------------
 
-saturn_keybd_device::saturn_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+saturn_keybd_device::saturn_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SATURN_KEYBD, tag, owner, clock),
 	device_saturn_control_port_interface(mconfig, *this),
 	m_key(*this, "KEY.%u", 0),

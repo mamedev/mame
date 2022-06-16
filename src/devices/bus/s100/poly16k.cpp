@@ -26,7 +26,7 @@ class poly_16k_ram_device : public device_t, public device_s100_card_interface
 {
 public:
 	// construction/destruction
-	poly_16k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	poly_16k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-specific overrides
@@ -82,7 +82,7 @@ INPUT_PORTS_END
 //  poly_16k_ram_device - constructor
 //-------------------------------------------------
 
-poly_16k_ram_device::poly_16k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+poly_16k_ram_device::poly_16k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S100_POLY_16K, tag, owner, clock)
 	, device_s100_card_interface(mconfig, *this)
 	, m_dsw(*this, "DSW")

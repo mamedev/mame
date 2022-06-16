@@ -232,7 +232,7 @@ uint32_t s3c2440_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 DEFINE_DEVICE_TYPE(S3C2440, s3c2440_device, "s3c2440", "Samsung S3C2440 SoC")
 
-s3c2440_device::s3c2440_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s3c2440_device::s3c2440_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S3C2440, tag, owner, clock)
 	, m_cpu(*this, ":maincpu")
 	, m_palette(*this, finder_base::DUMMY_TAG)

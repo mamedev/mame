@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "atapihle.h"
 
-atapi_hle_device::atapi_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+atapi_hle_device::atapi_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: ata_hle_device(mconfig, type, tag, owner, clock),
 	m_packet(0),
 	m_data_size(0)

@@ -574,7 +574,7 @@ private:
 	bool m_accel_present = false;
 	bool m_accel_temp_slowdown = false;
 	int m_accel_stage = 0;
-	u32 m_accel_speed = 0;
+	XTAL m_accel_speed = XTAL();
 	u8 m_accel_slotspk = 0, m_accel_gsxsettings = 0, m_accel_percent = 0;
 
 	void accel_full_speed()
@@ -597,7 +597,7 @@ private:
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(1021800);
+			m_maincpu->set_unscaled_clock(XTAL::u(1021800));
 		}
 	}
 
@@ -621,7 +621,7 @@ private:
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(1021800);
+			m_maincpu->set_unscaled_clock(XTAL::u(1021800));
 		}
 	}
 
@@ -1646,7 +1646,7 @@ void apple2gs_state::machine_reset()
 		static const int speeds[4] = { 7000000, 8000000, 12000000, 16000000 };
 		m_accel_present = true;
 		int idxSpeed = (m_sysconfig->read() >> 1);
-		m_accel_speed = speeds[idxSpeed];
+		m_accel_speed = XTAL::u(speeds[idxSpeed]);
 		m_accel_fast = true;
 		accel_full_speed();
 	}
@@ -4833,10 +4833,10 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
 	m_maincpu->set_dasm_override(FUNC(apple2gs_state::dasm_trampoline));
 	m_maincpu->wdm_handler().set(FUNC(apple2gs_state::wdm_trampoline));
-	TIMER(config, m_scantimer, 0);
+	TIMER(config, m_scantimer);
 	m_scantimer->configure_scanline(FUNC(apple2gs_state::apple2_interrupt), "screen", 0, 1);
 
-	TIMER(config, m_acceltimer, 0).configure_generic(FUNC(apple2gs_state::accel_timer));
+	TIMER(config, m_acceltimer).configure_generic(FUNC(apple2gs_state::accel_timer));
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -4858,7 +4858,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 #if !RUN_ADB_MICRO
 	/* keyboard controller */
-	AY3600(config, m_ay3600, 0);
+	AY3600(config, m_ay3600);
 	m_ay3600->x0().set_ioport("X0");
 	m_ay3600->x1().set_ioport("X1");
 	m_ay3600->x2().set_ioport("X2");
@@ -4920,7 +4920,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	/* serial */
 	SCC85C30(config, m_scc, A2GS_14M / 2);
-	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
+	m_scc->configure_channels(XTAL::u(3'686'400), XTAL::u(3'686'400), XTAL::u(3'686'400), XTAL::u(3'686'400));
 	m_scc->out_int_callback().set(FUNC(apple2gs_state::scc_irq_w));
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
@@ -4936,7 +4936,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	/* slot devices */
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2gs_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2gs_state::a2bus_nmi_w));

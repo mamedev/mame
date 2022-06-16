@@ -19,7 +19,7 @@ class astrocade_lightpen_device : public device_t,
 {
 public:
 	// construction/destruction
-	astrocade_lightpen_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
+	astrocade_lightpen_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~astrocade_lightpen_device();
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger);

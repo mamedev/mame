@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(DVK_KGD, dvk_kgd_device, "kgd", "DVK KGD framebuffer")
 //  dvk_kgd_device - constructor
 //-------------------------------------------------
 
-dvk_kgd_device::dvk_kgd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dvk_kgd_device::dvk_kgd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DVK_KGD, tag, owner, clock)
 	, device_qbus_card_interface(mconfig, *this)
 	, m_screen(*this, "screen")

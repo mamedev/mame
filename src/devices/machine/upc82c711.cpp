@@ -22,7 +22,7 @@
 DEFINE_DEVICE_TYPE(UPC82C711, upc82c711_device, "upc82c711", "Universal Peripheral Controller 82C711")
 
 
-upc82c711_device::upc82c711_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upc82c711_device::upc82c711_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UPC82C711, tag, owner, clock)
 	, m_ide(*this, "ide")
 	, m_fdc(*this, "fdc")

@@ -31,7 +31,7 @@ std::unique_ptr<util::disasm_interface> f2mc16_device::create_disassembler()
 	return std::make_unique<f2mc16_disassembler>();
 }
 
-f2mc16_device::f2mc16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+f2mc16_device::f2mc16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_program(nullptr)
@@ -43,7 +43,7 @@ f2mc16_device::f2mc16_device(const machine_config &mconfig, device_type type, co
 	m_prefix_valid = false;
 }
 
-f2mc16_device::f2mc16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+f2mc16_device::f2mc16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: f2mc16_device(mconfig, F2MC16, tag, owner, clock)
 {
 }

@@ -65,7 +65,7 @@ static constexpr u8 Z180_ASEXT1_MASK       = 0x1f;
 //  z180asci_channel_base
 //**************************************************************************
 
-z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int id, const bool ext)
+z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const int id, const bool ext)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_rcv_clock(nullptr)
 	, m_tra_clock(nullptr)
@@ -580,12 +580,12 @@ void z180asci_channel_base::output_rts(int rts)
 //  z180asci_channel_0
 //**************************************************************************
 
-z180asci_channel_0::z180asci_channel_0(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool ext)
+z180asci_channel_0::z180asci_channel_0(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const bool ext)
 	: z180asci_channel_base(mconfig, type, tag, owner, clock, 0, ext)
 {
 }
 
-z180asci_channel_0::z180asci_channel_0(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z180asci_channel_0::z180asci_channel_0(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z180asci_channel_0(mconfig, Z180ASCI_CHANNEL_0, tag, owner, clock, false)
 {
 }
@@ -629,12 +629,12 @@ void z180asci_channel_0::asext_w(uint8_t data)
 //  z180asci_channel_1
 //**************************************************************************
 
-z180asci_channel_1::z180asci_channel_1(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool ext)
+z180asci_channel_1::z180asci_channel_1(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const bool ext)
 	: z180asci_channel_base(mconfig, type, tag, owner, clock, 1, ext)
 {
 }
 
-z180asci_channel_1::z180asci_channel_1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z180asci_channel_1::z180asci_channel_1(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z180asci_channel_1(mconfig, Z180ASCI_CHANNEL_1, tag, owner, clock, false)
 {
 }
@@ -677,7 +677,7 @@ void z180asci_channel_1::asext_w(uint8_t data)
 //  z180asci_ext_channel_0
 //**************************************************************************
 
-z180asci_ext_channel_0::z180asci_ext_channel_0(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z180asci_ext_channel_0::z180asci_ext_channel_0(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z180asci_channel_0(mconfig, Z180ASCI_EXT_CHANNEL_0, tag, owner, clock, true)
 {
 }
@@ -686,7 +686,7 @@ z180asci_ext_channel_0::z180asci_ext_channel_0(const machine_config &mconfig, co
 //  z180asci_channel_1
 //**************************************************************************
 
-z180asci_ext_channel_1::z180asci_ext_channel_1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z180asci_ext_channel_1::z180asci_ext_channel_1(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z180asci_channel_1(mconfig, Z180ASCI_EXT_CHANNEL_1, tag, owner, clock, true)
 {
 }

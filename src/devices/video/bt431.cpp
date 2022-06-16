@@ -21,7 +21,7 @@
 
 DEFINE_DEVICE_TYPE(BT431, bt431_device, "bt431", "Bt431 64x64 Pixel Cursor Generator")
 
-bt431_device::bt431_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+bt431_device::bt431_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BT431, tag, owner, clock)
 {
 }

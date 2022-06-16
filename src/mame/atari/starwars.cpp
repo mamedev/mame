@@ -292,14 +292,14 @@ void starwars_state::starwars(machine_config &config)
 	outlatch.q_out_cb<7>().set(FUNC(starwars_state::recall_w)); // NVRAM array recall
 
 	/* video hardware */
-	VECTOR(config, "vector", 0);
+	VECTOR(config, "vector");
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
 	screen.set_refresh_hz(CLOCK_3KHZ / 12 / 6);
 	screen.set_size(400, 300);
 	screen.set_visarea(0, 250, 0, 280);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	avg_device &avg(AVG_STARWARS(config, "avg", 0));
+	avg_device &avg(AVG_STARWARS(config, "avg"));
 	avg.set_vector("vector");
 	avg.set_memory(m_maincpu, AS_PROGRAM, 0x0000);
 
@@ -329,7 +329,7 @@ void starwars_state::esb(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &starwars_state::esb_main_map);
 
-	SLAPSTIC(config, m_slapstic, 101);
+	SLAPSTIC(config, m_slapstic, XTAL::u(101));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x8000, 0x9fff, 0);
 	m_slapstic->set_bank(m_slapstic_bank);
 

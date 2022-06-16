@@ -228,7 +228,7 @@ void et3400_state::et3400(machine_config &config)
 	config.set_default_layout(layout_et3400);
 
 	// Devices
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set(FUNC(et3400_state::pia_aw));
 	m_pia->writepb_handler().set(FUNC(et3400_state::pia_bw));
 	m_pia->readpa_handler().set(FUNC(et3400_state::pia_ar));

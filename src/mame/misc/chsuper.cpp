@@ -385,13 +385,13 @@ void chsuper_state::chsuper(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chsuper);
 	PALETTE(config, m_palette).set_entries(0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // ADV476KP50
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // ADV476KP50
 	ramdac.set_addrmap(0, &chsuper_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 74HC273 latch + R2R network (unknown values)
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // 74HC273 latch + R2R network (unknown values)
 }
 
 

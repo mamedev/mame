@@ -21,7 +21,7 @@ class i82355_device : public device_t
 {
 public:
 	// construction/destruction
-	i82355_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	i82355_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callback configuration
 	auto eint_callback() { return m_eint_callback.bind(); }

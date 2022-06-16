@@ -1767,7 +1767,7 @@ void snowbros_state::snowbros(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* 8 Mhz - confirmed */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snowbros_state::snowbros_map);
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(snowbros_state::snowbros_irq), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(snowbros_state::snowbros_irq), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	Z80(config, m_soundcpu, XTAL(12'000'000)/2); /* 6 MHz - confirmed */
@@ -1787,7 +1787,7 @@ void snowbros_state::snowbros(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_snowbros);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
+	KANEKO_PANDORA(config, m_pandora);
 	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
@@ -1808,7 +1808,7 @@ void snowbros_state::wintbob(machine_config &config)
 	snowbros(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(10000000); /* 10mhz - Confirmed */
+	m_maincpu->set_clock(XTAL::u(10000000)); /* 10mhz - Confirmed */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snowbros_state::wintbob_map);
 
 	config.device_remove("pandora");
@@ -1872,7 +1872,7 @@ void snowbros_state::honeydol(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); /* MC68000P12 @ 12MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snowbros_state::honeydol_map);
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(snowbros_state::snowbros_irq), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(snowbros_state::snowbros_irq), "screen", 0, 1);
 
 	Z80(config, m_soundcpu, XTAL(16'000'000)/4); /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &snowbros_state::honeydol_sound_map);
@@ -1909,7 +1909,7 @@ void snowbros_state::twinadv(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); /* 12MHz like Honey Doll ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snowbros_state::twinadv_map);
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(snowbros_state::snowbros_irq), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(snowbros_state::snowbros_irq), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	Z80(config, m_soundcpu, XTAL(16'000'000)/4); /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
@@ -1977,7 +1977,7 @@ void snowbros_state::finalttr(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.08);
 	ymsnd.add_route(1, "mono", 0.08);
 
-	m_oki->set_clock(999900);
+	m_oki->set_clock(XTAL::u(999900));
 	m_oki->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.4);
 }
 
@@ -1995,7 +1995,7 @@ void snowbros_state::snowbro3(machine_config &config) /* PCB has 16MHz & 12MHz O
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(12'000'000)); /* MC68000P10 CPU @ 12mhz or 8MHz (16MHz/2) ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snowbros_state::snowbros3_map);
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(snowbros_state::snowbros3_irq), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(snowbros_state::snowbros3_irq), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
@@ -2022,7 +2022,7 @@ void snowbros_state::yutnori(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &snowbros_state::yutnori_map);
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(snowbros_state::snowbros_irq), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(snowbros_state::snowbros_irq), "screen", 0, 1);
 
 //  WATCHDOG_TIMER(config, "watchdog"); // maybe
 
@@ -2039,7 +2039,7 @@ void snowbros_state::yutnori(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hyperpac);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256);
 
-	KANEKO_PANDORA(config, m_pandora, 0);
+	KANEKO_PANDORA(config, m_pandora);
 	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */

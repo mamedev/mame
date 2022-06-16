@@ -17,7 +17,7 @@ class mc8123_device : public z80_device
 {
 public:
 	// construction/destruction
-	mc8123_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mc8123_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// this function assumes a fixed portion of ROM at 0000-7FFF, and
 	// an arbitrary amount of banks at 8000-BFFF.

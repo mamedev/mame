@@ -246,7 +246,7 @@ eispc_keyboard_device::eispc_keyboard_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
-		uint32_t clock)
+		const XTAL &clock)
 	: device_t(mconfig, EISPC_KB, tag, owner, clock)
 	, m_mcu(*this, M6801_TAG)
 	, m_rows(*this, "P1%u", 0)

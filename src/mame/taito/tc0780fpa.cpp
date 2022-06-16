@@ -392,7 +392,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 
 DEFINE_DEVICE_TYPE(TC0780FPA, tc0780fpa_device, "tc0780fpa", "TC0780FPA Polygon Renderer")
 
-tc0780fpa_device::tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tc0780fpa_device::tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TC0780FPA, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 {

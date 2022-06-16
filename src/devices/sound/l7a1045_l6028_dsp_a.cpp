@@ -100,7 +100,7 @@ DEFINE_DEVICE_TYPE(L7A1045, l7a1045_sound_device, "l7a1045", "L7A1045 L6028 DSP-
 //  l7a1045_sound_device - constructor
 //-------------------------------------------------
 
-l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, L7A1045, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

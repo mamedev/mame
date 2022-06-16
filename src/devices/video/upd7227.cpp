@@ -37,7 +37,7 @@ void upd7227_device::upd7227_map(address_map &map)
 //  upd7227_device - constructor
 //-------------------------------------------------
 
-upd7227_device::upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+upd7227_device::upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UPD7227, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("videoram", ENDIANNESS_BIG, 8, 7, 0, address_map_constructor(FUNC(upd7227_device::upd7227_map), this))

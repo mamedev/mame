@@ -721,11 +721,11 @@ void fitfight_state::machine_reset()
 
 void fitfight_state::fitfight(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &fitfight_state::fitfight_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fitfight_state::irq2_line_hold));
 
-	upd78c10_device &audiocpu(UPD78C10(config, m_audiocpu, 12000000));
+	upd78c10_device &audiocpu(UPD78C10(config, m_audiocpu, XTAL::u(12000000)));
 	audiocpu.set_addrmap(AS_PROGRAM, &fitfight_state::snd_mem);
 	audiocpu.pa_in_cb().set(FUNC(fitfight_state::snd_porta_r));
 	audiocpu.pa_out_cb().set(FUNC(fitfight_state::snd_porta_w));
@@ -749,12 +749,12 @@ void fitfight_state::fitfight(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1333333, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0); // ~8080Hz ??? TODO: find out the real frequency
+	OKIM6295(config, "oki", XTAL::u(1333333), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0); // ~8080Hz ??? TODO: find out the real frequency
 }
 
 void fitfight_state::bbprot(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &fitfight_state::bbprot_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fitfight_state::irq2_line_hold));
 
@@ -772,7 +772,7 @@ void fitfight_state::bbprot(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1333333, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0); // ~8080Hz ??? TODO: find out the real frequency
+	OKIM6295(config, "oki", XTAL::u(1333333), okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0); // ~8080Hz ??? TODO: find out the real frequency
 }
 
 /***

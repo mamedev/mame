@@ -47,7 +47,7 @@ void device_astrocade_accessory_interface::interface_pre_start()
 //    Bally Astrocade accessory port
 //**************************************************************************
 
-astrocade_accessory_port_device::astrocade_accessory_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+astrocade_accessory_port_device::astrocade_accessory_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ASTROCADE_ACCESSORY_PORT, tag, owner, clock)
 	, device_single_card_slot_interface<device_astrocade_accessory_interface>(mconfig, *this)
 	, m_ltpen(0)

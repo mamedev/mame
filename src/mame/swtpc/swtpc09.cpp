@@ -462,7 +462,7 @@ void swtpc09_state::swtpc09_base(machine_config &config)
 	MC6809(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &swtpc09_state::mp09_mem);
 
-	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_endianness(ENDIANNESS_BIG);
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(20);
@@ -497,14 +497,14 @@ void swtpc09_state::swtpc09_base(machine_config &config)
 	io7.firq_cb().set("mainfirq", FUNC(input_merger_device::in_w<7>));
 
 	// IO8 at 0xe080 is used internally by the MPID board PIA.
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(swtpc09_state::pia0_a_r));
 	m_pia->ca1_w(0);
 	m_pia->irqa_handler().set(FUNC(swtpc09_state::pia0_irq_a));
 
 	// IO9 at 0xe090 is used internally by the MPID board 6840 timer.
-	PTM6840(config, m_ptm, 2000000);
-	m_ptm->set_external_clocks(50, 0, 50);
+	PTM6840(config, m_ptm, XTAL::u(2000000));
+	m_ptm->set_external_clocks(XTAL::u(50), XTAL()0, XTAL::u(50));
 	m_ptm->o1_callback().set(FUNC(swtpc09_state::ptm_o1_callback));
 	m_ptm->o3_callback().set(FUNC(swtpc09_state::ptm_o3_callback));
 	m_ptm->irq_callback().set(FUNC(swtpc09_state::ptm_irq));
@@ -569,7 +569,7 @@ void swtpc09_state::swtpc09(machine_config &config)
 	swtpc09_base(config);
 
 	// DMAF2
-	FD1797(config, m_fdc, 2000000);
+	FD1797(config, m_fdc, XTAL::u(2000000));
 	FLOPPY_CONNECTOR(config, "fdc:0", swtpc09_flex_floppies, "dd", swtpc09_state::floppy_flex_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", swtpc09_flex_floppies, "dd", swtpc09_state::floppy_flex_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", swtpc09_flex_floppies, "dd", swtpc09_state::floppy_flex_formats).enable_sound(true);
@@ -599,7 +599,7 @@ void swtpc09_state::swtpc09u(machine_config &config)
 	m_bankdev->set_addrmap(AS_PROGRAM, &swtpc09_state::uniflex_dmaf2_mem);
 
 	// DMAF2
-	FD1797(config, m_fdc, 2400000);
+	FD1797(config, m_fdc, XTAL::u(2400000));
 	FLOPPY_CONNECTOR(config, "fdc:0", swtpc09_uniflex_floppies, "8dsdd", swtpc09_state::floppy_uniflex_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", swtpc09_uniflex_floppies, "8dsdd", swtpc09_state::floppy_uniflex_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", swtpc09_uniflex_floppies, "8dsdd", swtpc09_state::floppy_uniflex_formats).enable_sound(true);
@@ -615,11 +615,11 @@ void swtpc09_state::swtpc09u(machine_config &config)
 void swtpc09_state::swtpc09d3(machine_config &config)
 {
 	swtpc09_base(config);
-	m_pia->set_clock(2000000);
+	m_pia->set_clock(XTAL::u(2000000));
 	m_bankdev->set_addrmap(AS_PROGRAM, &swtpc09_state::uniflex_dmaf3_mem);
 
 	// DMAF3
-	FD1797(config, m_fdc, 2400000);
+	FD1797(config, m_fdc, XTAL::u(2400000));
 	FLOPPY_CONNECTOR(config, "fdc:0", swtpc09_uniflex_floppies, "8dsdd", swtpc09_state::floppy_uniflex_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", swtpc09_uniflex_floppies, "8dsdd", swtpc09_state::floppy_uniflex_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", swtpc09_uniflex_floppies, "8dsdd", swtpc09_state::floppy_uniflex_formats).enable_sound(true);
@@ -633,10 +633,10 @@ void swtpc09_state::swtpc09d3(machine_config &config)
 	WD1000(config, m_hdc, 5_MHz_XTAL);
 	m_hdc->intrq_wr_callback().set(FUNC(swtpc09_state::dmaf3_hdc_intrq_w));
 	m_hdc->drq_wr_callback().set(FUNC(swtpc09_state::dmaf3_hdc_drq_w));
-	HARDDISK(config, "hdc:0", 0);
-	HARDDISK(config, "hdc:1", 0);
-	HARDDISK(config, "hdc:2", 0);
-	HARDDISK(config, "hdc:3", 0);
+	HARDDISK(config, "hdc:0");
+	HARDDISK(config, "hdc:1");
+	HARDDISK(config, "hdc:2");
+	HARDDISK(config, "hdc:3");
 
 	via6522_device &via(MOS6522(config, "via", 4_MHz_XTAL / 4));
 	via.readpa_handler().set(FUNC(swtpc09_state::dmaf3_via_read_porta));

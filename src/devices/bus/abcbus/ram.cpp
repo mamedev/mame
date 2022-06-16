@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(ABC80_16KB_RAM_CARD, abc80_16kb_ram_card_device, "abc80_16kb"
 //  abc80_16kb_ram_card_device - constructor
 //-------------------------------------------------
 
-abc80_16kb_ram_card_device::abc80_16kb_ram_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc80_16kb_ram_card_device::abc80_16kb_ram_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ABC80_16KB_RAM_CARD, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	m_ram(*this, "ram", 0x4000, ENDIANNESS_LITTLE)

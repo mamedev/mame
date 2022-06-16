@@ -15,7 +15,7 @@ public:
 		CI4
 	};
 
-	k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	/*
 	Note: k053251_w() automatically does a ALL_TILEMAPS->mark_all_dirty()

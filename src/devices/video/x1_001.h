@@ -12,8 +12,8 @@ typedef device_delegate<int (uint16_t code, uint8_t color)> gfxbank_cb_delegate;
 class x1_001_device : public device_t, public device_gfx_interface
 {
 public:
-	x1_001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template <typename T> x1_001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+	x1_001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
+	template <typename T> x1_001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: x1_001_device(mconfig, tag, owner, clock)
 	{
 		set_info(gfxinfo);

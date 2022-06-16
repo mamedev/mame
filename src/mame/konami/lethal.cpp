@@ -515,18 +515,18 @@ void lethal_state::lethalen(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
 	m_palette->enable_shadows();
 
-	K056832(config, m_k056832, 0);
+	K056832(config, m_k056832);
 	m_k056832->set_tile_callback(FUNC(lethal_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_8LE, 1, 0);
 	m_k056832->set_palette(m_palette);
 
-	K053244(config, m_k053244, 0);
+	K053244(config, m_k053244);
 	m_k053244->set_palette(m_palette);
 	m_k053244->set_bpp(6);
 	m_k053244->set_offsets(95, 0);
 	m_k053244->set_sprite_callback(FUNC(lethal_state::sprite_callback));
 
-	K054000(config, "k054000", 0);
+	K054000(config, "k054000");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

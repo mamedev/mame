@@ -256,7 +256,7 @@ void bingoct_device::device_add_mconfig(machine_config &config)
 //  bingoct_device - constructor
 //-------------------------------------------------
 
-bingoct_device::bingoct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bingoct_device::bingoct_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, BINGOCT, tag, owner, clock),
 	m_maincpu(*this, "maincpu"),
 	m_soundcpu(*this, "soundcpu"),

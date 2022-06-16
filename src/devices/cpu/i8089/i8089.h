@@ -11,19 +11,11 @@
 
 #pragma once
 
-#ifdef _MSC_VER
-// MSVC seems to want to actually instantiate templates when it gets an extern template declaration, effectively defeating the purpose of extern template declatations altogether
-// In this case it causes a problem because the required_device template can't be instantiated for the incomplete i8089_channel_device type
 #include "i8089_channel.h"
-#endif
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// forward declaration
-class i8089_channel_device;
 
 // ======================> i8089_device
 
@@ -33,7 +25,7 @@ class i8089_device : public cpu_device
 
 public:
 	// construction/destruction
-	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto sintr1() { return m_write_sintr1.bind(); }

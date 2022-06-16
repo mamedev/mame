@@ -119,20 +119,20 @@ ioport_constructor a2091_device::device_input_ports() const
 
 void dmac_hdc_device_base::wd33c93(device_t *device)
 {
-	device->set_clock(10000000);
+	device->set_clock(XTAL::u(10000000));
 	downcast<wd33c93a_device *>(device)->irq_cb().set(*this, FUNC(dmac_hdc_device_base::scsi_irq_w));
 	downcast<wd33c93a_device *>(device)->drq_cb().set(*this, FUNC(dmac_hdc_device_base::scsi_drq_w));
 }
 
 void dmac_hdc_device_base::device_add_mconfig(machine_config &config)
 {
-	amiga_dmac_device &dmac(AMIGA_DMAC(config, "dmac", 0));
+	amiga_dmac_device &dmac(AMIGA_DMAC(config, "dmac"));
 	dmac.scsi_read_handler().set(FUNC(dmac_hdc_device_base::dmac_scsi_r));
 	dmac.scsi_write_handler().set(FUNC(dmac_hdc_device_base::dmac_scsi_w));
 	dmac.int_handler().set(FUNC(dmac_hdc_device_base::dmac_int_w));
 	dmac.cfgout_handler().set(FUNC(dmac_hdc_device_base::dmac_cfgout_w));
 
-	NSCSI_BUS(config, "scsi", 0);
+	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr, false);
@@ -214,7 +214,7 @@ const tiny_rom_entry *dmac_hdc_device_base::device_rom_region() const
 //  dmac_hdc_device_base - constructor
 //-------------------------------------------------
 
-dmac_hdc_device_base::dmac_hdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dmac_hdc_device_base::dmac_hdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_int6(false),
 	m_dmac(*this, "dmac"),
@@ -222,7 +222,7 @@ dmac_hdc_device_base::dmac_hdc_device_base(const machine_config &mconfig, device
 {
 }
 
-a590_device::a590_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a590_device::a590_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dmac_hdc_device_base(mconfig, ZORRO_A590, tag, owner, clock),
 	device_exp_card_interface(mconfig, *this),
 	m_dips(*this, "dips"),
@@ -232,7 +232,7 @@ a590_device::a590_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-a2091_device::a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2091_device::a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dmac_hdc_device_base(mconfig, ZORRO_A2091, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_jp1(*this, "jp1"),

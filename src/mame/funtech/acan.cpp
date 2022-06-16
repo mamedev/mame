@@ -17,7 +17,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(ACANSND, acan_sound_device, "acansound", "Super A'Can Audio")
 
-acan_sound_device::acan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acan_sound_device::acan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACANSND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
@@ -34,7 +34,7 @@ acan_sound_device::acan_sound_device(const machine_config &mconfig, const char *
 void acan_sound_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, clock() / 16 / 5);
-	m_mix = std::make_unique<int32_t[]>((clock() / 16 / 5) * 2);
+	m_mix = std::make_unique<int32_t[]>((clock().value() / 16 / 5) * 2);
 	m_timer = timer_alloc(FUNC(acan_sound_device::channel_irq), this);
 
 	m_timer_irq_handler.resolve_safe();

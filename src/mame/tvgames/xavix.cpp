@@ -1309,7 +1309,7 @@ void xavix_state::xavix(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "lowbus").set_map(&xavix_state::xavix_lowbus_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
-	XAVIX_ADC(config, m_adc, 0);
+	XAVIX_ADC(config, m_adc);
 	m_adc->read_0_callback().set(FUNC(xavix_state::adc0_r));
 	m_adc->read_1_callback().set(FUNC(xavix_state::adc1_r));
 	m_adc->read_2_callback().set(FUNC(xavix_state::adc2_r));
@@ -1319,13 +1319,13 @@ void xavix_state::xavix(machine_config &config)
 	m_adc->read_6_callback().set(FUNC(xavix_state::adc6_r));
 	m_adc->read_7_callback().set(FUNC(xavix_state::adc7_r));
 
-	XAVIX_ANPORT(config, m_anport, 0);
+	XAVIX_ANPORT(config, m_anport);
 	m_anport->read_0_callback().set(FUNC(xavix_state::anport0_r));
 	m_anport->read_1_callback().set(FUNC(xavix_state::anport1_r));
 	m_anport->read_2_callback().set(FUNC(xavix_state::anport2_r));
 	m_anport->read_3_callback().set(FUNC(xavix_state::anport3_r));
 
-	XAVIX_MATH(config, m_math, 0);
+	XAVIX_MATH(config, m_math);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1366,14 +1366,14 @@ void xavix_i2c_state::xavix_i2c_24c02(machine_config &config)
 {
 	xavix(config);
 
-	I2C_24C02(config, "i2cmem", 0);
+	I2C_24C02(config, "i2cmem");
 }
 
 void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 {
 	xavix(config);
 
-	I2C_24C04(config, "i2cmem", 0); // 24LC04 on Nostalgia games, 24C04 on others
+	I2C_24C04(config, "i2cmem"); // 24LC04 on Nostalgia games, 24C04 on others
 }
 
 void xavix_i2c_ltv_tam_state::xavix_i2c_24lc04_tam(machine_config &config)
@@ -1390,7 +1390,7 @@ void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
 {
 	xavix(config);
 
-	I2C_24C08(config, "i2cmem", 0);
+	I2C_24C08(config, "i2cmem");
 }
 
 void xavix_state::xavixp(machine_config &config)
@@ -1419,7 +1419,7 @@ void xavix_mtrk_state::xavix_mtrk(machine_config &config)
 {
 	xavix(config);
 
-	XAVIX_MTRK_WHEEL(config, m_wheel, 0);
+	XAVIX_MTRK_WHEEL(config, m_wheel);
 	m_wheel->event_out_cb().set(FUNC(xavix_state::ioevent_trg08));
 }
 
@@ -1434,7 +1434,7 @@ void xavix_madfb_state::xavix_madfb(machine_config &config)
 {
 	xavix(config);
 
-	XAVIX_MADFB_BALL(config, m_ball, 0);
+	XAVIX_MADFB_BALL(config, m_ball);
 	m_ball->event_out_cb().set(FUNC(xavix_state::ioevent_trg01));
 }
 
@@ -1450,7 +1450,7 @@ void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 {
 	xavix_cart(config);
 
-	I2C_24C02(config, "i2cmem", 0); // 24LC02
+	I2C_24C02(config, "i2cmem"); // 24LC02
 
 	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
@@ -1462,7 +1462,7 @@ void xavix_i2c_cart_state::xavix_i2c_jpopira(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	I2C_24C02(config, "i2cmem", 0); // 24LC02
+	I2C_24C02(config, "i2cmem"); // 24LC02
 
 	SOFTWARE_LIST(config, "cart_list_jpopira_jp").set_original("jpopira_jp"); // NOTE, these are for Jumping Popira only, they don't work with the karaoke or regular popira units
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");

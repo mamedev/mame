@@ -32,7 +32,7 @@
 
 DEFINE_DEVICE_TYPE(UTS_400_KEYBOARD, uts_400_keyboard_device, "uts_400kbd", "UTS 400-Format Keyboard (F3621-04-000)")
 
-uts_400_keyboard_device::uts_400_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+uts_400_keyboard_device::uts_400_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, UTS_400_KEYBOARD, tag, owner, clock)
 	, device_uts_keyboard_interface(mconfig, *this)
 	, m_keys(*this, "KEY%X", 0U)

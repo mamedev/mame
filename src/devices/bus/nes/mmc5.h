@@ -17,7 +17,7 @@ class nes_exrom_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~nes_exrom_device();
 
 	virtual uint8_t read_l(offs_t offset) override;

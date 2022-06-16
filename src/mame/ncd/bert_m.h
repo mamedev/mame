@@ -12,7 +12,7 @@ public:
 	// configuration
 	template <typename T> void set_memory(T &&tag, int spacenum) { m_memory_space.set_tag(std::forward<T>(tag), spacenum); }
 
-	bert_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	bert_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void map(address_map &map);
 	void set_qlc_mode(bool state);

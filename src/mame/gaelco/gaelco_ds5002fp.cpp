@@ -20,7 +20,7 @@ void gaelco_ds5002fp_device::dallas_ram(address_map &map)
 	map(0x10000, 0x17fff).ram().share("sram"); // yes, the games access it as data and use it for temporary storage!!
 }
 
-gaelco_ds5002fp_device::gaelco_ds5002fp_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+gaelco_ds5002fp_device::gaelco_ds5002fp_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, GAELCO_DS5002FP, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_hostmem_config({ "hostmem", ENDIANNESS_BIG, 8, 16, 0 })

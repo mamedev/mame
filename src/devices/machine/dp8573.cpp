@@ -20,7 +20,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(DP8573, dp8573_device, "dp8573", "DP8573 Real-Time Clock")
 
-dp8573_device::dp8573_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dp8573_device::dp8573_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DP8573, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_intr_cb(*this)

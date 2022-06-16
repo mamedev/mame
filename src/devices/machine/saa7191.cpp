@@ -26,7 +26,7 @@
 
 DEFINE_DEVICE_TYPE(SAA7191, saa7191_device, "saa7191", "Philips SAA7191 DMSD")
 
-saa7191_device::saa7191_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+saa7191_device::saa7191_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SAA7191, tag, owner, clock)
 	, m_chr_in(*this)
 	, m_cvbs_in(*this)

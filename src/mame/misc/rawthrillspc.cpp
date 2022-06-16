@@ -74,7 +74,7 @@ void rawthrillspc_state::machine_reset()
 void rawthrillspc_state::rawthrillspc(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM4(config, m_maincpu, 120000000); // Actually an Athlon 64 X2
+	PENTIUM4(config, m_maincpu, XTAL::u(120000000)); // Actually an Athlon 64 X2
 	m_maincpu->set_addrmap(AS_PROGRAM, &rawthrillspc_state::rawthrillspc_map);
 
 	// Video hardware

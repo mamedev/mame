@@ -140,7 +140,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(TEK410X_KEYBOARD, tek410x_keyboard_device, "tek410x_kbd", "Tektronix 410X Standard Keyboard (119-1592-01)")
 
-tek410x_keyboard_device::tek410x_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+tek410x_keyboard_device::tek410x_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TEK410X_KEYBOARD, tag, owner, clock)
 	, m_mcu(*this, "mcu")
 	, m_key_matrix(*this, "X%u", 0U)

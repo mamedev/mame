@@ -121,7 +121,7 @@ uint32_t macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 
 void macpci_state::pippin(machine_config &config)
 {
 	/* basic machine hardware */
-	PPC603(config, m_maincpu, 66000000);
+	PPC603(config, m_maincpu, XTAL::u(66000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpci_state::pippin_mem);
 
 	/* video hardware */
@@ -143,7 +143,7 @@ void macpci_state::pippin(machine_config &config)
 	cdda.add_route(0, "lspeaker", 1.00);
 	cdda.add_route(1, "rspeaker", 1.00);
 
-	cdrom_image_device &cdrom(CDROM(config, "cdrom", 0));
+	cdrom_image_device &cdrom(CDROM(config, "cdrom"));
 	cdrom.set_interface("pippin_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("pippin");
 
@@ -160,7 +160,7 @@ void macpci_state::pippin(machine_config &config)
 
 	//scc8530_t &scc(SCC8530(config, "scc", C7M));
 	//scc.intrq_callback().set(FUNC(macpci_state::set_scc_interrupt));
-	CUDA(config, m_cuda, 0);
+	CUDA(config, m_cuda);
 	m_cuda->set_type(CUDA_341S0060);
 	m_cuda->reset_callback().set(FUNC(macpci_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(FUNC(macpci_state::cuda_adb_linechange_w));
@@ -168,7 +168,7 @@ void macpci_state::pippin(machine_config &config)
 	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
 	config.set_perfect_quantum(m_maincpu);
 
-	mn1880_device &cdmcu(MN1880(config, "cdmcu", 8388608)); // type and clock unknown
+	mn1880_device &cdmcu(MN1880(config, "cdmcu", XTAL::u(8388608))); // type and clock unknown
 	cdmcu.set_addrmap(AS_PROGRAM, &macpci_state::cdmcu_mem);
 	cdmcu.set_addrmap(AS_DATA, &macpci_state::cdmcu_data);
 }

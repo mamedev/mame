@@ -49,7 +49,7 @@ DEFINE_DEVICE_TYPE(K051649, k051649_device, "k051649", "K051649 SCC1")
 //  k051649_device - constructor
 //-------------------------------------------------
 
-k051649_device::k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+k051649_device::k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K051649, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)

@@ -215,13 +215,13 @@ void superchs_state::superchs(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
+	adc0809_device &adc(ADC0809(config, "adc", XTAL::u(500000))); // unknown clock
 	adc.eoc_ff_callback().set_inputline("maincpu", 3);
 	adc.in_callback<0>().set_ioport("WHEEL");
 	adc.in_callback<1>().set_ioport("ACCEL");
 	adc.in_callback<2>().set(FUNC(superchs_state::volume_r));
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_1_callback().set_ioport("COINS");
 	tc0510nio.read_2_callback().set_ioport("SWITCHES");
 	tc0510nio.read_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
@@ -243,7 +243,7 @@ void superchs_state::superchs(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superchs);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x20, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, 0);
@@ -252,7 +252,7 @@ void superchs_state::superchs(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "lspeaker", 1.0);
 	taito_en.add_route(1, "rspeaker", 1.0);
 }

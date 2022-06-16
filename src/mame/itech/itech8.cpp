@@ -514,8 +514,8 @@
 
 #define FULL_LOGGING    0
 
-#define CLOCK_8MHz      (8000000)
-#define CLOCK_12MHz     (12000000)
+#define CLOCK_8MHz      XTAL::u(8000000)
+#define CLOCK_12MHz     XTAL::u(12000000)
 
 
 
@@ -1716,14 +1716,14 @@ void itech8_state::itech8_core_devices(machine_config &config)
 	m_screen->set_size(512, 263);
 	m_screen->screen_vblank().set(FUNC(itech8_state::generate_nmi));
 
-	TMS34061(config, m_tms34061, 0);
+	TMS34061(config, m_tms34061);
 	m_tms34061->set_rowshift(8);  /* VRAM address is (row << rowshift) | col */
 	m_tms34061->set_vram_size(itech8_state::VRAM_SIZE);
 	m_tms34061->int_callback().set(FUNC(itech8_state::generate_tms34061_interrupt));      /* interrupt gen callback */
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch, 0);
+	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, M6809_IRQ_LINE);
 
 	via6522_device &via(MOS6522(config, "via6522_0", CLOCK_8MHz/4));
@@ -1783,7 +1783,7 @@ void itech8_state::itech8_sound_ym3812(machine_config &config)
 	MC6809(config, m_soundcpu, CLOCK_8MHz);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech8_state::sound3812_map);
 
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.readpb_handler().set("ticket", FUNC(ticket_dispenser_device::line_r));
 	pia.writepa_handler().set(FUNC(itech8_state::pia_porta_out));
 	pia.writepb_handler().set(FUNC(itech8_state::pia_portb_out));

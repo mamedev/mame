@@ -37,7 +37,7 @@ void vp595_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	CDP1863(config, m_pfg, 0);
+	CDP1863(config, m_pfg);
 	m_pfg->set_clock2(CDP1863_XTAL);
 	m_pfg->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -52,7 +52,7 @@ void vp595_device::device_add_mconfig(machine_config &config)
 //  vp595_device - constructor
 //-------------------------------------------------
 
-vp595_device::vp595_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vp595_device::vp595_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VP595, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_pfg(*this, CDP1863_TAG)

@@ -55,7 +55,7 @@ class vic10_expansion_slot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	vic10_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
+	vic10_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock, T &&opts, char const *dflt)
 		: vic10_expansion_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -63,7 +63,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_callback() { return m_write_irq.bind(); }
 	auto res_callback() { return m_write_res.bind(); }

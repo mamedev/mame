@@ -128,7 +128,7 @@ INPUT_PORTS_END
 class apollo_config_device : public device_t
 {
 public:
-	apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -139,7 +139,7 @@ private:
 
 DEFINE_DEVICE_TYPE(APOLLO_CONF, apollo_config_device, "apollo_config", "Apollo Configuration")
 
-apollo_config_device::apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+apollo_config_device::apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, APOLLO_CONF, tag, owner, clock)
 {
 }
@@ -700,7 +700,7 @@ WRITE_LINE_MEMBER(apollo_state::apollo_rtc_irq_function)
 #undef VERBOSE
 #define VERBOSE 0
 
-apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	duart_base_device(mconfig, APOLLO_SIO, tag, owner, clock),
 	m_csrb(0)
 {
@@ -847,7 +847,7 @@ DEFINE_DEVICE_TYPE(APOLLO_NI, apollo_ni, "node_id", "Apollo Node ID")
 //  apollo_ni - constructor
 //-------------------------------------------------
 
-apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, APOLLO_NI, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_wdc(*this, ":isa1:wdc")
@@ -1055,7 +1055,7 @@ static void apollo_isa_cards(device_slot_interface &device)
 void apollo_state::common(machine_config &config)
 {
 	// configuration MUST be reset first !
-	APOLLO_CONF(config, APOLLO_CONF_TAG, 0);
+	APOLLO_CONF(config, APOLLO_CONF_TAG);
 
 	AM9517A(config, m_dma8237_1, 14.318181_MHz_XTAL / 3);
 	m_dma8237_1->out_hreq_callback().set(FUNC(apollo_state::apollo_dma_1_hrq_changed));
@@ -1090,20 +1090,20 @@ void apollo_state::common(machine_config &config)
 	m_dma8237_2->out_dack_callback<2>().set(FUNC(apollo_state::pc_dack6_w));
 	m_dma8237_2->out_dack_callback<3>().set(FUNC(apollo_state::pc_dack7_w));
 
-	PIC8259(config, m_pic8259_master, 0);
+	PIC8259(config, m_pic8259_master);
 	m_pic8259_master->out_int_callback().set(FUNC(apollo_state::apollo_pic8259_master_set_int_line));
 	m_pic8259_master->in_sp_callback().set_constant(1);
 	m_pic8259_master->read_slave_ack_callback().set(FUNC(apollo_state::apollo_pic8259_get_slave_ack));
 
-	PIC8259(config, m_pic8259_slave, 0);
+	PIC8259(config, m_pic8259_slave);
 	m_pic8259_slave->out_int_callback().set(FUNC(apollo_state::apollo_pic8259_slave_set_int_line));
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
-	PTM6840(config, m_ptm, 0);
-	m_ptm->set_external_clocks(250000, 125000, 62500);
+	PTM6840(config, m_ptm);
+	m_ptm->set_external_clocks(XTAL::u(250000), XTAL::u(125000), XTAL::u(62500));
 	m_ptm->irq_callback().set(FUNC(apollo_state::apollo_ptm_irq_function));
 
-	clock_device &ptmclock(CLOCK(config, "ptmclock", 250000));
+	clock_device &ptmclock(CLOCK(config, "ptmclock", XTAL::u(250000)));
 	ptmclock.signal_handler().set(FUNC(apollo_state::apollo_ptm_timer_tick));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
@@ -1114,12 +1114,12 @@ void apollo_state::common(machine_config &config)
 	m_rtc->set_24hrs(false);
 	m_rtc->set_epoch(0);
 
-	APOLLO_NI(config, m_node_id, 0);
+	APOLLO_NI(config, m_node_id);
 
 	APOLLO_SIO(config, m_sio2, 3.6864_MHz_XTAL);
 	m_sio2->irq_cb().set(FUNC(apollo_state::sio2_irq_handler));
 
-	ISA16(config, m_isa, 0);
+	ISA16(config, m_isa);
 	m_isa->set_custom_spaces();
 	m_isa->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir1_w)); // in place of irq 2 on at irq 9 is used
 	m_isa->irq3_callback().set(m_pic8259_master, FUNC(pic8259_device::ir3_w));
@@ -1140,13 +1140,13 @@ void apollo_state::common(machine_config &config)
 	m_isa->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
 	m_isa->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
 
-	ISA16_SLOT(config, "isa1", 0, APOLLO_ISA_TAG, apollo_isa_cards, "wdc", false); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa2", 0, APOLLO_ISA_TAG, apollo_isa_cards, "ctape", false);
-	ISA16_SLOT(config, "isa3", 0, APOLLO_ISA_TAG, apollo_isa_cards, "3c505", false);
-	ISA16_SLOT(config, "isa4", 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
-	ISA16_SLOT(config, "isa6", 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
-	ISA16_SLOT(config, "isa7", 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", APOLLO_ISA_TAG, apollo_isa_cards, "wdc", false); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa2", APOLLO_ISA_TAG, apollo_isa_cards, "ctape", false);
+	ISA16_SLOT(config, "isa3", APOLLO_ISA_TAG, apollo_isa_cards, "3c505", false);
+	ISA16_SLOT(config, "isa4", APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa6", APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa7", APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
 
 	SOFTWARE_LIST(config, "ctape_list").set_original("apollo_ctape");
 }
@@ -1259,7 +1259,7 @@ DEFINE_DEVICE_TYPE(APOLLO_STDIO, apollo_stdio_device, "apollo_stdio", "Apollo ST
 // apollo_stdio_device - constructor
 //-------------------------------------------------
 
-apollo_stdio_device::apollo_stdio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+apollo_stdio_device::apollo_stdio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, APOLLO_STDIO, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_tx_w(*this)
@@ -1289,8 +1289,8 @@ void apollo_stdio_device::device_reset()
 
 	// comms is at 8N1, 9600 baud
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rcv_rate(9600);
-	set_tra_rate(9600);
+	set_rcv_rate(XTAL::u(9600));
+	set_tra_rate(XTAL::u(9600));
 
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;

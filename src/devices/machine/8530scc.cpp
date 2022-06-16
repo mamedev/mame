@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(SCC8530, scc8530_legacy_device, "scc8530l", "Zilog 8530 SCC (
     IMPLEMENTATION
 ***************************************************************************/
 
-scc8530_legacy_device::scc8530_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+scc8530_legacy_device::scc8530_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SCC8530, tag, owner, clock),
 	mode(0), reg(0), status(0), IRQV(0), MasterIRQEnable(0), lastIRQStat(0), IRQType(),
 	intrq_cb(*this)

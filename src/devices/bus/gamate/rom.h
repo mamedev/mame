@@ -15,7 +15,7 @@ class gamate_rom_plain_device : public device_t,
 {
 public:
 	// construction/destruction
-	gamate_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gamate_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) override;
@@ -24,7 +24,7 @@ public:
 	virtual void write_rom(offs_t offset, uint8_t data);
 
 protected:
-	gamate_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gamate_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -41,10 +41,10 @@ class gamate_rom_banked_device : public gamate_rom_plain_device
 {
 public:
 	// construction/destruction
-	gamate_rom_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gamate_rom_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	gamate_rom_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gamate_rom_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) override;
@@ -64,7 +64,7 @@ class gamate_rom_4in1_device : public gamate_rom_banked_device
 {
 public:
 	// construction/destruction
-	gamate_rom_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gamate_rom_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) override;

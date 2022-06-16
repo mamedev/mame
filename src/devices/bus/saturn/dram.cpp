@@ -19,18 +19,18 @@ DEFINE_DEVICE_TYPE(SATURN_DRAM_8MB,  saturn_dram8mb_device,  "sat_dram_8mb",  "S
 DEFINE_DEVICE_TYPE(SATURN_DRAM_32MB, saturn_dram32mb_device, "sat_dram_32mb", "Saturn Data RAM 32Mbit Cart")
 
 
-saturn_dram_device::saturn_dram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cart_type)
+saturn_dram_device::saturn_dram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int cart_type)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sat_cart_interface(mconfig, *this, cart_type)
 {
 }
 
-saturn_dram8mb_device::saturn_dram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+saturn_dram8mb_device::saturn_dram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: saturn_dram_device(mconfig, SATURN_DRAM_8MB, tag, owner, clock, 0x5a)
 {
 }
 
-saturn_dram32mb_device::saturn_dram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+saturn_dram32mb_device::saturn_dram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: saturn_dram_device(mconfig, SATURN_DRAM_32MB, tag, owner, clock, 0x5c)
 {
 }

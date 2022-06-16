@@ -248,7 +248,7 @@ template <bool SCC> void rtpc_state::iocc_pio_map(address_map &map)
 	}
 
 	// delay 1µs per byte written
-	map(0x00'80e0, 0x00'80e3).lw8([this](u8 data) { m_cpu->eat_cycles(m_cpu->clock() / 1000000 + 1); }, "io_delay");
+	map(0x00'80e0, 0x00'80e3).lw8([this](u8 data) { m_cpu->eat_cycles(m_cpu->clock().value() / 1000000 + 1); }, "io_delay");
 
 	map(0x00'8400, 0x00'8403).mirror(0x7c).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x00'8400, 0x00'8401).mirror(0x78).w(FUNC(rtpc_state::kls_cmd_w));
@@ -466,7 +466,7 @@ void rtpc_state::dia_w(u8 data)
 
 void rtpc_state::common(machine_config &config)
 {
-	ROMP(config, m_cpu, 23'529'400 / 4);
+	ROMP(config, m_cpu, XTAL(23'529'400) / 4);
 	m_cpu->set_mmu(m_mmu);
 	m_cpu->set_iou(m_iocc);
 
@@ -515,14 +515,14 @@ void rtpc_state::common(machine_config &config)
 
 	TIMER(config, "mcu_timer").configure_periodic(FUNC(rtpc_state::mcu_timer), attotime::from_hz(32768));
 
-	RTPC_IOCC(config, m_iocc, 0);
+	RTPC_IOCC(config, m_iocc);
 	m_iocc->set_addrmap(0, &rtpc_state::iocc_mem_map);
 	m_iocc->out_int().set(reqi2, FUNC(input_merger_device::in_w<1>));
 	m_iocc->out_rst().set_inputline(m_dma[0], INPUT_LINE_RESET);
 	m_iocc->out_rst().append_inputline(m_dma[1], INPUT_LINE_RESET);
 
 	// ISA bus
-	ISA16(config, m_isa, 14'318'180 / 3);
+	ISA16(config, m_isa, XTAL::u(14'318'180) / 3);
 	m_isa->set_memspace(m_iocc, AS_PROGRAM);
 	m_isa->set_iospace(m_iocc, AS_IO);
 	//m_isa->iochck_callback().set(FUNC(at_mb_device::iochck_w));
@@ -702,8 +702,8 @@ void rtpc_state::ibm6150(machine_config &config)
 	common(config);
 	m_iocc->set_addrmap(2, &rtpc_state::iocc_pio_map<true>);
 
-	SCC8530N(config, m_scc, 3'580'000);
-	m_scc->configure_channels(3'072'000, 3'072'000, 3'072'000, 3'072'000);
+	SCC8530N(config, m_scc, XTAL::u(3'580'000));
+	m_scc->configure_channels(XTAL::u(3'072'000), XTAL::u(3'072'000), XTAL::u(3'072'000), XTAL::u(3'072'000));
 	m_scc->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir6_w));
 
 	// port: TXD, DTR, RTS, RI, RXD, DSR, CTS, DCD
@@ -727,14 +727,14 @@ void rtpc_state::ibm6150(machine_config &config)
 	m_scc->out_txdb_callback().set(port1, FUNC(rs232_port_device::write_txd));
 
 	// ISA slots
-	ISA16_SLOT(config, "isa1", 0, m_isa, rtpc_isa16_cards, "fdc",   false); // slot 1: disk/diskette adapter
-	ISA16_SLOT(config, "isa2", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
-	ISA8_SLOT(config,  "isa3", 0, m_isa, rtpc_isa8_cards,  "mda",   false); // slot 3: option
-	ISA16_SLOT(config, "isa4", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 4: option
-	ISA16_SLOT(config, "isa5", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 5: option
-	ISA8_SLOT(config,  "isa6", 0, m_isa, rtpc_isa8_cards,  nullptr, false); // slot 6: option
-	ISA16_SLOT(config, "isa7", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 7: option
-	ISA16_SLOT(config, "isa8", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 8: coprocessor/option
+	ISA16_SLOT(config, "isa1", m_isa, rtpc_isa16_cards, "fdc",   false); // slot 1: disk/diskette adapter
+	ISA16_SLOT(config, "isa2", m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
+	ISA8_SLOT(config,  "isa3", m_isa, rtpc_isa8_cards,  "mda",   false); // slot 3: option
+	ISA16_SLOT(config, "isa4", m_isa, rtpc_isa16_cards, nullptr, false); // slot 4: option
+	ISA16_SLOT(config, "isa5", m_isa, rtpc_isa16_cards, nullptr, false); // slot 5: option
+	ISA8_SLOT(config,  "isa6", m_isa, rtpc_isa8_cards,  nullptr, false); // slot 6: option
+	ISA16_SLOT(config, "isa7", m_isa, rtpc_isa16_cards, nullptr, false); // slot 7: option
+	ISA16_SLOT(config, "isa8", m_isa, rtpc_isa16_cards, nullptr, false); // slot 8: coprocessor/option
 }
 
 void rtpc_state::ibm6151(machine_config &config)
@@ -743,12 +743,12 @@ void rtpc_state::ibm6151(machine_config &config)
 	m_iocc->set_addrmap(2, &rtpc_state::iocc_pio_map<false>);
 
 	// ISA slots
-	ISA8_SLOT(config,  "isa1", 0, m_isa, rtpc_isa8_cards,  "mda",   false); // slot 1: option
-	ISA16_SLOT(config, "isa2", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
-	ISA16_SLOT(config, "isa3", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
-	ISA16_SLOT(config, "isa4", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 4: option
-	ISA16_SLOT(config, "isa5", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 5: coprocessor/option
-	ISA16_SLOT(config, "isa6", 0, m_isa, rtpc_isa16_cards, "fdc",   false); // slot 6: disk/diskette adapter
+	ISA8_SLOT(config,  "isa1", m_isa, rtpc_isa8_cards,  "mda",   false); // slot 1: option
+	ISA16_SLOT(config, "isa2", m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
+	ISA16_SLOT(config, "isa3", m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
+	ISA16_SLOT(config, "isa4", m_isa, rtpc_isa16_cards, nullptr, false); // slot 4: option
+	ISA16_SLOT(config, "isa5", m_isa, rtpc_isa16_cards, nullptr, false); // slot 5: coprocessor/option
+	ISA16_SLOT(config, "isa6", m_isa, rtpc_isa16_cards, "fdc",   false); // slot 6: disk/diskette adapter
 }
 
 ROM_START(ibm6150)

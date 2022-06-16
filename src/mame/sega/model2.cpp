@@ -2497,11 +2497,11 @@ void model2_state::model2_scsp(machine_config &config)
 	m_scsp->add_route(0, "lspeaker", 1.0);
 	m_scsp->add_route(1, "rspeaker", 1.0);
 
-	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
+	I8251(config, m_uart, XTAL::u(8000000)); // uPD71051C, clock unknown
 //  m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
 //  m_uart->txrdy_handler().set(FUNC(model2_state::sound_ready_w));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(500000))); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 }
@@ -2509,18 +2509,18 @@ void model2_state::model2_scsp(machine_config &config)
 /* original Model 2 */
 void model2o_state::model2o(machine_config &config)
 {
-	I960(config, m_maincpu, 25000000);
+	I960(config, m_maincpu, XTAL::u(25000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2o_state::model2o_mem);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
-	MB86234(config, m_copro_tgp, 16000000);
+	MB86234(config, m_copro_tgp, XTAL::u(16000000));
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2o_state::copro_tgp_prog_map);
 	m_copro_tgp->set_addrmap(AS_DATA, &model2o_state::copro_tgp_data_map);
 	m_copro_tgp->set_addrmap(AS_IO, &model2o_state::copro_tgp_io_map);
 	m_copro_tgp->set_addrmap(mb86233_device::AS_RF, &model2o_state::copro_tgp_rf_map);
 
-	ADDRESS_MAP_BANK(config, m_copro_tgp_bank, 0);
+	ADDRESS_MAP_BANK(config, m_copro_tgp_bank);
 	m_copro_tgp_bank->set_addrmap(0, &model2o_state::copro_tgp_bank_map);
 	m_copro_tgp_bank->set_endianness(ENDIANNESS_LITTLE);
 	m_copro_tgp_bank->set_data_width(32);
@@ -2528,8 +2528,8 @@ void model2o_state::model2o(machine_config &config)
 	m_copro_tgp_bank->set_shift(-2);
 	m_copro_tgp_bank->set_stride(0x10000);
 
-	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
-	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
+	GENERIC_FIFO_U32(config, m_copro_fifo_in);
+	GENERIC_FIFO_U32(config, m_copro_fifo_out);
 
 	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
@@ -2537,26 +2537,26 @@ void model2o_state::model2o(machine_config &config)
 	model2_screen(config);
 
 	// create SEGA_MODEL1IO device *after* SCREEN device
-	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
+	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard"));
 	ioboard.set_default_bios_tag("epr14869c");
 	ioboard.read_callback().set("dpram", FUNC(mb8421_device::left_r));
 	ioboard.write_callback().set("dpram", FUNC(mb8421_device::left_w));
 	ioboard.in_callback<0>().set_ioport("IN0");
 	ioboard.in_callback<1>().set_ioport("IN1");
 
-	MB8421(config, "dpram", 0);
+	MB8421(config, "dpram");
 
-	SEGAM1AUDIO(config, m_m1audio, 0);
+	SEGAM1AUDIO(config, m_m1audio);
 	m_m1audio->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
-	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
+	I8251(config, m_uart, XTAL::u(8000000)); // uPD71051C, clock unknown
 	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(500000))); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	M2COMM(config, "m2comm", 0);
+	M2COMM(config, "m2comm");
 }
 
 u8 model2_state::driveio_portg_r()
@@ -2597,14 +2597,14 @@ void model2_state::sj25_0207_01(machine_config &config)
 	m_drivecpu->set_addrmap(AS_IO, &model2_state::drive_io_map);
 	m_drivecpu->set_vblank_int("screen", FUNC(model2_state::irq0_line_hold));
 
-	sega_315_5296_device &driveio1(SEGA_315_5296(config, "driveio1", 0)); // unknown clock
+	sega_315_5296_device &driveio1(SEGA_315_5296(config, "driveio1")); // unknown clock
 	driveio1.out_pd_callback().set(FUNC(model2_state::driveio_port_w));
 	driveio1.in_pg_callback().set(FUNC(model2_state::driveio_portg_r));
 	driveio1.in_ph_callback().set(FUNC(model2_state::driveio_porth_r));
 
-	SEGA_315_5296(config, "driveio2", 0); // unknown clock
+	SEGA_315_5296(config, "driveio2"); // unknown clock
 
-	MSM6253(config, "driveadc", 0);
+	MSM6253(config, "driveadc");
 }
 
 void model2o_state::daytona(machine_config &config)
@@ -2668,17 +2668,17 @@ void model2o_state::vcop(machine_config &config)
 /* 2A-CRX */
 void model2a_state::model2a(machine_config &config)
 {
-	I960(config, m_maincpu, 25000000);
+	I960(config, m_maincpu, XTAL::u(25000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
-	MB86234(config, m_copro_tgp, 16000000);
+	MB86234(config, m_copro_tgp, XTAL::u(16000000));
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2a_state::copro_tgp_prog_map);
 	m_copro_tgp->set_addrmap(AS_DATA, &model2a_state::copro_tgp_data_map);
 	m_copro_tgp->set_addrmap(AS_IO, &model2a_state::copro_tgp_io_map);
 	m_copro_tgp->set_addrmap(mb86233_device::AS_RF, &model2a_state::copro_tgp_rf_map);
 
-	ADDRESS_MAP_BANK(config, m_copro_tgp_bank, 0);
+	ADDRESS_MAP_BANK(config, m_copro_tgp_bank);
 	m_copro_tgp_bank->set_addrmap(0, &model2a_state::copro_tgp_bank_map);
 	m_copro_tgp_bank->set_endianness(ENDIANNESS_LITTLE);
 	m_copro_tgp_bank->set_data_width(32);
@@ -2686,13 +2686,13 @@ void model2a_state::model2a(machine_config &config)
 	m_copro_tgp_bank->set_shift(-2);
 	m_copro_tgp_bank->set_stride(0x10000);
 
-	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
-	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
+	GENERIC_FIFO_U32(config, m_copro_fifo_in);
+	GENERIC_FIFO_U32(config, m_copro_fifo_out);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
-	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	sega_315_5649_device &io(SEGA_315_5649(config, "io"));
 	io.out_pa_callback().set(FUNC(model2a_state::eeprom_w));
 	io.in_pb_callback().set(FUNC(model2a_state::in0_r));
 	io.in_pc_callback().set_ioport("IN1");
@@ -2704,9 +2704,9 @@ void model2a_state::model2a(machine_config &config)
 	model2_screen(config);
 	model2_scsp(config);
 
-	M2COMM(config, "m2comm", 0);
+	M2COMM(config, "m2comm");
 
-	SEGA_BILLBOARD(config, m_billboard, 0);
+	SEGA_BILLBOARD(config, m_billboard);
 
 	config.set_default_layout(layout_segabill);
 }
@@ -2726,7 +2726,7 @@ void model2a_state::manxttdx(machine_config &config)
 {
 	manxtt(config);
 
-	SEGAM1AUDIO(config, m_m1audio, 0);
+	SEGAM1AUDIO(config, m_m1audio);
 	m_m1audio->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
 	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
@@ -2774,7 +2774,7 @@ void model2a_state::model2a_5881(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_5881_mem);
 
-	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
+	SEGA315_5881_CRYPT(config, m_cryptdevice);
 	m_cryptdevice->set_read_cb(FUNC(model2a_state::crypt_read_callback));
 }
 
@@ -2784,7 +2784,7 @@ void model2a_state::model2a_0229(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_0229_mem);
 
-	SEGA315_5838_COMP(config, m_0229crypt, 0);
+	SEGA315_5838_COMP(config, m_0229crypt);
 	m_0229crypt->set_addrmap(0, &model2a_state::sega_0229_map);
 }
 
@@ -2796,28 +2796,28 @@ void model2a_state::zeroguna(machine_config &config)
 /* 2B-CRX */
 void model2b_state::model2b(machine_config &config)
 {
-	I960(config, m_maincpu, 25000000);
+	I960(config, m_maincpu, XTAL::u(25000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_crx_mem);
 
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
-	ADSP21062(config, m_copro_adsp, 40000000);
+	ADSP21062(config, m_copro_adsp, XTAL::u(40000000));
 	m_copro_adsp->set_boot_mode(adsp21062_device::BOOT_MODE_HOST);
 	m_copro_adsp->set_addrmap(AS_DATA, &model2b_state::copro_sharc_map);
 
-	//ADSP21062(config, m_dsp2, 40000000);
+	//ADSP21062(config, m_dsp2, XTAL::u(40000000));
 	//m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_HOST);
 	//m_dsp2->set_addrmap(AS_DATA, &model2b_state::geo_sharc_map);
 
 	config.set_maximum_quantum(attotime::from_hz(18000));
 
-	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
-	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
+	GENERIC_FIFO_U32(config, m_copro_fifo_in);
+	GENERIC_FIFO_U32(config, m_copro_fifo_out);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
-	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	sega_315_5649_device &io(SEGA_315_5649(config, "io"));
 	io.out_pa_callback().set(FUNC(model2b_state::eeprom_w));
 	io.in_pb_callback().set(FUNC(model2b_state::in0_r));
 	io.in_pc_callback().set_ioport("IN1");
@@ -2829,9 +2829,9 @@ void model2b_state::model2b(machine_config &config)
 	model2_screen(config);
 	model2_scsp(config);
 
-	M2COMM(config, "m2comm", 0);
+	M2COMM(config, "m2comm");
 
-	SEGA_BILLBOARD(config, m_billboard, 0);
+	SEGA_BILLBOARD(config, m_billboard);
 
 	config.set_default_layout(layout_segabill);
 }
@@ -2842,7 +2842,7 @@ void model2b_state::model2b_5881(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_5881_mem);
 
-	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
+	SEGA315_5881_CRYPT(config, m_cryptdevice);
 	m_cryptdevice->set_read_cb(FUNC(model2b_state::crypt_read_callback));
 }
 
@@ -2852,7 +2852,7 @@ void model2b_state::model2b_0229(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_0229_mem);
 
-	SEGA315_5838_COMP(config, m_0229crypt, 0);
+	SEGA315_5838_COMP(config, m_0229crypt);
 	m_0229crypt->set_addrmap(0, &model2b_state::sega_0229_map);
 }
 
@@ -2908,7 +2908,7 @@ void model2b_state::rchase2(machine_config &config)
 {
 	model2b(config);
 
-	z80_device &iocpu(Z80(config, "iocpu", 4000000));
+	z80_device &iocpu(Z80(config, "iocpu", XTAL::u(4000000)));
 	iocpu.set_addrmap(AS_PROGRAM, &model2b_state::rchase2_iocpu_map);
 	iocpu.set_addrmap(AS_IO, &model2b_state::rchase2_ioport_map);
 
@@ -2951,23 +2951,23 @@ void model2b_state::zerogun(machine_config &config)
 /* 2C-CRX */
 void model2c_state::model2c(machine_config &config)
 {
-	I960(config, m_maincpu, 25000000);
+	I960(config, m_maincpu, XTAL::u(25000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2c_state::model2c_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2c_state::model2c_interrupt), "screen", 0, 1);
 
-	MB86235(config, m_copro_tgpx4, 40000000);
+	MB86235(config, m_copro_tgpx4, XTAL::u(40000000));
 	m_copro_tgpx4->set_addrmap(AS_PROGRAM, &model2c_state::copro_tgpx4_map);
 	m_copro_tgpx4->set_addrmap(AS_DATA, &model2c_state::copro_tgpx4_data_map);
 	m_copro_tgpx4->set_fifoin_tag(m_copro_fifo_in);
 	m_copro_tgpx4->set_fifoout0_tag(m_copro_fifo_out);
 
-	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
-	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
+	GENERIC_FIFO_U32(config, m_copro_fifo_in);
+	GENERIC_FIFO_U32(config, m_copro_fifo_out);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
-	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	sega_315_5649_device &io(SEGA_315_5649(config, "io"));
 	io.out_pa_callback().set(FUNC(model2c_state::eeprom_w));
 	io.in_pb_callback().set(FUNC(model2c_state::in0_r));
 	io.in_pc_callback().set_ioport("IN1");
@@ -2978,7 +2978,7 @@ void model2c_state::model2c(machine_config &config)
 	model2_screen(config);
 	model2_scsp(config);
 
-	M2COMM(config, "m2comm", 0);
+	M2COMM(config, "m2comm");
 }
 
 void model2c_state::skisuprg(machine_config &config)
@@ -2999,7 +2999,7 @@ void model2c_state::stcc(machine_config &config)
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
 
-	DSBZ80(config, m_dsbz80, 0);
+	DSBZ80(config, m_dsbz80);
 	m_dsbz80->add_route(0, "lspeaker", 1.0);
 	m_dsbz80->add_route(1, "rspeaker", 1.0);
 
@@ -3043,7 +3043,7 @@ void model2c_state::model2c_5881(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2c_state::model2c_5881_mem);
 
-	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
+	SEGA315_5881_CRYPT(config, m_cryptdevice);
 	m_cryptdevice->set_read_cb(FUNC(model2c_state::crypt_read_callback));
 }
 

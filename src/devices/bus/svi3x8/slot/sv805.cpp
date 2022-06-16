@@ -44,7 +44,7 @@ void sv805_device::device_add_mconfig(machine_config &config)
 //  sv805_device - constructor
 //-------------------------------------------------
 
-sv805_device::sv805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sv805_device::sv805_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SV805, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this),
 	m_uart(*this, "uart"),

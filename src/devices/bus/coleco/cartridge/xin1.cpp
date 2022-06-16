@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(COLECOVISION_XIN1, colecovision_xin1_cartridge_device, "colec
 //  colecovision_xin1_cartridge_device - constructor
 //-------------------------------------------------
 
-colecovision_xin1_cartridge_device::colecovision_xin1_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+colecovision_xin1_cartridge_device::colecovision_xin1_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COLECOVISION_XIN1, tag, owner, clock),
 	device_colecovision_cartridge_interface(mconfig, *this),
 	m_current_offset(0)

@@ -125,14 +125,14 @@ void cbm_interpod_device::interpod_mem(address_map &map)
 
 void cbm_interpod_device::device_add_mconfig(machine_config &config)
 {
-	M6502(config, m_maincpu, 1000000);
+	M6502(config, m_maincpu, XTAL::u(1000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cbm_interpod_device::interpod_mem);
 
-	MOS6522(config, m_via, 1000000);
+	MOS6522(config, m_via, XTAL::u(1000000));
 
-	MOS6532_NEW(config, m_riot, 1000000);
+	MOS6532_NEW(config, m_riot, XTAL::u(1000000));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 
 	ieee488_device::add_cbm_devices(config, nullptr);
 
@@ -149,7 +149,7 @@ void cbm_interpod_device::device_add_mconfig(machine_config &config)
 //  cbm_interpod_device - constructor
 //-------------------------------------------------
 
-cbm_interpod_device::cbm_interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cbm_interpod_device::cbm_interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CBM_INTERPOD, tag, owner, clock),
 	device_cbm_iec_interface(mconfig, *this),
 	m_maincpu(*this, R6502_TAG),

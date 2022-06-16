@@ -435,7 +435,7 @@ void fuuki16_state::fuuki16(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fuuki16);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x4000 / 2);
 
-	FUUKI_VIDEO(config, m_fuukivid, 0);
+	FUUKI_VIDEO(config, m_fuukivid);
 	m_fuukivid->set_palette(m_palette);
 	m_fuukivid->set_color_base(0x400*2);
 	m_fuukivid->set_color_num(0x40);

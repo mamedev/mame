@@ -83,12 +83,12 @@ void mshark_device::mshark_io(address_map &map)
 void mshark_device::device_add_mconfig(machine_config &config)
 {
 	// basic machine hardware
-	I8085A(config, m_maincpu, 1000000);
+	I8085A(config, m_maincpu, XTAL::u(1000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mshark_device::mshark_mem);
 	m_maincpu->set_addrmap(AS_IO, &mshark_device::mshark_io);
 
 	// devices
-	HARDDISK(config, "harddisk1", 0);
+	HARDDISK(config, "harddisk1");
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 }
 
@@ -120,7 +120,7 @@ ioport_constructor mshark_device::device_input_ports() const
 //  mshark_device - constructor
 //-------------------------------------------------
 
-mshark_device::mshark_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mshark_device::mshark_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSHARK, tag, owner, clock)
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, I8085_TAG)

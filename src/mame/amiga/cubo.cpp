@@ -1077,9 +1077,9 @@ void cubo_state::cubo(machine_config &config)
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_copper->set_ecs_mode(true);
 
-	I2C_24C08(config, "i2cmem", 0); // AT24C08N
+	I2C_24C08(config, "i2cmem"); // AT24C08N
 
-	akiko_device &akiko(AKIKO(config, "akiko", 0));
+	akiko_device &akiko(AKIKO(config, "akiko"));
 	akiko.mem_r_callback().set(FUNC(amiga_state::chip_ram_r));
 	akiko.mem_w_callback().set(FUNC(amiga_state::chip_ram_w));
 	akiko.int_callback().set(FUNC(cubo_state::akiko_int_w));
@@ -1120,7 +1120,7 @@ void cubo_state::cubo(machine_config &config)
 	MOS8520(config, m_cia_1, amiga_state::CLK_E_PAL);
 	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 
-	MICROTOUCH(config, m_microtouch, 9600).stx().set(FUNC(cubo_state::rs232_rx_w));
+	MICROTOUCH(config, m_microtouch, XTAL::u(9600)).stx().set(FUNC(cubo_state::rs232_rx_w));
 
 	CDROM(config, "cd32_cdrom").set_interface("cd32_cdrom");
 

@@ -16,7 +16,7 @@ class i80186_cpu_device : public i8086_common_cpu_device
 {
 public:
 	// construction/destruction
-	i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto read_slave_ack_callback() { return m_read_slave_ack_func.bind(); }
 	auto chip_select_callback() { return m_out_chip_select_func.bind(); }
@@ -60,7 +60,7 @@ protected:
 		I80186_POLLSTS
 	};
 
-	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);
+	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int data_bus_size);
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks / 2); }
@@ -168,14 +168,14 @@ class i80188_cpu_device : public i80186_cpu_device
 {
 public:
 	// construction/destruction
-	i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class am186em_device : public i80186_cpu_device
 {
 public:
 	// construction/destruction
-	am186em_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	am186em_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_execute_interface overrides
@@ -187,7 +187,7 @@ class am188em_device : public i80186_cpu_device
 {
 public:
 	// construction/destruction
-	am188em_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	am188em_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_execute_interface overrides

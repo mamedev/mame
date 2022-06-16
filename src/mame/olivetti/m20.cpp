@@ -768,7 +768,7 @@ void m20_state::m20(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Devices */
-	FD1797(config, m_fd1797, 1000000);
+	FD1797(config, m_fd1797, XTAL::u(1000000));
 	m_fd1797->intrq_wr_callback().set(m_i8259, FUNC(pic8259_device::ir0_w));
 	FLOPPY_CONNECTOR(config, "fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats);
@@ -779,18 +779,18 @@ void m20_state::m20(machine_config &config)
 	crtc.set_char_width(16);
 	crtc.set_update_row_callback(FUNC(m20_state::update_row));
 
-	I8255A(config, m_i8255, 0);
+	I8255A(config, m_i8255);
 
-	I8251(config, m_kbdi8251, 0);
+	I8251(config, m_kbdi8251);
 	m_kbdi8251->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
 	m_kbdi8251->rxrdy_handler().set(m_i8259, FUNC(pic8259_device::ir4_w));
 
-	I8251(config, m_ttyi8251, 0);
+	I8251(config, m_ttyi8251);
 	m_ttyi8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_ttyi8251->rxrdy_handler().set(m_i8259, FUNC(pic8259_device::ir3_w));
 	m_ttyi8251->txrdy_handler().set(m_i8259, FUNC(pic8259_device::ir5_w));
 
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 	pit8253.set_clk<0>(1230782);
 	pit8253.out_handler<0>().set(FUNC(m20_state::tty_clock_tick_w));
 	pit8253.set_clk<1>(1230782);
@@ -798,7 +798,7 @@ void m20_state::m20(machine_config &config)
 	pit8253.set_clk<2>(1230782);
 	pit8253.out_handler<2>().set(FUNC(m20_state::timer_tick_w));
 
-	PIC8259(config, m_i8259, 0);
+	PIC8259(config, m_i8259);
 	m_i8259->out_int_callback().set(FUNC(m20_state::int_w));
 
 	rs232_port_device &kbd(RS232_PORT(config, "kbd", keyboard, "m20"));

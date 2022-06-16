@@ -36,7 +36,7 @@ this reason.
 
 #include "megadriv.h"
 
-#define MASTER_CLOCK        53693100
+#define MASTER_CLOCK        XTAL::u(53693100)
 
 #define MP_ROM  1
 #define MP_GAME 0

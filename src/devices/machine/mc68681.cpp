@@ -112,7 +112,7 @@ DEFINE_DEVICE_TYPE(DUART_CHANNEL, duart_channel, "duart_channel", "DUART channel
 //  LIVE DEVICE
 //**************************************************************************
 
-duart_base_device::duart_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+duart_base_device::duart_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
@@ -134,23 +134,23 @@ duart_base_device::duart_base_device(const machine_config &mconfig, device_type 
 {
 }
 
-scn2681_device::scn2681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scn2681_device::scn2681_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: duart_base_device(mconfig, SCN2681, tag, owner, clock)
 {
 }
 
-mc68681_device::mc68681_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mc68681_device::mc68681_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: duart_base_device(mconfig, type, tag, owner, clock),
 	m_read_vector(false)
 {
 }
 
-mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc68681_device(mconfig, MC68681, tag, owner, clock)
 {
 }
 
-sc28c94_device::sc28c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sc28c94_device::sc28c94_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: duart_base_device(mconfig, SC28C94, tag, owner, clock)
 {
 }
@@ -162,17 +162,17 @@ sc28c94_device::sc28c94_device(const machine_config &mconfig, const char *tag, d
 // that the code knows all of this and will not warn if those registers are accessed as it could be ported code.
 // TODO: A lot of subtle differences and also detect misuse of unavailable registers as they should be ignored
 //--------------------------------------------------------------------------------------------------------------------
-mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: duart_base_device(mconfig, type, tag, owner, clock)
 {
 }
 
-mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc68340_duart_device(mconfig, MC68340_DUART, tag, owner, clock)
 {
 }
 
-xr68c681_device::xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xr68c681_device::xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc68681_device(mconfig, XR68C681, tag, owner, clock),
 	m_XTXA(false),
 	m_XRXA(false),
@@ -277,22 +277,22 @@ void xr68c681_device::device_reset()
 
 void duart_base_device::device_add_mconfig(machine_config &config)
 {
-	DUART_CHANNEL(config, CHANA_TAG, 0);
-	DUART_CHANNEL(config, CHANB_TAG, 0);
+	DUART_CHANNEL(config, CHANA_TAG);
+	DUART_CHANNEL(config, CHANB_TAG);
 }
 
 void sc28c94_device::device_add_mconfig(machine_config &config)
 {
-	DUART_CHANNEL(config, CHANA_TAG, 0);
-	DUART_CHANNEL(config, CHANB_TAG, 0);
-	DUART_CHANNEL(config, CHANC_TAG, 0);
-	DUART_CHANNEL(config, CHAND_TAG, 0);
+	DUART_CHANNEL(config, CHANA_TAG);
+	DUART_CHANNEL(config, CHANB_TAG);
+	DUART_CHANNEL(config, CHANC_TAG);
+	DUART_CHANNEL(config, CHAND_TAG);
 }
 
 void mc68340_duart_device::device_add_mconfig(machine_config &config)
 {
-	DUART_CHANNEL(config, CHANA_TAG, 0);
-	DUART_CHANNEL(config, CHANB_TAG, 0);
+	DUART_CHANNEL(config, CHANA_TAG);
+	DUART_CHANNEL(config, CHANB_TAG);
 }
 
 void duart_base_device::update_interrupts()
@@ -1160,7 +1160,7 @@ void duart_base_device::set_ISR_bits(int mask)
 
 // DUART channel class stuff
 
-duart_channel::duart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+duart_channel::duart_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DUART_CHANNEL, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, MR1(0)

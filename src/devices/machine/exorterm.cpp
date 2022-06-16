@@ -27,7 +27,7 @@ TODO
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-exorterm155_device::exorterm155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+exorterm155_device::exorterm155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_maincpu(*this, "maincpu")
 	, m_irqs(*this, "irqs")
@@ -65,7 +65,7 @@ exorterm155_device::exorterm155_device(const machine_config &mconfig, device_typ
 {
 }
 
-exorterm155_device::exorterm155_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+exorterm155_device::exorterm155_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: exorterm155_device(mconfig, EXORTERM155, tag, owner, clock)
 {
 }
@@ -836,7 +836,7 @@ void exorterm155_device::device_add_mconfig(machine_config &config)
 
 	config.set_default_layout(layout_exorterm155);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set(FUNC(exorterm155_device::acia_txd_w));
 	m_acia->rts_handler().set(FUNC(exorterm155_device::acia_rts_w));
 	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
@@ -875,11 +875,11 @@ void exorterm155_device::device_add_mconfig(machine_config &config)
 	m_pia_disp->irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<6>));
 
 	// Derived from the horizontal blanking, 3.4ms.
-	CLOCK(config, m_sys_timer_clock, 4706 / 16);
+	CLOCK(config, m_sys_timer_clock, XTAL::u(4706) / 16);
 	m_sys_timer_clock->signal_handler().set(FUNC(exorterm155_device::sys_timer_w));
 
 	SPEAKER(config, "bell").front_center();
-	BEEP(config, m_beeper, 2000);
+	BEEP(config, m_beeper, XTAL::u(2000));
 	m_beeper->add_route(ALL_OUTPUTS, "bell", 0.25);
 }
 

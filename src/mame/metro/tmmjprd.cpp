@@ -736,7 +736,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
 
 void tmmjprd_state::tmpdoki(machine_config &config)
 {
-	M68EC020(config, m_maincpu, 24000000); /* 24 MHz */
+	M68EC020(config, m_maincpu, XTAL::u(24000000)); /* 24 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmmjprd_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(tmmjprd_state::scanline), "lscreen", 0, 1);
 

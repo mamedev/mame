@@ -205,7 +205,7 @@ void zerozone_state::zerozone(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

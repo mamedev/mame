@@ -27,7 +27,7 @@ void meg_base_device::offsets_map(address_map &map)
 	map(0, 0x7f).ram();
 }
 
-meg_base_device::meg_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u32 prg_size) :
+meg_base_device::meg_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 prg_size) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 64, prg_size > 256 ? 9 : 8, -3, address_map_constructor(FUNC(meg_base_device::prg_map), this)),
 	m_fp_config("fp", ENDIANNESS_BIG, 16, prg_size > 256 ? 9 : 8, -1, address_map_constructor(FUNC(meg_base_device::fp_map), this)),
@@ -168,12 +168,12 @@ std::unique_ptr<util::disasm_interface> meg_base_device::create_disassembler()
 	return std::make_unique<meg_disassembler>(this);
 }
 
-meg_embedded_device::meg_embedded_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+meg_embedded_device::meg_embedded_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	meg_base_device(mconfig, MEGEMB, tag, owner, clock, 384)
 {
 }
 
-meg_device::meg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+meg_device::meg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	meg_base_device(mconfig, MEG, tag, owner, clock, 256)
 {
 }

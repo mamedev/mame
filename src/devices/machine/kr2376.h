@@ -52,7 +52,7 @@ public:
 		KR2376_PO=7             /* PO    - Pin  7 - Parity Output */
 	};
 
-	kr2376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	kr2376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <unsigned N> auto x() { return m_read_x[N].bind(); }
 	auto shift() { return m_read_shift.bind(); }
@@ -101,7 +101,7 @@ private:
 class kr2376_st_device : public kr2376_device
 {
 public:
-	kr2376_st_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kr2376_st_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual uint8_t key_codes(int mode, int x, int y) override;
 };
@@ -109,7 +109,7 @@ protected:
 class kr2376_12_device : public kr2376_device
 {
 public:
-  kr2376_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+  kr2376_12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
   virtual uint8_t key_codes(int mode, int x, int y) override;
 };

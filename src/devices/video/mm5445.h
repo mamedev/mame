@@ -45,7 +45,7 @@
 class mm5445_device : public device_t
 {
 public:
-	mm5445_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	mm5445_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	auto output_cb() { return m_write_output.bind(); }
@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(data_w) { m_data = (state) ? 1 : 0; }
 
 protected:
-	mm5445_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 outpins);
+	mm5445_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 outpins);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -77,19 +77,19 @@ protected:
 class mm5446_device : public mm5445_device
 {
 public:
-	mm5446_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mm5446_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mm5447_device : public mm5445_device
 {
 public:
-	mm5447_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mm5447_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mm5448_device : public mm5445_device
 {
 public:
-	mm5448_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mm5448_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

@@ -53,7 +53,7 @@ INPUT_PORTS_END
 //  dragon_amtor_device - constructor
 //-------------------------------------------------
 
-dragon_amtor_device::dragon_amtor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dragon_amtor_device::dragon_amtor_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DRAGON_AMTOR, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_eprom(*this, "eprom")

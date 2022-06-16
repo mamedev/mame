@@ -139,7 +139,7 @@ inline void lmc1992_device::execute_command(int addr, int data)
 //  lmc1992_device - constructor
 //-------------------------------------------------
 
-lmc1992_device::lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lmc1992_device::lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LMC1992, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {

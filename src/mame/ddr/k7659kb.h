@@ -31,7 +31,7 @@ class k7659_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	k7659_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k7659_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t read();
 

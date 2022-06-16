@@ -34,7 +34,7 @@ inline void ATTR_PRINTF( 3, 4 ) zs01_device::verboselog( int n_level, const char
 // device type definition
 DEFINE_DEVICE_TYPE(ZS01, zs01_device, "zs01", "Konami ZS01 PIC")
 
-zs01_device::zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock ) :
+zs01_device::zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock ) :
 	device_t(mconfig, ZS01, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_ds2401(*this, finder_base::DUMMY_TAG),

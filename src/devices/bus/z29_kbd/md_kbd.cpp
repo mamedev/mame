@@ -29,7 +29,7 @@
 
 DEFINE_DEVICE_TYPE(MD_KEYBOARD, md_keyboard_device, "md_kbd", "Micro-Decision Keyboard")
 
-md_keyboard_device::md_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+md_keyboard_device::md_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MD_KEYBOARD, tag, owner, clock)
 	, device_z29_keyboard_interface(mconfig, *this)
 	, m_mcu(*this, "mcu")
@@ -262,7 +262,7 @@ void md_keyboard_device::device_add_mconfig(machine_config &config)
 	m_mcu->t1_in_cb().set(FUNC(md_keyboard_device::mcu_t1_r));
 
 	SPEAKER(config, "speaker").front_center();
-	BEEP(config, m_buzzer, 1'000'000'000 / PERIOD_OF_555_ASTABLE_NSEC(RES_R(510), RES_R(510), CAP_U(1)));
+	BEEP(config, m_buzzer, XTAL::u(1'000'000'000) / PERIOD_OF_555_ASTABLE_NSEC(RES_R(510), RES_R(510), CAP_U(1)));
 	m_buzzer->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 

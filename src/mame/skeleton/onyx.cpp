@@ -146,7 +146,7 @@ void onyx_state::c8002(machine_config &config)
 	subcpu.set_addrmap(AS_PROGRAM, &onyx_state::submem);
 	subcpu.set_addrmap(AS_IO, &onyx_state::subio);
 
-	clock_device &sio1_clock(CLOCK(config, "sio1_clock", 307200));
+	clock_device &sio1_clock(CLOCK(config, "sio1_clock", XTAL::u(307200)));
 	sio1_clock.signal_handler().set(m_sio[0], FUNC(z80sio_device::rxca_w));
 	sio1_clock.signal_handler().append(m_sio[0], FUNC(z80sio_device::txca_w));
 
@@ -176,7 +176,7 @@ void onyx_state::c8002(machine_config &config)
 	//z80pio_device& pio1s(Z80PIO(config, "pio1s", XTAL(16'000'000)/4));
 	//pio1s->out_int_callback().set_inputline("subcpu", INPUT_LINE_IRQ0);
 
-	clock_device &sio1s_clock(CLOCK(config, "sio1s_clock", 614400));
+	clock_device &sio1s_clock(CLOCK(config, "sio1s_clock", XTAL::u(614400)));
 	sio1s_clock.signal_handler().set("sio1s", FUNC(z80sio_device::rxtxcb_w));
 	//sio1s_clock.signal_handler().append("sio1s", FUNC(z80sio_device::txca_w));
 
@@ -253,7 +253,7 @@ void onyx_state::c5000(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &onyx_state::c5000_mem);
 	maincpu.set_addrmap(AS_IO, &onyx_state::c5000_io);
 
-	clock_device &sio1_clock(CLOCK(config, "sio1_clock", 614400));
+	clock_device &sio1_clock(CLOCK(config, "sio1_clock", XTAL::u(614400)));
 	sio1_clock.signal_handler().set(m_sio[0], FUNC(z80sio_device::rxtxcb_w));
 	//sio1_clock.signal_handler().append(m_sio[0], FUNC(z80sio_device::txca_w));
 

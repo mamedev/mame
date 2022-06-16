@@ -26,7 +26,7 @@ class adamnet_device : public device_t
 {
 public:
 	// construction/destruction
-	adamnet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adamnet_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void add_device(device_t *target);
 
@@ -76,7 +76,7 @@ public:
 	// construction/destruction
 	template <typename T, typename U>
 	adamnet_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus, U &&opts, char const *dflt)
-		: adamnet_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: adamnet_slot_device(mconfig, tag, owner)
 	{
 		set_bus(std::forward<T>(bus));
 		option_reset();
@@ -84,7 +84,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides

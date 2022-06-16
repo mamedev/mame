@@ -58,7 +58,7 @@ public:
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t lineattr, uint8_t lten, uint8_t rvv, uint8_t vsp, uint8_t gpa, uint8_t hlgt)> draw_character_delegate;
 
 	// construction/destruction
-	i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_character_width(int value) { m_hpixels_per_column = value; }
 	void set_refresh_hack(bool hack) { m_refresh_hack = hack; }
@@ -80,7 +80,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	i8275_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	i8275_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -212,7 +212,7 @@ class i8276_device : public i8275_device
 {
 public:
 	// construction/destruction
-	i8276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8276_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

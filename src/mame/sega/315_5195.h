@@ -30,14 +30,14 @@ public:
 
 	// construction/destruction
 	template <typename T>
-	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag)
+	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag)
 		: sega_315_5195_mapper_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 		m_cpuregion.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	template <typename... T> void set_mapper(T &&... args) { m_mapper.set(std::forward<T>(args)...); }

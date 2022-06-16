@@ -66,37 +66,37 @@ void scsicd512_device::ReadData(uint8_t *data, int dataLength)
 	}
 }
 
-scsicd512_device::scsicd512_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+scsicd512_device::scsicd512_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	scsicd_device(mconfig, type, tag, owner, clock)
 {
 }
 
-dec_rrd45_device::dec_rrd45_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dec_rrd45_device::dec_rrd45_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	scsicd512_device(mconfig, RRD45, tag, owner, "DEC     ", "RRD45   (C) DEC ", "0436", 0x98)
 {
 }
 
-toshiba_xm3301_device::toshiba_xm3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+toshiba_xm3301_device::toshiba_xm3301_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	scsicd512_device(mconfig, XM3301, tag, owner, "TOSHIBA ", "CD-ROM XM-3301TA", "0272", 0x88)
 {
 }
 
-toshiba_xm5301_sun_device::toshiba_xm5301_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+toshiba_xm5301_sun_device::toshiba_xm5301_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	scsicd512_device(mconfig, XM5301SUN, tag, owner, "TOSHIBA ", "XM-5301TASUN4XCD", "2915", 0x98)
 {
 }
 
-toshiba_xm5401_sun_device::toshiba_xm5401_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+toshiba_xm5401_sun_device::toshiba_xm5401_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	scsicd512_device(mconfig, XM5401SUN, tag, owner, "TOSHIBA ", "XM-5401TASUN4XCD", "1036", 0x98)
 {
 }
 
-toshiba_xm5701_device::toshiba_xm5701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+toshiba_xm5701_device::toshiba_xm5701_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	scsicd512_device(mconfig, XM5701, tag, owner, "TOSHIBA ", "CD-ROM XM-5701TA", "3136", 0x98)
 {
 }
 
-toshiba_xm5701_sun_device::toshiba_xm5701_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+toshiba_xm5701_sun_device::toshiba_xm5701_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	scsicd512_device(mconfig, XM5701SUN, tag, owner, "TOSHIBA ", "XM5701TASUN12XCD", "0997", 0x98)
 {
 }

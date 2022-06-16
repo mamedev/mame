@@ -88,7 +88,7 @@ DEFINE_DEVICE_TYPE(MN18801A, mn18801a_device, "mn18801a", "Panasonic MN18801A")
 
 ALLOW_SAVE_TYPE(mn1880_device::microstate)
 
-mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_mmu, address_map_constructor data_map)
+mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool has_mmu, address_map_constructor data_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, has_mmu ? 21 : 16, 0, 16, 14)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, has_mmu ? 21 : 16, 0, 16, 14, data_map)
@@ -107,12 +107,12 @@ mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-mn1880_device::mn1880_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mn1880_device::mn1880_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mn1880_device(mconfig, MN1880, tag, owner, clock, false, address_map_constructor(FUNC(mn1880_device::internal_data_map), this))
 {
 }
 
-mn18801a_device::mn18801a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mn18801a_device::mn18801a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mn1880_device(mconfig, MN18801A, tag, owner, clock, true, address_map_constructor(FUNC(mn18801a_device::internal_data_map), this))
 {
 }

@@ -550,12 +550,18 @@ bool XTAL::validate(double base_clock)
 
 void XTAL::validate(const char *message) const
 {
+	if(!m_base_clock || m_disable_validation)
+		return;
+
 	if(!validate(m_base_clock))
 		fail(m_base_clock, message);
 }
 
 void XTAL::validate(const std::string &message) const
 {
+	if(!m_base_clock || m_disable_validation)
+		return;
+
 	if(!validate(m_base_clock))
 		fail(m_base_clock, message);
 }

@@ -48,7 +48,7 @@ const tiny_rom_entry *bbc_memexb20_device::device_rom_region() const
 //  bbc_memexb20_device - constructor
 //-------------------------------------------------
 
-bbc_memexb20_device::bbc_memexb20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_memexb20_device::bbc_memexb20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_MEMEXB20, tag, owner, clock)
 	, device_bbc_internal_interface(mconfig, *this)
 	, m_shadow(false)

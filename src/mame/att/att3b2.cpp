@@ -76,13 +76,13 @@ void att3b2_state::att3b2v2(machine_config &config)
 
 	PIT8253(config, "pit"); // D8253C-5; unknown clocks
 
-	AM9517A(config, "dmac", 5'000'000); // AM9517A-5DC; unknown clock
+	AM9517A(config, "dmac", XTAL::u(5'000'000)); // AM9517A-5DC; unknown clock
 
-	SCN2681(config, "duart", 3'686'400); // MC2681P
+	SCN2681(config, "duart", XTAL::u(3'686'400)); // MC2681P
 
 	// TODO: hard disk controller (NEC D7261AD)
 
-	WD2797(config, "fdc", 1'000'000); // TMS2797NL
+	WD2797(config, "fdc", XTAL::u(1'000'000)); // TMS2797NL
 
 	// TODO: RTC (MM58174AN)
 }
@@ -90,12 +90,12 @@ void att3b2_state::att3b2v2(machine_config &config)
 void att3b2_state::att3b2v3(machine_config &config)
 {
 	att3b2v2(config);
-	m_maincpu->set_clock(18'000'000);
+	m_maincpu->set_clock(XTAL::u(18'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &att3b2_state::mem_map_600);
 
 	PIT8254(config.replace(), "pit"); // Intel 82C54
 
-	FD1793(config.replace(), "fdc", 1'000'000); // FD 1793-02
+	FD1793(config.replace(), "fdc", XTAL::u(1'000'000)); // FD 1793-02
 }
 
 ROM_START(3b2_300)

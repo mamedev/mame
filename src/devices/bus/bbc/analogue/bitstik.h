@@ -31,7 +31,7 @@ class bbc_bitstik_device :
 {
 protected:
 	// construction/destruction
-	bbc_bitstik_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_bitstik_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -50,7 +50,7 @@ private:
 class bbc_bitstik1_device : public bbc_bitstik_device
 {
 public:
-	bbc_bitstik1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_bitstik1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -59,7 +59,7 @@ protected:
 class bbc_bitstik2_device : public bbc_bitstik_device
 {
 public:
-	bbc_bitstik2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_bitstik2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

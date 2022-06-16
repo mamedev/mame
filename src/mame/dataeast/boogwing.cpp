@@ -345,9 +345,9 @@ void boogwing_state::boogwing(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
-	DECO_ACE(config, m_deco_ace, 0);
+	DECO_ACE(config, m_deco_ace);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0);
@@ -360,7 +360,7 @@ void boogwing_state::boogwing(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0);
@@ -373,15 +373,15 @@ void boogwing_state::boogwing(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0]);
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[1], 0);
+	DECO_SPRITE(config, m_sprgen[1]);
 	m_sprgen[1]->set_gfx_region(4);
 	m_sprgen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO104PROT(config, m_deco104, 0);
+	DECO104PROT(config, m_deco104);
 	m_deco104->port_a_cb().set_ioport("INPUTS");
 	m_deco104->port_b_cb().set_ioport("SYSTEM");
 	m_deco104->port_c_cb().set_ioport("DSW");

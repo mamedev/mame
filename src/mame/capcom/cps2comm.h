@@ -11,7 +11,7 @@
 class cps2_comm_device : public device_t
 {
 public:
-	cps2_comm_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	cps2_comm_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	u16 usart_data_r(offs_t offset, u16 mem_mask);
 	u16 usart_status_r(offs_t offset, u16 mem_mask);

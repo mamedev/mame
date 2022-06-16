@@ -102,7 +102,7 @@ void vectrex_base_state::vectrex_base(machine_config &config)
 	MC6809(config, m_maincpu, 6_MHz_XTAL); // 68A09
 
 	/* video hardware */
-	VECTOR(config, m_vector, 0);
+	VECTOR(config, m_vector);
 	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(400, 300);
@@ -111,7 +111,7 @@ void vectrex_base_state::vectrex_base(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic301 (also used for vector generation)
+	MC1408(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic301 (also used for vector generation)
 
 	AY8912(config, m_ay8912, 6_MHz_XTAL / 4);
 	m_ay8912->port_a_read_callback().set_ioport("BUTTONS");
@@ -135,7 +135,7 @@ void vectrex_state::vectrex(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &vectrex_state::vectrex_map);
 
-	vectrex_cart_slot_device &slot(VECTREX_CART_SLOT(config, "cartslot", 0));
+	vectrex_cart_slot_device &slot(VECTREX_CART_SLOT(config, "cartslot"));
 	vectrex_cart(slot);
 
 	/* software lists */

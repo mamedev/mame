@@ -14,7 +14,7 @@ DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_FPGA, k573fpga_device)
 class k573fpga_device : public device_t
 {
 public:
-	k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename... T> void add_route(T &&... args) { subdevice<mas3507d_device>("mpeg")->add_route(std::forward<T>(args)...); }
 	template <typename T> void set_ram(T &&tag) { ram.set_tag(std::forward<T>(tag)); }

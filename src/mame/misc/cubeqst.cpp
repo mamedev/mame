@@ -540,7 +540,7 @@ void cubeqst_state::cubeqst(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SIMUTREK_SPECIAL(config, m_laserdisc, 0);
+	SIMUTREK_SPECIAL(config, m_laserdisc);
 	m_laserdisc->set_overlay(CUBEQST_HBLANK, CUBEQST_VCOUNT, FUNC(cubeqst_state::screen_update_cubeqst));
 	m_laserdisc->set_overlay_clip(0, 320-1, 0, 256-8);
 	m_laserdisc->set_overlay_position(0.002f, -0.018f);
@@ -562,10 +562,10 @@ void cubeqst_state::cubeqst(machine_config &config)
 	for (int i = 0; i < 8; i++)
 	{
 		// ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c22 (34) + tl074cn.1b (53) + r10k.rn1 (30)
-		AD7521(config, m_dacs[i*2+0], 0).add_route(0, "rspeaker", 0.125);
+		AD7521(config, m_dacs[i*2+0]).add_route(0, "rspeaker", 0.125);
 
 		// ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c13 (34) + tl074cn.3b (53) + r10k.rn3 (30)
-		AD7521(config, m_dacs[i*2+1], 0).add_route(0, "lspeaker", 0.125);
+		AD7521(config, m_dacs[i*2+1]).add_route(0, "lspeaker", 0.125);
 	}
 }
 

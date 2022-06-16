@@ -20,7 +20,7 @@ class apple2_common_device : public device_t
 {
 public:
 	// construction/destruction
-	apple2_common_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apple2_common_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_GS_cputag(T &&tag) { m_GScpu.set_tag(std::forward<T>(tag)); }
 

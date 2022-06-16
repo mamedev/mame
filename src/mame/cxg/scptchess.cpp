@@ -184,7 +184,7 @@ INPUT_PORTS_END
 void scptchess_state::scptchess_v1(machine_config &config)
 {
 	/* basic machine hardware */
-	HD44801(config, m_maincpu, 400000);
+	HD44801(config, m_maincpu, XTAL::u(400000));
 	m_maincpu->write_r<2>().set(FUNC(scptchess_state::mux_w<0>));
 	m_maincpu->write_r<3>().set(FUNC(scptchess_state::mux_w<1>));
 	m_maincpu->write_d().set(FUNC(scptchess_state::leds_w));

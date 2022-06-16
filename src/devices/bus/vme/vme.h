@@ -86,7 +86,7 @@ public:
 	// construction/destruction
 	template <typename T, typename U>
 	vme_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, uint32_t slot_nbr, U &&bus_tag)
-		: vme_slot_device(mconfig, tag, owner, 0)
+		: vme_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -95,7 +95,7 @@ public:
 		set_vme_slot(std::forward<U>(bus_tag), slot_nbr);
 	}
 
-	vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// Callbacks to the board from the VME bus comes through here
 	auto vme_j1_callback()  { return m_vme_j1_callback.bind(); }
@@ -106,7 +106,7 @@ public:
 	virtual void write8(offs_t offset, uint8_t data);
 
 protected:
-	vme_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vme_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -130,7 +130,7 @@ class vme_device : public device_t,
 	public device_memory_interface
 {
 public:
-	vme_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~vme_device();
 
 	// inline configuration
@@ -185,7 +185,7 @@ public:
 	void install_device(vme_amod_t amod, offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, uint32_t mask);
 
 protected:
-	vme_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vme_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

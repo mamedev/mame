@@ -33,7 +33,7 @@ class c1541_device_base :  public device_t,
 {
 protected:
 	// construction/destruction
-	c1541_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	c1541_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -103,7 +103,7 @@ class c1540_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -117,7 +117,7 @@ class c1541_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -131,7 +131,7 @@ class c1541c_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -149,7 +149,7 @@ class c1541ii_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -163,7 +163,7 @@ class sx1541_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -177,7 +177,7 @@ class fsd1_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	fsd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	fsd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -191,7 +191,7 @@ class fsd2_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -208,7 +208,7 @@ class csd1_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -222,7 +222,7 @@ class c1541_dolphin_dos_device : public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -237,7 +237,7 @@ class c1541_professional_dos_v1_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -252,7 +252,7 @@ class c1541_prologic_dos_classic_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -282,7 +282,7 @@ class indus_gt_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	indus_gt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	indus_gt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -296,7 +296,7 @@ class technica_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	technica_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	technica_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -310,7 +310,7 @@ class blue_chip_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	blue_chip_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	blue_chip_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -324,7 +324,7 @@ class commander_c2_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	commander_c2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	commander_c2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -338,7 +338,7 @@ class enhancer_2000_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	enhancer_2000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	enhancer_2000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -352,7 +352,7 @@ class fd148_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	fd148_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	fd148_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -366,7 +366,7 @@ class msd_sd1_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	msd_sd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msd_sd1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -380,7 +380,7 @@ class msd_sd2_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	msd_sd2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msd_sd2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

@@ -7,7 +7,7 @@
 DEFINE_DEVICE_TYPE(NG_KOF2K3BL_PROT, kof2k3bl_prot_device, "ng_kof2k3bl_prot", "Neo Geo KoF 2003 Bootleg Protection")
 
 
-kof2k3bl_prot_device::kof2k3bl_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+kof2k3bl_prot_device::kof2k3bl_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NG_KOF2K3BL_PROT, tag, owner, clock)
 {
 }

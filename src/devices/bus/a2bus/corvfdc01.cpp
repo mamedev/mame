@@ -103,7 +103,7 @@ const tiny_rom_entry *a2bus_corvfdc01_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_wdfdc(*this, FDC01_FDC_TAG),
@@ -115,7 +115,7 @@ a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, de
 {
 }
 
-a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_corvfdc01_device(mconfig, A2BUS_CORVFDC01, tag, owner, clock)
 {
 }

@@ -243,7 +243,7 @@ void pc4_state::pc4(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beep, XTAL::u(3250)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	RP5C01(config, "rtc", XTAL(32'768));
 }

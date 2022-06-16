@@ -44,7 +44,7 @@ DEFINE_DEVICE_TYPE(MC6852, mc6852_device, "mc6852", "Motorola MC6852 SSDA")
 //  mc6852_device - constructor
 //-------------------------------------------------
 
-mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MC6852, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_write_tx_data(*this),

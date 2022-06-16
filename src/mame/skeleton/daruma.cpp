@@ -121,7 +121,7 @@ INPUT_PORTS_END
 void daruma_state::daruma(machine_config &config)
 {
 	/* basic machine hardware */
-	I80C32(config, m_maincpu, 11059200); //verified on pcb
+	I80C32(config, m_maincpu, XTAL::u(11059200)); //verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &daruma_state::mem_prg);
 	m_maincpu->set_addrmap(AS_IO, &daruma_state::mem_io);
 	// TODO: ports

@@ -26,7 +26,7 @@ class sv801_device : public device_t, public device_svi_slot_interface
 {
 public:
 	// construction/destruction
-	sv801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sv801_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;

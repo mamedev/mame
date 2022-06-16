@@ -11,7 +11,7 @@
 class romp_device : public cpu_device
 {
 public:
-	romp_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	romp_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_mmu(T &&tag) { m_mmu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_iou(T &&tag) { m_iou.set_tag(std::forward<T>(tag)); }

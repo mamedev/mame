@@ -110,7 +110,7 @@ public:
 	// construction/destruction
 	template <typename T, typename U>
 	nasbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus, U &&opts, char const *dflt)
-		: nasbus_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: nasbus_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -118,12 +118,12 @@ public:
 		set_fixed(false);
 		set_bus(std::forward<T>(bus));
 	}
-	nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_bus(T &&tag) { m_bus.set_tag(std::forward<T>(tag)); }
 
 protected:
-	nasbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nasbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -142,7 +142,7 @@ class nasbus_device : public device_t
 	friend class device_nasbus_card_interface;
 public:
 	// construction/destruction
-	nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~nasbus_device();
 
 	auto ram_disable() { return m_ram_disable_handler.bind(); }

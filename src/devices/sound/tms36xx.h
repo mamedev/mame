@@ -24,7 +24,7 @@ public:
 		TMS3617     = 17      // Monster Bash (13 notes, six outputs)
 	};
 
-	tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_subtype(subtype type)
 	{

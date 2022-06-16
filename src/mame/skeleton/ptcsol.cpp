@@ -764,7 +764,7 @@ void sol20_state::sol20(machine_config &config)
 	AY51013(config, m_uart); // TMS6011NC
 	m_uart->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
 
-	CLOCK(config, m_uart_clock, 4800);
+	CLOCK(config, m_uart_clock, XTAL::u(4800));
 	m_uart_clock->signal_handler().set(m_uart, FUNC(ay51013_device::write_rcp));
 	m_uart_clock->signal_handler().append(m_uart, FUNC(ay51013_device::write_tcp));
 
@@ -775,11 +775,11 @@ void sol20_state::sol20(machine_config &config)
 	m_uart_s->write_so_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_uart_s->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
 
-	CLOCK(config, m_uart_s_clock, 4800);
+	CLOCK(config, m_uart_s_clock, XTAL::u(4800));
 	m_uart_s_clock->signal_handler().set(m_uart_s, FUNC(ay51013_device::write_rcp));
 	m_uart_s_clock->signal_handler().append(m_uart_s, FUNC(ay51013_device::write_tcp));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(sol20_state::kbd_put));
 
 	SOFTWARE_LIST(config, "cass_list").set_original("sol20_cass");

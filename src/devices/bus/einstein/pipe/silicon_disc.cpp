@@ -49,7 +49,7 @@ const tiny_rom_entry *einstein_silicon_disc_device::device_rom_region() const
 //  einstein_silicon_disc_device - constructor
 //-------------------------------------------------
 
-einstein_silicon_disc_device::einstein_silicon_disc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+einstein_silicon_disc_device::einstein_silicon_disc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, EINSTEIN_SILICON_DISC, tag, owner, clock),
 	device_tatung_pipe_interface(mconfig, *this),
 	m_rom(*this, "rom"),

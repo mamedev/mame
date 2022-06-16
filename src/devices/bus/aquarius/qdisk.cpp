@@ -78,7 +78,7 @@ void aquarius_qdisk_device::device_add_mconfig(machine_config &config)
 //  aquarius_qdisk_device - constructor
 //-------------------------------------------------
 
-aquarius_qdisk_device::aquarius_qdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+aquarius_qdisk_device::aquarius_qdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AQUARIUS_QDISK, tag, owner, clock)
 	, device_aquarius_cartridge_interface(mconfig, *this)
 	, m_ssda(*this, "mc6852")

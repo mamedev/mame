@@ -168,9 +168,9 @@ void mustache_state::mustache(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mustache_state::memmap);
 	m_maincpu->set_addrmap(AS_OPCODES, &mustache_state::decrypted_opcodes_map);
 
-	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("maincpu");
+	SEI80BU(config, "sei80bu").set_device_rom_tag("maincpu");
 
-	T5182(config, "t5182", 0);
+	T5182(config, "t5182");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

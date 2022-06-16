@@ -23,10 +23,10 @@ class neogeo_mjctrl_ac_device : public device_t, public device_neogeo_control_po
 {
 public:
 	// construction/destruction
-	neogeo_mjctrl_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_mjctrl_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	neogeo_mjctrl_ac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_mjctrl_ac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -50,7 +50,7 @@ class neogeo_mjctrl_device : public neogeo_mjctrl_ac_device
 {
 public:
 	// construction/destruction
-	neogeo_mjctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_mjctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

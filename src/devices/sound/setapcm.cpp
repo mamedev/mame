@@ -75,7 +75,7 @@ DEFINE_DEVICE_TYPE(ST0032_SOUND, st0032_sound_device, "st0032_sound", "Seta ST-0
 //-------------------------------------------------
 
 template<unsigned MaxVoices, unsigned Divider>
-setapcm_device<MaxVoices, Divider>::setapcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+setapcm_device<MaxVoices, Divider>::setapcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
@@ -84,12 +84,12 @@ setapcm_device<MaxVoices, Divider>::setapcm_device(const machine_config &mconfig
 {
 }
 
-nile_sound_device::nile_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nile_sound_device::nile_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: setapcm_device<8, 160>(mconfig, NILE_SOUND, tag, owner, clock)
 {
 }
 
-st0032_sound_device::st0032_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+st0032_sound_device::st0032_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: setapcm_device<16, 384>(mconfig, ST0032_SOUND, tag, owner, clock)
 {
 }

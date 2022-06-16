@@ -356,7 +356,7 @@ void bmjr_state::bmjr(machine_config &config)
 {
 	/* basic machine hardware */
 	// 750khz gets the cassette sound close to a normal kansas city 300 baud
-	M6800(config, m_maincpu, 750'000); //XTAL(4'000'000)/4); //unknown clock / divider
+	M6800(config, m_maincpu, XTAL::u(750'000)); //XTAL(4'000'000)/4); //unknown clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmjr_state::mem_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bmjr_state::irq0_line_hold));
 
@@ -374,7 +374,7 @@ void bmjr_state::bmjr(machine_config &config)
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50); // guesswork
+	BEEP(config, "beeper", XTAL::u(1200)).add_route(ALL_OUTPUTS, "mono", 0.50); // guesswork
 
 	/* Devices */
 	CASSETTE(config, m_cass);

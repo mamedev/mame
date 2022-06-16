@@ -27,13 +27,13 @@ public:
 
 	// construction/destruction
 	template <typename T>
-	cesblit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+	cesblit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag)
 		: cesblit_device(mconfig, tag, owner, clock)
 	{
 		set_screen(std::forward<T>(screen_tag));
 	}
 
-	cesblit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cesblit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_compute_addr(compute_addr_t compute_addr)  { m_compute_addr = compute_addr; }

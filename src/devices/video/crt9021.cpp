@@ -59,7 +59,7 @@ DEFINE_DEVICE_TYPE(CRT9021, crt9021_device, "crt9021", "SMC CRT9021 VAC")
 //  crt9021_device - constructor
 //-------------------------------------------------
 
-crt9021_device::crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+crt9021_device::crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CRT9021, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_display_cb(*this),

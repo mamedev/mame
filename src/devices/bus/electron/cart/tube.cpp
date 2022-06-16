@@ -37,7 +37,7 @@ void electron_tube_device::device_add_mconfig(machine_config &config)
 //  electron_tube_device - constructor
 //-------------------------------------------------
 
-electron_tube_device::electron_tube_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+electron_tube_device::electron_tube_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ELECTRON_TUBE, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
 	, m_tube(*this, "tube")

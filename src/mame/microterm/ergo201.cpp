@@ -153,7 +153,7 @@ void ergo201_state::ergo201(machine_config &config)
 	AY31015(config, m_kbuart); // GI AY-3-1015D
 	m_kbuart->set_auto_rdav(true);
 
-	clock_device &kbclock(CLOCK(config, "kbclock", 10000));
+	clock_device &kbclock(CLOCK(config, "kbclock", XTAL::u(10000)));
 	kbclock.signal_handler().set(m_kbuart, FUNC(ay31015_device::write_rcp));
 	kbclock.signal_handler().append(m_kbuart, FUNC(ay31015_device::write_tcp));
 

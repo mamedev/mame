@@ -1059,7 +1059,7 @@ void taitox_cchip_state::superman(machine_config &config)
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -1101,7 +1101,7 @@ void taitox_state::daisenpu(machine_config &config)
 	ymsnd.add_route(0, "lspeaker", 0.45);
 	ymsnd.add_route(1, "rspeaker", 0.45);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 }
@@ -1109,11 +1109,11 @@ void taitox_state::daisenpu(machine_config &config)
 void taitox_state::gigandes(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 8000000);    // 8 MHz?
+	M68000(config, m_maincpu, XTAL::u(8000000));    // 8 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitox_state::gigandes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitox_state::irq2_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);  // 4 MHz ???
+	Z80(config, m_audiocpu, XTAL::u(4000000));  // 4 MHz ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitox_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));   // 10 CPU slices per frame - enough for the sound CPU to read all commands
@@ -1137,14 +1137,14 @@ void taitox_state::gigandes(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -1152,11 +1152,11 @@ void taitox_state::gigandes(machine_config &config)
 void taitox_state::ballbros(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 8000000);    // 8 MHz?
+	M68000(config, m_maincpu, XTAL::u(8000000));    // 8 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitox_state::ballbros_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitox_state::irq2_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);  // 4 MHz ???
+	Z80(config, m_audiocpu, XTAL::u(4000000));  // 4 MHz ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitox_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));   // 10 CPU slices per frame - enough for the sound CPU to read all commands
@@ -1181,14 +1181,14 @@ void taitox_state::ballbros(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }

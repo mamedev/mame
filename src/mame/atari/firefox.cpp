@@ -665,7 +665,7 @@ void firefox_state::firefox(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firefox);
 	PALETTE(config, m_palette).set_entries(512);
 
-	PHILIPS_22VP931(config, m_laserdisc, 0);
+	PHILIPS_22VP931(config, m_laserdisc);
 	m_laserdisc->set_overlay(64*8, 525, FUNC(firefox_state::screen_update_firefox));
 	m_laserdisc->set_overlay_clip(7*8, 53*8-1, 44, 480+44);
 	m_laserdisc->add_route(0, "lspeaker", 0.50);

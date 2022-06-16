@@ -164,7 +164,7 @@ DEFINE_DEVICE_TYPE(HD6120, hd6120_device, "hd6120", "Harris HD-6120")
 
 ALLOW_SAVE_TYPE(hd6120_device::minor_state)
 
-hd6120_device::hd6120_device(const machine_config &config, const char *tag, device_t *owner, u32 clock)
+hd6120_device::hd6120_device(const machine_config &config, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(config, HD6120, tag, owner, clock)
 	, m_inst_config("instruction", ENDIANNESS_BIG, 16, 16, -1) // 12 data bits
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1) // 12 data bits

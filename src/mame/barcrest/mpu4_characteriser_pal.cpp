@@ -35,12 +35,12 @@ check is bypassed. This may be something to look at for prototype ROMs and hacks
 
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal, "mpu4chrpal", "Barcrest MPU4 Characteriser PAL")
 
-mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_PAL, tag, owner, clock)
 {
 }
 
-mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_current_chr_table(nullptr),
 	m_prot_col(0),

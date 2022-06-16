@@ -6,7 +6,7 @@
 DEFINE_DEVICE_TYPE(H8S2655, h8s2655_device, "h8s2655", "Hitachi H8S/2655")
 DEFINE_DEVICE_TYPE(H8S2653, h8s2653_device, "h8s2653", "Hitachi H8S/2653")
 
-h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	h8s2600_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2655_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -41,13 +41,13 @@ h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, 
 	has_trace = true;
 }
 
-h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8s2655_device(mconfig, H8S2655, tag, owner, clock)
 
 {
 }
 
-h8s2653_device::h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2653_device::h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8s2655_device(mconfig, H8S2653, tag, owner, clock)
 {
 }

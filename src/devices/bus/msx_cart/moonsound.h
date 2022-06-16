@@ -15,7 +15,7 @@ DECLARE_DEVICE_TYPE(MSX_CART_MOONSOUND, msx_cart_moonsound_device)
 class msx_cart_moonsound_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_moonsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_moonsound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

@@ -40,7 +40,7 @@
 
 DEFINE_DEVICE_TYPE(JALECO_MEGASYSTEM32_SPRITE, ms32_sprite_device, "ms32spr", "Jaleco Megasystem 32 Sprite hardware")
 
-ms32_sprite_device::ms32_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ms32_sprite_device::ms32_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, JALECO_MEGASYSTEM32_SPRITE, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, m_color_base(0)

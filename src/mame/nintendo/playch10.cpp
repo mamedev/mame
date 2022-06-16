@@ -1942,19 +1942,19 @@ void playch10_state::playch10(machine_config &config)
 	top.set_screen_update(FUNC(playch10_state::screen_update_playch10_top));
 	top.screen_vblank().set(FUNC(playch10_state::vblank_irq));
 
-	PPU_2C03B(config, m_ppu, 0);
+	PPU_2C03B(config, m_ppu);
 	m_ppu->set_addrmap(0, &playch10_state::ppu_map);
 	m_ppu->set_screen("bottom");
 	m_ppu->set_cpu_tag("cart");
 	m_ppu->int_callback().set_inputline(m_cartcpu, INPUT_LINE_NMI);
 	m_ppu->int_callback().append(FUNC(playch10_state::int_detect_w));
 
-	NES_ZAPPER_SENSOR(config, m_sensor, 0).set_screen_tag("bottom");
+	NES_ZAPPER_SENSOR(config, m_sensor).set_screen_tag("bottom");
 
 	SPEAKER(config, "mono").front_center();
 	m_cartcpu->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	RP5H01(config, m_rp5h01, 0);
+	RP5H01(config, m_rp5h01);
 }
 
 void playch10_state::playch10_a(machine_config &config)

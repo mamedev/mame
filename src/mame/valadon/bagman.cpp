@@ -523,7 +523,7 @@ void bagman_state::bagman(machine_config &config)
 	m_tmsprom->pdc().set("tms", FUNC(tms5110_device::pdc_w)); // tms pdc func
 	m_tmsprom->ctl().set("tms", FUNC(tms5110_device::ctl_w)); // tms ctl func
 
-	tms5110a_device &tms(TMS5110A(config, "tms", 640000));
+	tms5110a_device &tms(TMS5110A(config, "tms", XTAL::u(640000)));
 	tms.m0().set("tmsprom", FUNC(tmsprom_device::m0_w));
 	tms.data().set("tmsprom", FUNC(tmsprom_device::data_r));
 	tms.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -581,13 +581,13 @@ void pickin_state::pickin(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(1500000)));
 	aysnd.port_a_read_callback().set_ioport("P1");
 	aysnd.port_b_read_callback().set_ioport("P2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	// Maybe
-	ay8910_device &ay2(AY8910(config, "ay2", 1500000));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL::u(1500000)));
 	ay2.port_a_read_callback().set_constant(0xff); // needed to avoid spurious credits on startup
 	ay2.port_b_read_callback().set_constant(0xff);
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.40);
@@ -643,12 +643,12 @@ void pickin_state::botanic(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(1500000)));
 	aysnd.port_a_read_callback().set_ioport("P1");
 	aysnd.port_b_read_callback().set_ioport("P2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.40);
+	AY8910(config, "ay2", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
 

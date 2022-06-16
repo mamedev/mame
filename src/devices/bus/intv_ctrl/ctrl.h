@@ -42,7 +42,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	intv_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: intv_control_port_device(mconfig, tag, owner, 0)
+		: intv_control_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -50,7 +50,7 @@ public:
 		set_fixed(false);
 	}
 
-	intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~intv_control_port_device();
 
 	uint8_t ctrl_r() { return m_device ? m_device->read_ctrl() : 0; }

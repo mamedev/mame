@@ -593,7 +593,7 @@ void univac_state::uts20(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_uts);
 
-	dp835x_device &crtc(DP835X_A(config, "crtc", 19'980'000));
+	dp835x_device &crtc(DP835X_A(config, "crtc", XTAL::u(19'980'000)));
 	crtc.set_screen("screen");
 	crtc.vblank_callback().set(m_ctc, FUNC(z80ctc_device::trg0));
 	crtc.vblank_callback().append(m_ctc, FUNC(z80ctc_device::trg3));

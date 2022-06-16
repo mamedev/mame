@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(BL_HANDHELDS_LCDC, bl_handhelds_lcdc_device, "blhandheldlcdc", "BaoBaoLong Handhelds LCD Controller")
 
-bl_handhelds_lcdc_device::bl_handhelds_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bl_handhelds_lcdc_device::bl_handhelds_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, BL_HANDHELDS_LCDC, tag, owner, clock)
 {
 }

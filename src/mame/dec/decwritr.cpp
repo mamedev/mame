@@ -458,7 +458,7 @@ void decwriter_state::la120(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_speaker, 786).add_route(ALL_OUTPUTS, "mono", 0.50); // TODO: LA120 speaker is controlled by asic; VT100 has: 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
+	BEEP(config, m_speaker, XTAL::u(786)).add_route(ALL_OUTPUTS, "mono", 0.50); // TODO: LA120 speaker is controlled by asic; VT100 has: 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 
 	/* i8251 */
 	i8251_device &usart(I8251(config, "usart", XTAL(18'000'000) / 9));

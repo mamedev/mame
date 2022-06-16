@@ -16,14 +16,14 @@
 
 class m65ce02_device : public m65c02_device {
 public:
-	m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
 protected:
-	m65ce02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	m65ce02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t  TMP3;                   /* temporary internal values */
 	uint8_t   Z;                      /* Z index register */

@@ -43,7 +43,7 @@ class mb89374_device : public device_t,
 {
 public:
 	// construction/destruction
-	mb89374_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb89374_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_irq_callback() { return m_out_irq_cb.bind(); }
 	template <unsigned N> auto out_po_callback() { return m_out_po_cb[N].bind(); }

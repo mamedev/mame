@@ -8,7 +8,7 @@
 
 DEFINE_DEVICE_TYPE(MC6843, mc6843_device, "mc6843", "Motorola MC6843 FDC")
 
-mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MC6843, tag, owner, clock),
 	  m_irq(*this),
 	  m_force_ready(false)

@@ -63,7 +63,7 @@ public:
 	virtual u8 read_c800(u16 offset) override;
 
 protected:
-	a2bus_grappler_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	a2bus_grappler_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// signal state
 	u8 busy_in() const { return m_busy_in; }
@@ -100,7 +100,7 @@ private:
 };
 
 
-a2bus_grappler_device_base::a2bus_grappler_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+a2bus_grappler_device_base::a2bus_grappler_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_printer_conn(*this, "prn"),
@@ -230,7 +230,7 @@ void a2bus_grappler_device_base::set_slct_in(s32 param)
 class a2bus_grappler_device : public a2bus_grappler_device_base
 {
 public:
-	a2bus_grappler_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	a2bus_grappler_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device_a2bus_card_interface implementation
 	virtual u8 read_c0nx(u8 offset) override;
@@ -260,7 +260,7 @@ private:
 };
 
 
-a2bus_grappler_device::a2bus_grappler_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+a2bus_grappler_device::a2bus_grappler_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	a2bus_grappler_device_base(mconfig, A2BUS_GRAPPLER, tag, owner, clock),
 	m_strobe(1U),
 	m_ack_latch(1U),
@@ -443,7 +443,7 @@ public:
 	virtual void write_cnxx(u8 offset, u8 data) override;
 
 protected:
-	a2bus_grapplerplus_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	a2bus_grapplerplus_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;
@@ -472,7 +472,7 @@ private:
 };
 
 
-a2bus_grapplerplus_device_base::a2bus_grapplerplus_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+a2bus_grapplerplus_device_base::a2bus_grapplerplus_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock) :
 	a2bus_grappler_device_base(mconfig, type, tag, owner, clock),
 	m_s1(*this, "S1"),
 	m_ack_latch(1U),
@@ -619,7 +619,7 @@ void a2bus_grapplerplus_device_base::set_ack_in(s32 param)
 class a2bus_grapplerplus_device : public a2bus_grapplerplus_device_base
 {
 public:
-	a2bus_grapplerplus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	a2bus_grapplerplus_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// DIP switch handlers
 	virtual DECLARE_INPUT_CHANGED_MEMBER(sw_msb) override;
@@ -653,7 +653,7 @@ private:
 };
 
 
-a2bus_grapplerplus_device::a2bus_grapplerplus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+a2bus_grapplerplus_device::a2bus_grapplerplus_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 	a2bus_grapplerplus_device_base(mconfig, A2BUS_GRAPPLERPLUS, tag, owner, clock),
 	m_strobe_timer(nullptr),
 	m_data_latch(0xffU),
@@ -842,7 +842,7 @@ TIMER_CALLBACK_MEMBER(a2bus_grapplerplus_device::update_strobe)
 class a2bus_buf_grapplerplus_device : public a2bus_grapplerplus_device_base
 {
 public:
-	a2bus_buf_grapplerplus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	a2bus_buf_grapplerplus_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 		a2bus_buf_grapplerplus_device(mconfig, A2BUS_BUFGRAPPLERPLUS, tag, owner, clock)
 	{
 	}
@@ -851,7 +851,7 @@ public:
 	virtual u8 read_c0nx(u8 offset) override;
 
 protected:
-	a2bus_buf_grapplerplus_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	a2bus_buf_grapplerplus_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device_t implementation
 	virtual tiny_rom_entry const *device_rom_region() const override { return ROM_NAME(bufgrapplerplus); }
@@ -895,7 +895,7 @@ private:
 
 
 
-a2bus_buf_grapplerplus_device::a2bus_buf_grapplerplus_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+a2bus_buf_grapplerplus_device::a2bus_buf_grapplerplus_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock) :
 	a2bus_grapplerplus_device_base(mconfig, type, tag, owner, clock),
 	m_mcu(*this, "mcu"),
 	m_ram(),
@@ -1223,7 +1223,7 @@ void a2bus_buf_grapplerplus_device::clear_ibusy(s32 param)
 class a2bus_buf_grapplerplus_reva_device : public a2bus_buf_grapplerplus_device
 {
 public:
-	a2bus_buf_grapplerplus_reva_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	a2bus_buf_grapplerplus_reva_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock) :
 		a2bus_buf_grapplerplus_device(mconfig, A2BUS_BUFGRAPPLERPLUSA, tag, owner, clock)
 	{
 	}

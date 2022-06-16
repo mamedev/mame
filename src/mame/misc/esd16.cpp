@@ -718,7 +718,7 @@ void esd16_state::esd16_nosound(machine_config &config)
 	screen.set_screen_update(FUNC(esd16_state::screen_update));
 	screen.set_palette("palette");
 
-	DECO_SPRITE(config, m_sprgen, 0);
+	DECO_SPRITE(config, m_sprgen);
 	m_sprgen->set_gfx_region(0);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_pri_callback(FUNC(esd16_state::pri_callback));

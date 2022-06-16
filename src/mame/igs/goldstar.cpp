@@ -255,7 +255,7 @@ constexpr XTAL MASTER_CLOCK = 12_MHz_XTAL;
 constexpr XTAL CPU_CLOCK    = MASTER_CLOCK / 4;
 constexpr XTAL PSG_CLOCK    = MASTER_CLOCK / 4;
 constexpr XTAL AY_CLOCK     = MASTER_CLOCK / 8;
-#define OKI_CLOCK       1056000      /* unverified resonator */
+#define OKI_CLOCK       XTAL::u(1056000)      /* unverified resonator */
 
 }
 
@@ -8738,7 +8738,7 @@ void sanghopm_state::star100(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	PALETTE(config, m_palette).set_entries(0x100);
-	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &sanghopm_state::ramdac_map);
+	RAMDAC(config, "ramdac", "palette").set_addrmap(0, &sanghopm_state::ramdac_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sangho);
 
@@ -9732,9 +9732,9 @@ void unkch_state::megaline(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &unkch_state::megaline_map);
 	m_maincpu->set_addrmap(AS_IO, &unkch_state::megaline_portmap);
 
-	//I8255A(config, m_ppi[0], 0);
-	//I8255A(config, m_ppi[1], 0);
-	//I8255A(config, m_ppi[2], 0);
+	//I8255A(config, m_ppi[0]);
+	//I8255A(config, m_ppi[1]);
+	//I8255A(config, m_ppi[2]);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9805,7 +9805,7 @@ void unkch_state::bonusch(machine_config &config)
 
 void unkch_state::feverch(machine_config &config)
 {
-	Z80(config, m_maincpu, 12'000'000 / 2); // clock not verified
+	Z80(config, m_maincpu, XTAL::u(12'000'000) / 2); // clock not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &unkch_state::feverch_map);
 	m_maincpu->set_addrmap(AS_IO, &unkch_state::feverch_portmap);
 
@@ -9838,11 +9838,11 @@ void unkch_state::feverch(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, "sn1", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80); // actually SN76489AN, clock not verified
+	SN76489A(config, "sn1", XTAL::u(12'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.80); // actually SN76489AN, clock not verified
 
-	SN76489A(config, "sn2", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80); // actually SN76489AN, clock not verified
+	SN76489A(config, "sn2", XTAL::u(12'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.80); // actually SN76489AN, clock not verified
 
-	SN76489A(config, "sn3", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80); // actually SN76489AN, clock not verified
+	SN76489A(config, "sn3", XTAL::u(12'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.80); // actually SN76489AN, clock not verified
 }
 
 /***************************************************************************

@@ -187,11 +187,11 @@ void sm1800_state::sm1800(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(sm1800_state::portc_r));
 	m_ppi->out_pc_callback().set(FUNC(sm1800_state::portc_w));
 
-	I8275(config, m_crtc, 2000000);
+	I8275(config, m_crtc, XTAL::u(2000000));
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(sm1800_state::crtc_display_pixels));
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 }
 
 /* ROM definition */

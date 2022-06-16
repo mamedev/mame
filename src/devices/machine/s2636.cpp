@@ -157,7 +157,7 @@ uint16_t const s2636_device::SCORE_FONT[16][5] =
 
 DEFINE_DEVICE_TYPE(S2636, s2636_device, "s2636", "Signetics 2636 PVI")
 
-s2636_device::s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s2636_device::s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, S2636, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_sound_interface(mconfig, *this)

@@ -13,7 +13,7 @@
 class e05a30_device : public device_t
 {
 public:
-	e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto printhead() { return m_write_printhead.bind(); }
 	auto pf_stepper() { return m_write_pf_stepper.bind(); }

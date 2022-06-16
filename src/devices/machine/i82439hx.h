@@ -12,14 +12,14 @@
 class i82439hx_host_device : public pci_host_device {
 public:
 	template <typename T>
-	i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int ram_size)
+	i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag, int ram_size)
 		: i82439hx_host_device(mconfig, tag, owner, clock)
 	{
 		set_ids_host(0x80861250, 0x03, 0x00000000);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_ram_size(ram_size);
 	}
-	i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_size(int ram_size);

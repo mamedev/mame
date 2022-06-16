@@ -16,7 +16,7 @@
 DEFINE_DEVICE_TYPE(R65C19, r65c19_device, "r65c19", "Rockwell R65C19 MCU")
 DEFINE_DEVICE_TYPE(L2800, l2800_device, "l2800", "Rockwell L2800 MCU")
 
-r65c19_device::r65c19_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map)
+r65c19_device::r65c19_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map)
 	: r65c02_device(mconfig, type, tag, owner, clock)
 	, m_w(0)
 	, m_i(0)
@@ -26,19 +26,19 @@ r65c19_device::r65c19_device(const machine_config &mconfig, device_type type, co
 	program_config.m_internal_map = std::move(internal_map);
 }
 
-r65c19_device::r65c19_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+r65c19_device::r65c19_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: r65c19_device(mconfig, R65C19, tag, owner, clock, address_map_constructor())
 {
 }
 
-c39_device::c39_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map)
+c39_device::c39_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map)
 	: r65c19_device(mconfig, type, tag, owner, clock, internal_map)
 	, m_exp_config("expansion", ENDIANNESS_LITTLE, 8, 21, 0)
 	, m_es4_config("es4", ENDIANNESS_LITTLE, 8, 9, 0)
 {
 }
 
-l2800_device::l2800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+l2800_device::l2800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c39_device(mconfig, L2800, tag, owner, clock, address_map_constructor(FUNC(l2800_device::internal_map), this))
 {
 }

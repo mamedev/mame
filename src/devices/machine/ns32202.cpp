@@ -61,7 +61,7 @@ enum cictl_mask : u8
 	CICTL_CERH = 0x80, // h-counter error flag
 };
 
-ns32202_device::ns32202_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+ns32202_device::ns32202_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NS32202, tag, owner, clock)
 	, m_out_int(*this)
 	, m_out_cout(*this)

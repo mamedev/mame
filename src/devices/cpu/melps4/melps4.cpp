@@ -42,7 +42,7 @@
 #include "melps4d.h"
 
 
-melps4_cpu_device::melps4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, u8 sm_page, u8 int_page)
+melps4_cpu_device::melps4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, u8 sm_page, u8 int_page)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)

@@ -8,7 +8,7 @@
 class nereid_device : public device_t, public device_palette_interface
 {
 public:
-	nereid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nereid_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t ctrl_r(offs_t offset, uint16_t mem_mask = ~0);
 	void ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -16,7 +16,7 @@ public:
 	rgb_t map_color(uint8_t input, uint8_t ovl = 0);
 
 protected:
-	nereid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nereid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual u32 palette_entries() const noexcept override { return 0x200; }

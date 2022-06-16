@@ -544,7 +544,7 @@ void wallc_state::wallc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wallc_state::wallc_map);
 	m_maincpu->set_vblank_int("screen", FUNC(wallc_state::irq0_line_hold));
 
-	ADC0804(config, "adc", 640000).vin_callback().set_ioport("DIAL"); // clock not verified
+	ADC0804(config, "adc", XTAL::u(640000)).vin_callback().set_ioport("DIAL"); // clock not verified
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

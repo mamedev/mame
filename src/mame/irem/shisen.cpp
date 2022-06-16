@@ -371,7 +371,7 @@ void shisen_state::shisen(machine_config &config)
 	ymsnd.add_route(0, "lspeaker", 0.5);
 	ymsnd.add_route(1, "rspeaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 }
 
 

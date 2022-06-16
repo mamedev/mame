@@ -70,7 +70,7 @@ DEFINE_DEVICE_TYPE(DS1302, ds1302_device, "ds1302", "Dallas DS1302 Trickle-Charg
 //  ds1302_device - constructor
 //-------------------------------------------------
 
-ds1302_device::ds1302_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t ram_size)
+ds1302_device::ds1302_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint8_t ram_size)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -78,7 +78,7 @@ ds1302_device::ds1302_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-ds1302_device::ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ds1302_device::ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ds1302_device(mconfig, DS1302, tag, owner, clock, 0x1f)
 {
 }
@@ -88,7 +88,7 @@ ds1302_device::ds1302_device(const machine_config &mconfig, const char *tag, dev
 //  ds1202_device - constructor
 //-------------------------------------------------
 
-ds1202_device::ds1202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ds1202_device::ds1202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ds1302_device(mconfig, DS1202, tag, owner, clock, 0x18)
 {
 }

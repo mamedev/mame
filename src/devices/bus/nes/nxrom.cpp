@@ -57,72 +57,72 @@ DEFINE_DEVICE_TYPE(NES_UN1ROM,   nes_un1rom_device,   "nes_un1rom",   "NES Cart 
 DEFINE_DEVICE_TYPE(NES_NOCHR,    nes_nochr_device,    "nes_nochr",    "NES Cart NoCash NOCHR PCB")
 
 
-nes_nrom_device::nes_nrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_nrom_device::nes_nrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock), device_nes_cart_interface(mconfig, *this)
 {
 }
 
-nes_nrom_device::nes_nrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_nrom_device::nes_nrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_NROM, tag, owner, clock)
 {
 }
 
-nes_nrom368_device::nes_nrom368_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_nrom368_device::nes_nrom368_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_NROM368, tag, owner, clock)
 {
 }
 
-nes_fcbasic_device::nes_fcbasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_fcbasic_device::nes_fcbasic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_FCBASIC, tag, owner, clock)
 {
 }
 
-nes_axrom_device::nes_axrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_axrom_device::nes_axrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_AXROM, tag, owner, clock)
 {
 }
 
-nes_bxrom_device::nes_bxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_bxrom_device::nes_bxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_BXROM, tag, owner, clock)
 {
 }
 
-nes_cnrom_device::nes_cnrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_cnrom_device::nes_cnrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_chr_open_bus(0)
 {
 }
 
-nes_cnrom_device::nes_cnrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_cnrom_device::nes_cnrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_cnrom_device(mconfig, NES_CNROM, tag, owner, clock)
 {
 }
 
-nes_cprom_device::nes_cprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_cprom_device::nes_cprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_CPROM, tag, owner, clock)
 {
 }
 
-nes_gxrom_device::nes_gxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_gxrom_device::nes_gxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_GXROM, tag, owner, clock)
 {
 }
 
-nes_uxrom_device::nes_uxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_uxrom_device::nes_uxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_UXROM, tag, owner, clock)
 {
 }
 
-nes_uxrom_cc_device::nes_uxrom_cc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_uxrom_cc_device::nes_uxrom_cc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_UXROM_CC, tag, owner, clock)
 {
 }
 
-nes_un1rom_device::nes_un1rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_un1rom_device::nes_un1rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_UN1ROM, tag, owner, clock)
 {
 }
 
-nes_nochr_device::nes_nochr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_nochr_device::nes_nochr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_NOCHR, tag, owner, clock)
 {
 }

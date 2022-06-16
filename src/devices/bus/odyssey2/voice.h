@@ -22,7 +22,7 @@ class o2_voice_device : public device_t,
 {
 public:
 	// construction/destruction
-	o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void cart_init() override;
 

@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(AHA1542A, aha1542a_device, "aha1542a", "AHA-1542A SCSI Contro
 DEFINE_DEVICE_TYPE(AHA1542B, aha1542b_device, "aha1542b", "AHA-1542B SCSI Controller")
 
 
-aha154x_device::aha154x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+aha154x_device::aha154x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_localcpu(*this, "localcpu")
@@ -33,12 +33,12 @@ aha154x_device::aha154x_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-aha1542a_device::aha1542a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+aha1542a_device::aha1542a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: aha154x_device(mconfig, AHA1542A, tag, owner, clock)
 {
 }
 
-aha1542b_device::aha1542b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+aha1542b_device::aha1542b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: aha154x_device(mconfig, AHA1542B, tag, owner, clock)
 	, m_busaic(*this, "busaic")
 {

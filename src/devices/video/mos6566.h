@@ -189,7 +189,7 @@ class mos6566_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <class T> void set_cpu(T &&tag) { m_cpu.set_tag(tag); }
 	auto irq_callback() { return m_write_irq.bind(); }
@@ -228,7 +228,7 @@ protected:
 		TYPE_8569   // PAL-N VIC-IIe (C128)
 	};
 
-	mos6566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	mos6566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -356,10 +356,10 @@ class mos6567_device :  public mos6566_device
 {
 public:
 	// construction/destruction
-	mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	mos6567_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	mos6567_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 };
 
 
@@ -369,7 +369,7 @@ class mos8562_device :  public mos6567_device
 {
 public:
 	// construction/destruction
-	mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -379,7 +379,7 @@ class mos8564_device :  public mos6567_device
 {
 public:
 	// construction/destruction
-	mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_execute_interface overrides
@@ -394,10 +394,10 @@ class mos6569_device :  public mos6566_device
 {
 public:
 	// construction/destruction
-	mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	mos6569_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	mos6569_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	// device-level overrides
 	virtual void execute_run() override;
@@ -410,7 +410,7 @@ class mos8565_device :  public mos6569_device
 {
 public:
 	// construction/destruction
-	mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -420,7 +420,7 @@ class mos8566_device :  public mos6569_device
 {
 public:
 	// construction/destruction
-	mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_execute_interface overrides

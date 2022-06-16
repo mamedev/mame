@@ -509,7 +509,7 @@ void st_blitter_device::ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 //  VIDEO
 //**************************************************************************
 
-st_blitter_device::st_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+st_blitter_device::st_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ST_BLITTER, tag, owner, clock)
 	, m_space(*this, finder_base::DUMMY_TAG, 0)
 	, m_int_callback(*this)

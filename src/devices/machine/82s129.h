@@ -78,7 +78,7 @@ public:
 
 protected:
 	// construction/destruction
-	prom82s129_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	prom82s129_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -115,13 +115,13 @@ private:
 class prom82s126_device : public prom82s129_base_device
 {
 public:
-	prom82s126_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	prom82s126_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class prom82s129_device : public prom82s129_base_device
 {
 public:
-	prom82s129_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	prom82s129_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition

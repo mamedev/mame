@@ -29,7 +29,7 @@ class acorn_8k_device :
 {
 public:
 	// construction/destruction
-	acorn_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	acorn_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

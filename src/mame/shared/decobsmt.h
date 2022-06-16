@@ -19,7 +19,7 @@ class decobsmt_device : public device_t
 {
 public:
 	// construction/destruction
-	decobsmt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	decobsmt_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void bsmt_reset_w(u8 data);
 	u8 bsmt_status_r();

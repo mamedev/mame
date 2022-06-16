@@ -71,7 +71,7 @@ void tms32051_device::tms32051_internal_data(address_map &map)
 }
 
 
-tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data)
+tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_pgm, address_map_constructor internal_data)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, internal_pgm)
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, internal_data)
@@ -79,7 +79,7 @@ tms32051_device::tms32051_device(const machine_config &mconfig, device_type type
 {
 }
 
-tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms32051_device(mconfig, TMS32051, tag, owner, clock, address_map_constructor(FUNC(tms32051_device::tms32051_internal_pgm), this), address_map_constructor(FUNC(tms32051_device::tms32051_internal_data), this))
 {
 }
@@ -115,7 +115,7 @@ void tms32053_device::tms32053_internal_data(address_map &map)
 }
 
 
-tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms32051_device(mconfig, TMS32053, tag, owner, clock, address_map_constructor(FUNC(tms32053_device::tms32053_internal_pgm), this), address_map_constructor(FUNC(tms32053_device::tms32053_internal_data), this))
 {
 }

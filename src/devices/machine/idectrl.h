@@ -18,7 +18,7 @@
 class ide_controller_device : public abstract_ata_interface_device
 {
 public:
-	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T> ide_controller_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
 	{
@@ -52,7 +52,7 @@ public:
 	void cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { write_cs1(offset, data, mem_mask); }
 
 protected:
-	ide_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ide_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(IDE_CONTROLLER, ide_controller_device)
@@ -61,7 +61,7 @@ DECLARE_DEVICE_TYPE(IDE_CONTROLLER, ide_controller_device)
 class ide_controller_32_device : public abstract_ata_interface_device
 {
 public:
-	ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	template <typename T> ide_controller_32_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
 	{
@@ -95,7 +95,7 @@ public:
 	void cs1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) { write_cs1(offset, data, mem_mask); }
 
 protected:
-	ide_controller_32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ide_controller_32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(IDE_CONTROLLER_32, ide_controller_32_device)
@@ -104,7 +104,7 @@ DECLARE_DEVICE_TYPE(IDE_CONTROLLER_32, ide_controller_32_device)
 class bus_master_ide_controller_device : public ide_controller_32_device
 {
 public:
-	bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	template <typename T> void set_bus_master_space(T &&bmtag, int bmspace) { m_dma_space.set_tag(std::forward<T>(bmtag), bmspace); }
 	template <bool R> void set_bus_master_space(const address_space_finder<R> &finder) { m_dma_space.set_tag(finder); }
 

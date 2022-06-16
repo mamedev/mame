@@ -91,7 +91,7 @@ void dms5000_state::dms5000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dms5000_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dms5000_state::io_map);
 
-	LS259(config, "cntlatch", 0); // V34
+	LS259(config, "cntlatch"); // V34
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

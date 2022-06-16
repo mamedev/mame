@@ -682,7 +682,7 @@ void dcs_audio_device::denver_postload()
 //  dcs_audio_device - constructor
 //-------------------------------------------------
 
-dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rev) :
+dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int rev) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_cpu(nullptr),
 	m_program(nullptr),
@@ -2531,7 +2531,7 @@ DEFINE_DEVICE_TYPE(DCS_AUDIO_2K, dcs_audio_2k_device, "dcs_audio_2k", "DCS Audio
 //  dcs_audio_2k_device - constructor
 //-------------------------------------------------
 
-dcs_audio_2k_device::dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dcs_audio_2k_device::dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dcs_audio_device(mconfig, DCS_AUDIO_2K, tag, owner, clock, REV_DCS1)
 {
 }
@@ -2547,7 +2547,7 @@ DEFINE_DEVICE_TYPE(DCS_AUDIO_2K_UART, dcs_audio_2k_uart_device, "dcs_audio_2k_ua
 //  dcs_audio_2k_uart_device - constructor
 //-------------------------------------------------
 
-dcs_audio_2k_uart_device::dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dcs_audio_2k_uart_device::dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dcs_audio_device(mconfig, DCS_AUDIO_2K_UART, tag, owner, clock, REV_DCS1)
 {
 }
@@ -2565,7 +2565,7 @@ DEFINE_DEVICE_TYPE(DCS_AUDIO_8K, dcs_audio_8k_device, "dcs_audio_8k", "DCS Audio
 //  dcs_audio_8k_device - constructor
 //-------------------------------------------------
 
-dcs_audio_8k_device::dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dcs_audio_8k_device::dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dcs_audio_device(mconfig, DCS_AUDIO_8K, tag, owner, clock, REV_DCS1)
 {
 }
@@ -2584,7 +2584,7 @@ DEFINE_DEVICE_TYPE(DCS_AUDIO_WPC, dcs_audio_wpc_device, "dcs_audio_wpc", "DCS Au
 //  dcs_audio_wpc_device - constructor
 //-------------------------------------------------
 
-dcs_audio_wpc_device::dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dcs_audio_wpc_device::dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dcs_audio_device(mconfig, DCS_AUDIO_WPC, tag, owner, clock, REV_DCS1P5)
 {
 }
@@ -2601,7 +2601,7 @@ void dcs_audio_wpc_device::device_add_mconfig(machine_config &config)
 //  dcs2_audio_device - constructor
 //-------------------------------------------------
 
-dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	dcs_audio_device(mconfig, type, tag, owner, clock, REV_DCS1)
 {
 }
@@ -2632,7 +2632,7 @@ DEFINE_DEVICE_TYPE(DCS2_AUDIO_2115, dcs2_audio_2115_device, "dcs2_audio_2115", "
 //  dcs2_audio_2115_device - constructor
 //-------------------------------------------------
 
-dcs2_audio_2115_device::dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dcs2_audio_2115_device::dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dcs2_audio_device(mconfig, DCS2_AUDIO_2115, tag, owner, clock)
 {
 }
@@ -2649,7 +2649,7 @@ DEFINE_DEVICE_TYPE(DCS2_AUDIO_2104, dcs2_audio_2104_device, "dcs2_audio_2104", "
 //-------------------------------------------------
 
 
-dcs2_audio_2104_device::dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dcs2_audio_2104_device::dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dcs2_audio_device(mconfig, DCS2_AUDIO_2104, tag, owner, clock)
 {
 }
@@ -2671,7 +2671,7 @@ DEFINE_DEVICE_TYPE(DCS2_AUDIO_DSIO, dcs2_audio_dsio_device, "dcs2_audio_dsio", "
 //  dcs2_audio_dsio_device - constructor
 //-------------------------------------------------
 
-dcs2_audio_dsio_device::dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dcs2_audio_dsio_device::dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dcs2_audio_device(mconfig, DCS2_AUDIO_DSIO, tag, owner, clock)
 {
 }
@@ -2703,7 +2703,7 @@ void dcs2_audio_dsio_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 //  dcs2_audio_denver_device - constructor
 //-------------------------------------------------
-dcs2_audio_denver_device::dcs2_audio_denver_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dcs2_audio_denver_device::dcs2_audio_denver_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	dcs2_audio_device(mconfig, type, tag, owner, clock)
 {
 }
@@ -2725,7 +2725,7 @@ void dcs2_audio_denver_device::device_add_mconfig(machine_config &config)
 	TIMER(config, m_sport0_timer).configure_generic(FUNC(dcs_audio_device::sport0_irq)); // Atlantis driver waits for sport0 rx interrupts
 }
 
-dcs2_audio_denver_5ch_device::dcs2_audio_denver_5ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dcs2_audio_denver_5ch_device::dcs2_audio_denver_5ch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dcs2_audio_denver_device(mconfig, DCS2_AUDIO_DENVER_5CH, tag, owner, clock)
 {
 }
@@ -2751,7 +2751,7 @@ void dcs2_audio_denver_5ch_device::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(DCS2_AUDIO_DENVER_5CH, dcs2_audio_denver_5ch_device, "dcs2_audio_denver_5ch", "DCS2 Audio Denver 5 Channel")
 
-dcs2_audio_denver_2ch_device::dcs2_audio_denver_2ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dcs2_audio_denver_2ch_device::dcs2_audio_denver_2ch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dcs2_audio_denver_device(mconfig, DCS2_AUDIO_DENVER_2CH, tag, owner, clock)
 {
 }

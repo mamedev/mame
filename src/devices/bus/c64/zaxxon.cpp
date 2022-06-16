@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(C64_ZAXXON, c64_zaxxon_cartridge_device, "c64_zaxxon", "C64 Z
 //  c64_zaxxon_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_zaxxon_cartridge_device::c64_zaxxon_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_zaxxon_cartridge_device::c64_zaxxon_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_ZAXXON, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)

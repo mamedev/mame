@@ -89,7 +89,7 @@ const tiny_rom_entry *bbc_tube_cms6809_device::device_rom_region() const
 //  bbc_tube_cms6809_device - constructor
 //-------------------------------------------------
 
-bbc_tube_cms6809_device::bbc_tube_cms6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_cms6809_device::bbc_tube_cms6809_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_TUBE_CMS6809, tag, owner, clock)
 	, device_bbc_tube_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")

@@ -65,7 +65,7 @@
 #define LOG_DRIVE(...) do { if (DIABLO_DEBUG) logprintf(__VA_ARGS__); } while (0)
 
 
-diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, DIABLO_HD, tag, owner, clock),
 	m_log_level(8),
 	m_diablo31(true),
@@ -1432,7 +1432,7 @@ TIMER_CALLBACK_MEMBER(diablo_hd_device::sector_mark_tick)
 
 void diablo_hd_device::device_add_mconfig(machine_config &config)
 {
-	DIABLO(config, "drive", 0);
+	DIABLO(config, "drive");
 }
 
 

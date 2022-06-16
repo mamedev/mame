@@ -7,7 +7,7 @@
 class xavix_math_device : public device_t
 {
 public:
-	xavix_math_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xavix_math_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t mult_r(offs_t offset);
 	void mult_w(offs_t offset, uint8_t data);

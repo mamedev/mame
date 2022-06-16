@@ -128,7 +128,7 @@ void k573dio_device::amap(address_map &map)
 	map(0xfe, 0xff).w(FUNC(k573dio_device::output_2_w));
 }
 
-k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KONAMI_573_DIGITAL_IO_BOARD, tag, owner, clock),
 	ram(*this, "ram", 0x2000000, ENDIANNESS_LITTLE),
 	k573fpga(*this, "k573fpga"),

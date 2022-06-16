@@ -54,7 +54,7 @@ void sv801_device::device_add_mconfig(machine_config &config)
 //  sv801_device - constructor
 //-------------------------------------------------
 
-sv801_device::sv801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sv801_device::sv801_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SV801, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),

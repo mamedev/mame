@@ -18,7 +18,7 @@ class astrocade_joy_device : public device_t,
 {
 public:
 	// construction/destruction
-	astrocade_joy_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
+	astrocade_joy_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~astrocade_joy_device();
 
 	// device_astrocade_ctrl_interface implementation

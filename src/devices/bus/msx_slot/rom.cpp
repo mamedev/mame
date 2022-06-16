@@ -7,13 +7,13 @@
 DEFINE_DEVICE_TYPE(MSX_SLOT_ROM, msx_slot_rom_device, "msx_slot_rom", "MSX Internal ROM")
 
 
-msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_rom_device(mconfig, MSX_SLOT_ROM, tag, owner, clock)
 {
 }
 
 
-msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_rom_region(*this, finder_base::DUMMY_TAG)

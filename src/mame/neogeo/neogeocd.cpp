@@ -1052,7 +1052,7 @@ void ngcd_state::neocd_ntsc(machine_config &config)
 	m_screen->set_screen_update(FUNC(ngcd_state::screen_update));
 
 	// temporary until things are cleaned up
-	LC89510_TEMP(config, m_tempcdc, 0); // cd controller
+	LC89510_TEMP(config, m_tempcdc); // cd controller
 	m_tempcdc->set_cdrom_tag("cdrom");
 	m_tempcdc->set_is_neoCD(true);
 	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1));

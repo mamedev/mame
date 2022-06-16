@@ -28,7 +28,7 @@ class spectrum_flpone_device :
 {
 public:
 	// construction/destruction
-	spectrum_flpone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_flpone_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static void floppy_formats(format_registration &fr);
 	DECLARE_INPUT_CHANGED_MEMBER(snapshot_button) { m_slot->nmi_w(newval ? ASSERT_LINE : CLEAR_LINE); }

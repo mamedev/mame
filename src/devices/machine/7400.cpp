@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(TTL7400, ttl7400_device, "7400", "7400 Quad 2-Input NAND Gate")
 
-ttl7400_device::ttl7400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ttl7400_device::ttl7400_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TTL7400, tag, owner, clock)
 	, m_y_func(*this)
 	, m_a(0)

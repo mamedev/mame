@@ -14,7 +14,7 @@
 class sgi_re2_device : public device_t
 {
 public:
-	sgi_re2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	sgi_re2_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	auto out_rdy() { return m_rdy_cb.bind(); }
 	auto out_drq() { return m_drq_cb.bind(); }

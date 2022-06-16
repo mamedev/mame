@@ -50,7 +50,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_dsr);
 
 protected:
-	psxsio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	psxsio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -86,13 +86,13 @@ private:
 class psxsio0_device : public psxsio_device
 {
 public:
-	psxsio0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psxsio0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class psxsio1_device : public psxsio_device
 {
 public:
-	psxsio1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psxsio1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 #endif // MAME_CPU_PSX_SIO_H

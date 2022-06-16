@@ -58,7 +58,7 @@ void kissp_state::init_kissp()
 void kissp_state::kissp(machine_config &config)
 {
 	/* basic machine hardware */
-	I8035(config, m_maincpu, 6000000);
+	I8035(config, m_maincpu, XTAL::u(6000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &kissp_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &kissp_state::io_map);
 }

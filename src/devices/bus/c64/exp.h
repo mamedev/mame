@@ -56,7 +56,7 @@ class c64_expansion_slot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: c64_expansion_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -65,7 +65,7 @@ public:
 		set_fixed(false);
 	}
 
-	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_callback() { return m_write_irq.bind(); }
 	auto nmi_callback() { return m_write_nmi.bind(); }
@@ -87,8 +87,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
 	DECLARE_WRITE_LINE_MEMBER( dma_w ) { m_write_dma(state); }
 	DECLARE_WRITE_LINE_MEMBER( reset_w ) { m_write_reset(state); }
-	int phi2() { return clock(); }
-	int dotclock() { return phi2() * 8; }
+	XTAL phi2() { return clock(); }
+	XTAL dotclock() { return phi2() * 8; }
 	int hiram() { return m_hiram; }
 	int loram() { return m_loram; }
 

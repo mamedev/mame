@@ -373,7 +373,7 @@ void cosmicg_state::cosmicg(machine_config &config)
 	m_samples->set_samples_names(cosmicg_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // NE556
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5); // NE556
 	// Other DACs include 3-bit binary-weighted (100K/50K/25K) DAC combined with another NE556 for attack march
 }
 

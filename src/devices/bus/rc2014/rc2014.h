@@ -74,7 +74,7 @@ class rc2014_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~rc2014_bus_device();
 
 	auto clk_callback() { return m_clk.bind(); }
@@ -103,7 +103,7 @@ public:
 	const z80_daisy_config* get_daisy_chain();
 
 protected:
-	rc2014_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	rc2014_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -144,7 +144,7 @@ protected:
 class rc2014_slot_device : public device_t, public device_slot_interface
 {
 public:
-	rc2014_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	rc2014_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T, typename U>
 	rc2014_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option, bool fixed = false)
@@ -158,7 +158,7 @@ public:
 	}
 
 protected:
-	rc2014_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	rc2014_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
@@ -176,7 +176,7 @@ class rc2014_ext_bus_device : public rc2014_bus_device
 {
 public:
 	// construction/destruction
-	rc2014_ext_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rc2014_ext_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto clk2_callback() { return m_clk2.bind(); }
 	auto page_callback() { return m_page.bind(); }
@@ -199,7 +199,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( user8_w ) { m_user8(state); }
 
 protected:
-	rc2014_ext_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	rc2014_ext_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -237,7 +237,7 @@ protected:
 class rc2014_ext_slot_device : public rc2014_slot_device
 {
 public:
-	rc2014_ext_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	rc2014_ext_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T, typename U>
 	rc2014_ext_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option, bool fixed = false)
@@ -251,7 +251,7 @@ public:
 	}
 
 protected:
-	rc2014_ext_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	rc2014_ext_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock);
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
@@ -267,10 +267,10 @@ class rc2014_rc80_bus_device : public rc2014_ext_bus_device
 {
 public:
 	// construction/destruction
-	rc2014_rc80_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rc2014_rc80_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	rc2014_rc80_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	rc2014_rc80_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -297,7 +297,7 @@ protected:
 class rc2014_rc80_slot_device : public rc2014_ext_slot_device
 {
 public:
-	rc2014_rc80_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	rc2014_rc80_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T, typename U>
 	rc2014_rc80_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option, bool fixed = false)

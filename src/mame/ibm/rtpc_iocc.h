@@ -14,7 +14,7 @@ class rtpc_iocc_device
 	, public rsc_bus_interface
 {
 public:
-	rtpc_iocc_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	rtpc_iocc_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	auto out_int() { return m_out_int.bind(); }
 	auto out_rst() { return m_out_rst.bind(); }

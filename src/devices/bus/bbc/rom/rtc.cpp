@@ -34,7 +34,7 @@ void bbc_stlrtc_device::device_add_mconfig(machine_config &config)
 void bbc_pmsrtc_device::device_add_mconfig(machine_config &config)
 {
 	/* Dallas DS1216 SmartWatch RAM */
-	DS1315(config, m_rtc, 0);
+	DS1315(config, m_rtc);
 }
 
 //**************************************************************************
@@ -45,14 +45,14 @@ void bbc_pmsrtc_device::device_add_mconfig(machine_config &config)
 //  bbc_stlrtc_device - constructor
 //-------------------------------------------------
 
-bbc_stlrtc_device::bbc_stlrtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_stlrtc_device::bbc_stlrtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_STLRTC, tag, owner, clock)
 	, device_bbc_rom_interface(mconfig, *this)
 	, m_rtc(*this, "rtc")
 {
 }
 
-bbc_pmsrtc_device::bbc_pmsrtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_pmsrtc_device::bbc_pmsrtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_PMSRTC, tag, owner, clock)
 	, device_bbc_rom_interface(mconfig, *this)
 	, m_rtc(*this, "rtc")

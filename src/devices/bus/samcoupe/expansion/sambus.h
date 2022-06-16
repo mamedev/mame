@@ -25,7 +25,7 @@ class sam_sambus_device : public device_t, public device_samcoupe_expansion_inte
 {
 public:
 	// construction/destruction
-	sam_sambus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sam_sambus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// from host
 	virtual void xmem_w(int state) override;

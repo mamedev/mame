@@ -182,7 +182,7 @@ void sega_sk1100_device::device_add_mconfig(machine_config &config)
 //  sega_sk1100_device - constructor
 //-------------------------------------------------
 
-sega_sk1100_device::sega_sk1100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sega_sk1100_device::sega_sk1100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SEGA_SK1100, tag, owner, clock),
 	device_sg1000_expansion_slot_interface(mconfig, *this),
 	m_cassette(*this, "cassette"),

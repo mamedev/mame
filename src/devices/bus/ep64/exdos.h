@@ -29,7 +29,7 @@ class ep64_exdos_device : public device_t,
 {
 public:
 	// construction/destruction
-	ep64_exdos_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ep64_exdos_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t read();
 	void write(uint8_t data);

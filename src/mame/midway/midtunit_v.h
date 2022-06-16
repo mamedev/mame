@@ -24,14 +24,14 @@ public:
 	// construction/destruction
 	template <typename T, typename U, typename V>
 	midtunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&palette_tag, V &&gfxrom_tag)
-		: midtunit_video_device(mconfig, tag, owner, (uint32_t)0)
+		: midtunit_video_device(mconfig, tag, owner)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 		m_palette.set_tag(std::forward<U>(palette_tag));
 		m_gfxrom.set_tag(std::forward<V>(gfxrom_tag));
 	}
 
-	midtunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	midtunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
@@ -61,7 +61,7 @@ public:
 
 protected:
 	// construction/destruction
-	midtunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	midtunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual void device_start() override;
 
@@ -184,13 +184,13 @@ public:
 	// construction/destruction
 	template <typename T, typename U, typename V>
 	midwunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&palette_tag, V &&gfxrom_tag)
-		: midwunit_video_device(mconfig, tag, owner, (uint32_t)0)
+		: midwunit_video_device(mconfig, tag, owner)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 		m_palette.set_tag(std::forward<U>(palette_tag));
 		m_gfxrom.set_tag(std::forward<V>(gfxrom_tag));
 	}
-	midwunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	midwunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint16_t midwunit_gfxrom_r(offs_t offset);
 
@@ -198,7 +198,7 @@ public:
 	uint16_t midwunit_control_r();
 
 protected:
-	midwunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	midwunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual void device_start() override;
 #if DEBUG_MIDTUNIT_BLITTER
@@ -212,14 +212,14 @@ public:
 	// construction/destruction
 	template <typename T, typename U, typename V>
 	midxunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&palette_tag, V &&gfxrom_tag)
-		: midwunit_video_device(mconfig, tag, owner, (uint32_t)0)
+		: midwunit_video_device(mconfig, tag, owner)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 		m_palette.set_tag(std::forward<U>(palette_tag));
 		m_gfxrom.set_tag(std::forward<V>(gfxrom_tag));
 	}
 
-	midxunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	midxunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void midxunit_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t midxunit_paletteram_r(offs_t offset);

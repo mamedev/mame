@@ -62,7 +62,7 @@ public:
 		set_insert_rom(true);
 	}
 
-	bbc_tube_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	bbc_tube_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void set_insert_rom(bool insert_rom) { m_insert_rom = insert_rom; }
 	bool insert_rom() { return m_insert_rom; }

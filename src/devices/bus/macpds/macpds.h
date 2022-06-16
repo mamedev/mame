@@ -26,7 +26,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *nbtag, T &&opts, const char *dflt)
-		: macpds_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: macpds_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -34,14 +34,14 @@ public:
 		set_macpds_slot(nbtag);
 	}
 
-	macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration
 	template <typename T>
 	void set_macpds_slot(T &&tag) { m_macpds.set_tag(std::forward<T>(tag));}
 
 protected:
-	macpds_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	macpds_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -62,12 +62,12 @@ class macpds_device : public device_t
 public:
 	// construction/destruction
 	macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *cputag)
-		: macpds_device(mconfig, tag, owner, (uint32_t)0)
+		: macpds_device(mconfig, tag, owner)
 	{
 		set_cputag(cputag);
 	}
 
-	macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	~macpds_device() { m_device_list.detach_all(); }
 	// inline configuration
@@ -81,7 +81,7 @@ public:
 	void set_irq_line(int line, int state);
 
 protected:
-	macpds_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	macpds_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;

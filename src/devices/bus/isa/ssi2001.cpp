@@ -18,7 +18,7 @@ void ssi2001_device::device_add_mconfig(machine_config &config)
 	PC_JOY(config, m_joy);
 }
 
-ssi2001_device::ssi2001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ssi2001_device::ssi2001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA8_SSI2001, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_joy(*this, "pc_joy"),

@@ -122,7 +122,7 @@ void ncr53c94_device::write(offs_t offset, uint8_t data)
 		ncr53c90a_device::write(offset, data);
 }
 
-ncr5390_device::ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ncr5390_device::ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nscsi_device(mconfig, type, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, tm(nullptr), config(0), status(0), istatus(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0)
@@ -132,35 +132,35 @@ ncr5390_device::ncr5390_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-ncr53c90a_device::ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ncr53c90a_device::ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: ncr5390_device(mconfig, type, tag, owner, clock)
 	, config2(0)
 {
 }
 
-ncr5390_device::ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ncr5390_device::ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ncr5390_device(mconfig, NCR5390, tag, owner, clock)
 {
 }
 
-ncr53c90a_device::ncr53c90a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ncr53c90a_device::ncr53c90a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ncr53c90a_device(mconfig, NCR53C90A, tag, owner, clock)
 {
 }
 
-ncr53c94_device::ncr53c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ncr53c94_device::ncr53c94_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ncr53c94_device(mconfig, NCR53C94, tag, owner, clock)
 {
 }
 
-ncr53c94_device::ncr53c94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ncr53c94_device::ncr53c94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: ncr53c90a_device(mconfig, type, tag, owner, clock)
 	, config3(0)
 	, m_busmd(BUSMD_0)
 {
 }
 
-ncr53cf94_device::ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ncr53cf94_device::ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ncr53c94_device(mconfig, NCR53CF94, tag, owner, clock)
 {
 }

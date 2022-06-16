@@ -158,7 +158,7 @@ class mm5837_device : public device_t
 {
 public:
 	// construction/destruction
-	mm5837_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mm5837_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	void set_vdd(double voltage) { m_vdd = voltage; }
@@ -186,7 +186,7 @@ class mm5837_stream_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	mm5837_stream_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm5837_stream_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_vdd(double voltage) { m_vdd = voltage; }

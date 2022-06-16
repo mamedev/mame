@@ -40,7 +40,7 @@ void device_pccard_interface::write_reg(offs_t offset, uint16_t data, uint16_t m
 
 DEFINE_DEVICE_TYPE(PCCARD_SLOT, pccard_slot_device, "pccard", "PC Card Slot")
 
-pccard_slot_device::pccard_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pccard_slot_device::pccard_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PCCARD_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_pccard_interface>(mconfig, *this),
 	m_pccard(nullptr)

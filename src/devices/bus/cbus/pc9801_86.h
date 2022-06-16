@@ -26,8 +26,8 @@ class pc9801_86_device : public pc9801_snd_device
 {
 public:
 	// construction/destruction
-	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
+	pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 
@@ -77,7 +77,7 @@ class pc9801_speakboard_device : public pc9801_86_device
 {
 public:
 	// construction/destruction
-	pc9801_speakboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc9801_speakboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
@@ -98,7 +98,7 @@ class otomichan_kai_device : public pc9801_86_device
 {
 public:
 	// construction/destruction
-	otomichan_kai_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	otomichan_kai_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 

@@ -585,7 +585,7 @@ void pc8401a_state::pc8401a(machine_config &config)
 	ppi.in_pc_callback().set(FUNC(pc8401a_state::ppi_pc_r));
 	ppi.out_pc_callback().set(FUNC(pc8401a_state::ppi_pc_w));
 
-	i8251_device &uart(I8251(config, I8251_TAG, 0));
+	i8251_device &uart(I8251(config, I8251_TAG));
 	uart.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
@@ -610,7 +610,7 @@ void pc8401a_state::pc8401a(machine_config &config)
 void pc8500_state::pc8500(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000); // NEC uPD70008C
+	Z80(config, m_maincpu, XTAL::u(4000000)); // NEC uPD70008C
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8500_state::pc8401a_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc8500_state::pc8500_io);
 
@@ -624,7 +624,7 @@ void pc8500_state::pc8500(machine_config &config)
 	ppi.in_pc_callback().set(FUNC(pc8401a_state::ppi_pc_r));
 	ppi.out_pc_callback().set(FUNC(pc8401a_state::ppi_pc_w));
 
-	i8251_device &uart(I8251(config, I8251_TAG, 0));
+	i8251_device &uart(I8251(config, I8251_TAG));
 	uart.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));

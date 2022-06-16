@@ -21,7 +21,7 @@ class single_clock_device : public device_t, public device_rc2014_card_interface
 {
 public:
 	// construction/destruction
-	single_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	single_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -31,7 +31,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( clk_w ) { m_bus->clk_w(state); }
 };
 
-single_clock_device::single_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+single_clock_device::single_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RC2014_SINGLE_CLOCK, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 {
@@ -61,7 +61,7 @@ class dual_clock_base : public device_t
 {
 protected:
 	// construction/destruction
-	dual_clock_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	dual_clock_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -79,7 +79,7 @@ protected:
 	required_ioport m_clk_sel_2;
 };
 
-dual_clock_base::dual_clock_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+dual_clock_base::dual_clock_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_clock_1(*this, "clock1")
 	, m_clock_2(*this, "clock2")
@@ -151,10 +151,10 @@ ioport_constructor dual_clock_base::device_input_ports() const
 
 void dual_clock_base::device_add_mconfig(machine_config &config)
 {
-	CLOCK(config, m_clock_1, 0);
+	CLOCK(config, m_clock_1);
 	m_clock_1->signal_handler().set(FUNC(dual_clock_base::clk_w));
 
-	CLOCK(config, m_clock_2, 0);
+	CLOCK(config, m_clock_2);
 	m_clock_2->signal_handler().set(FUNC(dual_clock_base::clk2_w));
 }
 
@@ -166,7 +166,7 @@ class dual_clock_device : public dual_clock_base, public device_rc2014_ext_card_
 {
 public:
 	// construction/destruction
-	dual_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dual_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -177,7 +177,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( clk2_w ) override { m_bus->clk2_w(state); }
 };
 
-dual_clock_device::dual_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dual_clock_device::dual_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dual_clock_base(mconfig, RC2014_DUAL_CLOCK, tag, owner, clock)
 	, device_rc2014_ext_card_interface(mconfig, *this)
 {
@@ -197,7 +197,7 @@ class dual_clock_device_40pin : public dual_clock_base, public device_rc2014_car
 {
 public:
 	// construction/destruction
-	dual_clock_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dual_clock_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -208,7 +208,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( clk2_w ) override { }
 };
 
-dual_clock_device_40pin::dual_clock_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dual_clock_device_40pin::dual_clock_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dual_clock_base(mconfig, RC2014_DUAL_CLOCK_40P, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 {

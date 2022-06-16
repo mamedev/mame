@@ -458,7 +458,7 @@ void juku_state::machine_reset()
 void juku_state::juku(machine_config &config)
 {
 	// КР580ВМ80A @ 2 MHz
-	I8080A(config, m_maincpu, 2000000);
+	I8080A(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &juku_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &juku_state::io_map);
 	m_maincpu->in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
@@ -470,11 +470,11 @@ void juku_state::juku(machine_config &config)
 	m_bank->set_stride(0x10000);
 
 	// КР580ВН59
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// КР580ВИ53
-	PIT8253(config, m_pit[0], 0);
+	PIT8253(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(16_MHz_XTAL/16);
 	m_pit[0]->out_handler<0>().set(m_pit[1], FUNC(pit8253_device::write_clk0));
 	m_pit[0]->out_handler<0>().append(m_pit[0], FUNC(pit8253_device::write_gate1));
@@ -485,13 +485,13 @@ void juku_state::juku(machine_config &config)
 	m_pit[0]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 
 	// КР580ВИ53
-	PIT8253(config, m_pit[1], 0);
+	PIT8253(config, m_pit[1]);
 	m_pit[1]->out_handler<0>().set(m_pit[1], FUNC(pit8253_device::write_gate1));
 	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate2));
 	m_pit[1]->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w));
 
 	// КР580ВИ53
-	PIT8253(config, m_pit[2], 0);
+	PIT8253(config, m_pit[2]);
 
 	// КР580ВВ55A
 	I8255A(config, m_pio[0]);
@@ -503,12 +503,12 @@ void juku_state::juku(machine_config &config)
 	I8255A(config, m_pio[1]);
 
 	// КР580ВВ51A
-	I8251(config, m_sio[0], 0);
+	I8251(config, m_sio[0]);
 	m_sio[0]->rxrdy_handler().set("pic", FUNC(pic8259_device::ir2_w));
 	m_sio[0]->txrdy_handler().set("pic", FUNC(pic8259_device::ir3_w));
 
 	// КР580ВВ51A (instead of FDC?)
-	I8251(config, m_sio[1], 0);
+	I8251(config, m_sio[1]);
 	m_sio[1]->rxrdy_handler().set("pic", FUNC(pic8259_device::ir0_w));
 	m_sio[1]->txrdy_handler().set("pic", FUNC(pic8259_device::ir1_w));
 
@@ -519,9 +519,9 @@ void juku_state::juku(machine_config &config)
 	screen.set_visarea(0, 319, 0, 239);
 	screen.set_screen_update(FUNC(juku_state::screen_update));
 
-	TTL74148(config, m_key_encoder, 0);
+	TTL74148(config, m_key_encoder);
 
-	KR1818VG93(config, m_fdc, 1000000);
+	KR1818VG93(config, m_fdc, XTAL::u(1000000));
 //  m_fdc->intrq_wr_callback().set(FUNC(juku_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(juku_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", juku_floppies, "525qd", juku_state::floppy_formats);

@@ -33,7 +33,7 @@
 
 DEFINE_DEVICE_TYPE(PXA255_PERIPHERALS, pxa255_periphs_device, "pxa255_periphs", "Intel XScale PXA255 Peripherals")
 
-pxa255_periphs_device::pxa255_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pxa255_periphs_device::pxa255_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PXA255_PERIPHERALS, tag, owner, clock)
 	, m_gpio0_w(*this)
 	, m_gpio1_w(*this)

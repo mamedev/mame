@@ -16,7 +16,7 @@
 
 DEFINE_DEVICE_TYPE(NAMCO_163, namco_163_sound_device, "namco_163_sound", "Namco 163 (Sound)")
 
-namco_163_sound_device::namco_163_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+namco_163_sound_device::namco_163_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NAMCO_163, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_reg_addr(0x78)

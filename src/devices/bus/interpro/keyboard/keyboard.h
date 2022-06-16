@@ -22,7 +22,7 @@ public:
 		set_fixed(false);
 	}
 
-	interpro_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	interpro_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callback configuration
 	auto rxd_handler_cb() { return m_rxd_handler.bind(); }

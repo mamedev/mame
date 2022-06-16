@@ -46,7 +46,7 @@ INPUT_PORTS_END
 
 void yamaha_psr40_state::psr40(machine_config &config)
 {
-	Z80(config, m_maincpu, 4'000'000); // unknown clock
+	Z80(config, m_maincpu, XTAL::u(4'000'000)); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &yamaha_psr40_state::mem_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5517APL + battery?

@@ -19,9 +19,9 @@
 
 class h8_sci_device : public device_t {
 public:
-	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int eri, int rxi, int txi, int tei)
-		: h8_sci_device(mconfig, tag, owner, 0)
+		: h8_sci_device(mconfig, tag, owner)
 	{
 		set_info(intc, eri, rxi, txi, tei);
 	}

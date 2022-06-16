@@ -13,10 +13,10 @@
 class spg290_cdservo_device : public device_t
 {
 public:
-	spg290_cdservo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spg290_cdservo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T>
-	spg290_cdservo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cdrom_tag)
+	spg290_cdservo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cdrom_tag)
 		: spg290_cdservo_device(mconfig, tag, owner, clock)
 	{
 		m_cdrom.set_tag(std::forward<T>(cdrom_tag));

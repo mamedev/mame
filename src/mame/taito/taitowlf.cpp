@@ -368,13 +368,13 @@ void taitowlf_state::taitowlf_palette(palette_device &palette) const
 void taitowlf_state::taitowlf(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM(config, m_maincpu, 200000000);
+	PENTIUM(config, m_maincpu, XTAL::u(200000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitowlf_state::taitowlf_map);
 	m_maincpu->set_addrmap(AS_IO, &taitowlf_state::taitowlf_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus"));
 	pcibus.set_device(0, FUNC(taitowlf_state::intel82439tx_pci_r), FUNC(taitowlf_state::intel82439tx_pci_w));
 	pcibus.set_device(7, FUNC(taitowlf_state::intel82371ab_pci_r), FUNC(taitowlf_state::intel82371ab_pci_w));
 

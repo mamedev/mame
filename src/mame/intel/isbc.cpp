@@ -354,10 +354,10 @@ void isbc_state::isbc86(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &isbc_state::isbc_io);
 	m_maincpu->set_irq_acknowledge_callback("pic_0", FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_pic_0, 0);
+	PIC8259(config, m_pic_0);
 	m_pic_0->out_int_callback().set_inputline(m_maincpu, 0);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(XTAL(22'118'400)/18);
 	pit.out_handler<0>().set(m_pic_0, FUNC(pic8259_device::ir0_w));
 	pit.set_clk<1>(XTAL(22'118'400)/18);
@@ -366,7 +366,7 @@ void isbc_state::isbc86(machine_config &config)
 
 	I8255A(config, "ppi");
 
-	I8251(config, m_uart8251, 0);
+	I8251(config, m_uart8251);
 	m_uart8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -388,10 +388,10 @@ void isbc_state::rpc86(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &isbc_state::rpc86_io);
 	m_maincpu->set_irq_acknowledge_callback("pic_0", FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_pic_0, 0);
+	PIC8259(config, m_pic_0);
 	m_pic_0->out_int_callback().set_inputline(m_maincpu, 0);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(XTAL(22'118'400)/18);
 	pit.out_handler<0>().set(m_pic_0, FUNC(pic8259_device::ir2_w));
 	pit.set_clk<1>(XTAL(22'118'400)/144);
@@ -400,7 +400,7 @@ void isbc_state::rpc86(machine_config &config)
 
 	I8255A(config, "ppi");
 
-	I8251(config, m_uart8251, 0);
+	I8251(config, m_uart8251);
 	m_uart8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -414,10 +414,10 @@ void isbc_state::rpc86(machine_config &config)
 	rs232.dsr_handler().set(m_uart8251, FUNC(i8251_device::write_dsr));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(isbc286_terminal));
 
-	ISBX_SLOT(config, m_sbx[0], 0, isbx_cards, nullptr);
+	ISBX_SLOT(config, m_sbx[0], isbx_cards, nullptr);
 	//m_sbx[0]->mintr0().set("pic_0", FUNC(pic8259_device::ir3_w));
 	//m_sbx[0]->mintr1().set("pic_0", FUNC(pic8259_device::ir4_w));
-	ISBX_SLOT(config, m_sbx[1], 0, isbx_cards, nullptr);
+	ISBX_SLOT(config, m_sbx[1], isbx_cards, nullptr);
 	//m_sbx[1]->mintr0().set("pic_0", FUNC(pic8259_device::ir5_w));
 	//m_sbx[1]->mintr1().set("pic_0", FUNC(pic8259_device::ir6_w));
 }
@@ -428,7 +428,7 @@ void isbc_state::isbc8605(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_IO, &isbc_state::isbc8605_io);
 
-	ISBC_208(config, "isbc_208", 0, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
+	ISBC_208(config, "isbc_208", m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
 }
 
 void isbc_state::isbc8630(machine_config &config)
@@ -437,7 +437,7 @@ void isbc_state::isbc8630(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_IO, &isbc_state::isbc8630_io);
 
-	ISBC_215G(config, "isbc_215g", 0, 0x100, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
+	ISBC_215G(config, "isbc_215g", 0x100, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
 
 	LS259(config, m_statuslatch); // U14
 //  m_statuslatch->q_out_cb<0>().set("pit", FUNC(pit8253_device::write_gate0));
@@ -459,16 +459,16 @@ void isbc_state::isbc286(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &isbc_state::isbc286_io);
 	m_maincpu->set_irq_acknowledge_callback("pic_0", FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_pic_0, 0);
+	PIC8259(config, m_pic_0);
 	m_pic_0->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic_0->in_sp_callback().set_constant(1);
 	m_pic_0->read_slave_ack_callback().set(FUNC(isbc_state::get_slave_ack));
 
-	PIC8259(config, m_pic_1, 0);
+	PIC8259(config, m_pic_1);
 	m_pic_1->out_int_callback().set(m_pic_0, FUNC(pic8259_device::ir7_w));
 	m_pic_1->in_sp_callback().set_constant(0);
 
-	pit8254_device &pit(PIT8254(config, "pit", 0));
+	pit8254_device &pit(PIT8254(config, "pit"));
 	pit.set_clk<0>(XTAL(22'118'400)/18);
 	pit.out_handler<0>().set(m_pic_0, FUNC(pic8259_device::ir0_w));
 	pit.set_clk<1>(XTAL(22'118'400)/18);
@@ -486,7 +486,7 @@ void isbc_state::isbc286(machine_config &config)
 	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
 	m_centronics->fault_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit6));
 
-	INPUT_BUFFER(config, m_cent_status_in, 0);
+	INPUT_BUFFER(config, m_cent_status_in);
 
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
@@ -523,14 +523,14 @@ void isbc_state::isbc286(machine_config &config)
 	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsb_w));
 	rs232b.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(isbc286_terminal));
 
-	ISBX_SLOT(config, m_sbx[0], 0, isbx_cards, nullptr);
+	ISBX_SLOT(config, m_sbx[0], isbx_cards, nullptr);
 	m_sbx[0]->mintr0().set("pic_1", FUNC(pic8259_device::ir3_w));
 	m_sbx[0]->mintr1().set("pic_1", FUNC(pic8259_device::ir4_w));
-	ISBX_SLOT(config, m_sbx[1], 0, isbx_cards, nullptr);
+	ISBX_SLOT(config, m_sbx[1], isbx_cards, nullptr);
 	m_sbx[1]->mintr0().set("pic_1", FUNC(pic8259_device::ir5_w));
 	m_sbx[1]->mintr1().set("pic_1", FUNC(pic8259_device::ir6_w));
 
-	ISBC_215G(config, "isbc_215g", 0, 0x100, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
+	ISBC_215G(config, "isbc_215g", 0x100, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
 }
 
 void isbc_state::isbc2861(machine_config &config)
@@ -547,7 +547,7 @@ void isbc_state::sm1810(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &isbc_state::sm1810_io);
 
 	m_uart8251->dtr_handler().set(m_uart8251, FUNC(i8251_device::write_dsr));
-	isbc_215g_device &isbc215(ISBC_215G(config, "isbc_215g", 0, 0xefe0, m_maincpu));
+	isbc_215g_device &isbc215(ISBC_215G(config, "isbc_215g", 0xefe0, m_maincpu));
 	isbc215.irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
 	isbc215.subdevice<isbx_slot_device>("sbx2")->set_option_machine_config("fdc_218a", cfg_fdc_qd);
 

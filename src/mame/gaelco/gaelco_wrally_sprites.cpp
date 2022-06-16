@@ -7,14 +7,14 @@
 DEFINE_DEVICE_TYPE(GAELCO_WRALLY_SPRITES, gaelco_wrally_sprites_device, "gaelco_wrally_sprites", "Gaelco World Rally Sprites")
 DEFINE_DEVICE_TYPE(BLMBYCAR_SPRITES, blmbycar_sprites_device, "blmbycar_sprites", "Blomby Car Sprites")
 
-gaelco_wrally_sprites_device::gaelco_wrally_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+gaelco_wrally_sprites_device::gaelco_wrally_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 {
 }
 
-gaelco_wrally_sprites_device::gaelco_wrally_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gaelco_wrally_sprites_device::gaelco_wrally_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: gaelco_wrally_sprites_device(mconfig, GAELCO_WRALLY_SPRITES, tag, owner, clock)
 {
 }
@@ -220,7 +220,7 @@ void gaelco_wrally_sprites_device::mix_sprites(bitmap_ind16 &bitmap, const recta
 
 ***************************************************************************/
 
-blmbycar_sprites_device::blmbycar_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+blmbycar_sprites_device::blmbycar_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: gaelco_wrally_sprites_device(mconfig, BLMBYCAR_SPRITES, tag, owner, clock)
 {
 }

@@ -40,7 +40,7 @@ enum
 #define DEVICE1_PDIAG_TIME                  (attotime::from_msec(2))
 #define DIAGNOSTIC_TIME                     (attotime::from_msec(2))
 
-ata_hle_device::ata_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ata_hle_device::ata_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_ata_interface(mconfig, *this),
 	m_buffer_offset(0),

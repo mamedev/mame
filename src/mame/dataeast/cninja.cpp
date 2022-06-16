@@ -765,7 +765,7 @@ void cninja_state::cninja(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	deco_irq_device &irq(DECO_IRQ(config, "irq"));
 	irq.set_screen_tag(m_screen);
 	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
 	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
@@ -784,7 +784,7 @@ void cninja_state::cninja(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -795,7 +795,7 @@ void cninja_state::cninja(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
@@ -808,12 +808,12 @@ void cninja_state::cninja(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0]);
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO104PROT(config, m_ioprot, 0);
+	DECO104PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("DSW");
@@ -843,10 +843,10 @@ void cninja_state::stoneage(machine_config &config)
 	M68000(config, m_maincpu, XTAL(24'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cninja_state::cninja_map);
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, XTAL::u(3579545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cninja_state::stoneage_s_map);
 
-	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	deco_irq_device &irq(DECO_IRQ(config, "irq"));
 	irq.set_screen_tag(m_screen);
 	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
 	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
@@ -867,7 +867,7 @@ void cninja_state::stoneage(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -878,7 +878,7 @@ void cninja_state::stoneage(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
@@ -891,12 +891,12 @@ void cninja_state::stoneage(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0]);
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO104PROT(config, m_ioprot, 0);
+	DECO104PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("DSW");
@@ -937,10 +937,10 @@ void cninja_state::cninjabl(machine_config &config)
 	M68000(config, m_maincpu, XTAL(24'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cninja_state::cninjabl_map);
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, XTAL::u(3579545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cninja_state::cninjabl_sound_map);
 
-	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	deco_irq_device &irq(DECO_IRQ(config, "irq"));
 	irq.set_screen_tag(m_screen);
 	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
 	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
@@ -959,7 +959,7 @@ void cninja_state::cninjabl(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -970,7 +970,7 @@ void cninja_state::cninjabl(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
@@ -1008,7 +1008,7 @@ void cninja_state::edrandy(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	deco_irq_device &irq(DECO_IRQ(config, "irq"));
 	irq.set_screen_tag(m_screen);
 	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
 	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
@@ -1025,7 +1025,7 @@ void cninja_state::edrandy(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -1036,7 +1036,7 @@ void cninja_state::edrandy(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
@@ -1049,12 +1049,12 @@ void cninja_state::edrandy(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0]);
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO146PROT(config, m_ioprot, 0);
+	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("DSW");
@@ -1087,7 +1087,7 @@ void cninja_state::robocop2(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	deco_irq_device &irq(DECO_IRQ(config, "irq"));
 	irq.set_screen_tag(m_screen);
 	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
 	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
@@ -1107,7 +1107,7 @@ void cninja_state::robocop2(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -1119,7 +1119,7 @@ void cninja_state::robocop2(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
@@ -1133,12 +1133,12 @@ void cninja_state::robocop2(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0]);
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO146PROT(config, m_ioprot, 0);
+	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("DSW");
@@ -1188,7 +1188,7 @@ void cninja_state::mutantf(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -1201,7 +1201,7 @@ void cninja_state::mutantf(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
@@ -1214,15 +1214,15 @@ void cninja_state::mutantf(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0]);
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[1], 0);
+	DECO_SPRITE(config, m_sprgen[1]);
 	m_sprgen[1]->set_gfx_region(4);
 	m_sprgen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO146PROT(config, m_ioprot, 0);
+	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("DSW");

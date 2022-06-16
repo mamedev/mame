@@ -15,7 +15,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(COM52C50, com52c50_device, "com52c50", "SMC COM52C50 TIC")
 
-com52c50_device::com52c50_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+com52c50_device::com52c50_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, COM52C50, tag, owner, clock)
 	, m_int1_callback(*this)
 	, m_int2_callback(*this)

@@ -290,7 +290,7 @@ void desdis_state::fdes2100d(machine_config &config)
 	M65C02(config, m_maincpu, 6_MHz_XTAL); // W65C02P-6
 	m_maincpu->set_addrmap(AS_PROGRAM, &desdis_state::fdes2100d_map);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
+	auto &irq_clock(CLOCK(config, "irq_clock", XTAL::u(600))); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
 	irq_clock.set_pulse_width(attotime::from_nsec(15250)); // active for 15.25us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
@@ -325,7 +325,7 @@ void desmas_state::fdes2265(machine_config &config)
 	M68000(config.replace(), m_maincpu, 16_MHz_XTAL); // MC68HC000P12F
 	m_maincpu->set_addrmap(AS_PROGRAM, &desmas_state::fdes2265_map);
 
-	auto &irq_clock(CLOCK(config.replace(), "irq_clock", 600)); // from 555 timer, ideal frequency is 600Hz (measured 597Hz)
+	auto &irq_clock(CLOCK(config.replace(), "irq_clock", XTAL::u(600))); // from 555 timer, ideal frequency is 600Hz (measured 597Hz)
 	irq_clock.set_pulse_width(attotime::from_usec(6)); // active for 6us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M68K_IRQ_4);
 

@@ -1165,21 +1165,21 @@ GFXDECODE_END
 void scramble_state::scramble(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 18432000/6);    /* 3.072 MHz */
+	Z80(config, m_maincpu, XTAL::u(18432000)/6);    /* 3.072 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::scramble_map);
 
-	Z80(config, m_audiocpu, 14318000/8);   /* 1.78975 MHz */
+	Z80(config, m_audiocpu, XTAL::u(14318000)/8);   /* 1.78975 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &scramble_state::scramble_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &scramble_state::scramble_sound_io_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(scramble_state::scramble_sh_irq_callback));
 
-	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1"));
 	ttl7474_9m_1.output_cb().set(FUNC(scramble_state::galaxold_7474_9m_1_callback));
 
-	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2"));
 	ttl7474_9m_2.comp_output_cb().set(FUNC(scramble_state::galaxold_7474_9m_2_q_callback));
 
-	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474"));
 	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
 	TIMER(config, "int_timer").configure_generic(FUNC(scramble_state::galaxold_interrupt_timer));
@@ -1216,9 +1216,9 @@ void scramble_state::scramble(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "8910.1", 14318000/8).add_route(ALL_OUTPUTS, "mono", 0.16);
+	AY8910(config, "8910.1", XTAL::u(14318000)/8).add_route(ALL_OUTPUTS, "mono", 0.16);
 
-	ay8910_device &ay2(AY8910(config, "8910.2", 14318000/8));
+	ay8910_device &ay2(AY8910(config, "8910.2", XTAL::u(14318000)/8));
 	ay2.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	ay2.port_b_read_callback().set(FUNC(scramble_state::scramble_portB_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.16);
@@ -1347,7 +1347,7 @@ void scramble_state::triplep(machine_config &config)
 	m_palette->set_init(FUNC(scramble_state::galaxold_palette));
 
 	/* sound hardware */
-	subdevice<ay8910_device>("8910.1")->set_clock(18432000/12); // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
+	subdevice<ay8910_device>("8910.1")->set_clock(XTAL::u(18432000)/12); // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
 	subdevice<ay8910_device>("8910.1")->reset_routes().add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	config.device_remove("8910.2");
@@ -1370,7 +1370,7 @@ void scramble_state::hunchbks(machine_config &config)
 	scramble(config);
 
 	/* basic machine hardware */
-	s2650_device &maincpu(S2650(config.replace(), m_maincpu, 18432000/6));
+	s2650_device &maincpu(S2650(config.replace(), m_maincpu, XTAL::u(18432000)/6));
 	maincpu.set_addrmap(AS_PROGRAM, &scramble_state::hunchbks_map);
 	maincpu.set_addrmap(AS_IO, &scramble_state::hunchbks_readport);
 	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank));
@@ -1389,7 +1389,7 @@ void scramble_state::hncholms(machine_config &config)
 	hunchbks(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(18432000/6/2/2);
+	m_maincpu->set_clock(XTAL::u(18432000)/6/2/2);
 
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scorpion)
 }
@@ -1397,16 +1397,16 @@ void scramble_state::hncholms(machine_config &config)
 void scramble_state::ad2083(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 18432000/6);    /* 3.072 MHz */
+	Z80(config, m_maincpu, XTAL::u(18432000)/6);    /* 3.072 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::ad2083_map);
 
-	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1"));
 	ttl7474_9m_1.output_cb().set(FUNC(scramble_state::galaxold_7474_9m_1_callback));
 
-	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2"));
 	ttl7474_9m_2.comp_output_cb().set(FUNC(scramble_state::galaxold_7474_9m_2_q_callback));
 
-	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474"));
 	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
 	TIMER(config, "int_timer").configure_generic(FUNC(scramble_state::galaxold_interrupt_timer));
@@ -1450,12 +1450,12 @@ void scramble_state::harem(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,harem)
 
 	/* extra AY8910 with I/O ports */
-	ay8910_device &ay3(AY8910(config, "8910.3", 14318000/8));
+	ay8910_device &ay3(AY8910(config, "8910.3", XTAL::u(14318000)/8));
 	ay3.add_route(ALL_OUTPUTS, "mono", 0.16);
 	ay3.port_a_write_callback().set(m_digitalker, FUNC(digitalker_device::digitalker_data_w));
 	ay3.port_b_write_callback().set(FUNC(scramble_state::harem_digitalker_control_w));
 
-	DIGITALKER(config, m_digitalker, 4000000).add_route(ALL_OUTPUTS, "mono", 0.16);
+	DIGITALKER(config, m_digitalker, XTAL::u(4000000)).add_route(ALL_OUTPUTS, "mono", 0.16);
 }
 
 /***************************************************************************

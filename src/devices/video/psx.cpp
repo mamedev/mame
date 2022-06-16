@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(CXD8561BQ, cxd8561bq_device, "cxd8561bq", "CXD8561BQ GPU") //
 DEFINE_DEVICE_TYPE(CXD8561CQ, cxd8561cq_device, "cxd8561cq", "CXD8561CQ GPU") // SGRAM
 DEFINE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device,  "cxd8654q",  "CXD8654Q GPU") // SGRAM
 
-psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
+psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu)
 	: psxgpu_device(mconfig, type, tag, owner, clock)
 {
 	set_vram_size(vram_size);
@@ -41,7 +41,7 @@ psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, co
 	vblank_callback().set(*cpu->subdevice<psxirq_device>("irq"), FUNC(psxirq_device::intin0));
 }
 
-psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
@@ -75,62 +75,62 @@ void psxgpu_device::device_reset()
 	gpu_reset();
 }
 
-cxd8514q_device::cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
+cxd8514q_device::cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu)
 	: psxgpu_device(mconfig, CXD8514Q, tag, owner, clock, vram_size, cpu)
 {
 }
 
-cxd8514q_device::cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cxd8514q_device::cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: psxgpu_device(mconfig, CXD8514Q, tag, owner, clock)
 {
 }
 
-cxd8538q_device::cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
+cxd8538q_device::cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu)
 	: psxgpu_device(mconfig, CXD8538Q, tag, owner, clock, vram_size, cpu)
 {
 }
 
-cxd8538q_device::cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cxd8538q_device::cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: psxgpu_device(mconfig, CXD8538Q, tag, owner, clock)
 {
 }
 
-cxd8561q_device::cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
+cxd8561q_device::cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu)
 	: psxgpu_device(mconfig, CXD8561Q, tag, owner, clock, vram_size, cpu)
 {
 }
 
-cxd8561q_device::cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cxd8561q_device::cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: psxgpu_device(mconfig, CXD8561Q, tag, owner, clock)
 {
 }
 
-cxd8561bq_device::cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
+cxd8561bq_device::cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu)
 	: psxgpu_device(mconfig, CXD8561BQ, tag, owner, clock, vram_size, cpu)
 {
 }
 
-cxd8561bq_device::cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cxd8561bq_device::cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: psxgpu_device(mconfig, CXD8561BQ, tag, owner, clock)
 {
 }
 
-cxd8561cq_device::cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
+cxd8561cq_device::cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu)
 	: psxgpu_device(mconfig, CXD8561CQ, tag, owner, clock, vram_size, cpu)
 {
 }
 
-cxd8561cq_device::cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cxd8561cq_device::cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: psxgpu_device(mconfig, CXD8561CQ, tag, owner, clock)
 {
 }
 
-cxd8654q_device::cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu)
+cxd8654q_device::cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu)
 	: psxgpu_device(mconfig, CXD8654Q, tag, owner, clock, vram_size, cpu)
 {
 }
 
-cxd8654q_device::cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cxd8654q_device::cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: psxgpu_device(mconfig, CXD8654Q, tag, owner, clock)
 {
 }

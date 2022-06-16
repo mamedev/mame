@@ -14,7 +14,7 @@ class i8008_device : public cpu_device
 {
 public:
 	// construction/destruction
-	i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	enum

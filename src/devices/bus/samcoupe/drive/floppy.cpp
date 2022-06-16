@@ -47,7 +47,7 @@ void sam_floppy_device::device_add_mconfig(machine_config &config)
 //  sam_floppy_device - constructor
 //-------------------------------------------------
 
-sam_floppy_device::sam_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sam_floppy_device::sam_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SAM_FLOPPY, tag, owner, clock),
 	device_samcoupe_drive_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),

@@ -13,7 +13,7 @@
 class el2_3c503_device : public device_t, public device_isa8_card_interface
 {
 public:
-	el2_3c503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	el2_3c503_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t el2_3c503_loport_r(offs_t offset);
 	void el2_3c503_loport_w(offs_t offset, uint8_t data);

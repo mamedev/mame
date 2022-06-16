@@ -85,7 +85,7 @@ INPUT_PORTS_END
 void speeddrv_state::speeddrv(machine_config &config)
 {
 	/* basic machine hardware */
-	I486(config, m_maincpu, 40000000); // ?? at least a pentium
+	I486(config, m_maincpu, XTAL::u(40000000)); // ?? at least a pentium
 	m_maincpu->set_addrmap(AS_PROGRAM, &speeddrv_state::speeddrv_map);
 	m_maincpu->set_addrmap(AS_IO, &speeddrv_state::speeddrv_io);
 }

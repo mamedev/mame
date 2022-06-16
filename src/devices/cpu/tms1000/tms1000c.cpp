@@ -26,7 +26,7 @@ TODO:
 DEFINE_DEVICE_TYPE(TMS1000C, tms1000c_cpu_device, "tms1000c", "Texas Instruments TMS1000C") // 28-pin SDIP, 10 R pins
 
 
-tms1000c_cpu_device::tms1000c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+tms1000c_cpu_device::tms1000c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	tms1000_cpu_device(mconfig, TMS1000C, tag, owner, clock, 8 /* o pins */, 10 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 3 /* stack levels */, 10 /* rom width */, address_map_constructor(FUNC(tms1000c_cpu_device::rom_10bit), this), 6 /* ram width */, address_map_constructor(FUNC(tms1000c_cpu_device::ram_6bit), this))
 { }
 

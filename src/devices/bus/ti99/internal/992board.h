@@ -54,7 +54,7 @@ public:
 	auto int_cb() { return m_int_cb.bind(); }
 
 protected:
-	video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	int     m_beol;
 
 	virtual void device_start() override;
@@ -89,14 +89,14 @@ private:
 class video992_24_device : public video992_device
 {
 public:
-	video992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	video992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 /* Variant for TI-99/2 32K */
 class video992_32_device : public video992_device
 {
 public:
-	video992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	video992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 /*
@@ -105,14 +105,14 @@ public:
 class io992_device : public bus::hexbus::hexbus_chained_device
 {
 public:
-	io992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	io992_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t cruread(offs_t offset);
 	void cruwrite(offs_t offset, uint8_t data);
 	auto rombank_cb() { return m_set_rom_bank.bind(); }
 
 protected:
-	io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	bool m_have_banked_rom;
 
 	virtual void device_start() override;
@@ -141,14 +141,14 @@ private:
 class io992_24_device : public io992_device
 {
 public:
-	io992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	io992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 /* Variant for TI-99/2 32K */
 class io992_32_device : public io992_device
 {
 public:
-	io992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	io992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 /********************************************************************
@@ -166,7 +166,7 @@ public:
 class ti992_expport_attached_device : public device_t
 {
 public:
-	ti992_expport_attached_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	ti992_expport_attached_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 		device_t(mconfig, type, tag, owner, clock)
 	{ }
 
@@ -181,7 +181,7 @@ class ti992_expport_device : public device_t, public device_slot_interface
 
 public:
 	template <typename U>
-	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, U &&opts, const char *dflt)
 		: ti992_expport_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -190,7 +190,7 @@ public:
 		set_fixed(false);
 	}
 
-	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Methods called from the console
 	// More methods should be added, once we can find further 99/2 cartridges
@@ -210,7 +210,7 @@ private:
 class ti992_expram_device : public ti992_expport_attached_device
 {
 public:
-	ti992_expram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti992_expram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void readz(offs_t offset, uint8_t *value) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 

@@ -14,7 +14,7 @@ class namcos2_roz_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
-	namcos2_roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	namcos2_roz_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_rozram_tag(T &&tag) { m_rozram.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_rozctrl_tag(T &&tag) { m_roz_ctrl.set_tag(std::forward<T>(tag)); }

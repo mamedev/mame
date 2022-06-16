@@ -56,18 +56,18 @@ void wozfdc_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-wozfdc_device::wozfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+wozfdc_device::wozfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 		m_phaselatch(*this, "phaselatch")
 {
 }
 
-diskii_fdc_device::diskii_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+diskii_fdc_device::diskii_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	wozfdc_device(mconfig, DISKII_FDC, tag, owner, clock)
 {
 }
 
-appleiii_fdc_device::appleiii_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+appleiii_fdc_device::appleiii_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	wozfdc_device(mconfig, APPLEIII_FDC, tag, owner, clock)
 {
 }

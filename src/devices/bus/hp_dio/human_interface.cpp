@@ -39,7 +39,7 @@ void human_interface_device::device_add_mconfig(machine_config &config)
 	HP_HIL_SLOT(config, "hil2", m_mlc, hp_hil_devices, "hp_46060b");
 
 	SPEAKER(config, "mono").front_center();
-	sn76494_device &sound(SN76494(config, "sn76494", 333333));
+	sn76494_device &sound(SN76494(config, "sn76494", XTAL::u(333333)));
 	sound.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	msm58321_device &rtc(MSM58321(config, "rtc", 32.768_kHz_XTAL));
@@ -63,7 +63,7 @@ void human_interface_device::device_add_mconfig(machine_config &config)
 	gpib.int_write_cb().set(FUNC(human_interface_device::gpib_irq));
 	gpib.accrq_write_cb().set(FUNC(human_interface_device::gpib_dreq));
 
-	ieee488_device &ieee488(IEEE488(config, IEEE488_TAG, 0));
+	ieee488_device &ieee488(IEEE488(config, IEEE488_TAG));
 	ieee488.eoi_callback().set(m_tms9914, FUNC(tms9914_device::eoi_w));
 	ieee488.dav_callback().set(m_tms9914, FUNC(tms9914_device::dav_w));
 	ieee488.nrfd_callback().set(m_tms9914, FUNC(tms9914_device::nrfd_w));
@@ -74,7 +74,7 @@ void human_interface_device::device_add_mconfig(machine_config &config)
 	ieee488.ren_callback().set(m_tms9914, FUNC(tms9914_device::ren_w));
 	ieee488.dio_callback().set(FUNC(human_interface_device::ieee488_dio_w));
 
-	ieee488_slot_device &slot0(IEEE488_SLOT(config, "ieee0", 0));
+	ieee488_slot_device &slot0(IEEE488_SLOT(config, "ieee0"));
 	hp_ieee488_devices(slot0);
 	slot0.set_default_option("hp9122c");
 }
@@ -94,12 +94,12 @@ void human_interface_device::iocpu_map(address_map& map)
 	map(0x0000, 0x07ff).rom().region("iocpu", 0);
 }
 
-human_interface_device::human_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+human_interface_device::human_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	human_interface_device(mconfig, HPDIO_HUMAN_INTERFACE, tag, owner, clock)
 {
 }
 
-human_interface_device::human_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+human_interface_device::human_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this),
 	m_iocpu(*this, "iocpu"),

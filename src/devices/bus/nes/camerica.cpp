@@ -46,27 +46,27 @@ DEFINE_DEVICE_TYPE(NES_BF9096A, nes_bf9096a_device, "nes_bf9096a", "NES Cart Cam
 DEFINE_DEVICE_TYPE(NES_GOLDEN5, nes_golden5_device, "nes_golden5", "NES Cart Camerica Golden 5 PCB")
 
 
-nes_bf9093_device::nes_bf9093_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bf9093_device::nes_bf9093_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_BF9093, tag, owner, clock)
 {
 }
 
-nes_bf9096_device::nes_bf9096_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool page_swap)
+nes_bf9096_device::nes_bf9096_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool page_swap)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_reg(0), m_page_swap(page_swap)
 {
 }
 
-nes_bf9096_device::nes_bf9096_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bf9096_device::nes_bf9096_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_bf9096_device(mconfig, NES_BF9096, tag, owner, clock, false)
 {
 }
 
-nes_bf9096a_device::nes_bf9096a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_bf9096a_device::nes_bf9096a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_bf9096_device(mconfig, NES_BF9096A, tag, owner, clock, true)
 {
 }
 
-nes_golden5_device::nes_golden5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_golden5_device::nes_golden5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_GOLDEN5, tag, owner, clock), m_lock(0), m_reg(0)
 {
 }

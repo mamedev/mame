@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(HP9845_IO_SLOT, hp9845_io_slot_device, "hp98x5_io_slot", "HP9
 // +---------------------+
 // |hp9845_io_slot_device|
 // +---------------------+
-hp9845_io_slot_device::hp9845_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+hp9845_io_slot_device::hp9845_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, HP9845_IO_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_hp9845_io_interface>(mconfig, *this),
 	m_irq_cb_func(*this),

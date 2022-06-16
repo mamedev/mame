@@ -21,7 +21,7 @@ class arc_ether1_aka25_device :
 {
 public:
 	// construction/destruction
-	arc_ether1_aka25_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_ether1_aka25_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -100,7 +100,7 @@ const tiny_rom_entry *arc_ether1_aka25_device::device_rom_region() const
 //  arc_ether1_aka25_device - constructor
 //-------------------------------------------------
 
-arc_ether1_aka25_device::arc_ether1_aka25_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_ether1_aka25_device::arc_ether1_aka25_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_ETHER1_AKA25, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")

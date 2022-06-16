@@ -364,7 +364,7 @@ ROM_START( keytronic_pc3270 )
 ROM_END
 
 
-pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pc_kbd_keytronic_pc3270_device(mconfig, PC_KBD_KEYTRONIC_PC3270, tag, owner, clock)
 {
 }
@@ -383,7 +383,7 @@ pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(
 }
 
 
-pc_kbd_keytronic_pc3270_at_device::pc_kbd_keytronic_pc3270_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pc_kbd_keytronic_pc3270_at_device::pc_kbd_keytronic_pc3270_at_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pc_kbd_keytronic_pc3270_device(mconfig, PC_KBD_KEYTRONIC_PC3270_AT, tag, owner, clock)
 {
 }
@@ -422,7 +422,7 @@ void pc_kbd_keytronic_pc3270_device::device_reset()
 
 void pc_kbd_keytronic_pc3270_device::device_add_mconfig(machine_config &config)
 {
-	I8051(config, m_cpu, 11060250);
+	I8051(config, m_cpu, XTAL::u(11060250));
 	m_cpu->set_addrmap(AS_PROGRAM, &pc_kbd_keytronic_pc3270_device::keytronic_pc3270_program);
 	m_cpu->set_addrmap(AS_IO, &pc_kbd_keytronic_pc3270_device::keytronic_pc3270_io);
 	m_cpu->port_in_cb<1>().set(FUNC(pc_kbd_keytronic_pc3270_device::p1_read));

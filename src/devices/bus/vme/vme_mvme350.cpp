@@ -208,14 +208,14 @@ const tiny_rom_entry *vme_mvme350_card_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_vme_card_interface(mconfig, *this)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
-vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vme_mvme350_card_device(mconfig, VME_MVME350, tag, owner, clock)
 {
 	LOG("%s %s\n", tag, FUNCNAME);

@@ -15,13 +15,13 @@
 
 class cmi01a_device : public device_t, public device_sound_interface {
 public:
-	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 channel)
+	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t channel)
 		: cmi01a_device(mconfig, tag, owner, clock)
 	{
 		m_channel = channel;
 	}
 
-	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto irq_callback() { return m_irq_cb.bind(); }
 

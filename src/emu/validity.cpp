@@ -2656,7 +2656,7 @@ void validity_checker::validate_device_types()
 	machine_config::token const tok(config.begin_configuration(config.root_device()));
 	for (device_type type : registered_device_types)
 	{
-		device_t *const dev = config.device_add(type.shortname(), type, 0);
+		device_t *const dev = config.device_add(type.shortname(), type);
 
 		char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
 		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()), name) : name);
@@ -2696,7 +2696,7 @@ void validity_checker::validate_device_types()
 			}
 			else if (!devname.second)
 			{
-				device_t *const dup = config.device_add("_dup", *devname.first->second, 0);
+				device_t *const dup = config.device_add("_dup", *devname.first->second);
 				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description, core_filename_extract_base(dup->source()), dup->shortname());
 				config.device_remove("_dup");
 			}
@@ -2720,7 +2720,7 @@ void validity_checker::validate_device_types()
 			}
 			else if (!devdesc.second)
 			{
-				device_t *const dup = config.device_add("_dup", *devdesc.first->second, 0);
+				device_t *const dup = config.device_add("_dup", *devdesc.first->second);
 				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description, dev->name(), core_filename_extract_base(dup->source()), dup->shortname());
 				config.device_remove("_dup");
 			}

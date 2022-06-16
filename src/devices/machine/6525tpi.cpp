@@ -106,7 +106,7 @@
 
 DEFINE_DEVICE_TYPE(TPI6525, tpi6525_device, "tpi6525", "6525 TPI")
 
-tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TPI6525, tag, owner, clock),
 	m_out_irq_cb(*this),
 	m_in_pa_cb(*this),

@@ -126,7 +126,7 @@ INPUT_PORTS_END
 void aim65_40_state::aim65_40(machine_config &config)
 {
 	/* basic machine hardware */
-	m6502_device &cpu(M6502(config, M6502_TAG, 1000000));
+	m6502_device &cpu(M6502(config, M6502_TAG, XTAL::u(1000000)));
 	cpu.set_addrmap(AS_PROGRAM, &aim65_40_state::mem_map);
 
 	/* video hardware */
@@ -135,11 +135,11 @@ void aim65_40_state::aim65_40(machine_config &config)
 	/* sound hardware */
 
 	/* devices */
-	MOS6522(config, M6522_0_TAG, 1000000);
-	MOS6522(config, M6522_1_TAG, 1000000);
-	MOS6522(config, M6522_2_TAG, 1000000);
+	MOS6522(config, M6522_0_TAG, XTAL::u(1000000));
+	MOS6522(config, M6522_1_TAG, XTAL::u(1000000));
+	MOS6522(config, M6522_2_TAG, XTAL::u(1000000));
 
-	mos6551_device &acia(MOS6551(config, M6551_TAG, 0));
+	mos6551_device &acia(MOS6551(config, M6551_TAG));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

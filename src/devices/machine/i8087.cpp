@@ -167,7 +167,7 @@ static inline floatx80 double_to_fx80(double in)
 
 DEFINE_DEVICE_TYPE(I8087, i8087_device, "i8087", "Intel 8087")
 
-i8087_device::i8087_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+i8087_device::i8087_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_space(*this, finder_base::DUMMY_TAG, -1),
 	m_int_handler(*this),
@@ -175,7 +175,7 @@ i8087_device::i8087_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-i8087_device::i8087_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+i8087_device::i8087_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		i8087_device(mconfig, I8087, tag, owner, clock)
 {
 }

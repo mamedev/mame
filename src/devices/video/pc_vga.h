@@ -21,7 +21,7 @@ class vga_device : public device_t, public device_video_interface, public device
 
 public:
 	// construction/destruction
-	vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void zero();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -57,7 +57,7 @@ protected:
 		RGB32_MODE
 	};
 
-	vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -255,7 +255,7 @@ public:
 
 protected:
 	// construction/destruction
-	svga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	svga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	void svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -281,7 +281,7 @@ protected:
 class ibm8514a_device : public device_t
 {
 public:
-	ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_vga(T &&tag) { m_vga.set_tag(std::forward<T>(tag)); }
 	void set_vga_owner() { m_vga.set_tag(DEVICE_SELF); }
@@ -397,7 +397,7 @@ public:
 	} ibm8514;
 
 protected:
-	ibm8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ibm8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	void ibm8514_write(uint32_t offset, uint32_t src);
@@ -423,7 +423,7 @@ DECLARE_DEVICE_TYPE(IBM8514A, ibm8514a_device)
 class mach8_device : public ibm8514a_device
 {
 public:
-	mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t mach8_ec0_r();
 	void mach8_ec0_w(uint16_t data);
@@ -467,7 +467,7 @@ public:
 	uint16_t offset() { if(mach8.ati_mode) return mach8.ge_pitch; else return 128; }
 
 protected:
-	mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void device_start() override;
 	struct
 	{
@@ -499,7 +499,7 @@ class tseng_vga_device :  public svga_device
 {
 public:
 	// construction/destruction
-	tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t port_03b0_r(offs_t offset) override;
 	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
@@ -546,7 +546,7 @@ class ati_vga_device : public svga_device
 {
 public:
 	// construction/destruction
-	ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
@@ -560,7 +560,7 @@ public:
 
 	mach8_device* get_8514() { return m_8514; }
 protected:
-	ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -587,7 +587,7 @@ class s3_vga_device : public ati_vga_device
 {
 public:
 	// construction/destruction
-	s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t port_03b0_r(offs_t offset) override;
 	virtual void port_03b0_w(offs_t offset, uint8_t data) override;
@@ -605,7 +605,7 @@ public:
 	ibm8514a_device* get_8514() { return m_8514; }
 
 protected:
-	s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -679,7 +679,7 @@ class gamtor_vga_device :  public svga_device
 {
 public:
 	// construction/destruction
-	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 
 	virtual uint8_t port_03b0_r(offs_t offset) override;
@@ -704,7 +704,7 @@ public:
 		OTI111
 	};
 
-	xga_copro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xga_copro_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 xga_read(offs_t offset);
 	void xga_write(offs_t offset, u8 data);
@@ -760,7 +760,7 @@ DECLARE_DEVICE_TYPE(XGA_COPRO, xga_copro_device)
 class oak_oti111_vga_device : public svga_device
 {
 public:
-	oak_oti111_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	oak_oti111_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 xga_read(offs_t offset);
 	void xga_write(offs_t offset, u8 data);

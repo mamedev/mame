@@ -23,27 +23,27 @@ DEFINE_DEVICE_TYPE(ASTROCADE_ROM_512K, astrocade_rom_512k_device, "astrocade_rom
 DEFINE_DEVICE_TYPE(ASTROCADE_ROM_CASS, astrocade_rom_cass_device, "astrocade_rom_cass", "Bally Astrocade AstroBASIC Cart")
 
 
-astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock), device_astrocade_cart_interface(mconfig, *this)
 {
 }
 
-astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: astrocade_rom_device(mconfig, ASTROCADE_ROM_STD, tag, owner, clock)
 {
 }
 
-astrocade_rom_256k_device::astrocade_rom_256k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+astrocade_rom_256k_device::astrocade_rom_256k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: astrocade_rom_device(mconfig, ASTROCADE_ROM_256K, tag, owner, clock), m_base_bank(0)
 {
 }
 
-astrocade_rom_512k_device::astrocade_rom_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+astrocade_rom_512k_device::astrocade_rom_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: astrocade_rom_device(mconfig, ASTROCADE_ROM_512K, tag, owner, clock), m_base_bank(0)
 {
 }
 
-astrocade_rom_cass_device::astrocade_rom_cass_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+astrocade_rom_cass_device::astrocade_rom_cass_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: astrocade_rom_device(mconfig, ASTROCADE_ROM_CASS, tag, owner, clock)
 	, m_cassette(*this, "cassette")
 {

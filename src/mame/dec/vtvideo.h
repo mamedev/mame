@@ -21,7 +21,7 @@ class vt100_video_device : public device_t,
 	public device_video_interface
 {
 public:
-	vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto ram_rd_callback() { return m_read_ram.bind(); }
 	auto vert_freq_intr_wr_callback() { return m_write_vert_freq_intr.bind(); }
@@ -38,7 +38,7 @@ public:
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	vt100_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vt100_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -92,7 +92,7 @@ protected:
 class rainbow_video_device : public vt100_video_device
 {
 public:
-	rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void video_blanking(bitmap_ind16 &bitmap, const rectangle &cliprect);

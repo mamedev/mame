@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(ECBBUS_SLOT, ecbbus_slot_device, "ecbbus_slot", "ECB bus slot
 //  ecbbus_slot_device - constructor
 //-------------------------------------------------
 
-ecbbus_slot_device::ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ecbbus_slot_device::ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ECBBUS_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_ecbbus_card_interface>(mconfig, *this),
 	m_bus(*this, finder_base::DUMMY_TAG),
@@ -81,7 +81,7 @@ device_ecbbus_card_interface::device_ecbbus_card_interface(const machine_config 
 //  ecbbus_device - constructor
 //-------------------------------------------------
 
-ecbbus_device::ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ecbbus_device::ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ECBBUS, tag, owner, clock),
 	m_write_irq(*this),
 	m_write_nmi(*this)

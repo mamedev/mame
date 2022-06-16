@@ -488,11 +488,11 @@ GFXDECODE_END
 
 void mugsmash_state::mugsmash(machine_config &config)
 {
-	M68000(config, m_maincpu, 12'000'000);
+	M68000(config, m_maincpu, XTAL::u(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mugsmash_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mugsmash_state::irq6_line_hold));
 
-	Z80(config, m_audiocpu, 4'000'000);  // guess
+	Z80(config, m_audiocpu, XTAL::u(4'000'000));  // guess
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mugsmash_state::sound_map);
 
 
@@ -514,12 +514,12 @@ void mugsmash_state::mugsmash(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3'579'545));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(3'579'545)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 1.00);   // music
 	ymsnd.add_route(1, "rspeaker", 1.00);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1'122'000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1'122'000), okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50); // sound fx
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 }

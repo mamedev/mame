@@ -900,13 +900,13 @@ void mz2000_state::mz2000(machine_config &config)
 	pio.in_pb_callback().set(FUNC(mz2000_state::mz2000_pio1_portb_r));
 
 	/* TODO: clocks aren't known */
-	PIT8253(config, m_pit8253, 0);
+	PIT8253(config, m_pit8253);
 	m_pit8253->set_clk<0>(31250);
 	m_pit8253->set_clk<1>(31250); /* needed by "Art Magic" to boot */
 	m_pit8253->set_clk<2>(31250);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
+	BEEP(config, "beeper", XTAL::u(4096)).add_route(ALL_OUTPUTS,"mono",0.15);
 
 	MB8877(config, m_mb8877a, 1_MHz_XTAL);
 

@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(PASOPIA_PAC2, pasopia_pac2_slot_device, "pasopia_pac2", "Paso
 //  pasopia_pac2_slot_device - construction
 //-------------------------------------------------
 
-pasopia_pac2_slot_device::pasopia_pac2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pasopia_pac2_slot_device::pasopia_pac2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PASOPIA_PAC2, tag, owner, clock)
 	, device_single_card_slot_interface<pac2_card_interface>(mconfig, *this)
 	, m_card(nullptr)

@@ -40,7 +40,7 @@ void neogeo_kf2k2mp2_cart_device::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(NEOGEO_KOF2002B_CART, neogeo_kof2002b_cart_device, "neocart_kof2002b", "Neo Geo KoF 2002 Bootleg Cart")
 
-neogeo_kof2002b_cart_device::neogeo_kof2002b_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_kof2002b_cart_device::neogeo_kof2002b_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_KOF2002B_CART, tag, owner, clock),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_pcm2_prot(*this, "pcm2_prot"),
@@ -64,7 +64,7 @@ void neogeo_kof2002b_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_KF2K2MP_CART, neogeo_kf2k2mp_cart_device, "neocart_kf2k2mp", "Neo Geo KoF 2002 MP Cart")
 
-neogeo_kf2k2mp_cart_device::neogeo_kf2k2mp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_kf2k2mp_cart_device::neogeo_kf2k2mp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_KF2K2MP_CART, tag, owner, clock),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_pcm2_prot(*this, "pcm2_prot")
@@ -87,7 +87,7 @@ void neogeo_kf2k2mp_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_KF2K2MP2_CART, neogeo_kf2k2mp2_cart_device, "neocart_kf2k2mp2", "Neo Geo KoF 2002 MP2 Cart")
 
-neogeo_kf2k2mp2_cart_device::neogeo_kf2k2mp2_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_kf2k2mp2_cart_device::neogeo_kf2k2mp2_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_KF2K2MP2_CART, tag, owner, clock),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_pcm2_prot(*this, "pcm2_prot")

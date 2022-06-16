@@ -15,7 +15,7 @@
 class adb_hle_device : public adb_device, public adb_slot_card_interface
 {
 public:
-	adb_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adb_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

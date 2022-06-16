@@ -47,13 +47,13 @@ class zx8301_device :   public device_t,
 {
 public:
 	// construction/destruction
-	template <typename T> zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	template <typename T> zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag)
 		: zx8301_device(mconfig, tag, owner, clock)
 	{
 		m_cpu.set_tag(std::forward<T>(cpu_tag));
 	}
 
-	zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto vsync_wr_callback() { return m_write_vsync.bind(); }
 

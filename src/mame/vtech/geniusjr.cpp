@@ -260,7 +260,7 @@ void geniusjr_state::machine_start()
 
 void geniusjr_state::gj4000(machine_config &config)
 {
-	M68HC05L9(config, m_maincpu, 8'000'000); // unknown clock
+	M68HC05L9(config, m_maincpu, XTAL::u(8'000'000)); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &geniusjr_state::gj4000_map);
 
 	m_bank_size = 0x8000;
@@ -277,7 +277,7 @@ void geniusjr_state::gln(machine_config &config)
 
 void geniusjr_state::gj5000(machine_config &config)
 {
-	M68HC05L9(config, m_maincpu, 8'000'000); // unknown clock (type also uncertain)
+	M68HC05L9(config, m_maincpu, XTAL::u(8'000'000)); // unknown clock (type also uncertain)
 	m_maincpu->set_addrmap(AS_PROGRAM, &geniusjr_state::gj5000_map);
 
 	m_bank_size = 0x4000;
@@ -287,7 +287,7 @@ void geniusjr_state::gj5000(machine_config &config)
 
 void geniusjr_state::gjrstar(machine_config &config)
 {
-	M68HC05L9(config, m_maincpu, 8'000'000); // unknown clock (type also uncertain, could be L7 instead of L9)
+	M68HC05L9(config, m_maincpu, XTAL::u(8'000'000)); // unknown clock (type also uncertain, could be L7 instead of L9)
 	m_maincpu->set_addrmap(AS_PROGRAM, &geniusjr_state::gjrstar_map);
 
 	m_bank_size = 0x2000;

@@ -749,7 +749,7 @@ INPUT_PORTS_END
 
 void apc_state::machine_start()
 {
-	m_fdc->set_rate(500000);
+	m_fdc->set_rate(XTAL::u(500000));
 
 	m_rtc->cs_w(1);
 //  m_rtc->oe_w(1);
@@ -913,18 +913,18 @@ void apc_state::apc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &apc_state::apc_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(MAIN_CLOCK); // heartbeat IRQ
 	m_pit->out_handler<0>().set(m_i8259_m, FUNC(pic8259_device::ir3_w));
 	m_pit->set_clk<1>(MAIN_CLOCK); // Memory Refresh
 	m_pit->set_clk<2>(MAIN_CLOCK); // RS-232c
 
-	PIC8259(config, m_i8259_m, 0);
+	PIC8259(config, m_i8259_m);
 	m_i8259_m->out_int_callback().set_inputline(m_maincpu, 0);
 	m_i8259_m->in_sp_callback().set_constant(1);
 	m_i8259_m->read_slave_ack_callback().set(FUNC(apc_state::get_slave_ack));
 
-	PIC8259(config, m_i8259_s, 0);
+	PIC8259(config, m_i8259_s);
 	m_i8259_s->out_int_callback().set(m_i8259_m, FUNC(pic8259_device::ir7_w)); // TODO: check ir7_w
 	m_i8259_s->in_sp_callback().set_constant(0);
 
@@ -943,7 +943,7 @@ void apc_state::apc(machine_config &config)
 	NVRAM(config, m_cmos, nvram_device::DEFAULT_ALL_1);
 	UPD1990A(config, m_rtc);
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), true, true);
 	m_fdc->intrq_wr_callback().set(m_i8259_s, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 	FLOPPY_CONNECTOR(config, m_fdc_connector[0], apc_floppies, "8", floppy_image_device::default_fm_floppy_formats, "8");
@@ -962,11 +962,11 @@ void apc_state::apc(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apc);
 
-	UPD7220(config, m_hgdc1, 3579545); // unk clock
+	UPD7220(config, m_hgdc1, XTAL::u(3579545)); // unk clock
 	m_hgdc1->set_addrmap(0, &apc_state::upd7220_1_map);
 	m_hgdc1->set_draw_text(FUNC(apc_state::hgdc_draw_text));
 
-	UPD7220(config, m_hgdc2, 3579545); // unk clock
+	UPD7220(config, m_hgdc2, XTAL::u(3579545)); // unk clock
 	m_hgdc2->set_addrmap(0, &apc_state::upd7220_2_map);
 	m_hgdc2->set_display_pixels(FUNC(apc_state::hgdc_display_pixels));
 

@@ -868,7 +868,7 @@ void tecmo_state::rygar(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

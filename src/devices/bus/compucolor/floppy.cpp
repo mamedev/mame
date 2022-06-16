@@ -79,7 +79,7 @@ device_compucolor_floppy_port_interface::device_compucolor_floppy_port_interface
 //  compucolor_floppy_port_device - constructor
 //-------------------------------------------------
 
-compucolor_floppy_port_device::compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+compucolor_floppy_port_device::compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rs232_port_device(mconfig, COMPUCOLOR_FLOPPY_PORT, tag, owner, clock), m_dev(nullptr)
 {
 }
@@ -89,7 +89,7 @@ compucolor_floppy_port_device::compucolor_floppy_port_device(const machine_confi
 //  compucolor_floppy_device - constructor
 //-------------------------------------------------
 
-compucolor_floppy_device::compucolor_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+compucolor_floppy_device::compucolor_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, COMPUCOLOR_FLOPPY, tag, owner, clock)
 	, device_compucolor_floppy_port_interface(mconfig, *this)
 	, m_floppy(*this, "floppy")

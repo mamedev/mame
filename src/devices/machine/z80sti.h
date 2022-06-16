@@ -50,7 +50,7 @@ class z80sti_device :   public device_t,
 {
 public:
 	// construction/destruction
-	z80sti_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80sti_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_int_cb() { return m_out_int_cb.bind(); }
 	auto in_gpio_cb() { return m_in_gpio_cb.bind(); }

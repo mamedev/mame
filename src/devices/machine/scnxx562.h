@@ -58,7 +58,7 @@ class duscc_channel : public device_t, public device_serial_interface
 	friend class duscc_device;
 
 public:
-	duscc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	duscc_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// read register handlers
 	uint8_t do_dusccreg_cmr1_r();
@@ -530,7 +530,7 @@ class duscc_device : public device_t, public device_z80daisy_interface
 
 public:
 	// construction/destruction
-	duscc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	duscc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_txda_callback() { return m_out_txda_cb.bind(); }
 	auto out_dtra_callback() { return m_out_dtra_cb.bind(); }
@@ -547,13 +547,13 @@ public:
 	auto out_trxcb_callback() { return m_out_trxcb_cb.bind(); }
 	auto out_int_callback() { return m_out_int_cb.bind(); }
 
-	void configure_channels(int rxa, int txa, int rxb, int txb)
+	void configure_channels(const XTAL &rxa, const XTAL &txa, const XTAL &rxb, const XTAL &txb)
 	{
 #if 0 // TODO: Fix this, need a way to set external rx/tx clocks for the channels
-		m_chanA->m_rxc = rxa;
-		m_chanA->m_txc = txa;
-		m_chanB->m_rxc = rxb;
-		m_chanB->m_txc = txb;
+		m_chanA->m_rxc = rxa.value();
+		m_chanA->m_txc = txa.value();
+		m_chanB->m_rxc = rxb.value();
+		m_chanB->m_txc = txb.value();
 #endif
 	}
 
@@ -587,7 +587,7 @@ public:
 	void syncb_w(int state) { m_chanB->sync_w(state); }
 
 protected:
-	duscc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	duscc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -684,25 +684,25 @@ DECLARE_DEVICE_TYPE(DUSCC68C562,   duscc68c562_device)
 class duscc26562_device : public duscc_device
 {
 public :
-	duscc26562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	duscc26562_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class duscc26c562_device : public duscc_device
 {
 public :
-	duscc26c562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	duscc26c562_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class duscc68562_device : public duscc_device
 {
 public :
-	duscc68562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	duscc68562_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class duscc68c562_device : public duscc_device
 {
 public :
-	duscc68c562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	duscc68c562_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 #endif // MAME_MACHINE_SCNXX562_H

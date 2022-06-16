@@ -81,7 +81,7 @@ void powermate_ide_device::device_add_mconfig(machine_config &config)
 //  powermate_ide_device - constructor
 //-------------------------------------------------
 
-powermate_ide_device::powermate_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+powermate_ide_device::powermate_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ADAM_IDE, tag, owner, clock),
 		device_adam_expansion_slot_card_interface(mconfig, *this),
 		m_ata(*this, ATA_TAG),

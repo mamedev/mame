@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(SWIM3, swim3_device, "swim3", "Apple SWIM3 (Sander/Wozniak Integrated Machine) version 3 floppy controller")
 
-swim3_device::swim3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+swim3_device::swim3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	applefdintf_device(mconfig, SWIM3, tag, owner, clock),
 	m_irq_cb(*this),
 	m_drq_cb(*this)

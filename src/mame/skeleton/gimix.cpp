@@ -751,7 +751,7 @@ void gimix_state::gimix(machine_config &config)
 	rtc.irq().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
 	/* timer */
-	ptm6840_device &ptm(PTM6840(config, "timer", 2'000'000));  // clock is a guess
+	ptm6840_device &ptm(PTM6840(config, "timer", XTAL::u(2'000'000)));  // clock is a guess
 	// PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
 	ptm.irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
@@ -766,31 +766,31 @@ void gimix_state::gimix(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:3", gimix_floppies, "525hd", gimix_state::floppy_formats).enable_sound(true);
 
 	/* parallel ports */
-	pia6821_device &pia1(PIA6821(config, "pia1", 2'000'000));
+	pia6821_device &pia1(PIA6821(config, "pia1", XTAL::u(2'000'000)));
 	pia1.writepa_handler().set(FUNC(gimix_state::pia_pa_w));
 	pia1.writepb_handler().set(FUNC(gimix_state::pia_pb_w));
 	pia1.readpa_handler().set(FUNC(gimix_state::pia_pa_r));
 	pia1.readpb_handler().set(FUNC(gimix_state::pia_pb_r));
 
-	PIA6821(config, "pia2", 2'000'000);
+	PIA6821(config, "pia2", XTAL::u(2'000'000));
 
 	/* serial ports */
-	ACIA6850(config, m_acia1, 2'000'000);
+	ACIA6850(config, m_acia1, XTAL::u(2'000'000));
 	m_acia1->txd_handler().set("serial1", FUNC(rs232_port_device::write_txd));
 	m_acia1->rts_handler().set("serial1", FUNC(rs232_port_device::write_rts));
 	m_acia1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
-	ACIA6850(config, m_acia2, 2'000'000);
+	ACIA6850(config, m_acia2, XTAL::u(2'000'000));
 	m_acia2->txd_handler().set("serial2", FUNC(rs232_port_device::write_txd));
 	m_acia2->rts_handler().set("serial2", FUNC(rs232_port_device::write_rts));
 	m_acia2->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
 
-	ACIA6850(config, m_acia3, 2'000'000);
+	ACIA6850(config, m_acia3, XTAL::u(2'000'000));
 	m_acia3->txd_handler().set("serial3", FUNC(rs232_port_device::write_txd));
 	m_acia3->rts_handler().set("serial3", FUNC(rs232_port_device::write_rts));
 	m_acia3->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<4>));
 
-	ACIA6850(config, m_acia4, 2'000'000);
+	ACIA6850(config, m_acia4, XTAL::u(2'000'000));
 	m_acia4->txd_handler().set("serial4", FUNC(rs232_port_device::write_txd));
 	m_acia4->rts_handler().set("serial4", FUNC(rs232_port_device::write_rts));
 	m_acia4->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<5>));
@@ -811,7 +811,7 @@ void gimix_state::gimix(machine_config &config)
 	serial4.rxd_handler().set(m_acia4, FUNC(acia6850_device::write_rxd));
 	serial4.cts_handler().set(m_acia4, FUNC(acia6850_device::write_cts));
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 9600 * 16));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(9600 * 16)));
 	acia_clock.signal_handler().set(m_acia1, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia1, FUNC(acia6850_device::write_rxc));
 	acia_clock.signal_handler().append(m_acia2, FUNC(acia6850_device::write_txc));

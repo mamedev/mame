@@ -18,7 +18,7 @@
 class m72_audio_device : public device_t, public device_rom_interface<32> // unknown address bits
 {
 public:
-	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	~m72_audio_device() {}
 
 	template <typename T> void set_dac_tag(T &&tag) { m_dac.set_tag(std::forward<T>(tag)); }

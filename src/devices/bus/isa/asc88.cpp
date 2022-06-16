@@ -23,7 +23,7 @@
 DEFINE_DEVICE_TYPE(ASC88, asc88_device, "asc88", "ASC-88 SCSI Adapter")
 
 
-asc88_device::asc88_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+asc88_device::asc88_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ASC88, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_scsic(*this, "scsi:7:scsic")

@@ -549,7 +549,7 @@ ioport_constructor victor_9000_keyboard_device::device_input_ports() const
 //  victor_9000_keyboard_device - constructor
 //-------------------------------------------------
 
-victor_9000_keyboard_device::victor_9000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+victor_9000_keyboard_device::victor_9000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VICTOR9K_KEYBOARD, tag, owner, clock),
 	m_maincpu(*this, I8021_TAG),
 	m_y(*this, "Y%u", 0),

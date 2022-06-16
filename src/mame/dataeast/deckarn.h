@@ -12,7 +12,7 @@ class deco_karnovsprites_device : public device_t
 public:
 	typedef device_delegate<void (u32 &colour, u32 &pri_mask)> colpri_cb_delegate;
 
-	deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, u16* spriteram, int size);
 	void set_flip_screen(bool flip) { m_flip_screen = flip; }
 

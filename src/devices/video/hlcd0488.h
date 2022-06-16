@@ -42,7 +42,7 @@
 class hlcd0488_device : public device_t
 {
 public:
-	hlcd0488_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	hlcd0488_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	auto write_cols() { return m_write_cols.bind(); } // COL pins in data, ROW pins in offset

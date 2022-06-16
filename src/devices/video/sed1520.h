@@ -38,7 +38,7 @@ public:
 
 protected:
 	// construction/destruction
-	sed15xx_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t ddr_size, uint32_t page_size);
+	sed15xx_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t ddr_size, uint32_t page_size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -72,7 +72,7 @@ public:
 	typedef device_delegate<uint32_t (bitmap_ind16 &bitmap, const rectangle &cliprect, bool lcd_on, uint8_t *dram, uint8_t start_line, uint8_t adc, uint8_t duty)> sed1520_update_delegate;
 
 	// construction/destruction
-	sed1520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sed1520_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	template <typename... T> void set_screen_update_cb(T &&... args) { m_screen_update_cb.set(std::forward<T>(args)...); }
@@ -103,7 +103,7 @@ public:
 	typedef device_delegate<uint32_t (bitmap_ind16 &bitmap, const rectangle &cliprect, bool lcd_on, uint8_t *dram, uint8_t start_line, uint8_t adc, uint8_t duty, bool reverse, bool fill, uint8_t contrast, bool line_inv, uint8_t line_inv_num)> sed1560_update_delegate;
 
 	// construction/destruction
-	sed1560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sed1560_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	template <typename... T> void set_screen_update_cb(T &&... args) { m_screen_update_cb.set(std::forward<T>(args)...); }
@@ -113,7 +113,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	sed1560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t ddr_size, uint32_t page_size);
+	sed1560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t ddr_size, uint32_t page_size);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -139,7 +139,7 @@ class epl43102_device : public sed1560_device
 {
 public:
 	// construction/destruction
-	epl43102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	epl43102_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual void control_write(uint8_t data) override;
 

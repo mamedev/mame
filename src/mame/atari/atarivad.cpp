@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(ATARI_VAD, atari_vad_device, "atarivad", "Atari VAD")
 //  atari_vad_device - constructor
 //-------------------------------------------------
 
-atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ATARI_VAD, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_scanline_int_cb(*this)

@@ -136,7 +136,7 @@ void odyssey_state::machine_reset()
 void odyssey_state::odyssey(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM(config, m_maincpu, 133000000); // a Celeron at 1.70 GHz on the MB I checked.
+	PENTIUM(config, m_maincpu, XTAL::u(133000000)); // a Celeron at 1.70 GHz on the MB I checked.
 	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey_state::odyssey_map);
 
 	/* video hardware */

@@ -13,13 +13,13 @@ class apf_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	apf_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apf_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset) override;
 
 protected:
-	apf_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	apf_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override { }
@@ -32,7 +32,7 @@ class apf_basic_device : public apf_rom_device
 {
 public:
 	// construction/destruction
-	apf_basic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apf_basic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t extra_rom(offs_t offset) override;
@@ -44,7 +44,7 @@ class apf_spacedst_device : public apf_rom_device
 {
 public:
 	// construction/destruction
-	apf_spacedst_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apf_spacedst_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_ram(offs_t offset) override;

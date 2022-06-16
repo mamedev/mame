@@ -9,7 +9,7 @@
 DEFINE_DEVICE_TYPE(CEDAR_MAGNET_PLANE, cedar_magnet_plane_device, "cedmag_plane", "Cedar Plane")
 
 
-cedar_magnet_plane_device::cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+cedar_magnet_plane_device::cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CEDAR_MAGNET_PLANE, tag, owner, clock)
 	, cedar_magnet_board_interface(mconfig, *this, "planecpu", "ram")
 {
@@ -69,18 +69,18 @@ void cedar_magnet_plane_device::plane_portcf_w(u8 data)
 
 void cedar_magnet_plane_device::device_add_mconfig(machine_config &config)
 {
-	z80_device &planecpu(Z80(config, "planecpu", 4000000));
+	z80_device &planecpu(Z80(config, "planecpu", XTAL::u(4000000)));
 	planecpu.set_addrmap(AS_PROGRAM, &cedar_magnet_plane_device::cedar_magnet_plane_map);
 	planecpu.set_addrmap(AS_IO, &cedar_magnet_plane_device::cedar_magnet_plane_io);
 
-	z80pio_device& pio0(Z80PIO(config, "z80pio0", 4000000/2));
+	z80pio_device& pio0(Z80PIO(config, "z80pio0", XTAL::u(4000000)/2));
 //  pio0.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 	pio0.in_pa_callback().set(FUNC(cedar_magnet_plane_device::pio0_pa_r));
 	pio0.out_pa_callback().set(FUNC(cedar_magnet_plane_device::pio0_pa_w));
 //  pio0.in_pb_callback().set(FUNC(cedar_magnet_plane_device::pio0_pb_r));
 	pio0.out_pb_callback().set(FUNC(cedar_magnet_plane_device::pio0_pb_w));
 
-	z80pio_device& pio1(Z80PIO(config, "z80pio1", 4000000/2));
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL::u(4000000)/2));
 //  pio1.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 //  pio1.in_pa_callback().set(FUNC(cedar_magnet_plane_device::pio1_pa_r));
 	pio1.out_pa_callback().set(FUNC(cedar_magnet_plane_device::pio1_pa_w));

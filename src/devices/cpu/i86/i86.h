@@ -108,7 +108,7 @@ protected:
 	enum WREGS { AX=0, CX, DX, BX, SP, BP, SI, DI };
 
 	// construction/destruction
-	i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -345,7 +345,7 @@ public:
 		AS_EXTRA
 	};
 	// construction/destruction
-	i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -354,7 +354,7 @@ public:
 	auto esc_data_handler() { return m_esc_data_handler.bind(); }
 
 protected:
-	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);
+	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int data_bus_size);
 
 	virtual void execute_run() override;
 	virtual void device_start() override;
@@ -387,7 +387,7 @@ class i8088_cpu_device : public i8086_cpu_device
 {
 public:
 	// construction/destruction
-	i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

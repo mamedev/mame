@@ -56,7 +56,7 @@ void device_mtx_exp_interface::rom_alloc(uint32_t size, const char *tag)
 //  mtx_exp_slot_device - constructor
 //-------------------------------------------------
 
-mtx_exp_slot_device::mtx_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mtx_exp_slot_device::mtx_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MTX_EXP_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_mtx_exp_interface>(mconfig, *this)
 	, device_cartrom_image_interface(mconfig, *this)

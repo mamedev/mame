@@ -228,7 +228,7 @@ void dorachan_state::machine_reset()
 void dorachan_state::dorachan(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2000000);
+	Z80(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &dorachan_state::dorachan_map);
 	m_maincpu->set_addrmap(AS_IO, &dorachan_state::dorachan_io_map);
 	m_maincpu->set_periodic_int(FUNC(dorachan_state::irq0_line_hold), attotime::from_hz(2*60));

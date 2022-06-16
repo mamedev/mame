@@ -62,7 +62,7 @@ void nes_turbofile_device::device_add_mconfig(machine_config &config)
 //  nes_turbofile_device - constructor
 //-------------------------------------------------
 
-nes_turbofile_device::nes_turbofile_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_turbofile_device::nes_turbofile_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_TURBOFILE, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_nvram(*this, "nvram")

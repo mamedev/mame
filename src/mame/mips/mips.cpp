@@ -775,7 +775,7 @@ void rx2030_state::rx2030(machine_config &config)
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 
 	// parallel port
-	Z8038(config, m_fio, 0);
+	Z8038(config, m_fio);
 	m_fio->out_int_cb<1>().set_inputline(m_iop, INPUT_LINE_IRQ4);
 
 	// keyboard connector

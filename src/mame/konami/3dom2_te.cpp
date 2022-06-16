@@ -692,7 +692,7 @@ static const char *get_reg_name(uint32_t unit, uint32_t reg)
 //  m2_te_device - constructor
 //-------------------------------------------------
 
-m2_te_device::m2_te_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m2_te_device::m2_te_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, M2_TE, tag, owner, clock),
 	m_general_int_handler(*this),
 	m_dfinstr_int_handler(*this),

@@ -311,7 +311,7 @@ void spectrum_gamma_device::device_add_mconfig(machine_config& config)
 	m_centronics->busy_handler().set([this](u8 data) { m_centronics_busy = data; });
 	m_centronics->set_output_latch(cent_data_out);
 
-	ACIA6850(config, m_acia, 0); // schematics missing, wiring unknown
+	ACIA6850(config, m_acia); // schematics missing, wiring unknown
 }
 
 const tiny_rom_entry *spectrum_betav2_device::device_rom_region() const
@@ -353,7 +353,7 @@ const tiny_rom_entry *spectrum_gamma_device::device_rom_region() const
 //  spectrum_betav2_device - constructor
 //-------------------------------------------------
 
-spectrum_betav2_device::spectrum_betav2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_betav2_device::spectrum_betav2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_rom(*this, "rom")
@@ -364,54 +364,54 @@ spectrum_betav2_device::spectrum_betav2_device(const machine_config &mconfig, de
 {
 }
 
-spectrum_betav2_device::spectrum_betav2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_betav2_device::spectrum_betav2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_betav2_device(mconfig, SPECTRUM_BETAV2, tag, owner, clock)
 {
 }
 
-spectrum_betav3_device::spectrum_betav3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_betav3_device::spectrum_betav3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_betav2_device(mconfig, type, tag, owner, clock)
 {
 }
 
-spectrum_betav3_device::spectrum_betav3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_betav3_device::spectrum_betav3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_betav3_device(mconfig, SPECTRUM_BETAV3, tag, owner, clock)
 {
 }
 
-spectrum_betaplus_device::spectrum_betaplus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_betaplus_device::spectrum_betaplus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_betav3_device(mconfig, type, tag, owner, clock)
 {
 }
 
-spectrum_betaplus_device::spectrum_betaplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_betaplus_device::spectrum_betaplus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_betaplus_device(mconfig, SPECTRUM_BETAPLUS, tag, owner, clock)
 {
 }
 
-spectrum_betaclone_device::spectrum_betaclone_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_betaclone_device::spectrum_betaclone_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_betaplus_device(mconfig, type, tag, owner, clock)
 {
 }
 
-spectrum_betaclone_device::spectrum_betaclone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_betaclone_device::spectrum_betaclone_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_betaclone_device(mconfig, SPECTRUM_BETACLONE, tag, owner, clock)
 {
 }
 
-spectrum_betacbi_device::spectrum_betacbi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_betacbi_device::spectrum_betacbi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_betaclone_device(mconfig, type, tag, owner, clock)
 	, m_centronics(*this, "centronics")
 	, m_centronics_busy(0)
 {
 }
 
-spectrum_betacbi_device::spectrum_betacbi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_betacbi_device::spectrum_betacbi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_betacbi_device(mconfig, SPECTRUM_BETACBI, tag, owner, clock)
 {
 }
 
-spectrum_gamma_device::spectrum_gamma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_gamma_device::spectrum_gamma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_betaplus_device(mconfig, type, tag, owner, clock)
 	, m_ppi(*this, "ppi")
 	, m_acia(*this, "acia")
@@ -420,7 +420,7 @@ spectrum_gamma_device::spectrum_gamma_device(const machine_config &mconfig, devi
 {
 }
 
-spectrum_gamma_device::spectrum_gamma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_gamma_device::spectrum_gamma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_gamma_device(mconfig, SPECTRUM_GAMMA, tag, owner, clock)
 {
 }

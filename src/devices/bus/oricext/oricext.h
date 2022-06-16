@@ -22,7 +22,7 @@ class oricext_connector: public device_t, public device_single_card_slot_interfa
 public:
 	template <typename T, typename U>
 	oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, U &&cputag)
-		: oricext_connector(mconfig, tag, owner, (uint32_t)0)
+		: oricext_connector(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -31,7 +31,7 @@ public:
 		set_cputag(std::forward<U>(cputag));
 	}
 
-	oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~oricext_connector();
 
 	template <typename T> void set_cputag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }

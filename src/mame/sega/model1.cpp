@@ -1709,19 +1709,19 @@ ROM_END
 
 void model1_state::model1(machine_config &config)
 {
-	V60(config, m_maincpu, 16000000);
+	V60(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &model1_state::model1_mem);
 	m_maincpu->set_addrmap(AS_IO, &model1_state::model1_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(model1_state::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x MB84256A-70LL + battery
 
-	GENERIC_FIFO_U32(config, "copro_fifo_in", 0);
-	GENERIC_FIFO_U32(config, "copro_fifo_out", 0);
+	GENERIC_FIFO_U32(config, "copro_fifo_in");
+	GENERIC_FIFO_U32(config, "copro_fifo_out");
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(model1_state::model1_interrupt), "screen", 0, 1);
 
-	MB86233(config, m_tgp_copro, 16000000);
+	MB86233(config, m_tgp_copro, XTAL::u(16000000));
 	m_tgp_copro->set_addrmap(AS_PROGRAM, &model1_state::copro_prog_map);
 	m_tgp_copro->set_addrmap(AS_DATA, &model1_state::copro_data_map);
 	m_tgp_copro->set_addrmap(AS_IO, &model1_state::copro_io_map);
@@ -1738,21 +1738,21 @@ void model1_state::model1(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
 
 	// create SEGA_MODEL1IO device *after* SCREEN device
-	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
+	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard"));
 	ioboard.read_callback().set(m_dpram, FUNC(mb8421_device::left_r));
 	ioboard.write_callback().set(m_dpram, FUNC(mb8421_device::left_w));
 	ioboard.in_callback<0>().set_ioport("IN.0");
 	ioboard.in_callback<1>().set_ioport("IN.1");
 
-	MB8421(config, m_dpram, 0);
+	MB8421(config, m_dpram);
 
-	SEGAM1AUDIO(config, m_m1audio, 0);
+	SEGAM1AUDIO(config, m_m1audio);
 	m_m1audio->rxd_handler().set(m_m1uart, FUNC(i8251_device::write_rxd));
 
-	I8251(config, m_m1uart, 8000000); // uPD71051C, clock unknown
+	I8251(config, m_m1uart, XTAL::u(8000000)); // uPD71051C, clock unknown
 	m_m1uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
 
-	clock_device &m1uart_clock(CLOCK(config, "m1uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	clock_device &m1uart_clock(CLOCK(config, "m1uart_clock", XTAL::u(500000))); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	m1uart_clock.signal_handler().set(m_m1uart, FUNC(i8251_device::write_txc));
 	m1uart_clock.signal_handler().append(m_m1uart, FUNC(i8251_device::write_rxc));
 }
@@ -1782,7 +1782,7 @@ void model1_state::vr(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
-	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
+	M1COMM(config, "m1comm").set_default_bios_tag("epr15112");
 }
 
 void model1_state::vformula(machine_config &config)
@@ -1799,7 +1799,7 @@ void model1_state::vformula(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
-	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15624");
+	M1COMM(config, "m1comm").set_default_bios_tag("epr15624");
 }
 
 void model1_state::swa(machine_config &config)
@@ -1818,7 +1818,7 @@ void model1_state::swa(machine_config &config)
 
 	SPEAKER(config, "dleft").front_left();
 	SPEAKER(config, "dright").front_right();
-	DSBZ80(config, m_dsbz80, 0);
+	DSBZ80(config, m_dsbz80);
 	m_dsbz80->add_route(0, "dleft", 1.0);
 	m_dsbz80->add_route(1, "dright", 1.0);
 
@@ -1846,7 +1846,7 @@ void model1_state::wingwar(machine_config &config)
 
 	config.set_default_layout(layout_model1io2);
 
-	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
+	M1COMM(config, "m1comm").set_default_bios_tag("epr15112");
 }
 
 void model1_state::wingwar360(machine_config &config)
@@ -1873,7 +1873,7 @@ void model1_state::polhemus_map(address_map &map)
 void model1_state::netmerc(machine_config &config)
 {
 	model1(config);
-	i386sx_device &polhemus(I386SX(config, "polhemus", 16000000));
+	i386sx_device &polhemus(I386SX(config, "polhemus", XTAL::u(16000000)));
 	polhemus.set_addrmap(AS_PROGRAM, &model1_state::polhemus_map);
 
 	model1io2_device &ioboard(SEGA_MODEL1IO2(config.replace(), "ioboard", 0));

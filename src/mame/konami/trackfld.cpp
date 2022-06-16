@@ -928,9 +928,9 @@ void trackfld_state::trackfld(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	TRACKFLD_AUDIO(config, m_soundbrd, 0, m_audiocpu, m_vlm);
+	TRACKFLD_AUDIO(config, m_soundbrd, m_audiocpu, m_vlm);
 
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
 
 	SN76496(config, m_sn, SOUND_CLOCK/8);
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -1000,9 +1000,9 @@ void trackfld_state::yieartf(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	TRACKFLD_AUDIO(config, m_soundbrd, 0, finder_base::DUMMY_TAG, m_vlm);
+	TRACKFLD_AUDIO(config, m_soundbrd, finder_base::DUMMY_TAG, m_vlm);
 
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
 
 	SN76496(config, m_sn, MASTER_CLOCK/6/2);
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -1051,9 +1051,9 @@ void trackfld_state::hyprolyb(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	HYPROLYB_ADPCM(config, "hyprolyb_adpcm", 0);
+	HYPROLYB_ADPCM(config, "hyprolyb_adpcm");
 
-	msm5205_device &msm(MSM5205(config, "msm", 384000));
+	msm5205_device &msm(MSM5205(config, "msm", XTAL::u(384000)));
 	msm.vck_legacy_callback().set("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::vck_callback));
 	msm.set_prescaler_selector(msm5205_device::S96_4B); /* 4 kHz */
 	msm.add_route(ALL_OUTPUTS, "speaker", 0.5);
@@ -1084,7 +1084,7 @@ void trackfld_state::wizzquiz(machine_config &config)
 
 	/* basic machine hardware */
 	// right cpu?
-	M6800(config.replace(), m_maincpu, 2048000);    /* 1.400 MHz ??? */
+	M6800(config.replace(), m_maincpu, XTAL::u(2048000));    /* 1.400 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::wizzquiz_map);
 
 	m_screen->screen_vblank().set(FUNC(trackfld_state::vblank_nmi));

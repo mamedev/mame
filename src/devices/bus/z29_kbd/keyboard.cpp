@@ -68,7 +68,7 @@
 
 DEFINE_DEVICE_TYPE(Z29_KEYBOARD, z29_keyboard_port_device, "z29_kbd", "Z-29 Keyboard Port")
 
-z29_keyboard_port_device::z29_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+z29_keyboard_port_device::z29_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, Z29_KEYBOARD, tag, owner, clock)
 	, device_single_card_slot_interface<device_z29_keyboard_interface>(mconfig, *this)
 	, m_keyin_callback(*this)

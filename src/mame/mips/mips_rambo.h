@@ -12,7 +12,7 @@
 class mips_rambo_device : public device_t
 {
 public:
-	mips_rambo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mips_rambo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	auto irq_out() { return m_irq_out_cb.bind(); }

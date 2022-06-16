@@ -32,7 +32,7 @@
 DEFINE_DEVICE_TYPE(MD_ROM_GAMEGENIE, md_rom_ggenie_device, "md_ggenie", "MD Game Genie")
 
 
-md_rom_ggenie_device::md_rom_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+md_rom_ggenie_device::md_rom_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MD_ROM_GAMEGENIE, tag, owner, clock)
 	, device_md_cart_interface(mconfig, *this)
 	, m_exp(*this, "subslot")

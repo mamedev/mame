@@ -353,7 +353,7 @@ void apexc_state::apexc(machine_config &config)
 {
 	/* basic machine hardware */
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
-	APEXC(config, m_maincpu, 2000);
+	APEXC(config, m_maincpu, XTAL::u(2000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apexc_state::mem);
 	m_maincpu->tape_read().set(m_tape_reader, FUNC(apexc_tape_reader_image_device::read));
 	m_maincpu->tape_punch().set(FUNC(apexc_state::tape_write));

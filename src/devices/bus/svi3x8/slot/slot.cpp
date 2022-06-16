@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(SVI_SLOT_BUS, svi_slot_bus_device, "svislotbus", "SVI Slot Bu
 //  svi_slot_bus_device - constructor
 //-------------------------------------------------
 
-svi_slot_bus_device::svi_slot_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+svi_slot_bus_device::svi_slot_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SVI_SLOT_BUS, tag, owner, clock)
 	, m_int_handler(*this)
 	, m_romdis_handler(*this)
@@ -196,7 +196,7 @@ DEFINE_DEVICE_TYPE(SVI_SLOT, svi_slot_device, "svislot", "SVI Slot")
 //  svi_slot_device - constructor
 //-------------------------------------------------
 
-svi_slot_device::svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+svi_slot_device::svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SVI_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_svi_slot_interface>(mconfig, *this)
 	, m_bus(*this, finder_base::DUMMY_TAG)

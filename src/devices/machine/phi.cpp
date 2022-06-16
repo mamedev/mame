@@ -187,7 +187,7 @@ constexpr uint8_t CONTROLLER_ADDR   = 0x1e; // PHI always has this address when 
 DEFINE_DEVICE_TYPE(PHI, phi_device, "hp_phi", "HP Processor-to-HPIB Interface")
 
 // Constructors
-phi_device::phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+phi_device::phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	  m_dio_read_func(*this),
 	  m_dio_write_func(*this),
@@ -198,7 +198,7 @@ phi_device::phi_device(const machine_config &mconfig, device_type type, const ch
 {
 }
 
-phi_device::phi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+phi_device::phi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: phi_device(mconfig, PHI, tag, owner, clock)
 {
 }

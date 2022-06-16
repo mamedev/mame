@@ -55,7 +55,7 @@
 class f1_daisy_device : public device_t, public z80_daisy_chain_interface
 {
 public:
-	f1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	f1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
@@ -349,7 +349,7 @@ void apricotf_floppies(device_slot_interface &device)
 
 DEFINE_DEVICE_TYPE(F1_DAISY, f1_daisy_device, "f1_daisy", "F1 daisy chain abstraction")
 
-f1_daisy_device::f1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+f1_daisy_device::f1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, F1_DAISY, tag, owner, clock)
 	, z80_daisy_chain_interface(mconfig, *this)
 {
@@ -409,12 +409,12 @@ void f1_state::act_f1(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_act_f1);
 
 	/* Devices */
-	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
+	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG);
 
-	Z80SIO(config, m_sio, 2500000);
+	Z80SIO(config, m_sio, XTAL::u(2500000));
 	m_sio->out_int_callback().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	Z80CTC(config, m_ctc, 2500000);
+	Z80CTC(config, m_ctc, XTAL::u(2500000));
 	m_ctc->intr_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
 	m_ctc->zc_callback<1>().set(FUNC(f1_state::ctc_z1_w));
 	m_ctc->zc_callback<2>().set(FUNC(f1_state::ctc_z2_w));

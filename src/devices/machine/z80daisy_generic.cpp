@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(Z80DAISY_GENERIC, z80daisy_generic_device, "z80daisy_generic"
 //  z80daisy_generic_device - constructor
 //-------------------------------------------------
 
-z80daisy_generic_device::z80daisy_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+z80daisy_generic_device::z80daisy_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, Z80DAISY_GENERIC, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
 	m_int_handler(*this),

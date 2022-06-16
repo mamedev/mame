@@ -29,7 +29,7 @@ public:
 
 protected:
 	// construction/destruction
-	paper_tape_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	paper_tape_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> paper_tape_reader_device
@@ -45,7 +45,7 @@ public:
 
 protected:
 	// construction/destruction
-	paper_tape_reader_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	paper_tape_reader_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override;
@@ -65,7 +65,7 @@ public:
 
 protected:
 	// construction/destruction
-	paper_tape_punch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	paper_tape_punch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 #endif // MAME_DEVICES_IMAGEDEV_PAPERTAPE_H

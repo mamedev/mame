@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(ACORN_BUS_SLOT, acorn_bus_slot_device, "acorn_bus_slot", "Aco
 //-------------------------------------------------
 //  acorn_bus_slot_device - constructor
 //-------------------------------------------------
-acorn_bus_slot_device::acorn_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_bus_slot_device::acorn_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACORN_BUS_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_acorn_bus_interface>(mconfig, *this)
 	, m_bus(*this, finder_base::DUMMY_TAG)
@@ -62,7 +62,7 @@ DEFINE_DEVICE_TYPE(ACORN_BUS, acorn_bus_device, "acorn_bus", "Acorn Bus")
 //  acorn_bus_device - constructor
 //-------------------------------------------------
 
-acorn_bus_device::acorn_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+acorn_bus_device::acorn_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ACORN_BUS, tag, owner, clock)
 	, m_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_out_irq_cb(*this)

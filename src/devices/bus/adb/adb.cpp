@@ -16,7 +16,7 @@
 
 DEFINE_DEVICE_TYPE(ADB_CONNECTOR, adb_connector, "adbslot", "ADB connector")
 
-adb_connector::adb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+adb_connector::adb_connector(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ADB_CONNECTOR, tag, owner, clock),
 	device_single_card_slot_interface<adb_slot_card_interface>(mconfig, *this)
 {
@@ -43,7 +43,7 @@ adb_slot_card_interface::adb_slot_card_interface(const machine_config &mconfig, 
 
 
 
-adb_device::adb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+adb_device::adb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_adb_cb(*this),
 	m_poweron_cb(*this)

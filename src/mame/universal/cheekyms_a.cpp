@@ -11,7 +11,7 @@
 DEFINE_DEVICE_TYPE(CHEEKY_MOUSE_AUDIO, cheekyms_audio_device, "cheekyms_audio", "Cheeky Mouse Sound Board")
 
 
-cheekyms_audio_device::cheekyms_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cheekyms_audio_device::cheekyms_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CHEEKY_MOUSE_AUDIO, tag, owner, clock)
 	, m_mute(*this, "sound_nl:mute")
 	, m_cheese(*this, "sound_nl:cheese")
@@ -41,7 +41,7 @@ void cheekyms_audio_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	NETLIST_SOUND(config, "sound_nl", 48000)
+	NETLIST_SOUND(config, "sound_nl", XTAL::u(48000))
 		.set_source(NETLIST_NAME(cheekyms))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 

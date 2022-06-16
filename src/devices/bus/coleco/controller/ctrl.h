@@ -50,14 +50,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	colecovision_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: colecovision_control_port_device(mconfig, tag, owner, (uint32_t)0)
+		: colecovision_control_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	colecovision_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	colecovision_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// static configuration helpers
 	auto irq() { return m_write_irq.bind(); }

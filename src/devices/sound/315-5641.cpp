@@ -7,7 +7,7 @@
 
 DEFINE_DEVICE_TYPE(SEGA_315_5641_PCM, sega_315_5641_pcm_device, "315_5641_pcm", "Sega 315-5641 PCM")
 
-sega_315_5641_pcm_device::sega_315_5641_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_315_5641_pcm_device::sega_315_5641_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upd7759_device(mconfig, SEGA_315_5641_PCM, tag, owner, clock)
 	, m_fifocallback(*this)
 	, m_fifo_read(0)

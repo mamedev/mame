@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "DEC PDP8")
 //  pdp8_device - constructor
 //-------------------------------------------------
 
-pdp8_device::pdp8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pdp8_device::pdp8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, PDP8, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, 16, 12, -1),
 		m_pc(0),

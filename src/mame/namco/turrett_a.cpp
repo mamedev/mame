@@ -16,7 +16,7 @@ DEFINE_DEVICE_TYPE(TURRETT, turrett_device, "ttsnd", "Turret Tower Sound")
 //  turrett_device - constructor
 //-------------------------------------------------
 
-turrett_device::turrett_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+turrett_device::turrett_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TURRETT, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)

@@ -40,7 +40,7 @@ void vic1011_device::device_add_mconfig(machine_config &config)
 //  vic1011_device - constructor
 //-------------------------------------------------
 
-vic1011_device::vic1011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vic1011_device::vic1011_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VIC1011, tag, owner, clock)
 	, device_pet_user_port_interface(mconfig, *this)
 	, m_rs232(*this, "rs232")

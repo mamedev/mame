@@ -326,7 +326,7 @@ INPUT_CHANGED_MEMBER(tec1_state::reset_button)
 void tec1_state::tec1(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 1000000);   /* speed can be varied between 250kHz and 2MHz */
+	Z80(config, m_maincpu, XTAL::u(1000000));   /* speed can be varied between 250kHz and 2MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tec1_state::tec1_map);
 	m_maincpu->set_addrmap(AS_IO, &tec1_state::tec1_io);
 
@@ -335,7 +335,7 @@ void tec1_state::tec1(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	m_display->set_segmask(0x3f, 0xff);
 
-	MM74C923(config, m_kb, 0);
+	MM74C923(config, m_kb);
 	m_kb->set_cap_osc(CAP_N(100));
 	m_kb->set_cap_debounce(CAP_U(1));
 	m_kb->da_wr_callback().set(FUNC(tec1_state::da_w));
@@ -361,7 +361,7 @@ void tec1_state::tecjmon(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	m_display->set_segmask(0x3f, 0xff);
 
-	MM74C923(config, m_kb, 0);
+	MM74C923(config, m_kb);
 	m_kb->set_cap_osc(CAP_N(100));
 	m_kb->set_cap_debounce(CAP_U(1));
 	m_kb->da_wr_callback().set(FUNC(tec1_state::da_w));

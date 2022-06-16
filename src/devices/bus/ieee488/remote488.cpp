@@ -243,7 +243,7 @@ constexpr unsigned AH_TO_MS         = 10;   // Timeout in AH to report a byte st
 // device type definition
 DEFINE_DEVICE_TYPE(REMOTE488, remote488_device, "remote488", "IEEE-488 Remotizer")
 
-remote488_device::remote488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+remote488_device::remote488_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig , REMOTE488 , tag , owner , clock),
 	device_ieee488_interface(mconfig , *this),
 	m_stream(*this , "stream")
@@ -252,7 +252,7 @@ remote488_device::remote488_device(const machine_config &mconfig, const char *ta
 
 void remote488_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config, m_stream, 0);
+	BITBANGER(config, m_stream);
 }
 
 void remote488_device::ieee488_eoi(int state)

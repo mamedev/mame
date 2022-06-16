@@ -27,7 +27,7 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
 
 protected:
-	arc_laserd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	arc_laserd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -53,7 +53,7 @@ class arc_lbp4_device : public arc_laserd_device
 {
 public:
 	// construction/destruction
-	arc_lbp4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_lbp4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -125,7 +125,7 @@ void arc_laserd_device::device_add_mconfig(machine_config &config)
 //  arc_laserd_device - constructor
 //-------------------------------------------------
 
-arc_laserd_device::arc_laserd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+arc_laserd_device::arc_laserd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")
@@ -133,7 +133,7 @@ arc_laserd_device::arc_laserd_device(const machine_config &mconfig, device_type 
 {
 }
 
-arc_lbp4_device::arc_lbp4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_lbp4_device::arc_lbp4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: arc_laserd_device(mconfig, ARC_LBP4, tag, owner, clock)
 {
 }

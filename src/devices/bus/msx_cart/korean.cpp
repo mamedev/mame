@@ -8,7 +8,7 @@ DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_90IN1,  msx_cart_korean_90in1_device,  "msx_c
 DEFINE_DEVICE_TYPE(MSX_CART_KOREAN_126IN1, msx_cart_korean_126in1_device, "msx_cart_korean_126in1", "MSX Cartridge - Korean 126-in-1")
 
 
-msx_cart_korean_80in1_device::msx_cart_korean_80in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_korean_80in1_device::msx_cart_korean_80in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_KOREAN_80IN1, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -102,7 +102,7 @@ void msx_cart_korean_80in1_device::write_cart(offs_t offset, uint8_t data)
 
 
 
-msx_cart_korean_90in1_device::msx_cart_korean_90in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_korean_90in1_device::msx_cart_korean_90in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_KOREAN_90IN1, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -209,7 +209,7 @@ void msx_cart_korean_90in1_device::banking(uint8_t data)
 
 
 
-msx_cart_korean_126in1_device::msx_cart_korean_126in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_korean_126in1_device::msx_cart_korean_126in1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_KOREAN_126IN1, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)

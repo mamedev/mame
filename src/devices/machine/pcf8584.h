@@ -39,7 +39,7 @@ class pcf8584_device : public device_t
 
 public:
 	// device type constructor
-	pcf8584_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pcf8584_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callback configuration
 	auto sda_cb() { return m_sda_callback.bind(); }

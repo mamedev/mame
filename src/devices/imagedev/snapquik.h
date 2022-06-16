@@ -22,12 +22,12 @@ public:
 
 	// construction/destruction
 	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const char* extensions, attotime delay = attotime::zero)
-		: snapshot_image_device(mconfig, tag, owner, 0U)
+		: snapshot_image_device(mconfig, tag, owner)
 	{
 		set_extensions(extensions);
 		set_delay(delay);
 	}
-	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~snapshot_image_device();
 
 	void set_interface(const char *interface) { m_interface = interface; }
@@ -49,7 +49,7 @@ public:
 	template <typename... T> void set_load_callback(T &&... args) { m_load.set(std::forward<T>(args)...); }
 
 protected:
-	snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -76,12 +76,12 @@ class quickload_image_device : public snapshot_image_device
 public:
 	// construction/destruction
 	quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const char* extensions, attotime delay = attotime::zero)
-		: quickload_image_device(mconfig, tag, owner, 0U)
+		: quickload_image_device(mconfig, tag, owner)
 	{
 		set_extensions(extensions);
 		set_delay(delay);
 	}
-	quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual const char *image_type_name() const noexcept override { return "quickload"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "quik"; }

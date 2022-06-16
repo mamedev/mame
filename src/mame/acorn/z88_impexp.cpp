@@ -28,12 +28,12 @@
 #include "emu.h"
 #include "z88_impexp.h"
 
-static constexpr uint32_t Z88_RS232_BAUD = 9600;
+static constexpr XTAL Z88_RS232_BAUD = XTAL::u(9600);
 
 // device type definition
 DEFINE_DEVICE_TYPE(Z88_IMPEXP, z88_impexp_device, "z88_impexp", "Z88 Imp-Export protocol");
 
-z88_impexp_device::z88_impexp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z88_impexp_device::z88_impexp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, Z88_IMPEXP, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, device_rs232_port_interface(mconfig, *this)

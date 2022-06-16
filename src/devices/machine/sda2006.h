@@ -14,7 +14,7 @@ class sda2006_device : public device_t,
 {
 public:
 	// construction/destruction
-	sda2006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sda2006_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// I/O operations
 	DECLARE_READ_LINE_MEMBER(read_data);

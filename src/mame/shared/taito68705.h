@@ -66,10 +66,10 @@ public:
 	template <unsigned N> auto aux_out_cb() { return m_aux_out_cb[N].bind(); }
 	auto aux_strobe_cb() { return m_aux_strobe_cb.bind(); }
 
-	taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	taito68705_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	taito68705_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual u8 mcu_portc_r();
 	void mcu_portb_w(offs_t offset, u8 data, u8 mem_mask = ~0);
@@ -87,7 +87,7 @@ protected:
 class taito68705_mcu_tiger_device : public taito68705_mcu_device
 {
 public:
-	taito68705_mcu_tiger_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	taito68705_mcu_tiger_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual u8 mcu_portc_r() override;
@@ -124,7 +124,7 @@ protected:
 class arkanoid_68705p3_device : public arkanoid_mcu_device_base
 {
 public:
-	arkanoid_68705p3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	arkanoid_68705p3_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -134,7 +134,7 @@ protected:
 class arkanoid_68705p5_device : public arkanoid_mcu_device_base
 {
 public:
-	arkanoid_68705p5_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	arkanoid_68705p5_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

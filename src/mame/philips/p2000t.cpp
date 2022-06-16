@@ -225,7 +225,7 @@ uint8_t p2000t_state::videoram_r(offs_t offset)
 void p2000t_state::p2000t(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2500000);
+	Z80(config, m_maincpu, XTAL::u(2500000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &p2000t_state::p2000t_mem);
 	m_maincpu->set_addrmap(AS_IO, &p2000t_state::p2000t_io);
 	m_maincpu->set_vblank_int("screen", FUNC(p2000t_state::p2000_interrupt));
@@ -238,7 +238,7 @@ void p2000t_state::p2000t(machine_config &config)
 	screen.set_visarea(0, 40 * 12 - 1, 0, 24 * 20 - 1);
 	screen.set_screen_update("saa5050", FUNC(saa5050_device::screen_update));
 
-	saa5050_device &saa5050(SAA5050(config, "saa5050", 6000000));
+	saa5050_device &saa5050(SAA5050(config, "saa5050", XTAL::u(6000000)));
 	saa5050.d_cb().set(FUNC(p2000t_state::videoram_r));
 	saa5050.set_screen_size(40, 24, 80);
 
@@ -247,7 +247,7 @@ void p2000t_state::p2000t(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* the mini cassette driver */
-	MDCR(config, m_mdcr, 0);
+	MDCR(config, m_mdcr);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("16K").set_extra_options("16K,32K,48K,64K,80K,102K");
@@ -258,7 +258,7 @@ void p2000t_state::p2000t(machine_config &config)
 void p2000m_state::p2000m(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2500000);
+	Z80(config, m_maincpu, XTAL::u(2500000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &p2000m_state::p2000m_mem);
 	m_maincpu->set_addrmap(AS_IO, &p2000m_state::p2000t_io);
 	m_maincpu->set_vblank_int("screen", FUNC(p2000m_state::p2000_interrupt));
@@ -281,7 +281,7 @@ void p2000m_state::p2000m(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* the mini cassette driver */
-	MDCR(config, m_mdcr, 0);
+	MDCR(config, m_mdcr);
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("16K").set_extra_options("16K,32K,48K,64K,80K,102K");
 }

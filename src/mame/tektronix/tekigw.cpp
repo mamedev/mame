@@ -704,7 +704,7 @@ void tekigw_state_base::common_config(machine_config &config)
 
 	SCC8530N(config, m_scc, 16_MHz_XTAL / 4);
 	m_scc->out_int_callback().set(m_icu, FUNC(ns32202_device::ir_w<1>)).invert();
-	m_scc->configure_channels(2'457'600, 0, 2'457'600, 0);
+	m_scc->configure_channels(XTAL::u(2'457'600), XTAL(), XTAL::u(2'457'600), XTAL());
 
 	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
 	m_serial[0]->cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
@@ -777,7 +777,7 @@ void tek6100_state::tek6130(machine_config &config)
 	 *  - Micropolis 1304 (830,6,16,512)
 	 *  - Maxtor XT-1105 (918,11,16,512)
 	 */
-	HARDDISK(config, m_hdd, 0);
+	HARDDISK(config, m_hdd);
 
 	TMS9914(config, m_gpib, 20_MHz_XTAL / 4);
 	m_gpib->int_write_cb().set(m_icu, FUNC(ns32202_device::ir_w<10>));
@@ -807,16 +807,16 @@ void tek6100_state::tek6130(machine_config &config)
 	// TODO: graphics board disabled for now
 	if (false)
 	{
-		NS32016(config, m_dpu_cpu, 0); // 8'000'000);
+		NS32016(config, m_dpu_cpu); // 8'000'000);
 		m_dpu_cpu->set_addrmap(0, &tek6100_state::dpu_cpu_map<0>);
 
-		ns32081_device &dpu_fpu(NS32081(config, "dpu_fpu", 8'000'000));
+		ns32081_device &dpu_fpu(NS32081(config, "dpu_fpu", XTAL::u(8'000'000)));
 		m_dpu_cpu->set_fpu(dpu_fpu);
 
-		ns32202_device &dpu_icu(NS32202(config, "dpu_icu", 20'000));
+		ns32202_device &dpu_icu(NS32202(config, "dpu_icu", XTAL::u(20'000)));
 		dpu_icu.out_int().set_inputline(m_dpu_cpu, INPUT_LINE_IRQ0).invert();
 
-		i8744_device &dpu_mcu(I8744(config, "dpu_mcu", 0)); // 10'000'000)); // 8744H-10
+		i8744_device &dpu_mcu(I8744(config, "dpu_mcu")); // 10'000'000)); // 8744H-10
 		(void)dpu_mcu;
 
 		mc6845_device &dpu_crtc(SY6845E(config, "dpu_crtc", 25.2_MHz_XTAL)); // SYP6845EA
@@ -833,7 +833,7 @@ void tek6100_state::tek6130(machine_config &config)
 		// 13-inch 640x480 60Hz 4-bit color
 		// 15-inch 640x480 60Hz monochrome
 		screen_device &dpu_screen(SCREEN(config, "dpu_screen", SCREEN_TYPE_RASTER));
-		dpu_screen.set_raw(25200000, 800, 0, 640, 525, 0, 480);
+		dpu_screen.set_raw(XTAL::u(25200000), 800, 0, 640, 525, 0, 480);
 		dpu_screen.set_screen_update(FUNC(tek6100_state::screen_update));
 	}
 }
@@ -852,7 +852,7 @@ void tek4132_state::tek4132(machine_config &config)
 
 	m_lan->set_addrmap(0, &tek4132_state::lan_map);
 
-	m_scc->configure_channels(3'686'400, 0, 3'686'400, 0);
+	m_scc->configure_channels(XTAL::u(3'686'400), XTAL(), XTAL::u(3'686'400), XTAL()0);
 
 	/*
 	 * Interrupt sources
@@ -879,7 +879,7 @@ void tek4132_state::tek4132(machine_config &config)
 	EEPROM_X24C44_16BIT(config, m_nov[1]); // X2443P
 	m_nov[1]->do_callback().set(FUNC(tek4132_state::nov_do));
 
-	AM9517A(config, m_sdma, 4'000'000); // clock?
+	AM9517A(config, m_sdma, XTAL::u(4'000'000)); // clock?
 	m_sdma->dreq_active_low();
 
 	INPUT_MERGER_ALL_HIGH(config, m_sirq);

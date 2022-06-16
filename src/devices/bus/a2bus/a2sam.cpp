@@ -28,7 +28,7 @@ class a2bus_sam_device:
 {
 public:
 	// construction/destruction
-	a2bus_sam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_sam_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		device_t(mconfig, A2BUS_SAM, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dac(*this, "dac")
@@ -54,7 +54,7 @@ protected:
 void a2bus_sam_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 }
 
 } // anonymous namespace

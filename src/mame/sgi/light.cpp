@@ -64,7 +64,7 @@ enum
 DEFINE_DEVICE_TYPE(LIGHT_VIDEO, light_video_device, "light_video", "SGI Light graphics board")
 
 
-light_video_device::light_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+light_video_device::light_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LIGHT_VIDEO, tag, owner, clock)
 	, m_palette(*this, "palette")
 {

@@ -32,7 +32,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 DEFINE_DEVICE_TYPE(PSX_IRQ, psxirq_device, "psxirq", "Sony PSX IRQ")
 
-psxirq_device::psxirq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+psxirq_device::psxirq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PSX_IRQ, tag, owner, clock), n_irqdata(0), n_irqmask(0),
 	m_irq_handler(*this)
 {

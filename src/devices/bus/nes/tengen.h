@@ -12,7 +12,7 @@ class nes_tengen032_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
@@ -20,7 +20,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_tengen032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_tengen032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -53,7 +53,7 @@ class nes_tengen037_device : public nes_tengen032_device
 {
 public:
 	// construction/destruction
-	nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void write_h(offs_t offset, u8 data) override;

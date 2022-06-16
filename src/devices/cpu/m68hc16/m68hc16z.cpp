@@ -29,7 +29,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(MC68HC16Z1, mc68hc16z1_device, "mc68hc16z1", "Motorola MC68HC16Z1")
 
-m68hc16z_device::m68hc16z_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
+m68hc16z_device::m68hc16z_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map)
 	: cpu16_device(mconfig, type, tag, owner, clock, map)
 	, m_pitr(0)
 	, m_sccr{0, 0}
@@ -38,7 +38,7 @@ m68hc16z_device::m68hc16z_device(const machine_config &mconfig, device_type type
 {
 }
 
-mc68hc16z1_device::mc68hc16z1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mc68hc16z1_device::mc68hc16z1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m68hc16z_device(mconfig, MC68HC16Z1, tag, owner, clock, address_map_constructor(FUNC(mc68hc16z1_device::internal_map), this))
 {
 }

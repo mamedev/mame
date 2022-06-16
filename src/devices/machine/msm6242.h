@@ -46,7 +46,7 @@ class msm6242_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_int_handler() { return m_out_int_handler.bind(); }
 
@@ -55,7 +55,7 @@ public:
 	u8 read(offs_t offset);
 
 protected:
-	msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -105,7 +105,7 @@ class rtc62421_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> rtc62423_device
@@ -114,7 +114,7 @@ class rtc62423_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> rtc72421_device
@@ -123,7 +123,7 @@ class rtc72421_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> rtc72423_device
@@ -132,7 +132,7 @@ class rtc72423_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

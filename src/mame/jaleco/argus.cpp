@@ -479,11 +479,11 @@ GFXDECODE_END
 void argus_state::argus(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5000000);           /* 4 MHz */
+	Z80(config, m_maincpu, XTAL::u(5000000));           /* 4 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &argus_state::argus_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(argus_state::scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 5000000);
+	Z80(config, m_audiocpu, XTAL::u(5000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &argus_state::sound_map_a);
 	m_audiocpu->set_addrmap(AS_IO, &argus_state::sound_portmap_1);
 
@@ -500,14 +500,14 @@ void argus_state::argus(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_argus);
 	PALETTE(config, m_palette).set_entries(896);
 
-	JALECO_BLEND(config, m_blend, 0);
+	JALECO_BLEND(config, m_blend);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2203_device &ym1(YM2203(config, "ym1", 6000000 / 4));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL::u(6000000) / 4));
 	ym1.irq_handler().set_inputline(m_audiocpu, 0);
 	ym1.add_route(0, "mono", 0.15);
 	ym1.add_route(1, "mono", 0.15);
@@ -518,11 +518,11 @@ void argus_state::argus(machine_config &config)
 void valtric_state::valtric(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5000000);    /* 5 MHz */
+	Z80(config, m_maincpu, XTAL::u(5000000));    /* 5 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &valtric_state::valtric_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(valtric_state::scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 5000000);
+	Z80(config, m_audiocpu, XTAL::u(5000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &valtric_state::sound_map_a);
 	m_audiocpu->set_addrmap(AS_IO, &valtric_state::sound_portmap_2);
 
@@ -539,21 +539,21 @@ void valtric_state::valtric(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_valtric);
 	PALETTE(config, m_palette).set_entries(768);
 
-	JALECO_BLEND(config, m_blend, 0);
+	JALECO_BLEND(config, m_blend);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2203_device &ym1(YM2203(config, "ym1", 6000000 / 4));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL::u(6000000) / 4));
 	ym1.irq_handler().set_inputline(m_audiocpu, 0);
 	ym1.add_route(0, "mono", 0.15);
 	ym1.add_route(1, "mono", 0.15);
 	ym1.add_route(2, "mono", 0.15);
 	ym1.add_route(3, "mono", 0.50);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 6000000 / 4));
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL::u(6000000) / 4));
 	ym2.add_route(0, "mono", 0.15);
 	ym2.add_route(1, "mono", 0.15);
 	ym2.add_route(2, "mono", 0.15);
@@ -563,11 +563,11 @@ void valtric_state::valtric(machine_config &config)
 void butasan_state::butasan(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5000000);    /* 5 MHz */
+	Z80(config, m_maincpu, XTAL::u(5000000));    /* 5 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &butasan_state::butasan_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(butasan_state::scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 5000000);
+	Z80(config, m_audiocpu, XTAL::u(5000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &butasan_state::sound_map_b);
 	m_audiocpu->set_addrmap(AS_IO, &butasan_state::sound_portmap_2);
 
@@ -584,21 +584,21 @@ void butasan_state::butasan(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_butasan);
 	PALETTE(config, m_palette).set_entries(768);
 
-	JALECO_BLEND(config, m_blend, 0);
+	JALECO_BLEND(config, m_blend);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2203_device &ym1(YM2203(config, "ym1", 6000000 / 4));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL::u(6000000) / 4));
 	ym1.irq_handler().set_inputline(m_audiocpu, 0);
 	ym1.add_route(0, "mono", 0.30);
 	ym1.add_route(1, "mono", 0.30);
 	ym1.add_route(2, "mono", 0.30);
 	ym1.add_route(3, "mono", 1.0);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 6000000 / 4));
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL::u(6000000) / 4));
 	ym2.add_route(0, "mono", 0.30);
 	ym2.add_route(1, "mono", 0.30);
 	ym2.add_route(2, "mono", 0.30);

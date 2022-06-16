@@ -48,12 +48,12 @@ DEFINE_DEVICE_TYPE(YMZ774, ymz774_device, "ymz774", "Yamaha YMZ774 AMMS2C")
 //  ymz770_device - constructor
 //-------------------------------------------------
 
-ymz770_device::ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ymz770_device::ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ymz770_device(mconfig, YMZ770, tag, owner, clock, 16000)
 {
 }
 
-ymz770_device::ymz770_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t sclock)
+ymz770_device::ymz770_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t sclock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
@@ -456,7 +456,7 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 //  ymz774_device
 //-------------------------------------------------
 
-ymz774_device::ymz774_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ymz774_device::ymz774_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ymz770_device(mconfig, YMZ774, tag, owner, clock, 44100)
 {
 	// calculate volume increments, fixed point values, fractions of 0x20000

@@ -10,13 +10,13 @@ class konami_gn676_lan_device :  public device_t
 {
 public:
 	template <typename T>
-	konami_gn676_lan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&work_ram_tag)
-		: konami_gn676_lan_device(mconfig, tag, owner, clock)
+	konami_gn676_lan_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&work_ram_tag)
+		: konami_gn676_lan_device(mconfig, tag, owner)
 	{
 		m_work_ram.set_tag(std::forward<T>(work_ram_tag));
 	}
 
-	konami_gn676_lan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konami_gn676_lan_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint32_t lanc1_r(offs_t offset);
 	void lanc1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

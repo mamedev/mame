@@ -96,7 +96,7 @@ void s32comm_device::device_add_mconfig(machine_config &config)
 //  s32comm_device - constructor
 //-------------------------------------------------
 
-s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, S32COMM, tag, owner, clock)
 {
 	std::fill(std::begin(m_shared), std::end(m_shared), 0);

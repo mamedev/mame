@@ -13,7 +13,7 @@
 DEFINE_DEVICE_TYPE(SPG290_I2C, spg290_i2c_device, "spg290_i2c", "SPG290 I2C")
 
 
-spg290_i2c_device::spg290_i2c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spg290_i2c_device::spg290_i2c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPG290_I2C, tag, owner, clock)
 	, m_irq_cb(*this)
 	, m_i2c_read_cb(*this)

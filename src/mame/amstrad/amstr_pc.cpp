@@ -672,22 +672,22 @@ void amstrad_pc_state::cfg_fdc(device_t *device)
 void amstrad_pc_state::pc200(machine_config &config)
 {
 	/* basic machine hardware */
-	I8086(config, m_maincpu, 8000000);
+	I8086(config, m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &amstrad_pc_state::ppc640_map);
 	m_maincpu->set_addrmap(AS_IO, &amstrad_pc_state::pc200_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	PCNOPPI_MOTHERBOARD(config, m_mb).set_cputag(m_maincpu);
 	m_mb->int_callback().set_inputline(m_maincpu, 0);
 	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "aga", 0, "mb:isa", pc_isa8_cards, "aga_pc200", true);
-	ISA8_SLOT(config, "fdc", 0, "mb:isa", pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_fdc);
-	ISA8_SLOT(config, "com", 0, "mb:isa", pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_com);
+	ISA8_SLOT(config, "aga", "mb:isa", pc_isa8_cards, "aga_pc200", true);
+	ISA8_SLOT(config, "fdc", "mb:isa", pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_fdc);
+	ISA8_SLOT(config, "com", "mb:isa", pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_com);
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* printer */
 	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
@@ -720,7 +720,7 @@ void amstrad_pc_state::pc2086(machine_config &config)
 void amstrad_pc_state::ppc640(machine_config &config)
 {
 	pc200(config);
-	V30(config.replace(), m_maincpu, 8000000);
+	V30(config.replace(), m_maincpu, XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &amstrad_pc_state::ppc640_map);
 	m_maincpu->set_addrmap(AS_IO, &amstrad_pc_state::ppc512_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));

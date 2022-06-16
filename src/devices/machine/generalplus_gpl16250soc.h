@@ -22,12 +22,12 @@ typedef device_delegate<void (uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)>
 class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_interface
 {
 public:
-	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock) :
 		sunplus_gcm394_base_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(sunplus_gcm394_base_device::gcm394_internal_map), this))
 	{
 	}
 
-	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal) :
+	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock, address_map_constructor internal) :
 		unsp_20_device(mconfig, type, tag, owner, clock, internal),
 		device_mixer_interface(mconfig, *this, 2),
 		m_screen(*this, finder_base::DUMMY_TAG),
@@ -377,13 +377,13 @@ class sunplus_gcm394_device : public sunplus_gcm394_base_device
 {
 public:
 	template <typename T>
-	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag) :
 		sunplus_gcm394_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
-	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -391,14 +391,14 @@ class generalplus_gpac800_device : public sunplus_gcm394_base_device
 {
 public:
 	template <typename T>
-	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag) :
 		generalplus_gpac800_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 		m_csbase = 0x30000;
 	}
 
-	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void gpac800_internal_map(address_map &map);
@@ -446,14 +446,14 @@ class generalplus_gpspispi_device : public sunplus_gcm394_base_device
 {
 public:
 	template <typename T>
-	generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+	generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag) :
 		generalplus_gpspispi_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 		m_csbase = 0x30000;
 	}
 
-	generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void gpspispi_internal_map(address_map &map);
@@ -469,7 +469,7 @@ class generalplus_gpspi_direct_device : public sunplus_gcm394_base_device
 {
 public:
 	template <typename T>
-	generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+	generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag) :
 		generalplus_gpspi_direct_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
@@ -478,7 +478,7 @@ public:
 		m_csbase = 0xffffffff;
 	}
 
-	generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void gpspi_direct_internal_map(address_map &map);

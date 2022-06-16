@@ -25,7 +25,7 @@ class mc1502_fdc_device : public device_t,
 {
 public:
 	// construction/destruction
-	mc1502_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc1502_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T>
 	void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }

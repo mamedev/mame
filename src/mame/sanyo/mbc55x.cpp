@@ -274,7 +274,7 @@ void mbc55x_state::mbc55x(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(14.318181_MHz_XTAL, 896, 0, 640, 262, 0, 200);
+	screen.set_raw(14.318181_MHz_XTAL, 896, 640, 262, 0, 200);
 	screen.set_screen_update(VID_MC6845_NAME, FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(mbc55x_state::mbc55x_palette), SCREEN_NO_COLOURS * 3);
@@ -340,7 +340,7 @@ void mbc55x_state::mbc55x(machine_config &config)
 	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w)); // all other IRQ and DRQ lines are NC
 	isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI).invert();
 
-	ISA8_SLOT(config, "external", 0, "isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "external", "isa", pc_isa8_cards, nullptr, false);
 
 	i8251_device &sio(I8251(config, "sio", 14.318181_MHz_XTAL / 8)); // on separate board, through 20-pin header
 	sio.dtr_handler().set("line", FUNC(rs232_port_device::write_dtr));
@@ -375,4 +375,4 @@ ROM_START( mbc55x )
 ROM_END
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
-COMP( 1983, mbc55x, 0,      0,      mbc55x,  mbc55x, mbc55x_state, empty_init, "Sanyo", "MBC-55x", 0 )
+COMP( 1983, mbc55x,      0, 0,      mbc55x,  mbc55x, mbc55x_state, empty_init, "Sanyo", "MBC-55x", 0 )

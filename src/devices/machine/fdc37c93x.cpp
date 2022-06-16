@@ -15,7 +15,7 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 
 DEFINE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device, "fdc37c93x", "SMSC FDC37C93X")
 
-fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, FDC37C93X, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, mode(OperatingMode::Run)
@@ -244,7 +244,7 @@ void fdc37c93x_device::floppy_formats(format_registration &fr)
 void fdc37c93x_device::device_add_mconfig(machine_config &config)
 {
 	// floppy disc controller
-	smc37c78_device &fdcdev(SMC37C78(config, floppy_controller_fdcdev, 24'000'000));
+	smc37c78_device &fdcdev(SMC37C78(config, floppy_controller_fdcdev, XTAL::u(24'000'000)));
 	fdcdev.intrq_wr_callback().set(FUNC(fdc37c93x_device::irq_floppy_w));
 	fdcdev.drq_wr_callback().set(FUNC(fdc37c93x_device::drq_floppy_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", fdc37c93x_device::floppy_formats);

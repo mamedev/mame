@@ -540,7 +540,7 @@ void finalizr_state::finalizr(machine_config &config)
 
 	SN76489A(config, "snsnd", 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "speaker", 0.75);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.325); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.325); // unknown DAC
 }
 
 void finalizr_state::finalizrb(machine_config &config)

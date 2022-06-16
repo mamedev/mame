@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(AIRRAID_VIDEO, airraid_video_device, "airraid_vid", "Seibu Air Raid Video")
 
-airraid_video_device::airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+airraid_video_device::airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AIRRAID_VIDEO, tag, owner, clock),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "^palette"),

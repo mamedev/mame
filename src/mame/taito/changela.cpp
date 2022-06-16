@@ -418,11 +418,11 @@ void changela_state::machine_reset()
 
 void changela_state::changela(machine_config &config)
 {
-	Z80(config, m_maincpu, 5000000);
+	Z80(config, m_maincpu, XTAL::u(5000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &changela_state::changela_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(changela_state::changela_scanline), "screen", 0, 1);
 
-	M68705P3(config, m_mcu, 2500000);
+	M68705P3(config, m_mcu, XTAL::u(2500000));
 	m_mcu->portb_r().set_ioport("MCU");
 	m_mcu->porta_w().set(FUNC(changela_state::changela_68705_port_a_w));
 	m_mcu->portc_w().set(FUNC(changela_state::changela_68705_port_c_w));
@@ -448,12 +448,12 @@ void changela_state::changela(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay1(AY8910(config, "ay1", 1250000));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL::u(1250000)));
 	ay1.port_a_read_callback().set_ioport("DSWA");
 	ay1.port_b_read_callback().set_ioport("DSWB");
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 1250000));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL::u(1250000)));
 	ay2.port_a_read_callback().set_ioport("DSWC");
 	ay2.port_b_read_callback().set_ioport("DSWD");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);

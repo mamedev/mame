@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(M50753, m50753_device, "m50753", "Mitsubishi M50753")
 //-------------------------------------------------
 //  m5074x_device - constructor
 //-------------------------------------------------
-m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, address_map_constructor internal_map) :
+m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int addrbits, address_map_constructor internal_map) :
 	m740_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, addrbits, 0, internal_map),
 	m_read_p(*this),
@@ -231,13 +231,13 @@ void m5074x_device::recalc_timer(int timer)
 	switch (timer)
 	{
 		case 0:
-			hz = clock() / 16;
+			hz = clock().value() / 16;
 			hz /= (m_tmr12pre + 2);
 			m_timers[TIMER_1]->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
 			break;
 
 		case 1:
-			hz = clock() / 16;
+			hz = clock().value() / 16;
 			hz /= (m_tmr12pre + 2);
 			m_timers[TIMER_2]->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
 			break;
@@ -254,7 +254,7 @@ void m5074x_device::recalc_timer(int timer)
 				}
 				else
 				{
-					hz = clock() / 16;
+					hz = clock().value() / 16;
 					hz /= (m_tmrxpre + 2);
 					m_timers[TIMER_X]->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
 				}
@@ -458,12 +458,12 @@ void m50740_device::m50740_map(address_map &map)
 	map(0x1400, 0x1fff).rom().region(DEVICE_SELF, 0);
 }
 
-m50740_device::m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m50740_device::m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m50740_device(mconfig, M50740, tag, owner, clock)
 {
 }
 
-m50740_device::m50740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+m50740_device::m50740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	m5074x_device(mconfig, type, tag, owner, clock, 13, address_map_constructor(FUNC(m50740_device::m50740_map), this))
 {
 }
@@ -477,12 +477,12 @@ void m50741_device::m50741_map(address_map &map)
 	map(0x1000, 0x1fff).rom().region(DEVICE_SELF, 0);
 }
 
-m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m50741_device(mconfig, M50741, tag, owner, clock)
 {
 }
 
-m50741_device::m50741_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+m50741_device::m50741_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	m5074x_device(mconfig, type, tag, owner, clock, 13, address_map_constructor(FUNC(m50741_device::m50741_map), this))
 {
 }
@@ -506,12 +506,12 @@ static constexpr u8 IRQ_50753_INT1REQ = 0x80;
 static constexpr u8 IRQ_50753_INTADC = 0x20;
 static constexpr u8 IRQ_50753_INT2REQ = 0x02;
 
-m50753_device::m50753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m50753_device::m50753_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	m50753_device(mconfig, M50753, tag, owner, clock)
 {
 }
 
-m50753_device::m50753_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+m50753_device::m50753_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	m5074x_device(mconfig, type, tag, owner, clock, 16, address_map_constructor(FUNC(m50753_device::m50753_map), this)),
 	m_ad_in(*this),
 	m_in_p(*this),

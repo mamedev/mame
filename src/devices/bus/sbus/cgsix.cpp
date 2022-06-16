@@ -28,7 +28,7 @@ void sbus_cgsix_device::base_map(address_map &map)
 	map(0x00700000, 0x00700fff).rw(FUNC(sbus_cgsix_device::fbc_r), FUNC(sbus_cgsix_device::fbc_w));
 }
 
-sbus_cgsix_device::sbus_cgsix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sbus_cgsix_device::sbus_cgsix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sbus_card_interface(mconfig, *this)
 	, m_rom(*this, "prom")
@@ -1322,10 +1322,10 @@ void sbus_turbogx_device::device_add_mconfig(machine_config &config)
 	m_screen->set_raw(105.561_MHz_XTAL, 1472, 0, 1152, 943, 0, 900);
 	m_screen->screen_vblank().set(FUNC(sbus_turbogx_device::vblank_w));
 
-	BT458(config, m_ramdac, 0);
+	BT458(config, m_ramdac);
 }
 
-sbus_turbogx_device::sbus_turbogx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sbus_turbogx_device::sbus_turbogx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sbus_cgsix_device(mconfig, SBUS_TURBOGX, tag, owner, clock, 0x100000)
 {
 }
@@ -1364,10 +1364,10 @@ void sbus_turbogxp_device::device_add_mconfig(machine_config &config)
 	m_screen->set_refresh_hz(72);
 	m_screen->screen_vblank().set(FUNC(sbus_turbogxp_device::vblank_w));
 
-	BT467(config, m_ramdac, 0);
+	BT467(config, m_ramdac);
 }
 
-sbus_turbogxp_device::sbus_turbogxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sbus_turbogxp_device::sbus_turbogxp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sbus_cgsix_device(mconfig, SBUS_TURBOGXP, tag, owner, clock, 0x400000)
 {
 }

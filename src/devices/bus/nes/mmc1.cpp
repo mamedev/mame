@@ -45,22 +45,22 @@ DEFINE_DEVICE_TYPE(NES_SZROM, nes_szrom_device, "nes_szrom", "NES Cart SZROM (MM
 
 
 
-nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_reg_write_enable(0), m_latch(0), m_count(0)
 {
 }
 
-nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sxrom_device(mconfig, NES_SXROM, tag, owner, clock)
 {
 }
 
-nes_sorom_device::nes_sorom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_sorom_device::nes_sorom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sxrom_device(mconfig, NES_SOROM, tag, owner, clock)
 {
 }
 
-nes_szrom_device::nes_szrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_szrom_device::nes_szrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_sxrom_device(mconfig, NES_SZROM, tag, owner, clock)
 {
 }

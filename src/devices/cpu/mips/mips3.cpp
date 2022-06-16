@@ -131,7 +131,7 @@ DEFINE_DEVICE_TYPE(RM7000LE,  rm7000le_device,  "rm7000le",  "MIPS RM7000 (littl
 
 
 // VR4300 and VR5432 have 4 fewer PFN bits, and only 32 TLB entries
-mips3_device::mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mips3_flavor flavor, endianness_t endianness, uint32_t data_bits)
+mips3_device::mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, mips3_flavor flavor, endianness_t endianness, uint32_t data_bits)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_core(nullptr)

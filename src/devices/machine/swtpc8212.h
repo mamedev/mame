@@ -19,7 +19,7 @@ INPUT_PORTS_EXTERN(swtpc8212);
 class swtpc8212_device : public device_t
 {
 public:
-	swtpc8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	swtpc8212_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_changed);
 
@@ -34,7 +34,7 @@ public:
 	void rs232_conn_rxd_w(int state);
 
 protected:
-	swtpc8212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	swtpc8212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;

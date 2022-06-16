@@ -41,7 +41,7 @@ void vic1010_device::device_add_mconfig(machine_config &config)
 //  vic1010_device - constructor
 //-------------------------------------------------
 
-vic1010_device::vic1010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vic1010_device::vic1010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, VIC1010, tag, owner, clock)
 	, device_vic20_expansion_card_interface(mconfig, *this)
 	, m_expansion_slot(*this, "slot%u", 1)

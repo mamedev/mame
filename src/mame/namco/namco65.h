@@ -15,7 +15,7 @@ class namcoc65_device : public device_t
 {
 public:
 	// construction/destruction
-	namcoc65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namcoc65_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto in_pb_callback() { return m_in_pb_cb.bind(); }
 	auto in_pc_callback() { return m_in_pc_cb.bind(); }

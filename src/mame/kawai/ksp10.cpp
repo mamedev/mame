@@ -39,7 +39,7 @@ INPUT_PORTS_END
 
 void kawai_ksp10_state::ksp10(machine_config &config)
 {
-	TMP96C141(config, m_maincpu, 10'000'000); // clock unknown
+	TMP96C141(config, m_maincpu, XTAL::u(10'000'000)); // clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &kawai_ksp10_state::mem_map);
 }
 

@@ -29,17 +29,17 @@ void scn2674_device::scn2674_vram(address_map &map)
 		map(0x0000, (1 << space_config(0)->addr_width()) - 1).noprw();
 }
 
-scn2672_device::scn2672_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scn2672_device::scn2672_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scn2674_device(mconfig, SCN2672, tag, owner, clock, false)
 {
 }
 
-scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scn2674_device(mconfig, SCN2674, tag, owner, clock, true)
 {
 }
 
-scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extend_addressing)
+scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool extend_addressing)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)

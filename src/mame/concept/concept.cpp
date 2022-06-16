@@ -261,7 +261,7 @@ void concept_state::concept(machine_config &config)
 	m_kbdacia->set_xtal(16.364_MHz_XTAL / 9);
 
 	/* Apple II bus */
-	A2BUS(config, m_a2bus, 0).set_space(m_maincpu, AS_PROGRAM);
+	A2BUS(config, m_a2bus).set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->nmi_w().set("iocint", FUNC(input_merger_device::in_w<0>));
 	m_a2bus->irq_w().set("iocint", FUNC(input_merger_device::in_w<1>));
 	A2BUS_SLOT(config, "sl1", m_a2bus, concept_a2_cards, nullptr);

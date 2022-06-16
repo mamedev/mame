@@ -81,7 +81,7 @@ class multibus_device
 	, public device_memory_interface
 {
 public:
-	multibus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	multibus_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// interrupt interface
 	template <unsigned I> auto int_callback() { return m_int_cb[I].bind(); }
@@ -113,7 +113,7 @@ class multibus_slot_device
 	, public device_slot_interface
 {
 public:
-	multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T, typename U>
 	multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option, bool const fixed)

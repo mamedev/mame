@@ -51,7 +51,7 @@ const tiny_rom_entry *miracle_gold_card_device::device_rom_region() const
 //  miracle_gold_card_device - constructor
 //-------------------------------------------------
 
-miracle_gold_card_device::miracle_gold_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+miracle_gold_card_device::miracle_gold_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, MIRACLE_GOLD_CARD, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this)
 {

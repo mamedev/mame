@@ -24,7 +24,7 @@ class spectrum_sdi_device :
 {
 public:
 	// construction/destruction
-	spectrum_sdi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_sdi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 

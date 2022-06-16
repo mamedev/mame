@@ -30,7 +30,7 @@ class alpha68k_palette_device : public device_t,
 {
 public:
 	// construction/destruction
-	alpha68k_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	alpha68k_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	void set_entries(u32 entries) { m_entries = entries; }
 	// terminology is from NeoGeo development wiki page
 	u16 get_reference_pen() { return 0; }

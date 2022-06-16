@@ -2514,7 +2514,7 @@ void nbmj9195_state::NBMJDRV1_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj9195_state::sailorws_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj9195_state::sailorws_io_map);
 
-	tmpz84c011_device& audiocpu(TMPZ84C011(config, "audiocpu", 8000000)); /* TMPZ84C011, 8.00 MHz */
+	tmpz84c011_device& audiocpu(TMPZ84C011(config, "audiocpu", XTAL::u(8000000))); /* TMPZ84C011, 8.00 MHz */
 	audiocpu.set_daisy_config(daisy_chain_sound);
 	audiocpu.set_addrmap(AS_PROGRAM, &nbmj9195_state::sailorws_sound_map);
 	audiocpu.set_addrmap(AS_IO, &nbmj9195_state::sailorws_sound_io_map);
@@ -2542,10 +2542,10 @@ void nbmj9195_state::NBMJDRV1_base(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3812(config, "ymsnd", 4000000).add_route(ALL_OUTPUTS, "speaker", 0.7);
+	YM3812(config, "ymsnd", XTAL::u(4000000)).add_route(ALL_OUTPUTS, "speaker", 0.7);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 void nbmj9195_state::NBMJDRV1(machine_config &config)

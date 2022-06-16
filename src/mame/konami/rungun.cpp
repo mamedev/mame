@@ -377,11 +377,11 @@ void rungun_state::machine_reset()
 void rungun_state::rng(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);
+	M68000(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &rungun_state::rungun_map);
 	m_maincpu->set_vblank_int("screen", FUNC(rungun_state::rng_interrupt));
 
-	Z80(config, m_soundcpu, 8000000);
+	Z80(config, m_soundcpu, XTAL::u(8000000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &rungun_state::rungun_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); // higher if sound stutters
@@ -405,16 +405,16 @@ void rungun_state::rng(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_offsets(34, 9);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(rungun_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_RNG, -8, 15);
 	m_k055673->set_palette(m_palette);
 	m_k055673->set_screen(m_screen);
 
-	K053252(config, m_k053252, 16000000/2);
+	K053252(config, m_k053252, XTAL::u(16000000)/2);
 	m_k053252->set_offsets(9*8, 24);
 	m_k053252->set_screen("screen");
 

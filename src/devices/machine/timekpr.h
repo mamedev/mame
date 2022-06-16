@@ -41,7 +41,7 @@ public:
 
 protected:
 	// construction/destruction
-	timekeeper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 size);
+	timekeeper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -95,37 +95,37 @@ protected:
 class m48t02_device : public timekeeper_device
 {
 public:
-	m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class m48t35_device : public timekeeper_device
 {
 public:
-	m48t35_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	m48t35_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class m48t37_device : public timekeeper_device
 {
 public:
-	m48t37_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	m48t37_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class m48t58_device : public timekeeper_device
 {
 public:
-	m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class mk48t08_device : public timekeeper_device
 {
 public:
-	mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class mk48t12_device : public timekeeper_device
 {
 public:
-	mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 // device type definition

@@ -19,13 +19,13 @@ DEFINE_DEVICE_TYPE(X68K_NEPTUNEX, x68k_neptune_device, "x68k_neptunex", "Neptune
 // device machine config
 void x68k_neptune_device::device_add_mconfig(machine_config &config)
 {
-	DP8390D(config, m_dp8390, 0);
+	DP8390D(config, m_dp8390);
 	m_dp8390->irq_callback().set(FUNC(x68k_neptune_device::x68k_neptune_irq_w));
 	m_dp8390->mem_read_callback().set(FUNC(x68k_neptune_device::x68k_neptune_mem_read));
 	m_dp8390->mem_write_callback().set(FUNC(x68k_neptune_device::x68k_neptune_mem_write));
 }
 
-x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, X68K_NEPTUNEX, tag, owner, clock)
 	, device_x68k_expansion_card_interface(mconfig, *this)
 	, m_slot(nullptr)

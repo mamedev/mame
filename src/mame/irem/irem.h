@@ -26,7 +26,7 @@ public:
 	optional_device<netlist_mame_logic_input_device> m_audio_SINH;
 
 protected:
-	irem_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	irem_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -62,7 +62,7 @@ private:
 class m62_audio_device : public irem_audio_device
 {
 public:
-	m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -71,7 +71,7 @@ protected:
 class m52_soundc_audio_device : public irem_audio_device
 {
 public:
-	m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -80,7 +80,7 @@ protected:
 class m52_large_audio_device : public irem_audio_device
 {
 public:
-	m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

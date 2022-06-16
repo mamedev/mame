@@ -19,10 +19,10 @@ class kc_m011_device :
 {
 public:
 	// construction/destruction
-	kc_m011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_m011_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	kc_m011_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	kc_m011_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -59,7 +59,7 @@ class kc_m022_device :
 {
 public:
 	// construction/destruction
-	kc_m022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_m022_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// kcexp_interface overrides
@@ -80,7 +80,7 @@ class kc_m032_device :
 {
 public:
 	// construction/destruction
-	kc_m032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_m032_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -105,7 +105,7 @@ class kc_m034_device :
 {
 public:
 	// construction/destruction
-	kc_m034_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_m034_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -130,7 +130,7 @@ class kc_m035_device :
 {
 public:
 	// construction/destruction
-	kc_m035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_m035_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// kcexp_interface overrides
@@ -152,7 +152,7 @@ class kc_m036_device :
 {
 public:
 	// construction/destruction
-	kc_m036_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_m036_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

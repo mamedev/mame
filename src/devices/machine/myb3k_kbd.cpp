@@ -342,7 +342,7 @@ myb3k_keyboard_device::myb3k_keyboard_device(
 {
 }
 
-myb3k_keyboard_device::myb3k_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+myb3k_keyboard_device::myb3k_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: myb3k_keyboard_device(mconfig, MYB3K_KEYBOARD, tag, owner, clock)
 {
 }

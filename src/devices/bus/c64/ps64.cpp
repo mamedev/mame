@@ -67,7 +67,7 @@ DEFINE_DEVICE_TYPE(C64_PS64, c64_ps64_cartridge_device, "c64_ps64", "C64 PS-64")
 void c64_ps64_cartridge_device::device_add_mconfig(machine_config &config)
 {
 	//SPEAKER(config, "speaker").front_center();
-	//VOTRAX_SC02(config, SSI263_TAG, 2000000).add_route(ALL_OUTPUTS, "mono", 1.00);
+	//VOTRAX_SC02(config, SSI263_TAG, XTAL::u(2000000)).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 
@@ -80,7 +80,7 @@ void c64_ps64_cartridge_device::device_add_mconfig(machine_config &config)
 //  c64_ps64_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_ps64_cartridge_device::c64_ps64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_ps64_cartridge_device::c64_ps64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_PS64, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {

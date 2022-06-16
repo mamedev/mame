@@ -382,12 +382,12 @@ void pastelg_state::pastelg(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1250000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(1250000)));
 	aysnd.port_a_read_callback().set_ioport("DSWA");
 	aysnd.port_b_read_callback().set_ioport("DSWB");
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 /*
@@ -421,7 +421,7 @@ void threeds_state::threeds(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &threeds_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(threeds_state::irq0_line_assert));
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
@@ -438,12 +438,12 @@ void threeds_state::threeds(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1250000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(1250000)));
 	aysnd.port_a_read_callback().set_ioport("DSWB");
 	aysnd.port_b_read_callback().set_ioport("DSWA");
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 

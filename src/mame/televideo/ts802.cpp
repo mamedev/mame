@@ -198,7 +198,7 @@ void ts802_state::ts802(machine_config &config)
 	//m_maincpu->set_daisy_config(daisy_chain_intf); // causes problems
 
 	/* Devices */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(ts802_state::kbd_put));
 
 	z80dma_device& dma(Z80DMA(config, "dma", 16_MHz_XTAL / 4));
@@ -218,7 +218,7 @@ void ts802_state::ts802(machine_config &config)
 	z80ctc_device& ctc(Z80CTC(config, "ctc", 16_MHz_XTAL / 4));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	FD1793(config, "fdc", 4'000'000 / 2);                  // unknown clock
+	FD1793(config, "fdc", XTAL::u(4'000'000) / 2);                  // unknown clock
 	FLOPPY_CONNECTOR(config, "fdc:0", ts802_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 

@@ -810,7 +810,7 @@ int discrete_device::same_module_index(const discrete_base_node &node)
 //  discrete_device - constructor
 //-------------------------------------------------
 
-discrete_device::discrete_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+discrete_device::discrete_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		m_intf(nullptr),
 		m_sample_rate(0),
@@ -825,7 +825,7 @@ discrete_device::discrete_device(const machine_config &mconfig, device_type type
 {
 }
 
-discrete_sound_device::discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+discrete_sound_device::discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: discrete_device(mconfig, DISCRETE, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr)

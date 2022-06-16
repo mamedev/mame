@@ -18,7 +18,7 @@
 DEFINE_DEVICE_TYPE(SPG290_CDSERVO, spg290_cdservo_device, "spg290_cdservo", "SPG290 CDServo HLE")
 
 
-spg290_cdservo_device::spg290_cdservo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spg290_cdservo_device::spg290_cdservo_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SPG290_CDSERVO, tag, owner, clock)
 	, m_cdrom(*this, finder_base::DUMMY_TAG)
 	, m_irq_cb(*this)

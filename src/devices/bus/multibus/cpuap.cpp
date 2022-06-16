@@ -28,7 +28,7 @@
 
 DEFINE_DEVICE_TYPE(CPUAP, cpuap_device, "cpuap", "Siemens S26361-D333 CPUAP")
 
-cpuap_device::cpuap_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+cpuap_device::cpuap_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CPUAP, tag, owner, clock)
 	, device_multibus_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")

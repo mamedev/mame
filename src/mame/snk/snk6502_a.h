@@ -17,7 +17,7 @@
 class snk6502_sound_device : public device_t, public device_sound_interface
 {
 public:
-	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_READ_LINE_MEMBER(music0_playing);
 
@@ -79,7 +79,7 @@ private:
 class vanguard_sound_device : public device_t
 {
 public:
-	vanguard_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vanguard_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void sound_w(offs_t offset, uint8_t data);
 	void speech_w(uint8_t data);
@@ -101,13 +101,13 @@ private:
 class fantasy_sound_device : public device_t
 {
 public:
-	fantasy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fantasy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void sound_w(offs_t offset, uint8_t data);
 	void speech_w(uint8_t data);
 
 protected:
-	fantasy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	fantasy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -125,7 +125,7 @@ private:
 class nibbler_sound_device : public fantasy_sound_device
 {
 public:
-	nibbler_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nibbler_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -135,7 +135,7 @@ protected:
 class pballoon_sound_device : public fantasy_sound_device
 {
 public:
-	pballoon_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pballoon_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -146,7 +146,7 @@ protected:
 class sasuke_sound_device : public device_t
 {
 public:
-	sasuke_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sasuke_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void sound_w(offs_t offset, uint8_t data);
 
@@ -166,7 +166,7 @@ private:
 class satansat_sound_device : public device_t
 {
 public:
-	satansat_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	satansat_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void sound_w(offs_t offset, uint8_t data);
 

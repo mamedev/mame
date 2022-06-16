@@ -748,7 +748,7 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&elan_eu3a14_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
-	ELAN_EU3A14_SYS(config, m_sys, 0);
+	ELAN_EU3A14_SYS(config, m_sys);
 	m_sys->set_cpu("maincpu");
 	m_sys->set_addrbank("bank");
 
@@ -765,7 +765,7 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
-	ELAN_EU3A14_VID(config, m_vid, 0);
+	ELAN_EU3A14_VID(config, m_vid);
 	m_vid->set_cpu("maincpu");
 	m_vid->set_addrbank("bank");
 	m_vid->set_palette("palette");
@@ -776,7 +776,7 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ELAN_EU3A05_SOUND(config, m_sound, 8000);
+	ELAN_EU3A05_SOUND(config, m_sound, XTAL::u(8000));
 	m_sound->space_read_callback().set(FUNC(elan_eu3a14_state::read_full_space));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_sound->sound_end_cb<0>().set(FUNC(elan_eu3a14_state::sound_end0));

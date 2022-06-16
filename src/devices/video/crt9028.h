@@ -56,7 +56,7 @@ public:
 
 protected:
 	// base type constructor
-	crt9028_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
+	crt9028_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock,
 							int dots_per_char, int chars_per_row, int horiz_blanking, int hsync_delay, int hsync_width, bool hsync_active,
 							int char_rows, int scans_per_char, bool vsync_active,
 							int vert_blanking, int vsync_delay, int vsync_width,
@@ -129,7 +129,7 @@ class crt9028_000_device : public crt9028_device
 {
 public:
 	// device constructor
-	crt9028_000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	crt9028_000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-specific overrides

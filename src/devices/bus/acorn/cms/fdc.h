@@ -27,7 +27,7 @@ class cms_fdc_device :
 {
 public:
 	// construction/destruction
-	cms_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cms_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static void floppy_formats(format_registration &fr);
 

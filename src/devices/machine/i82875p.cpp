@@ -43,7 +43,7 @@ void i82875p_host_device::config_map(address_map &map)
 	map(0xe8, 0xe8).r(FUNC(i82875p_host_device::capreg2_r));
 }
 
-i82875p_host_device::i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i82875p_host_device::i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_host_device(mconfig, I82875P_HOST, tag, owner, clock)
 	, cpu(*this, finder_base::DUMMY_TAG)
 {
@@ -423,7 +423,7 @@ void i82875p_host_device::map_extra(uint64_t memory_window_start, uint64_t memor
 }
 
 
-i82875p_agp_device::i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i82875p_agp_device::i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: agp_bridge_device(mconfig, I82875P_AGP, tag, owner, clock)
 {
 	set_ids_bridge(0x80862579, 0x02);
@@ -448,7 +448,7 @@ void i82875p_overflow_device::overflow_map(address_map &map)
 }
 
 
-i82875p_overflow_device::i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i82875p_overflow_device::i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, I82875P_OVERFLOW, tag, owner, clock)
 {
 }

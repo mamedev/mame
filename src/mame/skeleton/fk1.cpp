@@ -437,7 +437,7 @@ void fk1_state::fk1(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	pit8253_device &pit8253(PIT8253(config, "pit", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit"));
 	pit8253.set_clk<0>(50);
 	pit8253.out_handler<0>().set(FUNC(fk1_state::pit_out0));
 	pit8253.set_clk<1>(1000000);
@@ -468,7 +468,7 @@ void fk1_state::fk1(machine_config &config)
 	ppi3.out_pc_callback().set(FUNC(fk1_state::ppi3_c_w));
 
 	/* uart */
-	I8251(config, "uart", 0);
+	I8251(config, "uart");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("48K");  // 32 for banks1,2 + 16 for vram

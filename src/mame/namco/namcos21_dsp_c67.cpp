@@ -19,7 +19,7 @@ TODO: handle protection properly and with callbacks
 
 DEFINE_DEVICE_TYPE(NAMCOS21_DSP_C67, namcos21_dsp_c67_device, "namcos21_dsp_c67_device", "Namco System 21 DSP Setup (5x C67 type)")
 
-namcos21_dsp_c67_device::namcos21_dsp_c67_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+namcos21_dsp_c67_device::namcos21_dsp_c67_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NAMCOS21_DSP_C67, tag, owner, clock),
 	m_renderer(*this, finder_base::DUMMY_TAG),
 	m_c67master(*this, "dspmaster"),
@@ -126,7 +126,7 @@ void namcos21_dsp_c67_device::reset_kickstart()
 
 void namcos21_dsp_c67_device::device_add_mconfig(machine_config &config)
 {
-	namco_c67_device& dspmaster(NAMCO_C67(config, m_c67master, 24000000)); /* 24 MHz? overclocked */
+	namco_c67_device& dspmaster(NAMCO_C67(config, m_c67master, XTAL::u(24000000))); /* 24 MHz? overclocked */
 	dspmaster.set_addrmap(AS_PROGRAM, &namcos21_dsp_c67_device::master_dsp_program);
 	dspmaster.set_addrmap(AS_DATA, &namcos21_dsp_c67_device::master_dsp_data);
 	dspmaster.set_addrmap(AS_IO, &namcos21_dsp_c67_device::master_dsp_io);
@@ -136,7 +136,7 @@ void namcos21_dsp_c67_device::device_add_mconfig(machine_config &config)
 
 	for (int i = 0; i < 4; i++)
 	{
-		namco_c67_device& dspslave(NAMCO_C67(config, m_c67slave[i], 24000000)); /* 24 MHz? overclocked */
+		namco_c67_device& dspslave(NAMCO_C67(config, m_c67slave[i], XTAL::u(24000000))); /* 24 MHz? overclocked */
 		dspslave.set_addrmap(AS_PROGRAM, &namcos21_dsp_c67_device::slave_dsp_program);
 		dspslave.set_addrmap(AS_DATA, &namcos21_dsp_c67_device::slave_dsp_data);
 		dspslave.set_addrmap(AS_IO, &namcos21_dsp_c67_device::slave_dsp_io);

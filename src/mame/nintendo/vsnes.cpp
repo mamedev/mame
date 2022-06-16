@@ -2421,7 +2421,7 @@ void vs_uni_state::vsnes(machine_config &config)
 	m_ppu1->set_cpu_tag(m_maincpu);
 	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	NES_ZAPPER_SENSOR(config, m_sensor, 0).set_screen_tag("screen1");
+	NES_ZAPPER_SENSOR(config, m_sensor).set_screen_tag("screen1");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

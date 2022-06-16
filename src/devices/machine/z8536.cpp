@@ -776,7 +776,7 @@ void cio_base_device::external_port_w(int port, int bit, int state)
 //  cio_base_device - constructor
 //-------------------------------------------------
 
-cio_base_device::cio_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+cio_base_device::cio_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_write_irq(*this),
 	m_read_pa(*this),
@@ -794,7 +794,7 @@ cio_base_device::cio_base_device(const machine_config &mconfig, device_type type
 //  z8036_device - constructor
 //-------------------------------------------------
 
-z8036_device::z8036_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+z8036_device::z8036_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cio_base_device(mconfig, Z8036, tag, owner, clock)
 {
 }
@@ -804,7 +804,7 @@ z8036_device::z8036_device(const machine_config &mconfig, const char *tag, devic
 //  z8536_device - constructor
 //-------------------------------------------------
 
-z8536_device::z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+z8536_device::z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	cio_base_device(mconfig, Z8536, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this)
 {

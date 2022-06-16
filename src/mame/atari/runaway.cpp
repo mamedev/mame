@@ -552,7 +552,7 @@ GFXDECODE_END
 void qwak_state::qwak(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 12096000 / 8); /* ? */
+	M6502(config, m_maincpu, XTAL::u(12096000) / 8); /* ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &qwak_state::qwak_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
@@ -576,11 +576,11 @@ void qwak_state::qwak(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	pokey_device &pokey1(POKEY(config, "pokey1", 12096000 / 8));
+	pokey_device &pokey1(POKEY(config, "pokey1", XTAL::u(12096000) / 8));
 	pokey1.allpot_r().set_ioport("6008");
 	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	pokey_device &pokey2(POKEY(config, "pokey2", 12096000 / 8));
+	pokey_device &pokey2(POKEY(config, "pokey2", XTAL::u(12096000) / 8));
 	pokey2.pot_r<0>().set(FUNC(qwak_state::pot_r));
 	pokey2.pot_r<1>().set(FUNC(qwak_state::pot_r));
 	pokey2.pot_r<2>().set(FUNC(qwak_state::pot_r));

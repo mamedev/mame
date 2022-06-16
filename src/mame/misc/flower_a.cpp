@@ -44,7 +44,7 @@ void flower_sound_device::regs_map(address_map &map)
 //  flower_sound_device - constructor
 //-------------------------------------------------
 
-flower_sound_device::flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+flower_sound_device::flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, FLOWER_CUSTOM, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  device_memory_interface(mconfig, *this),

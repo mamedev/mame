@@ -248,9 +248,9 @@ void blit_state::blit(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	CLOCK(config, "system_clock", 19200 * 16).signal_handler().set(FUNC(blit_state::system_clock_write));
+	CLOCK(config, "system_clock", XTAL::u(19200 * 16)).signal_handler().set(FUNC(blit_state::system_clock_write));
 
-	ACIA6850(config, m_acia0, 0);
+	ACIA6850(config, m_acia0);
 	m_acia0->txd_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia0->rts_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia0->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_5);
@@ -261,7 +261,7 @@ void blit_state::blit(machine_config &config)
 	rs232h.cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 	rs232h.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(host_rs232_defaults));
 
-	ACIA6850(config, m_acia1, 0);
+	ACIA6850(config, m_acia1);
 	m_acia1->txd_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia1->rts_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia1->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_2);

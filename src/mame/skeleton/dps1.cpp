@@ -191,7 +191,7 @@ void dps1_state::machine_reset()
 {
 	m_bank1->set_entry(1);
 	// set fdc for 8 inch floppies
-	m_fdc->set_rate(500000);
+	m_fdc->set_rate(XTAL::u(500000));
 	// turn on the motor
 	floppy_image_device *floppy = m_floppy0->get_device();
 	m_fdc->set_floppy(floppy);
@@ -224,8 +224,8 @@ void dps1_state::dps1(machine_config &config)
 	rs232.dsr_handler().set(uart, FUNC(scn2651_device::dsr_w));
 	rs232.cts_handler().set(uart, FUNC(scn2651_device::cts_w));
 
-	AM9519(config, "am9519a", 0);
-	AM9519(config, "am9519b", 0);
+	AM9519(config, "am9519a");
+	AM9519(config, "am9519b");
 
 	// floppy
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, false, true);

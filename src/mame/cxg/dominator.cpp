@@ -225,7 +225,7 @@ void dominator_state::dominator(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 
 	/* video hardware */
-	LC7582(config, m_lcd, 0);
+	LC7582(config, m_lcd);
 	m_lcd->write_segs().set(FUNC(dominator_state::lcd_s_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8+1, 8);

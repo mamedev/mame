@@ -47,7 +47,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	intvecs_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: intvecs_control_port_device(mconfig, tag, owner, 0)
+		: intvecs_control_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -55,7 +55,7 @@ public:
 		set_fixed(false);
 	}
 
-	intvecs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intvecs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~intvecs_control_port_device();
 
 	uint8_t porta_r() { return m_device ? m_device->read_portA() : 0; }
@@ -88,7 +88,7 @@ class intvecs_ctrls_device : public device_t,
 {
 public:
 	// construction/destruction
-	intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -113,7 +113,7 @@ class intvecs_keybd_device : public device_t,
 {
 public:
 	// construction/destruction
-	intvecs_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	intvecs_keybd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -138,7 +138,7 @@ class intvecs_synth_device : public device_t,
 {
 public:
 	// construction/destruction
-	intvecs_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	intvecs_synth_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

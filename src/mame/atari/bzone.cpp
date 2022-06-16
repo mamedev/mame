@@ -596,12 +596,12 @@ void bzone_state::bzone_base(machine_config &config)
 	m_screen->set_visarea(0, 580, 0, 400);
 	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	avg_device &avg(AVG_BZONE(config, "avg", 0));
+	avg_device &avg(AVG_BZONE(config, "avg"));
 	avg.set_vector("vector");
 	avg.set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
 	/* Drivers */
-	MATHBOX(config, m_mathbox, 0);
+	MATHBOX(config, m_mathbox);
 }
 
 void bzone_state::bzone(machine_config &config)
@@ -634,11 +634,11 @@ void redbaron_state::redbaron(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	pokey_device &pokey(POKEY(config, "pokey", 1500000));
+	pokey_device &pokey(POKEY(config, "pokey", XTAL::u(1500000)));
 	pokey.allpot_r().set(FUNC(redbaron_state::redbaron_joy_r));
 	pokey.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	REDBARON(config, m_redbaronsound, 0);
+	REDBARON(config, m_redbaronsound);
 	m_redbaronsound->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

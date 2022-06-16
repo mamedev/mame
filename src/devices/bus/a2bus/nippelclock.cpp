@@ -55,14 +55,14 @@ WRITE_LINE_MEMBER(a2bus_nippelclock_device::irq_w)
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_nippelclock_device::a2bus_nippelclock_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a2bus_nippelclock_device::a2bus_nippelclock_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
 	, m_rtc(*this, "rtc")
 {
 }
 
-a2bus_nippelclock_device::a2bus_nippelclock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_nippelclock_device::a2bus_nippelclock_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_nippelclock_device(mconfig, A2BUS_NIPPELCLOCK, tag, owner, clock)
 {
 }

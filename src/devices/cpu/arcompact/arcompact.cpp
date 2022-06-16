@@ -49,7 +49,7 @@ void arcompact_device::arcompact_auxreg_map(address_map &map)
 
 #define AUX_SPACE_ADDRESS_WIDTH 32  // IO space is 32 bits of dwords
 
-arcompact_device::arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+arcompact_device::arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, ARCA5, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0) // some docs describe these as 'middle endian'?!
 	, m_io_config( "io", ENDIANNESS_LITTLE, 32, AUX_SPACE_ADDRESS_WIDTH, -2, address_map_constructor(FUNC(arcompact_device::arcompact_auxreg_map), this))

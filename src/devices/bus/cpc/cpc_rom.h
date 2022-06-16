@@ -22,7 +22,7 @@ class cpc_rom_image_device : public device_t, public device_rom_image_interface
 {
 public:
 	// construction/destruction
-	cpc_rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cpc_rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~cpc_rom_image_device();
 
 	// image-level overrides
@@ -55,7 +55,7 @@ class cpc_rom_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cpc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t* base(uint8_t slot) { if(slot >=1 && slot <= 8) return m_rom[slot]->base(); else return nullptr; }
 

@@ -238,7 +238,7 @@ void scc68070_device::cpu_space_map(address_map &map)
 //  scc68070_device - constructor
 //-------------------------------------------------
 
-scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: scc68070_base_device(mconfig, tag, owner, clock, SCC68070, address_map_constructor(FUNC(scc68070_device::internal_map), this))
 	, m_iack2_callback(*this)
 	, m_iack4_callback(*this)

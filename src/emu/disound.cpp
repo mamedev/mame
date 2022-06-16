@@ -71,12 +71,12 @@ device_sound_interface &device_sound_interface::add_route(u32 output, device_t &
 //  associated with this device
 //-------------------------------------------------
 
-sound_stream *device_sound_interface::stream_alloc(int inputs, int outputs, int sample_rate)
+sound_stream *device_sound_interface::stream_alloc(int inputs, int outputs, const XTAL &sample_rate)
 {
 	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_delegate(&device_sound_interface::sound_stream_update, this), STREAM_DEFAULT_FLAGS);
 }
 
-sound_stream *device_sound_interface::stream_alloc(int inputs, int outputs, int sample_rate, sound_stream_flags flags)
+sound_stream *device_sound_interface::stream_alloc(int inputs, int outputs, const XTAL &sample_rate, sound_stream_flags flags)
 {
 	return device().machine().sound().stream_alloc(*this, inputs, outputs, sample_rate, stream_update_delegate(&device_sound_interface::sound_stream_update, this), flags);
 }

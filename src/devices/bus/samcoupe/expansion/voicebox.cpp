@@ -38,7 +38,7 @@ const tiny_rom_entry *sam_voicebox_device::device_rom_region() const
 void sam_voicebox_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
-	SP0256(config, m_sp0256, 3000000); // ???
+	SP0256(config, m_sp0256, XTAL::u(3000000)); // ???
 	m_sp0256->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
@@ -51,7 +51,7 @@ void sam_voicebox_device::device_add_mconfig(machine_config &config)
 //  sam_voicebox_device - constructor
 //-------------------------------------------------
 
-sam_voicebox_device::sam_voicebox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sam_voicebox_device::sam_voicebox_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SAM_VOICEBOX, tag, owner, clock),
 	device_samcoupe_expansion_interface(mconfig, *this),
 	m_sp0256(*this, "sp0256")

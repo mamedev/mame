@@ -87,7 +87,7 @@ static const u8 command_map[3][MAX_COMMANDS] =
 
 DEFINE_DEVICE_TYPE(ASIC65, asic65_device, "asic65", "Atari ASIC65")
 
-asic65_device::asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+asic65_device::asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ASIC65, tag, owner, clock)
 	, m_synced_write_timer(nullptr)
 	, m_asic65_type(0)
@@ -552,7 +552,7 @@ void asic65_device::asic65_io_map(address_map &map)
 void asic65_device::device_add_mconfig(machine_config &config)
 {
 	/* ASIC65 */
-	TMS32010(config, m_ourcpu, 20000000);
+	TMS32010(config, m_ourcpu, XTAL::u(20000000));
 	m_ourcpu->set_addrmap(AS_PROGRAM, &asic65_device::asic65_program_map);
 	m_ourcpu->set_addrmap(AS_IO, &asic65_device::asic65_io_map);
 	m_ourcpu->bio().set(FUNC(asic65_device::get_bio));

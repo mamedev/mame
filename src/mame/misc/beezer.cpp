@@ -524,7 +524,7 @@ void beezer_state::beezer(machine_config &config)
 	noise.output_callback().set(FUNC(beezer_state::noise_w));
 
 	SPEAKER(config, "speaker").front_center();
-	DAC76(config, m_dac, 0);
+	DAC76(config, m_dac);
 	m_dac->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 

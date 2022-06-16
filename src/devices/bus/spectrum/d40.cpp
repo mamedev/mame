@@ -145,7 +145,7 @@ const tiny_rom_entry *spectrum_d80v2_device::device_rom_region() const
 //  spectrum_d40base_device - constructor
 //-------------------------------------------------
 
-spectrum_d40base_device::spectrum_d40base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_d40base_device::spectrum_d40base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_rom(*this, "rom")
@@ -154,26 +154,26 @@ spectrum_d40base_device::spectrum_d40base_device(const machine_config &mconfig, 
 {
 }
 
-spectrum_d40_device::spectrum_d40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_d40_device::spectrum_d40_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_d40base_device(mconfig, SPECTRUM_D40, tag, owner, clock)
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:%u", 0)
 {
 }
 
-spectrum_d40_device::spectrum_d40_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_d40_device::spectrum_d40_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	:spectrum_d40base_device(mconfig, type, tag, owner, clock)
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:%u", 0)
 {
 }
 
-spectrum_d80_device::spectrum_d80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_d80_device::spectrum_d80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_d40_device(mconfig, SPECTRUM_D80, tag, owner, clock)
 {
 }
 
-spectrum_d80v2_device::spectrum_d80v2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spectrum_d80v2_device::spectrum_d80v2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spectrum_d40base_device(mconfig, SPECTRUM_D80V2, tag, owner, clock)
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:%u", 0)

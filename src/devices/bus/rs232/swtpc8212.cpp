@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "swtpc8212.h"
 
-swtpc8212_terminal_device::swtpc8212_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+swtpc8212_terminal_device::swtpc8212_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SERIAL_TERMINAL_SWTPC8212, tag, owner, clock)
 	, device_rs232_port_interface(mconfig, *this)
 	, m_swtpc8212(*this, "swtpc8212")
@@ -14,7 +14,7 @@ swtpc8212_terminal_device::swtpc8212_terminal_device(const machine_config &mconf
 
 void swtpc8212_terminal_device::device_add_mconfig(machine_config &config)
 {
-	SWTPC8212(config, m_swtpc8212, 0);
+	SWTPC8212(config, m_swtpc8212);
 	m_swtpc8212->rs232_conn_txd_handler().set(FUNC(swtpc8212_terminal_device::output_rxd));
 	m_swtpc8212->rs232_conn_rts_handler().set(FUNC(swtpc8212_terminal_device::route_term_rts));
 	m_swtpc8212->rs232_conn_dtr_handler().set(FUNC(swtpc8212_terminal_device::route_term_dtr));

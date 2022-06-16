@@ -65,7 +65,7 @@ enum
 DEFINE_DEVICE_TYPE(LH5801, lh5801_cpu_device, "lh5801", "Sharp LH5801")
 
 
-lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, LH5801, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)

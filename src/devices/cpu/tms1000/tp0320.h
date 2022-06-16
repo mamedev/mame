@@ -17,7 +17,7 @@
 class tp0320_cpu_device : public tms0980_cpu_device
 {
 public:
-	tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void ram_192x4(address_map &map);

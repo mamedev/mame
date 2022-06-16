@@ -104,7 +104,7 @@ public:
 
 protected:
 	// construction/destruction
-	cio_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	cio_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -416,7 +416,7 @@ class z8036_device : public cio_base_device
 {
 public:
 	// construction/destruction
-	z8036_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	z8036_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
@@ -428,7 +428,7 @@ class z8536_device : public cio_base_device, public device_z80daisy_interface
 {
 public:
 	// construction/destruction
-	z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);

@@ -60,14 +60,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	nes_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: nes_control_port_device(mconfig, tag, owner, (u32)0)
+		: nes_control_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~nes_control_port_device();
 
 	u8 read_bit0();

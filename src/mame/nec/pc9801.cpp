@@ -1905,8 +1905,8 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 {
 	MACHINE_START_CALL_MEMBER(pc9801_common);
 
-	m_fdc_2hd->set_rate(500000);
-	m_fdc_2dd->set_rate(250000);
+	m_fdc_2hd->set_rate(XTAL::u(500000));
+	m_fdc_2dd->set_rate(XTAL::u(250000));
 	// TODO: set_rpm for m_fdc_2dd?
 	m_sys_type = 0x00 >> 6;
 }
@@ -2064,7 +2064,7 @@ void pc9801_atapi_devices(device_slot_interface &device)
 
 void pc9801_state::pc9801_keyboard(machine_config &config)
 {
-	PC9801_KBD(config, m_keyb, 53);
+	PC9801_KBD(config, m_keyb, XTAL::u(53));
 	m_keyb->irq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir1_w));
 }
 
@@ -2128,7 +2128,7 @@ void pc9801_state::pc9801_cbus(machine_config &config)
 
 void pc9801_state::pc9801_sasi(machine_config &config)
 {
-	SCSI_PORT(config, m_sasibus, 0);
+	SCSI_PORT(config, m_sasibus);
 	m_sasibus->set_data_input_buffer("sasi_data_in");
 	m_sasibus->io_handler().set(FUNC(pc9801_state::write_sasi_io)); // bit2
 	m_sasibus->cd_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit3));
@@ -2171,7 +2171,7 @@ void pc9801vm_state::pc9801_ide(machine_config &config)
 
 void pc9801_state::pc9801_common(machine_config &config)
 {
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(MAIN_CLOCK_X1); // heartbeat IRQ
 	m_pit->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(MAIN_CLOCK_X1); // Memory Refresh
@@ -2179,7 +2179,7 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_pit->out_handler<2>().set(m_sio, FUNC(i8251_device::write_txc));
 	m_pit->out_handler<2>().append(m_sio, FUNC(i8251_device::write_rxc));
 
-	AM9517A(config, m_dmac, 5000000); // unknown clock, TODO: check channels 0 - 1
+	AM9517A(config, m_dmac, XTAL::u(5000000)); // unknown clock, TODO: check channels 0 - 1
 	m_dmac->dreq_active_low();
 	m_dmac->out_hreq_callback().set(FUNC(pc9801_state::dma_hrq_changed));
 	m_dmac->out_eop_callback().set(FUNC(pc9801_state::tc_w));
@@ -2192,22 +2192,22 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_dmac->out_dack_callback<2>().set(FUNC(pc9801_state::dack2_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(pc9801_state::dack3_w));
 
-	PIC8259(config, m_pic1, 0);
+	PIC8259(config, m_pic1);
 	m_pic1->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic1->in_sp_callback().set_constant(1);
 	m_pic1->read_slave_ack_callback().set(FUNC(pc9801_state::get_slave_ack));
 
-	PIC8259(config, m_pic2, 0);
+	PIC8259(config, m_pic2);
 	m_pic2->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir7_w)); // TODO: Check ir7_w
 	m_pic2->in_sp_callback().set_constant(0);
 
-	I8255(config, m_ppi_sys, 0);
+	I8255(config, m_ppi_sys);
 	m_ppi_sys->in_pa_callback().set_ioport("DSW2");
 	m_ppi_sys->in_pb_callback().set(FUNC(pc9801_state::ppi_sys_portb_r));
 	m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
 //  m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_portc_w));
 
-	I8255(config, m_ppi_prn, 0);
+	I8255(config, m_ppi_prn);
 	// TODO: other ports
 	m_ppi_prn->in_pb_callback().set(FUNC(pc9801_state::ppi_prn_portb_r));
 
@@ -2215,11 +2215,11 @@ void pc9801_state::pc9801_common(machine_config &config)
 	pc9801_mouse(config);
 	pc9801_cbus(config);
 
-	I8251(config, m_sio, 0);
+	I8251(config, m_sio);
 
-	PC9801_MEMSW(config, m_memsw, 0);
+	PC9801_MEMSW(config, m_memsw);
 
-	UPD765A(config, m_fdc_2hd, 8'000'000, true, true);
+	UPD765A(config, m_fdc_2hd, XTAL::u(8'000'000), true, true);
 	m_fdc_2hd->intrq_wr_callback().set(m_pic2, FUNC(pic8259_device::ir3_w));
 	m_fdc_2hd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq2_w)).invert();
 	FLOPPY_CONNECTOR(config, "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
@@ -2267,7 +2267,7 @@ void pc9801_state::config_floppy_35hd(machine_config &config)
 
 void pc9801_state::pc9801(machine_config &config)
 {
-	I8086(config, m_maincpu, 5000000); // 5 MHz for vanilla, 8 MHz for direct children
+	I8086(config, m_maincpu, XTAL::u(5000000)); // 5 MHz for vanilla, 8 MHz for direct children
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -2281,7 +2281,7 @@ void pc9801_state::pc9801(machine_config &config)
 	// TODO: maybe force dips to avoid beep error
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
 
-	UPD765A(config, m_fdc_2dd, 8'000'000, false, true);
+	UPD765A(config, m_fdc_2dd, XTAL::u(8'000'000), false, true);
 	m_fdc_2dd->intrq_wr_callback().set(FUNC(pc9801_state::fdc_2dd_irq));
 	m_fdc_2dd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w)).invert();
 	FLOPPY_CONNECTOR(config, "upd765_2dd:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
@@ -2293,7 +2293,7 @@ void pc9801_state::pc9801(machine_config &config)
 	m_dmac->in_ior_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::dma_w));
 
-	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
+	BEEP(config, m_beeper, XTAL::u(2400)).add_route(ALL_OUTPUTS, "mono", 0.15);
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
 }
 
@@ -2329,7 +2329,7 @@ void pc9801vm_state::pc9801rs(machine_config &config)
 
 	m_hgdc[1]->set_addrmap(0, &pc9801vm_state::upd7220_grcg_2_map);
 
-//  DAC_1BIT(config, m_dac1bit, 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
+//  DAC_1BIT(config, m_dac1bit).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
 	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.40);
 	PALETTE(config, m_palette, FUNC(pc9801vm_state::pc9801_palette), 16 + 16);
 }
@@ -2358,7 +2358,7 @@ void pc9801vm_state::pc9801ux(machine_config &config)
 	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	config_floppy_35hd(config);
-//  AM9157A(config, "i8237", 10000000); // unknown clock
+//  AM9157A(config, "i8237", XTAL::u(10000000)); // unknown clock
 }
 
 void pc9801vm_state::pc9801dx(machine_config &config)

@@ -10,7 +10,7 @@
 class mm58274c_device : public device_t
 {
 public:
-	mm58274c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm58274c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_mode24(int mode) { m_mode24 = mode; }
 	void set_day1(int day) { m_day1 = day; }

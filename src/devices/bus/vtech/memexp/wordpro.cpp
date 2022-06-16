@@ -52,7 +52,7 @@ const tiny_rom_entry *vtech_wordpro_device::device_rom_region() const
 //  vtech_wordpro_device - constructor
 //-------------------------------------------------
 
-vtech_wordpro_device::vtech_wordpro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vtech_wordpro_device::vtech_wordpro_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	vtech_memexp_device(mconfig, VTECH_WORDPRO, tag, owner, clock)
 {
 }

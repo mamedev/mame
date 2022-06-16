@@ -19,7 +19,7 @@ public:
 	static constexpr uint32_t DRAM_MASK = (DRAM_SIZE-1);
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t host_r(address_space &space, offs_t offset);
 	void host_w(offs_t offset, uint8_t data);

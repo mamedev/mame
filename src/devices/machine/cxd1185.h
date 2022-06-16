@@ -13,7 +13,7 @@ class cxd1185_device
 	, public nscsi_slot_card_interface
 {
 public:
-	cxd1185_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	cxd1185_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device configuration
 	auto irq_out_cb() { return m_irq_out_cb.bind(); }

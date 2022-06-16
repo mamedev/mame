@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(PASOPIA_PA7248, pasopia_pa7248_device, "pa7248", "PA7248 Paso
 //  pasopia_rampac2_device - construction
 //-------------------------------------------------
 
-pasopia_rampac2_device::pasopia_rampac2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 ram_size)
+pasopia_rampac2_device::pasopia_rampac2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 ram_size)
 	: device_t(mconfig, type, tag, owner, clock)
 	, pac2_card_interface(mconfig, *this)
 	, device_nvram_interface(mconfig, *this)
@@ -43,7 +43,7 @@ pasopia_rampac2_device::pasopia_rampac2_device(const machine_config &mconfig, de
 //  pasopia_pa7243_device - construction
 //-------------------------------------------------
 
-pasopia_pa7243_device::pasopia_pa7243_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pasopia_pa7243_device::pasopia_pa7243_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pasopia_rampac2_device(mconfig, PASOPIA_PA7243, tag, owner, clock, 0x4000)
 {
 }
@@ -53,7 +53,7 @@ pasopia_pa7243_device::pasopia_pa7243_device(const machine_config &mconfig, cons
 //  pasopia_pa7245_device - construction
 //-------------------------------------------------
 
-pasopia_pa7245_device::pasopia_pa7245_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pasopia_pa7245_device::pasopia_pa7245_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pasopia_rampac2_device(mconfig, PASOPIA_PA7245, tag, owner, clock, 0x8000)
 {
 }
@@ -63,7 +63,7 @@ pasopia_pa7245_device::pasopia_pa7245_device(const machine_config &mconfig, cons
 //  pasopia_pa7248_device - construction
 //-------------------------------------------------
 
-pasopia_pa7248_device::pasopia_pa7248_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pasopia_pa7248_device::pasopia_pa7248_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pasopia_rampac2_device(mconfig, PASOPIA_PA7248, tag, owner, clock, 0x10000)
 {
 }

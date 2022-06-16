@@ -15,7 +15,7 @@
 
 DEFINE_DEVICE_TYPE(SGI_XMAP2, sgi_xmap2_device, "sgi_xmap2", "SGI XMAP2")
 
-sgi_xmap2_device::sgi_xmap2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+sgi_xmap2_device::sgi_xmap2_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SGI_XMAP2, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, m_options_port(*this, "^options")

@@ -32,7 +32,7 @@ static constexpr uint8_t sm8500_b2w[8] = {
 };
 
 
-sm8500_cpu_device::sm8500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sm8500_cpu_device::sm8500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, SM8500, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_dma_func(*this)

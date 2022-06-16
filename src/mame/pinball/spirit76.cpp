@@ -349,7 +349,7 @@ void spirit76_state::machine_reset()
 void spirit76_state::spirit76(machine_config &config)
 {
 	/* basic machine hardware */
-	M6800(config, m_maincpu, 500000);
+	M6800(config, m_maincpu, XTAL::u(500000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &spirit76_state::maincpu_map);
 
 	TIMER(config, "irq").configure_periodic(FUNC(spirit76_state::irq), attotime::from_hz(1200));
@@ -358,7 +358,7 @@ void spirit76_state::spirit76(machine_config &config)
 	config.set_default_layout(layout_spirit76);
 
 	//6821pia
-	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia6821_device &pia(PIA6821(config, "pia"));
 	pia.writepa_handler().set(FUNC(spirit76_state::porta_w));
 	pia.writepb_handler().set(FUNC(spirit76_state::portb_w));
 	pia.readpa_handler().set(FUNC(spirit76_state::porta_r));

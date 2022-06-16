@@ -315,7 +315,7 @@ void k28_state::k28(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	VOTRAX_SC01(config, "speech", 760000).add_route(ALL_OUTPUTS, "mono", 0.5); // measured 760kHz on its RC pin
+	VOTRAX_SC01(config, "speech", XTAL::u(760000)).add_route(ALL_OUTPUTS, "mono", 0.5); // measured 760kHz on its RC pin
 }
 
 

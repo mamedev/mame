@@ -37,7 +37,7 @@ void prof80_mmu_device::program_map(address_map &map)
 //  prof80_mmu_device - constructor
 //-------------------------------------------------
 
-prof80_mmu_device::prof80_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+prof80_mmu_device::prof80_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PROF80_MMU, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_program_space_config("program", ENDIANNESS_LITTLE, 8, 20, 0, address_map_constructor(FUNC(prof80_mmu_device::program_map), this))

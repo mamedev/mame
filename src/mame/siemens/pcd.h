@@ -21,7 +21,7 @@ public:
 	void detect_w(uint8_t data);
 
 protected:
-	pcdx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pcdx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	void pcdx_palette(palette_device &palette) const;
 
@@ -33,7 +33,7 @@ protected:
 class pcd_video_device : public pcdx_video_device
 {
 public:
-	pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map) override;
 	void vram_sw_w(uint8_t data);
@@ -82,7 +82,7 @@ class pcx_video_device : public pcdx_video_device,
 							public device_serial_interface
 {
 public:
-	pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	auto txd_handler() { return m_txd_handler.bind(); }
 
 	virtual void map(address_map &map) override;

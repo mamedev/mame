@@ -548,7 +548,7 @@ void osbexec_state::osbexec(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(osbexec_state::osbexec_pia0_a_r));
 	m_pia[0]->readpb_handler().set(FUNC(osbexec_state::osbexec_pia0_b_r));
 	m_pia[0]->writepa_handler().set(FUNC(osbexec_state::osbexec_pia0_a_w));
@@ -558,7 +558,7 @@ void osbexec_state::osbexec(machine_config &config)
 	m_pia[0]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_pia[0]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
 
@@ -576,7 +576,7 @@ void osbexec_state::osbexec(machine_config &config)
 	m_sio->out_rtsb_callback().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_rts));
 	m_sio->out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<4>));
 
-	pit8253_device &ctc(PIT8253(config, "ctc", 0));
+	pit8253_device &ctc(PIT8253(config, "ctc"));
 	ctc.set_clk<0>(MAIN_CLOCK / 13); // divided by 74S161 @ UC25
 	ctc.set_clk<1>(MAIN_CLOCK / 13); // divided by 74S161 @ UC25
 	ctc.set_clk<2>(MAIN_CLOCK / 12);

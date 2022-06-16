@@ -199,7 +199,7 @@ ioport_constructor isa8_eistwib_device::device_input_ports() const
 //-------------------------------------------------
 void isa8_eistwib_device::device_add_mconfig(machine_config &config)
 {
-	SDLC_LOGGER(config, m_sdlclogger, 0); // To decode the frames
+	SDLC_LOGGER(config, m_sdlclogger); // To decode the frames
 	I8274(config, m_uart8274, (XTAL(14'318'181)/ 3) / 2); // Half the 4,77 MHz ISA bus CLK signal
 	//m_uart8274->out_rtsa_callback().set([this] (int state) { m_rts = state; });
 	m_uart8274->out_txda_callback().set([this] (int state) { m_txd = state; m_sdlclogger->data_w(state); });
@@ -215,7 +215,7 @@ void isa8_eistwib_device::device_add_mconfig(machine_config &config)
 	TIMER(config, "bitclock").configure_periodic(FUNC(isa8_eistwib_device::tick_bitclock), attotime::from_hz(300000));
 }
 
-isa8_eistwib_device::isa8_eistwib_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_eistwib_device::isa8_eistwib_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA8_EIS_TWIB, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_uart8274(*this, "terminal")

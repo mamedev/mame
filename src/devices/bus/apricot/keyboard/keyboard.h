@@ -48,14 +48,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	apricot_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: apricot_keyboard_bus_device(mconfig, tag, owner, 0)
+		: apricot_keyboard_bus_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	apricot_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apricot_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~apricot_keyboard_bus_device();
 
 	// callbacks

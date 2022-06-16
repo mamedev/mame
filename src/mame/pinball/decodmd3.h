@@ -19,13 +19,13 @@ class decodmd_type3_device : public device_t
 {
 public:
 	template <typename T>
-	decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gfxregion_tag)
+	decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&gfxregion_tag)
 		: decodmd_type3_device(mconfig, tag, owner, clock)
 	{
 		set_gfxregion(std::forward<T>(gfxregion_tag));
 	}
 
-	decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_gfxregion(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }
 

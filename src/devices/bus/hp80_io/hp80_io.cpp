@@ -21,13 +21,17 @@ DEFINE_DEVICE_TYPE(HP80_IO_SLOT, hp80_io_slot_device, "hp80_io_slot", "HP80 I/O 
 // +-------------------+
 // |hp80_io_slot_device|
 // +-------------------+
-hp80_io_slot_device::hp80_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+hp80_io_slot_device::hp80_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, HP80_IO_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_hp80_io_interface>(mconfig, *this),
 	m_irl_cb_func(*this),
 	m_halt_cb_func(*this),
 	m_slot_no(0)
 {
+	option_reset();
+	hp80_io_slot_devices(*this);
+	set_default_option(nullptr);
+	set_fixed(false);
 }
 
 hp80_io_slot_device::~hp80_io_slot_device()

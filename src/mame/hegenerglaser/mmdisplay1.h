@@ -15,7 +15,7 @@
 class mephisto_display1_device : public device_t
 {
 public:
-	mephisto_display1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	mephisto_display1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callback is optional, it will output to digitx when not used
 	auto output_digit() { return m_output_digit.bind(); }

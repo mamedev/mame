@@ -31,7 +31,7 @@
 class pic8259_device : public device_t
 {
 public:
-	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto out_int_callback() { return m_out_int_func.bind(); } // Interrupt request output to CPU or master 8259 (active high)
 	auto in_sp_callback() { return m_in_sp_func.bind(); } // Slave program select (VCC = master; GND = slave; pin becomes EN output in buffered mode)
@@ -53,7 +53,7 @@ public:
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
 protected:
-	pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -119,7 +119,7 @@ private:
 class v5x_icu_device : public pic8259_device
 {
 public:
-	v5x_icu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	v5x_icu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual bool is_x86() const override { return true; }
@@ -128,7 +128,7 @@ protected:
 class mk98pic_device : public pic8259_device
 {
 public:
-	mk98pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mk98pic_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	virtual bool is_x86() const override { return true; }

@@ -73,12 +73,12 @@ void nec_p72_device::device_start()
 //  nec_p72_device - constructor
 //-------------------------------------------------
 
-nec_p72_device::nec_p72_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nec_p72_device::nec_p72_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	nec_p72_device(mconfig, NEC_P72, tag, owner, clock)
 {
 }
 
-nec_p72_device::nec_p72_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nec_p72_device::nec_p72_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu")

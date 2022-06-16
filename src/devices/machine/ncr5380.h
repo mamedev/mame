@@ -13,7 +13,7 @@ class ncr5380_device
 	, public nscsi_slot_card_interface
 {
 public:
-	ncr5380_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	ncr5380_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// device configuration
 	auto irq_handler() { return m_irq_handler.bind(); }
@@ -30,7 +30,7 @@ public:
 	void dma_w(u8 val);
 
 protected:
-	ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs = false);
+	ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock, bool has_lbs = false);
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -170,13 +170,13 @@ private:
 class ncr53c80_device : public ncr5380_device
 {
 public:
-	ncr53c80_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	ncr53c80_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class cxd1180_device : public ncr5380_device
 {
 public:
-	cxd1180_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	cxd1180_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 DECLARE_DEVICE_TYPE(NCR5380, ncr5380_device)

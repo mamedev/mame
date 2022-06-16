@@ -29,7 +29,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 DEFINE_DEVICE_TYPE(PSX_DMA, psxdma_device, "psxdma", "Sony PSX DMA")
 
-psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PSX_DMA, tag, owner, clock), m_ram(), m_ramsize(0), m_dpcp(0), m_dicr(0),
 	m_irq_handler(*this)
 {

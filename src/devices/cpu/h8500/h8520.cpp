@@ -12,17 +12,17 @@
 DEFINE_DEVICE_TYPE(HD6435208, hd6435208_device, "hd6435208", "Hitachi HD6435208 (H8/520)")
 DEFINE_DEVICE_TYPE(HD6475208, hd6475208_device, "hd6475208", "Hitachi HD6475208 (H8/520)")
 
-h8520_device::h8520_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+h8520_device::h8520_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: h8500_device(mconfig, type, tag, owner, clock, 20, 8, 9, 4, address_map_constructor(FUNC(h8520_device::internal_map), this))
 {
 }
 
-hd6435208_device::hd6435208_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hd6435208_device::hd6435208_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: h8520_device(mconfig, HD6435208, tag, owner, clock)
 {
 }
 
-hd6475208_device::hd6475208_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hd6475208_device::hd6475208_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: h8520_device(mconfig, HD6475208, tag, owner, clock)
 {
 }

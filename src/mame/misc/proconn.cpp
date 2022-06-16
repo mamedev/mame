@@ -266,14 +266,14 @@ void proconn_state::machine_reset()
 
 void proconn_state::proconn(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000); /* ?? Mhz */
+	Z80(config, m_maincpu, XTAL::u(4000000)); /* ?? Mhz */
 	m_maincpu->set_daisy_config(z80_daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &proconn_state::proconn_map);
 	m_maincpu->set_addrmap(AS_IO, &proconn_state::proconn_portmap);
 
 	S16LF01(config, m_vfd);
 
-	Z80PIO(config, m_z80pio[0], 4000000); /* ?? Mhz */
+	Z80PIO(config, m_z80pio[0], XTAL::u(4000000)); /* ?? Mhz */
 	m_z80pio[0]->out_int_callback().set(FUNC(proconn_state::pio_1_m_out_int_w));
 	m_z80pio[0]->in_pa_callback().set(FUNC(proconn_state::pio_1_m_in_pa_r));
 	m_z80pio[0]->out_pa_callback().set(FUNC(proconn_state::pio_1_m_out_pa_w));
@@ -282,7 +282,7 @@ void proconn_state::proconn(machine_config &config)
 	m_z80pio[0]->out_pb_callback().set(FUNC(proconn_state::pio_1_m_out_pb_w));
 	m_z80pio[0]->out_brdy_callback().set(FUNC(proconn_state::pio_1_m_out_brdy_w));
 
-	Z80PIO(config, m_z80pio[1], 4000000); /* ?? Mhz */
+	Z80PIO(config, m_z80pio[1], XTAL::u(4000000)); /* ?? Mhz */
 	m_z80pio[1]->out_int_callback().set(FUNC(proconn_state::pio_2_m_out_int_w));
 	m_z80pio[1]->in_pa_callback().set(FUNC(proconn_state::pio_2_m_in_pa_r));
 	m_z80pio[1]->out_pa_callback().set(FUNC(proconn_state::pio_2_m_out_pa_w));
@@ -291,7 +291,7 @@ void proconn_state::proconn(machine_config &config)
 	m_z80pio[1]->out_pb_callback().set(FUNC(proconn_state::pio_2_m_out_pb_w));
 	m_z80pio[1]->out_brdy_callback().set(FUNC(proconn_state::pio_2_m_out_brdy_w));
 
-	Z80PIO(config, m_z80pio[2], 4000000); /* ?? Mhz */
+	Z80PIO(config, m_z80pio[2], XTAL::u(4000000)); /* ?? Mhz */
 	m_z80pio[2]->out_int_callback().set(FUNC(proconn_state::pio_3_m_out_int_w));
 	m_z80pio[2]->in_pa_callback().set(FUNC(proconn_state::pio_3_m_in_pa_r));
 	m_z80pio[2]->out_pa_callback().set(FUNC(proconn_state::pio_3_m_out_pa_w));
@@ -300,7 +300,7 @@ void proconn_state::proconn(machine_config &config)
 	m_z80pio[2]->out_pb_callback().set(FUNC(proconn_state::pio_3_m_out_pb_w));
 	m_z80pio[2]->out_brdy_callback().set(FUNC(proconn_state::pio_3_m_out_brdy_w));
 
-	Z80PIO(config, m_z80pio[3], 4000000); /* ?? Mhz */
+	Z80PIO(config, m_z80pio[3], XTAL::u(4000000)); /* ?? Mhz */
 	m_z80pio[3]->out_int_callback().set(FUNC(proconn_state::pio_4_m_out_int_w));
 	m_z80pio[3]->in_pa_callback().set(FUNC(proconn_state::pio_4_m_in_pa_r));
 	m_z80pio[3]->out_pa_callback().set(FUNC(proconn_state::pio_4_m_out_pa_w));
@@ -309,7 +309,7 @@ void proconn_state::proconn(machine_config &config)
 	m_z80pio[3]->out_pb_callback().set(FUNC(proconn_state::pio_4_m_out_pb_w));
 	m_z80pio[3]->out_brdy_callback().set(FUNC(proconn_state::pio_4_m_out_brdy_w));
 
-	Z80PIO(config, m_z80pio[4], 4000000); /* ?? Mhz */
+	Z80PIO(config, m_z80pio[4], XTAL::u(4000000)); /* ?? Mhz */
 	m_z80pio[4]->out_int_callback().set(FUNC(proconn_state::pio_5_m_out_int_w));
 	m_z80pio[4]->in_pa_callback().set(FUNC(proconn_state::pio_5_m_in_pa_r));
 	m_z80pio[4]->out_pa_callback().set(FUNC(proconn_state::pio_5_m_out_pa_w));
@@ -318,10 +318,10 @@ void proconn_state::proconn(machine_config &config)
 	m_z80pio[4]->out_pb_callback().set(FUNC(proconn_state::pio_5_m_out_pb_w));
 	m_z80pio[4]->out_brdy_callback().set(FUNC(proconn_state::pio_5_m_out_brdy_w));
 
-	Z80CTC(config, m_z80ctc, 4000000);
+	Z80CTC(config, m_z80ctc, XTAL::u(4000000));
 	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80SIO(config, m_z80sio, 4000000); /* ?? Mhz */
+	Z80SIO(config, m_z80sio, XTAL::u(4000000)); /* ?? Mhz */
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -329,11 +329,11 @@ void proconn_state::proconn(machine_config &config)
 
 	config.set_default_layout(layout_proconn);
 
-	AY8910(config, m_ay, 1000000); /* ?? Mhz */ // YM2149F on PC92?
+	AY8910(config, m_ay, XTAL::u(1000000)); /* ?? Mhz */ // YM2149F on PC92?
 	m_ay->port_b_write_callback().set(FUNC(proconn_state::meter_w));
 	m_ay->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
 
-	METERS(config, m_meters, 0);
+	METERS(config, m_meters);
 	m_meters->set_number(8);
 }
 

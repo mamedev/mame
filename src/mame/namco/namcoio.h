@@ -23,7 +23,7 @@ public:
 	virtual void customio_run() = 0;
 
 protected:
-	namcoio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int device_type);
+	namcoio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int device_type);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -58,7 +58,7 @@ private:
 class namco56xx_device : public namcoio_device
 {
 public:
-	namco56xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco56xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -68,7 +68,7 @@ public:
 class namco58xx_device : public namcoio_device
 {
 public:
-	namco58xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco58xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -78,7 +78,7 @@ public:
 class namco59xx_device : public namcoio_device
 {
 public:
-	namco59xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco59xx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 

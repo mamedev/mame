@@ -265,7 +265,7 @@ inline void upd65031_device::set_mode(int mode)
 //  upd65031_device - constructor
 //-------------------------------------------------
 
-upd65031_device::upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+upd65031_device::upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, UPD65031, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_read_kb(*this),
@@ -370,7 +370,7 @@ void upd65031_device::device_reset()
 	}
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(9600);
+	set_rate(XTAL::u(9600));
 	transmit_register_reset();
 	receive_register_reset();
 	m_write_rts(1);

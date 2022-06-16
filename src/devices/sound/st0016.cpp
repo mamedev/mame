@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(ST0016, st0016_device, "st0016", "Seta ST0016 (Audio)")
 //  st0016_device - constructor
 //-------------------------------------------------
 
-st0016_device::st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+st0016_device::st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ST0016, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)

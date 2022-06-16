@@ -40,7 +40,7 @@ const tiny_rom_entry *einstein_speech_device::device_rom_region() const
 void einstein_speech_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
-	SP0256(config, m_sp0256, 3120000); // ???
+	SP0256(config, m_sp0256, XTAL::u(3120000)); // ???
 	m_sp0256->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
@@ -53,7 +53,7 @@ void einstein_speech_device::device_add_mconfig(machine_config &config)
 //  einstein_speech_device - constructor
 //-------------------------------------------------
 
-einstein_speech_device::einstein_speech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+einstein_speech_device::einstein_speech_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, EINSTEIN_SPEECH, tag, owner, clock),
 	device_einstein_userport_interface(mconfig, *this),
 	m_sp0256(*this, "sp0256")

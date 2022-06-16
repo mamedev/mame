@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(DS8874, ds8874_device, "ds8874", "DS8874 LED Driver")
 //  constructor
 //-------------------------------------------------
 
-ds8874_device::ds8874_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+ds8874_device::ds8874_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, DS8874, tag, owner, clock),
 	m_write_output(*this)
 { }

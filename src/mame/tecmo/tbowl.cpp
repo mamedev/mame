@@ -609,17 +609,17 @@ void tbowl_state::machine_reset()
 void tbowl_state::tbowl(machine_config &config)
 {
 	// CPU on Board '6206B'
-	Z80(config, m_maincpu, 8000000); // NEC D70008AC-8 (Z80 Clone)
+	Z80(config, m_maincpu, XTAL::u(8000000)); // NEC D70008AC-8 (Z80 Clone)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tbowl_state::_6206B_map);
 	m_maincpu->set_vblank_int("lscreen", FUNC(tbowl_state::irq0_line_hold));
 
 	// CPU on Board '6206C'
-	z80_device &sub(Z80(config, "sub", 8000000)); // NEC D70008AC-8 (Z80 Clone)
+	z80_device &sub(Z80(config, "sub", XTAL::u(8000000))); // NEC D70008AC-8 (Z80 Clone)
 	sub.set_addrmap(AS_PROGRAM, &tbowl_state::_6206C_map);
 	sub.set_vblank_int("lscreen", FUNC(tbowl_state::irq0_line_hold));
 
 	// CPU on Board '6206A'
-	Z80(config, m_audiocpu, 4000000); // Actual Z80
+	Z80(config, m_audiocpu, XTAL::u(4000000)); // Actual Z80
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tbowl_state::_6206A_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -629,7 +629,7 @@ void tbowl_state::tbowl(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024*2).set_endianness(ENDIANNESS_BIG);
 	config.set_default_layout(layout_dualhsxs);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
@@ -654,19 +654,19 @@ void tbowl_state::tbowl(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	ym3812_device &ym1(YM3812(config, "ym1", 4000000));
+	ym3812_device &ym1(YM3812(config, "ym1", XTAL::u(4000000)));
 	ym1.irq_handler().set_inputline(m_audiocpu, 0);
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	ym3812_device &ym2(YM3812(config, "ym2", 4000000));
+	ym3812_device &ym2(YM3812(config, "ym2", XTAL::u(4000000)));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MSM5205(config, m_msm[0], 384000);
+	MSM5205(config, m_msm[0], XTAL::u(384000));
 	m_msm[0]->vck_legacy_callback().set(FUNC(tbowl_state::adpcm_int<0>));    // interrupt function
 	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B); // 8KHz
 	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MSM5205(config, m_msm[1], 384000);
+	MSM5205(config, m_msm[1], XTAL::u(384000));
 	m_msm[1]->vck_legacy_callback().set(FUNC(tbowl_state::adpcm_int<1>));    // interrupt function
 	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B); // 8KHz
 	m_msm[1]->add_route(ALL_OUTPUTS, "mono", 0.50);

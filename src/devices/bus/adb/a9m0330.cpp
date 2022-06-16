@@ -185,7 +185,7 @@ const tiny_rom_entry *a9m0330_device::device_rom_region() const
     DEVICE IMPLEMENTATION
 ***************************************************************************/
 
-a9m0330_device::a9m0330_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+a9m0330_device::a9m0330_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	adb_device(mconfig, ADB_A9M0330, tag, owner, clock),
 	adb_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_mcu(*this, "mcu")

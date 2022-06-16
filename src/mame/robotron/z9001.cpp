@@ -265,10 +265,10 @@ void z9001_state::z9001(machine_config &config)
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 800).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, "beeper", XTAL::u(800)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(z9001_state::kbd_put));
 	TIMER(config, "z9001_timer").configure_periodic(FUNC(z9001_state::timer_callback), attotime::from_msec(10));
 

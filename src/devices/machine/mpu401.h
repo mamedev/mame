@@ -15,7 +15,7 @@ class mpu401_device : public device_t
 {
 public:
 	// construction/destruction
-	mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto irq_cb() { return write_irq.bind(); }
 

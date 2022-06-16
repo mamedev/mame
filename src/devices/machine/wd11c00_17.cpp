@@ -175,7 +175,7 @@ inline void wd11c00_17_device::select()
 //  wd11c00_17_device - constructor
 //-------------------------------------------------
 
-wd11c00_17_device::wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+wd11c00_17_device::wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, WD11C00_17, tag, owner, clock)
 	, m_out_irq5_cb(*this)
 	, m_out_drq3_cb(*this)

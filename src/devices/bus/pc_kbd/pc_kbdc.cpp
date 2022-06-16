@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(PC_KBDC, pc_kbdc_device, "pc_kbdc", "PC keyboard connector")
 //-------------------------------------------------
 //  pc_kbdc_device - constructor
 //-------------------------------------------------
-pc_kbdc_device::pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pc_kbdc_device::pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PC_KBDC, tag, owner, clock),
 	device_single_card_slot_interface<device_pc_kbd_interface>(mconfig, *this),
 	m_out_clock_cb(*this),

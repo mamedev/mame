@@ -57,7 +57,7 @@ public:
 		PORT7
 	};
 
-	tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	auto read_port4_callback() { return m_read_port[3].bind(); }
@@ -77,7 +77,7 @@ public:
 	void write_ms(int state);
 
 protected:
-	tms1024_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	tms1024_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -96,7 +96,7 @@ protected:
 class tms1025_device : public tms1024_device
 {
 public:
-	tms1025_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	tms1025_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto read_port1_callback() { return m_read_port[0].bind(); }
 	auto read_port2_callback() { return m_read_port[1].bind(); }

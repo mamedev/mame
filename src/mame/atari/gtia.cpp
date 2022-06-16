@@ -120,7 +120,7 @@ DEFINE_DEVICE_TYPE(ATARI_GTIA, gtia_device, "gtia", "Atari GTIA")
 //  upd7220_device - constructor
 //-------------------------------------------------
 
-gtia_device::gtia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gtia_device::gtia_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ATARI_GTIA, tag, owner, clock)
 	, m_region(GTIA_NTSC)
 	, m_read_cb(*this)

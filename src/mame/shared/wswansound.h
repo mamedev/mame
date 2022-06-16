@@ -18,7 +18,7 @@ class wswan_sound_device : public device_t,
 	public device_rom_interface<14,1>
 {
 public:
-	wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void port_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 port_r(offs_t offset, u16 mem_mask);

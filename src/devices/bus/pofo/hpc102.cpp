@@ -58,7 +58,7 @@ void pofo_hpc102_device::device_add_mconfig(machine_config &config)
 //  pofo_hpc102_device - constructor
 //-------------------------------------------------
 
-pofo_hpc102_device::pofo_hpc102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pofo_hpc102_device::pofo_hpc102_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, POFO_HPC102, tag, owner, clock),
 	device_portfolio_expansion_slot_interface(mconfig, *this),
 	m_uart(*this, M82C50A_TAG)

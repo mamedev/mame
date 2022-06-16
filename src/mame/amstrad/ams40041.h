@@ -19,7 +19,7 @@ class ams40041_device : public mc6845_device
 {
 public:
 	// device type constructor
-	ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// screen update callback
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

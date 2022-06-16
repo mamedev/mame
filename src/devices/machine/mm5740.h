@@ -89,7 +89,7 @@ class mm5740_device : public device_t
 {
 public:
 	// construction/destruction
-	mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// public interface
 	uint16_t b_r();

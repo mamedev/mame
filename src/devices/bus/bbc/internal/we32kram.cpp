@@ -56,7 +56,7 @@ const tiny_rom_entry *bbc_we32kram_device::device_rom_region() const
 //  bbc_we32kram_device - constructor
 //-------------------------------------------------
 
-bbc_we32kram_device::bbc_we32kram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_we32kram_device::bbc_we32kram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_WE32KRAM, tag, owner, clock)
 	, device_bbc_internal_interface(mconfig, *this)
 {

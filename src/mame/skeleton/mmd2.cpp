@@ -373,7 +373,7 @@ void mmd2_state::mmd2(machine_config &config)
 	config.set_default_layout(layout_mmd2);
 
 	/* Devices */
-	i8279_device &kbdc(I8279(config, "i8279", 400000));        // based on divider
+	i8279_device &kbdc(I8279(config, "i8279", XTAL::u(400000)));        // based on divider
 	kbdc.out_sl_callback().set(FUNC(mmd2_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(mmd2_state::digit_w));   // display A&B
 	kbdc.in_rl_callback().set(FUNC(mmd2_state::keyboard_r));   // kbd RL lines

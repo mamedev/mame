@@ -957,7 +957,7 @@ void rex6000_state::rex6000(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beep).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void oz750_state::oz750(machine_config &config)
@@ -1012,7 +1012,7 @@ void oz750_state::oz750(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beep).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 /* ROM definition */

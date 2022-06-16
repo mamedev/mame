@@ -330,7 +330,7 @@ void maclc_state::maclc_base(machine_config &config)
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 
 	SCC85C30(config, m_scc, C7M);
-	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
+	m_scc->configure_channels(XTAL::u(3'686'400), XTAL::u(3'686'400), XTAL::u(3'686'400), XTAL::u(3'686'400));
 	m_scc->out_int_callback().set(m_v8, FUNC(v8_device::scc_irq_w));
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));

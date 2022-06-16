@@ -235,7 +235,7 @@ void k1003_state::machine_start()
 void k1003_state::k1003(machine_config &config)
 {
 	/* basic machine hardware */
-	I8008(config, m_maincpu, 800000);
+	I8008(config, m_maincpu, XTAL::u(800000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &k1003_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &k1003_state::io_map);
 

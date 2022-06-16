@@ -37,7 +37,7 @@
 class mm75_device : public mm76_device
 {
 public:
-	mm75_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mm75_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

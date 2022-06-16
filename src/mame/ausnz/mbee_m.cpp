@@ -203,7 +203,7 @@ u8 mbee_state::port18_r()
 
 u8 mbee_state::speed_r(offs_t offset)
 {
-	m_maincpu->set_unscaled_clock(BIT(offset, 8, 2) ? 6750000 : 3375000);
+	m_maincpu->set_unscaled_clock(BIT(offset, 8, 2) ? XTAL::u(6750000) : XTAL::u(3375000));
 	return 0xff;
 }
 

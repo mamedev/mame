@@ -26,12 +26,12 @@ DEFINE_DEVICE_TYPE(A2EAUX_EXT80COL, a2eaux_ext80col_device, "a2eext80", "Apple I
 //  LIVE DEVICE
 //**************************************************************************
 
-a2eaux_ext80col_device::a2eaux_ext80col_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2eaux_ext80col_device::a2eaux_ext80col_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 		a2eaux_ext80col_device(mconfig, A2EAUX_EXT80COL, tag, owner, clock)
 {
 }
 
-a2eaux_ext80col_device::a2eaux_ext80col_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2eaux_ext80col_device::a2eaux_ext80col_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 		device_t(mconfig, type, tag, owner, clock),
 		device_a2eauxslot_card_interface(mconfig, *this)
 {

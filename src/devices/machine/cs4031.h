@@ -37,7 +37,7 @@ class cs4031_device : public device_t
 public:
 	// construction/destruction
 	template <typename T, typename U, typename V, typename W, typename X>
-	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cputag, U &&isatag, V &&biostag, W &&keybctag, X &&ramtag)
+	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cputag, U &&isatag, V &&biostag, W &&keybctag, X &&ramtag)
 		: cs4031_device(mconfig, tag, owner, clock)
 	{
 		set_cputag(std::forward<T>(cputag));
@@ -47,7 +47,7 @@ public:
 		set_ramtag(std::forward<X>(ramtag));
 	}
 
-	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto ior() { return m_read_ior.bind(); }

@@ -83,7 +83,7 @@ INPUT_PORTS_END
 void sanremmg_state::sanremmg(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM7(config, m_maincpu, 50000000); // wrong, this is an M30624FG (M16C/62A family) with 256K internal ROM, no CPU core available
+	ARM7(config, m_maincpu, XTAL::u(50000000)); // wrong, this is an M30624FG (M16C/62A family) with 256K internal ROM, no CPU core available
 	m_maincpu->set_addrmap(AS_PROGRAM, &sanremmg_state::sanremmg_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -18,7 +18,7 @@ DECLARE_DEVICE_TYPE(PSX_MDEC, psxmdec_device)
 class psxmdec_device : public device_t
 {
 public:
-	psxmdec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psxmdec_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void write(offs_t offset, uint32_t data);
 	uint32_t read(offs_t offset);

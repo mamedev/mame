@@ -113,7 +113,7 @@ void sh7604_sci_device::sci_regs(address_map &map)
 //  sh7604_sci_device - constructor
 //-------------------------------------------------
 
-sh7604_sci_device::sh7604_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sh7604_sci_device::sh7604_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SH7604_SCI, tag, owner, clock)
 
 {

@@ -306,7 +306,7 @@ void vd_state::machine_reset()
 void vd_state::vd(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vd_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &vd_state::io_map);
 	TIMER(config, "irq").configure_periodic(FUNC(vd_state::irq), attotime::from_hz(300));
@@ -317,11 +317,11 @@ void vd_state::vd(machine_config &config)
 	genpin_audio(config);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	ay8910_device &ay1(AY8910(config, "ay1", 2000000)); //?
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL::u(2000000))); //?
 	ay1.add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	ay1.port_a_read_callback().set_ioport("DSW2");
 	ay1.port_b_read_callback().set_ioport("DSW1");
-	ay8910_device &ay2(AY8910(config, "ay2", 2000000)); //?
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL::u(2000000))); //?
 	ay2.add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 	ay2.port_b_read_callback().set_ioport("DSW3");
 

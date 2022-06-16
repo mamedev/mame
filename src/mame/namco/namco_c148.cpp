@@ -65,7 +65,7 @@ DEFINE_DEVICE_TYPE(NAMCO_C148, namco_c148_device, "namco_c148", "Namco C148 Inte
 //  namco_c148_device - constructor
 //-------------------------------------------------
 
-namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NAMCO_C148, tag, owner, clock),
 	m_out_ext1_cb(*this),
 	m_out_ext2_cb(*this),

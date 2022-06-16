@@ -177,7 +177,7 @@ INPUT_PORTS_END
 
 void sc499_device::device_add_mconfig(machine_config &config)
 {
-	SC499_CTAPE(config, m_image, 0);
+	SC499_CTAPE(config, m_image);
 }
 
 
@@ -307,7 +307,7 @@ DEFINE_DEVICE_TYPE(ISA8_SC499, sc499_device, "sc499", "Archive SC-499")
 // sc499_device - constructor
 //-------------------------------------------------
 
-sc499_device::sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sc499_device::sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ISA8_SC499, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_iobase(*this, "IO_BASE"),
@@ -1272,7 +1272,7 @@ void sc499_device::block_set_filemark()
 
 DEFINE_DEVICE_TYPE(SC499_CTAPE, sc499_ctape_image_device, "sc499_ctape", "SC-499 Cartridge Tape")
 
-sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: microtape_image_device(mconfig, SC499_CTAPE, tag, owner, clock)
 {
 }

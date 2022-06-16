@@ -22,11 +22,11 @@ class ez80_device : public z80_device
 {
 public:
 	// device type constructor
-	ez80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ez80_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// construction/destruction
-	ez80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	ez80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type declaration

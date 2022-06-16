@@ -108,14 +108,14 @@ void rmnimbus_state::nimbus_iocpu_io(address_map &map)
 void rmnimbus_state::nimbus(machine_config &config)
 {
 	/* basic machine hardware */
-	I80186(config, m_maincpu, 16000000); // the cpu is a 10Mhz part but the serial clocks are wrong unless it runs at 8Mhz
+	I80186(config, m_maincpu, XTAL::u(16000000)); // the cpu is a 10Mhz part but the serial clocks are wrong unless it runs at 8Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &rmnimbus_state::nimbus_mem);
 	m_maincpu->set_addrmap(AS_IO, &rmnimbus_state::nimbus_io);
 	m_maincpu->read_slave_ack_callback().set(FUNC(rmnimbus_state::cascade_callback));
 	m_maincpu->tmrout0_handler().set(m_z80sio, FUNC(z80sio_device::rxca_w));
 	m_maincpu->tmrout1_handler().set(m_z80sio, FUNC(z80sio_device::rxtxcb_w));
 
-	I8031(config, m_iocpu, 11059200);
+	I8031(config, m_iocpu, XTAL::u(11059200));
 	m_iocpu->set_addrmap(AS_PROGRAM, &rmnimbus_state::nimbus_iocpu_mem);
 	m_iocpu->set_addrmap(AS_IO, &rmnimbus_state::nimbus_iocpu_io);
 	m_iocpu->port_in_cb<1>().set(FUNC(rmnimbus_state::nimbus_pc8031_port1_r));
@@ -133,7 +133,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 	PALETTE(config, m_palette).set_entries(16);
 
 	/* Backing storage */
-	WD2793(config, m_fdc, 2000000);
+	WD2793(config, m_fdc, XTAL::u(2000000));
 	m_fdc->set_force_ready(true);
 	m_fdc->intrq_wr_callback().set(FUNC(rmnimbus_state::nimbus_fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(rmnimbus_state::nimbus_fdc_drq_w));
@@ -169,7 +169,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 	m_ram->set_extra_options("128K,256K,384K,512K,640K,1024K");
 
 	/* Peripheral chips */
-	Z80SIO(config, m_z80sio, 4000000); // Z0844006PSC (SIO/0)
+	Z80SIO(config, m_z80sio, XTAL::u(4000000)); // Z0844006PSC (SIO/0)
 	m_z80sio->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
 	m_z80sio->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	m_z80sio->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
@@ -186,7 +186,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 
 	EEPROM_93C06_16BIT(config, m_eeprom);
 
-	MOS6522(config, m_via, 1000000);
+	MOS6522(config, m_via, XTAL::u(1000000));
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->writepb_handler().set(FUNC(rmnimbus_state::nimbus_via_write_portb));
 	m_via->ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
@@ -200,12 +200,12 @@ void rmnimbus_state::nimbus(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, MONO_TAG).front_center();
-	ay8910_device &ay8910(AY8910(config, AY8910_TAG, 2000000));
+	ay8910_device &ay8910(AY8910(config, AY8910_TAG, XTAL::u(2000000)));
 	ay8910.port_a_write_callback().set(FUNC(rmnimbus_state::nimbus_sound_ay8910_porta_w));
 	ay8910.port_b_write_callback().set(FUNC(rmnimbus_state::nimbus_sound_ay8910_portb_w));
 	ay8910.add_route(ALL_OUTPUTS, MONO_TAG, 0.75);
 
-	msm5205_device &msm5205(MSM5205(config, MSM5205_TAG, 384000));
+	msm5205_device &msm5205(MSM5205(config, MSM5205_TAG, XTAL::u(384000)));
 	msm5205.vck_callback().set(FUNC(rmnimbus_state::nimbus_msm5205_vck)); /* VCK function */
 	msm5205.set_prescaler_selector(msm5205_device::S48_4B);      /* 8 kHz */
 	msm5205.add_route(ALL_OUTPUTS, MONO_TAG, 0.75);

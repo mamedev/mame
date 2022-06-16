@@ -87,7 +87,7 @@ DEFINE_DEVICE_TYPE(Z8S180, z8s180_device, "z8s180", "Zilog Z8S180") // enhanced 
 DEFINE_DEVICE_TYPE(Z80182, z80182_device, "z80182", "Zilog Z80182") // further enhanced Z8S180
 
 
-z180_device::z180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extended_io, address_map_constructor internal_map)
+z180_device::z180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool extended_io, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, z80_daisy_chain_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, 16, 12, internal_map)
@@ -114,29 +114,29 @@ std::unique_ptr<util::disasm_interface> z180_device::create_disassembler()
 	return std::make_unique<z180_disassembler>();
 }
 
-z80180_device::z80180_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z80180_device::z80180_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z180_device(mconfig, Z80180, tag, owner, clock, false, address_map_constructor())
 {
 }
 
-hd64180rp_device::hd64180rp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd64180rp_device::hd64180rp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z180_device(mconfig, HD64180RP, tag, owner, clock, false, address_map_constructor())
 {
 	// 64-pin DIP versions omit A19
 	set_address_width(19);
 }
 
-z8s180_device::z8s180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+z8s180_device::z8s180_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: z180_device(mconfig, type, tag, owner, clock, false, address_map_constructor())
 {
 }
 
-z8s180_device::z8s180_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z8s180_device::z8s180_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z8s180_device(mconfig, Z8S180, tag, owner, clock)
 {
 }
 
-z80182_device::z80182_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z80182_device::z80182_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z8s180_device(mconfig, Z80182, tag, owner, clock)
 {
 }

@@ -573,7 +573,7 @@ inline void c2040_device::update_ieee_signals()
 //  c2040_device - constructor
 //-------------------------------------------------
 
-c2040_device::c2040_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+c2040_device::c2040_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_ieee488_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),
@@ -595,7 +595,7 @@ c2040_device::c2040_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-c2040_device::c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c2040_device::c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	c2040_device(mconfig, C2040, tag, owner, clock)
 {
 }
@@ -605,7 +605,7 @@ c2040_device::c2040_device(const machine_config &mconfig, const char *tag, devic
 //  c3040_device - constructor
 //-------------------------------------------------
 
-c3040_device::c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c3040_device::c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	c2040_device(mconfig, C3040, tag, owner, clock)
 {
 }
@@ -615,7 +615,7 @@ c3040_device::c3040_device(const machine_config &mconfig, const char *tag, devic
 //  c4040_device - constructor
 //-------------------------------------------------
 
-c4040_device::c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c4040_device::c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	c2040_device(mconfig, C4040, tag, owner, clock)
 {
 }

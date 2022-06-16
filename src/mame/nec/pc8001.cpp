@@ -775,7 +775,7 @@ void pc8001_state::pc8001(machine_config &config)
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
 
 	/* devices */
-	I8251(config, I8251_TAG, 0);
+	I8251(config, I8251_TAG);
 
 	UPD1990A(config, m_rtc);
 
@@ -797,7 +797,7 @@ void pc8001_state::pc8001(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	// TODO: unknown clock, is it really a beeper?
-	BEEP(config, m_beep, 2400).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beep, XTAL::u(2400)).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void pc8001mk2_state::pc8001mk2(machine_config &config)

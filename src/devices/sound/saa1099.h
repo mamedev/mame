@@ -19,7 +19,7 @@ class saa1099_device : public device_t,
 						public device_sound_interface
 {
 public:
-	saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void control_w(u8 data);
 	void data_w(u8 data);

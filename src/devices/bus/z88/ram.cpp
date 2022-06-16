@@ -32,12 +32,12 @@ DEFINE_DEVICE_TYPE(Z88_1024K_RAM, z88_1024k_ram_device, "z88_1024k_ram", "Z88 10
 //  z88_32k_ram_device - constructor
 //-------------------------------------------------
 
-z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z88_32k_ram_device(mconfig, Z88_32K_RAM, tag, owner, clock)
 {
 }
 
-z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, device_z88cart_interface(mconfig, *this)
@@ -49,7 +49,7 @@ z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, device_typ
 //  z88_128k_ram_device - constructor
 //-------------------------------------------------
 
-z88_128k_ram_device::z88_128k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z88_128k_ram_device::z88_128k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z88_32k_ram_device(mconfig, Z88_128K_RAM, tag, owner, clock)
 {
 }
@@ -58,7 +58,7 @@ z88_128k_ram_device::z88_128k_ram_device(const machine_config &mconfig, const ch
 //  z88_512k_ram_device - constructor
 //-------------------------------------------------
 
-z88_512k_ram_device::z88_512k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z88_512k_ram_device::z88_512k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z88_32k_ram_device(mconfig, Z88_512K_RAM, tag, owner, clock)
 {
 }
@@ -67,7 +67,7 @@ z88_512k_ram_device::z88_512k_ram_device(const machine_config &mconfig, const ch
 //  z88_1024k_ram_device - constructor
 //-------------------------------------------------
 
-z88_1024k_ram_device::z88_1024k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z88_1024k_ram_device::z88_1024k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z88_32k_ram_device(mconfig, Z88_1024K_RAM, tag, owner, clock)
 {
 }

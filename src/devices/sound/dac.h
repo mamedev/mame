@@ -82,7 +82,7 @@ class dac_device_base : public device_t, public device_sound_interface
 {
 protected:
 	// constructor
-	dac_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain);
+	dac_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain);
 
 	// device startup
 	virtual void device_start() override;
@@ -128,7 +128,7 @@ private:
 class dac_bit_device_base : public dac_device_base, public dac_bit_interface
 {
 protected:
-	dac_bit_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
+	dac_bit_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
 		dac_device_base(mconfig, type, tag, owner, clock, bits, mapper, gain)
 	{
 	}
@@ -144,7 +144,7 @@ public:
 class dac_byte_device_base : public dac_device_base, public dac_byte_interface
 {
 protected:
-	dac_byte_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
+	dac_byte_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
 		dac_device_base(mconfig, type, tag, owner, clock, bits, mapper, gain)
 	{
 	}
@@ -160,7 +160,7 @@ public:
 class dac_word_device_base : public dac_device_base, public dac_word_interface
 {
 protected:
-	dac_word_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
+	dac_word_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 bits, dac_mapper_callback mapper, stream_buffer::sample_t gain) :
 		dac_device_base(mconfig, type, tag, owner, clock, bits, mapper, gain)
 	{
 	}
@@ -186,7 +186,7 @@ DECLARE_DEVICE_TYPE(_dac_type, _dac_class) \
 class _dac_class : public _dac_base_class \
 {\
 public: \
-	_dac_class(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) : \
+	_dac_class(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL()) : \
 		_dac_base_class(mconfig, _dac_type, tag, owner, clock, _dac_bits, _dac_mapper, _dac_gain) {} \
 }; \
 DAC_GENERATOR_EPILOG(_dac_type, _dac_class, _dac_description, _dac_shortname)

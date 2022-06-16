@@ -25,13 +25,13 @@
 class usb_sound_device : public device_t, public device_mixer_interface
 {
 public:
-	template <typename T> usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&maincpu_tag)
+	template <typename T> usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&maincpu_tag)
 		: usb_sound_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(maincpu_tag);
 	}
 
-	usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t status_r();
 	void data_w(uint8_t data);
@@ -53,7 +53,7 @@ public:
 
 protected:
 
-	usb_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	usb_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -174,13 +174,13 @@ DECLARE_DEVICE_TYPE(SEGAUSB, usb_sound_device)
 class usb_rom_sound_device : public usb_sound_device
 {
 public:
-	template <typename T> usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&maincpu_tag)
+	template <typename T> usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&maincpu_tag)
 		: usb_rom_sound_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(maincpu_tag);
 	}
 
-	usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

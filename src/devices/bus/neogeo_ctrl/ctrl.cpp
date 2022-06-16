@@ -86,7 +86,7 @@ device_neogeo_ctrl_edge_interface::~device_neogeo_ctrl_edge_interface()
 //  neogeo_control_port_device - constructor
 //-------------------------------------------------
 
-neogeo_control_port_device::neogeo_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_control_port_device::neogeo_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NEOGEO_CONTROL_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_neogeo_control_port_interface>(mconfig, *this),
 	m_device(nullptr)
@@ -135,7 +135,7 @@ void neogeo_control_port_device::write_ctrlsel(uint8_t data)
 //  neogeo_ctrl_edge_port_device - constructor
 //-------------------------------------------------
 
-neogeo_ctrl_edge_port_device::neogeo_ctrl_edge_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_ctrl_edge_port_device::neogeo_ctrl_edge_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NEOGEO_CTRL_EDGE_CONNECTOR, tag, owner, clock),
 	device_single_card_slot_interface<device_neogeo_ctrl_edge_interface>(mconfig, *this),
 	m_device(nullptr)

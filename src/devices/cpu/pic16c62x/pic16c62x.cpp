@@ -119,7 +119,7 @@ void pic16c62x_device::pic16c62xa_ram(address_map &map)
 }
 
 
-pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int picmodel)
+pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int program_width, int picmodel)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1
 					   , ( ( program_width == 9 ) ?  address_map_constructor(FUNC(pic16c62x_device::pic16c62x_rom_9), this) :
@@ -138,32 +138,32 @@ pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type ty
 }
 
 
-pic16c620_device::pic16c620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic16c620_device::pic16c620_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c62x_device(mconfig, PIC16C620, tag, owner, clock, 9, 0x16C620)
 {
 }
 
-pic16c620a_device::pic16c620a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic16c620a_device::pic16c620a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c62x_device(mconfig, PIC16C620A, tag, owner, clock, 9, 0x16C620A)
 {
 }
 
-pic16c621_device::pic16c621_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic16c621_device::pic16c621_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c62x_device(mconfig, PIC16C621, tag, owner, clock, 10, 0x16C621)
 {
 }
 
-pic16c621a_device::pic16c621a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic16c621a_device::pic16c621a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c62x_device(mconfig, PIC16C621A, tag, owner, clock, 10, 0x16C621A)
 {
 }
 
-pic16c622_device::pic16c622_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic16c622_device::pic16c622_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c62x_device(mconfig, PIC16C622, tag, owner, clock, 11, 0x16C622)
 {
 }
 
-pic16c622a_device::pic16c622a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pic16c622a_device::pic16c622a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pic16c62x_device(mconfig, PIC16C622A, tag, owner, clock, 11, 0x16C622A)
 {
 }

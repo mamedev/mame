@@ -13,7 +13,7 @@
 class jmbx1_device : public pc8801_exp_device
 {
 public:
-	jmbx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	jmbx1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void io_map(address_map &map) override;
 

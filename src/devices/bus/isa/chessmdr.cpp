@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(ISA8_CHESSMDR, isa8_chessmdr_device, "isa_chessmdr", "The Che
 //  constructor
 //-------------------------------------------------
 
-isa8_chessmdr_device::isa8_chessmdr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_chessmdr_device::isa8_chessmdr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA8_CHESSMDR, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_chessm(*this, "chessm")
@@ -97,7 +97,7 @@ ioport_constructor isa8_chessmdr_device::device_input_ports() const
 
 void isa8_chessmdr_device::device_add_mconfig(machine_config &config)
 {
-	CHESSMACHINE(config, m_chessm, 15'000'000);
+	CHESSMACHINE(config, m_chessm, XTAL::u(15'000'000));
 }
 
 

@@ -2390,7 +2390,7 @@ void aristmk5_state::aristmk5_touch(machine_config &config)
 	aristmk5(config);
 	subdevice<ns16450_device>("uart_0a")->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 
-	microtouch_device &microtouch(MICROTOUCH(config, "microtouch", 2400));
+	microtouch_device &microtouch(MICROTOUCH(config, "microtouch", XTAL::u(2400)));
 	microtouch.stx().set("uart_0a", FUNC(ins8250_uart_device::rx_w));
 }
 
@@ -2405,7 +2405,7 @@ void aristmk5_state::aristmk5_usa_touch(machine_config &config)
 	aristmk5_usa(config);
 	subdevice<ns16450_device>("uart_0a")->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 
-	microtouch_device &microtouch(MICROTOUCH(config, "microtouch", 2400));
+	microtouch_device &microtouch(MICROTOUCH(config, "microtouch", XTAL::u(2400)));
 	microtouch.stx().set("uart_0a", FUNC(ins8250_uart_device::rx_w));
 }
 

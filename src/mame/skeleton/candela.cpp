@@ -680,7 +680,7 @@ void can09t_state::can09t(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &can09t_state::can09t_map);
 
 	/* --PIA inits----------------------- */
-	PIA6821(config, m_syspia, 0); // CPU board
+	PIA6821(config, m_syspia); // CPU board
 	m_syspia->readpa_handler().set(FUNC(can09t_state::syspia_A_r));
 	m_syspia->readpb_handler().set(FUNC(can09t_state::syspia_B_r));
 	m_syspia->writepb_handler().set(FUNC(can09t_state::syspia_B_w));
@@ -693,7 +693,7 @@ void can09t_state::can09t(machine_config &config)
 	/* 0xE20A 0xB113 (SYSPIA Control B) = 0x34 - CB2 is low and lock DDRB */
 	/* 0xE20E 0xB111 (SYSPIA port B)    = 0x10 - Data to port B */
 
-	PIA6821(config, m_usrpia, 0); // CPU board
+	PIA6821(config, m_usrpia); // CPU board
 	m_usrpia->cb2_handler().set(FUNC(can09t_state::usrpia_cb2_w));
 	/* 0xE212 0xB122 (USRPIA Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xE212 0xB123 (USRPIA Control B) = 0x00 - Channel B IRQ disabled */
@@ -701,13 +701,13 @@ void can09t_state::can09t(machine_config &config)
 	/* 0xE215 0xB121 (USRPIA DDR B)     = 0xFF - Port B all outputs */
 	/* 0xE21A 0xB122 (USRPIA Control A) = 0x34 - CA2 is low and lock DDRB */
 	/* 0xE21A 0xB123 (USRPIA Control B) = 0x34 - CB2 is low and lock DDRB */
-	PIA6821(config, m_pia3, 0); // ROM board
-	PIA6821(config, m_pia4, 0); // ROM board
+	PIA6821(config, m_pia3); // ROM board
+	PIA6821(config, m_pia4); // ROM board
 
-	PTM6840(config, "ptm", 0);
+	PTM6840(config, "ptm");
 
 	/* RS232 usage: mame can09t -window -debug -rs232 terminal */
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
@@ -778,7 +778,7 @@ void can09_state::can09(machine_config &config)
 #endif
 
 	/* --PIA inits----------------------- */
-	PIA6821(config, m_pia1, 0); // CPU board
+	PIA6821(config, m_pia1); // CPU board
 	m_pia1->readpa_handler().set(FUNC(can09_state::pia1_A_r));
 	m_pia1->writepa_handler().set(FUNC(can09_state::pia1_A_w));
 	m_pia1->readpb_handler().set(FUNC(can09_state::pia1_B_r));
@@ -793,9 +793,9 @@ void can09_state::can09(machine_config &config)
 	/* 0xFF93 0xE034 (PIA1 Port B)    = 0x18 - Write Data on Port B */
 
 #if 1
-	PIA6821(config, PIA2_TAG, 0); // CPU board
-	ACIA6850(config, "acia1", 0); // CPU board
-	ACIA6850(config, "acia2", 0); // CPU board
+	PIA6821(config, PIA2_TAG); // CPU board
+	ACIA6850(config, "acia1"); // CPU board
+	ACIA6850(config, "acia2"); // CPU board
 #endif
 }
 

@@ -151,7 +151,7 @@ ioport_constructor c4023_device::device_input_ports() const
 //  c1526_device_base - constructor
 //-------------------------------------------------
 
-c1526_device_base::c1526_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+c1526_device_base::c1526_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock)
 {
 }
@@ -161,7 +161,7 @@ c1526_device_base::c1526_device_base(const machine_config &mconfig, device_type 
 //  c1526_device - constructor
 //-------------------------------------------------
 
-c1526_device::c1526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c1526_device::c1526_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	c1526_device_base(mconfig, C1526, tag, owner, clock),
 	device_cbm_iec_interface(mconfig, *this)
 {
@@ -172,7 +172,7 @@ c1526_device::c1526_device(const machine_config &mconfig, const char *tag, devic
 //  c4023_device - constructor
 //-------------------------------------------------
 
-c4023_device::c4023_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c4023_device::c4023_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	c1526_device_base(mconfig, C4023, tag, owner, clock),
 	device_ieee488_interface(mconfig, *this)
 {

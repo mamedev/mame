@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(E0516, e0516_device, "e0516", "E05-16 RTC")
 //  e0516_device - constructor
 //-------------------------------------------------
 
-e0516_device::e0516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+e0516_device::e0516_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, E0516, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
 	, m_cs(0), m_clk(0), m_data_latch(0), m_reg_latch(0), m_read_write(0), m_state(0), m_bits(0), m_dio(0)

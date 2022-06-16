@@ -21,7 +21,7 @@ class isa16_ex1280_device : public device_t,
 {
 public:
 	// construction/destruction
-	isa16_ex1280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa16_ex1280_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Flag non working features
 	static constexpr feature_type unemulated_features() { return feature::GRAPHICS | feature::PALETTE; }

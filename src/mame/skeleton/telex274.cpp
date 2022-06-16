@@ -154,19 +154,19 @@ void telex274_state::telex274(machine_config &config)
 	maintimer.out4_cb().append("mpsc", FUNC(i8274_device::txca_w)); // ?
 	maintimer.out5_cb().set("mpsc", FUNC(i8274_device::rxtxcb_w)); // ?
 
-	I8274(config, "mpsc", 4'000'000);
+	I8274(config, "mpsc", XTAL::u(4'000'000));
 
-	M68000(config, m_coaxcpu, 10'000'000);
+	M68000(config, m_coaxcpu, XTAL::u(10'000'000));
 	m_coaxcpu->set_addrmap(AS_PROGRAM, &telex274_state::coax_mem);
 	m_coaxcpu->set_disable();
 
-	M68000(config, m_examcpu, 10'000'000);
+	M68000(config, m_examcpu, XTAL::u(10'000'000));
 	m_examcpu->set_addrmap(AS_PROGRAM, &telex274_state::exam_mem);
 	m_examcpu->set_disable();
 
-	//AM9513A(config, "examtimer", 4'000'000);
+	//AM9513A(config, "examtimer", XTAL::u(4'000'000));
 
-	//WD2797(config, "fdc", 1'000'000);
+	//WD2797(config, "fdc", XTAL::u(1'000'000));
 }
 
 

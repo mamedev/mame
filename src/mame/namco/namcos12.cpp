@@ -1746,11 +1746,11 @@ void namcos12_state::init_golgo13()
 void namcos12_state::namcos12_mobo(machine_config &config)
 {
 	/* basic machine hardware */
-	H83002(config, m_sub, 16934400); // frequency based on research (superctr)
+	H83002(config, m_sub, XTAL::u(16934400)); // frequency based on research (superctr)
 	m_sub->set_addrmap(AS_PROGRAM, &namcos12_state::s12h8rwmap);
 	m_sub->set_addrmap(AS_IO, &namcos12_state::s12h8iomap);
 
-	NAMCO_SETTINGS(config, m_settings, 0);
+	NAMCO_SETTINGS(config, m_settings);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set("sub:sci1", FUNC(h8_sci_device::rx_w));
@@ -1761,7 +1761,7 @@ void namcos12_state::namcos12_mobo(machine_config &config)
 	sub_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
 	sub_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

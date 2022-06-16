@@ -464,7 +464,7 @@ private:
 	bool m_has_laser_mouse;
 	bool m_laser_fdc_on;
 	int m_accel_stage;
-	u32 m_accel_speed;
+	XTAL m_accel_speed;
 	u8 m_accel_slotspk, m_accel_gameio, m_laser_speed;
 
 	emu_timer *m_strobe_timer;
@@ -1193,7 +1193,7 @@ void apple2e_state::machine_reset()
 
 	if (((m_sysconfig->read() & 0x30) == 0x30) || (m_isiicplus))
 	{
-		m_accel_speed = 4000000;    // Zip speed
+		m_accel_speed = XTAL::u(4000000);    // Zip speed
 		accel_full_speed();
 		m_accel_fast = true;
 	}
@@ -1201,7 +1201,7 @@ void apple2e_state::machine_reset()
 	if (m_accel_laser)
 	{
 		m_accel_present = true;
-		m_accel_speed = 1021800;
+		m_accel_speed = XTAL::u(1021800);
 	}
 
 	if (m_has_laser_mouse)
@@ -1422,7 +1422,7 @@ void apple2e_state::accel_full_speed()
 
 void apple2e_state::accel_normal_speed()
 {
-	m_maincpu->set_unscaled_clock(1021800);
+	m_maincpu->set_unscaled_clock(XTAL::u(1021800));
 }
 
 void apple2e_state::accel_slot(int slot)
@@ -4981,20 +4981,20 @@ static void apple2eaux_cards(device_slot_interface &device)
 void apple2e_state::apple2e(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1021800);
+	M6502(config, m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
-	TIMER(config, m_scantimer, 0).configure_scanline(FUNC(apple2e_state::apple2_interrupt), "screen", 0, 1);
+	TIMER(config, m_scantimer).configure_scanline(FUNC(apple2e_state::apple2_interrupt), "screen", 0, 1);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	TIMER(config, m_acceltimer, 0).configure_generic(FUNC(apple2e_state::accel_timer));
+	TIMER(config, m_acceltimer).configure_generic(FUNC(apple2e_state::accel_timer));
 
 	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
+	m_screen->set_raw(XTAL::u(1021800)*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_ff));
 	m_screen->set_palette(m_video);
 
@@ -5003,13 +5003,13 @@ void apple2e_state::apple2e(machine_config &config)
 	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 0.4);
 
 	/* DS1315 for no-slot clock */
-	DS1315(config, m_ds1315, 0).read_backing().set(FUNC(apple2e_state::nsc_backing_r));
+	DS1315(config, m_ds1315).read_backing().set(FUNC(apple2e_state::nsc_backing_r));
 
 	/* RAM */
 	RAM(config, m_ram).set_default_size("64K").set_default_value(0x00);
 
 	/* keyboard controller */
-	ay3600_device &kbdc(AY3600(config, "ay3600", 0));
+	ay3600_device &kbdc(AY3600(config, "ay3600"));
 	kbdc.x0().set_ioport("X0");
 	kbdc.x1().set_ioport("X1");
 	kbdc.x2().set_ioport("X2");
@@ -5025,11 +5025,11 @@ void apple2e_state::apple2e(machine_config &config)
 	kbdc.ako().set(FUNC(apple2e_state::ay3600_ako_w));
 
 	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
-	timer_device &timer(TIMER(config, "repttmr", 0));
+	timer_device &timer(TIMER(config, "repttmr"));
 	timer.configure_periodic(FUNC(apple2e_state::ay3600_repeat), attotime::from_hz(15));
 
 	/* slot devices */
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2e_state::a2bus_nmi_w));
@@ -5043,7 +5043,7 @@ void apple2e_state::apple2e(machine_config &config)
 	A2BUS_SLOT(config, "sl6", m_a2bus, apple2e_cards, "diskiing");
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2e_cards, nullptr);
 
-	A2EAUXSLOT(config, m_a2eauxslot, 0);
+	A2EAUXSLOT(config, m_a2eauxslot);
 	m_a2eauxslot->set_space(m_maincpu, AS_PROGRAM);
 	m_a2eauxslot->out_irq_callback().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2eauxslot->out_nmi_callback().set(FUNC(apple2e_state::a2bus_nmi_w));
@@ -5065,10 +5065,10 @@ void apple2e_state::apple2e(machine_config &config)
 void apple2e_state::apple2epal(machine_config &config)
 {
 	apple2e(config);
-	M6502(config.replace(), m_maincpu, 1016966);
+	M6502(config.replace(), m_maincpu, XTAL::u(1016966));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
-	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
+	m_screen->set_raw(XTAL::u(1016966) * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
 void apple2e_state::mprof3(machine_config &config)
@@ -5083,7 +5083,7 @@ void apple2e_state::apple2ee(machine_config &config)
 	apple2e(config);
 	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
 
-	M65C02(config.replace(), m_maincpu, 1021800);
+	M65C02(config.replace(), m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 }
@@ -5091,11 +5091,11 @@ void apple2e_state::apple2ee(machine_config &config)
 void apple2e_state::apple2eepal(machine_config &config)
 {
 	apple2ee(config);
-	M65C02(config.replace(), m_maincpu, 1016966);
+	M65C02(config.replace(), m_maincpu, XTAL::u(1016966));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
-	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
+	m_screen->set_raw(XTAL::u(1016966) * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
 void apple2e_state::spectred(machine_config &config)
@@ -5112,17 +5112,17 @@ void apple2e_state::spectred(machine_config &config)
 void apple2e_state::tk3000(machine_config &config)
 {
 	apple2e(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	M65C02(config.replace(), m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 
-//  z80_device &subcpu(Z80(config, "subcpu", 1021800));    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
+//  z80_device &subcpu(Z80(config, "subcpu", XTAL::u(1021800)));    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
 //  subcpu.set_addrmap(AS_PROGRAM, &apple2e_state::tk3000_kbd_map);
 }
 
 void apple2e_state::apple2ep(machine_config &config)
 {
 	apple2e(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	M65C02(config.replace(), m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 }
@@ -5132,7 +5132,7 @@ void apple2e_state::apple2c(machine_config &config)
 	apple2ee(config);
 	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
 
-	M65C02(config.replace(), m_maincpu, 1021800);
+	M65C02(config.replace(), m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
@@ -5147,12 +5147,12 @@ void apple2e_state::apple2c(machine_config &config)
 	config.device_remove("sl6");
 	config.device_remove("sl7");
 
-	MOS6551(config, m_acia1, 0);
+	MOS6551(config, m_acia1);
 	m_acia1->set_xtal(XTAL(14'318'181) / 8); // ~1.789 MHz
 	m_acia1->txd_handler().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia1->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));
 
-	MOS6551(config, m_acia2, 0);
+	MOS6551(config, m_acia2);
 	m_acia2->set_xtal(1.8432_MHz_XTAL);   // matches SSC so modem software is compatible
 	m_acia2->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
 	m_acia2->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));
@@ -5182,14 +5182,14 @@ void apple2e_state::apple2c(machine_config &config)
 void apple2e_state::apple2cp(machine_config &config)
 {
 	apple2c(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	M65C02(config.replace(), m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_memexp_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
 
-	IWM(config, m_iwm, A2BUS_7M_CLOCK, 1021800*2);
+	IWM(config, m_iwm, A2BUS_7M_CLOCK, XTAL::u(1021800)*2);
 	m_iwm->phases_cb().set(FUNC(apple2e_state::phases_w));
 	m_iwm->sel35_cb().set(FUNC(apple2e_state::sel35_w));
 	m_iwm->devsel_cb().set(FUNC(apple2e_state::devsel_w));
@@ -5213,7 +5213,7 @@ void apple2e_state::apple2c_iwm(machine_config &config)
 void apple2e_state::apple2c_mem(machine_config &config)
 {
 	apple2c(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	M65C02(config.replace(), m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_memexp_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
@@ -5226,7 +5226,7 @@ void apple2e_state::apple2c_mem(machine_config &config)
 void apple2e_state::laser128(machine_config &config)
 {
 	apple2c(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	M65C02(config.replace(), m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
@@ -5261,7 +5261,7 @@ void apple2e_state::laser128(machine_config &config)
 void apple2e_state::laser128o(machine_config &config)
 {
 	apple2c(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	M65C02(config.replace(), m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
@@ -5297,7 +5297,7 @@ void apple2e_state::laser128o(machine_config &config)
 void apple2e_state::laser128ex2(machine_config &config)
 {
 	apple2c(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	M65C02(config.replace(), m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
@@ -5334,7 +5334,7 @@ void apple2e_state::ace500(machine_config &config)
 	apple2ee(config);
 	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
 
-	M65C02(config.replace(), m_maincpu, 1021800);
+	M65C02(config.replace(), m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace500_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
@@ -5345,7 +5345,7 @@ void apple2e_state::ace500(machine_config &config)
 	OUTPUT_LATCH(config, m_printer_out);
 	m_printer_conn->set_output_latch(*m_printer_out);
 
-	MOS6551(config, m_acia1, 0);
+	MOS6551(config, m_acia1);
 	m_acia1->set_xtal(1.8432_MHz_XTAL);
 	m_acia1->txd_handler().set(MODEM_PORT_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia1->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));
@@ -5376,7 +5376,7 @@ void apple2e_state::ace500(machine_config &config)
 void apple2e_state::ace2200(machine_config &config)
 {
 	apple2e(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	M65C02(config.replace(), m_maincpu, XTAL::u(1021800));
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace2200_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 

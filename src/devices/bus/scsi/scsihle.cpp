@@ -11,7 +11,7 @@ Base class for HLE'd SCSI devices.
 #include "emu.h"
 #include "scsihle.h"
 
-scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	scsi_port_interface(mconfig, *this),
 	m_scsi_id(*this, "SCSI_ID"),

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "legscsi.h"
 
-legacy_scsi_host_adapter::legacy_scsi_host_adapter(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+legacy_scsi_host_adapter::legacy_scsi_host_adapter(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_selected(0)
 	, m_scsi_port(*this, finder_base::DUMMY_TAG)

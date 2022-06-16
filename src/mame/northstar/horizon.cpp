@@ -191,7 +191,7 @@ void horizon_state::horizon(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &horizon_state::horizon_io);
 
 	// devices
-	I8251(config, m_usart_l, 0);
+	I8251(config, m_usart_l);
 	m_usart_l->txd_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_usart_l->dtr_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart_l->rts_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
@@ -201,7 +201,7 @@ void horizon_state::horizon(machine_config &config)
 	rs232a.dsr_handler().set(m_usart_l, FUNC(i8251_device::write_dsr));
 	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	I8251(config, m_usart_r, 0);
+	I8251(config, m_usart_r);
 	m_usart_r->txd_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
 	m_usart_r->dtr_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart_r->rts_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));

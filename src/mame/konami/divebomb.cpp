@@ -690,14 +690,14 @@ void divebomb_state::divebomb(machine_config &config)
 	GENERIC_LATCH_8(config, m_roz2fg_latch);
 	m_roz2fg_latch->data_pending_callback().set(m_fgcpu_irq, FUNC(input_merger_any_high_device::in_w<1>));
 
-	K051316(config, m_k051316[0], 0);
+	K051316(config, m_k051316[0]);
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_bpp(8);
 	m_k051316[0]->set_wrap(0);
 	m_k051316[0]->set_offsets(-88, -16);
 	m_k051316[0]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_1));
 
-	K051316(config, m_k051316[1], 0);
+	K051316(config, m_k051316[1]);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_bpp(8);
 	m_k051316[1]->set_wrap(0);

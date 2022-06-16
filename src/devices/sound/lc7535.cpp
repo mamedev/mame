@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(LC7535, lc7535_device, "lc7535", "Sanyo LC7535")
 //  lc7535_device - constructor
 //-------------------------------------------------
 
-lc7535_device::lc7535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+lc7535_device::lc7535_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, LC7535, tag, owner, clock),
 	m_select_cb(*this),
 	m_volume_cb(*this),

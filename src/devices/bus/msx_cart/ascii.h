@@ -18,7 +18,7 @@ DECLARE_DEVICE_TYPE(MSX_CART_MSXWRITE,     msx_cart_msxwrite_device)
 class msx_cart_ascii8_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_ascii8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_ascii8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void initialize_cartridge() override;
 
@@ -43,7 +43,7 @@ private:
 class msx_cart_ascii16_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_ascii16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_ascii16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void initialize_cartridge() override;
 
@@ -68,7 +68,7 @@ private:
 class msx_cart_ascii8_sram_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_ascii8_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_ascii8_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void initialize_cartridge() override;
 
@@ -96,7 +96,7 @@ private:
 class msx_cart_ascii16_sram_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_ascii16_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_ascii16_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void initialize_cartridge() override;
 
@@ -124,7 +124,7 @@ private:
 class msx_cart_msxwrite_device : public device_t, public msx_cart_interface
 {
 public:
-	msx_cart_msxwrite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msx_cart_msxwrite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void initialize_cartridge() override;
 

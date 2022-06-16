@@ -30,7 +30,7 @@ class a2065_device : public device_t, public device_zorro2_card_interface, publi
 {
 public:
 	// construction/destruction
-	a2065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2065_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t host_ram_r(offs_t offset);
 	void host_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

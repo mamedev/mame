@@ -7,7 +7,7 @@
 class starfield_05xx_device : public device_t
 {
 public:
-	starfield_05xx_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	starfield_05xx_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	void enable_starfield(uint8_t on);
 	void set_scroll_speed(uint8_t index_x, uint8_t index_y);

@@ -175,7 +175,7 @@ const tiny_rom_entry *bbc_tube_rc65816_device::device_rom_region() const
 //  bbc_tube_rc6502_device - constructor
 //-------------------------------------------------
 
-bbc_tube_rc6502_device::bbc_tube_rc6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_rc6502_device::bbc_tube_rc6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_tube_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
@@ -188,12 +188,12 @@ bbc_tube_rc6502_device::bbc_tube_rc6502_device(const machine_config &mconfig, de
 {
 }
 
-bbc_tube_rc6502_device::bbc_tube_rc6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_rc6502_device::bbc_tube_rc6502_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_rc6502_device(mconfig, BBC_TUBE_RC6502, tag, owner, clock)
 {
 }
 
-bbc_tube_rc65816_device::bbc_tube_rc65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_rc65816_device::bbc_tube_rc65816_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_rc6502_device(mconfig, BBC_TUBE_RC65816, tag, owner, clock)
 {
 }

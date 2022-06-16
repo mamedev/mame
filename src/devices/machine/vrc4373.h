@@ -13,13 +13,13 @@
 class vrc4373_device : public pci_host_device {
 public:
 	template <typename T>
-	vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: vrc4373_device(mconfig, tag, owner, clock)
+	vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: vrc4373_device(mconfig, tag, owner)
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
 
-	vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,

@@ -295,7 +295,7 @@ void pensebem2017_state::pensebem2017(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 ROM_START( pbem2017 )

@@ -197,12 +197,12 @@ ioport_constructor isa8_pgc_device::device_input_ports() const
 //  isa8_pgc_device - constructor
 //-------------------------------------------------
 
-isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_pgc_device(mconfig, ISA8_PGC, tag, owner, clock)
 {
 }
 
-isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),

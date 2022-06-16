@@ -7,7 +7,7 @@ const uint8_t manufacturer_id = 0xfe;
 
 DEFINE_DEVICE_TYPE(MSX_S1985, msx_s1985_device, "msx_s1985", "MSX-Engine S1985")
 
-msx_s1985_device::msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_s1985_device::msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_S1985, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_selected(false)

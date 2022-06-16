@@ -40,7 +40,7 @@ public:
 	typedef delegate<void (philips_22vp931_device &, int)> data_ready_delegate;
 
 	// construction/destruction
-	philips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	philips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// input and output
 	void data_w(uint8_t data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(philips_22vp931_device::process_deferred_data), this), data); }

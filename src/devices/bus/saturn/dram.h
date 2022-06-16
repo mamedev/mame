@@ -20,7 +20,7 @@ public:
 
 protected:
 	// construction/destruction
-	saturn_dram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cart_type);
+	saturn_dram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int cart_type);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -31,14 +31,14 @@ class saturn_dram8mb_device : public saturn_dram_device
 {
 public:
 	// construction/destruction
-	saturn_dram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_dram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class saturn_dram32mb_device : public saturn_dram_device
 {
 public:
 	// construction/destruction
-	saturn_dram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_dram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

@@ -103,7 +103,7 @@ ioport_constructor qimi_device::device_input_ports() const
 //  qimi_device - constructor
 //-------------------------------------------------
 
-qimi_device::qimi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+qimi_device::qimi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, QIMI, tag, owner, clock),
 	m_write_extint(*this),
 	m_buttons(*this, "mouse_buttons"),

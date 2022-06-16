@@ -67,7 +67,7 @@ void chameleonrx1_state::machine_reset()
 void chameleonrx1_state::chameleonrx1(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM4(config, m_maincpu, 100000000); // actually 2.66 GHz
+	PENTIUM4(config, m_maincpu, XTAL::u(100000000)); // actually 2.66 GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &chameleonrx1_state::chameleonrx1_map);
 
 	/* video hardware */

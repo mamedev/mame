@@ -22,7 +22,7 @@ class hp98032_io_card_device : public device_t, public device_hp9845_io_interfac
 {
 public:
 	// construction/destruction
-	hp98032_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp98032_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~hp98032_io_card_device();
 
 protected:
@@ -67,7 +67,7 @@ class hp98032_gpio_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	hp98032_gpio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp98032_gpio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~hp98032_gpio_slot_device();
 
 	// Bits in jumper configuration
@@ -163,7 +163,7 @@ class hp98032_gpio_loopback_device : public device_t, public device_hp98032_gpio
 {
 public:
 	// construction/destruction
-	hp98032_gpio_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp98032_gpio_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~hp98032_gpio_loopback_device();
 
 	virtual uint16_t get_jumpers() const override;

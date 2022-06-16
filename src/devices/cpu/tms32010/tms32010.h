@@ -35,7 +35,7 @@ class tms32010_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto bio() { return m_bio_in.bind(); }
@@ -43,7 +43,7 @@ public:
 	void tms32010_ram(address_map &map);
 	void tms32015_ram(address_map &map);
 protected:
-	tms32010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map, int addr_mask);
+	tms32010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor data_map, int addr_mask);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -191,7 +191,7 @@ class tms32015_device : public tms32010_device
 {
 public:
 	// construction/destruction
-	tms32015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms32015_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -199,7 +199,7 @@ class tms32016_device : public tms32010_device
 {
 public:
 	// construction/destruction
-	tms32016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms32016_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

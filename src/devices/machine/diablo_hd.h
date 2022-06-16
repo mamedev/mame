@@ -19,7 +19,7 @@ DECLARE_DEVICE_TYPE(DIABLO_HD, diablo_hd_device)
 class diablo_hd_device : public device_t
 {
 public:
-	diablo_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	diablo_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~diablo_hd_device();
 
 	static const int DIABLO_UNIT_MAX = 2;           //!< max number of drive units

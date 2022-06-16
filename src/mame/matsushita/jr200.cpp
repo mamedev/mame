@@ -346,7 +346,7 @@ void jr200_state::jr200_beep_freq_w(offs_t offset, uint8_t data)
 	if (beep_freq)
 		m_beeper->set_clock(84000 / beep_freq);
 	else
-		m_beeper->set_clock(0);
+		m_beeper->set_clock(XTAL::u(0));
 }
 
 void jr200_state::jr200_border_col_w(uint8_t data)
@@ -622,7 +622,7 @@ void jr200_state::jr200(machine_config &config)
 
 	// All sounds are produced by the MN1271
 
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS,"mono",0.50);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS,"mono",0.50);
 }
 
 

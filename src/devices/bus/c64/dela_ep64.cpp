@@ -37,7 +37,7 @@ void c64_dela_ep64_cartridge_device::device_add_mconfig(machine_config &config)
 //  c64_dela_ep64_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_dela_ep64_cartridge_device::c64_dela_ep64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_dela_ep64_cartridge_device::c64_dela_ep64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_DELA_EP64, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_eprom1(*this, "eprom1"),

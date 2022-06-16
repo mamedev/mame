@@ -198,7 +198,7 @@ class sega005_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	emu_timer *m_sega005_sound_timer;
 	sound_stream *m_sega005_stream;

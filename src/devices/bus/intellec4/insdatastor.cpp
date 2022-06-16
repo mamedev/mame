@@ -166,7 +166,7 @@ class imm4_22_device
 		, public device_image_interface
 {
 public:
-	imm4_22_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	imm4_22_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -208,7 +208,7 @@ private:
 };
 
 
-imm4_22_device::imm4_22_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+imm4_22_device::imm4_22_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, INTELLEC4_INST_DATA_STORAGE, tag, owner, clock)
 	, bus::intellec4::device_univ_card_interface(mconfig, *this)
 	, device_image_interface(mconfig, *this)

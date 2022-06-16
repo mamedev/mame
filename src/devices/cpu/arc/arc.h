@@ -21,7 +21,7 @@ class arc_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	arc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

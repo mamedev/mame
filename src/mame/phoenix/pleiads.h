@@ -10,7 +10,7 @@
 class pleiads_sound_device : public device_t, public device_sound_interface
 {
 public:
-	pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void control_a_w(uint8_t data);
 	void control_b_w(uint8_t data);
@@ -45,7 +45,7 @@ protected:
 		int freq = 0;
 	};
 
-	pleiads_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pleiads_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -98,7 +98,7 @@ protected:
 class naughtyb_sound_device : public pleiads_sound_device
 {
 public:
-	naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides
@@ -112,7 +112,7 @@ protected:
 class popflame_sound_device : public pleiads_sound_device
 {
 public:
-	popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides

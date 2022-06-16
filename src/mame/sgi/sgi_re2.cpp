@@ -49,7 +49,7 @@ static u32 const regmask[] =
 
 DEFINE_DEVICE_TYPE(SGI_RE2, sgi_re2_device, "sgi_re2", "SGI Raster Engine 2")
 
-sgi_re2_device::sgi_re2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+sgi_re2_device::sgi_re2_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SGI_RE2, tag, owner, clock)
 	, m_xmap(*this, "^xmap%u", 0U)
 	, m_cursor(*this, "^cursor%u", 0U)

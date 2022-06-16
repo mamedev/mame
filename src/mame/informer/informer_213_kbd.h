@@ -26,7 +26,7 @@ class informer_213_kbd_hle_device : public device_t,
 {
 public:
 	// construction/destruction
-	informer_213_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	informer_213_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callbacks
 	auto int_handler() { return m_int_handler.bind(); }

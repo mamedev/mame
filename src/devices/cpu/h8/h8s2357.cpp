@@ -10,7 +10,7 @@ DEFINE_DEVICE_TYPE(H8S2394, h8s2394_device, "h8s2394", "Hitachi H8S/2394")
 DEFINE_DEVICE_TYPE(H8S2392, h8s2392_device, "h8s2392", "Hitachi H8S/2392")
 DEFINE_DEVICE_TYPE(H8S2390, h8s2390_device, "h8s2390", "Hitachi H8S/2390")
 
-h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
+h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t start) :
 	h8s2000_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2357_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -45,32 +45,32 @@ h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-h8s2357_device::h8s2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2357_device::h8s2357_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8s2357_device(mconfig, H8S2357, tag, owner, clock, 0xffdc00)
 {
 }
 
-h8s2352_device::h8s2352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2352_device::h8s2352_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8s2357_device(mconfig, H8S2352, tag, owner, clock, 0xffdc00)
 {
 }
 
-h8s2398_device::h8s2398_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2398_device::h8s2398_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8s2357_device(mconfig, H8S2398, tag, owner, clock, 0xffdc00)
 {
 }
 
-h8s2394_device::h8s2394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2394_device::h8s2394_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8s2357_device(mconfig, H8S2394, tag, owner, clock, 0xff7c00)
 {
 }
 
-h8s2392_device::h8s2392_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2392_device::h8s2392_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8s2357_device(mconfig, H8S2392, tag, owner, clock, 0xffdc00)
 {
 }
 
-h8s2390_device::h8s2390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+h8s2390_device::h8s2390_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	h8s2357_device(mconfig, H8S2390, tag, owner, clock, 0xffec00)
 {
 }

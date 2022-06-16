@@ -52,14 +52,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	snes_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: snes_control_port_device(mconfig, tag, owner, 0)
+		: snes_control_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~snes_control_port_device();
 
 	template <typename... T> void set_onscreen_callback(T &&... args) { m_onscreen_cb.set(std::forward<T>(args)...); }

@@ -326,14 +326,14 @@ void konamigq_state::konamigq(machine_config &config)
 	m_dasp->set_addrmap(AS_DATA, &konamigq_state::konamigq_dasp_map);
 	m_dasp->set_periodic_int(FUNC(konamigq_state::tms_sync), attotime::from_hz(48000));
 
-	MB89371(config, "mb89371", 0);
+	MB89371(config, "mb89371");
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(konamigq_def_eeprom, 128);
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
-	AM53CF96(config, m_am53cf96, 0);
+	AM53CF96(config, m_am53cf96);
 	m_am53cf96->set_scsi_port("scsi");
 	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 

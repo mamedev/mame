@@ -1129,8 +1129,8 @@ void meritm_state::crt250(machine_config &config)
 	m_v9938[1]->set_vram_size(0x20000);
 	//m_v9938[1]->int_cb().set(FUNC(meritm_state::vdp1_interrupt));
 
-	TIMER(config, "vblank_start", 0).configure_scanline(FUNC(meritm_state::vblank_start_tick), "screen", 259, 262);
-	TIMER(config, "vblank_end", 0).configure_scanline(FUNC(meritm_state::vblank_end_tick), "screen", 262, 262);
+	TIMER(config, "vblank_start").configure_scanline(FUNC(meritm_state::vblank_start_tick), "screen", 259, 262);
+	TIMER(config, "vblank_end").configure_scanline(FUNC(meritm_state::vblank_end_tick), "screen", 262, 262);
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_screen_update(FUNC(meritm_state::screen_update));
 
@@ -1162,7 +1162,7 @@ void meritm_state::crt250_crt252_crt258(machine_config &config)
 	NS16550(config, m_uart, UART_CLK);
 	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
 
-	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	MICROTOUCH(config, m_microtouch, XTAL::u(9600)).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
 	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform));
 }
 
@@ -1181,7 +1181,7 @@ void meritm_state::crt260(machine_config &config)
 	NS16550(config, m_uart, UART_CLK);
 	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
 
-	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	MICROTOUCH(config, m_microtouch, XTAL::u(9600)).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
 	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform));
 }
 

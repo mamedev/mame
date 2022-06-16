@@ -93,14 +93,14 @@ void nes_hori4p_device::device_add_mconfig(machine_config &config)
 //  nes_horitwin_device - constructor
 //-------------------------------------------------
 
-nes_horitwin_device::nes_horitwin_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_horitwin_device::nes_horitwin_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_HORITWIN, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_subexp(*this, "subexp%u", 0)
 {
 }
 
-nes_hori4p_device::nes_hori4p_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_hori4p_device::nes_hori4p_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_HORI4P, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_subexp(*this, "subexp%u", 0)

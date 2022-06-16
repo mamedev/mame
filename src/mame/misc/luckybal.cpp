@@ -588,11 +588,11 @@ void luckybal_state::luckybal(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(luckybal_state::input_port_c_r));
 	m_ppi->out_pc_callback().set(FUNC(luckybal_state::output_port_c_w));
 
-	CD4099(config, "latch1", 0);
+	CD4099(config, "latch1");
 
-	CD4099(config, "latch2", 0);
+	CD4099(config, "latch2");
 
-	CD4099(config, "latch3", 0);
+	CD4099(config, "latch3");
 
 	// nvram
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -606,7 +606,7 @@ void luckybal_state::luckybal(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC08(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC08(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 

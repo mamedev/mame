@@ -663,7 +663,7 @@ bool debug_stats::update_display_state(bool key_pressed)
 //  generic_voodoo_device - constructor
 //-------------------------------------------------
 
-generic_voodoo_device::generic_voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
+generic_voodoo_device::generic_voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, voodoo_model model) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_model(model),
@@ -702,7 +702,7 @@ void generic_voodoo_device::device_start()
 
 DEFINE_DEVICE_TYPE(VOODOO_1, voodoo_1_device, "voodoo_1", "3dfx Voodoo Graphics")
 
-voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
+voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, voodoo_model model) :
 	generic_voodoo_device(mconfig, type, tag, owner, clock, model),
 	m_chipmask(1),
 	m_init_enable(0),
@@ -2347,7 +2347,7 @@ u32 voodoo_1_device::reg_swapbuffer_w(u32 chipmask, u32 regnum, u32 data)
 
 	// determine how many cycles to wait; we deliberately overshoot here because
 	// the final count gets updated on the VBLANK
-	return (m_vblank_swap + 1) * clock() / 10;
+	return (m_vblank_swap + 1) * clock().value() / 10;
 }
 
 

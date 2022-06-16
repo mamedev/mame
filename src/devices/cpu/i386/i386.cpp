@@ -44,13 +44,13 @@ DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Intel Pentiu
 DEFINE_DEVICE_TYPE(PENTIUM4,    pentium4_device,    "pentium4",    "Intel Pentium 4")
 
 
-i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i386_device(mconfig, I386, tag, owner, clock, 32, 32, 32)
 {
 }
 
 
-i386_device::i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width)
+i386_device::i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int program_data_width, int program_addr_width, int io_data_width)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0, 32, 12)
@@ -62,75 +62,75 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	set_vtlb_dynamic_entries(32);
 }
 
-i386sx_device::i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i386sx_device::i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i386_device(mconfig, I386SX, tag, owner, clock, 16, 24, 16)
 {
 }
 
-i486_device::i486_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i486_device::i486_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i486_device(mconfig, I486, tag, owner, clock)
 {
 }
 
-i486_device::i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+i486_device::i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: i386_device(mconfig, type, tag, owner, clock, 32, 32, 32)
 {
 }
 
-i486dx4_device::i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i486dx4_device::i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i486_device(mconfig, I486DX4, tag, owner, clock)
 {
 }
 
-pentium_device::pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pentium_device::pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pentium_device(mconfig, PENTIUM, tag, owner, clock)
 {
 }
 
-pentium_device::pentium_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+pentium_device::pentium_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: i386_device(mconfig, type, tag, owner, clock, 32, 32, 32)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb
 	set_vtlb_dynamic_entries(96);
 }
 
-mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: i386_device(mconfig, MEDIAGX, tag, owner, clock, 32, 32, 32)
 {
 }
 
-pentium_pro_device::pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pentium_pro_device::pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pentium_pro_device(mconfig, PENTIUM_PRO, tag, owner, clock)
 {
 }
 
-pentium_pro_device::pentium_pro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+pentium_pro_device::pentium_pro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: pentium_device(mconfig, type, tag, owner, clock)
 {
 }
 
-pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pentium_device(mconfig, PENTIUM_MMX, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
 }
 
-pentium2_device::pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pentium2_device::pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pentium_pro_device(mconfig, PENTIUM2, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
 }
 
-pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pentium_pro_device(mconfig, PENTIUM3, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
 }
 
-pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pentium_device(mconfig, PENTIUM4, tag, owner, clock)
 {
 	// 128 dtlb, 64 itlb

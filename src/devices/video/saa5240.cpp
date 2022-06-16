@@ -98,7 +98,7 @@ const tiny_rom_entry *saa5243e_device::device_rom_region() const
 //  saa5240_device - constructor
 //-------------------------------------------------
 
-saa5240_device::saa5240_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+saa5240_device::saa5240_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_char_rom(*this, "chargen")
@@ -115,17 +115,17 @@ saa5240_device::saa5240_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-saa5240a_device::saa5240a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+saa5240a_device::saa5240a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	saa5240_device(mconfig, SAA5240A, tag, owner, clock)
 {
 }
 
-saa5240b_device::saa5240b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+saa5240b_device::saa5240b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	saa5240_device(mconfig, SAA5240B, tag, owner, clock)
 {
 }
 
-saa5243e_device::saa5243e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+saa5243e_device::saa5243e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	saa5240_device(mconfig, SAA5243E, tag, owner, clock)
 {
 }

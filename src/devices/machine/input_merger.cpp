@@ -110,22 +110,22 @@ TIMER_CALLBACK_MEMBER(input_merger_device::update_state)
 //  SPECIALISATIONS
 //**************************************************************************
 
-input_merger_any_high_device::input_merger_any_high_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+input_merger_any_high_device::input_merger_any_high_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: input_merger_device(mconfig, INPUT_MERGER_ANY_HIGH, tag, owner, clock, u32(0), u32(0), 1)
 {
 }
 
-input_merger_all_high_device::input_merger_all_high_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+input_merger_all_high_device::input_merger_all_high_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: input_merger_device(mconfig, INPUT_MERGER_ALL_HIGH, tag, owner, clock, ~u32(0), ~u32(0), 0)
 {
 }
 
-input_merger_any_low_device::input_merger_any_low_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+input_merger_any_low_device::input_merger_any_low_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: input_merger_device(mconfig, INPUT_MERGER_ANY_LOW, tag, owner, clock, ~u32(0), ~u32(0), 1)
 {
 }
 
-input_merger_all_low_device::input_merger_all_low_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+input_merger_all_low_device::input_merger_all_low_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: input_merger_device(mconfig, INPUT_MERGER_ALL_LOW, tag, owner, clock, u32(0), u32(0), 0)
 {
 }

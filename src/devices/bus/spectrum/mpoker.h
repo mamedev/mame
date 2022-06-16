@@ -21,7 +21,7 @@ class spectrum_mpoker_device : public device_t, public device_spectrum_expansion
 {
 public:
 	// construction/destruction
-	spectrum_mpoker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_mpoker_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(freeze_button);
 

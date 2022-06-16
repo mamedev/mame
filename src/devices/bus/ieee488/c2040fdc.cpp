@@ -70,7 +70,7 @@ const tiny_rom_entry *c2040_fdc_device::device_rom_region() const
 //  c2040_fdc_device - constructor
 //-------------------------------------------------
 
-c2040_fdc_device::c2040_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c2040_fdc_device::c2040_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C2040_FDC, tag, owner, clock),
 	m_write_sync(*this),
 	m_write_ready(*this),

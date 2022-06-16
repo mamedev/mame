@@ -566,8 +566,8 @@ void olibochu_state::olibochu(machine_config &config)
 
 	AY8910(config, "aysnd", 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, "mono", 0.5);
-	clock_device &cvsd_clock(CLOCK(config, "cvsd_clock", 16000));
+	HC55516(config, m_cvsd).add_route(ALL_OUTPUTS, "mono", 0.5);
+	clock_device &cvsd_clock(CLOCK(config, "cvsd_clock", XTAL::u(16000)));
 	cvsd_clock.signal_handler().set(FUNC(olibochu_state::cvsd_tick));
 	cvsd_clock.signal_handler().append(m_cvsd, FUNC(hc55516_device::mclock_w));
 }

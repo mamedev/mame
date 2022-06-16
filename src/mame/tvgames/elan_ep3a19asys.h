@@ -9,7 +9,7 @@
 class elan_ep3a19asys_device : public elan_eu3a05commonsys_device, public device_memory_interface
 {
 public:
-	elan_ep3a19asys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	elan_ep3a19asys_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t elan_eu3a05_dmatrg_r();
 	void elan_eu3a05_dmatrg_w(uint8_t data);

@@ -295,8 +295,7 @@ protected:
 		save_item(NAME(m_palette_bank));
 	}
 
-	template <typename T>
-	void sound_2203(machine_config &config, T ymclk);
+	void sound_2203(machine_config &config, XTAL ymclk);
 
 	void lastday_map(address_map &map);
 	void gulfstrm_map(address_map &map);
@@ -1425,8 +1424,7 @@ u8 dooyong_z80_ym2203_state::unk_r()
 
 ***************************************************************************/
 
-template <typename T>
-void dooyong_z80_ym2203_state::sound_2203(machine_config &config, T ymclk)
+void dooyong_z80_ym2203_state::sound_2203(machine_config &config, XTAL ymclk)
 {
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
@@ -1499,11 +1497,11 @@ void dooyong_z80_ym2203_state::lastday(machine_config &config)
 void dooyong_z80_ym2203_state::gulfstrm(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000);   /* ??? */
+	Z80(config, m_maincpu, XTAL::u(8000000));   /* ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::gulfstrm_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 8000000);  /* ??? */
+	Z80(config, m_audiocpu, XTAL::u(8000000));  /* ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::lastday_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
@@ -1530,7 +1528,7 @@ void dooyong_z80_ym2203_state::gulfstrm(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, gulfstrm)
 
 	/* sound hardware */
-	sound_2203(config, 1'500'000); /* 3.579545MHz */
+	sound_2203(config, XTAL::u(1'500'000)); /* 3.579545MHz */
 }
 
 void dooyong_z80_ym2203_state::pollux(machine_config &config)
@@ -1567,17 +1565,17 @@ void dooyong_z80_ym2203_state::pollux(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, pollux)
 
 	/* sound hardware */
-	sound_2203(config, 1'500'000); /* 1.5MHz verified */
+	sound_2203(config, XTAL::u(1'500'000)); /* 1.5MHz verified */
 }
 
 void dooyong_z80_state::bluehawk(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000);   /* ??? */
+	Z80(config, m_maincpu, XTAL::u(8000000));   /* ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);  /* ??? */
+	Z80(config, m_audiocpu, XTAL::u(4000000));  /* ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)

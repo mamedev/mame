@@ -63,54 +63,54 @@ DEFINE_DEVICE_TYPE(BBC_PALMO2, bbc_palmo2_device, "bbc_palmo2", "Instant Mini Of
 //  bbc_palprom_device - constructor
 //-------------------------------------------------
 
-bbc_pal_device::bbc_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_pal_device::bbc_pal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_rom_interface(mconfig, *this)
 	, m_bank(0)
 {
 }
 
-bbc_cciword_device::bbc_cciword_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_cciword_device::bbc_cciword_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_pal_device(mconfig, BBC_CCIWORD, tag, owner, clock)
 {
 }
 
-bbc_ccibase_device::bbc_ccibase_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_ccibase_device::bbc_ccibase_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_pal_device(mconfig, BBC_CCIBASE, tag, owner, clock)
 {
 }
 
-bbc_ccispell_device::bbc_ccispell_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_ccispell_device::bbc_ccispell_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_pal_device(mconfig, BBC_CCISPELL, tag, owner, clock)
 {
 }
 
-bbc_palqst_device::bbc_palqst_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_palqst_device::bbc_palqst_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_pal_device(mconfig, BBC_PALQST, tag, owner, clock)
 {
 }
 
-bbc_palwap_device::bbc_palwap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_palwap_device::bbc_palwap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_pal_device(mconfig, BBC_PALWAP, tag, owner, clock)
 {
 }
 
-bbc_palted_device::bbc_palted_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_palted_device::bbc_palted_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_pal_device(mconfig, BBC_PALTED, tag, owner, clock)
 {
 }
 
-bbc_palabep_device::bbc_palabep_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_palabep_device::bbc_palabep_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_pal_device(mconfig, BBC_PALABEP, tag, owner, clock)
 {
 }
 
-bbc_palabe_device::bbc_palabe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_palabe_device::bbc_palabe_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_pal_device(mconfig, BBC_PALABE, tag, owner, clock)
 {
 }
 
-bbc_palmo2_device::bbc_palmo2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_palmo2_device::bbc_palmo2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_pal_device(mconfig, BBC_PALMO2, tag, owner, clock)
 {
 }

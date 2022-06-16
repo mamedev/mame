@@ -101,7 +101,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK          (10000000)
+#define MASTER_CLOCK          XTAL::u(10000000)
 
 #define PIXEL_CLOCK           (MASTER_CLOCK/2)
 #define HTOTAL                (320)
@@ -413,7 +413,7 @@ void cloud9_state::cloud9(machine_config &config)
 	PALETTE(config, m_palette).set_entries(64);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((double)PIXEL_CLOCK / (double)VTOTAL / (double)HTOTAL);
+	m_screen->set_refresh_hz(PIXEL_CLOCK.dvalue() / (double)VTOTAL / (double)HTOTAL);
 	m_screen->set_size(HTOTAL, VTOTAL);
 	m_screen->set_vblank_time(0);          /* VBLANK is handled manually */
 	m_screen->set_visarea(0, 255, 0, 231);

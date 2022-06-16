@@ -11,7 +11,7 @@ class m68ec040_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68ec040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	m68ec040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -26,7 +26,7 @@ class m68lc040_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68lc040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	m68lc040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -41,7 +41,7 @@ class m68040_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	m68040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 

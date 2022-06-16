@@ -370,27 +370,27 @@ void sm7238_state::sm7238(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_sm7238);
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	PIT8253(config, m_t_hblank, 0);
+	PIT8253(config, m_t_hblank);
 	m_t_hblank->set_clk<1>(16.384_MHz_XTAL / 9); // FIXME -- keyboard is slower and doesn't sync otherwise
 	m_t_hblank->out_handler<1>().set(FUNC(sm7238_state::write_keyboard_clock));
 
-	PIT8253(config, m_t_vblank, 0);
+	PIT8253(config, m_t_vblank);
 	m_t_vblank->set_clk<2>(16.5888_MHz_XTAL / 9);
 	m_t_vblank->out_handler<2>().set(FUNC(sm7238_state::write_printer_clock));
 
-	PIT8253(config, m_t_color, 0);
+	PIT8253(config, m_t_color);
 
-	PIT8253(config, m_t_iface, 0);
+	PIT8253(config, m_t_iface);
 	m_t_iface->set_clk<1>(16.5888_MHz_XTAL / 9);
 	m_t_iface->out_handler<1>().set(m_i8251line, FUNC(i8251_device::write_txc));
 	m_t_iface->set_clk<2>(16.5888_MHz_XTAL / 9);
 	m_t_iface->out_handler<2>().set(m_i8251line, FUNC(i8251_device::write_rxc));
 
 	// serial connection to host
-	I8251(config, m_i8251line, 0);
+	I8251(config, m_i8251line);
 	m_i8251line->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_i8251line->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_i8251line->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -402,16 +402,16 @@ void sm7238_state::sm7238(machine_config &config)
 	rs232.dsr_handler().set(m_i8251line, FUNC(i8251_device::write_dsr));
 
 	// serial connection to KM-035 keyboard
-	I8251(config, m_i8251kbd, 0);
+	I8251(config, m_i8251kbd);
 	m_i8251kbd->txd_handler().set(m_keyboard, FUNC(km035_device::write_rxd));
 	m_i8251kbd->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 
-	KM035(config, m_keyboard, 0);
+	KM035(config, m_keyboard);
 	m_keyboard->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
 	m_keyboard->rts_handler().set(m_i8251kbd, FUNC(i8251_device::write_cts));
 
 	// serial connection to printer
-	I8251(config, m_i8251prn, 0);
+	I8251(config, m_i8251prn);
 	m_i8251prn->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir3_w));
 
 	rs232_port_device &prtr(RS232_PORT(config, "prtr", default_rs232_devices, nullptr));

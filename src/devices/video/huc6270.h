@@ -16,7 +16,7 @@ class huc6270_device : public device_t
 {
 public:
 	// construction/destruction
-	huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_vram_size(uint32_t vram_size) { m_vram_size = vram_size; }
 	auto irq() { return m_irq_changed_cb.bind(); }

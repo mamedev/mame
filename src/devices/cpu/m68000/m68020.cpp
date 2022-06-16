@@ -36,7 +36,7 @@ std::unique_ptr<util::disasm_interface> m68020hmmu_device::create_disassembler()
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68020);
 }
 
-m68020_device::m68020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+m68020_device::m68020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m68000_base_device(mconfig, tag, owner, clock, M68020, 32,32)
 {
 }
@@ -48,7 +48,7 @@ void m68020_device::device_start()
 }
 
 
-m68020fpu_device::m68020fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+m68020fpu_device::m68020fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m68000_base_device(mconfig, tag, owner, clock, M68020FPU, 32,32)
 {
 }
@@ -60,7 +60,7 @@ void m68020fpu_device::device_start()
 }
 
 // 68020 with 68851 PMMU
-m68020pmmu_device::m68020pmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+m68020pmmu_device::m68020pmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m68000_base_device(mconfig, tag, owner, clock, M68020PMMU, 32,32)
 {
 }
@@ -86,7 +86,7 @@ bool m68020hmmu_device::memory_translate(int space, int intention, offs_t &addre
 
 // 68020 with Apple HMMU & 68881 FPU
 //      case CPUINFO_FCT_TRANSLATE: info->translate = CPU_TRANSLATE_NAME(m68khmmu);     break;
-m68020hmmu_device::m68020hmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+m68020hmmu_device::m68020hmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m68000_base_device(mconfig, tag, owner, clock, M68020HMMU, 32,32)
 {
 }
@@ -98,7 +98,7 @@ void m68020hmmu_device::device_start()
 }
 
 
-m68ec020_device::m68ec020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+m68ec020_device::m68ec020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m68000_base_device(mconfig, tag, owner, clock, M68EC020, 32,24)
 {
 }

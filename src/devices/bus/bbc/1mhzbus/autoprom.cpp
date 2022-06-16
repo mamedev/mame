@@ -96,7 +96,7 @@ const tiny_rom_entry *bbc_autoprom_device::device_rom_region() const
 //  bbc_autoprom_device - constructor
 //-------------------------------------------------
 
-bbc_autoprom_device::bbc_autoprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_autoprom_device::bbc_autoprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_AUTOPROM, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_autorun(*this, "autorun")

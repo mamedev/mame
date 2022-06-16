@@ -100,7 +100,7 @@ DEFINE_DEVICE_TYPE(V9938, v9938_device, "v9938", "Yamaha V9938 VDP")
 DEFINE_DEVICE_TYPE(V9958, v9958_device, "v9958", "Yamaha V9958 VDP")
 
 
-v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int model)
+v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int model)
 :   device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_palette_interface(mconfig, *this),
@@ -135,12 +135,12 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	set_addrmap(AS_DATA, address_map_constructor(FUNC(v99x8_device::memmap), this));
 }
 
-v9938_device::v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+v9938_device::v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 : v99x8_device(mconfig, V9938, tag, owner, clock, MODEL_V9938)
 {
 }
 
-v9958_device::v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+v9958_device::v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 : v99x8_device(mconfig, V9958, tag, owner, clock, MODEL_V9958)
 {
 }

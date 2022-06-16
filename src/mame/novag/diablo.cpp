@@ -301,7 +301,7 @@ void diablo_state::diablo68k(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(diablo_state::lcd_palette), 3);
 
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd);
 	m_lcd->set_lcd_size(2, 8);
 	m_lcd->set_pixel_update_cb(FUNC(diablo_state::lcd_pixel_update));
 

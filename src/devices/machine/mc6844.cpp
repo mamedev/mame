@@ -77,7 +77,7 @@ DEFINE_DEVICE_TYPE(MC6844, mc6844_device, "mc6844", "MC6844 DMA")
 //-------------------------------------------------
 //  mc6844_device - constructor
 //-------------------------------------------------
-mc6844_device::mc6844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc6844_device::mc6844_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MC6844, tag, owner, clock)
 	, device_execute_interface(mconfig, *this)
 	, m_out_int_cb(*this)

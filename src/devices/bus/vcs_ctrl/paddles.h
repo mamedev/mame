@@ -26,7 +26,7 @@ class vcs_paddles_device : public device_t,
 {
 public:
 	// construction/destruction
-	vcs_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vcs_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static void reverse_players(device_t *device) { downcast<vcs_paddles_device &>(*device).m_reverse_players = true; }
 

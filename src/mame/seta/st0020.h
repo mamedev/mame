@@ -11,7 +11,7 @@
 class st0020_device : public device_t, public device_gfx_interface
 {
 public:
-	st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_is_st0032(int is_st0032) { m_is_st0032 = is_st0032; }

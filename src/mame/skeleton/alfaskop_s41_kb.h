@@ -16,7 +16,7 @@ public:
 	auto txd_cb() { return m_txd_cb.bind(); }
 	auto leds_cb() { return m_leds_cb.bind(); }
 
-	alfaskop_s41_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	alfaskop_s41_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	DECLARE_INPUT_CHANGED_MEMBER(key);
 	DECLARE_WRITE_LINE_MEMBER(rxd_w);

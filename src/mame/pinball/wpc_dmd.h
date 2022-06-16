@@ -13,7 +13,7 @@
 class wpc_dmd_device : public device_t
 {
 public:
-	wpc_dmd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wpc_dmd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~wpc_dmd_device();
 
 	void registers(address_map &map);

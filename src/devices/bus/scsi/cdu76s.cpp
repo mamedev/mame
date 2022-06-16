@@ -42,7 +42,7 @@ void sony_cdu76s_device::ReadData( uint8_t *data, int dataLength )
 // device type definition
 DEFINE_DEVICE_TYPE(CDU76S, sony_cdu76s_device, "cdu76s", "Sony CDU-76S")
 
-sony_cdu76s_device::sony_cdu76s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sony_cdu76s_device::sony_cdu76s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	scsicd_device(mconfig, CDU76S, tag, owner, clock)
 {
 }

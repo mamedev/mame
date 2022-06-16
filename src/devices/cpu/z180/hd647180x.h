@@ -25,7 +25,7 @@ public:
 	};
 
 	// construction/destruction
-	hd647180x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd647180x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto in_pa_callback() { return m_port_input_cb[0].bind(); }
 	auto in_pb_callback() { return m_port_input_cb[1].bind(); }

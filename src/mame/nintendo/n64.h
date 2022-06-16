@@ -82,7 +82,7 @@ private:
 
 public:
 	// construction/destruction
-	n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t is64_r(offs_t offset);
 	void is64_w(offs_t offset, uint32_t data);
@@ -316,9 +316,9 @@ DECLARE_DEVICE_TYPE(N64PERIPH, n64_periphs)
 
 /*----------- defined in video/n64.c -----------*/
 
-#define DACRATE_NTSC    (48681812)
-#define DACRATE_PAL (49656530)
-#define DACRATE_MPAL    (48628316)
+#define DACRATE_NTSC    XTAL::u(48681812)
+#define DACRATE_PAL XTAL::u(49656530)
+#define DACRATE_MPAL    XTAL::u(48628316)
 
 /*----------- defined in machine/n64.c -----------*/
 

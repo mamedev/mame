@@ -345,12 +345,12 @@ void battlnts_state::battlnts(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_battlnts);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 128);
 
-	K007342(config, m_k007342, 0);
+	K007342(config, m_k007342);
 	m_k007342->set_gfxnum(0);
 	m_k007342->set_tile_callback(FUNC(battlnts_state::tile_callback));
 	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
-	K007420(config, m_k007420, 0);
+	K007420(config, m_k007420);
 	m_k007420->set_bank_limit(0x3ff);
 	m_k007420->set_sprite_callback(FUNC(battlnts_state::sprite_callback));
 	m_k007420->set_palette_tag("palette");

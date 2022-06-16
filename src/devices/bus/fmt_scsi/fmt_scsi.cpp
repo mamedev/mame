@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(FMT_SCSI_SLOT, fmt_scsi_slot_device, "fmt_scsi_slot", "FM Tow
 //  fmt_scsi_slot_device - construction
 //-------------------------------------------------
 
-fmt_scsi_slot_device::fmt_scsi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+fmt_scsi_slot_device::fmt_scsi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, FMT_SCSI_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<fmt_scsi_card_interface>(mconfig, *this)
 	, m_card(nullptr)

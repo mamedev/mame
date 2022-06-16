@@ -317,7 +317,7 @@ void paso1600_state::paso1600(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	AM9517A(config, m_dma, 16000000/4);

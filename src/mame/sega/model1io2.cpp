@@ -180,7 +180,7 @@ void model1io2_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom); // 93C45
 
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 
 	msm6253_device &adc(MSM6253(config, "adc", 32_MHz_XTAL / 16 / 4));
 	adc.set_input_cb<0>(FUNC(model1io2_device::analog0_r));
@@ -199,7 +199,7 @@ void model1io2_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(model1io2_device::lcd_palette), 3);
 
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd);
 	m_lcd->set_lcd_size(2, 20);
 	m_lcd->set_pixel_update_cb(FUNC(model1io2_device::lcd_pixel_update));
 }
@@ -213,7 +213,7 @@ void model1io2_device::device_add_mconfig(machine_config &config)
 //  model1io2_device - constructor
 //-------------------------------------------------
 
-model1io2_device::model1io2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+model1io2_device::model1io2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SEGA_MODEL1IO2, tag, owner, clock),
 	m_eeprom(*this, "eeprom"),
 	m_watchdog(*this, "watchdog"),

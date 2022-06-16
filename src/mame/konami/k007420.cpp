@@ -21,7 +21,7 @@ TODO:
 
 DEFINE_DEVICE_TYPE(K007420, k007420_device, "k007420", "K007420 Sprite Generator")
 
-k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K007420, tag, owner, clock)
 	, m_ram(nullptr)
 	, m_flipscreen(0)

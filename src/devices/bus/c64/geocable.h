@@ -27,7 +27,7 @@ class c64_geocable_device : public device_t, public device_pet_user_port_interfa
 {
 public:
 	// construction/destruction
-	c64_geocable_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64_geocable_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

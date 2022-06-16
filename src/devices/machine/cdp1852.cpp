@@ -39,7 +39,7 @@ enum
 //  cdp1852_device - constructor
 //-------------------------------------------------
 
-cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CDP1852, tag, owner, clock),
 	m_read_mode(*this),
 	m_write_sr(*this),

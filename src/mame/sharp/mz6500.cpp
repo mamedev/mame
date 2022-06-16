@@ -149,7 +149,7 @@ void mz6500_state::upd7220_map(address_map &map)
 void mz6500_state::mz6500(machine_config &config)
 {
 	/* basic machine hardware */
-	I8086(config, m_maincpu, 8000000); //unk clock
+	I8086(config, m_maincpu, XTAL::u(8000000)); //unk clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz6500_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mz6500_state::io_map);
 

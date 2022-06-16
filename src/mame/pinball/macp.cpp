@@ -340,11 +340,11 @@ void macp_state::machine_reset()
 void macp_state::mac16k(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3'800'000);
+	Z80(config, m_maincpu, XTAL::u(3'800'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macp_state::mem16k_map);
 	m_maincpu->set_addrmap(AS_IO, &macp_state::io16k_map);
 
-	clock_device &cpoint_clock(CLOCK(config, "cpoint_clock", 50)); // crosspoint detector
+	clock_device &cpoint_clock(CLOCK(config, "cpoint_clock", XTAL::u(50))); // crosspoint detector
 	cpoint_clock.signal_handler().set(FUNC(macp_state::clock_tick));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -353,7 +353,7 @@ void macp_state::mac16k(machine_config &config)
 	config.set_default_layout(layout_macp);
 
 	//I8279
-	i8279_device &kbdc(I8279(config, "i8279", 3'800'000)); // based on divider
+	i8279_device &kbdc(I8279(config, "i8279", XTAL::u(3'800'000))); // based on divider
 	kbdc.out_sl_callback().set(FUNC(macp_state::scanlines_w));    // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(macp_state::digit_w));      // display A&B
 	kbdc.in_rl_callback().set(FUNC(macp_state::kbd_r));           // kbd RL lines

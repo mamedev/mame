@@ -14,7 +14,7 @@
 class tiamc1_sound_device : public device_t, public device_sound_interface
 {
 public:
-	tiamc1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tiamc1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void tiamc1_timer0_w(offs_t offset, uint8_t data);
 	void tiamc1_timer1_w(offs_t offset, uint8_t data);

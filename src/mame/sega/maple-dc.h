@@ -17,13 +17,13 @@ public:
 	};
 
 	template <typename T>
-	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&cpu_tag)
 		: maple_dc_device(mconfig, tag, owner, clock)
 	{
 		set_maincpu_tag(std::forward<T>(cpu_tag));
 	}
 
-	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	template <typename T> void set_maincpu_tag(T &&cpu_tag) { cpu.set_tag(std::forward<T>(cpu_tag)); }
 	auto irq_callback() { return irq_cb.bind(); }
 

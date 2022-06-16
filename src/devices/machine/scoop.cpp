@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(SCOOP, scoop_device, "scoop", "Sharp SCOOP peripheral interface")
 
-scoop_device::scoop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scoop_device::scoop_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SCOOP, tag, owner, clock)
 	, m_gpio_out(*this)
 {

@@ -103,7 +103,7 @@ ioport_constructor sms_sports_pad_jp_device::device_input_ports() const
 //  sms_sports_pad_jp_device - constructor
 //-------------------------------------------------
 
-sms_sports_pad_jp_device::sms_sports_pad_jp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sms_sports_pad_jp_device::sms_sports_pad_jp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SMS_SPORTS_PAD_JP, tag, owner, clock),
 	device_sms_control_port_interface(mconfig, *this),
 	m_sports_jp_in(*this, "SPORTS_JP_IN"),

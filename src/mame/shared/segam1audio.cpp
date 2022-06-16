@@ -52,7 +52,7 @@ DEFINE_DEVICE_TYPE(SEGAM1AUDIO, segam1audio_device, "segam1audio", "Sega Model 1
 
 void segam1audio_device::device_add_mconfig(machine_config &config)
 {
-	M68000(config, m_audiocpu, 10000000);  // verified on real h/w
+	M68000(config, m_audiocpu, XTAL::u(10000000));  // verified on real h/w
 	m_audiocpu->set_addrmap(AS_PROGRAM, &segam1audio_device::segam1audio_map);
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -76,7 +76,7 @@ void segam1audio_device::device_add_mconfig(machine_config &config)
 	m_uart->rxrdy_handler().set_inputline(m_audiocpu, M68K_IRQ_2);
 	m_uart->txd_handler().set(FUNC(segam1audio_device::output_txd));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(500000))); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 }
@@ -89,7 +89,7 @@ void segam1audio_device::device_add_mconfig(machine_config &config)
 //  segam1audio_device - constructor
 //-------------------------------------------------
 
-segam1audio_device::segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+segam1audio_device::segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SEGAM1AUDIO, tag, owner, clock),
 	m_audiocpu(*this, "sndcpu"),
 	m_multipcm_1(*this, "pcm1"),

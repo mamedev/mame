@@ -130,7 +130,7 @@ public:
 
 protected:
 	// construction/destruction
-	dcs_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rev);
+	dcs_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int rev);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -259,7 +259,7 @@ class dcs_audio_2k_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -276,7 +276,7 @@ class dcs_audio_2k_uart_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -292,7 +292,7 @@ class dcs_audio_8k_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -308,7 +308,7 @@ class dcs_audio_wpc_device : public dcs_audio_device
 {
 public:
 	// construction/destruction
-	dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void dcs_wpc_data_map(address_map &map);
 protected:
@@ -326,7 +326,7 @@ class dcs2_audio_device : public dcs_audio_device
 {
 protected:
 	// construction/destruction
-	dcs2_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	dcs2_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -339,7 +339,7 @@ class dcs2_audio_2115_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -355,7 +355,7 @@ class dcs2_audio_2104_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -371,7 +371,7 @@ class dcs2_audio_dsio_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -386,7 +386,7 @@ class dcs2_audio_denver_device : public dcs2_audio_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_denver_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	dcs2_audio_denver_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -396,7 +396,7 @@ class dcs2_audio_denver_5ch_device : public dcs2_audio_denver_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_denver_5ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dcs2_audio_denver_5ch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -406,7 +406,7 @@ class dcs2_audio_denver_2ch_device : public dcs2_audio_denver_device
 {
 public:
 	// construction/destruction
-	dcs2_audio_denver_2ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dcs2_audio_denver_2ch_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;

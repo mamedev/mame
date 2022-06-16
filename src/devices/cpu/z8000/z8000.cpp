@@ -23,13 +23,13 @@ DEFINE_DEVICE_TYPE(Z8001, z8001_device, "z8001", "Zilog Z8001")
 DEFINE_DEVICE_TYPE(Z8002, z8002_device, "z8002", "Zilog Z8002")
 
 
-z8002_device::z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z8002_device::z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z8002_device(mconfig, Z8002, tag, owner, clock, 16, 1)
 {
 }
 
 
-z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int vecmult)
+z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int addrbits, int vecmult)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 16, addrbits, 0)
@@ -45,7 +45,7 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 }
 
 
-z8001_device::z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z8001_device::z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z8002_device(mconfig, Z8001, tag, owner, clock, 23, 2)
 {
 }

@@ -26,7 +26,7 @@ dooyong_tilemap_device_base::dooyong_tilemap_device_base(
 		device_type type,
 		char const *tag,
 		device_t *owner,
-		u32 clock)
+		const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_gfxnum(0)
@@ -49,7 +49,7 @@ void dooyong_tilemap_device_base::set_palette_bank(u16 bank)
 	}
 }
 
-dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: dooyong_rom_tilemap_device(mconfig, DOOYONG_ROM_TILEMAP, tag, owner, clock)
 {
 }
@@ -59,7 +59,7 @@ dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(
 		device_type type,
 		char const *tag,
 		device_t *owner,
-		u32 clock)
+		const XTAL &clock)
 	: dooyong_tilemap_device_base(mconfig, type, tag, owner, clock)
 	, m_rows(8)
 	, m_tilerom(*this, finder_base::DUMMY_TAG)
@@ -182,7 +182,7 @@ TILE_GET_INFO_MEMBER(dooyong_rom_tilemap_device::tile_info)
 }
 
 
-rshark_rom_tilemap_device::rshark_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+rshark_rom_tilemap_device::rshark_rom_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: dooyong_rom_tilemap_device(mconfig, RSHARK_ROM_TILEMAP, tag, owner, clock)
 	, m_colorrom(*this, finder_base::DUMMY_TAG)
 	, m_colorrom_offset(0)
@@ -212,7 +212,7 @@ TILE_GET_INFO_MEMBER(rshark_rom_tilemap_device::tile_info)
 }
 
 
-dooyong_ram_tilemap_device::dooyong_ram_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+dooyong_ram_tilemap_device::dooyong_ram_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: dooyong_tilemap_device_base(mconfig, DOOYONG_RAM_TILEMAP, tag, owner, clock)
 	, m_tileram()
 {

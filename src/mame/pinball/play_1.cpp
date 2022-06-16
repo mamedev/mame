@@ -566,7 +566,7 @@ WRITE_LINE_MEMBER( play_1_state::clock_w )
 void play_1_state::play_1(machine_config &config)
 {
 	/* basic machine hardware */
-	CDP1802(config, m_maincpu, 400000); // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
+	CDP1802(config, m_maincpu, XTAL::u(400000)); // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &play_1_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &play_1_state::io_map);
 	m_maincpu->wait_cb().set(FUNC(play_1_state::wait_r));
@@ -580,14 +580,14 @@ void play_1_state::play_1(machine_config &config)
 	/* Video */
 	config.set_default_layout(layout_play_1);
 
-	clock_device &xpoint(CLOCK(config, "xpoint", 100)); // crossing-point detector
+	clock_device &xpoint(CLOCK(config, "xpoint", XTAL::u(100))); // crossing-point detector
 	xpoint.signal_handler().set(FUNC(play_1_state::clock_w));
 
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	CLOCK(config, m_monotone, 0); // sound device
+	CLOCK(config, m_monotone); // sound device
 	m_monotone->signal_handler().set("speaker", FUNC(speaker_sound_device::level_w));
 }
 

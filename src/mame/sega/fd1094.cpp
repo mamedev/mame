@@ -552,7 +552,7 @@ uint16_t *fd1094_decryption_cache::decrypted_opcodes(uint8_t state)
 //-------------------------------------------------
 
 
-fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: m68000_device(mconfig, FD1094, tag, owner, clock)
 	, m_decrypted_opcodes_bank(*this, "^fd1094_decrypted_opcodes")
 	, m_state(0x00)

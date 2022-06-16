@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(IREM_M62_AUDIO,        m62_audio_device,        "m62_audio", 
 DEFINE_DEVICE_TYPE(IREM_M52_SOUNDC_AUDIO, m52_soundc_audio_device, "m52_soundc_audio", "Irem M52 SoundC Audio")
 DEFINE_DEVICE_TYPE(IREM_M52_LARGE_AUDIO,  m52_large_audio_device,  "m52_large_audio",  "Irem M52 Large Audio")
 
-irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_audio_SINH(*this, "snd_nl:sinh")
 	, m_cpu(*this, "iremsound")
@@ -36,17 +36,17 @@ irem_audio_device::irem_audio_device(const machine_config &mconfig, device_type 
 {
 }
 
-m62_audio_device::m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m62_audio_device::m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: irem_audio_device(mconfig, IREM_M62_AUDIO, tag, owner, clock)
 {
 }
 
-m52_soundc_audio_device::m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m52_soundc_audio_device::m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: irem_audio_device(mconfig, IREM_M52_SOUNDC_AUDIO, tag, owner, clock)
 {
 }
 
-m52_large_audio_device::m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m52_large_audio_device::m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: irem_audio_device(mconfig, IREM_M52_LARGE_AUDIO, tag, owner, clock)
 {
 }
@@ -439,7 +439,7 @@ void m62_audio_device::device_add_mconfig(machine_config &config)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	NETLIST_SOUND(config, "snd_nl", 48000)
+	NETLIST_SOUND(config, "snd_nl", XTAL::u(48000))
 		.set_source(netlist_kidniki)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 

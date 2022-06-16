@@ -246,11 +246,11 @@ void selz80_state::selz80(machine_config &config)
 	m_display->set_segmask(0xff, 0xff);
 
 	/* Devices */
-	CLOCK(config, m_clock, 153'600);
+	CLOCK(config, m_clock, XTAL::u(153'600));
 	m_clock->signal_handler().set("uart", FUNC(i8251_device::write_txc));
 	m_clock->signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart(I8251(config, "uart", 0));
+	i8251_device &uart(I8251(config, "uart"));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

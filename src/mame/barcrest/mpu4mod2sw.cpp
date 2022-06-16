@@ -82,7 +82,7 @@ template<const uint8_t* Table> void mpu4mod2_machines_state::mod2_cheatchr_pal_f
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_characteriser);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(Table);
@@ -96,7 +96,7 @@ template<uint8_t Fixed> void mpu4mod2_machines_state::mod2_bootleg_fixedret_f(ma
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_bootleg_characteriser);
 
-	MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+	MPU4_CHARACTERISER_BL(config, m_characteriser_bl);
 	m_characteriser_bl->set_bl_fixed_return(Fixed);
 }
 
@@ -123,7 +123,7 @@ void mpu4mod2_machines_state::mod2_chr_blastbnk_f(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_bl_characteriser_blastbank);
 
-	MPU4_CHARACTERISER_BL_BLASTBANK(config, m_characteriser_blastbank, 0);
+	MPU4_CHARACTERISER_BL_BLASTBANK(config, m_characteriser_blastbank);
 }
 
 void mpu4mod2_machines_state::mod2_chr_copcash_f(machine_config &config)
@@ -132,7 +132,7 @@ void mpu4mod2_machines_state::mod2_chr_copcash_f(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4mod2_machines_state::mpu4_memmap_bl_characteriser_blastbank);
 
-	MPU4_CHARACTERISER_BL_BLASTBANK(config, m_characteriser_blastbank, 0);
+	MPU4_CHARACTERISER_BL_BLASTBANK(config, m_characteriser_blastbank);
 	m_characteriser_blastbank->set_retxor(0x03);
 }
 

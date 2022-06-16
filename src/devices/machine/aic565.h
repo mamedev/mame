@@ -21,7 +21,7 @@ class aic565_device : public device_t
 {
 public:
 	// construction/destruction
-	aic565_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	aic565_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callback configuration
 	auto hrst_callback() { return m_hrst_callback.bind(); }

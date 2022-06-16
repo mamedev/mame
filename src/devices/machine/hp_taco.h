@@ -20,7 +20,7 @@ class hp_taco_device : public device_t
 {
 public:
 	// construction/destruction
-	hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	auto irq() { return m_irq_handler.bind(); }
@@ -46,7 +46,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(wr_bit_r);
 
 protected:
-	hp_taco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	hp_taco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

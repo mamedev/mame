@@ -155,7 +155,7 @@
 
 DEFINE_DEVICE_TYPE(K001604, k001604_device, "k001604_device", "K001604 2D tilemaps + 2x ROZ")
 
-k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K001604, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, nullptr),
 	m_tile_ram(nullptr),

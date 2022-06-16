@@ -103,17 +103,17 @@ INPUT_PORTS_END
 
 void lee1220_state::lee1220(machine_config &config)
 {
-	I8085A(config, m_maincpu, 10'000'000); // Intel P8085AH-2
+	I8085A(config, m_maincpu, XTAL::u(10'000'000)); // Intel P8085AH-2
 	m_maincpu->set_addrmap(AS_PROGRAM, &lee1220_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &lee1220_state::io_map);
 
-	AM9517A(config, "dmac", 5'000'000); // Intel P8237A-5
+	AM9517A(config, "dmac", XTAL::u(5'000'000)); // Intel P8237A-5
 
 	I8748(config, "kbdmcu", 5.9904_MHz_XTAL);
 
 	//WD1933(config, m_sdlc); // WDC WD1933PL-11
 
-	i8251_device &usart(I8251(config, "usart", 0)); // NEC D8251AC
+	i8251_device &usart(I8251(config, "usart")); // NEC D8251AC
 	usart.rxrdy_handler().set_inputline(m_maincpu, I8085_RST55_LINE);
 
 	PIT8253(config, "pit"); // Intel D8253-5
@@ -123,7 +123,7 @@ void lee1220_state::lee1220(machine_config &config)
 	screen.set_raw(28'944'000, 1152, 0, 960, 420, 0, 400);
 	screen.set_screen_update(m_crtc, FUNC(hd6845s_device::screen_update));
 
-	HD6845S(config, m_crtc, 2'412'000); // Hitachi HD46505SP/HD6845SP
+	HD6845S(config, m_crtc, XTAL::u(2'412'000)); // Hitachi HD46505SP/HD6845SP
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(12);

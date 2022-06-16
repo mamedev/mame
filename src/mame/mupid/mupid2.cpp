@@ -227,7 +227,7 @@ void mupid2_state::port_c0_w(uint8_t data)
 
 void mupid2_state::c2a2(machine_config &config)
 {
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mupid2_state::maincpu_mem);
 	m_maincpu->set_addrmap(AS_IO, &mupid2_state::maincpu_io);
 
@@ -236,16 +236,16 @@ void mupid2_state::c2a2(machine_config &config)
 	// timing unknown
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(mupid2_state::nmi), attotime::from_hz(5000));
 
-	Z80SIO(config, "sio", 4000000);
+	Z80SIO(config, "sio", XTAL::u(4000000));
 
-	I8035(config, m_kbdcpu, 4000000);
+	I8035(config, m_kbdcpu, XTAL::u(4000000));
 	m_kbdcpu->set_addrmap(AS_PROGRAM, &mupid2_state::kbdcpu_mem);
 	m_kbdcpu->bus_in_cb().set(FUNC(mupid2_state::kbd_bus_r));
 	m_kbdcpu->p1_in_cb().set(FUNC(mupid2_state::kbd_p1_r));
 	m_kbdcpu->p1_out_cb().set(FUNC(mupid2_state::kbd_p1_w));
 	m_kbdcpu->p2_out_cb().set(FUNC(mupid2_state::kbd_p2_w));
 
-	M58990(config, "adc", 1000000);
+	M58990(config, "adc", XTAL::u(1000000));
 
 	PALETTE(config, m_palette, FUNC(mupid2_state::palette_init), 32);
 }

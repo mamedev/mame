@@ -25,7 +25,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(ATARI1050, atari1050_device, "atari1050", "Atari 1050 Dual Density Disk Drive")
 
-atari1050_device::atari1050_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+atari1050_device::atari1050_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ATARI1050, tag, owner, clock)
 	, device_a8sio_card_interface(mconfig, *this)
 	, m_pia(*this, "pia")

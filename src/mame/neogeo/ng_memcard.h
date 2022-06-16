@@ -21,7 +21,7 @@ class ng_memcard_device : public device_t, public device_memcard_image_interface
 {
 public:
 	// construction/destruction
-	ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_image_interface implementation
 	virtual bool is_reset_on_load() const noexcept override { return false; }

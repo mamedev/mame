@@ -491,7 +491,7 @@ void segas18_astormbl_state::astormbl_video(machine_config &config)
 	// see note in segas16a.cpp, also used here for consistency
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(64);
 }
 
@@ -544,7 +544,7 @@ void segas18_astormbl_s18snd_state::sound_w(offs_t offset, uint16_t data, uint16
 
 void segas18_astormbl_s18snd_state::astormbl_sound(machine_config &config)
 {
-	Z80(config, m_soundcpu, 8'000'000);
+	Z80(config, m_soundcpu, XTAL::u(8'000'000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_s18snd_state::sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segas18_astormbl_s18snd_state::sound_portmap);
 
@@ -553,14 +553,14 @@ void segas18_astormbl_s18snd_state::astormbl_sound(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3438_device &ym1(YM3438(config, "ym1", 8'000'000));
+	ym3438_device &ym1(YM3438(config, "ym1", XTAL::u(8'000'000)));
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 	ym1.irq_handler().set_inputline("soundcpu", INPUT_LINE_IRQ0);
 
-	ym3438_device &ym2(YM3438(config, "ym2", 8'000'000));
+	ym3438_device &ym2(YM3438(config, "ym2", XTAL::u(8'000'000)));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", 10'000'000)); // ASSP (RF)5C68A
+	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", XTAL::u(10'000'000))); // ASSP (RF)5C68A
 	rfsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 	rfsnd.set_addrmap(0, &segas18_astormbl_s18snd_state::pcm_map);
 }
@@ -568,7 +568,7 @@ void segas18_astormbl_s18snd_state::astormbl_sound(machine_config &config)
 void segas18_astormbl_s18snd_state::astormbl(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000);
+	M68000(config, m_maincpu, XTAL::u(10000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_s18snd_state::astormbl_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas18_astormbl_s18snd_state::irq4_line_hold));
 

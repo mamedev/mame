@@ -58,7 +58,7 @@ DEFINE_DEVICE_TYPE(TMS34020, tms34020_device, "tms34020", "Texas Instruments TMS
     GLOBAL VARIABLES
 ***************************************************************************/
 
-tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_regs_map, bool is_34020)
+tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_regs_map, bool is_34020)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, is_34020 ? 32 : 16, 32, 3, internal_regs_map)
@@ -95,13 +95,13 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 }
 
 
-tms34010_device::tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms34010_device::tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms340x0_device(mconfig, TMS34010, tag, owner, clock, address_map_constructor(FUNC(tms34010_device::internal_regs_map), this), false)
 {
 }
 
 
-tms34020_device::tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms34020_device::tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms340x0_device(mconfig, TMS34020, tag, owner, clock, address_map_constructor(FUNC(tms34020_device::internal_regs_map), this), true)
 {
 }

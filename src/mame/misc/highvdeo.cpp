@@ -1237,7 +1237,7 @@ void highvdeo_state::tv_vcf(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &highvdeo_state::ramdac_map);
 
 	/* sound hardware */
@@ -1303,7 +1303,7 @@ void highvdeo_state::ciclone(machine_config &config)
 
 void highvdeo_state::brasil(machine_config &config)
 {
-	I80186(config, m_maincpu, 20000000);  // fashion doesn't like 20/2 Mhz
+	I80186(config, m_maincpu, XTAL::u(20000000));  // fashion doesn't like 20/2 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::brasil_map);
 	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::brasil_io);
 
@@ -1334,7 +1334,7 @@ void highvdeo_state::fashion(machine_config &config)
 
 void highvdeo_state::grancapi(machine_config &config)
 {
-	I80186(config, m_maincpu, 20000000);
+	I80186(config, m_maincpu, XTAL::u(20000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::brasil_map);
 	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::grancapi_io);
 
@@ -1373,7 +1373,7 @@ void highvdeo_state::zoomania(machine_config &config)
 
 void highvdeo_state::magicbom(machine_config &config)
 {
-	I80186(config, m_maincpu, 20000000);
+	I80186(config, m_maincpu, XTAL::u(20000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &highvdeo_state::tv_tcf_map);
 	m_maincpu->set_addrmap(AS_IO, &highvdeo_state::magicbom_io);
 

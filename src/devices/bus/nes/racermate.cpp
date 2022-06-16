@@ -35,7 +35,7 @@
 DEFINE_DEVICE_TYPE(NES_RACERMATE, nes_racermate_device, "nes_racermate", "NES Cart Racermate PCB")
 
 
-nes_racermate_device::nes_racermate_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_racermate_device::nes_racermate_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_RACERMATE, tag, owner, clock)
 	, m_latch(0)
 {

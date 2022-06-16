@@ -542,7 +542,7 @@ void fromanc2_state::fromanc2(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.75);
@@ -600,7 +600,7 @@ void fromanc2_state::fromancr(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.75);
@@ -622,7 +622,7 @@ void fromanc2_state::fromanc4(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	NS16550(config, m_uart, 2000000); // actual type is TL16C550CFN; clock unknown
+	NS16550(config, m_uart, XTAL::u(2000000)); // actual type is TL16C550CFN; clock unknown
 	m_uart->out_int_callback().set_inputline("maincpu", M68K_IRQ_2);
 	//m_uart->out_tx_callback().set("link", FUNC(rs232_port_device::write_txd));
 	//m_uart->out_rts_callback().set("link", FUNC(rs232_port_device::write_rts));
@@ -659,7 +659,7 @@ void fromanc2_state::fromanc4(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.75);

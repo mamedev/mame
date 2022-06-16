@@ -49,9 +49,9 @@ class h8_watchdog_device : public device_t {
 public:
 	enum { B, H, S };
 
-	h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int irq, int type)
-		: h8_watchdog_device(mconfig, tag, owner, 0)
+		: h8_watchdog_device(mconfig, tag, owner)
 	{
 		set_info(intc, irq, type);
 	}

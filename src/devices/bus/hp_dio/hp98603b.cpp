@@ -42,12 +42,12 @@ const tiny_rom_entry *dio16_98603b_device::device_rom_region() const
 	return ROM_NAME(hp98603b);
 }
 
-dio16_98603b_device::dio16_98603b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dio16_98603b_device::dio16_98603b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	dio16_98603b_device(mconfig, HPDIO_98603B, tag, owner, clock)
 {
 }
 
-dio16_98603b_device::dio16_98603b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+dio16_98603b_device::dio16_98603b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this)
 {

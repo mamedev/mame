@@ -35,7 +35,7 @@ void c64_speakeasy_cartridge_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	VOTRAX_SC01(config, m_votrax, 720000).add_route(ALL_OUTPUTS, "mono", 0.85);
+	VOTRAX_SC01(config, m_votrax, XTAL::u(720000)).add_route(ALL_OUTPUTS, "mono", 0.85);
 }
 
 
@@ -48,7 +48,7 @@ void c64_speakeasy_cartridge_device::device_add_mconfig(machine_config &config)
 //  c64_speakeasy_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_speakeasy_cartridge_device::c64_speakeasy_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_speakeasy_cartridge_device::c64_speakeasy_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_SPEAKEASY, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_votrax(*this, SC01A_TAG)

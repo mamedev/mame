@@ -197,7 +197,7 @@ void pbo_state::pbo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pbo_state::main_map);
 
 	SCC85C30(config, m_scc, 10_MHz_XTAL); // Unknown PCLK
-	m_scc->configure_channels(4'915'200, 4'915'200, 4'915'200, 4'915'200);
+	m_scc->configure_channels(XTAL::u(4'915'200), XTAL::u(4'915'200), XTAL::u(4'915'200), XTAL::u(4'915'200));
 	m_scc->out_txda_callback().set(m_rs232[0], FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtra_callback().set(m_rs232[0], FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsa_callback().set(m_rs232[0], FUNC(rs232_port_device::write_rts));
@@ -253,7 +253,7 @@ void pbo_state::pbo(machine_config &config)
 	AM7990(config, m_lance);
 	m_lance->intr_out().set(FUNC(pbo_state::net_irq_w));
 
-	MC68681(config, "duart", 3'686'400);
+	MC68681(config, "duart", XTAL::u(3'686'400));
 }
 
 ROM_START( pbo )

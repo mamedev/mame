@@ -33,7 +33,7 @@
 class xavix_sound_device : public device_t, public device_sound_interface
 {
 public:
-	xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto read_regs_callback() { return m_readregs_cb.bind(); }
 	auto read_samples_callback() { return m_readsamples_cb.bind(); }

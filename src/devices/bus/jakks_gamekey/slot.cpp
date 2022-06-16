@@ -54,7 +54,7 @@ void device_jakks_gamekey_interface::rom_alloc(uint32_t size, const char *tag)
 //-------------------------------------------------
 //  jakks_gamekey_slot_device - constructor
 //-------------------------------------------------
-jakks_gamekey_slot_device::jakks_gamekey_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+jakks_gamekey_slot_device::jakks_gamekey_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, JAKKS_GAMEKEY_SLOT, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_jakks_gamekey_interface>(mconfig, *this),

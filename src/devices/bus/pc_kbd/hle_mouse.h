@@ -13,7 +13,7 @@ class hle_ps2_mouse_device
 	, public device_pc_kbd_interface
 {
 public:
-	hle_ps2_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hle_ps2_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides

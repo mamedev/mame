@@ -69,13 +69,13 @@ O26 80 |  *                                                                     
 class sm530_device : public sm511_device
 {
 public:
-	sm530_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
+	sm530_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(32768));
 
 	// 4-bit F output port
 	auto write_f() { return m_write_f.bind(); }
 
 protected:
-	sm530_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	sm530_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	void program_2k(address_map &map);
 	void data_64_24x4(address_map &map);

@@ -85,7 +85,7 @@ ioport_constructor neogeo_mjctrl_device::device_input_ports() const
 //  neogeo_joystick_device - constructor
 //-------------------------------------------------
 
-neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_neogeo_control_port_interface(mconfig, *this)
 	, m_ctrl_sel(0x00)
@@ -94,12 +94,12 @@ neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, 
 {
 }
 
-neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: neogeo_mjctrl_ac_device(mconfig, NEOGEO_MJCTRL_AC, tag, owner, clock)
 {
 }
 
-neogeo_mjctrl_device::neogeo_mjctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+neogeo_mjctrl_device::neogeo_mjctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: neogeo_mjctrl_ac_device(mconfig, NEOGEO_MJCTRL, tag, owner, clock)
 {
 }

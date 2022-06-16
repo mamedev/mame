@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(AT28C64B, at28c64b_device, "at28c64b", "AT28C64B 8Kx8 EEPROM"
 //  at28c64b_device - constructor
 //-------------------------------------------------
 
-at28c64b_device::at28c64b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+at28c64b_device::at28c64b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AT28C64B, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),

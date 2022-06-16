@@ -41,7 +41,7 @@
 class tpi6525_device : public device_t
 {
 public:
-	tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_irq_cb() { return m_out_irq_cb.bind(); }
 	auto in_pa_cb() { return m_in_pa_cb.bind(); }

@@ -19,7 +19,7 @@ public:
 	auto out_rxrdy_cb() { return m_out_rxrdy.bind(); }
 	auto out_txrdy_cb() { return m_out_txrdy.bind(); }
 
-	seeq8003_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	seeq8003_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// register interface
 	virtual void map(address_map &map);
@@ -36,7 +36,7 @@ public:
 	void fifo_w(u8 data);
 
 protected:
-	seeq8003_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock = 0);
+	seeq8003_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -143,7 +143,7 @@ protected:
 class seeq80c03_device : public seeq8003_device
 {
 public:
-	seeq80c03_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	seeq80c03_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// register interface
 	virtual void map(address_map &map) override;

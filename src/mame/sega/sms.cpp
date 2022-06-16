@@ -252,15 +252,15 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "sms1.lh"
 
 
-#define MASTER_CLOCK_GG     32215905.0
-#define MASTER_CLOCK_PALN   10746168.0
+#define MASTER_CLOCK_GG     XTAL::u(32215905)
+#define MASTER_CLOCK_PALN   XTAL::u(10746168)
 // The clocks for PAL and PAL-M used here differ from their nominal values,
 // because with the latter errors will occur on Flubba's VDPTest, probably
 // due to rounding issues in the core.
 // Nominal XTAL value for SMS PAL-M (Brazil) is 10726834.
-#define MASTER_CLOCK_PALM   10726833.0
+#define MASTER_CLOCK_PALM   XTAL::u(10726833)
 // Nominal XTAL value for SMS PAL is 53203424.
-#define MASTER_CLOCK_PAL    53203425.0  /* 12 * subcarrier freq. (4.43361875MHz) */
+#define MASTER_CLOCK_PAL    XTAL::u(53203425)  /* 12 * subcarrier freq. (4.43361875MHz) */
 
 
 void sms1_state::sms1_mem(address_map &map)

@@ -20,7 +20,7 @@
 
 DEFINE_DEVICE_TYPE(MB60553, mb60553_zooming_tilemap_device, "mb60553", "MB60553 Zooming Tilemap")
 
-mb60553_zooming_tilemap_device::mb60553_zooming_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mb60553_zooming_tilemap_device::mb60553_zooming_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MB60553, tag, owner, clock)
 	, m_tmap(nullptr)
 	, m_vram()

@@ -252,7 +252,7 @@ void zac2650_state::tinvader(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	S2636(config, m_s2636, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	S2636(config, m_s2636).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void zac2650_state::tinvader_sound_w(uint8_t data)

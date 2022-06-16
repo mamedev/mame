@@ -36,7 +36,7 @@ const u8 dm9368_device::s_segment_data[16] =
 //  LIVE DEVICE
 //**************************************************************************
 
-dm9368_device::dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+dm9368_device::dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, DM9368, tag, owner, clock),
 	m_update_cb(*this),
 	m_rbo_cb(*this),

@@ -31,7 +31,7 @@ public:
 
 protected:
 	// construction/destruction
-	cbm2_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cbm2_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -54,7 +54,7 @@ class cbm2_hrg_a_device :  public cbm2_hrg_device
 {
 public:
 	// construction/destruction
-	cbm2_hrg_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cbm2_hrg_a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -71,7 +71,7 @@ class cbm2_hrg_b_device :  public cbm2_hrg_device
 {
 public:
 	// construction/destruction
-	cbm2_hrg_b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cbm2_hrg_b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

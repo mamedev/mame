@@ -601,7 +601,7 @@ void meyc8080_state::meyc8080(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.66); // unknown DAC
+	DAC_2BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.66); // unknown DAC
 }
 
 

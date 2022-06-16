@@ -172,7 +172,7 @@ static void vector06_floppies(device_slot_interface &device)
 void vector06_state::vector06(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 3000000); // actual speed is wrong due to unemulated latency
+	I8080(config, m_maincpu, XTAL::u(3000000)); // actual speed is wrong due to unemulated latency
 	m_maincpu->set_addrmap(AS_PROGRAM, &vector06_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &vector06_state::io_map);
 	m_maincpu->out_status_func().set(FUNC(vector06_state::status_callback));
@@ -224,7 +224,7 @@ void vector06_state::vector06(machine_config &config)
 
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(1500000);
 	m_pit->set_clk<1>(1500000);
 	m_pit->set_clk<2>(1500000);
@@ -233,7 +233,7 @@ void vector06_state::vector06(machine_config &config)
 	m_pit->out_handler<2>().set(FUNC(vector06_state::speaker_w));
 
 	// optional
-	AY8910(config, m_ay, 1773400).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, m_ay, XTAL::u(1773400)).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 

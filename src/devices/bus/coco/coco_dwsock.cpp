@@ -62,7 +62,7 @@ INPUT_CHANGED_MEMBER(beckerport_device::drivewire_port_changed)
 //  beckerport_device - constructor / destructor
 //-------------------------------------------------
 
-beckerport_device::beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+beckerport_device::beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, COCO_DWSOCK, tag, owner, clock)
 	, m_hostname(nullptr), m_dwconfigport(*this, DRIVEWIRE_PORT_TAG), m_dwtcpport(0)
 {

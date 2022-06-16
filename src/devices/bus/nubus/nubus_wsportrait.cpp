@@ -68,12 +68,12 @@ const tiny_rom_entry *nubus_wsportrait_device::device_rom_region() const
 //  nubus_wsportrait_device - constructor
 //-------------------------------------------------
 
-nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	nubus_wsportrait_device(mconfig, NUBUS_WSPORTRAIT, tag, owner, clock)
 {
 }
 
-nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),

@@ -178,7 +178,7 @@ class pdp1_readtape_image_device :  public paper_tape_reader_device
 {
 public:
 	// construction/destruction
-	pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual const char *image_interface() const noexcept override { return "pdp1_ptp"; }
 
 	auto st_ptr() { return m_st_ptr.bind(); }
@@ -226,7 +226,7 @@ class pdp1_punchtape_image_device : public paper_tape_punch_device
 {
 public:
 	// construction/destruction
-	pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto st_ptp() { return m_st_ptp.bind(); }
 
@@ -268,7 +268,7 @@ class pdp1_typewriter_device :   public device_t,
 {
 public:
 	// construction/destruction
-	pdp1_typewriter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	pdp1_typewriter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto st_tyo() { return m_st_tyo.bind(); }
 	auto st_tyi() { return m_st_tyi.bind(); }
@@ -327,7 +327,7 @@ class pdp1_cylinder_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
+	pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void iot_dia(int op2, int nac, int mb, int &io, int ac);
 	void iot_dba(int op2, int nac, int mb, int &io, int ac);

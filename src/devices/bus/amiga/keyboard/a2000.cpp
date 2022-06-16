@@ -103,7 +103,7 @@ public:
 
 protected:
 	// construction/destruction
-	a2000_kbd_g80_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock)
+	a2000_kbd_g80_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, type, tag, owner, clock)
 		, device_amiga_keyboard_interface(mconfig, *this)
 		, m_rows(*this, "ROW%u", 0U)
@@ -614,7 +614,7 @@ INPUT_PORTS_END
 class a2000_kbd_g80_us_device : public a2000_kbd_g80_device
 {
 public:
-	a2000_kbd_g80_us_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	a2000_kbd_g80_us_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_US, tag, owner, clock)
 	{
 	}
@@ -630,7 +630,7 @@ protected:
 class a2000_kbd_g80_de_device : public a2000_kbd_g80_device
 {
 public:
-	a2000_kbd_g80_de_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	a2000_kbd_g80_de_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_DE, tag, owner, clock)
 	{
 	}
@@ -648,7 +648,7 @@ protected:
 class a2000_kbd_g80_se_device : public a2000_kbd_g80_device
 {
 public:
-	a2000_kbd_g80_se_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	a2000_kbd_g80_se_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_SE, tag, owner, clock)
 	{
 	}
@@ -666,7 +666,7 @@ protected:
 class a2000_kbd_g80_dk_device : public a2000_kbd_g80_device
 {
 public:
-	a2000_kbd_g80_dk_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	a2000_kbd_g80_dk_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_DK, tag, owner, clock)
 	{
 	}
@@ -684,7 +684,7 @@ protected:
 class a2000_kbd_g80_gb_device : public a2000_kbd_g80_device
 {
 public:
-	a2000_kbd_g80_gb_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	a2000_kbd_g80_gb_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 		: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_GB, tag, owner, clock)
 	{
 	}

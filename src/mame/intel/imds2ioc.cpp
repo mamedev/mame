@@ -22,7 +22,7 @@
 #define IOC_XTAL_Y3     6_MHz_XTAL
 
 // Frequency of beeper
-#define IOC_BEEP_FREQ   3300
+#define IOC_BEEP_FREQ   XTAL::u(3300)
 
 // device type definition
 DEFINE_DEVICE_TYPE(IMDS2IOC, imds2ioc_device, "imds2ioc", "Intellec Series II Input/Output Controller")
@@ -55,7 +55,7 @@ void imds2ioc_device::io_map(address_map &map)
 	map(0xf0, 0xf8).rw(m_iocdma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 }
 
-imds2ioc_device::imds2ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+imds2ioc_device::imds2ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, IMDS2IOC, tag, owner, clock),
 	m_ioccpu(*this, "ioccpu"),
 	m_iocdma(*this, "iocdma"),
@@ -407,7 +407,7 @@ void imds2ioc_device::device_reset()
 {
 	m_ipc_ioc_status = 0x0f;
 
-	m_iocfdc->set_rate(500000); // The IMD images show a rate of 500kbps
+	m_iocfdc->set_rate(XTAL::u(500000)); // The IMD images show a rate of 500kbps
 }
 
 void imds2ioc_device::update_beeper()
@@ -585,7 +585,7 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 	//
 	// Clock here is semi-bogus: it gives the correct frame frequency at 50 Hz (with the incorrect
 	// assumption that CCLK is fixed at BCLK / 14)
-	I8275(config, m_ioccrtc, 22853600 / 14);
+	I8275(config, m_ioccrtc, XTAL::u(22853600) / 14);
 	m_ioccrtc->set_character_width(14);
 	m_ioccrtc->set_refresh_hack(true);
 	m_ioccrtc->set_display_callback(FUNC(imds2ioc_device::crtc_display_pixels));
@@ -610,7 +610,7 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 	m_iocdma->out_iow_cb<1>().set("iocfdc", FUNC(i8271_device::data_w));
 	m_iocdma->out_iow_cb<2>().set(m_ioccrtc, FUNC(i8275_device::dack_w));
 
-	PIT8253(config, m_ioctimer, 0);
+	PIT8253(config, m_ioctimer);
 	m_ioctimer->set_clk<0>(IOC_XTAL_Y1 / 4);
 	m_ioctimer->out_handler<0>().set(m_ioctimer, FUNC(pit8253_device::write_clk2));
 	m_ioctimer->out_handler<2>().set(FUNC(imds2ioc_device::beep_timer_w));

@@ -84,7 +84,7 @@ void o2_state::o2(machine_config &config)
 
 	SGI_CRIME(config, m_crime, m_maincpu);
 
-	DS1687(config, "rtc", 32768);
+	DS1687(config, "rtc", XTAL::u(32768));
 }
 
 ROM_START( o2 )

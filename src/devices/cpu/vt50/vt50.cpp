@@ -70,7 +70,7 @@
 DEFINE_DEVICE_TYPE(VT50_CPU, vt50_cpu_device, "vt50_cpu", "DEC VT50 CPU")
 DEFINE_DEVICE_TYPE(VT52_CPU, vt52_cpu_device, "vt52_cpu", "DEC VT52 CPU")
 
-vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int bbits, int ybits)
+vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int bbits, int ybits)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_rom_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
@@ -122,12 +122,12 @@ vt5x_cpu_device::vt5x_cpu_device(const machine_config &mconfig, device_type type
 	m_ram_config.m_is_octal = true;
 }
 
-vt50_cpu_device::vt50_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+vt50_cpu_device::vt50_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vt5x_cpu_device(mconfig, VT50_CPU, tag, owner, clock, 4, 4)
 {
 }
 
-vt52_cpu_device::vt52_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+vt52_cpu_device::vt52_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vt5x_cpu_device(mconfig, VT52_CPU, tag, owner, clock, 7, 5)
 	, m_graphic_callback(*this)
 {

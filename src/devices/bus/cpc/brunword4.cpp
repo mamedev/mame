@@ -63,7 +63,7 @@ const tiny_rom_entry *cpc_brunword4_device::device_rom_region() const
 	return ROM_NAME( cpc_brunword4 );
 }
 
-cpc_brunword4_device::cpc_brunword4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cpc_brunword4_device::cpc_brunword4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CPC_BRUNWORD_MK4, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_slot(nullptr), m_rombank_active(false), m_bank_sel(0)

@@ -59,13 +59,13 @@ class nick_device :  public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&screen_tag) :
 		nick_device(mconfig, tag, owner, clock)
 	{
 		set_screen(std::forward<T>(screen_tag));
 	}
 
-	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto virq_wr_callback() { return m_write_virq.bind(); }
 

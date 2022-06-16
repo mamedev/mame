@@ -83,7 +83,7 @@
 DEFINE_DEVICE_TYPE(MB89363B, mb89363b_device, "mb89363b", "Fujitsu MB89363B I/O")
 
 
-mb89363b_device::mb89363b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mb89363b_device::mb89363b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MB89363B, tag, owner, clock),
 		m_i8255_a(*this, "i8255_a"),
 		m_i8255_b(*this, "i8255_b"),

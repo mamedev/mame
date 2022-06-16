@@ -16,18 +16,18 @@
 #include "softlist_dev.h"
 
 
-paper_tape_image_device::paper_tape_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+paper_tape_image_device::paper_tape_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 {
 }
 
-paper_tape_reader_device::paper_tape_reader_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+paper_tape_reader_device::paper_tape_reader_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: paper_tape_image_device(mconfig, type, tag, owner, clock)
 {
 }
 
-paper_tape_punch_device::paper_tape_punch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+paper_tape_punch_device::paper_tape_punch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: paper_tape_image_device(mconfig, type, tag, owner, clock)
 {
 }

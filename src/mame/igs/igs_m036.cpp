@@ -294,7 +294,7 @@ void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 
 void igs_m036_state::igs_m036(machine_config &config)
 {
-	IGS036_CPU(config, m_maincpu, 20000000);
+	IGS036_CPU(config, m_maincpu, XTAL::u(20000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m036_state::igs_m036_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -312,7 +312,7 @@ void igs_m036_state::igs_m036(machine_config &config)
 
 void igs_m036_state::igs_m036_tt(machine_config &config)
 {
-	IGS036_CPU(config, m_maincpu, 20000000);
+	IGS036_CPU(config, m_maincpu, XTAL::u(20000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m036_state::igs_m036_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

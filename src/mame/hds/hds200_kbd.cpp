@@ -245,7 +245,7 @@ ioport_constructor hds200_kbd_hle_device::device_input_ports() const
 void hds200_kbd_hle_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_bell, 786).add_route(ALL_OUTPUTS, "mono", 0.5); // unknown frequency
+	BEEP(config, m_bell, XTAL::u(786)).add_route(ALL_OUTPUTS, "mono", 0.5); // unknown frequency
 }
 
 
@@ -257,7 +257,7 @@ void hds200_kbd_hle_device::device_add_mconfig(machine_config &config)
 //  hds200_kbd_hle_device - constructor
 //-------------------------------------------------
 
-hds200_kbd_hle_device::hds200_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+hds200_kbd_hle_device::hds200_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, HDS200_KBD_HLE, tag, owner, clock),
 	device_buffered_serial_interface(mconfig, *this),
 	device_matrix_keyboard_interface(mconfig, *this, "row_0", "row_1", "row_2", "row_3", "row_4", "row_5"),
@@ -289,8 +289,8 @@ void hds200_kbd_hle_device::device_reset()
 	transmit_register_reset();
 
 	set_data_frame(1, 8, PARITY_EVEN, STOP_BITS_2);
-	set_rcv_rate(2400);
-	set_tra_rate(2400);
+	set_rcv_rate(XTAL::u(2400));
+	set_tra_rate(XTAL::u(2400));
 
 	reset_key_state();
 	start_processing(attotime::from_hz(2400));

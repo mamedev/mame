@@ -57,12 +57,12 @@ static const double tx1_engine_gains[16] =
 DEFINE_DEVICE_TYPE(TX1_SOUND, tx1_sound_device, "tx1_sound", "TX-1 Custom Sound")
 DEFINE_DEVICE_TYPE(TX1J_SOUND, tx1j_sound_device, "tx1j_sound", "TX-1 Custom Sound (Japan)")
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tx1_sound_device(mconfig, TX1_SOUND, tag, owner, clock)
 {
 }
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_audiocpu(*this, "audio_cpu"),
@@ -94,7 +94,7 @@ tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type ty
 {
 }
 
-tx1j_sound_device::tx1j_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+tx1j_sound_device::tx1j_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	tx1_sound_device(mconfig, TX1J_SOUND, tag, owner, clock)
 {
 }
@@ -619,18 +619,18 @@ static const double bb_engine_gains[16] =
 DEFINE_DEVICE_TYPE(BUGGYBOY_SOUND, buggyboy_sound_device, "buggyboy_sound", "Buggy Boy Custom Sound")
 DEFINE_DEVICE_TYPE(BUGGYBOYJR_SOUND, buggyboyjr_sound_device, "buggyboyjr_sound", "Buggy Boy Jr. Custom Sound")
 
-buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: buggyboy_sound_device(mconfig, BUGGYBOY_SOUND, tag, owner, clock)
 {
 }
 
-buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: tx1_sound_device(mconfig, type, tag, owner, clock)
 	, m_ym(*this, "ym%u", 1U)
 {
 }
 
-buggyboyjr_sound_device::buggyboyjr_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+buggyboyjr_sound_device::buggyboyjr_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: buggyboy_sound_device(mconfig, BUGGYBOYJR_SOUND, tag, owner, clock)
 {
 }

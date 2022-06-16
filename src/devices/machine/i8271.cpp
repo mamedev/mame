@@ -9,7 +9,7 @@
 
 DEFINE_DEVICE_TYPE(I8271, i8271_device, "i8271", "Intel 8271 FDC")
 
-i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, I8271, tag, owner, clock), ready_connected(false), mode(0), main_phase(0),
 	intrq_cb(*this),
 	drq_cb(*this),
@@ -171,9 +171,9 @@ uint8_t i8271_device::rr_r()
 	return rr;
 }
 
-void i8271_device::set_rate(int rate)
+void i8271_device::set_rate(const XTAL &rate)
 {
-	cur_rate = rate;
+	cur_rate = rate.value();
 }
 
 uint8_t i8271_device::read(offs_t offset)

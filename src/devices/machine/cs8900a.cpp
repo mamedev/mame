@@ -375,7 +375,7 @@ void cs8900a_device::device_start()
 	save_item(NAME(rxevent_read_mask));
 }
 
-cs8900a_device::cs8900a_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+cs8900a_device::cs8900a_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_network_interface(mconfig, *this, 10)
 	, cs8900_ia_mac{0, 0, 0, 0, 0, 0}
@@ -400,7 +400,7 @@ cs8900a_device::cs8900a_device(const machine_config& mconfig, device_type type, 
 	, rxevent_read_mask(3) /* set if L and/or H u8 was read in RXEVENT? */
 {}
 
-cs8900a_device::cs8900a_device(machine_config const& mconfig, char const *tag, device_t *owner, u32 clock)
+cs8900a_device::cs8900a_device(machine_config const& mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: cs8900a_device(mconfig, CS8900A, tag, owner, clock)
 {}
 

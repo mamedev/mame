@@ -18,7 +18,7 @@ class igs017_igs031_device :
 public:
 	typedef device_delegate<u16 (u16)> palette_scramble_delegate;
 
-	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_i8255_tag(T &&tag) { m_i8255.set_tag(std::forward<T>(tag)); }
 	template <typename... T> void set_palette_scramble_cb(T &&... args) { m_palette_scramble_cb.set(std::forward<T>(args)...); }

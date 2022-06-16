@@ -98,7 +98,7 @@ public:
 	void sh2_common_map(address_map &map);
 
 protected:
-	sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_shared_ptr<uint32_t> m_sh2_shared;
 
@@ -204,14 +204,14 @@ class sega_32x_ntsc_device : public sega_32x_device
 {
 public:
 	template <typename T, typename U>
-	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&main_cpu_tag, U &&timer_tag)
+	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&main_cpu_tag, U &&timer_tag)
 		: sega_32x_ntsc_device(mconfig, tag, owner, clock)
 	{
 		m_main_cpu.set_tag(std::forward<T>(main_cpu_tag));
 		m_scan_timer.set_tag(std::forward<U>(timer_tag));
 	}
 
-	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -222,14 +222,14 @@ class sega_32x_pal_device : public sega_32x_device
 {
 public:
 	template <typename T, typename U>
-	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&main_cpu_tag, U &&timer_tag)
+	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&main_cpu_tag, U &&timer_tag)
 		: sega_32x_pal_device(mconfig, tag, owner, clock)
 	{
 		m_main_cpu.set_tag(std::forward<T>(main_cpu_tag));
 		m_scan_timer.set_tag(std::forward<U>(timer_tag));
 	}
 
-	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;

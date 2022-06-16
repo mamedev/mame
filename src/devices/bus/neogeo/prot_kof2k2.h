@@ -14,7 +14,7 @@ class kof2002_prot_device : public device_t
 {
 public:
 	// construction/destruction
-	kof2002_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	kof2002_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void kof2002_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
 	void matrim_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);

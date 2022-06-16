@@ -589,7 +589,7 @@ void elwro800_state::elwro800(machine_config &config)
 
 	UPD765A(config, "upd765", 8_MHz_XTAL / 2, true, true);
 
-	I8255A(config, m_i8255, 0);
+	I8255A(config, m_i8255);
 	m_i8255->in_pa_callback().set_ioport("JOY");
 	m_i8255->in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::read));
 	m_i8255->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));

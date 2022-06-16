@@ -88,7 +88,7 @@ class gba_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	gba_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint32_t read_rom(offs_t offset) override { return m_rom[offset]; }
@@ -100,7 +100,7 @@ public:
 	virtual void gpio_dev_write(uint16_t data, int gpio_dirs) { }
 
 protected:
-	gba_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -118,14 +118,14 @@ class gba_rom_sram_device : public gba_rom_device
 {
 public:
 	// construction/destruction
-	gba_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0) override;
 	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 protected:
-	gba_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -135,7 +135,7 @@ class gba_rom_drilldoz_device : public gba_rom_sram_device
 {
 public:
 	// construction/destruction
-	gba_rom_drilldoz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_drilldoz_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -153,7 +153,7 @@ class gba_rom_wariotws_device : public gba_rom_sram_device
 {
 public:
 	// construction/destruction
-	gba_rom_wariotws_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_wariotws_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -180,14 +180,14 @@ class gba_rom_flash_device : public gba_rom_device
 {
 public:
 	// construction/destruction
-	gba_rom_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 // reading and writing
 	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0) override;
 	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 protected:
-	gba_rom_flash_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_flash_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_reset() override;
 
@@ -206,7 +206,7 @@ class gba_rom_flash_rtc_device : public gba_rom_flash_device
 {
 public:
 	// construction/destruction
-	gba_rom_flash_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_flash_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual uint16_t gpio_dev_read(int gpio_dirs) override;
@@ -226,14 +226,14 @@ class gba_rom_flash1m_device : public gba_rom_device
 {
 public:
 	// construction/destruction
-	gba_rom_flash1m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_flash1m_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0) override;
 	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 protected:
-	gba_rom_flash1m_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_flash1m_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_reset() override;
 
@@ -252,7 +252,7 @@ class gba_rom_flash1m_rtc_device : public gba_rom_flash1m_device
 {
 public:
 	// construction/destruction
-	gba_rom_flash1m_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_flash1m_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual uint16_t gpio_dev_read(int gpio_dirs) override;
@@ -272,14 +272,14 @@ class gba_rom_eeprom_device : public gba_rom_device
 {
 public:
 	// construction/destruction
-	gba_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0) override;
 	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 protected:
-	gba_rom_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -295,7 +295,7 @@ class gba_rom_yoshiug_device : public gba_rom_eeprom_device
 {
 public:
 	// construction/destruction
-	gba_rom_yoshiug_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_yoshiug_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -322,14 +322,14 @@ class gba_rom_eeprom64_device : public gba_rom_device
 {
 public:
 	// construction/destruction
-	gba_rom_eeprom64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_eeprom64_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint32_t read_ram(offs_t offset, uint32_t mem_mask = ~0) override;
 	virtual void write_ram(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
 
 protected:
-	gba_rom_eeprom64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_eeprom64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -344,7 +344,7 @@ class gba_rom_boktai_device : public gba_rom_eeprom64_device
 {
 public:
 	// construction/destruction
-	gba_rom_boktai_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_boktai_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -369,7 +369,7 @@ class gba_rom_3dmatrix_device : public gba_rom_device
 {
 public:
 	// construction/destruction
-	gba_rom_3dmatrix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gba_rom_3dmatrix_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual void write_mapper(offs_t offset, uint32_t data) override;

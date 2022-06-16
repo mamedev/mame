@@ -11,7 +11,7 @@ public:
 	typedef device_delegate<void (u32 &code)> tile_delegate;
 	typedef device_delegate<void (u32 &colour, u32 &pri_mask)> colpri_cb_delegate;
 
-	fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration
 	void set_color_base(u16 base) { m_colbase = base; }

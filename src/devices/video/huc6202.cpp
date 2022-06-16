@@ -15,7 +15,7 @@
 DEFINE_DEVICE_TYPE(HUC6202, huc6202_device, "huc6202", "Hudson HuC6202 VPC")
 
 
-huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HUC6202, tag, owner, clock)
 	, m_next_pixel_0_cb(*this)
 	, m_time_til_next_event_0_cb(*this)

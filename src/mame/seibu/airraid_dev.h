@@ -18,7 +18,7 @@ class airraid_video_device :  public device_t
 {
 public:
 	// construction/destruction
-	airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void txram_w(offs_t offset, uint8_t data);
 	void vregs_w(offs_t offset, uint8_t data);

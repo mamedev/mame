@@ -11,8 +11,8 @@
 #include "sound/ymopn.h"
 #include "video/315_5313.h"
 
-#define MASTER_CLOCK_NTSC 53693175
-#define MASTER_CLOCK_PAL  53203424
+#define MASTER_CLOCK_NTSC XTAL::u(53693175)
+#define MASTER_CLOCK_PAL  XTAL::u(53203424)
 
 #define MD_CPU_REGION_SIZE 0x800000
 

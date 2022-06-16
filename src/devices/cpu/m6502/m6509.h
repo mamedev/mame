@@ -15,7 +15,7 @@
 
 class m6509_device : public m6502_device {
 public:
-	m6509_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m6509_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;

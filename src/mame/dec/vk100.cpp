@@ -1057,7 +1057,7 @@ void vk100_state::vk100(machine_config &config)
 	m_crtc->out_vsync_callback().set(FUNC(vk100_state::crtc_vsync));
 
 	/* i8251 uart */
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
@@ -1075,7 +1075,7 @@ void vk100_state::vk100(machine_config &config)
 	config.set_default_layout(layout_vk100);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_speaker, 116).add_route(ALL_OUTPUTS, "mono", 0.25); // 116 hz (page 172 of TM), but duty cycle is wrong here!
+	BEEP(config, m_speaker, XTAL::u(116)).add_route(ALL_OUTPUTS, "mono", 0.25); // 116 hz (page 172 of TM), but duty cycle is wrong here!
 }
 
 /* ROM definition */

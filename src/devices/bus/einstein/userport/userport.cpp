@@ -29,12 +29,16 @@ DEFINE_DEVICE_TYPE(EINSTEIN_USERPORT, einstein_userport_device, "einstein_userpo
 //  einstein_userport_device - constructor
 //-------------------------------------------------
 
-einstein_userport_device::einstein_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+einstein_userport_device::einstein_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, EINSTEIN_USERPORT, tag, owner, clock),
 	device_single_card_slot_interface<device_einstein_userport_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_bstb_handler(*this)
 {
+	option_reset();
+	einstein_userport_cards(*this);
+	set_default_option(nullptr);
+	set_fixed(false);
 }
 
 //-------------------------------------------------

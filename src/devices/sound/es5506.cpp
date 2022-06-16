@@ -146,7 +146,7 @@ enum : u16 {
 
 }
 
-es550x_device::es550x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+es550x_device::es550x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
@@ -178,7 +178,7 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 
 DEFINE_DEVICE_TYPE(ES5506, es5506_device, "es5506", "Ensoniq ES5506")
 
-es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: es550x_device(mconfig, ES5506, tag, owner, clock)
 	, m_bank0_config("bank0", ENDIANNESS_BIG, 16, 21, -1) // 21 bit address bus, word addressing only
 	, m_bank1_config("bank1", ENDIANNESS_BIG, 16, 21, -1)
@@ -348,7 +348,7 @@ device_memory_interface::space_config_vector es5506_device::memory_space_config(
 
 DEFINE_DEVICE_TYPE(ES5505, es5505_device, "es5505", "Ensoniq ES5505")
 
-es5505_device::es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+es5505_device::es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: es550x_device(mconfig, ES5505, tag, owner, clock)
 	, m_bank0_config("bank0", ENDIANNESS_BIG, 16, 20, -1) // 20 bit address bus, word addressing only
 	, m_bank1_config("bank1", ENDIANNESS_BIG, 16, 20, -1)

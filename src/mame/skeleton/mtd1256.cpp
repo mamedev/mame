@@ -126,7 +126,7 @@ void mtd1256_state::mtd1256(machine_config &config)
 
 	MM58274C(config, "rtc", 32.768_kHz_XTAL); // TODO: 1 second interrupt output configured
 
-	MM74C923(config, m_encoder, 0); // timing parameters unknown
+	MM74C923(config, m_encoder); // timing parameters unknown
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);

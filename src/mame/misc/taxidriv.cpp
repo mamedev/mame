@@ -508,15 +508,15 @@ void taxidriv_state::taxidriv_palette(palette_device &palette) const
 void taxidriv_state::taxidriv(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);    /* 4 MHz ??? */
+	Z80(config, m_maincpu, XTAL::u(4000000));    /* 4 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taxidriv_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taxidriv_state::irq0_line_hold));
 
-	z80_device &subcpu(Z80(config, "sub", 4000000));    /* 4 MHz ??? */
+	z80_device &subcpu(Z80(config, "sub", XTAL::u(4000000)));    /* 4 MHz ??? */
 	subcpu.set_addrmap(AS_PROGRAM, &taxidriv_state::cpu2_map);
 	subcpu.set_vblank_int("screen", FUNC(taxidriv_state::irq0_line_hold));   /* ??? */
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 4000000));   /* 4 MHz ??? */
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL::u(4000000)));   /* 4 MHz ??? */
 	audiocpu.set_addrmap(AS_PROGRAM, &taxidriv_state::cpu3_map);
 	audiocpu.set_addrmap(AS_IO, &taxidriv_state::cpu3_port_map);
 	audiocpu.set_vblank_int("screen", FUNC(taxidriv_state::irq0_line_hold));   /* ??? */
@@ -566,12 +566,12 @@ void taxidriv_state::taxidriv(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay1(AY8910(config, "ay1", 1250000));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL::u(1250000)));
 	ay1.port_a_read_callback().set(FUNC(taxidriv_state::p8910_0a_r));
 	ay1.port_b_write_callback().set(FUNC(taxidriv_state::p8910_0b_w));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 1250000));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL::u(1250000)));
 	ay2.port_a_read_callback().set(FUNC(taxidriv_state::p8910_1a_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 }

@@ -23,7 +23,7 @@ class isa8_babyblue2_device :
 {
 public:
 	// construction/destruction
-	isa8_babyblue2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_babyblue2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t z80_control_r(offs_t offset);
 	void z80_control_w(offs_t offset, uint8_t data);

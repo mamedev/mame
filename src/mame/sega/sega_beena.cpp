@@ -167,7 +167,7 @@ uint32_t sega_beena_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 void sega_beena_state::sega_beena(machine_config &config)
 {
-	ARM7_BE(config, m_maincpu, 81'000'000);
+	ARM7_BE(config, m_maincpu, XTAL::u(81'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega_beena_state::beena_arm7_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

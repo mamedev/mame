@@ -21,7 +21,7 @@
 class prof80_mmu_device : public device_t, public device_memory_interface
 {
 public:
-	prof80_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	prof80_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void z80_program_map(address_map &map);
 

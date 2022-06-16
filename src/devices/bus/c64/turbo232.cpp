@@ -39,7 +39,7 @@ DEFINE_DEVICE_TYPE(C64_TURBO232, c64_turbo232_cartridge_device, "c64_turbo232", 
 
 void c64_turbo232_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(3.6864_MHz_XTAL);
 	m_acia->irq_handler().set(FUNC(c64_turbo232_cartridge_device::acia_irq_w));
 	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -89,7 +89,7 @@ ioport_constructor c64_turbo232_cartridge_device::device_input_ports() const
 //  c64_turbo232_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_turbo232_cartridge_device::c64_turbo232_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_turbo232_cartridge_device::c64_turbo232_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_TURBO232, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MOS6551_TAG),

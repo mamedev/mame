@@ -86,10 +86,10 @@ INPUT_PORTS_END
 
 void castle_state::castle_V1rvE(machine_config &config)
 {
-	HD6303Y(config, m_maincpu, 1000000);
+	HD6303Y(config, m_maincpu, XTAL::u(1000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &castle_state::V1rvE_mastermap);
 
-	hd6303y_cpu_device &slavecpu(HD6303Y(config, "slavecpu", 1000000));
+	hd6303y_cpu_device &slavecpu(HD6303Y(config, "slavecpu", XTAL::u(1000000)));
 	slavecpu.set_addrmap(AS_PROGRAM, &castle_state::V1rvE_slavemap);
 }
 
@@ -105,7 +105,7 @@ void castle_state::V2rvA_map(address_map &map)
 
 void castle_state::castle_V2rvA(machine_config &config)
 {
-	HD6303Y(config, m_maincpu, 1000000);
+	HD6303Y(config, m_maincpu, XTAL::u(1000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &castle_state::V2rvA_map);
 
 	PIA6821(config, "pia");

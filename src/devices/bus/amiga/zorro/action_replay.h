@@ -31,7 +31,7 @@ public:
 
 protected:
 	// construction/destruction
-	action_replay_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	action_replay_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
@@ -48,7 +48,7 @@ class action_replay_mk1_device : public action_replay_device_base
 {
 public:
 	// construction/destruction
-	action_replay_mk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	action_replay_mk1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -59,7 +59,7 @@ class action_replay_mk2_device : public action_replay_device_base
 {
 public:
 	// construction/destruction
-	action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides
@@ -70,7 +70,7 @@ class action_replay_mk3_device : public action_replay_device_base
 {
 public:
 	// construction/destruction
-	action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// optional information overrides

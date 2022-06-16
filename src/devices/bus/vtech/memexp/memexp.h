@@ -53,15 +53,7 @@ class vtech_memexp_slot_device : public device_t, public device_single_card_slot
 	friend class device_vtech_memexp_interface;
 public:
 	// construction/destruction
-	vtech_memexp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner)
-		: vtech_memexp_slot_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		vtech_memexp_carts(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
-	}
-	vtech_memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vtech_memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~vtech_memexp_slot_device();
 
 	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
@@ -114,7 +106,7 @@ class vtech_memexp_device : public device_t, public device_vtech_memexp_interfac
 {
 public:
 	// construction/destruction
-	vtech_memexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vtech_memexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// from host
 	virtual uint8_t mreq_r(offs_t offset) override;

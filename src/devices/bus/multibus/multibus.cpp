@@ -24,7 +24,7 @@
 DEFINE_DEVICE_TYPE(MULTIBUS, multibus_device, "multibus", "Intel Multibus")
 DEFINE_DEVICE_TYPE(MULTIBUS_SLOT, multibus_slot_device, "multibus_slot", "Intel Multibus slot")
 
-multibus_device::multibus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+multibus_device::multibus_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MULTIBUS, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_mem_config("mem", ENDIANNESS_LITTLE, 16, 24)
@@ -45,7 +45,7 @@ void multibus_device::device_start()
 	m_xack_cb.resolve_safe();
 }
 
-multibus_slot_device::multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+multibus_slot_device::multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MULTIBUS_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_bus(*this, finder_base::DUMMY_TAG)

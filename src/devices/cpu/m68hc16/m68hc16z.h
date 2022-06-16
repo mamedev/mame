@@ -12,7 +12,7 @@
 class m68hc16z_device : public cpu16_device
 {
 protected:
-	m68hc16z_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map);
+	m68hc16z_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -92,7 +92,7 @@ class mc68hc16z1_device : public m68hc16z_device
 {
 public:
 	// device type constructor
-	mc68hc16z1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mc68hc16z1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	void internal_map(address_map &map);

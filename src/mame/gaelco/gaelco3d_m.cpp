@@ -182,7 +182,7 @@ void gaelco_serial_device::buf_reset(buf_t *buf)
 
 DEFINE_DEVICE_TYPE(GAELCO_SERIAL, gaelco_serial_device, "gaelco_serial", "Gaelco 3D Serial Hardware")
 
-gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, GAELCO_SERIAL, tag, owner, clock),
 	m_irq_handler(*this),
 	m_status(0),

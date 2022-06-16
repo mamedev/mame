@@ -24,7 +24,7 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 protected:
-	at29x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int memory_size, int device_id, int sector_size);
+	at29x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int memory_size, int device_id, int sector_size);
 
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
@@ -92,19 +92,19 @@ private:
 class at29c020_device : public at29x_device
 {
 public:
-	at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class at29c040_device : public at29x_device
 {
 public:
-	at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class at29c040a_device : public at29x_device
 {
 public:
-	at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 #endif // MAME_MACHINE_AT29X_H

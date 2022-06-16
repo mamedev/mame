@@ -544,13 +544,13 @@ void bw12_state::common(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // ls273.ic5 + mc1408.ic4
+	MC1408(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.125); // ls273.ic5 + mc1408.ic4
 
 	/* devices */
 	TIMER(config, FLOPPY_TIMER_TAG).configure_generic(FUNC(bw12_state::floppy_motor_off_tick));
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, false, true);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(bw12_state::pia_pa_r));
 	m_pia->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pia->ca2_handler().set(CENTRONICS_TAG, FUNC(centronics_device::write_strobe));
@@ -578,7 +578,7 @@ void bw12_state::common(machine_config &config)
 	m_pit->set_clk<2>(1.8432_MHz_XTAL);
 	m_pit->out_handler<2>().set(FUNC(bw12_state::pit_out2_w));
 
-	AY3600(config, m_kbc, 0);
+	AY3600(config, m_kbc);
 	m_kbc->x0().set_ioport("X0");
 	m_kbc->x1().set_ioport("X1");
 	m_kbc->x2().set_ioport("X2");

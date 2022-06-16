@@ -227,7 +227,7 @@
 
 DEFINE_DEVICE_TYPE(CORVUS_HDC, corvus_hdc_device, "corvus_hdc", "Corvus Flat Cable HDC")
 
-corvus_hdc_device::corvus_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+corvus_hdc_device::corvus_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CORVUS_HDC, tag, owner, clock),
 	m_status(0),
 	m_prep_mode(false),

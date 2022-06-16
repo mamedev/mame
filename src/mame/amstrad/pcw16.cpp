@@ -1008,7 +1008,7 @@ static void pcw16_com(device_slot_interface &device)
 void pcw16_state::pcw16(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 16000000);
+	Z80(config, m_maincpu, XTAL::u(16000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcw16_state::pcw16_map);
 	m_maincpu->set_addrmap(AS_IO, &pcw16_state::pcw16_io);
 	config.set_maximum_quantum(attotime::from_hz(60));
@@ -1051,7 +1051,7 @@ void pcw16_state::pcw16(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 3750).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beeper, XTAL::u(3750)).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* printer */
 	pc_lpt_device &lpt(PC_LPT(config, "lpt"));

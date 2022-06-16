@@ -99,7 +99,7 @@ DEFINE_DEVICE_TYPE(HUC6270, huc6270_device, "huc6270", "Hudson HuC6270 VDC")
 
 constexpr uint8_t huc6270_device::vram_increments[4];
 
-huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, HUC6270, tag, owner, clock)
 	, m_vram_size(0)
 	, m_irq_changed_cb(*this)

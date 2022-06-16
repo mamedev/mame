@@ -182,7 +182,7 @@ void tc8566af_device::map(address_map &map)
 
 constexpr int upd765_family_device::rates[4];
 
-upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	ready_connected(true),
 	ready_polled(true),
@@ -538,9 +538,9 @@ void upd765_family_device::dsr_w(uint8_t data)
 	cur_rate = rates[dsr & 3];
 }
 
-void upd765_family_device::set_rate(int rate)
+void upd765_family_device::set_rate(const XTAL &rate)
 {
-	cur_rate = rate;
+	cur_rate = rate.value();
 }
 
 uint8_t upd765_family_device::fifo_r()
@@ -2769,32 +2769,32 @@ bool upd765_family_device::sector_matches() const
 		cur_live.idbuf[3] == command[5];
 }
 
-upd765a_device::upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, UPD765A, tag, owner, clock)
+upd765a_device::upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : upd765_family_device(mconfig, UPD765A, tag, owner, clock)
 {
 	has_dor = false;
 }
 
-upd765b_device::upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, UPD765B, tag, owner, clock)
+upd765b_device::upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : upd765_family_device(mconfig, UPD765B, tag, owner, clock)
 {
 	has_dor = false;
 }
 
-i8272a_device::i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, I8272A, tag, owner, clock)
+i8272a_device::i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : upd765_family_device(mconfig, I8272A, tag, owner, clock)
 {
 	has_dor = false;
 }
 
-upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd72065_device(mconfig, UPD72065, tag, owner, clock)
+upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : upd72065_device(mconfig, UPD72065, tag, owner, clock)
 {
 }
 
-upd72065_device::upd72065_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, type, tag, owner, clock)
+upd72065_device::upd72065_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) : upd765_family_device(mconfig, type, tag, owner, clock)
 {
 	has_dor = false;
 	recalibrate_steps = 255;
 }
 
-upd72067_device::upd72067_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd72065_device(mconfig, UPD72067, tag, owner, clock)
+upd72067_device::upd72067_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : upd72065_device(mconfig, UPD72067, tag, owner, clock)
 {
 	ready_polled = true;
 	ready_connected = true;
@@ -2802,7 +2802,7 @@ upd72067_device::upd72067_device(const machine_config &mconfig, const char *tag,
 	select_multiplexed = false;
 }
 
-upd72069_device::upd72069_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd72065_device(mconfig, UPD72069, tag, owner, clock)
+upd72069_device::upd72069_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : upd72065_device(mconfig, UPD72069, tag, owner, clock)
 {
 	ready_polled = true;
 	ready_connected = true;
@@ -2810,7 +2810,7 @@ upd72069_device::upd72069_device(const machine_config &mconfig, const char *tag,
 	select_multiplexed = false;
 }
 
-i82072_device::i82072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, I82072, tag, owner, clock)
+i82072_device::i82072_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : upd765_family_device(mconfig, I82072, tag, owner, clock)
 {
 	has_dor = false;
 	recalibrate_steps = 255;
@@ -3095,7 +3095,7 @@ void i82072_device::index_callback(floppy_image_device *floppy, int state)
 	upd765_family_device::index_callback(floppy, state);
 }
 
-ps2_fdc_device::ps2_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, type, tag, owner, clock)
+ps2_fdc_device::ps2_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) : upd765_family_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -3120,7 +3120,7 @@ void ps2_fdc_device::soft_reset()
 	perpmode &= 0x3c;
 }
 
-smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, SMC37C78, tag, owner, clock)
+smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : ps2_fdc_device(mconfig, SMC37C78, tag, owner, clock)
 {
 	ready_connected = false;
 	select_connected = true;
@@ -3128,14 +3128,14 @@ smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag,
 	recalibrate_steps = 80;
 }
 
-n82077aa_device::n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, N82077AA, tag, owner, clock)
+n82077aa_device::n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : ps2_fdc_device(mconfig, N82077AA, tag, owner, clock)
 {
 	ready_connected = false;
 	select_connected = true;
 	select_multiplexed = false;
 }
 
-pc_fdc_superio_device::pc_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, tag, owner, clock)
+pc_fdc_superio_device::pc_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, tag, owner, clock)
 {
 	ready_polled = false;
 	ready_connected = false;
@@ -3143,7 +3143,7 @@ pc_fdc_superio_device::pc_fdc_superio_device(const machine_config &mconfig, cons
 	select_multiplexed = false;
 }
 
-dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : upd765_family_device(mconfig, DP8473, tag, owner, clock)
+dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : upd765_family_device(mconfig, DP8473, tag, owner, clock)
 {
 	ready_polled = false;
 	ready_connected = false;
@@ -3160,7 +3160,7 @@ void dp8473_device::soft_reset()
 	other_irq = true;
 }
 
-pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477A, tag, owner, clock)
+pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : ps2_fdc_device(mconfig, PC8477A, tag, owner, clock)
 {
 	ready_polled = true;
 	ready_connected = false;
@@ -3169,7 +3169,7 @@ pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, d
 	recalibrate_steps = 85; // TODO: may also be programmed as 255, 3925 or 4095 by (unemulated) mode command
 }
 
-pc8477b_device::pc8477b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477B, tag, owner, clock)
+pc8477b_device::pc8477b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : ps2_fdc_device(mconfig, PC8477B, tag, owner, clock)
 {
 	ready_polled = true;
 	ready_connected = false;
@@ -3178,7 +3178,7 @@ pc8477b_device::pc8477b_device(const machine_config &mconfig, const char *tag, d
 	recalibrate_steps = 85; // TODO: may also be programmed as 255, 3925 or 4095 by (unemulated) mode command
 }
 
-wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	upd765_family_device(mconfig, WD37C65C, tag, owner, clock),
 	m_clock2(0)
 {
@@ -3201,7 +3201,7 @@ uint8_t wd37c65c_device::get_st3(floppy_info &fi)
 	return st3;
 }
 
-mcs3201_device::mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mcs3201_device::mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	upd765_family_device(mconfig, MCS3201, tag, owner, clock),
 	m_input_handler(*this)
 {
@@ -3223,7 +3223,7 @@ uint8_t mcs3201_device::input_r()
 	return m_input_handler();
 }
 
-tc8566af_device::tc8566af_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tc8566af_device::tc8566af_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upd765_family_device(mconfig, TC8566AF, tag, owner, clock)
 	, m_cr1(0)
 {

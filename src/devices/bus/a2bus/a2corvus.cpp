@@ -73,7 +73,7 @@ ROM_END
 
 void a2bus_corvus_device::device_add_mconfig(machine_config &config)
 {
-	CORVUS_HDC(config, m_corvushd, 0);
+	CORVUS_HDC(config, m_corvushd);
 	HARDDISK(config, "harddisk1", "corvus_hdd");
 	HARDDISK(config, "harddisk2", "corvus_hdd");
 	HARDDISK(config, "harddisk3", "corvus_hdd");
@@ -93,14 +93,14 @@ const tiny_rom_entry *a2bus_corvus_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_corvus_device::a2bus_corvus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_corvus_device::a2bus_corvus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_corvushd(*this, CORVUS_HD_TAG), m_rom(nullptr)
 {
 }
 
-a2bus_corvus_device::a2bus_corvus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_corvus_device::a2bus_corvus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_corvus_device(mconfig, A2BUS_CORVUS, tag, owner, clock)
 {
 }

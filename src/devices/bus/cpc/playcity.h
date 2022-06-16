@@ -28,7 +28,7 @@ class cpc_playcity_device : public device_t, public device_cpc_expansion_card_in
 {
 public:
 	// construction/destruction
-	cpc_playcity_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cpc_playcity_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t ctc_r(offs_t offset);
 	void ctc_w(offs_t offset, uint8_t data);

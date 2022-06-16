@@ -32,7 +32,7 @@ namespace {
 	}
 }
 
-hp82919_io_card_device::hp82919_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp82919_io_card_device::hp82919_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig , HP82919_IO_CARD , tag , owner , clock)
 	, device_hp_ipc_io_interface(mconfig, *this)
 	, m_rs232_prim(*this , "rs232_prim")

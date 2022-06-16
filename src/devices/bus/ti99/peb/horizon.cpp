@@ -150,7 +150,7 @@ namespace bus::ti99::peb {
 #define OPT32K_TAG "m32_ram"
 #define RAM16M_TAG "m31_m0_ram"
 
-horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock):
 	device_t(mconfig, TI99_HORIZON, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),

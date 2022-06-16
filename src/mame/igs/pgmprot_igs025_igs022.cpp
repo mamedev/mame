@@ -373,10 +373,10 @@ void pgm_022_025_state::pgm_022_025(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_022_025_state::killbld_mem);
 
-	IGS025(config, m_igs025, 0);
+	IGS025(config, m_igs025);
 	m_igs025->set_external_cb(FUNC(pgm_022_025_state::igs025_to_igs022_callback));
 
-	IGS022(config, m_igs022, 0);
+	IGS022(config, m_igs022);
 }
 
 void pgm_022_025_state::pgm_022_025_dw3(machine_config &config)

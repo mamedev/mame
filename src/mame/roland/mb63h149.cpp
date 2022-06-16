@@ -35,13 +35,13 @@ DEFINE_DEVICE_TYPE(MB63H130, mb63h130_device, "mb63h130", "Roland MB63H130 Key A
 //  mb63h149_device - constructor
 //-------------------------------------------------
 
-mb63h149_device::mb63h149_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+mb63h149_device::mb63h149_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_int_callback(*this)
 {
 }
 
-mb63h149_device::mb63h149_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mb63h149_device::mb63h149_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mb63h149_device(mconfig, MB63H149, tag, owner, clock)
 {
 }
@@ -51,7 +51,7 @@ mb63h149_device::mb63h149_device(const machine_config &mconfig, const char *tag,
 //  mb63h130_device - constructor
 //-------------------------------------------------
 
-mb63h130_device::mb63h130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+mb63h130_device::mb63h130_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mb63h149_device(mconfig, MB63H130, tag, owner, clock)
 {
 }

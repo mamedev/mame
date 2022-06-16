@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(DMV_K210, dmv_k210_device, "dmv_k210", "K210 Centronics")
 //  dmv_k210_device - constructor
 //-------------------------------------------------
 
-dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DMV_K210, tag, owner, clock)
 	, device_dmvslot_interface(mconfig, *this)
 	, m_ppi(*this, "ppi8255")
@@ -79,7 +79,7 @@ TIMER_CALLBACK_MEMBER(dmv_k210_device::strobe_tick)
 
 void dmv_k210_device::device_add_mconfig(machine_config &config)
 {
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(dmv_k210_device::porta_r));
 	m_ppi->in_pb_callback().set(FUNC(dmv_k210_device::portb_r));
 	m_ppi->in_pc_callback().set(FUNC(dmv_k210_device::portc_r));

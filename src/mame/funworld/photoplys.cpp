@@ -71,7 +71,7 @@ void photoplays_state::machine_reset()
 void photoplays_state::photoplays(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM2(config, m_maincpu, 366'000'000); // Actually an Intel CELERON FV524RX366 128 SL36C
+	PENTIUM2(config, m_maincpu, XTAL::u(366'000'000)); // Actually an Intel CELERON FV524RX366 128 SL36C
 	m_maincpu->set_addrmap(AS_PROGRAM, &photoplays_state::photoplays_map);
 
 	// Video hardware

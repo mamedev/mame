@@ -58,7 +58,7 @@ DECLARE_DEVICE_TYPE(HARDDRIV_SOUND_BOARD,         harddriv_sound_board_device)
 class harddriv_state : public device_t
 {
 public:
-	harddriv_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	harddriv_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	void driver_msp(machine_config &config);
 	void driver_nomsp(machine_config &config);
@@ -506,7 +506,7 @@ class harddriv_sound_board_device :  public device_t
 {
 public:
 	// construction/destruction
-	harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~harddriv_sound_board_device() {}
 
 	uint16_t hd68k_snd_data_r();
@@ -583,7 +583,7 @@ private:
 class harddriv_board_device_state :  public harddriv_state
 {
 public:
-	harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -596,7 +596,7 @@ protected:
 class harddrivc_board_device_state :  public harddriv_state
 {
 public:
-	harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -609,10 +609,10 @@ protected:
 class racedriv_board_device_state :  public harddriv_state
 {
 public:
-	racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	racedriv_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	racedriv_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -622,7 +622,7 @@ protected:
 class racedrivb1_board_device_state :  public racedriv_board_device_state
 {
 public:
-	racedrivb1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	racedrivb1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -633,10 +633,10 @@ protected:
 class racedrivc_board_device_state :  public harddriv_state
 {
 public:
-	racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	racedrivc_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	racedrivc_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -646,7 +646,7 @@ protected:
 class racedrivc1_board_device_state :  public racedrivc_board_device_state
 {
 public:
-	racedrivc1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	racedrivc1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -655,7 +655,7 @@ protected:
 class racedrivc_panorama_side_board_device_state :  public racedrivc_board_device_state
 {
 public:
-	racedrivc_panorama_side_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	racedrivc_panorama_side_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -668,7 +668,7 @@ protected:
 class stunrun_board_device_state :  public harddriv_state
 {
 public:
-	stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -681,10 +681,10 @@ protected:
 class steeltal_board_device_state :  public harddriv_state
 {
 public:
-	steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	steeltal_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	steeltal_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -694,7 +694,7 @@ protected:
 class steeltal1_board_device_state :  public steeltal_board_device_state
 {
 public:
-	steeltal1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	steeltal1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -703,7 +703,7 @@ protected:
 class steeltalp_board_device_state :  public steeltal_board_device_state
 {
 public:
-	steeltalp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	steeltalp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -716,7 +716,7 @@ protected:
 class strtdriv_board_device_state :  public harddriv_state
 {
 public:
-	strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -729,10 +729,10 @@ protected:
 class hdrivair_board_device_state :  public harddriv_state
 {
 public:
-	hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	hdrivair_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	hdrivair_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -742,7 +742,7 @@ protected:
 class hdrivairp_board_device_state :  public hdrivair_board_device_state
 {
 public:
-	hdrivairp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hdrivairp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 protected:
 	virtual void device_start() override;
 };

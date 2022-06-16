@@ -638,31 +638,31 @@ void gts80b_state::p0(machine_config &config)
 void gts80b_state::p3(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN3(config, m_p3_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	GOTTLIEB_SOUND_PIN3(config, m_p3_sound).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void gts80b_state::p4(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN4(config, m_p4_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	GOTTLIEB_SOUND_PIN4(config, m_p4_sound).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void gts80b_state::p5(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN5(config, m_p5_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	GOTTLIEB_SOUND_PIN5(config, m_p5_sound).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void gts80b_state::p6(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_PIN6(config, m_p6_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	GOTTLIEB_SOUND_PIN6(config, m_p6_sound).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void gts80b_state::r2(machine_config &config)
 {
 	p0(config);
-	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	GOTTLIEB_SOUND_REV2(config, m_r2_sound).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void gts80b_state::master(machine_config &config)

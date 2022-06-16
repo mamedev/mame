@@ -30,7 +30,7 @@ class buddha_device : public device_t, public device_zorro2_card_interface, publ
 {
 public:
 	// construction/destruction
-	buddha_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	buddha_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

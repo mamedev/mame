@@ -1698,12 +1698,12 @@ uint32_t pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void pokemini_state::pokemini(machine_config &config)
 {
 	/* basic machine hardware */
-	MINX(config, m_maincpu, 4000000);
+	MINX(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pokemini_state::pokemini_mem_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	I2C_24C64(config, m_i2cmem, 0); // ?
+	I2C_24C64(config, m_i2cmem); // ?
 
 	/* This still needs to be improved to actually match the hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);

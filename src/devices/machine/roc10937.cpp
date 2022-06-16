@@ -129,7 +129,7 @@ static const int roc10937poslut[]=
 	0//15
 };
 
-rocvfd_device::rocvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+rocvfd_device::rocvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_outputs(),
 	m_cursor_pos(0),
@@ -252,22 +252,22 @@ DEFINE_DEVICE_TYPE(MIC10937, mic10937_device, "mic10937", "Micrel MIC10937 VFD c
 DEFINE_DEVICE_TYPE(ROC10957, roc10957_device, "roc10957", "Rockwell 10957 VFD controller") // and compatible
 DEFINE_DEVICE_TYPE(S16LF01,  s16lf01_device,  "s16lf01",  "Samsung 16LF01 Series VFD") // and compatible, basically the MSC1937 on a 16 seg display
 
-roc10937_device::roc10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+roc10937_device::roc10937_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rocvfd_device(mconfig, ROC10937, tag, owner, clock)
 {
 }
 
-msc1937_device::msc1937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msc1937_device::msc1937_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rocvfd_device(mconfig, MSC1937, tag, owner, clock)
 {
 }
 
-mic10937_device::mic10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mic10937_device::mic10937_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rocvfd_device(mconfig, MIC10937, tag, owner, clock)
 {
 }
 
-s16lf01_device::s16lf01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+s16lf01_device::s16lf01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rocvfd_device(mconfig, S16LF01, tag, owner, clock)
 {
 }
@@ -324,7 +324,7 @@ void rocvfd_device::write_char(int data)
 	}
 }
 
-roc10957_device::roc10957_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+roc10957_device::roc10957_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: rocvfd_device(mconfig, ROC10957, tag, owner, clock)
 {
 }

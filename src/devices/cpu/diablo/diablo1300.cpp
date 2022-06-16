@@ -86,7 +86,7 @@ DEFINE_DEVICE_TYPE(DIABLO1300, diablo1300_cpu_device, "diablo1300", "DIABLO 1300
 //  diablo1300_cpu_device - constructor
 //-------------------------------------------------
 
-diablo1300_cpu_device::diablo1300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+diablo1300_cpu_device::diablo1300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, DIABLO1300, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 9, -1)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 5)

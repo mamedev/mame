@@ -122,7 +122,7 @@ void yamaha_dx100_state::dx100(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(yamaha_dx100_state::palette_init), 3);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0)); // HD44780RA00
+	hd44780_device &lcdc(HD44780(config, "lcdc")); // HD44780RA00
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(yamaha_dx100_state::lcd_pixel_update));
 

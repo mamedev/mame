@@ -13,7 +13,7 @@
 DEFINE_DEVICE_TYPE(KR2376_ST,  kr2376_st_device,  "kr2376_st",  "SMC KR2376-ST Keyboard Encoder")
 DEFINE_DEVICE_TYPE(KR2376_12,  kr2376_12_device,  "kr2376_12",  "SMC KR2376-12 Keyboard Encoder")
 
-kr2376_device::kr2376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+kr2376_device::kr2376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_read_x(*this),
 	m_read_shift(*this),
@@ -22,7 +22,7 @@ kr2376_device::kr2376_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-kr2376_st_device::kr2376_st_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kr2376_st_device::kr2376_st_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kr2376_device(mconfig, KR2376_ST, tag, owner, clock)
 {
 }
@@ -85,7 +85,7 @@ uint8_t kr2376_st_device::key_codes(int mode, int x, int y)
 	return KEY_CODES[mode][x][y];
 }
 
-kr2376_12_device::kr2376_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kr2376_12_device::kr2376_12_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
   : kr2376_device(mconfig, KR2376_12, tag, owner, clock)
 {
 }

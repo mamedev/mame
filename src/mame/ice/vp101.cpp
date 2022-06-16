@@ -552,7 +552,7 @@ INPUT_PORTS_END
 
 void vp10x_state::vp101(machine_config &config)
 {
-	VR5500LE(config, m_maincpu, 400000000);
+	VR5500LE(config, m_maincpu, XTAL::u(400000000));
 	m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_system_clock(100000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vp10x_state::main_map);
@@ -572,7 +572,7 @@ void vp10x_state::vp101(machine_config &config)
 
 void vp10x_state::vp50(machine_config &config)
 {
-	TX4925LE(config, m_maincpu, 200000000);
+	TX4925LE(config, m_maincpu, XTAL::u(200000000));
 	m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_system_clock(100000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vp10x_state::vp50_map);

@@ -385,14 +385,14 @@ std::string machine_info::game_info_string() const
 		if (!exectags.insert(exec.device().tag()).second)
 			continue;
 		// get cpu specific clock that takes internal multiplier/dividers into account
-		u32 clock = exec.device().clock();
+		u32 clock = exec.device().clock().value();
 
 		// count how many identical CPUs we have
 		int count = 1;
 		const char *name = exec.device().name();
 		for (device_execute_interface &scan : execiter)
 		{
-			if (exec.device().type() == scan.device().type() && strcmp(name, scan.device().name()) == 0 && exec.device().clock() == scan.device().clock())
+			if (exec.device().type() == scan.device().type() && strcmp(name, scan.device().name()) == 0 && exec.device().clock().value() == scan.device().clock().value())
 				if (exectags.insert(scan.device().tag()).second)
 					count++;
 		}
@@ -434,12 +434,12 @@ std::string machine_info::game_info_string() const
 		int count = 1;
 		for (device_sound_interface &scan : snditer)
 		{
-			if (sound.device().type() == scan.device().type() && sound.device().clock() == scan.device().clock())
+			if (sound.device().type() == scan.device().type() && sound.device().clock().value() == scan.device().clock().value())
 				if (soundtags.insert(scan.device().tag()).second)
 					count++;
 		}
 
-		const u32 clock = sound.device().clock();
+		const u32 clock = sound.device().clock().value();
 		std::string hz(std::to_string(clock));
 		int d = (clock >= 1'000'000'000) ? 9 : (clock >= 1'000'000) ? 6 : (clock >= 1000) ? 3 : 0;
 		if (d > 0)

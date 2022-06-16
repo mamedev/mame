@@ -321,7 +321,7 @@ void tasc_state::tasc(machine_config &config)
 	subdevice<sensorboard_device>("smartboard:board")->set_nvram_enable(true);
 
 	/* video hardware */
-	LM24014H(config, m_lcd, 0);
+	LM24014H(config, m_lcd);
 	m_lcd->set_fs(1); // font size 6x8
 
 	config.set_default_layout(layout_tascr30);

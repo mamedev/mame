@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(ST0020_SPRITES, st0020_device, "st0020", "Seta ST0020 Sprites
 		do { if (m_is_st0032) mem_mask = swapendian_int16(mem_mask); } while (false)
 
 
-st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ST0020_SPRITES, tag, owner, clock),
 	device_gfx_interface(mconfig, *this),
 	m_rom_ptr(*this, DEVICE_SELF)

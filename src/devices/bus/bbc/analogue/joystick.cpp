@@ -82,7 +82,7 @@ ioport_constructor bbc_voltmace3b_device::device_input_ports() const
 //  bbc_joystick_device - constructor
 //-------------------------------------------------
 
-bbc_joystick_device::bbc_joystick_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+bbc_joystick_device::bbc_joystick_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_analogue_interface(mconfig, *this),
 	m_joy(*this, "JOY%u", 0),
@@ -90,12 +90,12 @@ bbc_joystick_device::bbc_joystick_device(const machine_config &mconfig, device_t
 {
 }
 
-bbc_acornjoy_device::bbc_acornjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bbc_acornjoy_device::bbc_acornjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	bbc_joystick_device(mconfig, BBC_ACORNJOY, tag, owner, clock)
 {
 }
 
-bbc_voltmace3b_device::bbc_voltmace3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bbc_voltmace3b_device::bbc_voltmace3b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	bbc_joystick_device(mconfig, BBC_VOLTMACE3B, tag, owner, clock)
 {
 }

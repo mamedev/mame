@@ -52,7 +52,7 @@ device_bbc_internal_interface::device_bbc_internal_interface(const machine_confi
 //  bbc_internal_slot_device - constructor
 //-------------------------------------------------
 
-bbc_internal_slot_device::bbc_internal_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_internal_slot_device::bbc_internal_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_INTERNAL_SLOT, tag, owner, clock)
 	, device_single_card_slot_interface<device_bbc_internal_interface>(mconfig, *this)
 	, m_irq_handler(*this)

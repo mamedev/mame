@@ -70,7 +70,7 @@ void konami_pc_state::machine_reset()
 void konami_pc_state::konami_pc(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM3(config, m_maincpu, 100000000); // actually Celeron
+	PENTIUM3(config, m_maincpu, XTAL::u(100000000)); // actually Celeron
 	m_maincpu->set_addrmap(AS_PROGRAM, &konami_pc_state::konami_pc_map);
 
 	/* video hardware */

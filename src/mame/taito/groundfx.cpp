@@ -552,14 +552,14 @@ void groundfx_state::groundfx(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	adc0809_device &adc(ADC0809(config, "adc", 500'000)); // unknown clock
+	adc0809_device &adc(ADC0809(config, "adc", XTAL::u(500'000))); // unknown clock
 	adc.eoc_ff_callback().set_inputline("maincpu", 5);
 	adc.in_callback<0>().set_constant(0); // unknown
 	adc.in_callback<1>().set_constant(0); // unknown (used to be labeled 'volume' - but doesn't seem to affect it)
 	adc.in_callback<2>().set_ioport("WHEEL");
 	adc.in_callback<3>().set_ioport("ACCEL");
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_2_callback().set_ioport("BUTTONS");
 	tc0510nio.read_3_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
 	tc0510nio.read_3_callback().append(FUNC(groundfx_state::frame_counter_r)).lshift(0);
@@ -581,11 +581,11 @@ void groundfx_state::groundfx(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_groundfx);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	TC0620SCC(config, m_tc0620scc, 0);
+	TC0620SCC(config, m_tc0620scc);
 	m_tc0620scc->set_offsets(50, 8);
 	m_tc0620scc->set_palette(m_palette);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x24, 0);
 	m_tc0480scp->set_offsets_tx(-1, 0);
@@ -594,7 +594,7 @@ void groundfx_state::groundfx(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "lspeaker", 1.0);
 	taito_en.add_route(1, "rspeaker", 1.0);
 }

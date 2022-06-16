@@ -187,11 +187,11 @@ void ob68k1a_state::ob68k1a(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ob68k1a_state::ob68k1a_mem);
 
 	// devices
-	PIA6821(config, m_pia0, 0);
-	PIA6821(config, m_pia1, 0);
-	PTM6840(config, MC6840_TAG, 10_MHz_XTAL/10).set_external_clocks(0, 0, 0);
+	PIA6821(config, m_pia0);
+	PIA6821(config, m_pia1);
+	PTM6840(config, MC6840_TAG, 10_MHz_XTAL/10).set_external_clocks(XTAL(), XTAL(), XTAL());
 
-	ACIA6850(config, m_acia0, 0);
+	ACIA6850(config, m_acia0);
 	m_acia0->txd_handler().set(m_rs232a, FUNC(rs232_port_device::write_txd));
 	m_acia0->rts_handler().set(m_rs232a, FUNC(rs232_port_device::write_rts));
 
@@ -200,7 +200,7 @@ void ob68k1a_state::ob68k1a(machine_config &config)
 	m_rs232a->dcd_handler().set(m_acia0, FUNC(acia6850_device::write_dcd));
 	m_rs232a->cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 
-	ACIA6850(config, m_acia1, 0);
+	ACIA6850(config, m_acia1);
 	m_acia1->txd_handler().set(m_rs232b, FUNC(rs232_port_device::write_txd));
 	m_acia1->rts_handler().set(m_rs232b, FUNC(rs232_port_device::write_rts));
 
@@ -216,7 +216,7 @@ void ob68k1a_state::ob68k1a(machine_config &config)
 	m_dbrg->ft_handler().append(m_acia1, FUNC(acia6850_device::write_rxc));
 
 	// internal ram
-	RAM(config, m_ram, 0);
+	RAM(config, m_ram);
 	m_ram->set_default_size("32K");
 	m_ram->set_extra_options("128K");
 }

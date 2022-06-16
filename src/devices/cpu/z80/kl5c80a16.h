@@ -28,7 +28,7 @@ public:
 	};
 
 	// device type constructor
-	kl5c80a16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	kl5c80a16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callback configuration
 	auto in_p0_callback() { return m_port_in_callback[0].bind(); }

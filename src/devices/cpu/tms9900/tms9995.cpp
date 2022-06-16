@@ -157,13 +157,13 @@ constexpr int tms9995_device::AS_SETADDRESS;
     Constructor
 ****************************************************************************/
 
-tms9995_device::tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms9995_device::tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: tms9995_device(mconfig, TMS9995, tag, owner, clock)
 {
 	m_mp9537 = false;
 }
 
-tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_state_any(0),
 		PC(0),

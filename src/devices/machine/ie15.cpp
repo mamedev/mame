@@ -39,7 +39,7 @@
 #define _PRINT(ch) (std::isprint(ch & 127)?(ch & 127):' ')
 
 
-ie15_device::ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ie15_device::ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
@@ -69,7 +69,7 @@ ie15_device::ie15_device(const machine_config &mconfig, device_type type, const 
 {
 }
 
-ie15_device::ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ie15_device::ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: ie15_device(mconfig, IE15, tag, owner, clock)
 {
 }
@@ -517,7 +517,7 @@ void ie15_device::device_reset()
 	m_serial_tx_ready = m_serial_rx_ready = IE_TRUE;
 	set_data_frame(1 /* start bits */, 8 /* data bits */, PARITY_NONE, STOP_BITS_1);
 	// device supports rates from 150 to 9600 baud but null_modem has hardcoded 9600
-	set_rate(9600);
+	set_rate(XTAL::u(9600));
 }
 
 /*
@@ -680,12 +680,12 @@ void ie15_device::ie15core(machine_config &config)
 	config.set_default_layout(layout_ie15);
 
 	/* Devices */
-	IE15_KEYBOARD(config, m_keyboard, 0);
+	IE15_KEYBOARD(config, m_keyboard);
 	m_keyboard->keyboard_cb().set(FUNC(ie15_device::kbd_put));
 	m_keyboard->sdv_cb().set(FUNC(ie15_device::kbd_sdv));
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 2400);
+	BEEP(config, m_beeper, XTAL::u(2400));
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 

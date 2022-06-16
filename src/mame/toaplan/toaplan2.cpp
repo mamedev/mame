@@ -3936,7 +3936,7 @@ void toaplan2_state::pwrkick(machine_config &config)
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pwrkick_68k_mem);
 
-	UPD4992(config, m_rtc, 32'768);
+	UPD4992(config, m_rtc, XTAL::u(32'768));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3971,7 +3971,7 @@ void toaplan2_state::othldrby(machine_config &config)
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::othldrby_68k_mem);
 
-	UPD4992(config, m_rtc, 32'768);
+	UPD4992(config, m_rtc, XTAL::u(32'768));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -4186,7 +4186,7 @@ void toaplan2_state::batrider(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,bgaregga)
 
-	ADDRESS_MAP_BANK(config, m_dma_space, 0);
+	ADDRESS_MAP_BANK(config, m_dma_space);
 	m_dma_space->set_addrmap(0, &toaplan2_state::batrider_dma_mem);
 	m_dma_space->set_endianness(ENDIANNESS_BIG);
 	m_dma_space->set_data_width(16);
@@ -4252,7 +4252,7 @@ void toaplan2_state::bbakraid(machine_config &config)
 
 	EEPROM_93C66_8BIT(config, "eeprom");
 
-	ADDRESS_MAP_BANK(config, m_dma_space, 0);
+	ADDRESS_MAP_BANK(config, m_dma_space);
 	m_dma_space->set_addrmap(0, &toaplan2_state::batrider_dma_mem);
 	m_dma_space->set_endianness(ENDIANNESS_BIG);
 	m_dma_space->set_data_width(16);
@@ -4300,7 +4300,7 @@ void toaplan2_state::nprobowl(machine_config &config)
 	M68000(config, m_maincpu, 32_MHz_XTAL / 2);   // 32MHz Oscillator, divisor not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::nprobowl_68k_mem);
 
-	ADDRESS_MAP_BANK(config, m_dma_space, 0);
+	ADDRESS_MAP_BANK(config, m_dma_space);
 	m_dma_space->set_addrmap(0, &toaplan2_state::batrider_dma_mem);
 	m_dma_space->set_endianness(ENDIANNESS_BIG);
 	m_dma_space->set_data_width(16);

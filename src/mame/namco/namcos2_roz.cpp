@@ -34,7 +34,7 @@ GFXDECODE_END
 
 DEFINE_DEVICE_TYPE(NAMCOS2_ROZ, namcos2_roz_device, "namcos2_roz", "Namco System 2 ROZ (C102)")
 
-namcos2_roz_device::namcos2_roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+namcos2_roz_device::namcos2_roz_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NAMCOS2_ROZ, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_rozram(*this, finder_base::DUMMY_TAG),

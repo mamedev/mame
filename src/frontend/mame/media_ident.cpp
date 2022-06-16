@@ -389,7 +389,7 @@ void media_identifier::match_hashes(std::vector<file_info> &info)
 	machine_config::token const tok(config.begin_configuration(config.root_device()));
 	for (device_type type : registered_device_types)
 	{
-		match_device(*config.device_add("_tmp", type, 0));
+		match_device(*config.device_add("_tmp", type));
 		config.device_remove("_tmp");
 	}
 }

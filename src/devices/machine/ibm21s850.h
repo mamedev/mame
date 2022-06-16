@@ -25,7 +25,7 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::COMMS; }
 
 protected:
-	ibm21s85x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ibm21s85x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -143,7 +143,7 @@ protected:
 class ibm21s850_device : public ibm21s85x_base_device
 {
 public:
-	ibm21s850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ibm21s850_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	virtual void device_reset() override;
@@ -161,7 +161,7 @@ private:
 class ibm21s851_device : public ibm21s85x_base_device
 {
 public:
-	ibm21s851_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ibm21s851_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	virtual void device_reset() override;

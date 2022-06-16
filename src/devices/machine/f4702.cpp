@@ -75,7 +75,7 @@ DEFINE_DEVICE_TYPE(F4702, f4702_device, "f4702", "Fairchild 4702B Bit Rate Gener
 //  f4702_device - constructor
 //-------------------------------------------------
 
-f4702_device::f4702_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+f4702_device::f4702_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, F4702, tag, owner, clock)
 	, device_execute_interface(mconfig, *this)
 	, m_s_callback(*this)

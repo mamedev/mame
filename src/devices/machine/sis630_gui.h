@@ -12,7 +12,7 @@
 class sis630_svga_device : public svga_device
 {
 public:
-	sis630_svga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis630_svga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
@@ -50,7 +50,7 @@ DECLARE_DEVICE_TYPE(SIS630_SVGA, sis630_svga_device)
 class sis630_gui_device : public pci_device
 {
 public:
-	sis630_gui_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis630_gui_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void legacy_memory_map(address_map &map);
 	void legacy_io_map(address_map &map);
@@ -111,7 +111,7 @@ class sis630_bridge_device : public pci_bridge_device
 {
 public:
 	template <typename T> sis630_bridge_device(
-		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+		const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock,
 		T &&gui_tag
 	) : sis630_bridge_device(mconfig, tag, owner, clock)
 	{
@@ -121,7 +121,7 @@ public:
 		m_vga.set_tag(std::forward<T>(gui_tag));
 	}
 
-	sis630_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis630_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

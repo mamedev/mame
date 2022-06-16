@@ -13,7 +13,7 @@
 #define LOGCMD(...)    LOGMASKED(LOG_COMMAND, __VA_ARGS__)
 
 
-jvc_xvd701_device::jvc_xvd701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+jvc_xvd701_device::jvc_xvd701_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, JVC_XVD701, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),

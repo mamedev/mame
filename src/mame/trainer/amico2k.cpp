@@ -220,7 +220,7 @@ void amico2k_state::machine_start()
 void amico2k_state::amico2k(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1000000); /* 1MHz */
+	M6502(config, m_maincpu, XTAL::u(1000000)); /* 1MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &amico2k_state::amico2k_mem);
 
 	/* video hardware */

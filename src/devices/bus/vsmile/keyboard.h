@@ -53,7 +53,7 @@ public:
 	};
 
 protected:
-	vsmile_keyboard_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock, uint8_t layout_type);
+	vsmile_keyboard_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock, uint8_t layout_type);
 
 	// device_t implementation
 	virtual void device_start() override;
@@ -103,7 +103,7 @@ class vsmile_keyboard_us_device : public vsmile_keyboard_device
 {
 public:
 	// construction/destruction
-	vsmile_keyboard_us_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
+	vsmile_keyboard_us_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device_t implementation
@@ -114,7 +114,7 @@ class vsmile_keyboard_fr_device : public vsmile_keyboard_device
 {
 public:
 	// construction/destruction
-	vsmile_keyboard_fr_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
+	vsmile_keyboard_fr_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device_t implementation
@@ -125,7 +125,7 @@ class vsmile_keyboard_ge_device : public vsmile_keyboard_device
 {
 public:
 	// construction/destruction
-	vsmile_keyboard_ge_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
+	vsmile_keyboard_ge_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device_t implementation

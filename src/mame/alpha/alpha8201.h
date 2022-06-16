@@ -14,7 +14,7 @@
 class alpha_8201_device : public device_t
 {
 public:
-	alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~alpha_8201_device() {}
 
 	// external I/O

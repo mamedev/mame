@@ -410,7 +410,7 @@ void jankenmn_state::jankenmn(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	AD7523(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AD7523(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 

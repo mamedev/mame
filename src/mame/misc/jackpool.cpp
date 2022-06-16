@@ -235,7 +235,7 @@ INTERRUPT_GEN_MEMBER(jackpool_state::jackpool_interrupt)
 
 void jackpool_state::jackpool(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000); // ?
+	M68000(config, m_maincpu, XTAL::u(12000000)); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &jackpool_state::jackpool_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(jackpool_state::jackpool_interrupt));  // ?
 
@@ -272,13 +272,13 @@ void jackpool_state::jackpool(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	NS16550(config, "uart", 1843200); // exact type and clock unknown
+	NS16550(config, "uart", XTAL::u(1843200)); // exact type and clock unknown
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x200);
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL::u(1056000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 

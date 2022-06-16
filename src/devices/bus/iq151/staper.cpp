@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(IQ151_STAPER, iq151_staper_device, "iq151_staper", "IQ151 STA
 //  iq151_staper_device - constructor
 //-------------------------------------------------
 
-iq151_staper_device::iq151_staper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iq151_staper_device::iq151_staper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IQ151_STAPER, tag, owner, clock)
 	, device_iq151cart_interface(mconfig, *this)
 	, m_ppi(*this, "ppi8255")
@@ -74,7 +74,7 @@ void iq151_staper_device::device_add_mconfig(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(iq151_staper_device::ppi_portb_w));
 	m_ppi->out_pc_callback().set(FUNC(iq151_staper_device::ppi_portc_w));
 
-	PRINTER(config, "printer", 0);
+	PRINTER(config, "printer");
 }
 
 //-------------------------------------------------

@@ -16,7 +16,7 @@
 class sega_315_5641_pcm_device : public upd7759_device
 {
 public:
-	sega_315_5641_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_315_5641_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto fifo_cb() { return m_fifocallback.bind(); }
 	virtual void port_w(u8 data) override;

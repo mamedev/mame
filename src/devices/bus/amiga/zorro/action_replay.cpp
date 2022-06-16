@@ -101,24 +101,24 @@ const tiny_rom_entry *action_replay_mk3_device::device_rom_region() const
 //  action_replay_device_base - constructor
 //-------------------------------------------------
 
-action_replay_device_base::action_replay_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+action_replay_device_base::action_replay_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_exp_card_interface(mconfig, *this),
 	m_button(*this, "freeze")
 {
 }
 
-action_replay_mk1_device::action_replay_mk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+action_replay_mk1_device::action_replay_mk1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	action_replay_device_base(mconfig, ZORRO_ACTION_REPLAY_MK1, tag, owner, clock)
 {
 }
 
-action_replay_mk2_device::action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+action_replay_mk2_device::action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	action_replay_device_base(mconfig, ZORRO_ACTION_REPLAY_MK2, tag, owner, clock)
 {
 }
 
-action_replay_mk3_device::action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+action_replay_mk3_device::action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	action_replay_device_base(mconfig, ZORRO_ACTION_REPLAY_MK3, tag, owner, clock)
 {
 }

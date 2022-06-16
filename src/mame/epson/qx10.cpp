@@ -59,7 +59,7 @@
 #include "imagedev/snapquik.h"
 
 
-#define MAIN_CLK    15974400
+#define MAIN_CLK    XTAL::u(15974400)
 
 #define RS232_TAG   "rs232"
 
@@ -922,7 +922,7 @@ void qx10_state::qx10(machine_config &config)
     1       Keyboard clock (1200bps)    +5V                     8259A (10E) IR5 Software timer
     2       Clock 1,9668MHz             Memory register D7      8259 (12E) IR1  Software timer
 */
-	PIT8253(config, m_pit_1, 0);
+	PIT8253(config, m_pit_1);
 	m_pit_1->set_clk<0>(1200);
 	m_pit_1->out_handler<0>().set(FUNC(qx10_state::speaker_duration));
 	m_pit_1->set_clk<1>(1200);
@@ -937,7 +937,7 @@ void qx10_state::qx10(machine_config &config)
     1       Clock 1,9668MHz     +5V         Keyboard clock      1200bps (Clock / 1664)
     2       Clock 1,9668MHz     +5V         RS-232C baud rate   9600bps (Clock / 208)
 */
-	PIT8253(config, m_pit_2, 0);
+	PIT8253(config, m_pit_2);
 	m_pit_2->set_clk<0>(MAIN_CLK / 8);
 	m_pit_2->out_handler<0>().set(FUNC(qx10_state::speaker_freq));
 	m_pit_2->set_clk<1>(MAIN_CLK / 8);
@@ -945,12 +945,12 @@ void qx10_state::qx10(machine_config &config)
 	m_pit_2->set_clk<2>(MAIN_CLK / 8);
 	m_pit_2->out_handler<2>().set(m_scc, FUNC(upd7201_device::rxtxcb_w));
 
-	PIC8259(config, m_pic_m, 0);
+	PIC8259(config, m_pic_m);
 	m_pic_m->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic_m->in_sp_callback().set_constant(1);
 	m_pic_m->read_slave_ack_callback().set(FUNC(qx10_state::get_slave_ack));
 
-	PIC8259(config, m_pic_s, 0);
+	PIC8259(config, m_pic_s);
 	m_pic_s->out_int_callback().set(m_pic_m, FUNC(pic8259_device::ir7_w));
 	m_pic_s->in_sp_callback().set_constant(0);
 
@@ -977,7 +977,7 @@ void qx10_state::qx10(machine_config &config)
 	AM9517A(config, m_dma_2, MAIN_CLK/4);
 	m_dma_2->dreq_active_low();
 
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->out_pa_callback().set("prndata", FUNC(output_latch_device::write));
 	m_ppi->in_pb_callback().set(FUNC(qx10_state::portb_r));
 	m_ppi->out_pc_callback().set(FUNC(qx10_state::portc_w));
@@ -993,7 +993,7 @@ void qx10_state::qx10(machine_config &config)
 	m_rtc->irq().set(m_pic_s, FUNC(pic8259_device::ir2_w));
 	m_rtc->sqw().set(FUNC(qx10_state::sqw_out));
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(qx10_state::qx10_upd765_interrupt));
 	m_fdc->drq_wr_callback().set(m_dma_1, FUNC(am9517a_device::dreq0_w)).invert();
 	FLOPPY_CONNECTOR(config, m_floppy[0], qx10_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);

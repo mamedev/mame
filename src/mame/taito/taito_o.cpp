@@ -288,7 +288,7 @@ void taitoo_state::machine_start()
 
 void taitoo_state::parentj(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000);       //?? MHz
+	M68000(config, m_maincpu, XTAL::u(12000000));       //?? MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitoo_state::prg_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(taitoo_state::interrupt), "screen", 0, 1);
 
@@ -304,14 +304,14 @@ void taitoo_state::parentj(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
-	TC0080VCO(config, m_tc0080vco, 0);
+	TC0080VCO(config, m_tc0080vco);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
 	m_tc0080vco->set_palette(m_palette);
 
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 2000000)); // ?? MHz
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL::u(2000000))); // ?? MHz
 	ymsnd.port_a_read_callback().set_ioport("DSWA");
 	ymsnd.port_b_read_callback().set_ioport("DSWB");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);

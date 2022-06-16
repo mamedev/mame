@@ -20,7 +20,7 @@ class ym2414_device : public ymfm_device_base<ymfm::ym2414>
 
 public:
 	// constructor
-	ym2414_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym2414_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers, handled by the interface
 	auto port_write_handler() { return io_write_handler(); }

@@ -43,7 +43,7 @@
 class hlcd0538_device : public device_t
 {
 public:
-	hlcd0538_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	hlcd0538_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration helpers
 	auto write_cols() { return m_write_cols.bind(); }              // C/R pins (0538: d0-d7 for rows)
@@ -54,7 +54,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(data_w) { m_data = (state) ? 1 : 0; }
 
 protected:
-	hlcd0538_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	hlcd0538_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -77,7 +77,7 @@ protected:
 class hlcd0539_device : public hlcd0538_device
 {
 public:
-	hlcd0539_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	hlcd0539_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 

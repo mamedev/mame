@@ -328,7 +328,7 @@ void rampart_state::rampart(machine_config &config)
 	M68000(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rampart_state::main_map);
 
-	SLAPSTIC(config, m_slapstic, 118);
+	SLAPSTIC(config, m_slapstic, XTAL::u(118));
 	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x140000, 0x147fff, 0x438000);
 	m_slapstic->set_bank(m_slapstic_bank);
 
@@ -342,7 +342,7 @@ void rampart_state::rampart(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_rampart);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 512).set_membits(8);
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, rampart_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, rampart_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

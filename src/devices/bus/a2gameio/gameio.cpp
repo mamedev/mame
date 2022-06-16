@@ -62,7 +62,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(APPLE2_GAMEIO, apple2_gameio_device, "a2gameio", "Apple II Game I/O Connector")
 
-apple2_gameio_device::apple2_gameio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+apple2_gameio_device::apple2_gameio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, APPLE2_GAMEIO, tag, owner, clock)
 	, device_single_card_slot_interface<device_a2gameio_interface>(mconfig, *this)
 	, m_intf(nullptr)

@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(MB90641A, mb90641_device, "mb90641a", "Fujitsu MB90641A")
 //-------------------------------------------------
 //  mb9061x_device - constructor
 //-------------------------------------------------
-mb9061x_device::mb9061x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
+mb9061x_device::mb9061x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_map) :
 	f2mc16_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0, internal_map)
 {
@@ -82,12 +82,12 @@ void mb90610_device::mb90610_map(address_map &map)
 	map(0x0100, 0x10ff).ram();  // 4K of internal RAM from 0x100 to 0x1100
 }
 
-mb90610_device::mb90610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mb90610_device::mb90610_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mb90610_device(mconfig, MB90610A, tag, owner, clock)
 {
 }
 
-mb90610_device::mb90610_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+mb90610_device::mb90610_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	mb9061x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(mb90610_device::mb90610_map), this))
 {
 }
@@ -412,12 +412,12 @@ void mb90611_device::mb90611_map(address_map &map)
 	map(0x0100, 0x04ff).ram();  // 1K of internal RAM from 0x100 to 0x500
 }
 
-mb90611_device::mb90611_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mb90611_device::mb90611_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mb90611_device(mconfig, MB90611A, tag, owner, clock)
 {
 }
 
-mb90611_device::mb90611_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+mb90611_device::mb90611_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	mb9061x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(mb90611_device::mb90611_map), this))
 {
 }
@@ -431,12 +431,12 @@ void mb90641_device::mb90641_map(address_map &map)
 	map(0x0100, 0x08ff).ram();  // 2K of internal RAM
 }
 
-mb90641_device::mb90641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mb90641_device::mb90641_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	mb90641_device(mconfig, MB90641A, tag, owner, clock)
 {
 }
 
-mb90641_device::mb90641_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+mb90641_device::mb90641_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	mb9061x_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(mb90641_device::mb90641_map), this))
 {
 }

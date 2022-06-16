@@ -58,7 +58,7 @@ const char *const kp63_device::s_count_modes[4] =
 //  kp63_device - constructor
 //-------------------------------------------------
 
-kp63_device::kp63_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 num_counters, u8 mode_mask)
+kp63_device::kp63_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 num_counters, u8 mode_mask)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_pulse_callback(*this)
 	, m_out_strobe_callback(*this)
@@ -82,7 +82,7 @@ kp63_device::kp63_device(const machine_config &mconfig, device_type type, const 
 //  kp63_3channel_device - constructor
 //-------------------------------------------------
 
-kp63_3channel_device::kp63_3channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+kp63_3channel_device::kp63_3channel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kp63_device(mconfig, KP63_3CHANNEL, tag, owner, clock, 3, 0x1f)
 {
 }
@@ -92,7 +92,7 @@ kp63_3channel_device::kp63_3channel_device(const machine_config &mconfig, const 
 //  kp63a_device - constructor
 //-------------------------------------------------
 
-kp63a_device::kp63a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+kp63a_device::kp63a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: kp63_device(mconfig, KP63A, tag, owner, clock, 4, 0x3f)
 {
 }

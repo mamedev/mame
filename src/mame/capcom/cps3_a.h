@@ -33,7 +33,7 @@ struct cps3_voice
 class cps3_sound_device : public device_t, public device_sound_interface
 {
 public:
-	cps3_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cps3_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~cps3_sound_device() { }
 
 	void set_base(int8_t* base) { m_base = base; }

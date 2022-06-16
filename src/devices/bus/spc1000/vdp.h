@@ -19,7 +19,7 @@ class spc1000_vdp_exp_device : public device_t, public device_spc1000_card_inter
 {
 public:
 	// construction/destruction
-	spc1000_vdp_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spc1000_vdp_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

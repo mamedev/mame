@@ -27,7 +27,7 @@ class spectrum_wafa_device:
 {
 public:
 	// construction/destruction
-	spectrum_wafa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_wafa_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK | feature::LAN; }
 

@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(CRT9028_000, crt9028_000_device, "crt9028_000", "CRT9028-000 
 //  crt9028_device - constructor
 //-------------------------------------------------
 
-crt9028_device::crt9028_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
+crt9028_device::crt9028_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock,
 							int dots_per_char, int chars_per_row, int horiz_blanking, int hsync_delay, int hsync_width, bool hsync_active,
 							int char_rows, int scans_per_char, bool vsync_active,
 							int vert_blanking, int vsync_delay, int vsync_width,
@@ -100,7 +100,7 @@ crt9028_device::crt9028_device(const machine_config &mconfig, device_type type, 
 //  crt9028_000_device - constructor
 //-------------------------------------------------
 
-crt9028_000_device::crt9028_000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+crt9028_000_device::crt9028_000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: crt9028_device(mconfig, CRT9028_000, tag, owner, clock,
 						7, 80, 20, 4, 8, false,
 						24, 10, false,

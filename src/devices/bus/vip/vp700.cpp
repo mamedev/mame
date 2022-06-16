@@ -46,7 +46,7 @@ const tiny_rom_entry *vp700_device::device_rom_region() const
 //  vp700_device - constructor
 //-------------------------------------------------
 
-vp700_device::vp700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vp700_device::vp700_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VP700, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "vp700")

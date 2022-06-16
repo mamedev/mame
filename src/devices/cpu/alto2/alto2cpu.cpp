@@ -125,7 +125,7 @@ void alto2_cpu_device::iomem_map(address_map &map)
 //  alto2_cpu_device - constructor
 //-------------------------------------------------
 
-alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	cpu_device(mconfig, ALTO2, tag, owner, clock),
 	m_kb_read_callback(*this),
 	m_utilout_callback(*this),

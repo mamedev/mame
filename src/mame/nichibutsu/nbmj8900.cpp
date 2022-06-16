@@ -328,9 +328,9 @@ void nbmj8900_state::ohpaipee(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	YM3812(config, "ymsnd", 2500000).add_route(ALL_OUTPUTS, "speaker", 0.7);
+	YM3812(config, "ymsnd", XTAL::u(2500000)).add_route(ALL_OUTPUTS, "speaker", 0.7);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.42); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.42); // unknown DAC
 }
 
 void nbmj8900_state::togenkyo(machine_config &config)

@@ -53,7 +53,7 @@ device_vic10_expansion_card_interface::~device_vic10_expansion_card_interface()
 //  vic10_expansion_slot_device - constructor
 //-------------------------------------------------
 
-vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VIC10_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_vic10_expansion_card_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),

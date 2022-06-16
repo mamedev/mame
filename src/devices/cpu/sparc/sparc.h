@@ -21,7 +21,7 @@
 class sparc_base_device : public cpu_device, public sparc_mmu_host_interface, protected sparc_disassembler::config
 {
 public:
-	sparc_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sparc_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_mmu(T &&tag) { m_mmu.set_tag(std::forward<T>(tag)); }
 
@@ -273,10 +273,10 @@ protected:
 class sparcv7_device : public sparc_base_device
 {
 public:
-	sparcv7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sparcv7_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	sparcv7_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sparcv7_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual bool execute_extra_group2(uint32_t op) override;
@@ -288,13 +288,13 @@ protected:
 class sparcv8_device : public sparc_base_device
 {
 public:
-	sparcv8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sparcv8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 protected:
-	sparcv8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sparcv8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -320,7 +320,7 @@ private:
 class mb86930_device : public sparcv8_device
 {
 public:
-	mb86930_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb86930_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

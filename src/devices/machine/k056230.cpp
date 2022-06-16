@@ -33,7 +33,7 @@ TODO: nearly everything
 DEFINE_DEVICE_TYPE(K056230, k056230_device, "k056230", "K056230 LANC")
 
 
-k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, K056230, tag, owner, clock)
 	, m_ram(*this, "lanc_ram", 0x800U * 4, ENDIANNESS_BIG)
 	, m_irq_cb(*this)

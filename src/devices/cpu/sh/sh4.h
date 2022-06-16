@@ -254,7 +254,7 @@ public:
 
 protected:
 	// construction/destruction
-	sh34_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal);
+	sh34_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, endianness_t endianness, address_map_constructor internal);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -690,7 +690,7 @@ public:
 	void sh3_internal_map(address_map &map);
 protected:
 	// construction/destruction
-	sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+	sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, endianness_t endianness);
 
 	virtual void device_reset() override;
 };
@@ -718,7 +718,7 @@ public:
 	void sh4_internal_map(address_map &map);
 protected:
 	// construction/destruction
-	sh4_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+	sh4_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, endianness_t endianness);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -729,7 +729,7 @@ class sh3_device : public sh3_base_device
 {
 	friend class sh4_frontend;
 public:
-	sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	std::unique_ptr<sh4_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 	virtual const opcode_desc* get_desclist(offs_t pc) override;
 	virtual void init_drc_frontend() override;
@@ -741,7 +741,7 @@ class sh3be_device : public sh3_base_device
 	friend class sh4be_frontend;
 
 public:
-	sh3be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sh3be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	std::unique_ptr<sh4be_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 	virtual const opcode_desc* get_desclist(offs_t pc) override;
 	virtual void init_drc_frontend() override;
@@ -756,7 +756,7 @@ class sh4_device : public sh4_base_device
 	friend class sh4_frontend;
 
 public:
-	sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	std::unique_ptr<sh4_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 	virtual const opcode_desc* get_desclist(offs_t pc) override;
 	virtual void init_drc_frontend() override;
@@ -769,7 +769,7 @@ class sh4be_device : public sh4_base_device
 	friend class sh4be_frontend;
 
 public:
-	sh4be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sh4be_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	std::unique_ptr<sh4be_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 	virtual const opcode_desc* get_desclist(offs_t pc) override;
 	virtual void init_drc_frontend() override;

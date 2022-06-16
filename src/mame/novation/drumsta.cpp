@@ -52,11 +52,11 @@ INPUT_PORTS_END
 
 void drumsta_state::drumsta(machine_config &config)
 {
-	MN1880(config, m_maincpu, 8000000); // type and clock unknown (custom silkscreen)
+	MN1880(config, m_maincpu, XTAL::u(8000000)); // type and clock unknown (custom silkscreen)
 	m_maincpu->set_addrmap(AS_PROGRAM, &drumsta_state::drumsta_prog);
 	m_maincpu->set_addrmap(AS_DATA, &drumsta_state::drumsta_data);
 
-	ADSP2181(config, m_dsp, 16000000).set_disable(); // clock unknown
+	ADSP2181(config, m_dsp, XTAL::u(16000000)).set_disable(); // clock unknown
 
 	EEPROM_2864(config, "eeprom"); // Atmel AT28C64
 }

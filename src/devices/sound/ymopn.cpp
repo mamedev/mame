@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(YM2203, ym2203_device, "ym2203", "YM2203 OPN")
 //  ym2203_device - constructor
 //-------------------------------------------------
 
-ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_ssg_device_base<ymfm::ym2203>(mconfig, tag, owner, clock, YM2203)
 {
 }
@@ -46,7 +46,7 @@ DEFINE_DEVICE_TYPE(YM2608, ym2608_device, "ym2608", "YM2608 OPNA")
 //  ym2608_device - constructor
 //-------------------------------------------------
 
-ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_ssg_device_base<ymfm::ym2608>(mconfig, tag, owner, clock, YM2608),
 	device_rom_interface(mconfig, *this),
 	m_internal(*this, "internal")
@@ -147,7 +147,7 @@ void ym2608_device::ymfm_external_write(ymfm::access_class type, uint32_t offset
 //-------------------------------------------------
 
 template<typename ChipClass>
-ym2610_device_base<ChipClass>::ym2610_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
+ym2610_device_base<ChipClass>::ym2610_device_base(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, device_type type) :
 	ymfm_ssg_device_base<ChipClass>(mconfig, tag, owner, clock, type),
 	device_memory_interface(mconfig, *this),
 	m_adpcm_a_config("adpcm_a", ENDIANNESS_LITTLE, 8, 24, 0),
@@ -227,7 +227,7 @@ DEFINE_DEVICE_TYPE(YM2610, ym2610_device, "ym2610", "YM2610 OPNB")
 //  ym2610_device - constructor
 //-------------------------------------------------
 
-ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ym2610_device_base<ymfm::ym2610>(mconfig, tag, owner, clock, YM2610)
 {
 }
@@ -243,7 +243,7 @@ DEFINE_DEVICE_TYPE(YM2610B, ym2610b_device, "ym2610b", "YM2610B OPNB2")
 //  ym2610b_device - constructor
 //-------------------------------------------------
 
-ym2610b_device::ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym2610b_device::ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ym2610_device_base<ymfm::ym2610b>(mconfig, tag, owner, clock, YM2610B)
 {
 }
@@ -260,7 +260,7 @@ DEFINE_DEVICE_TYPE(YM2612, ym2612_device, "ym2612", "YM2612 OPN2")
 //  ym2612_device - constructor
 //-------------------------------------------------
 
-ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ym2612>(mconfig, tag, owner, clock, YM2612)
 {
 }
@@ -277,7 +277,7 @@ DEFINE_DEVICE_TYPE(YM3438, ym3438_device, "ym3438", "YM3438 OPN2C")
 //  ym3438_device - constructor
 //-------------------------------------------------
 
-ym3438_device::ym3438_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ym3438_device::ym3438_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ym3438>(mconfig, tag, owner, clock, YM3438)
 {
 }
@@ -294,7 +294,7 @@ DEFINE_DEVICE_TYPE(YMF276, ymf276_device, "ymf276", "YMF276 OPN2L")
 //  ymf276_device - constructor
 //-------------------------------------------------
 
-ymf276_device::ymf276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ymf276_device::ymf276_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	ymfm_device_base<ymfm::ymf276>(mconfig, tag, owner, clock, YMF276)
 {
 }

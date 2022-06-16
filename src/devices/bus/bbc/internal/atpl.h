@@ -27,7 +27,7 @@ class bbc_atplsw_device :
 {
 public:
 	// construction/destruction
-	bbc_atplsw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_atplsw_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -56,7 +56,7 @@ class bbc_atplswp_device :
 {
 public:
 	// construction/destruction
-	bbc_atplswp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_atplswp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

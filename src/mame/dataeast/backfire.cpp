@@ -365,12 +365,12 @@ void backfire_state::machine_start()
 void backfire_state::backfire(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM(config, m_maincpu, 28000000/4); /* Unconfirmed */
+	ARM(config, m_maincpu, XTAL::u(28000000)/4); /* Unconfirmed */
 	m_maincpu->set_addrmap(AS_PROGRAM, &backfire_state::backfire_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	ADC0808(config, m_adc, 1000000); // unknown clock
+	ADC0808(config, m_adc, XTAL::u(1000000)); // unknown clock
 	m_adc->in_callback<0>().set_ioport("PADDLE0");
 	m_adc->in_callback<1>().set_ioport("PADDLE1");
 
@@ -397,7 +397,7 @@ void backfire_state::backfire(machine_config &config)
 	rscreen.set_screen_update(FUNC(backfire_state::screen_update_right));
 	rscreen.set_palette(m_palette);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_screen(m_lscreen);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
@@ -411,7 +411,7 @@ void backfire_state::backfire(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_screen(m_lscreen);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
@@ -425,13 +425,13 @@ void backfire_state::backfire(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
+	DECO_SPRITE(config, m_sprgen[0]);
 	m_sprgen[0]->set_screen(m_lscreen);
 	m_sprgen[0]->set_gfx_region(4);
 	m_sprgen[0]->set_pri_callback(FUNC(backfire_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[1], 0);
+	DECO_SPRITE(config, m_sprgen[1]);
 	m_sprgen[1]->set_screen("rscreen");
 	m_sprgen[1]->set_gfx_region(5);
 	m_sprgen[1]->set_pri_callback(FUNC(backfire_state::pri_callback));
@@ -441,7 +441,7 @@ void backfire_state::backfire(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", 28000000 / 2));
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL::u(28000000) / 2));
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }

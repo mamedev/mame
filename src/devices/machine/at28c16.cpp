@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(AT28C16, at28c16_device, "at28c16", "AT28C16 2Kx8 EEPROM")
 //  at28c16_device - constructor
 //-------------------------------------------------
 
-at28c16_device::at28c16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+at28c16_device::at28c16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, AT28C16, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),

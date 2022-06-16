@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(M24_Z8000, m24_z8000_device, "m24_z8000", "Olivetti M24 Z8000 Adapter")
 
-m24_z8000_device::m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m24_z8000_device::m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, M24_Z8000, tag, owner, clock),
 	m_z8000(*this, "z8000"),
 	m_maincpu(*this, ":maincpu"),
@@ -80,7 +80,7 @@ void m24_z8000_device::device_add_mconfig(machine_config &config)
 	m_z8000->viack().set(FUNC(m24_z8000_device::viack_r));
 	m_z8000->mo().set(FUNC(m24_z8000_device::mo_w));
 
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 	pit8253.set_clk<0>(19660000/15); //8251
 	pit8253.out_handler<0>().set_nop();
 	pit8253.set_clk<1>(19660000/15);
@@ -88,7 +88,7 @@ void m24_z8000_device::device_add_mconfig(machine_config &config)
 	pit8253.set_clk<2>(19660000/15);
 	pit8253.out_handler<2>().set(FUNC(m24_z8000_device::timer_irq_w));
 
-	I8251(config, "i8251", 0);
+	I8251(config, "i8251");
 }
 
 const uint8_t m24_z8000_device::pmem_table[16][4] =

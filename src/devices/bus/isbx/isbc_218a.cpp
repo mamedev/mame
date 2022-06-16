@@ -63,7 +63,7 @@ void isbc_218a_device::device_add_mconfig(machine_config &config)
 //  isbc_218a_device - constructor
 //-------------------------------------------------
 
-isbc_218a_device::isbc_218a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isbc_218a_device::isbc_218a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISBC_218A, tag, owner, clock),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),
@@ -94,7 +94,7 @@ void isbc_218a_device::device_reset()
 	if(m_fd8)
 	{
 		m_floppy0->get_device()->mon_w(0);
-		m_fdc->set_rate(500000);
+		m_fdc->set_rate(XTAL::u(500000));
 	}
 }
 

@@ -622,7 +622,7 @@ void c1571_device::add_base_mconfig(machine_config &config)
 	C64H156(config, m_ga, 16_MHz_XTAL);
 	m_ga->byte_callback().set(FUNC(c1571_device::byte_w));
 
-	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0", 0));
+	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0"));
 	connector.option_add("525qd", FLOPPY_525_QD);
 	connector.set_default_option("525qd");
 	connector.set_fixed(true);
@@ -673,10 +673,10 @@ void mini_chief_device::device_add_mconfig(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mini_chief_device::mini_chief_mem);
 
-	isa8_device &isa8(ISA8(config, ISA_BUS_TAG, 0));
+	isa8_device &isa8(ISA8(config, ISA_BUS_TAG));
 	isa8.set_memspace(m_maincpu, AS_PROGRAM);
 	isa8.set_iospace(m_maincpu, AS_PROGRAM);
-	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, mini_chief_isa8_cards, "wd1002a_wx1", false);
+	ISA8_SLOT(config, "isa1", ISA_BUS_TAG, mini_chief_isa8_cards, "wd1002a_wx1", false);
 }
 
 
@@ -713,7 +713,7 @@ ioport_constructor c1571_device::device_input_ports() const
 //  c1571_device - constructor
 //-------------------------------------------------
 
-c1571_device::c1571_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+c1571_device::c1571_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_cbm_iec_interface(mconfig, *this),
 		device_c64_floppy_parallel_interface(mconfig, *this),
@@ -737,7 +737,7 @@ c1571_device::c1571_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-c1571_device::c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c1571_device::c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1571_device(mconfig, C1571, tag, owner, clock)
 {
 }
@@ -747,7 +747,7 @@ c1571_device::c1571_device(const machine_config &mconfig, const char *tag, devic
 //  c1570_device - constructor
 //-------------------------------------------------
 
-c1570_device::c1570_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c1570_device::c1570_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1571_device(mconfig, C1570, tag, owner, clock)
 {
 }
@@ -757,7 +757,7 @@ c1570_device::c1570_device(const machine_config &mconfig, const char *tag, devic
 //  c1571cr_device - constructor
 //-------------------------------------------------
 
-c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1571_device(mconfig, C1571CR, tag, owner, clock)
 {
 }
@@ -767,7 +767,7 @@ c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, d
 //  mini_chief_device - constructor
 //-------------------------------------------------
 
-mini_chief_device::mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mini_chief_device::mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c1571_device(mconfig, MINI_CHIEF, tag, owner, clock)
 {
 }

@@ -21,7 +21,7 @@ class mephisto_board_device : public device_t
 {
 public:
 	// construction/destruction
-	mephisto_board_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	mephisto_board_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers
 	void set_disable_leds(bool disable_leds) { m_disable_leds = disable_leds; }
@@ -60,7 +60,7 @@ class mephisto_sensors_board_device : public mephisto_board_device
 {
 public:
 	// construction/destruction
-	mephisto_sensors_board_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	mephisto_sensors_board_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// optional information overrides
@@ -74,7 +74,7 @@ class mephisto_buttons_board_device : public mephisto_board_device
 {
 public:
 	// construction/destruction
-	mephisto_buttons_board_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	mephisto_buttons_board_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// optional information overrides

@@ -54,7 +54,7 @@ class cpc_ssa1_device : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_lrq(uint8_t state) { m_lrq = state; }
 	uint8_t get_lrq() { return m_lrq; }
@@ -91,7 +91,7 @@ class cpc_dkspeech_device : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_lrq(uint8_t state) { m_lrq = state; }
 	uint8_t get_lrq() { return m_lrq; }

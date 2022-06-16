@@ -604,10 +604,10 @@ void snk68_state::pow(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pow);
 
-	ALPHA68K_PALETTE(config, m_palette, 0);
+	ALPHA68K_PALETTE(config, m_palette);
 	m_palette->set_entries(2048);
 
-	SNK68_SPR(config, m_sprites, 0);
+	SNK68_SPR(config, m_sprites);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
 	m_sprites->set_tile_indirect_cb(FUNC(snk68_state::tile_callback_pow));
 	m_sprites->set_xpos_shift(12);
@@ -635,7 +635,7 @@ void snk68_state::powb(machine_config &config)
 
 	config.device_remove("upd");
 
-	MSM5205(config, "msm", 0).add_route(ALL_OUTPUTS, "mono", 0.50); // TODO: hook this up
+	MSM5205(config, "msm").add_route(ALL_OUTPUTS, "mono", 0.50); // TODO: hook this up
 }
 
 void snk68_state::streetsm(machine_config &config)

@@ -116,7 +116,7 @@ void isa8_myb3k_fdc4712_device::device_add_mconfig(machine_config &config)
 //**************************************************************************
 //  LIVE DEVICES
 //**************************************************************************
-isa8_myb3k_fdc471x_device_base::isa8_myb3k_fdc471x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+isa8_myb3k_fdc471x_device_base::isa8_myb3k_fdc471x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),
@@ -124,7 +124,7 @@ isa8_myb3k_fdc471x_device_base::isa8_myb3k_fdc471x_device_base(const machine_con
 {
 }
 
-isa8_myb3k_fdc4710_device::isa8_myb3k_fdc4710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_myb3k_fdc4710_device::isa8_myb3k_fdc4710_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_myb3k_fdc471x_device_base(mconfig, ISA8_MYB3K_FDC4710, tag, owner, clock)
 {
 	has_motor_control = true;
@@ -132,7 +132,7 @@ isa8_myb3k_fdc4710_device::isa8_myb3k_fdc4710_device(const machine_config &mconf
 	dma_channel = 2;
 }
 
-isa8_myb3k_fdc4711_device::isa8_myb3k_fdc4711_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_myb3k_fdc4711_device::isa8_myb3k_fdc4711_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_myb3k_fdc471x_device_base(mconfig, ISA8_MYB3K_FDC4711, tag, owner, clock)
 {
 	has_motor_control = true;
@@ -140,7 +140,7 @@ isa8_myb3k_fdc4711_device::isa8_myb3k_fdc4711_device(const machine_config &mconf
 	dma_channel = 2;
 }
 
-isa8_myb3k_fdc4712_device::isa8_myb3k_fdc4712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa8_myb3k_fdc4712_device::isa8_myb3k_fdc4712_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	isa8_myb3k_fdc471x_device_base(mconfig, ISA8_MYB3K_FDC4712, tag, owner, clock),
 	selected_drive(0)
 {

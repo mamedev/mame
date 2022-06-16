@@ -28,7 +28,7 @@ class ds75161a_device : public device_t
 {
 public:
 	// construction/destruction
-	ds75161a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds75161a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto in_ren() { return m_in_ren_cb.bind(); }
 	auto in_ifc() { return m_in_ifc_cb.bind(); }

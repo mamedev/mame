@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(SPG2XX_128, spg2xx_128_device, "spg2xx_128", "SPG2xx-series S
 DEFINE_DEVICE_TYPE(SPG28X,     spg28x_device,     "spg28x", "SPG280-series System-on-a-Chip") // 64 sprites
 
 
-spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t sprite_limit, address_map_constructor internal) :
+spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint16_t sprite_limit, address_map_constructor internal) :
 	unsp_device(mconfig, type, tag, owner, clock, internal),
 	device_mixer_interface(mconfig, *this, 2),
 	m_spg_audio(*this, "spgaudio"),
@@ -45,23 +45,23 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-spg24x_device::spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spg24x_device::spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	spg2xx_device(mconfig, SPG24X, tag, owner, clock, 256, address_map_constructor(FUNC(spg24x_device::internal_map), this))
 {
 }
 
-spg24x_device::spg24x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t sprite_limit, address_map_constructor internal) :
+spg24x_device::spg24x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint16_t sprite_limit, address_map_constructor internal) :
 	spg2xx_device(mconfig, type, tag, owner, clock, sprite_limit, internal)
 {
 }
 
 
-spg2xx_128_device::spg2xx_128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spg2xx_128_device::spg2xx_128_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	spg24x_device(mconfig, SPG2XX_128, tag, owner, clock, 128, address_map_constructor(FUNC(spg2xx_128_device::internal_map), this))
 {
 }
 
-spg28x_device::spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spg28x_device::spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	spg24x_device(mconfig, SPG28X, tag, owner, clock, 64, address_map_constructor(FUNC(spg28x_device::internal_map), this))
 {
 }

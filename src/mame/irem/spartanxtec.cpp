@@ -363,11 +363,11 @@ void spartanxtec_state::spartanxtec_palette(palette_device &palette) const
 void spartanxtec_state::spartanxtec(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	Z80(config, m_maincpu, XTAL::u(4000000));         /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &spartanxtec_state::spartanxtec_map);
 	m_maincpu->set_vblank_int("screen", FUNC(spartanxtec_state::irq0_line_assert));
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL::u(4000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spartanxtec_state::spartanxtec_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &spartanxtec_state::spartanxtec_sound_io);
 	m_audiocpu->set_periodic_int(FUNC(spartanxtec_state::irq0_line_assert), attotime::from_hz(1000)); // controls speed of music
@@ -393,11 +393,11 @@ void spartanxtec_state::spartanxtec(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	AY8912(config, "ay1", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, "ay1", XTAL::u(1000000)).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	AY8912(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, "ay2", XTAL::u(1000000)).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	AY8912(config, "ay3", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, "ay3", XTAL::u(1000000)).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 

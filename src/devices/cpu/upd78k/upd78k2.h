@@ -32,7 +32,7 @@ public:
 	// TODO: callbacks and configuration thereof
 
 protected:
-	upd78k2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int iram_bits, address_map_constructor mem_map, address_map_constructor sfr_map);
+	upd78k2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int iram_bits, address_map_constructor mem_map, address_map_constructor sfr_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -80,7 +80,7 @@ class upd78210_device : public upd78k2_device
 {
 public:
 	// device type constructor
-	upd78210_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd78210_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides
@@ -97,7 +97,7 @@ class upd78213_device : public upd78k2_device
 {
 public:
 	// device type constructor
-	upd78213_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upd78213_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_disasm_interface overrides

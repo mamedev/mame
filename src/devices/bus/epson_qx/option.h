@@ -136,7 +136,7 @@ public:
 		m_bus.set_tag(std::forward<T>(bus_tag));
 		m_slot = slot;
 	}
-	option_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	option_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER(inth1_w);
 	DECLARE_WRITE_LINE_MEMBER(inth2_w);
@@ -182,7 +182,7 @@ class option_bus_device :  public device_t
 {
 public:
 	// construction/destruction
-	option_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	option_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
 	void set_memview(memory_view::memory_view_entry &view) { m_view = &view; }

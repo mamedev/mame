@@ -118,7 +118,7 @@
 #define MAX_WORD_PER_ROW        220
 
 // Constants of alpha video
-#define VIDEO_PIXEL_CLOCK       20849400
+#define VIDEO_PIXEL_CLOCK       XTAL::u(20849400)
 #define VIDEO_CHAR_WIDTH        9
 #define VIDEO_CHAR_HEIGHT       15
 #define VIDEO_CHAR_COLUMNS      80
@@ -150,7 +150,7 @@
 
 // Constants of 98770A video
 // HBEND & VBEND probably are not really 0
-#define VIDEO_770_PIXEL_CLOCK   29798400
+#define VIDEO_770_PIXEL_CLOCK   XTAL::u(29798400)
 #define VIDEO_770_HTOTAL        1024
 #define VIDEO_770_HBEND         0
 #define VIDEO_770_HBSTART       (VIDEO_CHAR_COLUMNS * VIDEO_CHAR_WIDTH)
@@ -161,7 +161,7 @@
 #define VIDEO_770_ALPHA_R_LIM   640 // Right-side limit of alpha-only horizontal part
 
 // Constants of 98780A video
-#define VIDEO_780_PIXEL_CLOCK   28224000
+#define VIDEO_780_PIXEL_CLOCK   XTAL::u(28224000)
 #define VIDEO_780_HTOTAL        896
 #define VIDEO_780_VTOTAL        525
 #define VIDEO_780_HBEND         0
@@ -195,7 +195,7 @@ constexpr unsigned LP_XOFFSET = 5;  // x-offset of LP (due to delay in hit recog
 #define T14_PA              14
 #define T15_PA              15
 
-#define KEY_SCAN_OSCILLATOR     327680
+#define KEY_SCAN_OSCILLATOR     XTAL::u(327680)
 
 class hp9845_state : public driver_device
 {
@@ -3640,14 +3640,14 @@ void hp9845_base_state::ppu_io_map(address_map &map)
 
 void hp9845_base_state::hp9845_base(machine_config &config)
 {
-	HP_5061_3001(config , m_lpu , 5700000);
+	HP_5061_3001(config , m_lpu , XTAL::u(5700000));
 	// Clock scaling takes into account the slowdown caused by DRAM refresh
 	m_lpu->set_clock_scale(0.93);
 	m_lpu->set_addrmap(AS_PROGRAM , &hp9845_base_state::global_mem_map);
 	m_lpu->set_9845_boot_mode(true);
 	m_lpu->set_rw_cycles(6 , 6);
 	m_lpu->set_relative_mode(true);
-	HP_5061_3001(config , m_ppu , 5700000);
+	HP_5061_3001(config , m_ppu , XTAL::u(5700000));
 	m_ppu->set_clock_scale(0.93);
 	m_ppu->set_addrmap(AS_PROGRAM , &hp9845_base_state::global_mem_map);
 	m_ppu->set_addrmap(AS_IO , &hp9845_base_state::ppu_io_map);
@@ -3657,7 +3657,7 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	m_ppu->set_int_cb(m_io_sys , FUNC(hp98x5_io_sys_device::int_r));
 	m_ppu->pa_changed_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::pa_w));
 
-	HP98X5_IO_SYS(config , m_io_sys , 0);
+	HP98X5_IO_SYS(config , m_io_sys);
 	m_io_sys->irl().set_inputline(m_ppu, HPHYBRID_IRL);
 	m_io_sys->irh().set_inputline(m_ppu, HPHYBRID_IRH);
 	m_io_sys->sts().set(m_ppu , FUNC(hp_5061_3001_cpu_device::status_w));
@@ -3679,11 +3679,11 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	TIMER(config, m_beep_timer).configure_generic(FUNC(hp9845_base_state::beeper_off));
 
 	// Tape drives
-	HP_TACO(config , m_t15 , 4000000);
+	HP_TACO(config , m_t15 , XTAL::u(4000000));
 	m_t15->irq().set([this](int state) { m_io_sys->set_irq(T15_PA , state); });
 	m_t15->flg().set([this](int state) { m_io_sys->set_flg(T15_PA , state); });
 	m_t15->sts().set([this](int state) { m_io_sys->set_sts(T15_PA , state); });
-	HP_TACO(config , m_t14 , 4000000);
+	HP_TACO(config , m_t14 , XTAL::u(4000000));
 	m_t14->irq().set([this](int state) { m_io_sys->set_irq(T14_PA , state); });
 	m_t14->flg().set([this](int state) { m_io_sys->set_flg(T14_PA , state); });
 	m_t14->sts().set([this](int state) { m_io_sys->set_sts(T14_PA , state); });
@@ -3692,19 +3692,19 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	// right-hand side and left-hand side drawers, respectively.
 	// Here we do away with the distinction between LPU & PPU ROMs: in the end they
 	// are visible to both CPUs at the same addresses.
-	HP9845_OPTROM(config, "drawer1", 0);
-	HP9845_OPTROM(config, "drawer2", 0);
-	HP9845_OPTROM(config, "drawer3", 0);
-	HP9845_OPTROM(config, "drawer4", 0);
-	HP9845_OPTROM(config, "drawer5", 0);
-	HP9845_OPTROM(config, "drawer6", 0);
-	HP9845_OPTROM(config, "drawer7", 0);
-	HP9845_OPTROM(config, "drawer8", 0);
+	HP9845_OPTROM(config, "drawer1");
+	HP9845_OPTROM(config, "drawer2");
+	HP9845_OPTROM(config, "drawer3");
+	HP9845_OPTROM(config, "drawer4");
+	HP9845_OPTROM(config, "drawer5");
+	HP9845_OPTROM(config, "drawer6");
+	HP9845_OPTROM(config, "drawer7");
+	HP9845_OPTROM(config, "drawer8");
 
 	// I/O slots
 	for (unsigned slot = 0; slot < 4; slot++) {
 		auto& finder = m_io_slot[ slot ];
-		hp9845_io_slot_device& tmp( HP9845_IO_SLOT(config , finder , 0) );
+		hp9845_io_slot_device& tmp( HP9845_IO_SLOT(config , finder) );
 		tmp.irq().set([this , slot](int state) { set_irq_slot(slot , state); });
 		tmp.sts().set([this , slot](int state) { set_sts_slot(slot , state); });
 		tmp.flg().set([this , slot](int state) { set_flg_slot(slot , state); });
@@ -3718,7 +3718,7 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("192K").set_extra_options("64K, 320K, 448K");
 
 	// Internal printer
-	hp9845_printer_device& prt{ HP9845_PRINTER(config , "printer" , 0) };
+	hp9845_printer_device& prt{ HP9845_PRINTER(config , "printer") };
 	prt.irq().set(FUNC(hp9845_base_state::prt_irl_w));
 	prt.flg().set([this](int state) { m_io_sys->set_flg(PRINTER_PA , state); });
 	prt.sts().set([this](int state) { m_io_sys->set_sts(PRINTER_PA , state); });

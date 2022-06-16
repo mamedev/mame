@@ -63,92 +63,92 @@ DEFINE_DEVICE_TYPE(NES_KS7057,  nes_ks7057_device,  "nes_ks7057",  "NES Cart Kai
 DEFINE_DEVICE_TYPE(NES_KS7058,  nes_ks7058_device,  "nes_ks7058",  "NES Cart Kaiser KS-7058 PCB")
 
 
-nes_ks106c_device::nes_ks106c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks106c_device::nes_ks106c_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KS106C, tag, owner, clock), m_latch(0)
 {
 }
 
-nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KS7058, tag, owner, clock)
 {
 }
 
-nes_ks7022_device::nes_ks7022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7022_device::nes_ks7022_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KS7022, tag, owner, clock), m_latch(0)
 {
 }
 
-nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
 
-nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_ks7032_device(mconfig, NES_KS7032, tag, owner, clock)
 {
 }
 
-nes_ks202_device::nes_ks202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks202_device::nes_ks202_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_ks7032_device(mconfig, NES_KS202, tag, owner, clock)
 {
 }
 
-nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 a15_flip)
+nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 a15_flip)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_a15_flip(a15_flip)
 {
 }
 
-nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_ks7016_device(mconfig, NES_KS7016, tag, owner, clock, 0x00)
 {
 }
 
-nes_ks7016b_device::nes_ks7016b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7016b_device::nes_ks7016b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_ks7016_device(mconfig, NES_KS7016B, tag, owner, clock, 0x04)
 {
 }
 
-nes_ks7017_device::nes_ks7017_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7017_device::nes_ks7017_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KS7017, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_status(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
 
-nes_ks7021a_device::nes_ks7021a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7021a_device::nes_ks7021a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KS7021A, tag, owner, clock)
 {
 }
 
-nes_ks7010_device::nes_ks7010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7010_device::nes_ks7010_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KS7010, tag, owner, clock), m_latch(0)
 {
 }
 
-nes_ks7012_device::nes_ks7012_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7012_device::nes_ks7012_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KS7012, tag, owner, clock)
 {
 }
 
-nes_ks7013b_device::nes_ks7013b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7013b_device::nes_ks7013b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KS7013B, tag, owner, clock)
 {
 }
 
-nes_ks7030_device::nes_ks7030_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7030_device::nes_ks7030_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KS7030, tag, owner, clock)
 {
 }
 
-nes_ks7031_device::nes_ks7031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7031_device::nes_ks7031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KS7031, tag, owner, clock)
 {
 }
 
-nes_ks7037_device::nes_ks7037_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7037_device::nes_ks7037_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KS7037, tag, owner, clock), m_reg(0)
 {
 }
 
-nes_ks7057_device::nes_ks7057_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ks7057_device::nes_ks7057_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_KS7057, tag, owner, clock)
 {
 }

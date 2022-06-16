@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(DRAGON_SPRITES, dragon_sprites_device, "dragon_sprites", "Dra
 //  dragon_sprites_device - constructor
 //-------------------------------------------------
 
-dragon_sprites_device::dragon_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dragon_sprites_device::dragon_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DRAGON_SPRITES, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this )
 	, m_eprom(*this, "eprom")

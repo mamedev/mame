@@ -1168,7 +1168,7 @@ void pc1512_state::pc1512(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	// devices
-	PC1512_KEYBOARD(config, m_kb, 0);
+	PC1512_KEYBOARD(config, m_kb);
 	m_kb->clock_wr_callback().set(FUNC(pc1512_state::kbclk_w));
 	m_kb->data_wr_callback().set(FUNC(pc1512_state::kbdata_w));
 
@@ -1240,7 +1240,7 @@ void pc1512_state::pc1512(machine_config &config)
 	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	// ISA8 bus
-	isa8_device &isa(ISA8(config, ISA_BUS_TAG, 0));
+	isa8_device &isa(ISA8(config, ISA_BUS_TAG));
 	isa.set_memspace(m_maincpu, AS_PROGRAM);
 	isa.set_iospace(m_maincpu, AS_IO);
 	isa.irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
@@ -1252,9 +1252,9 @@ void pc1512_state::pc1512(machine_config &config)
 	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
 	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
 	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
-	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false); // FIXME: determine ISA clock
-	ISA8_SLOT(config, "isa2", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", ISA_BUS_TAG, pc_isa8_cards, nullptr, false); // FIXME: determine ISA clock
+	ISA8_SLOT(config, "isa2", ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("544K,576K,608K,640K");
@@ -1304,7 +1304,7 @@ void pc1640_state::pc1640(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	// devices
-	PC1512_KEYBOARD(config, m_kb, 0);
+	PC1512_KEYBOARD(config, m_kb);
 	m_kb->clock_wr_callback().set(FUNC(pc1512_base_state::kbclk_w));
 	m_kb->data_wr_callback().set(FUNC(pc1512_base_state::kbdata_w));
 
@@ -1376,7 +1376,7 @@ void pc1640_state::pc1640(machine_config &config)
 	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	// ISA8 bus
-	isa8_device &isa(ISA8(config, ISA_BUS_TAG, 0));
+	isa8_device &isa(ISA8(config, ISA_BUS_TAG));
 	isa.set_memspace(m_maincpu, AS_PROGRAM);
 	isa.set_iospace(m_maincpu, AS_IO);
 	isa.irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
@@ -1388,11 +1388,11 @@ void pc1640_state::pc1640(machine_config &config)
 	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
 	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
 	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
-	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", 0, ISA_BUS_TAG, pc1640_isa8_cards, "iga", false);
+	ISA8_SLOT(config, "isa1", ISA_BUS_TAG, pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", ISA_BUS_TAG, pc1640_isa8_cards, "iga", false);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("640K");

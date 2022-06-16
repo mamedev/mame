@@ -322,13 +322,13 @@ void ettrivia_state::ettrivia(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8912(config, m_ay[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, m_ay[0], XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	AY8912(config, m_ay[1], 1500000);
+	AY8912(config, m_ay[1], XTAL::u(1500000));
 	m_ay[1]->port_a_read_callback().set_ioport("IN1");
 	m_ay[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	AY8912(config, m_ay[2], 1500000);
+	AY8912(config, m_ay[2], XTAL::u(1500000));
 	m_ay[2]->port_a_read_callback().set_ioport("IN0");
 	m_ay[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 }

@@ -1071,7 +1071,7 @@ void namcos86_state::hopmappy(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ymsnd", 3579580).add_route(0, "mono", 0.0).add_route(1, "mono", 0.60);   /* only right channel is connected */
+	YM2151(config, "ymsnd", XTAL::u(3579580)).add_route(0, "mono", 0.0).add_route(1, "mono", 0.60);   /* only right channel is connected */
 
 	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000)/2048);
 	m_cus30->set_voices(8);
@@ -1096,7 +1096,7 @@ void namcos86_state::genpeitd(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &namcos86_state::genpeitd_mcu_map);
 
 	/* sound hardware */
-	NAMCO_63701X(config, m_63701x, 6000000);
+	NAMCO_63701X(config, m_63701x, XTAL::u(6000000));
 	m_63701x->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -1109,7 +1109,7 @@ void namcos86_state::rthunder(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &namcos86_state::rthunder_mcu_map);
 
 	/* sound hardware */
-	NAMCO_63701X(config, m_63701x, 6000000);
+	NAMCO_63701X(config, m_63701x, XTAL::u(6000000));
 	m_63701x->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -1122,7 +1122,7 @@ void namcos86_state::wndrmomo(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &namcos86_state::wndrmomo_mcu_map);
 
 	/* sound hardware */
-	NAMCO_63701X(config, m_63701x, 6000000);
+	NAMCO_63701X(config, m_63701x, XTAL::u(6000000));
 	m_63701x->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

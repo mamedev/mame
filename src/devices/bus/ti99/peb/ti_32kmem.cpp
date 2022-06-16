@@ -37,7 +37,7 @@ namespace bus::ti99::peb {
 
 #define RAMREGION "ram32k"
 
-ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_32KMEM, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_ram(*this, RAMREGION)
@@ -102,7 +102,7 @@ void ti_32k_expcard_device::device_start()
 
 void ti_32k_expcard_device::device_add_mconfig(machine_config &config)
 {
-	RAM(config, m_ram, 0);
+	RAM(config, m_ram);
 	m_ram->set_default_size("32k");
 	m_ram->set_default_value(0);
 }

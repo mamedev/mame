@@ -306,7 +306,7 @@ void trivrus_state::trivrus(machine_config &config)
 	m_vr0soc->tx_callback<0>().set(m_microtouch, FUNC(microtouch_device::rx));
 
 	// TODO: 3M from service mode, most likely wrong?
-	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_vr0soc, FUNC(vrender0soc_device::rx_w<0>));
+	MICROTOUCH(config, m_microtouch, XTAL::u(9600)).stx().set(m_vr0soc, FUNC(vrender0soc_device::rx_w<0>));
 }
 
 ROM_START( trivrus )

@@ -768,7 +768,7 @@ void tutor_state::tutor(machine_config &config)
 
 	// Sound
 	SPEAKER(config, "sound_out").front_center();
-	SN76489A(config, "sn76489a", 3579545).add_route(ALL_OUTPUTS, "sound_out", 0.75);
+	SN76489A(config, "sn76489a", XTAL::u(3579545)).add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer").busy_handler().set(FUNC(tutor_state::write_centronics_busy));
 
@@ -777,7 +777,7 @@ void tutor_state::tutor(machine_config &config)
 
 	// Cassette
 	SPEAKER(config, "cass_out").front_center();
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
+	CASSETTE(config, "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// Cartridge slot
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "tutor_cart", "bin");

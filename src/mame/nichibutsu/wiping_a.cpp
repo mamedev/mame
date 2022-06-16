@@ -19,7 +19,7 @@
 
 DEFINE_DEVICE_TYPE(WIPING_CUSTOM, wiping_sound_device, "wiping_sound", "Wiping Custom Sound")
 
-wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, WIPING_CUSTOM, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_last_channel(nullptr),

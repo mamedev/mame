@@ -124,7 +124,7 @@ void epson_tf20_device::device_add_mconfig(machine_config &config)
 //  epson_tf20_device - constructor
 //-------------------------------------------------
 
-epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, EPSON_TF20, tag, owner, clock),
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "19b"),

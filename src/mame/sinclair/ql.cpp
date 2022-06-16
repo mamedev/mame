@@ -962,7 +962,7 @@ void ql_state::ql(machine_config &config)
 
 	QL_ROM_CARTRIDGE_SLOT(config, m_cart, ql_rom_cartridge_cards, nullptr);
 
-	QIMI(config, m_qimi, 0);
+	QIMI(config, m_qimi);
 	m_qimi->extint_wr_callback().set(FUNC(ql_state::qimi_extintl_w));
 
 	// software lists

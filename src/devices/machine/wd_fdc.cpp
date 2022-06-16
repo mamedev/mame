@@ -134,7 +134,7 @@ static const char *const states[] =
 	"WRITE_SECTOR_PRE_BYTE"
 };
 
-wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	intrq_cb(*this),
 	drq_cb(*this),
@@ -2443,7 +2443,7 @@ int wd_fdc_device_base::settle_time() const
 	return 60000;
 }
 
-wd_fdc_analog_device_base::wd_fdc_analog_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+wd_fdc_analog_device_base::wd_fdc_analog_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	wd_fdc_device_base(mconfig, type, tag, owner, clock)
 {
 	clock_ratio = 1;
@@ -2495,7 +2495,7 @@ bool wd_fdc_analog_device_base::pll_write_next_bit(bool bit, attotime &tm, flopp
 	return cur_pll.write_next_bit(bit, tm, floppy, limit);
 }
 
-wd_fdc_digital_device_base::wd_fdc_digital_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+wd_fdc_digital_device_base::wd_fdc_digital_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	wd_fdc_device_base(mconfig, type, tag, owner, clock)
 {
 	clock_ratio = 4;
@@ -2704,7 +2704,7 @@ void wd_fdc_digital_device_base::digital_pll_t::commit(floppy_image_device *flop
 	write_position = 0;
 }
 
-fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1771, tag, owner, clock)
+fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, FD1771, tag, owner, clock)
 {
 	constexpr static int fd1771_step_times[4] = { 12000, 12000, 20000, 40000 };
 
@@ -2731,7 +2731,7 @@ int fd1771_device::calc_sector_size(uint8_t size, uint8_t command) const
 		return size ? size << 4 : 4096;
 }
 
-fd1781_device::fd1781_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1781, tag, owner, clock)
+fd1781_device::fd1781_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, FD1781, tag, owner, clock)
 {
 	constexpr static int fd1781_step_times[4] = { 6000, 12000, 20000, 40000 };
 
@@ -2759,7 +2759,7 @@ int fd1781_device::calc_sector_size(uint8_t size, uint8_t command) const
 constexpr int wd_fdc_device_base::fd179x_step_times[4];
 constexpr int wd_fdc_device_base::fd176x_step_times[4];
 
-fd1791_device::fd1791_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1791, tag, owner, clock)
+fd1791_device::fd1791_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, FD1791, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2775,7 +2775,7 @@ fd1791_device::fd1791_device(const machine_config &mconfig, const char *tag, dev
 	ready_hooked = true;
 }
 
-fd1792_device::fd1792_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1792, tag, owner, clock)
+fd1792_device::fd1792_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, FD1792, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2791,7 +2791,7 @@ fd1792_device::fd1792_device(const machine_config &mconfig, const char *tag, dev
 	ready_hooked = true;
 }
 
-fd1793_device::fd1793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1793, tag, owner, clock)
+fd1793_device::fd1793_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, FD1793, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2807,7 +2807,7 @@ fd1793_device::fd1793_device(const machine_config &mconfig, const char *tag, dev
 	ready_hooked = true;
 }
 
-kr1818vg93_device::kr1818vg93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, KR1818VG93, tag, owner, clock)
+kr1818vg93_device::kr1818vg93_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, KR1818VG93, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2823,7 +2823,7 @@ kr1818vg93_device::kr1818vg93_device(const machine_config &mconfig, const char *
 	ready_hooked = true;
 }
 
-fd1794_device::fd1794_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1794, tag, owner, clock)
+fd1794_device::fd1794_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, FD1794, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2839,7 +2839,7 @@ fd1794_device::fd1794_device(const machine_config &mconfig, const char *tag, dev
 	ready_hooked = true;
 }
 
-fd1795_device::fd1795_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1795, tag, owner, clock)
+fd1795_device::fd1795_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, FD1795, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2863,7 +2863,7 @@ int fd1795_device::calc_sector_size(uint8_t size, uint8_t command) const
 		return 128 << ((size + 1) & 3);
 }
 
-fd1797_device::fd1797_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1797, tag, owner, clock)
+fd1797_device::fd1797_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, FD1797, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2887,7 +2887,7 @@ int fd1797_device::calc_sector_size(uint8_t size, uint8_t command) const
 		return 128 << ((size + 1) & 3);
 }
 
-mb8866_device::mb8866_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, MB8866, tag, owner, clock)
+mb8866_device::mb8866_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, MB8866, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2903,7 +2903,7 @@ mb8866_device::mb8866_device(const machine_config &mconfig, const char *tag, dev
 	ready_hooked = true;
 }
 
-mb8876_device::mb8876_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, MB8876, tag, owner, clock)
+mb8876_device::mb8876_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, MB8876, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2919,7 +2919,7 @@ mb8876_device::mb8876_device(const machine_config &mconfig, const char *tag, dev
 	ready_hooked = true;
 }
 
-mb8877_device::mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, MB8877, tag, owner, clock)
+mb8877_device::mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, MB8877, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 4;
@@ -2935,7 +2935,7 @@ mb8877_device::mb8877_device(const machine_config &mconfig, const char *tag, dev
 	ready_hooked = true;
 }
 
-fd1761_device::fd1761_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1761, tag, owner, clock)
+fd1761_device::fd1761_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, FD1761, tag, owner, clock)
 {
 	step_times = fd176x_step_times;
 	delay_register_commit = 16;
@@ -2951,7 +2951,7 @@ fd1761_device::fd1761_device(const machine_config &mconfig, const char *tag, dev
 	ready_hooked = true;
 }
 
-fd1763_device::fd1763_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1763, tag, owner, clock)
+fd1763_device::fd1763_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, FD1763, tag, owner, clock)
 {
 	step_times = fd176x_step_times;
 	delay_register_commit = 16;
@@ -2967,7 +2967,7 @@ fd1763_device::fd1763_device(const machine_config &mconfig, const char *tag, dev
 	ready_hooked = true;
 }
 
-fd1765_device::fd1765_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1765, tag, owner, clock)
+fd1765_device::fd1765_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, FD1765, tag, owner, clock)
 {
 	step_times = fd176x_step_times;
 	delay_register_commit = 16;
@@ -2991,7 +2991,7 @@ int fd1765_device::calc_sector_size(uint8_t size, uint8_t command) const
 		return 128 << ((size + 1) & 3);
 }
 
-fd1767_device::fd1767_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, FD1767, tag, owner, clock)
+fd1767_device::fd1767_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, FD1767, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 16;
@@ -3015,7 +3015,7 @@ int fd1767_device::calc_sector_size(uint8_t size, uint8_t command) const
 		return 128 << ((size + 1) & 3);
 }
 
-wd2791_device::wd2791_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, WD2791, tag, owner, clock)
+wd2791_device::wd2791_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, WD2791, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 16;
@@ -3031,7 +3031,7 @@ wd2791_device::wd2791_device(const machine_config &mconfig, const char *tag, dev
 	ready_hooked = true;
 }
 
-wd2793_device::wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, WD2793, tag, owner, clock)
+wd2793_device::wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, WD2793, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 
@@ -3048,7 +3048,7 @@ wd2793_device::wd2793_device(const machine_config &mconfig, const char *tag, dev
 	ready_hooked = true;
 }
 
-wd2795_device::wd2795_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, WD2795, tag, owner, clock)
+wd2795_device::wd2795_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, WD2795, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 16;
@@ -3072,7 +3072,7 @@ int wd2795_device::calc_sector_size(uint8_t size, uint8_t command) const
 		return 128 << ((size + 1) & 3);
 }
 
-wd2797_device::wd2797_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, WD2797, tag, owner, clock)
+wd2797_device::wd2797_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_analog_device_base(mconfig, WD2797, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
 	delay_register_commit = 16;
@@ -3096,7 +3096,7 @@ int wd2797_device::calc_sector_size(uint8_t size, uint8_t command) const
 		return 128 << ((size + 1) & 3);
 }
 
-wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_device_base(mconfig, WD1770, tag, owner, clock)
+wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_digital_device_base(mconfig, WD1770, tag, owner, clock)
 {
 	step_times = wd_digital_step_times;
 	delay_register_commit = 16;
@@ -3112,7 +3112,7 @@ wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, dev
 	ready_hooked = false;
 }
 
-wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_device_base(mconfig, WD1772, tag, owner, clock)
+wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_digital_device_base(mconfig, WD1772, tag, owner, clock)
 {
 	const static int wd1772_step_times[4] = { 12000, 24000, 4000, 6000 };
 
@@ -3140,7 +3140,7 @@ int wd1772_device::settle_time() const
 	return 30000;
 }
 
-wd1773_device::wd1773_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_digital_device_base(mconfig, WD1773, tag, owner, clock)
+wd1773_device::wd1773_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) : wd_fdc_digital_device_base(mconfig, WD1773, tag, owner, clock)
 {
 	step_times = wd_digital_step_times;
 	delay_register_commit = 16;

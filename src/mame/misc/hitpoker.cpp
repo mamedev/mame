@@ -337,13 +337,13 @@ GFXDECODE_END
 
 void hitpoker_state::hitpoker(machine_config &config)
 {
-	MC68HC11A1(config, m_maincpu, 8'000'000);
+	MC68HC11A1(config, m_maincpu, XTAL::u(8'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &hitpoker_state::hitpoker_map);
 	m_maincpu->in_pa_callback().set(FUNC(hitpoker_state::hitpoker_pic_r));
 	m_maincpu->out_pa_callback().set(FUNC(hitpoker_state::hitpoker_pic_w));
 	m_maincpu->in_pe_callback().set_constant(0);
 
-	ds17x85_device &rtc(DS17487(config, "rtc", 32768));
+	ds17x85_device &rtc(DS17487(config, "rtc", XTAL::u(32768)));
 	rtc.irq().set_inputline(m_maincpu, MC68HC11_IRQ_LINE);
 
 	/* video hardware */
@@ -365,7 +365,7 @@ void hitpoker_state::hitpoker(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ym2149_device &aysnd(YM2149(config, "aysnd", 1500000));
+	ym2149_device &aysnd(YM2149(config, "aysnd", XTAL::u(1500000)));
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);

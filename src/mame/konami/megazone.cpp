@@ -734,7 +734,7 @@ void megazone_state::megazone(machine_config &config)
 	aysnd.add_route(1, "filter.0.1", 0.30);
 	aysnd.add_route(2, "filter.0.2", 0.30);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // R-2R ladder network
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // R-2R ladder network
 
 	FILTER_RC(config, m_filter[0]).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	FILTER_RC(config, m_filter[1]).add_route(ALL_OUTPUTS, "speaker", 1.0);

@@ -26,7 +26,7 @@ class cfa3000_anlg_device :
 {
 public:
 	// construction/destruction
-	cfa3000_anlg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cfa3000_anlg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

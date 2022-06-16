@@ -26,7 +26,7 @@ class isa8_pc1640_iga_device : public isa8_ega_device
 {
 public:
 	// construction/destruction
-	isa8_pc1640_iga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_pc1640_iga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

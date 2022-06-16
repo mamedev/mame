@@ -195,7 +195,7 @@ public:
 	device_md_cart_interface*       m_cart;
 
 protected:
-	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -209,7 +209,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	md_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: md_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: md_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -217,7 +217,7 @@ public:
 		set_fixed(false);
 	}
 
-	md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "megadriv_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "smd,bin,md,gen"; }
 };
@@ -230,14 +230,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	pico_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: pico_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: pico_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "pico_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,md"; }
 };
@@ -250,14 +250,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	copera_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: copera_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: copera_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "copera_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,md"; }
 };

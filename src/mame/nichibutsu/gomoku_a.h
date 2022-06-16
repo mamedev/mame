@@ -13,7 +13,7 @@ class gomoku_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 48'000);
+	gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = 48'000);
 
 	void sound1_w(offs_t offset, uint8_t data);
 	void sound2_w(offs_t offset, uint8_t data);

@@ -62,7 +62,7 @@ void c64_cpm_cartridge_device::z80_io(address_map &map)
 
 void c64_cpm_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_maincpu, 3000000);
+	Z80(config, m_maincpu, XTAL::u(3000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_cpm_cartridge_device::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &c64_cpm_cartridge_device::z80_io);
 }
@@ -122,7 +122,7 @@ inline void c64_cpm_cartridge_device::update_signals()
 //  c64_cpm_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_cpm_cartridge_device::c64_cpm_cartridge_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+c64_cpm_cartridge_device::c64_cpm_cartridge_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
@@ -131,7 +131,7 @@ c64_cpm_cartridge_device::c64_cpm_cartridge_device(const machine_config& mconfig
 {
 }
 
-c64_cpm_cartridge_device::c64_cpm_cartridge_device(const machine_config& mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_cpm_cartridge_device::c64_cpm_cartridge_device(const machine_config& mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	c64_cpm_cartridge_device(mconfig, C64_CPM, tag, owner, clock)
 {
 }

@@ -11,7 +11,7 @@
 class k573dio_device : public device_t
 {
 public:
-	k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto output_callback() { return output_cb.bind(); }
 

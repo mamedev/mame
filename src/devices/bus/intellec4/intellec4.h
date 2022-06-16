@@ -125,7 +125,7 @@ class univ_slot_device : public device_t, public device_single_card_slot_interfa
 {
 public:
 	template <typename T, typename U>
-	univ_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&bus_tag, U &&opts, const char *dflt)
+	univ_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&bus_tag, U &&opts, const char *dflt)
 		: univ_slot_device(mconfig, tag, owner, clock)
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
@@ -134,7 +134,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	univ_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	univ_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t implementation
@@ -164,7 +164,7 @@ public:
 	auto reset_4002_out_cb() { return m_reset_4002_out_cb.bind(); }
 	auto user_reset_out_cb() { return m_user_reset_out_cb.bind(); }
 
-	univ_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	univ_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER(sync_in);

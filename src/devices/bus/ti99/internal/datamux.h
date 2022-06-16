@@ -43,7 +43,7 @@ namespace bus::ti99::internal {
 class datamux_device : public device_t
 {
 public:
-	datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data);
 	void setaddress(offs_t offset, uint16_t busctrl);

@@ -29,7 +29,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	sk1100_printer_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: sk1100_printer_port_device(mconfig, tag, owner, 0)
+		: sk1100_printer_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -37,7 +37,7 @@ public:
 		set_fixed(false);
 	}
 
-	sk1100_printer_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	sk1100_printer_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~sk1100_printer_port_device();
 
 	DECLARE_READ_LINE_MEMBER(fault_r);

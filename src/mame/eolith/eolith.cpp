@@ -540,7 +540,7 @@ INPUT_PORTS_END
 
 void eolith_state::eolith45(machine_config &config)
 {
-	E132N(config, m_maincpu, 45000000);         /* 45 MHz */
+	E132N(config, m_maincpu, XTAL::u(45000000));         /* 45 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &eolith_state::eolith_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(eolith_state::eolith_speedup), "screen", 0, 1);
 
@@ -589,13 +589,13 @@ void eolith_state::eolith45(machine_config &config)
 void eolith_state::eolith50(machine_config &config)
 {
 	eolith45(config);
-	m_maincpu->set_clock(50000000);         /* 50 MHz */
+	m_maincpu->set_clock(XTAL::u(50000000));         /* 50 MHz */
 }
 
 void eolith_state::ironfort(machine_config &config)
 {
 	eolith45(config);
-	m_maincpu->set_clock(44900000); /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
+	m_maincpu->set_clock(XTAL::u(44900000)); /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
 }
 
 void eolith_state::hidctch3(machine_config &config)

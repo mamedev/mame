@@ -24,7 +24,7 @@ public:
 
 protected:
 	// construction/destruction
-	iq151_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	iq151_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -43,7 +43,7 @@ class iq151_basic6_device :
 {
 public:
 	// construction/destruction
-	iq151_basic6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iq151_basic6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// iq151cart_interface overrides
@@ -57,7 +57,7 @@ class iq151_basicg_device :
 {
 public:
 	// construction/destruction
-	iq151_basicg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iq151_basicg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// iq151cart_interface overrides
@@ -72,7 +72,7 @@ class iq151_amos1_device :
 {
 public:
 	// construction/destruction
-	iq151_amos1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iq151_amos1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// iq151cart_interface overrides
@@ -90,7 +90,7 @@ class iq151_amos2_device :
 {
 public:
 	// construction/destruction
-	iq151_amos2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iq151_amos2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// iq151cart_interface overrides
@@ -108,7 +108,7 @@ class iq151_amos3_device :
 {
 public:
 	// construction/destruction
-	iq151_amos3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iq151_amos3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// iq151cart_interface overrides

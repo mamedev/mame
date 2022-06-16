@@ -407,13 +407,13 @@ WRITE_LINE_MEMBER(junofrst_state::_30hz_irq)
 void junofrst_state::junofrst(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI1(config, m_maincpu, 1500000);         /* 1.5 MHz ??? */
+	KONAMI1(config, m_maincpu, XTAL::u(1500000));         /* 1.5 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &junofrst_state::main_map);
 
-	Z80(config, m_audiocpu, 14318000/8);    /* 1.78975 MHz */
+	Z80(config, m_audiocpu, XTAL::u(14318000)/8);    /* 1.78975 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &junofrst_state::audio_map);
 
-	I8039(config, m_i8039, 8000000);  /* 8MHz crystal */
+	I8039(config, m_i8039, XTAL::u(8000000));  /* 8MHz crystal */
 	m_i8039->set_addrmap(AS_PROGRAM, &junofrst_state::mcu_map);
 	m_i8039->set_addrmap(AS_IO, &junofrst_state::mcu_io_map);
 	m_i8039->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
@@ -444,14 +444,14 @@ void junofrst_state::junofrst(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 14318000/8));
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL::u(14318000)/8));
 	aysnd.port_a_read_callback().set(FUNC(junofrst_state::portA_r));
 	aysnd.port_b_write_callback().set(FUNC(junofrst_state::portB_w));
 	aysnd.add_route(0, "filter.0.0", 0.30);
 	aysnd.add_route(1, "filter.0.1", 0.30);
 	aysnd.add_route(2, "filter.0.2", 0.30);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 100K (R56-63)/200K (R64-71) ladder network
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // 100K (R56-63)/200K (R64-71) ladder network
 
 	FILTER_RC(config, m_filter_0_0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	FILTER_RC(config, m_filter_0_1).add_route(ALL_OUTPUTS, "speaker", 1.0);

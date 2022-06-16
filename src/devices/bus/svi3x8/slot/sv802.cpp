@@ -38,7 +38,7 @@ void sv802_device::device_add_mconfig(machine_config &config)
 //  sv802_device - constructor
 //-------------------------------------------------
 
-sv802_device::sv802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sv802_device::sv802_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SV802, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this),
 	m_centronics(*this, "centronics"),

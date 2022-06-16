@@ -135,7 +135,7 @@ DEVICE_INPUT_DEFAULTS_END
 void ultim809_state::ultim809(machine_config &config)
 {
 	// basic machine hardware
-	MC6809E(config, m_maincpu, 8000000 / 4);  // 68B09E
+	MC6809E(config, m_maincpu, XTAL::u(8000000) / 4);  // 68B09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &ultim809_state::mem_map);
 
 	// video hardware
@@ -146,7 +146,7 @@ void ultim809_state::ultim809(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// TBD: what type of VIA is this? It replaced a MC68B21P at some point in development.
-	MOS6522(config, m_via, 8000000 / 4);
+	MOS6522(config, m_via, XTAL::u(8000000) / 4);
 	// Memory banking: up to 32 banks with inbuilt U8, or replace it with external memory to get the full 4 MB
 	m_via->writepa_handler().set([this] (u8 data) { m_membank = data & 0x1F; });   // memory banking
 	//m_via->readpb_handler().set(FUNC(ultim809_state::portb_r));    // serial
@@ -155,7 +155,7 @@ void ultim809_state::ultim809(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, m_psg, 8000000 / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, m_psg, XTAL::u(8000000) / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
 	//m_psg->port_a_read_callback(FUNC(ultim809_state::...);  // joystick 1
 	//m_psg->port_b_read_callback(FUNC(ultim809_state::...);  // joystick 2
 

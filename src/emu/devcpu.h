@@ -38,7 +38,7 @@ public:
 
 protected:
 	// construction/destruction
-	cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	// configured state

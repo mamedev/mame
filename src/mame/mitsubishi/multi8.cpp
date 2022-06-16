@@ -634,10 +634,10 @@ void multi8_state::multi8(machine_config &config)
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
-	AY8912(config, m_aysnd, 1500000); //unknown clock / divider
+	AY8912(config, m_aysnd, XTAL::u(1500000)); //unknown clock / divider
 	m_aysnd->port_a_write_callback().set(FUNC(multi8_state::ym2203_porta_w));
 	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.50);
-	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS,"mono",0.50); // guesswork
+	BEEP(config, m_beeper, XTAL::u(1200)).add_route(ALL_OUTPUTS,"mono",0.50); // guesswork
 
 	/* devices */
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(multi8_state::keyboard_callback), attotime::from_hz(240/32));
@@ -653,7 +653,7 @@ void multi8_state::multi8(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(multi8_state::portb_w));
 	m_ppi->out_pc_callback().set(FUNC(multi8_state::portc_w));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 19200));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL::u(19200)));
 	uart_clock.signal_handler().set(FUNC(multi8_state::kansas_w));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(multi8_state::kansas_r), attotime::from_hz(40000));
 
@@ -661,11 +661,11 @@ void multi8_state::multi8(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	I8251(config, m_uart, 0); // for cassette
+	I8251(config, m_uart); // for cassette
 	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
-	PIT8253(config, "pit", 0);
-	PIC8259(config, "pic", 0);
+	PIT8253(config, "pit");
+	PIC8259(config, "pic");
 
 	//UPD765A(config, "fdc", false, true);
 	//FLOPPY_CONNECTOR(config, "fdc:0", multi8_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);

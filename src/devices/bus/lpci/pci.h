@@ -45,14 +45,14 @@ class pci_connector_device : public device_t,
 public:
 	template <typename T>
 	pci_connector_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, bool fixed)
-		: pci_connector_device(mconfig, tag, owner, (uint32_t)0)
+		: pci_connector_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(fixed);
 	}
-	pci_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pci_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~pci_connector_device();
 
 	pci_device_interface *get_device();
@@ -69,7 +69,7 @@ class pci_bus_device :  public device_t
 {
 public:
 	// construction/destruction
-	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

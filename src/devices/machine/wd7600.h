@@ -29,7 +29,7 @@ class wd7600_device : public device_t
 {
 public:
 	// construction/destruction
-	wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// callbacks
 	auto ior_callback() { return m_read_ior.bind(); }

@@ -13,7 +13,7 @@
 class dspv_device : public cpu_device, public device_sound_interface
 {
 public:
-	dspv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 22579200);
+	dspv_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = 22579200);
 
 	void map(address_map &map);
 

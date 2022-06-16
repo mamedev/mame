@@ -30,7 +30,7 @@ class luxor_55_21056_device :  public device_t,
 {
 public:
 	// construction/destruction
-	luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

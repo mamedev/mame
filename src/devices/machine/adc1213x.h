@@ -24,7 +24,7 @@ class adc12138_device : public device_t
 public:
 	typedef device_delegate<double (uint8_t input)> ipt_convert_delegate;
 
-	adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename... T> void set_ipt_convert_callback(T &&... args) { m_ipt_read_cb.set(std::forward<T>(args)...); }
 
@@ -36,7 +36,7 @@ public:
 	u8 eoc_r();
 
 protected:
-	adc12138_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	adc12138_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -65,14 +65,14 @@ private:
 class adc12130_device : public adc12138_device
 {
 public:
-	adc12130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc12130_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
 class adc12132_device : public adc12138_device
 {
 public:
-	adc12132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc12132_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(TTL153, ttl153_device, "ttl153", "SN54/74153")
 //  ttl153_device - constructor
 //-------------------------------------------------
 
-ttl153_device::ttl153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ttl153_device::ttl153_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TTL153, tag, owner, clock),
 	m_za_cb(*this),
 	m_zb_cb(*this),

@@ -21,7 +21,7 @@ class ym2203_device : public ymfm_ssg_device_base<ymfm::ym2203>
 
 public:
 	// constructor
-	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers, handled by the interface
 	auto port_a_read_callback() { return io_read_handler(0); }
@@ -48,7 +48,7 @@ class ym2608_device : public ymfm_ssg_device_base<ymfm::ym2608>, public device_r
 
 public:
 	// constructor
-	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// configuration helpers, handled by the interface
 	auto port_a_read_callback() { return io_read_handler(0); }
@@ -92,7 +92,7 @@ class ym2610_device_base : public ymfm_ssg_device_base<ChipClass>, public device
 
 public:
 	// constructor
-	ym2610_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
+	ym2610_device_base(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, device_type type);
 
 	// additional register reads
 	u8 data_r() { return update_streams().read_data(); }
@@ -131,7 +131,7 @@ DECLARE_DEVICE_TYPE(YM2610, ym2610_device);
 class ym2610_device : public ym2610_device_base<ymfm::ym2610>
 {
 public:
-	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -142,7 +142,7 @@ DECLARE_DEVICE_TYPE(YM2610B, ym2610b_device);
 class ym2610b_device : public ym2610_device_base<ymfm::ym2610b>
 {
 public:
-	ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -154,7 +154,7 @@ class ym2612_device : public ymfm_device_base<ymfm::ym2612>
 {
 public:
 	// constructor
-	ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// additional register writes
 	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
@@ -170,7 +170,7 @@ class ym3438_device : public ymfm_device_base<ymfm::ym3438>
 {
 public:
 	// constructor
-	ym3438_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ym3438_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// additional register writes
 	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
@@ -186,7 +186,7 @@ class ymf276_device : public ymfm_device_base<ymfm::ymf276>
 {
 public:
 	// constructor
-	ymf276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ymf276_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// additional register writes
 	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }

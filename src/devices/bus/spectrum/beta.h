@@ -28,8 +28,8 @@ class spectrum_betav2_device :
 {
 public:
 	// construction/destruction
-	spectrum_betav2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	spectrum_betav2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_betav2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
+	spectrum_betav2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static void floppy_formats(format_registration &fr);
 
@@ -75,8 +75,8 @@ class spectrum_betav3_device :
 {
 public:
 	// construction/destruction
-	spectrum_betav3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	spectrum_betav3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_betav3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
+	spectrum_betav3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -91,8 +91,8 @@ class spectrum_betaplus_device :
 {
 public:
 	// construction/destruction
-	spectrum_betaplus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	spectrum_betaplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_betaplus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
+	spectrum_betaplus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER(magic_button);
 
@@ -107,8 +107,8 @@ class spectrum_betaclone_device :
 {
 public:
 	// construction/destruction
-	spectrum_betaclone_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	spectrum_betaclone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_betaclone_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
+	spectrum_betaclone_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual uint8_t mreq_r(offs_t offset) override;
@@ -121,8 +121,8 @@ class spectrum_betacbi_device :
 {
 public:
 	// construction/destruction
-	spectrum_betacbi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	spectrum_betacbi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_betacbi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
+	spectrum_betacbi_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;
@@ -142,8 +142,8 @@ class spectrum_gamma_device :
 {
 public:
 	// construction/destruction
-	spectrum_gamma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	spectrum_gamma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_gamma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
+	spectrum_gamma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(busy_r) { return !m_centronics_busy; }
 protected:

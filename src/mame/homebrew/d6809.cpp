@@ -205,11 +205,11 @@ void d6809_state::d6809(machine_config &config)
 	MOS6551(config, "acia2", XTAL(14'745'600) / 8); // uses Q clock
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(d6809_state::kbd_put));
 
 	// Floppy
-	UPD765A(config, m_fdc, 8'000'000, true, true);
+	UPD765A(config, m_fdc, XTAL::u(8'000'000), true, true);
 	//m_fdc->drq_wr_callback().set(m_fdc, FUNC(upd765a_device::dack_w));   // pin not emulated
 	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }

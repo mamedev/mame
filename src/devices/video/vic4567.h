@@ -108,7 +108,7 @@ class vic3_device : public device_t,
 public:
 	enum class vic3_type { NTSC, PAL };
 
-	vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	void set_vic3_type(vic3_type type) { m_type = type; }

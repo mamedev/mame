@@ -65,7 +65,7 @@ public:
 	uint8_t out_r() const { return m_out; }
 
 protected:
-	am2847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, size_t size);
+	am2847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, size_t size);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -98,21 +98,21 @@ class am2847_device : public am2847_base_device
 {
 public:
 	// construction/destruction
-	am2847_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	am2847_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class am2849_device : public am2847_base_device
 {
 public:
 	// construction/destruction
-	am2849_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	am2849_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class tms3409_device : public am2847_base_device
 {
 public:
 	// construction/destruction
-	tms3409_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms3409_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition

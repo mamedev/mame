@@ -19,7 +19,7 @@ class cpc_transtape_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_transtape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cpc_transtape_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

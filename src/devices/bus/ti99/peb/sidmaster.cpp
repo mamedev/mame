@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(TI99_SIDMASTER, bus::ti99::peb::sidmaster_device, "ti99_sidma
 
 namespace bus::ti99::peb {
 
-sidmaster_device::sidmaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sidmaster_device::sidmaster_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_SIDMASTER, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_sid(*this, "sid")

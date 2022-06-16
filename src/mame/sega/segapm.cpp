@@ -60,7 +60,7 @@ INPUT_PORTS_END
 
 void segapm_state::segapm(machine_config &config)
 {
-	M68000(config, m_maincpu, 8000000); // ??
+	M68000(config, m_maincpu, XTAL::u(8000000)); // ??
 	m_maincpu->set_addrmap(AS_PROGRAM, &segapm_state::segapm_map);
 
 	// + 2 sh2s on 32x board

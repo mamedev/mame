@@ -589,7 +589,7 @@ void triforce_state::machine_start()
 void triforce_state::triforce_base(machine_config &config)
 {
 	/* basic machine hardware */
-	PPC603(config, m_maincpu, 64000000); /* Correct CPU is a PowerPC 750 (what Apple called "G3") with paired-single vector instructions added */
+	PPC603(config, m_maincpu, XTAL::u(64000000)); /* Correct CPU is a PowerPC 750 (what Apple called "G3") with paired-single vector instructions added */
 	m_maincpu->set_addrmap(AS_PROGRAM, &triforce_state::gc_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));

@@ -75,7 +75,7 @@ public:
 	auto re_out_cb() { return m_port_out_cb[4].bind(); }
 
 protected:
-	pic17c4x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 rom_size, address_map_constructor data_map);
+	pic17c4x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u16 rom_size, address_map_constructor data_map);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -158,10 +158,10 @@ class pic17c43_device : public pic17c4x_device
 {
 public:
 	// device type constructor
-	pic17c43_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pic17c43_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	pic17c43_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 rom_size);
+	pic17c43_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u16 rom_size);
 
 private:
 	void data_map(address_map &map);
@@ -171,7 +171,7 @@ class pic17c44_device : public pic17c43_device
 {
 public:
 	// device type constructor
-	pic17c44_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pic17c44_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type declarations

@@ -188,7 +188,7 @@ ioport_constructor geneve_xt_101_hle_keyboard_device::device_input_ports() const
 //  ibm_pc_xt_83_keyboard_device - constructor
 //-------------------------------------------------
 
-geneve_xt_101_hle_keyboard_device::geneve_xt_101_hle_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+geneve_xt_101_hle_keyboard_device::geneve_xt_101_hle_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KBD_GENEVE_XT_101_HLE, tag, owner, clock),
 	  device_pc_kbd_interface(mconfig, *this),
 	  m_keys(*this, "KEY%u", 0),

@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(TA7630, ta7630_device, "ta7630", "Toshiba TA7630P")
 //  ta7630_device - constructor
 //-------------------------------------------------
 
-ta7630_device::ta7630_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ta7630_device::ta7630_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TA7630, tag, owner, clock)
 //        ,device_sound_interface(mconfig, *this)
 {

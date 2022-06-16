@@ -21,7 +21,7 @@ class hp82919_io_card_device : public device_t, public device_hp_ipc_io_interfac
 {
 public:
 	// construction/destruction
-	hp82919_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp82919_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~hp82919_io_card_device();
 
 	uint8_t read(offs_t addr);

@@ -29,7 +29,7 @@ class a2058_device : public device_t, public device_zorro2_card_interface, publi
 {
 public:
 	// construction/destruction
-	a2058_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2058_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;

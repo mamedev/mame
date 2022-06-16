@@ -11,7 +11,7 @@ class lynx_sound_device : public device_t, public device_sound_interface
 public:
 	typedef device_delegate<void (void)> timer_delegate;
 
-	lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
@@ -48,7 +48,7 @@ protected:
 		s16 count = 0;
 	};
 
-	lynx_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	lynx_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -78,7 +78,7 @@ protected:
 class lynx2_sound_device : public lynx_sound_device
 {
 public:
-	lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

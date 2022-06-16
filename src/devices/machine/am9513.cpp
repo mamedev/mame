@@ -54,7 +54,7 @@ DEFINE_DEVICE_TYPE(AM9513A, am9513a_device, "am9513a", "Am9513A STC")
 //  am9513_device - constructor
 //-------------------------------------------------
 
-am9513_device::am9513_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_am9513a)
+am9513_device::am9513_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool is_am9513a)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_cb(*this)
 	, m_fout_cb(*this)
@@ -62,12 +62,12 @@ am9513_device::am9513_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-am9513_device::am9513_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+am9513_device::am9513_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: am9513_device(mconfig, AM9513, tag, owner, clock, false)
 {
 }
 
-am9513a_device::am9513a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+am9513a_device::am9513a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: am9513_device(mconfig, AM9513A, tag, owner, clock, true)
 {
 }

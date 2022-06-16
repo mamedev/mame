@@ -53,7 +53,7 @@ void device_colecovision_cartridge_interface::rom_alloc(size_t size)
 //  colecovision_cartridge_slot_device - constructor
 //-------------------------------------------------
 
-colecovision_cartridge_slot_device::colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+colecovision_cartridge_slot_device::colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COLECOVISION_CARTRIDGE_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_colecovision_cartridge_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),

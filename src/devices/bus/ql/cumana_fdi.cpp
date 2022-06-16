@@ -51,7 +51,7 @@ const tiny_rom_entry *cumana_floppy_disk_interface_device::device_rom_region() c
 //  cumana_floppy_disk_interface_device - constructor
 //-------------------------------------------------
 
-cumana_floppy_disk_interface_device::cumana_floppy_disk_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cumana_floppy_disk_interface_device::cumana_floppy_disk_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CUMANA_FLOPPY_DISK_INTERFACE, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this)
 {

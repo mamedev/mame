@@ -978,10 +978,10 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 void cntsteer_state::cntsteer(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 2000000);      /* MC68B09E */
+	MC6809E(config, m_maincpu, XTAL::u(2000000));      /* MC68B09E */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cntsteer_state::cntsteer_cpu1_map);
 
-	MC6809E(config, m_subcpu, 2000000);       /* MC68B09E */
+	MC6809E(config, m_subcpu, XTAL::u(2000000));       /* MC68B09E */
 	m_subcpu->set_addrmap(AS_PROGRAM, &cntsteer_state::cntsteer_cpu2_map);
 //  m_subcpu->set_disable();
 
@@ -1021,19 +1021,19 @@ void cntsteer_state::cntsteer(machine_config &config)
 
 	YM2149(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // labeled DAC-08CQ
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // labeled DAC-08CQ
 }
 
 void cntsteer_state::zerotrgt(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 2000000);      /* ? */
+	MC6809E(config, m_maincpu, XTAL::u(2000000));      /* ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cntsteer_state::gekitsui_cpu1_map);
 
-	MC6809E(config, m_subcpu, 2000000);       /* ? */
+	MC6809E(config, m_subcpu, XTAL::u(2000000));       /* ? */
 	m_subcpu->set_addrmap(AS_PROGRAM, &cntsteer_state::gekitsui_cpu2_map);
 
-	M6502(config, m_audiocpu, 1500000);        /* ? */
+	M6502(config, m_audiocpu, XTAL::u(1500000));        /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cntsteer_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(cntsteer_state::sound_interrupt), attotime::from_hz(480));
 
@@ -1062,9 +1062,9 @@ void cntsteer_state::zerotrgt(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	YM2149(config, "ay1", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	YM2149(config, "ay2", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 /***************************************************************************/

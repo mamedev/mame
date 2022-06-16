@@ -386,8 +386,8 @@ DEFINE_DEVICE_TYPE(SCC8523L,       scc8523l_device, "scc8523l",       "Zilog Z85
 //-------------------------------------------------
 void z80scc_device::device_add_mconfig(machine_config &config)
 {
-	Z80SCC_CHANNEL(config, CHANA_TAG, 0);
-	Z80SCC_CHANNEL(config, CHANB_TAG, 0);
+	Z80SCC_CHANNEL(config, CHANA_TAG);
+	Z80SCC_CHANNEL(config, CHANB_TAG);
 }
 
 
@@ -413,7 +413,7 @@ inline void z80scc_channel::out_dtr_cb(int state)
 //-------------------------------------------------
 //  z80scc_device - constructor
 //-------------------------------------------------
-z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
 	m_wr9(0),
@@ -440,42 +440,42 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 		elem = 0;
 }
 
-scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80scc_device(mconfig, SCC8030, tag, owner, clock, TYPE_SCC8030)
 {
 }
 
-scc80c30_device::scc80c30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scc80c30_device::scc80c30_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80scc_device(mconfig, SCC80C30, tag, owner, clock, TYPE_SCC80C30)
 {
 }
 
-scc80230_device::scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scc80230_device::scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80scc_device(mconfig, SCC80230, tag, owner, clock, TYPE_SCC80230)
 {
 }
 
-scc8530_device::scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scc8530_device::scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80scc_device(mconfig, SCC8530N, tag, owner, clock, TYPE_SCC8530)
 {
 }
 
-scc85c30_device::scc85c30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scc85c30_device::scc85c30_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80scc_device(mconfig, SCC85C30, tag, owner, clock, TYPE_SCC85C30)
 {
 }
 
-scc85230_device::scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scc85230_device::scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80scc_device(mconfig, SCC85230, tag, owner, clock, TYPE_SCC85230)
 {
 }
 
-scc85233_device::scc85233_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scc85233_device::scc85233_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80scc_device(mconfig, SCC85233, tag, owner, clock, TYPE_SCC85233)
 {
 }
 
-scc8523l_device::scc8523l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+scc8523l_device::scc8523l_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80scc_device(mconfig, SCC8523L, tag, owner, clock, TYPE_SCC8523L)
 {
 }
@@ -1011,7 +1011,7 @@ void z80scc_device::ab_dc_w(offs_t offset, uint8_t data)
 //-------------------------------------------------
 //  SCC_channel - constructor
 //-------------------------------------------------
-z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, Z80SCC_CHANNEL, tag, owner, clock),
 		device_serial_interface(mconfig, *this),
 		m_baudtimer(0),
@@ -2915,8 +2915,8 @@ void z80scc_channel::update_serial()
 	else
 	{
 		LOG("- BRG disabled\n");
-		set_rcv_rate(0);
-		set_tra_rate(0);
+		set_rcv_rate(XTAL::u(0));
+		set_tra_rate(XTAL::u(0));
 	}
 	// TODO: Check registers for use of RTxC and TRxC, if used as direct Tx and/or Rx clocks set them to value as programmed
 	// in m_uart->txca/txcb and rxca/rxcb respectivelly

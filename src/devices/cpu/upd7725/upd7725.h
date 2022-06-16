@@ -41,7 +41,7 @@ public:
 
 protected:
 	// construction/destruction
-	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits);
+	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t abits, uint32_t dbits);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -166,14 +166,14 @@ class upd7725_device : public necdsp_device
 {
 public:
 	// construction/destruction
-	upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class upd96050_device : public necdsp_device
 {
 public:
 	// construction/destruction
-	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t dataram_r(uint16_t addr) { return dataRAM[addr]; }
 	void dataram_w(uint16_t addr, uint16_t data) { dataRAM[addr] = data; }

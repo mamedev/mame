@@ -38,12 +38,12 @@ DEFINE_DEVICE_TYPE(NES_REX_DBZ5,   nes_rex_dbz5_device,   "nes_rex_dbz5",   "NES
 DEFINE_DEVICE_TYPE(NES_REX_SL1632, nes_rex_sl1632_device, "nes_rex_sl1632", "NES Cart Rex Soft SL-1632 PCB")
 
 
-nes_rex_dbz5_device::nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_rex_dbz5_device::nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_REX_DBZ5, tag, owner, clock), m_extra(0)
 {
 }
 
-nes_rex_sl1632_device::nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_rex_sl1632_device::nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_txrom_device(mconfig, NES_REX_SL1632, tag, owner, clock), m_mode(0)
 {
 }

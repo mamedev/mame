@@ -44,12 +44,12 @@
 DEFINE_DEVICE_TYPE(STEPPER, stepper_device, "stepper", "Stepper Motor")
 DEFINE_DEVICE_TYPE(REEL, reel_device, "reel", "Fruit Machine Reel")
 
-stepper_device::stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+stepper_device::stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: stepper_device(mconfig, STEPPER, tag, owner, clock)
 {
 }
 
-stepper_device::stepper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+stepper_device::stepper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_max_steps(48*2)
 	, m_optic_cb(*this)
@@ -509,7 +509,7 @@ reel_device::reel_device(const machine_config &mconfig, const char *tag, device_
 }
 ///////////////////////////////////////////////////////////////////////////
 
-reel_device::reel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+reel_device::reel_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: stepper_device(mconfig, REEL, tag, owner, clock)
 {
 }

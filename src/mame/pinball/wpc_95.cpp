@@ -2305,14 +2305,14 @@ void wpc_95_state::wpc_95(machine_config &config)
 
 	TIMER(config, "zero_crossing").configure_periodic(FUNC(wpc_95_state::zc_timer), attotime::from_hz(120)); // Mains power zero crossing
 
-	WPC_PIC(config, m_pic, 0);
-	WPC_LAMP(config, m_lamp, 0);
+	WPC_PIC(config, m_pic);
+	WPC_LAMP(config, m_lamp);
 	WPC_OUT(config, m_out, 0, 3);
-	WPC_SHIFT(config, "shift", 0);
-	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_95_state::scanline_irq));
+	WPC_SHIFT(config, "shift");
+	WPC_DMD(config, "dmd").scanline_callback().set(FUNC(wpc_95_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	DCS_AUDIO_WPC(config, m_dcs, 0);
+	DCS_AUDIO_WPC(config, m_dcs);
 }
 
 /*-------------------------

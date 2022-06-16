@@ -233,7 +233,7 @@ ioport_constructor ibm_pc_at_101_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ibm_pc_at_101_keyboard);
 }
 
-ibm_pc_at_101_keyboard_device::ibm_pc_at_101_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ibm_pc_at_101_keyboard_device::ibm_pc_at_101_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, PC_KBD_IBM_PC_AT_101, tag, owner, clock)
 	, device_pc_kbd_interface(mconfig, *this)
 	, m_mcu(*this, "mcu")

@@ -45,8 +45,8 @@ protected:
 	static constexpr unsigned MID_SHADE = 0x80;
 
 	// construction/destruction
-	psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu_tag);
-	psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu_tag);
+	psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_post_load() override;
@@ -311,48 +311,48 @@ class cxd8514q_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu);
-	cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu);
+	cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class cxd8538q_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu);
-	cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu);
+	cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class cxd8561q_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu);
-	cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu);
+	cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class cxd8561bq_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu);
-	cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu);
+	cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class cxd8561cq_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu);
-	cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu);
+	cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class cxd8654q_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu);
-	cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, uint32_t vram_size, psxcpu_device *cpu);
+	cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 #endif // MAME_VIDEO_PSX_H

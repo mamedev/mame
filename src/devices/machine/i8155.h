@@ -45,7 +45,7 @@ class i8155_device : public device_t
 {
 public:
 	// construction/destruction
-	i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto in_pa_callback()  { return m_in_pa_cb.bind(); }
 	auto in_pb_callback()  { return m_in_pb_cb.bind(); }
@@ -66,7 +66,7 @@ public:
 	void data_w(uint8_t data);
 
 protected:
-	i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -129,7 +129,7 @@ class i8156_device : public i8155_device
 {
 public:
 	// construction/destruction
-	i8156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8156_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // device type definition

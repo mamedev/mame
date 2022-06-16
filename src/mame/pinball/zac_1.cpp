@@ -660,7 +660,7 @@ void zac_1_state::zac1(machine_config &config)
 {
 	config_base(config);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-	CLOCK(config, m_monotone, 0); // basic audio
+	CLOCK(config, m_monotone); // basic audio
 	m_monotone->signal_handler().set(m_speaker, FUNC(speaker_sound_device::level_w));
 }
 
@@ -673,7 +673,7 @@ void zac_1_state::zac2(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &zac_1_state::audio_io);
 	m_audiocpu->t1_in_cb().set(FUNC(zac_1_state::audio_t1_r));
 	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
-	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.275);
+	MC1408(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.275);
 	GENERIC_LATCH_8(config, m_soundlatch);
 }
 
@@ -760,7 +760,7 @@ void zac_1_state::locomotp(machine_config &config)
 	noise.output_callback().set(FUNC(zac_1_state::noise_w));
 
 	// 555 timer, 1277 Hz, merges with noise to make a steam whistle
-	CLOCK(config, m_astable, 0);
+	CLOCK(config, m_astable);
 	m_astable->signal_handler().set(FUNC(zac_1_state::clock_w));
 }
 

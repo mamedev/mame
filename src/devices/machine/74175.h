@@ -66,7 +66,7 @@ public:
 	uint8_t q_w();
 
 protected:
-	ttl741745_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ttl741745_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -96,7 +96,7 @@ protected:
 class ttl74174_device : public ttl741745_device
 {
 public:
-	ttl74174_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ttl74174_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto q5_cb() { return m_q5_func.bind(); }
 	auto q6_cb() { return m_q6_func.bind(); }
@@ -124,7 +124,7 @@ private:
 class ttl74175_device : public ttl741745_device
 {
 public:
-	ttl74175_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ttl74175_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto not_q1_cb() { return m_not_q1_func.bind(); }
 	auto not_q2_cb() { return m_not_q2_func.bind(); }

@@ -107,7 +107,7 @@ void yuvomz80_state::hexaprs(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &yuvomz80_state::audio_io_map);
 
 	SPEAKER(config, "mono").front_center();
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000)); // type guessed
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL::u(8000000))); // type guessed
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 1.0);
@@ -124,10 +124,10 @@ void yuvomz80_state::hexaprsz(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &yuvomz80_state::audio_mem_map);
 	audiocpu.set_addrmap(AS_IO, &yuvomz80_state::hexaprsz_audio_io_map);
 
-	I8255A(config, "ppi0", 0);
-	I8255A(config, "ppi1", 0);
-	I8255A(config, "ppi2", 0);
-	I8255A(config, "ppi3", 0);
+	I8255A(config, "ppi0");
+	I8255A(config, "ppi1");
+	I8255A(config, "ppi2");
+	I8255A(config, "ppi3");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

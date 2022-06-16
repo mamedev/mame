@@ -27,7 +27,7 @@ class rtc3430042_device :  public device_t,
 {
 public:
 	// construction/destruction
-	rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );

@@ -242,7 +242,7 @@ ioport_constructor xerox_820_keyboard_device::device_input_ports() const
 //  xerox_820_keyboard_device - constructor
 //-------------------------------------------------
 
-xerox_820_keyboard_device::xerox_820_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+xerox_820_keyboard_device::xerox_820_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, XEROX_820_KEYBOARD, tag, owner, clock),
 	m_maincpu(*this, I8748_TAG),
 	m_y(*this, "Y%u", 0),

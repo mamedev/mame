@@ -1426,7 +1426,7 @@ void trkfldch_state::machine_reset()
 void trkfldch_state::trkfldch(machine_config &config)
 {
 	/* basic machine hardware */
-	G65816(config, m_maincpu, 20000000);
+	G65816(config, m_maincpu, XTAL::u(20000000));
 	//m_maincpu->set_addrmap(AS_DATA, &trkfldch_state::mem_map);
 	m_maincpu->set_addrmap(AS_PROGRAM, &trkfldch_state::trkfldch_map);
 	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &trkfldch_state::vectors_map);

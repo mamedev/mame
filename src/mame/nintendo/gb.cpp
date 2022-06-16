@@ -1077,7 +1077,7 @@ void gb_state::gameboy(machine_config &config)
 void sgb_state::supergb(machine_config &config)
 {
 	// basic machine hardware
-	LR35902(config, m_maincpu, 4'295'454); // derived from SNES xtal
+	LR35902(config, m_maincpu, XTAL::u(4'295'454)); // derived from SNES xtal
 	m_maincpu->set_addrmap(AS_PROGRAM, &sgb_state::sgb_map);
 	m_maincpu->timer_cb().set(FUNC(sgb_state::gb_timer_callback));
 	m_maincpu->set_halt_bug(true);
@@ -1101,7 +1101,7 @@ void sgb_state::supergb(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	DMG_APU(config, m_apu, 4'295'454);
+	DMG_APU(config, m_apu, XTAL::u(4'295'454));
 	m_apu->add_route(0, "lspeaker", 0.50);
 	m_apu->add_route(1, "rspeaker", 0.50);
 

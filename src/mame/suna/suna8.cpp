@@ -2069,10 +2069,10 @@ void suna8_state::brickzn11(machine_config &config)
 
 	AY8910(config, "aysnd", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "speaker", 0.33);    // 1.5MHz (measured)
 
-	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 0.17);  // unknown DAC
-	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 0.17);  // unknown DAC
-	DAC_4BIT_R2R(config, "ldac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.17); // unknown DAC
-	DAC_4BIT_R2R(config, "rdac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.17); // unknown DAC
+	DAC_4BIT_R2R(config, "ldac").add_route(ALL_OUTPUTS, "speaker", 0.17);  // unknown DAC
+	DAC_4BIT_R2R(config, "rdac").add_route(ALL_OUTPUTS, "speaker", 0.17);  // unknown DAC
+	DAC_4BIT_R2R(config, "ldac2").add_route(ALL_OUTPUTS, "speaker", 0.17); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac2").add_route(ALL_OUTPUTS, "speaker", 0.17); // unknown DAC
 }
 
 void suna8_state::brickzn(machine_config &config)

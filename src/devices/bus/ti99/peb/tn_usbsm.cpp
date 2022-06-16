@@ -65,7 +65,7 @@ enum
 	FEEPROM_WRITE_ENABLE = 0x10
 };
 
-nouspikel_usb_smartmedia_device::nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nouspikel_usb_smartmedia_device::nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, TI99_USBSM, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
 	m_feeprom_page(0),
@@ -357,8 +357,8 @@ INPUT_PORTS_END
 
 void nouspikel_usb_smartmedia_device::device_add_mconfig(machine_config &config)
 {
-	SMARTMEDIA(config, "smartmedia", 0);
-	STRATAFLASH(config, STRATA_TAG, 0);
+	SMARTMEDIA(config, "smartmedia");
+	STRATAFLASH(config, STRATA_TAG);
 	RAM(config, RAM1_TAG).set_default_size("512K").set_default_value(0);
 	RAM(config, RAM2_TAG).set_default_size("512K").set_default_value(0);
 }

@@ -196,7 +196,7 @@ static INPUT_PORTS_START( macadb )
 	PORT_BIT(0xE000, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-macadb_device::macadb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+macadb_device::macadb_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, MACADB, tag, owner, clock),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),

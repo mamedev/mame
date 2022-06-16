@@ -241,7 +241,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::kansas_r)
 WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
 {
 	m_cb2 = state;
-	m_maincpu->set_unscaled_clock(state ? 589744 : 1e6); // effective clock is ~590kHz while screen is on
+	m_maincpu->set_unscaled_clock(state ? XTAL::u(589744) : XTAL::u(1e6)); // effective clock is ~590kHz while screen is on
 }
 
 uint8_t d6800_state::d6800_cassette_r()
@@ -390,10 +390,10 @@ void d6800_state::d6800(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, "beeper", XTAL::u(1200)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(d6800_state::d6800_keyboard_r));
 	m_pia->readpb_handler().set(FUNC(d6800_state::d6800_cassette_r));
 	m_pia->writepa_handler().set(FUNC(d6800_state::d6800_keyboard_w));

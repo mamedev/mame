@@ -26,7 +26,7 @@
 
 DEFINE_DEVICE_TYPE(NEWS_HID_HLE, news_hid_hle_device, "news_hid_hle", "Sony NEWS Keyboard and Mouse (HLE)")
 
-news_hid_hle_device::news_hid_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+news_hid_hle_device::news_hid_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NEWS_HID_HLE, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7")
 	, m_mouse_x_axis(*this, "mouse_x_axis")

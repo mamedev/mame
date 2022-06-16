@@ -71,7 +71,7 @@ void device_m5_cart_interface::ram_alloc(uint32_t size)
 //-------------------------------------------------
 //  m5_cart_slot_device - constructor
 //-------------------------------------------------
-m5_cart_slot_device::m5_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+m5_cart_slot_device::m5_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, M5_CART_SLOT, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface(mconfig, *this),

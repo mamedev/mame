@@ -993,7 +993,7 @@ void base_state::base(machine_config &config)
 	ym3526_device &ymsnd(YM3526(config, "ymsnd", FIRETRAP_XTAL / 4));    // 3 MHz
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_msm, FIRETRAP_XTAL / 32);   // 375 kHz
@@ -1009,7 +1009,7 @@ void original_state::firetrap(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &original_state::main_map);
 
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(original_state::interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(original_state::interrupt), "screen", 0, 1);
 
 	I8751(config, m_mcu, 8_MHz_XTAL);
 	m_mcu->port_in_cb<0>().set(FUNC(original_state::mcu_p0_r));
@@ -1028,7 +1028,7 @@ void bootleg_state::firetrapbl(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &bootleg_state::main_map);
 
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(bootleg_state::interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(bootleg_state::interrupt), "screen", 0, 1);
 }
 
 

@@ -17,7 +17,7 @@
 class mac_video_sonora_device : public device_t
 {
 public:
-	mac_video_sonora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mac_video_sonora_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~mac_video_sonora_device() = default;
 
 	uint8_t vctrl_r(offs_t offset);

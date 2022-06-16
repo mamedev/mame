@@ -183,12 +183,12 @@ INPUT_PORTS_END
 void borisdpl_state::borisdpl(machine_config &config)
 {
 	/* basic machine hardware */
-	F8(config, m_maincpu, 3000000/2); // frequency approximated from video reference
+	F8(config, m_maincpu, XTAL::u(3000000)/2); // frequency approximated from video reference
 	m_maincpu->set_addrmap(AS_PROGRAM, &borisdpl_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &borisdpl_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
 
-	f38t56_device &psu(F38T56(config, "psu", 3000000/2));
+	f38t56_device &psu(F38T56(config, "psu", XTAL::u(3000000)/2));
 	psu.set_int_vector(0x5020);
 	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 	psu.read_a().set(FUNC(borisdpl_state::ram_data_r));

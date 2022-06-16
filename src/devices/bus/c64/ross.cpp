@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(C64_ROSS, c64_ross_cartridge_device, "c64_ross", "C64 Ross ca
 //  c64_ross_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_ross_cartridge_device::c64_ross_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c64_ross_cartridge_device::c64_ross_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, C64_ROSS, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this), m_bank(0)
 {

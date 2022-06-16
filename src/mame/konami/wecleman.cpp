@@ -1042,20 +1042,20 @@ void wecleman_state::machine_start()
 void wecleman_state::wecleman(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);   /* Schems show 10MHz */
+	M68000(config, m_maincpu, XTAL::u(10000000));   /* Schems show 10MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &wecleman_state::wecleman_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(wecleman_state::wecleman_scanline), "screen", 0, 1);
 
-	M68000(config, m_subcpu, 10000000);   /* Schems show 10MHz */
+	M68000(config, m_subcpu, XTAL::u(10000000));   /* Schems show 10MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &wecleman_state::wecleman_sub_map);
 
 	/* Schems: can be reset, no nmi, soundlatch, 3.58MHz */
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, XTAL::u(3579545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wecleman_state::wecleman_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown "ADCCLK" (generated on video board?)
+	adc0804_device &adc(ADC0804(config, "adc", XTAL::u(640000))); // unknown "ADCCLK" (generated on video board?)
 	adc.vin_callback().set(FUNC(wecleman_state::selected_ip_r));
 
 	KONAMI_007452_MATH(config, "k007452");
@@ -1078,9 +1078,9 @@ void wecleman_state::wecleman(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 0.85).add_route(1, "rspeaker", 0.85);
+	YM2151(config, "ymsnd", XTAL::u(3579545)).add_route(0, "lspeaker", 0.85).add_route(1, "rspeaker", 0.85);
 
-	K007232(config, m_k007232[0], 3579545);
+	K007232(config, m_k007232[0], XTAL::u(3579545));
 	m_k007232[0]->port_write().set(FUNC(wecleman_state::wecleman_volume_callback));
 	m_k007232[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.20);
 	m_k007232[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.20);
@@ -1113,20 +1113,20 @@ void hotchase_state::machine_reset()
 void hotchase_state::hotchase(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);   /* 10 MHz - PCB is drawn in one set's readme */
+	M68000(config, m_maincpu, XTAL::u(10000000));   /* 10 MHz - PCB is drawn in one set's readme */
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotchase_state::hotchase_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(hotchase_state::hotchase_scanline), "screen", 0, 1);
 
-	M68000(config, m_subcpu, 10000000);   /* 10 MHz - PCB is drawn in one set's readme */
+	M68000(config, m_subcpu, XTAL::u(10000000));   /* 10 MHz - PCB is drawn in one set's readme */
 	m_subcpu->set_addrmap(AS_PROGRAM, &hotchase_state::hotchase_sub_map);
 
-	MC6809E(config, m_audiocpu, 3579545 / 2);    /* 3.579/2 MHz - PCB is drawn in one set's readme */
+	MC6809E(config, m_audiocpu, XTAL::u(3579545) / 2);    /* 3.579/2 MHz - PCB is drawn in one set's readme */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &hotchase_state::hotchase_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(hotchase_state::hotchase_sound_timer), attotime::from_hz(496));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown clock (generated on video board?)
+	adc0804_device &adc(ADC0804(config, "adc", XTAL::u(640000))); // unknown clock (generated on video board?)
 	adc.vin_callback().set(FUNC(hotchase_state::selected_ip_r));
 
 	/* video hardware */
@@ -1141,13 +1141,13 @@ void hotchase_state::hotchase(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hotchase);
 	PALETTE(config, m_palette).set_entries(8192);
 
-	K051316(config, m_k051316[0], 0);
+	K051316(config, m_k051316[0]);
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_offsets(-0xb0 / 2, -16);
 	m_k051316[0]->set_wrap(1);
 	m_k051316[0]->set_zoom_callback(FUNC(hotchase_state::hotchase_zoom_callback_1));
 
-	K051316(config, m_k051316[1], 0);
+	K051316(config, m_k051316[1]);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_offsets(-0xb0 / 2, -16);
 	m_k051316[1]->set_zoom_callback(FUNC(hotchase_state::hotchase_zoom_callback_2));
@@ -1158,17 +1158,17 @@ void hotchase_state::hotchase(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	K007232(config, m_k007232[0], 3579545);
+	K007232(config, m_k007232[0], XTAL::u(3579545));
 	// SLEV not used, volume control is elsewhere
 	m_k007232[0]->add_route(0, "lspeaker", 0.20);
 	m_k007232[0]->add_route(1, "rspeaker", 0.20);
 
-	K007232(config, m_k007232[1], 3579545);
+	K007232(config, m_k007232[1], XTAL::u(3579545));
 	// SLEV not used, volume control is elsewhere
 	m_k007232[1]->add_route(0, "lspeaker", 0.20);
 	m_k007232[1]->add_route(1, "rspeaker", 0.20);
 
-	K007232(config, m_k007232[2], 3579545);
+	K007232(config, m_k007232[2], XTAL::u(3579545));
 	// SLEV not used, volume control is elsewhere
 	m_k007232[2]->add_route(0, "lspeaker", 0.20);
 	m_k007232[2]->add_route(1, "rspeaker", 0.20);

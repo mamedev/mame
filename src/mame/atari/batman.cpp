@@ -197,7 +197,7 @@ void batman_state::batman(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_batman);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
-	ATARI_VAD(config, m_vad, 0, m_screen);
+	ATARI_VAD(config, m_vad, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	m_vad->set_xoffsets(2, 6);
 
@@ -205,7 +205,7 @@ void batman_state::batman(machine_config &config)
 	TILEMAP(config, "vad:playfield2", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(batman_state::get_playfield2_tile_info));
 	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(batman_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, batman_state::s_mob_config).set_gfxdecode("gfxdecode");
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, batman_state::s_mob_config).set_gfxdecode("gfxdecode");
 	m_mob->set_xoffset(-1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -219,7 +219,7 @@ void batman_state::batman(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_III(config, m_jsa, 0);
+	ATARI_JSA_III(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260010").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);

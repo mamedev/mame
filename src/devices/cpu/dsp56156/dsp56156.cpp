@@ -122,7 +122,7 @@ void dsp56156_device::dsp56156_x_data_map(address_map &map)
 }
 
 
-dsp56156_device::dsp56156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dsp56156_device::dsp56156_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, DSP56156, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, address_map_constructor(FUNC(dsp56156_device::dsp56156_program_map), this))
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, address_map_constructor(FUNC(dsp56156_device::dsp56156_x_data_map), this))

@@ -64,7 +64,7 @@ INPUT_PORTS_END
 void picno_state::picno(machine_config &config)
 {
 	/* basic machine hardware */
-	HD6435328(config, m_maincpu, 20'000'000); // TODO: clock is a guess, divided by 2 in the cpu
+	HD6435328(config, m_maincpu, XTAL::u(20'000'000)); // TODO: clock is a guess, divided by 2 in the cpu
 	m_maincpu->set_addrmap(AS_PROGRAM, &picno_state::mem_map);
 
 	//SPEAKER(config, "lspeaker").front_left(); // no speaker in the unit, but there's a couple of sockets on the back

@@ -496,7 +496,7 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	ACIA6850(config, m_acia0, 0);
+	ACIA6850(config, m_acia0);
 	m_acia0->txd_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia0->rts_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia0->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
@@ -506,7 +506,7 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	rs232h.dcd_handler().set(m_acia0, FUNC(acia6850_device::write_dcd));
 	rs232h.cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 
-	ACIA6850(config, m_acia1, 0);
+	ACIA6850(config, m_acia1);
 	m_acia1->txd_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia1->rts_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia1->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
@@ -517,7 +517,7 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	rs232k.cts_handler().set(m_acia1, FUNC(acia6850_device::write_cts));
 	rs232k.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(kbd_rs232_defaults));
 
-	ACIA6850(config, m_acia2, 0);
+	ACIA6850(config, m_acia2);
 	m_acia2->txd_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia2->rts_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia2->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
@@ -535,7 +535,7 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	m_dbrgb->fr_handler().set(FUNC(bitgraph_state::com8116_b_fr_w));
 	m_dbrgb->ft_handler().set(FUNC(bitgraph_state::com8116_b_ft_w));
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readca1_handler().set(FUNC(bitgraph_state::pia_ca1_r));
 	m_pia->cb2_handler().set(FUNC(bitgraph_state::pia_cb2_w));
 	m_pia->readpa_handler().set(FUNC(bitgraph_state::pia_pa_r));
@@ -543,7 +543,7 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	m_pia->readpb_handler().set(FUNC(bitgraph_state::pia_pb_r));
 	m_pia->writepb_handler().set(FUNC(bitgraph_state::pia_pb_w));
 
-	ER2055(config, m_earom, 0);
+	ER2055(config, m_earom);
 
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_psg, XTAL(1'294'400));
@@ -587,9 +587,9 @@ void bitgraph_state::bitgrpha(machine_config &config)
 
 	bg_motherboard(config);
 
-	CLOCK(config, "system_clock", 40).signal_handler().set(FUNC(bitgraph_state::system_clock_write));
+	CLOCK(config, "system_clock", XTAL::u(40)).signal_handler().set(FUNC(bitgraph_state::system_clock_write));
 
-	ACIA6850(config, m_acia3, 0);
+	ACIA6850(config, m_acia3);
 	m_acia3->txd_handler().set(RS232_M_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia3->rts_handler().set(RS232_M_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia3->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
@@ -610,7 +610,7 @@ void bitgraph_state::bitgrphb(machine_config &config)
 	bg_motherboard(config);
 //  bg_ppu(config);
 
-	CLOCK(config, "system_clock", 1040).signal_handler().set(FUNC(bitgraph_state::system_clock_write));
+	CLOCK(config, "system_clock", XTAL::u(1040)).signal_handler().set(FUNC(bitgraph_state::system_clock_write));
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 }

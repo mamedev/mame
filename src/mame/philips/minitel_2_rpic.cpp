@@ -522,10 +522,10 @@ void minitel_state::minitel2(machine_config &config)
 
 	I2C_24C02(config, m_i2cmem);
 
-	TS9347(config, m_ts9347, 0);
+	TS9347(config, m_ts9347);
 	m_ts9347->set_palette_tag(m_palette);
 
-	TIMER(config, "minitel_sl", 0).configure_scanline(FUNC(minitel_state::minitel_scanline), "screen", 0, 10);
+	TIMER(config, "minitel_sl").configure_scanline(FUNC(minitel_state::minitel_scanline), "screen", 0, 10);
 
 	RS232_PORT(config, m_modem, default_rs232_devices, nullptr);
 	m_modem->rxd_handler().set_inputline(m_maincpu, MCS51_INT1_LINE).invert();
@@ -547,7 +547,7 @@ void minitel_state::minitel2(machine_config &config)
 	PALETTE(config, m_palette).set_entries(8+1);
 
 	// Send a fake 1300 Hz carrier (emulate the modem ZCO output)
-	auto &fake_1300hz_clock(CLOCK(config, "fake_1300hz_clock", 1300));
+	auto &fake_1300hz_clock(CLOCK(config, "fake_1300hz_clock", XTAL::u(1300)));
 	fake_1300hz_clock.set_pulse_width(attotime::from_usec(384));
 	fake_1300hz_clock.signal_handler().set_inputline(m_maincpu, MCS51_INT0_LINE);
 }

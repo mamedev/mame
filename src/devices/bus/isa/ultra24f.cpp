@@ -16,7 +16,7 @@
 
 DEFINE_DEVICE_TYPE(ULTRA24F, ultra24f_device, "ultra24f", "Ultra-24F SCSI Host Adapter")
 
-ultra24f_device::ultra24f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ultra24f_device::ultra24f_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ULTRA24F, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_uscpu(*this, "uscpu")
@@ -69,7 +69,7 @@ void ultra24f_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_uscpu, 32_MHz_XTAL / 4); // custom-marked as USC080-5-12A; clock guessed
 	m_uscpu->set_addrmap(AS_PROGRAM, &ultra24f_device::uscpu_map);
 
-	I82355(config, m_bmic, 0);
+	I82355(config, m_bmic);
 
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);

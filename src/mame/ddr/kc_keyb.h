@@ -22,7 +22,7 @@ class kc_keyboard_device : public device_t
 {
 public:
 	// construction/destruction
-	kc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~kc_keyboard_device();
 
 	auto out_wr_callback() { return m_write_out.bind(); }

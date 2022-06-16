@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(SERFLASH, serflash_device, "serflash", "Serial Flash")
 //  serflash_device - constructor
 //-------------------------------------------------
 
-serflash_device::serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+serflash_device::serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SERFLASH, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_length(0)

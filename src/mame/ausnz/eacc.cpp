@@ -259,7 +259,7 @@ void eacc_state::eacc(machine_config &config)
 
 	config.set_default_layout(layout_eacc);
 
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpb_handler().set(FUNC(eacc_state::keyboard_r));
 	m_pia->writepa_handler().set(FUNC(eacc_state::segment_w));
 	m_pia->writepb_handler().set(FUNC(eacc_state::digit_w));
@@ -269,16 +269,16 @@ void eacc_state::eacc(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TTL7474(config, m_7474, 0);
+	TTL7474(config, m_7474);
 	m_7474->output_cb().set(m_pia, FUNC(pia6821_device::cb1_w));
 
-	clock_device &eacc_scan(CLOCK(config, "eacc_scan", 600)); // 74C14 with 100k & 10nF = 1200Hz, but article says 600.
+	clock_device &eacc_scan(CLOCK(config, "eacc_scan", XTAL::u(600))); // 74C14 with 100k & 10nF = 1200Hz, but article says 600.
 	eacc_scan.signal_handler().set(FUNC(eacc_state::scan_w));
 
-	clock_device &eacc_cb1(CLOCK(config, "eacc_cb1", 15)); // cpu E -> MM5369 -> 15Hz
+	clock_device &eacc_cb1(CLOCK(config, "eacc_cb1", XTAL::u(15))); // cpu E -> MM5369 -> 15Hz
 	eacc_cb1.signal_handler().set(m_7474, FUNC(ttl7474_device::d_w));
 
-	clock_device &eacc_rnd(CLOCK(config, "eacc_rnd", 30)); // random pulse for distance and fuel
+	clock_device &eacc_rnd(CLOCK(config, "eacc_rnd", XTAL::u(30))); // random pulse for distance and fuel
 	eacc_rnd.signal_handler().set(FUNC(eacc_state::inputs_w));
 }
 

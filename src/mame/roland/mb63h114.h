@@ -21,7 +21,7 @@ class mb63h114_device : public device_t
 {
 public:
 	// device type constructor
-	mb63h114_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	mb63h114_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// CPU write handler
 	void xst_w(u8 data);

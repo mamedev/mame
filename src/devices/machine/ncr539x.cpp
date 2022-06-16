@@ -118,7 +118,7 @@ DEFINE_DEVICE_TYPE(NCR539X, ncr539x_device, "ncr539x", "NCR/AMD 5394/5396 SCSI")
 //  ncr539x_device - constructor/destructor
 //-------------------------------------------------
 
-ncr539x_device::ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ncr539x_device::ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	legacy_scsi_host_adapter(mconfig, NCR539X, tag, owner, clock),
 	m_out_irq_cb(*this),
 	m_out_drq_cb(*this)

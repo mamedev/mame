@@ -319,7 +319,7 @@ void dm7000_state::dm7000(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(dm7000_state::screen_update_dm7000));
 
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(dm7000_state::kbd_put));
 }
 

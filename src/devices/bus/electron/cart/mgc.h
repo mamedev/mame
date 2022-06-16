@@ -25,7 +25,7 @@ class electron_mgc_device : public device_t,
 {
 public:
 	// construction/destruction
-	electron_mgc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	electron_mgc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

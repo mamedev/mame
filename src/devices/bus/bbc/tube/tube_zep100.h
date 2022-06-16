@@ -29,10 +29,10 @@ class bbc_tube_zep100_device :
 {
 public:
 	// construction/destruction
-	bbc_tube_zep100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_tube_zep100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	bbc_tube_zep100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bbc_tube_zep100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -73,7 +73,7 @@ private:
 class bbc_tube_zep100l_device : public bbc_tube_zep100_device
 {
 public:
-	bbc_tube_zep100l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_tube_zep100l_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -82,7 +82,7 @@ protected:
 class bbc_tube_zep100w_device : public bbc_tube_zep100_device
 {
 public:
-	bbc_tube_zep100w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_tube_zep100w_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -91,7 +91,7 @@ protected:
 class bbc_tube_zep100m_device : public bbc_tube_zep100_device
 {
 public:
-	bbc_tube_zep100m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bbc_tube_zep100m_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

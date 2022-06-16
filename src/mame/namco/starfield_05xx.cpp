@@ -531,7 +531,7 @@ static const int post_vis_cycle_count_values[] =
 
 
 
-starfield_05xx_device::starfield_05xx_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+starfield_05xx_device::starfield_05xx_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, STARFIELD_05XX, tag, owner, clock)
 	, m_enable(0)
 	, m_lfsr(LFSR_SEED)

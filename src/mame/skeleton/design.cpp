@@ -265,7 +265,7 @@ void design6_state::design6(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &design6_state::io_map);
 	m_maincpu->port_out_cb<1>().set(FUNC(design6_state::port1_w));
 
-	ADDRESS_MAP_BANK(config, m_iobank, 0);
+	ADDRESS_MAP_BANK(config, m_iobank);
 	m_iobank->set_map(&design6_state::iobanked_map);
 	m_iobank->set_addr_width(17);
 	m_iobank->set_data_width(8);

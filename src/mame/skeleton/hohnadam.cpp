@@ -86,16 +86,16 @@ INPUT_PORTS_END
 
 void hohnadam_state::hohnadam(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000); // MC68000FN12, unknown clock
+	M68000(config, m_maincpu, XTAL::u(12000000)); // MC68000FN12, unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &hohnadam_state::main_map);
 
-	I8032(config, m_panelcpu, 12000000); // unknown type and clock
+	I8032(config, m_panelcpu, XTAL::u(12000000)); // unknown type and clock
 	m_panelcpu->set_addrmap(AS_PROGRAM, &hohnadam_state::panel_map);
 	m_panelcpu->set_addrmap(AS_IO, &hohnadam_state::panel_ext_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x HY62256ALJ-70 + CR2032 battery
 
-	//F82C721(config, "io", 24000000);
+	//F82C721(config, "io", XTAL::u(24000000));
 
 	// TODO: LCD, everything else
 }

@@ -50,14 +50,14 @@ class ti8x_link_port_device : public device_t, public device_single_card_slot_in
 public:
 	template <typename T>
 	ti8x_link_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: ti8x_link_port_device(mconfig, tag, owner, 0)
+		: ti8x_link_port_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	ti8x_link_port_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	ti8x_link_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// static configuration helpers
 	auto tip_handler() { return m_tip_handler.bind(); }

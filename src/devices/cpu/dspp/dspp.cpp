@@ -85,13 +85,13 @@ DEFINE_DEVICE_TYPE(DSPP, dspp_device, "dspp", "3DO DSPP")
 //  dspp_device - constructor
 //-------------------------------------------------
 
-dspp_device::dspp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dspp_device::dspp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dspp_device(mconfig, DSPP, tag, owner, clock, address_map_constructor(FUNC(dspp_device::code_map), this),
 		address_map_constructor(FUNC(dspp_device::data_map), this))
 {
 }
 
-dspp_device::dspp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor code_map_ctor, address_map_constructor data_map_ctor)
+dspp_device::dspp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor code_map_ctor, address_map_constructor data_map_ctor)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_int_handler(*this),
 		m_dma_read_handler(*this),

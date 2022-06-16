@@ -42,9 +42,9 @@ public:
 	};
 
 	// device type constructors
-	adc0804_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	adc0804_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	adc0804_device(const machine_config &mconfig, const char *tag, device_t *owner, double r, double c)
-		: adc0804_device(mconfig, tag, owner, 0U)
+		: adc0804_device(mconfig, tag, owner)
 	{
 		set_rc(r, c);
 	}
@@ -70,7 +70,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(intr_r) { return m_intr_active ? 0 : 1; }
 
 protected:
-	adc0804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	adc0804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -110,9 +110,9 @@ class adc0803_device : public adc0804_device
 {
 public:
 	// device type constructors
-	adc0803_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	adc0803_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	adc0803_device(const machine_config &mconfig, const char *tag, device_t *owner, double r, double c)
-		: adc0803_device(mconfig, tag, owner, 0U)
+		: adc0803_device(mconfig, tag, owner)
 	{
 		set_rc(r, c);
 	}

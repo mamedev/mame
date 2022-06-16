@@ -89,11 +89,11 @@ void epson_lx800_device::device_add_mconfig(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 4000); // ?
+	BEEP(config, m_beep, XTAL::u(4000)); // ?
 	m_beep->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* gate array */
-	e05a03_device &ic3b(E05A03(config, "ic3b", 0));
+	e05a03_device &ic3b(E05A03(config, "ic3b"));
 	ic3b.pe_lp_wr_callback().set_output("paperout_led");
 	ic3b.reso_wr_callback().set(FUNC(epson_lx800_device::reset_w));
 	ic3b.pe_wr_callback().set(FUNC(epson_lx800_device::centronics_pe_w));
@@ -176,12 +176,12 @@ ioport_constructor epson_lx800_device::device_input_ports() const
 //  epson_lx800_device - constructor
 //-------------------------------------------------
 
-epson_lx800_device::epson_lx800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+epson_lx800_device::epson_lx800_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	epson_lx800_device(mconfig, EPSON_LX800, tag, owner, clock)
 {
 }
 
-epson_lx800_device::epson_lx800_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+epson_lx800_device::epson_lx800_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),

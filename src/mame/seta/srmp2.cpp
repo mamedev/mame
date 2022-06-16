@@ -1174,7 +1174,7 @@ void srmp2_state::srmp2(machine_config &config)
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(srmp2_state::adpcm_int)); /* IRQ handler */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);
@@ -1183,7 +1183,7 @@ void srmp2_state::srmp2(machine_config &config)
 void srmp2_state::srmp3(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3500000);    /* 3.50 MHz? or 4.00 MHz? */
+	Z80(config, m_maincpu, XTAL::u(3500000));    /* 3.50 MHz? or 4.00 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &srmp2_state::srmp3_map);
 	m_maincpu->set_addrmap(AS_IO, &srmp2_state::srmp3_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(srmp2_state::irq0_line_assert));
@@ -1217,7 +1217,7 @@ void srmp2_state::srmp3(machine_config &config)
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(srmp2_state::adpcm_int)); /* IRQ handler */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);
@@ -1271,7 +1271,7 @@ void srmp2_state::mjyuugi(machine_config &config)
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MSM5205(config, m_msm, 384000);
+	MSM5205(config, m_msm, XTAL::u(384000));
 	m_msm->vck_legacy_callback().set(FUNC(srmp2_state::adpcm_int)); /* IRQ handler */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);

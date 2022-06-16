@@ -20,10 +20,10 @@ class nubus_quadralink_device :
 {
 public:
 	// construction/destruction
-	nubus_quadralink_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_quadralink_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	nubus_quadralink_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nubus_quadralink_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	required_device<z80scc_device> m_scc1, m_scc2;
 

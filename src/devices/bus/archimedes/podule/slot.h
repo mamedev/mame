@@ -41,7 +41,7 @@ public:
 		set_fixed(false);
 		m_exp.set_tag(std::forward<T>(bus_tag));
 	}
-	archimedes_podule_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	archimedes_podule_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -63,7 +63,7 @@ class archimedes_exp_device : public device_t,
 {
 public:
 	// construction/destruction
-	archimedes_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	archimedes_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// inline configuration
 	auto out_irq_callback() { return m_out_pirq_cb.bind(); }

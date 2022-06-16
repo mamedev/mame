@@ -357,7 +357,7 @@ DEFINE_DEVICE_TYPE(WD33C93B, wd33c93b_device, "wd33c93b", "Western Digital WD33C
 //  wd33c9x_base_device - constructor/destructor
 //-------------------------------------------------
 
-wd33c9x_base_device::wd33c9x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+wd33c9x_base_device::wd33c9x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: nscsi_device{ mconfig, type, tag, owner, clock }
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_addr{ 0 }
@@ -1723,22 +1723,22 @@ uint8_t wd33c9x_base_device::get_msg_out() const
 
 
 
-wd33c92_device::wd33c92_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+wd33c92_device::wd33c92_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: wd33c9x_base_device(mconfig, WD33C92, tag, owner, clock)
 {
 }
 
-wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: wd33c9x_base_device(mconfig, WD33C93, tag, owner, clock)
 {
 }
 
-wd33c93a_device::wd33c93a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+wd33c93a_device::wd33c93a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: wd33c9x_base_device(mconfig, WD33C93A, tag, owner, clock)
 {
 }
 
-wd33c93b_device::wd33c93b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+wd33c93b_device::wd33c93b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: wd33c9x_base_device(mconfig, WD33C93B, tag, owner, clock)
 {
 }

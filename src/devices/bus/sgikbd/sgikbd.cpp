@@ -8,12 +8,12 @@
 DEFINE_DEVICE_TYPE(SGIKBD_PORT, sgi_keyboard_port_device, "sgikbd", "SGI Keyboard Port")
 
 
-sgi_keyboard_port_device::sgi_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+sgi_keyboard_port_device::sgi_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: sgi_keyboard_port_device(mconfig, SGIKBD_PORT, tag, owner, clock)
 {
 }
 
-sgi_keyboard_port_device::sgi_keyboard_port_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock)
+sgi_keyboard_port_device::sgi_keyboard_port_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_single_card_slot_interface<device_sgi_keyboard_port_interface>(mconfig, *this)
 	, m_rxd(0)

@@ -39,12 +39,12 @@ void a8sio_cassette_device::device_add_mconfig(machine_config &config)
 //  LIVE DEVICE
 //**************************************************************************
 
-a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a8sio_cassette_device(mconfig, A8SIO_CASSETTE, tag, owner, clock)
 {
 }
 
-a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a8sio_card_interface(mconfig, *this)
 	, m_cassette(*this, "cassette")

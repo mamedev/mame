@@ -1769,7 +1769,7 @@ void ms32_state::ms32(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
 
-	Z80(config, m_audiocpu, 8000000); // Z0840008PSC, Clock from notes (40MHz / 5 or 48MHz / 6?)
+	Z80(config, m_audiocpu, XTAL::u(8000000)); // Z0840008PSC, Clock from notes (40MHz / 5 or 48MHz / 6?)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60000));

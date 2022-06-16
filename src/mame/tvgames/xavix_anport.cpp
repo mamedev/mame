@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(XAVIX_ANPORT, xavix_anport_device, "xavix_anport", "XaviX Analog ports")
 
-xavix_anport_device::xavix_anport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xavix_anport_device::xavix_anport_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, XAVIX_ANPORT, tag, owner, clock)
 	, m_in0_cb(*this)
 	, m_in1_cb(*this)

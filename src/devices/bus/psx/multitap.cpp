@@ -7,7 +7,7 @@
 
 DEFINE_DEVICE_TYPE(PSX_MULTITAP, psx_multitap_device, "psx_multitap", "Playstation Multitap")
 
-psx_multitap_device::psx_multitap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+psx_multitap_device::psx_multitap_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock) :
 	device_t(mconfig, PSX_MULTITAP, tag, owner, clock),
 	device_psx_controller_interface(mconfig, *this),
 	m_activeport(0),

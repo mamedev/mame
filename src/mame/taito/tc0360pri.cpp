@@ -45,7 +45,7 @@ each one of them can declare to have four different priority levels.
 
 DEFINE_DEVICE_TYPE(TC0360PRI, tc0360pri_device, "tc0360pri", "Taito TC0360PRI")
 
-tc0360pri_device::tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tc0360pri_device::tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, TC0360PRI, tag, owner, clock)
 {
 }

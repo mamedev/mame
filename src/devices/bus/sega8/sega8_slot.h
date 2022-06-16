@@ -113,7 +113,7 @@ class sega8_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual ~sega8_cart_slot_device();
 
 	// image-level overrides
@@ -150,7 +150,7 @@ public:
 	int get_sms_mode() { return m_cart->get_sms_mode(); }
 
 protected:
-	sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_card = false);
+	sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, bool is_card = false);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -166,14 +166,14 @@ class sega8_card_slot_device : public sega8_cart_slot_device
 {
 public:
 	// construction/destruction
-	sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual const char *image_type_name() const noexcept override { return "card"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "card"; }
 
 protected:
 	// construction/destruction
-	sega8_card_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sega8_card_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 // ======================> sg1000_cart_slot_device
@@ -184,14 +184,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	sg1000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: sg1000_cart_slot_device(mconfig, tag, owner, u32(0))
+		: sg1000_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	sg1000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sg1000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "sg1000_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,sg"; }
 };
@@ -204,14 +204,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	omv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: omv_cart_slot_device(mconfig, tag, owner, u32(0))
+		: omv_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	omv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	omv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "sg1000_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,sg"; }
 };
@@ -224,14 +224,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	sc3000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: sc3000_cart_slot_device(mconfig, tag, owner, u32(0))
+		: sc3000_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	sc3000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sc3000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "sg1000_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,sg,sc"; }
 };
@@ -244,14 +244,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	sg1000mk3_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: sg1000mk3_cart_slot_device(mconfig, tag, owner, u32(0))
+		: sg1000mk3_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	sg1000mk3_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sg1000mk3_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "sms_cart,sg1000_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,sms,sg"; }
 };
@@ -264,14 +264,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	sms_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: sms_cart_slot_device(mconfig, tag, owner, u32(0))
+		: sms_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	sms_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sms_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "sms_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,sms"; }
 };
@@ -284,14 +284,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	gamegear_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: gamegear_cart_slot_device(mconfig, tag, owner, u32(0))
+		: gamegear_cart_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	gamegear_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gamegear_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "gamegear_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,gg"; }
 };
@@ -305,14 +305,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: sms_card_slot_device(mconfig, tag, owner, u32(0))
+		: sms_card_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "sms_card"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 };
@@ -325,14 +325,14 @@ public:
 	// construction/destruction
 	template <typename T>
 	sg1000_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: sg1000_card_slot_device(mconfig, tag, owner, u32(0))
+		: sg1000_card_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	sg1000_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sg1000_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	virtual const char *image_interface() const noexcept override { return "sg1000_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,sg"; }
 };

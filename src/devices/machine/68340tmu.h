@@ -12,7 +12,7 @@ class mc68340_timer_module_device : public device_t
 	friend class m68340_cpu_device;
 
 public:
-	mc68340_timer_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mc68340_timer_module_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	uint16_t read(offs_t offset, uint16_t mem_mask = ~0);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

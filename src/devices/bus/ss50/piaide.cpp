@@ -49,7 +49,7 @@ class ss50_piaide_device : public device_t, public ss50_card_interface
 {
 public:
 	// construction/destruction
-	ss50_piaide_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	ss50_piaide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: device_t(mconfig, SS50_PIAIDE, tag, owner, clock)
 		, ss50_card_interface(mconfig, *this)
 		, m_pia(*this, "pia")
@@ -93,7 +93,7 @@ void ss50_piaide_device::device_start()
 
 void ss50_piaide_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 0);
+	PIA6821(config, m_pia);
 	m_pia->readpa_handler().set(FUNC(ss50_piaide_device::pia_a_r));
 	m_pia->readpb_handler().set(FUNC(ss50_piaide_device::pia_b_r));
 	m_pia->writepa_handler().set(FUNC(ss50_piaide_device::pia_a_w));

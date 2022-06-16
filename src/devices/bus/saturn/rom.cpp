@@ -18,13 +18,13 @@
 DEFINE_DEVICE_TYPE(SATURN_ROM, saturn_rom_device, "sat_rom", "Saturn ROM Carts")
 
 
-saturn_rom_device::saturn_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cart_type)
+saturn_rom_device::saturn_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int cart_type)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sat_cart_interface(mconfig, *this, cart_type)
 {
 }
 
-saturn_rom_device::saturn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+saturn_rom_device::saturn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 		: saturn_rom_device(mconfig, SATURN_ROM, tag, owner, clock, 0xff) // actually not clear if ROM carts have a type ID like DRAM/BRAM carts
 {
 }

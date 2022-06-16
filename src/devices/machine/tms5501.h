@@ -49,7 +49,7 @@ class tms5501_device :  public device_t,
 {
 public:
 	// construction/destruction
-	tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto int_callback() { return m_write_int.bind(); }
 	auto xmt_callback() { return m_write_xmt.bind(); }

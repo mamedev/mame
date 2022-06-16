@@ -50,7 +50,7 @@ public:
 	int check_interrupt() { return m_irq; }
 	void clear_interrupt() { m_irq = 0; }
 protected:
-	z180asci_channel_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int id, const bool ext);
+	z180asci_channel_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const int id, const bool ext);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -136,13 +136,13 @@ class z180asci_channel_0 : public z180asci_channel_base
 {
 public:
 	// construction/destruction
-	z180asci_channel_0(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z180asci_channel_0(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void stat_w(uint8_t data) override;
 	void asext_w(uint8_t data) override;
 	void state_add(device_state_interface &parent) override;
 protected:
-	z180asci_channel_0(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool ext);
+	z180asci_channel_0(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const bool ext);
 	// device-level overrides
 	virtual void device_reset() override;
 };
@@ -155,13 +155,13 @@ class z180asci_channel_1 : public z180asci_channel_base
 {
 public:
 	// construction/destruction
-	z180asci_channel_1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z180asci_channel_1(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void stat_w(uint8_t data) override;
 	void asext_w(uint8_t data) override;
 	void state_add(device_state_interface &parent) override;
 protected:
-	z180asci_channel_1(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool ext);
+	z180asci_channel_1(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, const bool ext);
 	// device-level overrides
 	virtual void device_reset() override;
 };
@@ -174,7 +174,7 @@ class z180asci_ext_channel_0 : public z180asci_channel_0
 {
 public:
 	// construction/destruction
-	z180asci_ext_channel_0(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z180asci_ext_channel_0(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 //**************************************************************************
@@ -185,7 +185,7 @@ class z180asci_ext_channel_1 : public z180asci_channel_1
 {
 public:
 	// construction/destruction
-	z180asci_ext_channel_1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z180asci_ext_channel_1(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 //**************************************************************************

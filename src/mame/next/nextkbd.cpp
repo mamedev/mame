@@ -16,7 +16,7 @@ void nextkbd_device::amap(address_map &map)
 	map(0x8, 0xb).rw(FUNC(nextkbd_device::kmdata_r), FUNC(nextkbd_device::kmdata_w));
 }
 
-nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, NEXTKBD, tag, owner, clock),
 	int_change_cb(*this),
 	int_power_cb(*this),

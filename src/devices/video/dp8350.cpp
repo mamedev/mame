@@ -69,7 +69,7 @@ DEFINE_DEVICE_TYPE(DP835X_A, dp835x_a_device, "dp835x_a", "DP835X CRTC (option A
 //  dp835x_device - constructor
 //-------------------------------------------------
 
-dp835x_device::dp835x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
+dp835x_device::dp835x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock,
 							 int char_width, int char_height, int chars_per_row, int rows_per_frame,
 							 int vsync_delay_f1, int vsync_width_f1, int vblank_interval_f1,
 							 int vsync_delay_f0, int vsync_width_f0, int vblank_interval_f0,
@@ -127,7 +127,7 @@ dp835x_device::dp835x_device(const machine_config &mconfig, device_type type, co
 //  dp8350_device - constructor
 //-------------------------------------------------
 
-dp8350_device::dp8350_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dp8350_device::dp8350_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dp835x_device(mconfig, DP8350, tag, owner, clock,
 						7, 10, 80, 24,
 						4, 10, 20,
@@ -143,7 +143,7 @@ dp8350_device::dp8350_device(const machine_config &mconfig, const char *tag, dev
 //  dp8367_device - constructor
 //-------------------------------------------------
 
-dp8367_device::dp8367_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dp8367_device::dp8367_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dp835x_device(mconfig, DP8367, tag, owner, clock,
 						9, 15, 80, 26,
 						0, 19, 25,
@@ -159,7 +159,7 @@ dp8367_device::dp8367_device(const machine_config &mconfig, const char *tag, dev
 //  dp835x_a_device - constructor
 //-------------------------------------------------
 
-dp835x_a_device::dp835x_a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dp835x_a_device::dp835x_a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dp835x_device(mconfig, DP835X_A, tag, owner, clock,
 						9, 14, 80, 25,
 						0, 14, 20, // sync parameters guessed
@@ -277,9 +277,9 @@ void dp835x_device::reconfigure_screen()
 	logerror("Frame rate refresh: %.2f Hz (f%d); horizontal rate scan: %.4f kHz; character rate: %.4f MHz; dot rate: %.5f MHz\n",
 		refresh.as_hz(),
 		m_60hz_refresh ? 1 : 0,
-		clock() / (m_dots_per_line * 1000.0),
-		clock() / (m_char_width * 1000000.0),
-		clock() / 1000000.0);
+		clock().value() / (m_dots_per_line * 1000.0),
+		clock().value() / (m_char_width * 1000000.0),
+		clock().value() / 1000000.0);
 
 	// get current screen position (note that this method is more accurate than calling hpos and vpos separately)
 	u32 dpos = attotime_to_clocks(refresh - screen().time_until_pos(lines_per_frame - 1, m_dots_per_row * (m_half_shift ? 2 : 1)));

@@ -935,7 +935,7 @@ void pce220_state::pce220(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beep, XTAL::u(3250)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	TIMER(config, "pce220_timer").configure_periodic(FUNC(pce220_state::pce220_timer_callback), attotime::from_msec(468));
 
@@ -944,7 +944,7 @@ void pce220_state::pce220(machine_config &config)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
-	PCE220SERIAL(config, m_serial, 0);
+	PCE220SERIAL(config, m_serial);
 	config.set_default_layout(layout_pce220);
 }
 

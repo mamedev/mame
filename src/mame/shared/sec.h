@@ -46,7 +46,7 @@ class sec_device : public device_t
 {
 public:
 	// construction/destruction
-	sec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sec_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	/* serial interface */
 	DECLARE_WRITE_LINE_MEMBER(clk_w);

@@ -95,7 +95,7 @@ ioport_constructor pet_userport_joystick_and_sound_device::device_input_ports() 
 void pet_userport_joystick_and_sound_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.99);
 }
 
 //**************************************************************************
@@ -106,7 +106,7 @@ void pet_userport_joystick_and_sound_device::device_add_mconfig(machine_config &
 //  pet_user_port_dual_joystick_and_sound_device - constructor
 //-------------------------------------------------
 
-pet_userport_joystick_and_sound_device::pet_userport_joystick_and_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pet_userport_joystick_and_sound_device::pet_userport_joystick_and_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PET_USERPORT_JOYSTICK_AND_SOUND_DEVICE, tag, owner, clock),
 	device_pet_user_port_interface(mconfig, *this),
 	m_dac(*this, "dac"),

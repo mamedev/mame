@@ -339,7 +339,7 @@ void gigatron_cpu_device::execute_set_input(int irqline, int state)
 #endif
 }
 
-gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+gigatron_cpu_device::gigatron_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, GTRON, tag, owner, clock)
 	, m_ramMask(0xffff)
 	, m_romMask(0xffff)

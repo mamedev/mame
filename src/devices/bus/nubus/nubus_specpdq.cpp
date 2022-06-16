@@ -185,12 +185,12 @@ uint32_t nubus_specpdq_device::palette_entries() const noexcept
 //  nubus_specpdq_device - constructor
 //-------------------------------------------------
 
-nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	nubus_specpdq_device(mconfig, NUBUS_SPECPDQ, tag, owner, clock)
 {
 }
 
-nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),

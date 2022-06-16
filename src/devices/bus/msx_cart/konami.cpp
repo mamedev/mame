@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(MSX_CART_SOUND_SDSNATCHER, msx_cart_konami_sound_sdsnatcher_d
 DEFINE_DEVICE_TYPE(MSX_CART_KEYBOARD_MASTER,  msx_cart_keyboard_master_device,         "msx_cart_keyboard_master",  "MSX Cartridge - Keyboard Master")
 
 
-msx_cart_konami_device::msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_konami_device::msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_KONAMI, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_mask(0)
@@ -126,7 +126,7 @@ void msx_cart_konami_device::write_cart(offs_t offset, uint8_t data)
 
 
 
-msx_cart_konami_scc_device::msx_cart_konami_scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_konami_scc_device::msx_cart_konami_scc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_KONAMI_SCC, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_k051649(*this, "k051649")
@@ -300,7 +300,7 @@ void msx_cart_konami_scc_device::write_cart(offs_t offset, uint8_t data)
 
 
 
-msx_cart_gamemaster2_device::msx_cart_gamemaster2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_gamemaster2_device::msx_cart_gamemaster2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_GAMEMASTER2, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 {
@@ -474,7 +474,7 @@ void msx_cart_gamemaster2_device::write_cart(offs_t offset, uint8_t data)
 
 
 
-msx_cart_synthesizer_device::msx_cart_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_synthesizer_device::msx_cart_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_SYNTHESIZER, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_bank_base(nullptr)
@@ -487,7 +487,7 @@ void msx_cart_synthesizer_device::device_add_mconfig(machine_config &config)
 {
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
 }
 
 
@@ -528,7 +528,7 @@ void msx_cart_synthesizer_device::write_cart(offs_t offset, uint8_t data)
 
 
 
-msx_cart_konami_sound_device::msx_cart_konami_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_konami_sound_device::msx_cart_konami_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_k052539(*this, "k052539")
@@ -822,7 +822,7 @@ void msx_cart_konami_sound_device::write_cart(offs_t offset, uint8_t data)
 }
 
 
-msx_cart_konami_sound_snatcher_device::msx_cart_konami_sound_snatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_konami_sound_snatcher_device::msx_cart_konami_sound_snatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SNATCHER, tag, owner, clock)
 {
 }
@@ -846,7 +846,7 @@ void msx_cart_konami_sound_snatcher_device::initialize_cartridge()
 }
 
 
-msx_cart_konami_sound_sdsnatcher_device::msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_konami_sound_sdsnatcher_device::msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_cart_konami_sound_device(mconfig, MSX_CART_SOUND_SDSNATCHER, tag, owner, clock)
 {
 }
@@ -872,7 +872,7 @@ void msx_cart_konami_sound_sdsnatcher_device::initialize_cartridge()
 
 
 
-msx_cart_keyboard_master_device::msx_cart_keyboard_master_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_cart_keyboard_master_device::msx_cart_keyboard_master_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, MSX_CART_KEYBOARD_MASTER, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_vlm5030(*this, "vlm5030")

@@ -70,11 +70,11 @@ void gsspade_state::gsspade(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &gsspade_state::ext_map);
 	m_soundcpu->port_in_cb<1>().set_ioport("P1");
 
-	I8279(config, "kdc", 1'789'772); // ?
+	I8279(config, "kdc", XTAL::u(1'789'772)); // ?
 
 	SPEAKER(config, "speaker").front_center();
 
-	ay8910_device &psg(AY8910(config, "psg", 1'789'772)); // File KC89C72 (clock guessed)
+	ay8910_device &psg(AY8910(config, "psg", XTAL::u(1'789'772))); // File KC89C72 (clock guessed)
 	psg.add_route(ALL_OUTPUTS, "speaker", 0.65);
 
 	ym2413_device &m3567(YM2413(config, "m3567", 3.579545_MHz_XTAL)); // M3567

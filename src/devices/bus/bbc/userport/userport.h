@@ -55,7 +55,7 @@ public:
 		set_fixed(false);
 	}
 
-	bbc_userport_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	bbc_userport_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callbacks
 	auto cb1_handler() { return m_cb1_handler.bind(); }

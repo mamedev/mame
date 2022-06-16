@@ -32,7 +32,7 @@ public:
 	// construction/destruction
 	template <typename T, typename U>
 	acorn_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&bus_tag, U &&opts, const char *dflt)
-		: acorn_bus_slot_device(mconfig, tag, owner, 0)
+		: acorn_bus_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -40,7 +40,7 @@ public:
 		set_fixed(false);
 		m_bus.set_tag(std::forward<T>(bus_tag));
 	}
-	acorn_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	acorn_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides
@@ -60,7 +60,7 @@ class acorn_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	acorn_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	acorn_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }

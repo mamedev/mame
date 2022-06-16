@@ -104,7 +104,7 @@ DEFINE_DEVICE_TYPE(MOS8568,  mos8568_device,  "mos8568",  "MOS 8568 VDC")
 #define ATTR_ALTERNATE_CHARSET      BIT(attr, 7)
 
 
-mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this, false)
 	, m_show_border_area(true)
@@ -128,7 +128,7 @@ mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-mc6845_device::mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc6845_device::mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc6845_device(mconfig, MC6845, tag, owner, clock)
 {
 }
@@ -1624,61 +1624,61 @@ void mos8563_device::mos8563_videoram_map(address_map &map)
 }
 
 
-r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc6845_device(mconfig, R6545_1, tag, owner, clock)
 {
 }
 
 
-mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc6845_device(mconfig, MC6845_1, tag, owner, clock)
 {
 }
 
 
-hd6845s_device::hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+hd6845s_device::hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: mc6845_device(mconfig, type, tag, owner, clock)
 {
 }
 
 
-hd6845s_device::hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd6845s_device::hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc6845_device(mconfig, HD6845S, tag, owner, clock)
 {
 }
 
 
-c6545_1_device::c6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c6545_1_device::c6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc6845_device(mconfig, C6545_1, tag, owner, clock)
 {
 }
 
 
-sy6545_1_device::sy6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sy6545_1_device::sy6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc6845_device(mconfig, SY6545_1, tag, owner, clock)
 {
 }
 
 
-sy6845e_device::sy6845e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sy6845e_device::sy6845e_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc6845_device(mconfig, SY6845E, tag, owner, clock)
 {
 }
 
 
-hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hd6845s_device(mconfig, HD6345, tag, owner, clock)
 {
 }
 
 
-ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc6845_device(mconfig, AMS40489, tag, owner, clock)
 {
 }
 
 
-mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: mc6845_device(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
@@ -1688,13 +1688,13 @@ mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, 
 }
 
 
-mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos8563_device(mconfig, MOS8563, tag, owner, clock)
 {
 }
 
 
-mos8568_device::mos8568_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos8568_device::mos8568_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos8563_device(mconfig, MOS8568, tag, owner, clock)
 {
 }

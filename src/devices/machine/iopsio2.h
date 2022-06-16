@@ -23,7 +23,7 @@ class iop_sio2_device : public device_t
 public:
 	template <typename T, typename U, typename V, typename W>
 	iop_sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&intc_tag, U &&pad0_tag, V &&pad1_tag, W &&mc0_tag)
-		: iop_sio2_device(mconfig, tag, owner, (uint32_t)0)
+		: iop_sio2_device(mconfig, tag, owner)
 	{
 		m_intc.set_tag(std::forward<T>(intc_tag));
 		m_pad0.set_tag(std::forward<U>(pad0_tag));
@@ -31,7 +31,7 @@ public:
 		m_mc0.set_tag(std::forward<W>(mc0_tag));
 	}
 
-	iop_sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iop_sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~iop_sio2_device() override;
 
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);

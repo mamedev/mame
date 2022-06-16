@@ -27,12 +27,12 @@ template class device_finder<device_a1bus_card_interface, true>;
 //-------------------------------------------------
 //  a1bus_slot_device - constructor
 //-------------------------------------------------
-a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a1bus_slot_device(mconfig, A1BUS_SLOT, tag, owner, clock)
 {
 }
 
-a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_single_card_slot_interface<device_a1bus_card_interface>(mconfig, *this)
 	, m_a1bus(*this, finder_base::DUMMY_TAG)
@@ -69,12 +69,12 @@ DEFINE_DEVICE_TYPE(A1BUS, a1bus_device, "a1bus", "Apple I Bus")
 //  a1bus_device - constructor
 //-------------------------------------------------
 
-a1bus_device::a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+a1bus_device::a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: a1bus_device(mconfig, A1BUS, tag, owner, clock)
 {
 }
 
-a1bus_device::a1bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a1bus_device::a1bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_out_irq_cb(*this)

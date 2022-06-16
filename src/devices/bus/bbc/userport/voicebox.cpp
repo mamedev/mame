@@ -40,7 +40,7 @@ const tiny_rom_entry *bbc_voicebox_device::device_rom_region() const
 void bbc_voicebox_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
-	SP0256(config, m_nsp, 3120000); // TODO: unknown crystal
+	SP0256(config, m_nsp, XTAL::u(3120000)); // TODO: unknown crystal
 	m_nsp->data_request_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_userport_slot_device::cb1_w)).invert();
 	m_nsp->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -54,7 +54,7 @@ void bbc_voicebox_device::device_add_mconfig(machine_config &config)
 //  bbc_voicebox_device - constructor
 //-------------------------------------------------
 
-bbc_voicebox_device::bbc_voicebox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_voicebox_device::bbc_voicebox_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_VOICEBOX, tag, owner, clock)
 	, device_bbc_userport_interface(mconfig, *this)
 	, m_nsp(*this, "sp0256")

@@ -398,10 +398,10 @@ void akkaarrh_state::akkaarrh(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	pokey_device &pokey1(POKEY(config, "pokey1", 1250000)); // Unverified
+	pokey_device &pokey1(POKEY(config, "pokey1", XTAL::u(1250000))); // Unverified
 	pokey1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	pokey_device &pokey2(POKEY(config, "pokey2", 1250000)); // Unverified
+	pokey_device &pokey2(POKEY(config, "pokey2", XTAL::u(1250000))); // Unverified
 	pokey2.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 

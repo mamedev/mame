@@ -198,7 +198,7 @@ class esq1_filters : public device_t,
 {
 public:
 	// construction/destruction
-	esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void set_vca(int channel, uint8_t value);
 	void set_vpan(int channel, uint8_t value);
@@ -229,7 +229,7 @@ private:
 
 DEFINE_DEVICE_TYPE(ESQ1_FILTERS, esq1_filters, "esq1_filters", "ESQ1 Filters stage")
 
-esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ESQ1_FILTERS, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {
@@ -334,7 +334,7 @@ void esq1_filters::recalc_filter(filter &f)
 
 void esq1_filters::device_start()
 {
-	stream = stream_alloc(8, 2, 44100);
+	stream = stream_alloc(8, 2, XTAL::u(44100));
 	memset(filters, 0, sizeof(filters));
 	for(auto & elem : filters)
 		recalc_filter(elem);

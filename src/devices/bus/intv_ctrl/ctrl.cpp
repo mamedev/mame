@@ -51,7 +51,7 @@ device_intv_control_port_interface::~device_intv_control_port_interface()
 //  intv_control_port_device - constructor
 //-------------------------------------------------
 
-intv_control_port_device::intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+intv_control_port_device::intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, INTV_CONTROL_PORT, tag, owner, clock),
 	device_single_card_slot_interface<device_intv_control_port_interface>(mconfig, *this),
 	m_device(nullptr)

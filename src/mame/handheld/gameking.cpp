@@ -285,7 +285,7 @@ void gameking_state::machine_start()
 void gameking_state::gameking(machine_config &config)
 {
 	// basic machine hardware
-	ST2204(config, m_maincpu, 6000000);
+	ST2204(config, m_maincpu, XTAL::u(6000000));
 	m_maincpu->set_addrmap(AS_DATA, &gameking_state::gameking_mem);
 	m_maincpu->in_pa_callback().set(FUNC(gameking_state::input_r));
 	m_maincpu->in_pb_callback().set(FUNC(gameking_state::input2_r));
@@ -305,7 +305,7 @@ void gameking_state::gameking(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(0, "speaker", 1.0);
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, "dac").add_route(0, "speaker", 1.0);
 
 	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gameking_cart", "bin").set_device_load(FUNC(gameking_state::cart_load));
@@ -321,7 +321,7 @@ void gameking_state::gameking3(machine_config &config)
 {
 	// basic machine hardware
 	gameking(config);
-	m_maincpu->set_clock(8000000);
+	m_maincpu->set_clock(XTAL::u(8000000));
 	m_maincpu->set_addrmap(AS_DATA, &gameking_state::gameking3_mem);
 
 	// video hardware

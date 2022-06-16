@@ -27,7 +27,7 @@ public:
 	// construction/destruction
 	template <typename T, typename U>
 	astrocade_accessory_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&screen_tag, U &&opts, char const *dflt)
-		: astrocade_accessory_port_device(mconfig, tag, owner, 0U)
+		: astrocade_accessory_port_device(mconfig, tag, owner)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 		option_reset();
@@ -35,7 +35,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	astrocade_accessory_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
+	astrocade_accessory_port_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock = XTAL());
 	virtual ~astrocade_accessory_port_device();
 
 	auto ltpen_handler() { return m_ltpen_handler.bind(); }

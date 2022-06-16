@@ -38,7 +38,7 @@ class upd7004_device : public device_t
 {
 public:
 	// construction/destruction
-	upd7004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7004_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto eoc_callback() { return m_eoc_cb.bind(); }
 	auto eoc_ff_callback() { return m_eoc_ff_cb.bind(); }

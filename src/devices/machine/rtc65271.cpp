@@ -669,7 +669,7 @@ DEFINE_DEVICE_TYPE(RTC65271, rtc65271_device, "rtc65271", "Epson RTC-65271 RTC")
 //  rtc65271_device - constructor
 //-------------------------------------------------
 
-rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RTC65271, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_interrupt_cb(*this)

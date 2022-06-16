@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(COCO_WPK2P, coco_wpk2p_device, "coco_wpk2p", "CoCo WordPak 2+
 //  coco_wpk2p_device - constructor
 //-------------------------------------------------
 
-coco_wpk2p_device::coco_wpk2p_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+coco_wpk2p_device::coco_wpk2p_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, COCO_WPK2P, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this )
 	, m_v9958(*this, "v9958")

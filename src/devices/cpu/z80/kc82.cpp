@@ -17,7 +17,7 @@
 //  kc82_device - constructor
 //-------------------------------------------------
 
-kc82_device::kc82_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor mem_map, address_map_constructor io_map)
+kc82_device::kc82_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor mem_map, address_map_constructor io_map)
 	: z80_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, 16, 10, mem_map)
 	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 20, 0, 16, 10, mem_map)

@@ -26,7 +26,7 @@ class arc_upa_hccs_device :
 {
 public:
 	// construction/destruction
-	arc_upa_hccs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_upa_hccs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -106,7 +106,7 @@ void arc_upa_hccs_device::device_add_mconfig(machine_config &config)
 //  arc_upa_hccs_device - constructor
 //-------------------------------------------------
 
-arc_upa_hccs_device::arc_upa_hccs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+arc_upa_hccs_device::arc_upa_hccs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARC_UPA_HCCS, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
 	, m_podule_rom(*this, "podule_rom")

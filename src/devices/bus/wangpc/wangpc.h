@@ -33,7 +33,7 @@ public:
 	// construction/destruction
 	template <typename T, typename U>
 	wangpcbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus, U &&opts, char const *dflt, int sid)
-		: wangpcbus_slot_device(mconfig, tag, owner, 0)
+		: wangpcbus_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -42,7 +42,7 @@ public:
 		set_bus(std::forward<T>(bus));
 		set_bus_slot(sid);
 	}
-	wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// inline configuration
 	template <typename T> void set_bus(T &&tag) { m_bus.set_tag(std::forward<T>(tag)); }
@@ -69,7 +69,7 @@ class wangpcbus_device : public device_t
 {
 public:
 	// construction/destruction
-	wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~wangpcbus_device() { m_device_list.detach_all(); }
 
 	auto irq2_wr_callback() { return m_write_irq2.bind(); }

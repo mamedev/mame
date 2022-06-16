@@ -36,7 +36,7 @@ class pcd3311_device :  public device_t,
 {
 public:
 	// construction/destruction
-	pcd3311_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcd3311_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void write(uint8_t data) { m_data = data; }
 	void strobe_w(int state) { m_strobe = state; }

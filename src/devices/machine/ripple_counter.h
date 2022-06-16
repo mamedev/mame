@@ -23,7 +23,7 @@ class ripple_counter_device : public device_t, public device_rom_interface<14>
 {
 public:
 	// construction/destruction
-	ripple_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	ripple_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// configuration
 	void set_stages(u8 stages) { m_count_mask = (1U << stages) - 1; override_address_width(stages); }

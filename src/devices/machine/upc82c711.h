@@ -24,7 +24,7 @@ class upc82c711_device : public device_t
 {
 public:
 	// construction/destruction
-	upc82c711_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	upc82c711_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	u16 io_r(offs_t offset, u16 mem_mask = ~0);
 	void io_w(offs_t offset, u16 data, u16 mem_mask = ~0);

@@ -499,7 +499,7 @@ void arachnid_state::arachnid(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02 (or DS1220Y)
 
 	// devices
-	PIA6821(config, m_pia_u4, 0);
+	PIA6821(config, m_pia_u4);
 	m_pia_u4->readpa_handler().set(FUNC(arachnid_state::pia_u4_pa_r));
 	m_pia_u4->readpb_handler().set(FUNC(arachnid_state::pia_u4_pb_r));
 	m_pia_u4->readca1_handler().set(FUNC(arachnid_state::pia_u4_pca_r));
@@ -509,7 +509,7 @@ void arachnid_state::arachnid(machine_config &config)
 	m_pia_u4->ca2_handler().set(FUNC(arachnid_state::pia_u4_pca_w));
 	m_pia_u4->cb2_handler().set(FUNC(arachnid_state::pia_u4_pcb_w));
 
-	PIA6821(config, m_pia_u17, 0);
+	PIA6821(config, m_pia_u17);
 	m_pia_u17->readpa_handler().set(FUNC(arachnid_state::pia_u17_pa_r));
 	m_pia_u17->ca1_w(1); // CA1 - 1000 HZ Input
 	m_pia_u17->writepb_handler().set(FUNC(arachnid_state::pia_u17_pb_w));
@@ -527,7 +527,7 @@ void arachnid_state::arachnid(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	ptm6840_device &ptm(PTM6840(config, PTM6840_TAG, 10.738635_MHz_XTAL / 3 / 4));
-	ptm.set_external_clocks(0, 0, 0);
+	ptm.set_external_clocks(XTAL(), XTAL(), XTAL());
 	ptm.o1_callback().set(FUNC(arachnid_state::ptm_o1_callback));
 }
 

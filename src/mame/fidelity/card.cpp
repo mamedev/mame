@@ -621,7 +621,7 @@ void card_state::vbrc(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
+	S14001A(config, m_speech, XTAL::u(25000)); // R/C circuit, around 25khz
 	m_speech->bsy().set_inputline("maincpu", Z80_INPUT_LINE_WAIT);
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
 }

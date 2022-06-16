@@ -28,7 +28,7 @@ class ch376_device :   public device_t
 {
 public:
 	// construction/destruction
-	ch376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ch376_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);

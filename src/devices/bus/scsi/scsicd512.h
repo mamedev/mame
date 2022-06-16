@@ -20,11 +20,11 @@ public:
 	virtual void ReadData(uint8_t *data, int dataLength) override;
 
 protected:
-	scsicd512_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	scsicd512_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	scsicd512_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner,
 		const char *mfr, const char *product, const char *rev, uint8_t data)
-		: scsicd512_device(mconfig, type, tag, owner, 0)
+		: scsicd512_device(mconfig, type, tag, owner)
 	{
 		strncpy(m_manufacturer, mfr, 8);
 		strncpy(m_product, product, 16);
@@ -43,37 +43,37 @@ protected:
 class dec_rrd45_device : public scsicd512_device
 {
 public:
-	dec_rrd45_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	dec_rrd45_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class toshiba_xm3301_device : public scsicd512_device
 {
 public:
-	toshiba_xm3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	toshiba_xm3301_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class toshiba_xm5301_sun_device : public scsicd512_device
 {
 public:
-	toshiba_xm5301_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	toshiba_xm5301_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class toshiba_xm5401_sun_device : public scsicd512_device
 {
 public:
-	toshiba_xm5401_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	toshiba_xm5401_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class toshiba_xm5701_device : public scsicd512_device
 {
 public:
-	toshiba_xm5701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	toshiba_xm5701_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 class toshiba_xm5701_sun_device : public scsicd512_device
 {
 public:
-	toshiba_xm5701_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	toshiba_xm5701_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 };
 
 DECLARE_DEVICE_TYPE(RRD45, dec_rrd45_device)

@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(I82355, i82355_device, "i82355", "Intel 82355 BMIC")
 //  i82355_device - constructor
 //-------------------------------------------------
 
-i82355_device::i82355_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+i82355_device::i82355_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, I82355, tag, owner, clock)
 	, m_eint_callback(*this)
 	, m_lint_callback(*this)

@@ -321,7 +321,7 @@ void pcm_state::pcm(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
+	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG);
 	CASSETTE(config, m_cass);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 

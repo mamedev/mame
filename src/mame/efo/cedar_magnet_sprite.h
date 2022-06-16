@@ -18,7 +18,7 @@ class cedar_magnet_sprite_device : public device_t, public cedar_magnet_board_in
 {
 public:
 	// construction/destruction
-	cedar_magnet_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cedar_magnet_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void sprite_port80_w(u8 data);
 	void sprite_port84_w(u8 data);

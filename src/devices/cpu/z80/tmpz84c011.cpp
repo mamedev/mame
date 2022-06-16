@@ -32,7 +32,7 @@ void tmpz84c011_device::tmpz84c011_internal_io_map(address_map &map)
 }
 
 
-tmpz84c011_device::tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tmpz84c011_device::tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: z80_device(mconfig, TMPZ84C011, tag, owner, clock),
 	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(tmpz84c011_device::tmpz84c011_internal_io_map), this)),
 	m_ctc(*this, "tmpz84c011_ctc"),

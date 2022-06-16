@@ -192,12 +192,12 @@ GFXDECODE_END
 void intrscti_state::intrscti(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);        /* ? MHz */
+	Z80(config, m_maincpu, XTAL::u(4000000));        /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &intrscti_state::intrscti_map);
 	m_maincpu->set_addrmap(AS_IO, &intrscti_state::intrscti_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(intrscti_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 4000000);         /* ? MHz */
+	Z80(config, m_subcpu, XTAL::u(4000000));         /* ? MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &intrscti_state::intrscti_sub_map);
 	m_subcpu->set_addrmap(AS_IO, &intrscti_state::intrscti_sub_io_map);
 

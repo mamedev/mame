@@ -515,7 +515,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( mrblkz80_state::timer_z )
 void taito_state::taito_common(machine_config &config)
 {
 	/* basic machine hardware */
-	M6802(config, m_audiocpu, 1000000); // cpu & clock are a guess
+	M6802(config, m_audiocpu, XTAL::u(1000000)); // cpu & clock are a guess
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taito_state::audio_map);
 
 	/* Video */
@@ -525,7 +525,7 @@ void taito_state::taito_common(machine_config &config)
 	genpin_audio(config);
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.475); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.475); // unknown DAC
 
 	PIA6821(config, m_pia);
 	//m_pia->readpa_handler().set(FUNC(taito_state::pia_pa_r));
@@ -564,7 +564,7 @@ void taito_8080::taito4(machine_config &config)
 	taito(config);
 
 	SPEAKER(config, "voxsnd").front_center();
-	VOTRAX_SC01(config, m_votrax, 720000); // guess
+	VOTRAX_SC01(config, m_votrax, XTAL::u(720000)); // guess
 	m_votrax->ar_callback().set(FUNC(taito_8080::votrax_request));
 	m_votrax->add_route(ALL_OUTPUTS, "voxsnd", 2.0);
 
@@ -599,7 +599,7 @@ void mrblkz80_state::taitoz(machine_config &config)
 {
 	taito_common(config);
 	taito_ay_audio(config);
-	Z80(config, m_z80cpu, 3'800'000); // guess
+	Z80(config, m_z80cpu, XTAL::u(3'800'000)); // guess
 	m_z80cpu->set_addrmap(AS_PROGRAM, &mrblkz80_state::mrblkz80_mem_map);
 	m_z80cpu->set_addrmap(AS_IO, &mrblkz80_state::mrblkz80_io_map);
 	TIMER(config, "timer_z").configure_periodic(FUNC(mrblkz80_state::timer_z), attotime::from_hz(200));

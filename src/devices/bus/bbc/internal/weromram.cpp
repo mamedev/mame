@@ -50,7 +50,7 @@ void bbc_weromram_device::device_add_mconfig(machine_config &config)
 //  bbc_weromram_device - constructor
 //-------------------------------------------------
 
-bbc_weromram_device::bbc_weromram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_weromram_device::bbc_weromram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_WEROMRAM, tag, owner, clock)
 	, device_bbc_internal_interface(mconfig, *this)
 	, m_rom(*this, "romslot%u", 0U)

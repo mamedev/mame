@@ -15,7 +15,7 @@
 class digitalker_device : public device_t, public device_sound_interface
 {
 public:
-	digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void digitalker_0_cs_w(int line);
 	void digitalker_0_cms_w(int line);

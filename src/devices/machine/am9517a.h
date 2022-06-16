@@ -49,7 +49,7 @@ class am9517a_device :  public device_t,
 
 public:
 	// construction/destruction
-	am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto out_hreq_callback() { return m_out_hreq_cb.bind(); }
 	auto out_eop_callback() { return m_out_eop_cb.bind(); }
@@ -79,7 +79,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dreq3_w );
 
 protected:
-	am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -147,7 +147,7 @@ class v5x_dmau_device : public am9517a_device
 {
 public:
 	// construction/destruction
-	v5x_dmau_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+	v5x_dmau_device(const machine_config &mconfig,  const char *tag, device_t *owner, const XTAL &clock);
 
 	auto in_mem16r_callback() { return m_in_mem16r_cb.bind(); }
 	auto out_mem16w_callback() { return m_out_mem16w_cb.bind(); }
@@ -184,7 +184,7 @@ class pcxport_dmac_device : public am9517a_device
 {
 public:
 	// construction/destruction
-	pcxport_dmac_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+	pcxport_dmac_device(const machine_config &mconfig,  const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_reset() override;
@@ -195,7 +195,7 @@ protected:
 class eisa_dma_device : public am9517a_device
 {
 public:
-	eisa_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	eisa_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <unsigned Channel> u8 get_address_page() { return m_channel[Channel].m_address >> 16; }
 	template <unsigned Channel> void set_address_page(u8 data)

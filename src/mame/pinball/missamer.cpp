@@ -513,24 +513,24 @@ void missamer_state::missamer(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &missamer_state::mem_map);
 	m_maincpu->set_clk_out(m_ramio[1], FUNC(i8155_device::set_unscaled_clock_int));
 
-	clock_device &vco_clock(CLOCK(config, "vco_clock", 500)); // 74LS124
+	clock_device &vco_clock(CLOCK(config, "vco_clock", XTAL::u(500))); // 74LS124
 	vco_clock.signal_handler().set_inputline(m_maincpu, I8085_RST75_LINE);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	I8155(config, m_ramio[0], 500); // VCO (470nf)
+	I8155(config, m_ramio[0], XTAL::u(500)); // VCO (470nf)
 	m_ramio[0]->out_to_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 	m_ramio[0]->out_pa_callback().set(FUNC(missamer_state::ramio0_pa_w));
 	m_ramio[0]->out_pb_callback().set(FUNC(missamer_state::ramio0_pb_w));
 	m_ramio[0]->out_pc_callback().set(FUNC(missamer_state::ramio0_pc_w));
 
-	I8155(config, m_ramio[1], 0); // CLK from 8085
+	I8155(config, m_ramio[1]); // CLK from 8085
 	// timer output: UART
 	m_ramio[1]->in_pa_callback().set(FUNC(missamer_state::ramio1_pa_r));
 	m_ramio[1]->in_pb_callback().set(FUNC(missamer_state::ramio1_pb_r));
 	m_ramio[1]->out_pc_callback().set(FUNC(missamer_state::ramio1_pc_w));
 
-	I8155(config, m_ramio[2], 235000); // VCO (100pf)
+	I8155(config, m_ramio[2], XTAL::u(235000)); // VCO (100pf)
 	m_ramio[2]->out_pb_callback().set(FUNC(missamer_state::ramio2_pb_w));
 	m_ramio[2]->out_pc_callback().set(FUNC(missamer_state::ramio2_pc_w));
 

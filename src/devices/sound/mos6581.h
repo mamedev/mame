@@ -47,7 +47,7 @@ public:
 		TYPE_8580
 	};
 
-	mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~mos6581_device();
 
 	auto potx() { return m_read_potx.bind(); }
@@ -57,7 +57,7 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 protected:
-	mos6581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	mos6581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint32_t variant);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -85,7 +85,7 @@ private:
 class mos8580_device : public mos6581_device
 {
 public:
-	mos8580_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos8580_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 

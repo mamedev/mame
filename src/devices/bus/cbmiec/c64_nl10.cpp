@@ -47,7 +47,7 @@ const tiny_rom_entry *c64_nl10_interface_device::device_rom_region() const
 //  c64_nl10_interface_device - constructor
 //-------------------------------------------------
 
-c64_nl10_interface_device::c64_nl10_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c64_nl10_interface_device::c64_nl10_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, C64_NL10_INTERFACE, tag, owner, clock)
 	, device_cbm_iec_interface(mconfig, *this)
 {

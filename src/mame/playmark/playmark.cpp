@@ -1082,11 +1082,11 @@ void playmark_state::machine_reset()
 void playmark_state::bigtwin(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 12000000);   // 12 MHz
+	M68000(config, m_maincpu, XTAL::u(12000000));   // 12 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::bigtwin_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq2_line_hold));
 
-	PIC16C57(config, m_audio_pic, 12000000);
+	PIC16C57(config, m_audio_pic, XTAL::u(12000000));
 	m_audio_pic->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
 	m_audio_pic->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
 	m_audio_pic->write_b().set(FUNC(playmark_state::playmark_oki_w));
@@ -1110,7 +1110,7 @@ void playmark_state::bigtwin(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, XTAL::u(1000000), okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_oki->set_addrmap(0, &playmark_state::oki_map);
 }
@@ -1146,7 +1146,7 @@ void playmark_state::bigtwinb(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, XTAL::u(1000000), okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_oki->set_addrmap(0, &playmark_state::oki_map);
 }
@@ -1154,7 +1154,7 @@ void playmark_state::bigtwinb(machine_config &config)
 void playmark_state::wbeachvl_base(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 12000000);   // 12 MHz
+	M68000(config, m_maincpu, XTAL::u(12000000));   // 12 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::wbeachvl_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq2_line_hold));
 
@@ -1177,7 +1177,7 @@ void playmark_state::wbeachvl_base(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, XTAL::u(1000000), okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_oki->set_addrmap(0, &playmark_state::oki_map);
 }
@@ -1207,7 +1207,7 @@ void playmark_state::wbeachvl_mcs(machine_config &config)
 	m_audio_mcs->port_in_cb<3>().set(FUNC(playmark_state::wbeachvla_snd_command_r));
 	m_audio_mcs->port_out_cb<3>().set(FUNC(playmark_state::playmark_oki_w));
 
-	I87C51(config, "extracpu", 12'000'000); // actually S87C751, clock unverified, on a sub PCB near a 12 MHz XTAL
+	I87C51(config, "extracpu", XTAL::u(12'000'000)); // actually S87C751, clock unverified, on a sub PCB near a 12 MHz XTAL
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audio_mcs, MCS51_INT1_LINE, HOLD_LINE);

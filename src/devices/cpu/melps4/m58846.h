@@ -19,7 +19,7 @@
 class m58846_device : public melps4_cpu_device
 {
 public:
-	m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

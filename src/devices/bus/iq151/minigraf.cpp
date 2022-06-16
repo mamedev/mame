@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(IQ151_MINIGRAF, iq151_minigraf_device, "iq151_minigraf", "IQ1
 //  iq151_minigraf_device - constructor
 //-------------------------------------------------
 
-iq151_minigraf_device::iq151_minigraf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+iq151_minigraf_device::iq151_minigraf_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, IQ151_MINIGRAF, tag, owner, clock)
 	, device_iq151cart_interface(mconfig, *this)
 	, m_rom(nullptr), m_posx(0), m_posy(0), m_pen(0), m_control(0), m_paper(nullptr)

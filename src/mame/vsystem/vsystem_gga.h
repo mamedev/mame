@@ -57,7 +57,7 @@ class vsystem_gga_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
-	vsystem_gga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	vsystem_gga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// static configuration
 	auto write_cb() { return m_write_cb.bind(); }

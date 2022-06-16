@@ -68,7 +68,7 @@
 
 DEFINE_DEVICE_TYPE(SGI_GR1, sgi_gr1_device, "sgi_gr1", "SGI GR1 Graphics")
 
-sgi_gr1_device::sgi_gr1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+sgi_gr1_device::sgi_gr1_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, SGI_GR1, tag, owner, clock)
 	, m_bank(*this, "bank")
 	, m_screen(*this, "screen")
@@ -173,7 +173,7 @@ void sgi_gr1_device::device_add_mconfig(machine_config &config)
 	m_ge->re_r().set(m_re, FUNC(sgi_re2_device::reg_r));
 	m_ge->re_w().set(m_re, FUNC(sgi_re2_device::reg_w));
 
-	SGI_RE2(config, m_re, 0);
+	SGI_RE2(config, m_re);
 	m_re->out_rdy().set(m_ge, FUNC(sgi_ge5_device::re_rdy_w));
 	m_re->out_drq().set(m_ge, FUNC(sgi_ge5_device::re_drq_w));
 

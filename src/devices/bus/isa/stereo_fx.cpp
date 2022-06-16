@@ -131,8 +131,8 @@ void stereo_fx_device::device_add_mconfig(machine_config &config)
 	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.00);
 	/* no CM/S support (empty sockets) */
 
-	DAC_8BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "ldac").add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 
 	PC_JOY(config, m_joy);
 }
@@ -194,7 +194,7 @@ uint8_t stereo_fx_device::invalid_r()
 	return 0xff;
 }
 
-stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA8_STEREO_FX, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_joy(*this, "pc_joy"),

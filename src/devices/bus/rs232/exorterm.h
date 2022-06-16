@@ -13,7 +13,7 @@
 class exorterm155_terminal_device : public device_t, public device_rs232_port_interface
 {
 public:
-	exorterm155_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	exorterm155_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) override;
 

@@ -558,7 +558,7 @@ void jackie_state::jackie(machine_config &config)
 	Z80(config, m_maincpu, XTAL(12'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jackie_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &jackie_state::io_map);
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(jackie_state::irq), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(jackie_state::irq), "screen", 0, 1);
 
 	i8255_device &ppi1(I8255A(config, "ppi1")); // D8255AC
 	ppi1.out_pa_callback().set(FUNC(jackie_state::nmi_and_coins_w));

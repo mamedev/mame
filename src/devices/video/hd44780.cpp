@@ -54,13 +54,13 @@ ROM_END
 //  hd44780_device - constructor
 //-------------------------------------------------
 
-hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: hd44780_device(mconfig, HD44780, tag, owner, clock)
 {
 	set_charset_type(CHARSET_HD44780_A00);
 }
 
-hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_pixel_update_cb(*this)
 	, m_busy_factor(1.0)
@@ -74,13 +74,13 @@ hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-sed1278_0b_device::sed1278_0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sed1278_0b_device::sed1278_0b_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	hd44780_device(mconfig, SED1278_0B, tag, owner, clock)
 {
 	set_charset_type(CHARSET_SED1278_0B);
 }
 
-ks0066_f05_device::ks0066_f05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+ks0066_f05_device::ks0066_f05_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	hd44780_device(mconfig, KS0066_F05, tag, owner, clock)
 {
 	set_charset_type(CHARSET_KS0066_F05);

@@ -134,7 +134,7 @@ enum
 class s3c2410_device : public device_t, protected s3c24xx_peripheral_types
 {
 public:
-	s3c2410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s3c2410_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	~s3c2410_device();
 
 	// configuration

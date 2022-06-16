@@ -164,12 +164,12 @@ INPUT_PORTS_END
 //  vt100_keyboard_device - constructor
 //-------------------------------------------------
 
-vt100_keyboard_device::vt100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+vt100_keyboard_device::vt100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vt100_keyboard_device(mconfig, VT100_KEYBOARD, tag, owner, clock)
 {
 }
 
-vt100_keyboard_device::vt100_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+vt100_keyboard_device::vt100_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_signal_out_cb(*this)
 	, m_uart(*this, "uart")
@@ -194,7 +194,7 @@ vt100_keyboard_device::vt100_keyboard_device(const machine_config &mconfig, devi
 void vt100_keyboard_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_speaker, 786); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
+	BEEP(config, m_speaker, XTAL::u(786)); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	AY31015(config, m_uart);
@@ -488,7 +488,7 @@ INPUT_PORTS_END
 //  ms7002_device - constructor
 //-------------------------------------------------
 
-ms7002_device::ms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+ms7002_device::ms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: vt100_keyboard_device(mconfig, MS7002, tag, owner, clock)
 	, m_scan_enable(false)
 {

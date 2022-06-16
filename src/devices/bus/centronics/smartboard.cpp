@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(CENTRONICS_SMARTBOARD, centronics_smartboard_device, "centron
 //  constructor
 //-------------------------------------------------
 
-centronics_smartboard_device::centronics_smartboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+centronics_smartboard_device::centronics_smartboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, CENTRONICS_SMARTBOARD, tag, owner, clock),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_smartboard(*this, "smartboard")

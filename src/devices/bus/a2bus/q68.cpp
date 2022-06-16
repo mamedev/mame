@@ -107,7 +107,7 @@ const tiny_rom_entry *a2bus_68k_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_68k_device::a2bus_68k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+a2bus_68k_device::a2bus_68k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
 	, m_m68008(*this, "m68008")
@@ -115,12 +115,12 @@ a2bus_68k_device::a2bus_68k_device(const machine_config &mconfig, device_type ty
 {
 }
 
-a2bus_q68_device::a2bus_q68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_q68_device::a2bus_q68_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_68k_device(mconfig, A2BUS_Q68, tag, owner, clock)
 {
 }
 
-a2bus_q68plus_device::a2bus_q68plus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2bus_q68plus_device::a2bus_q68plus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	a2bus_68k_device(mconfig, A2BUS_Q68PLUS, tag, owner, clock)
 {
 }

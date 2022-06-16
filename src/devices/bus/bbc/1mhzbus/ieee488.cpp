@@ -155,7 +155,7 @@ const tiny_rom_entry *bbc_ieee488_device::device_rom_region() const
 //  bbc_ieee488_device - constructor
 //-------------------------------------------------
 
-bbc_ieee488_device::bbc_ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_ieee488_device::bbc_ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_IEEE488, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_ieee(*this, IEEE488_TAG)
@@ -164,7 +164,7 @@ bbc_ieee488_device::bbc_ieee488_device(const machine_config &mconfig, const char
 {
 }
 
-bbc_b488_device::bbc_b488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_b488_device::bbc_b488_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_B488, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_ieee(*this, IEEE488_TAG)
@@ -172,7 +172,7 @@ bbc_b488_device::bbc_b488_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-//bbc_procyon_device::bbc_procyon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+//bbc_procyon_device::bbc_procyon_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 //  : device_t(mconfig, BBC_PROCYON, tag, owner, clock)
 //  , device_bbc_1mhzbus_interface(mconfig, *this)
 //  , m_ieee(*this, IEEE488_TAG)

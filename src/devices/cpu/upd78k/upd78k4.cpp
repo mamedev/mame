@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(UPD784031, upd784031_device, "upd784031", "NEC uPD784031")
 //  upd78k4_device - constructor
 //-------------------------------------------------
 
-upd78k4_device::upd78k4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor mem_map, address_map_constructor sfr_map)
+upd78k4_device::upd78k4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor mem_map, address_map_constructor sfr_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, mem_map)
 	, m_iram_config("iram", ENDIANNESS_LITTLE, 16, 9, 0, address_map_constructor(FUNC(upd78k4_device::iram_map), this))
@@ -234,7 +234,7 @@ void upd78k4_device::state_string_export(const device_state_entry &entry, std::s
 //  upd784031_device - constructor
 //-------------------------------------------------
 
-upd784031_device::upd784031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+upd784031_device::upd784031_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: upd78k4_device(mconfig, UPD784031, tag, owner, clock,
 						address_map_constructor(FUNC(upd784031_device::sfr_map), this),
 						address_map_constructor(FUNC(upd784031_device::sfr_map), this))

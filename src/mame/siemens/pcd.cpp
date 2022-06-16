@@ -477,13 +477,13 @@ void pcd_state::pcd(machine_config &config)
 
 	TIMER(config, "timer0_tick").configure_periodic(FUNC(pcd_state::timer0_tick), attotime::from_hz(16_MHz_XTAL / 24)); // adjusted to pass post
 
-	PIC8259(config, m_pic1, 0);
+	PIC8259(config, m_pic1);
 	m_pic1->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
-	PIC8259(config, m_pic2, 0);
+	PIC8259(config, m_pic2);
 	m_pic2->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
 
-	PCD_VIDEO(config, "video", 0);
+	PCD_VIDEO(config, "video");
 
 	RAM(config, RAM_TAG).set_default_size("1M");
 
@@ -533,10 +533,10 @@ void pcd_state::pcd(machine_config &config)
 	m_rtc->set_epoch(1900);
 	m_rtc->set_24hrs(true);
 
-	pcd_keyboard_device &keyboard(PCD_KEYBOARD(config, "keyboard", 0));
+	pcd_keyboard_device &keyboard(PCD_KEYBOARD(config, "keyboard"));
 	keyboard.out_tx_handler().set(m_usart[1], FUNC(scn2661b_device::rxd_w));
 
-	SCSI_PORT(config, m_scsi, 0);
+	SCSI_PORT(config, m_scsi);
 	m_scsi->set_data_input_buffer("scsi_data_in");
 	m_scsi->msg_handler().set(FUNC(pcd_state::write_scsi_msg));
 	m_scsi->bsy_handler().set(FUNC(pcd_state::write_scsi_bsy));
@@ -544,10 +544,10 @@ void pcd_state::pcd(machine_config &config)
 	m_scsi->cd_handler().set(FUNC(pcd_state::write_scsi_cd));
 	m_scsi->req_handler().set(FUNC(pcd_state::write_scsi_req));
 
-	output_latch_device &scsi_out(OUTPUT_LATCH(config, "scsi_data_out", 0));
+	output_latch_device &scsi_out(OUTPUT_LATCH(config, "scsi_data_out"));
 	m_scsi->set_output_latch(scsi_out);
 
-	INPUT_BUFFER(config, "scsi_data_in", 0);
+	INPUT_BUFFER(config, "scsi_data_in");
 	m_scsi->set_slot_device(1, "harddisk", OMTI5100, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
 	SOFTWARE_LIST(config, "flop_list").set_original("pcd_flop");

@@ -45,7 +45,7 @@ public:
 		FrenchWP      // French word processing
 	};
 
-	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint8_t cru_r(offs_t offset);
 	void cru_w(offs_t offset, uint8_t data);

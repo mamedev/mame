@@ -10,7 +10,7 @@
 
 DEFINE_DEVICE_TYPE(ADB_HLE, adb_hle_device, "adbhle", "ADB HLE")
 
-adb_hle_device::adb_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+adb_hle_device::adb_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	adb_device(mconfig, ADB_HLE, tag, owner, clock),
 	adb_slot_card_interface(mconfig, *this, DEVICE_SELF)
 {

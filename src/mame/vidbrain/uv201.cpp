@@ -95,7 +95,7 @@ DEFINE_DEVICE_TYPE(UV201, uv201_device, "uv201", "UV201")
 //  uv201_device - constructor
 //-------------------------------------------------
 
-uv201_device::uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+uv201_device::uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, UV201, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_write_ext_int(*this),

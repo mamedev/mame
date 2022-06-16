@@ -509,7 +509,7 @@ void atm_state::atm(machine_config &config)
 	m_screen->set_raw(X1_128_SINCLAIR / 5, 448, 312, {get_screen_area().left() - 40, get_screen_area().right() + 40, get_screen_area().top() - 40, get_screen_area().bottom() + 40});
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);
 
-	BETA_DISK(config, m_beta, 0);
+	BETA_DISK(config, m_beta);
 	ATA_INTERFACE(config, m_ata).options(atm_ata_devices, nullptr, nullptr, false);;
 
 	CENTRONICS(config, m_centronics, centronics_devices, "covox");

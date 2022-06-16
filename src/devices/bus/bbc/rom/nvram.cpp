@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(BBC_NVRAM, bbc_nvram_device, "bbc_nvram", "BBC Micro Sideways
 //  bbc_nvram_device - constructor
 //-------------------------------------------------
 
-bbc_nvram_device::bbc_nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_nvram_device::bbc_nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_NVRAM, tag, owner, clock)
 	, device_bbc_rom_interface(mconfig, *this)
 {

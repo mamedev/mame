@@ -3716,7 +3716,7 @@ void namcos23_state::gorgon(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
 
-	NAMCO_SETTINGS(config, m_settings, 0);
+	NAMCO_SETTINGS(config, m_settings);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
@@ -3778,7 +3778,7 @@ void namcos23_state::s23(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(2*115200));
 
-	NAMCO_SETTINGS(config, m_settings, 0);
+	NAMCO_SETTINGS(config, m_settings);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));

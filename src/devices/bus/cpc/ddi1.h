@@ -21,7 +21,7 @@ class cpc_ddi1_device : public device_t, public device_cpc_expansion_card_interf
 {
 public:
 	// construction/destruction
-	cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void motor_w(offs_t offset, uint8_t data);
 	void fdc_w(offs_t offset, uint8_t data);

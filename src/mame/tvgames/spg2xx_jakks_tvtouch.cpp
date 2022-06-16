@@ -266,7 +266,7 @@ void jakks_tvtouch_state::tvtouch(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(jakks_tvtouch_state::portb_w));
 	m_maincpu->portc_out().set(FUNC(jakks_tvtouch_state::portc_w));
 
-	I2C_24C04(config, m_i2cmem, 0);
+	I2C_24C04(config, m_i2cmem);
 }
 
 ROM_START( tvtchsw )

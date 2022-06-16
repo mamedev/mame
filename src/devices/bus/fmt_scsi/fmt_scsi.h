@@ -29,7 +29,7 @@ public:
 	// construction/destruction
 	template <typename T>
 	fmt_scsi_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: fmt_scsi_slot_device(mconfig, tag, owner, 0)
+		: fmt_scsi_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -37,7 +37,7 @@ public:
 		set_fixed(false);
 	}
 
-	fmt_scsi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	fmt_scsi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto drq_handler() { return m_drq_handler.bind(); }

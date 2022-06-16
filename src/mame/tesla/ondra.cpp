@@ -178,7 +178,7 @@ void ondra_state::ondra(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 950); // guess
+	BEEP(config, m_beep, XTAL::u(950)); // guess
 	m_beep->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CASSETTE(config, m_cassette);

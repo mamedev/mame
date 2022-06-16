@@ -91,7 +91,7 @@ DEFINE_DEVICE_TYPE(PCI_BUS_LEGACY, pci_bus_legacy_device, "pci_bus_legacy", "PCI
 //-------------------------------------------------
 //  pci_bus_legacy_device - constructor
 //-------------------------------------------------
-pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PCI_BUS_LEGACY, tag, owner, clock),
 	m_read_callback(*this),
 	m_write_callback(*this),

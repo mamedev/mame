@@ -61,7 +61,7 @@ S8 60 |  *                                                         | 16 b16
 class sm510_device : public sm510_base_device
 {
 public:
-	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
+	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL::u(32768));
 
 protected:
 	void program_2_7k(address_map &map);

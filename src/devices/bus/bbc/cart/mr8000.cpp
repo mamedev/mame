@@ -51,7 +51,7 @@ ioport_constructor bbc_mr8000_device::device_input_ports() const
 //  bbc_mr8000_device - constructor
 //-------------------------------------------------
 
-bbc_mr8000_device::bbc_mr8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_mr8000_device::bbc_mr8000_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_MR8000, tag, owner, clock)
 	, device_bbc_cart_interface(mconfig, *this)
 	, m_switch(*this, "SWITCH")

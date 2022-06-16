@@ -34,7 +34,7 @@ void sam_sdide_device::device_add_mconfig(machine_config &config)
 //  sam_sdide_device - constructor
 //-------------------------------------------------
 
-sam_sdide_device::sam_sdide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sam_sdide_device::sam_sdide_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SAM_SDIDE, tag, owner, clock),
 	device_samcoupe_expansion_interface(mconfig, *this),
 	m_ata(*this, "ata"),

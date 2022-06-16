@@ -380,7 +380,7 @@ void imi5000h_device::device_add_mconfig(machine_config & config)
 	pio3.out_pb_callback().set(FUNC(imi5000h_device::pio3_pb_w));
 	pio3.out_brdy_callback().set(Z80PIO_3_TAG, FUNC(z80pio_device::strobe_b));
 
-	//HARDDISK(config, "harddisk1", 0);
+	//HARDDISK(config, "harddisk1");
 }
 
 
@@ -438,7 +438,7 @@ ioport_constructor imi5000h_device::device_input_ports() const
 //  imi5000h_device - constructor
 //-------------------------------------------------
 
-imi5000h_device::imi5000h_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+imi5000h_device::imi5000h_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, IMI5000H, tag, owner, clock),
 	device_imi7000_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),

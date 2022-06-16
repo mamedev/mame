@@ -25,7 +25,7 @@ class cit101_keyboard_device : public device_t
 {
 public:
 	// device type constructor
-	cit101_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	cit101_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
@@ -36,7 +36,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_rxd);
 
 protected:
-	cit101_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	cit101_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -75,7 +75,7 @@ class cit101e_keyboard_device : public cit101_keyboard_device
 {
 public:
 	// device type constructor
-	cit101e_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	cit101e_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 protected:
 	// device-level overrides

@@ -32,7 +32,7 @@
 
 class sis85c496_host_device : public pci_host_device {
 public:
-	sis85c496_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis85c496_host_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(int ram_size);

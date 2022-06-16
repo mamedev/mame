@@ -93,7 +93,7 @@ const tiny_rom_entry* bbc_cc500_device::device_rom_region() const
 //  bbc_cc500_device - constructor
 //-------------------------------------------------
 
-bbc_cc500_device::bbc_cc500_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_cc500_device::bbc_cc500_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_CC500, tag, owner, clock)
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_palette(*this, ":palette")

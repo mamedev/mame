@@ -199,7 +199,7 @@ ioport_constructor bbc_tube_32016_device::device_input_ports() const
 //  bbc_tube_32016_device - constructor
 //-------------------------------------------------
 
-bbc_tube_32016_device::bbc_tube_32016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_32016_device::bbc_tube_32016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_tube_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
@@ -210,17 +210,17 @@ bbc_tube_32016_device::bbc_tube_32016_device(const machine_config &mconfig, devi
 {
 }
 
-bbc_tube_32016_device::bbc_tube_32016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_32016_device::bbc_tube_32016_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_32016_device(mconfig, BBC_TUBE_32016, tag, owner, clock)
 {
 }
 
-bbc_tube_16032_device::bbc_tube_16032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_16032_device::bbc_tube_16032_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_32016_device(mconfig, BBC_TUBE_16032, tag, owner, clock)
 {
 }
 
-bbc_tube_32016l_device::bbc_tube_32016l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_32016l_device::bbc_tube_32016l_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_32016_device(mconfig, BBC_TUBE_32016L, tag, owner, clock)
 {
 }

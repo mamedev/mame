@@ -202,7 +202,7 @@
 #include "screen.h"
 
 
-#define MAIN_CPU_MASTER_CLOCK   (11200000)
+#define MAIN_CPU_MASTER_CLOCK   XTAL::u(11200000)
 #define PIXEL_CLOCK             (MAIN_CPU_MASTER_CLOCK / 2)
 #define CRTC_CLOCK              (MAIN_CPU_MASTER_CLOCK / 16)
 
@@ -504,11 +504,11 @@ INPUT_PORTS_END
 void spiders_state::spiders(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809(config, m_maincpu, 2800000);
+	MC6809(config, m_maincpu, XTAL::u(2800000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &spiders_state::spiders_main_map);
 	m_maincpu->set_periodic_int(FUNC(spiders_state::update_pia_1), attotime::from_hz(25));
 
-	M6802(config, m_audiocpu, 3000000);
+	M6802(config, m_audiocpu, XTAL::u(3000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spiders_state::spiders_audio_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -527,20 +527,20 @@ void spiders_state::spiders(machine_config &config)
 	crtc.set_update_row_callback(FUNC(spiders_state::crtc_update_row));
 	crtc.out_de_callback().set("ic60", FUNC(ttl74123_device::a_w));
 
-	PIA6821(config, m_pia[0], 0);
+	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
 	m_pia[0]->readpb_handler().set_ioport("IN1");
 	m_pia[0]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_pia[0]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	PIA6821(config, m_pia[1], 0);
+	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set(FUNC(spiders_state::gfx_rom_r));
 	m_pia[1]->writepb_handler().set(FUNC(spiders_state::gfx_rom_intf_w));
 	m_pia[1]->cb2_handler().set(FUNC(spiders_state::flipscreen_w));
 	m_pia[1]->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	PIA6821(config, m_pia[2], 0);
+	PIA6821(config, m_pia[2]);
 	m_pia[2]->writepa_handler().set(FUNC(spiders_state::spiders_audio_ctrl_w));
 	m_pia[2]->writepb_handler().set(FUNC(spiders_state::spiders_audio_command_w));
 	m_pia[2]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
@@ -548,12 +548,12 @@ void spiders_state::spiders(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	PIA6821(config, m_pia[3], 0);
+	PIA6821(config, m_pia[3]);
 	m_pia[3]->writepa_handler().set(FUNC(spiders_state::spiders_audio_a_w));
 	m_pia[3]->writepb_handler().set(FUNC(spiders_state::spiders_audio_b_w));
 	m_pia[3]->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 
-	ttl74123_device &ic60(TTL74123(config, "ic60", 0));
+	ttl74123_device &ic60(TTL74123(config, "ic60"));
 	ic60.set_connection_type(TTL74123_GROUNDED);    /* the hook up type */
 	ic60.set_resistor_value(RES_K(22));             /* resistor connected to RCext */
 	ic60.set_capacitor_value(CAP_U(0.01));          /* capacitor connected to Cext and RCext */

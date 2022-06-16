@@ -68,7 +68,7 @@ Address   Description
 
 // Capacitor value in pF
 #define H19_KEY_DEBOUNCE_CAPACITOR 5000
-#define MM5740_CLOCK (mm5740_device::calc_effective_clock_key_debounce(H19_KEY_DEBOUNCE_CAPACITOR))
+#define MM5740_CLOCK XTAL::u(mm5740_device::calc_effective_clock_key_debounce(H19_KEY_DEBOUNCE_CAPACITOR))
 
 // Beep Frequency is 1 KHz
 #define H19_BEEP_FRQ (H19_CLOCK / 2048)

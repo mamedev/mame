@@ -498,7 +498,7 @@ void ksayakyu_state::ksayakyu(machine_config &config)
 	ay2.port_b_write_callback().set(FUNC(ksayakyu_state::dummy3_w));
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	DAC_6BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_6BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 ROM_START( ksayakyu )

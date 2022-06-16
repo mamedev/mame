@@ -30,7 +30,7 @@ public:
 
 protected:
 	// device base class constructor
-	rst_buffer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	rst_buffer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -54,7 +54,7 @@ class rst_pos_buffer_device : public rst_buffer_device
 {
 public:
 	// device constructor
-	rst_pos_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	rst_pos_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// set RST 1/RST 08H request line (modifies bit 3 of vector)
 	DECLARE_WRITE_LINE_MEMBER(rst1_w) { sync_input(state, 0x08); }
@@ -76,7 +76,7 @@ class rst_neg_buffer_device : public rst_buffer_device
 {
 public:
 	// device constructor
-	rst_neg_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	rst_neg_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// set RST 30H request line (modifies bit 3 of vector)
 	DECLARE_WRITE_LINE_MEMBER(rst30_w) { sync_input(state, 0x08); }

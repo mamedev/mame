@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(SUNPLUS_GCM394_AUDIO, sunplus_gcm394_audio_device, "gcm394_au
 static FILE *adpcm_file[16] = {};
 #endif
 
-spg2xx_audio_device::spg2xx_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spg2xx_audio_device::spg2xx_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_space_read_cb(*this)
@@ -56,17 +56,17 @@ spg2xx_audio_device::spg2xx_audio_device(const machine_config &mconfig, device_t
 {
 }
 
-spg2xx_audio_device::spg2xx_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spg2xx_audio_device::spg2xx_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spg2xx_audio_device(mconfig, SPG2XX_AUDIO, tag, owner, clock)
 {
 }
 
-spg110_audio_device::spg110_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+spg110_audio_device::spg110_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spg2xx_audio_device(mconfig, SPG110_AUDIO, tag, owner, clock)
 {
 }
 
-sunplus_gcm394_audio_device::sunplus_gcm394_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sunplus_gcm394_audio_device::sunplus_gcm394_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: spg2xx_audio_device(mconfig, SUNPLUS_GCM394_AUDIO, tag, owner, clock)
 {
 }

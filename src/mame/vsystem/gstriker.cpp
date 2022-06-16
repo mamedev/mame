@@ -629,7 +629,7 @@ void gstriker_state::base(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gstriker_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &gstriker_state::sound_io_map);
 
-	vs9209_device &io(VS9209(config, "io", 0));
+	vs9209_device &io(VS9209(config, "io"));
 	io.porta_input_cb().set_ioport("P1");
 	io.portb_input_cb().set_ioport("P2");
 	io.portc_input_cb().set_ioport("SYSTEM");
@@ -638,7 +638,7 @@ void gstriker_state::base(machine_config &config)
 	io.porth_input_cb().set("soundlatch", FUNC(generic_latch_8_device::pending_r)).lshift(0);
 	io.porth_output_cb().set("watchdog", FUNC(mb3773_device::write_line_ck)).bit(3);
 
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
@@ -653,15 +653,15 @@ void gstriker_state::base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gstriker);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x800);
 
-	MB60553(config, m_bg, 0);
+	MB60553(config, m_bg);
 	m_bg->set_gfxdecode_tag(m_gfxdecode);
 	m_bg->set_gfx_region(1);
 
-	VS920A(config, m_tx, 0);
+	VS920A(config, m_tx);
 	m_tx->set_gfxdecode_tag(m_gfxdecode);
 	m_tx->set_gfx_region(0);
 
-	VSYSTEM_SPR(config, m_spr, 0);
+	VSYSTEM_SPR(config, m_spr);
 	m_spr->set_gfx_region(2);
 	m_spr->set_pal_mask(0x1f);
 	m_spr->set_transpen(0);
@@ -690,7 +690,7 @@ void gstriker_state::gstriker(machine_config &config)
 
 	base(config);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set_inputline(m_maincpu, M68K_IRQ_2);
 	//m_acia->txd_handler().set("link", FUNC(rs232_port_device::write_txd));
 	//m_acia->rts_handler().set("link", FUNC(rs232_port_device::write_rts));

@@ -734,11 +734,11 @@ MACHINE_RESET_MEMBER(liberate_state,liberate)
 void liberate_state::liberate_base(machine_config &config)
 {
 	/* basic machine hardware */
-	DECO16(config, m_maincpu, 2000000);
+	DECO16(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &liberate_state::liberate_map);
 	m_maincpu->set_addrmap(AS_IO, &liberate_state::deco16_io_map);
 
-	DECO_222(config, m_audiocpu, 1500000); /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
+	DECO_222(config, m_audiocpu, XTAL::u(1500000)); /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::liberate_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(liberate_state::nmi_line_pulse), attotime::from_hz(16*60)); /* ??? */
 
@@ -767,9 +767,9 @@ void liberate_state::liberate_base(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8912(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8912(config, "ay1", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	AY8912(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8912(config, "ay2", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void liberate_state::liberate(machine_config &config)
@@ -783,7 +783,7 @@ void liberate_state::liberatb(machine_config &config)
 	liberate_base(config);
 
 	/* basic machine hardware */
-	M6502(config.replace(), m_maincpu, 2000000);
+	M6502(config.replace(), m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &liberate_state::liberatb_map);
 }
 
@@ -800,11 +800,11 @@ void liberate_state::prosoccr(machine_config &config)
 	liberate_base(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(10000000/8); //xtal is unknown?
+	m_maincpu->set_clock(XTAL::u(10000000)/8); //xtal is unknown?
 	m_maincpu->set_addrmap(AS_PROGRAM, &liberate_state::prosoccr_map);
 	m_maincpu->set_addrmap(AS_IO, &liberate_state::prosoccr_io_map);
 
-	m_audiocpu->set_clock(10000000/8); //xtal is 12 Mhz, divider is unknown
+	m_audiocpu->set_clock(XTAL::u(10000000)/8); //xtal is 12 Mhz, divider is unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::prosoccr_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
@@ -820,11 +820,11 @@ void liberate_state::prosoccr(machine_config &config)
 void liberate_state::prosport(machine_config &config)
 {
 	/* basic machine hardware */
-	DECO16(config, m_maincpu, 2000000);
+	DECO16(config, m_maincpu, XTAL::u(2000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &liberate_state::prosport_map);
 	m_maincpu->set_addrmap(AS_IO, &liberate_state::deco16_io_map);
 
-	DECO_222(config, m_audiocpu, 1500000/2); /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
+	DECO_222(config, m_audiocpu, XTAL::u(1500000)/2); /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::liberate_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(liberate_state::nmi_line_pulse), attotime::from_hz(16*60)); /* ??? */
 
@@ -853,9 +853,9 @@ void liberate_state::prosport(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8912(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8912(config, "ay1", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	AY8912(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8912(config, "ay2", XTAL::u(1500000)).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 

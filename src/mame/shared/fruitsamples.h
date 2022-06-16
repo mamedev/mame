@@ -16,7 +16,7 @@
 class fruit_samples_device : public device_t
 {
 public:
-	fruit_samples_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fruit_samples_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void play(uint8_t index);
 

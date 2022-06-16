@@ -546,7 +546,7 @@ void mhavoc_state::mhavoc(machine_config &config)
 	screen.set_visarea(0, 300, 0, 260);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	avg_device &avg(AVG_MHAVOC(config, "avg", 0));
+	avg_device &avg(AVG_MHAVOC(config, "avg"));
 	avg.set_vector("vector");
 	avg.set_memory(m_alpha, AS_PROGRAM, 0x4000);
 

@@ -42,7 +42,7 @@ void c2n_device::device_add_mconfig(machine_config &config)
 //  c2n_device - constructor
 //-------------------------------------------------
 
-c2n_device::c2n_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+c2n_device::c2n_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_pet_datassette_port_interface(mconfig, *this)
 	, m_cassette(*this, "cassette")
@@ -51,7 +51,7 @@ c2n_device::c2n_device(const machine_config &mconfig, device_type type, const ch
 {
 }
 
-c2n_device::c2n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c2n_device::c2n_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c2n_device(mconfig, C2N, tag, owner, clock)
 {
 }
@@ -61,7 +61,7 @@ c2n_device::c2n_device(const machine_config &mconfig, const char *tag, device_t 
 //  c1530_device - constructor
 //-------------------------------------------------
 
-c1530_device::c1530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c1530_device::c1530_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c2n_device(mconfig, C1530, tag, owner, clock)
 {
 }
@@ -71,7 +71,7 @@ c1530_device::c1530_device(const machine_config &mconfig, const char *tag, devic
 //  c1531_device - constructor
 //-------------------------------------------------
 
-c1531_device::c1531_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+c1531_device::c1531_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: c2n_device(mconfig, C1531, tag, owner, clock)
 {
 }

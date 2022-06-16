@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(SA16, sa16_device, "sa16", "Roland SA-16 Sampler")
 //  sa16_base_device - constructor
 //-------------------------------------------------
 
-sa16_base_device::sa16_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+sa16_base_device::sa16_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_int_callback(*this)
 	, m_sh_callback(*this)
@@ -47,7 +47,7 @@ sa16_base_device::sa16_base_device(const machine_config &mconfig, device_type ty
 //  rf5c36_device - constructor
 //-------------------------------------------------
 
-rf5c36_device::rf5c36_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+rf5c36_device::rf5c36_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sa16_base_device(mconfig, RF5C36, tag, owner, clock)
 {
 }
@@ -57,7 +57,7 @@ rf5c36_device::rf5c36_device(const machine_config &mconfig, const char *tag, dev
 //  sa16_device - constructor
 //-------------------------------------------------
 
-sa16_device::sa16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+sa16_device::sa16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sa16_base_device(mconfig, SA16, tag, owner, clock)
 {
 }

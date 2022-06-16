@@ -84,7 +84,7 @@ void nes_vausfc_device::device_add_mconfig(machine_config &config)
 //  nes_vaus_device - constructor
 //-------------------------------------------------
 
-nes_vaus_device::nes_vaus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+nes_vaus_device::nes_vaus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_paddle(*this, "PADDLE")
@@ -93,12 +93,12 @@ nes_vaus_device::nes_vaus_device(const machine_config &mconfig, device_type type
 {
 }
 
-nes_vaus_device::nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_vaus_device::nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_vaus_device(mconfig, NES_ARKPADDLE, tag, owner, clock)
 {
 }
 
-nes_vausfc_device::nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_vausfc_device::nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_vaus_device(mconfig, NES_ARKPADDLE_FC, tag, owner, clock)
 	, m_daisychain(*this, "subexp")
 {

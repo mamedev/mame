@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(ASTROCADE_CASSETTE, astrocade_cassette_device, "astrocade_cas
 //    Bally Astrocade cassette input
 //**************************************************************************
 
-astrocade_cassette_device::astrocade_cassette_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+astrocade_cassette_device::astrocade_cassette_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ASTROCADE_CASSETTE, tag, owner, clock)
 	, device_astrocade_ctrl_interface(mconfig, *this)
 	, m_cassette(*this, "cassette")

@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "scsi.h"
 
-scsi_port_device::scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+scsi_port_device::scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SCSI_PORT, tag, owner, clock),
 	m_bsy_handler(*this),
 	m_sel_handler(*this),
@@ -671,7 +671,7 @@ void scsi_port_device::set_output_latch(output_latch_device &latch)
 
 DEFINE_DEVICE_TYPE(SCSI_PORT, scsi_port_device, "scsi", "SCSI Port")
 
-scsi_port_slot_device::scsi_port_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+scsi_port_slot_device::scsi_port_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SCSI_PORT_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<scsi_port_interface>(mconfig, *this),
 	m_dev(nullptr),

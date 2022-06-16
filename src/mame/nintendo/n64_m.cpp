@@ -16,7 +16,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(N64PERIPH, n64_periphs, "n64_periphs", "N64 Peripheral Chips")
 
-n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, N64PERIPH, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_nvram_image(nullptr)
@@ -1018,7 +1018,7 @@ void n64_periphs::vi_recalculate_resolution()
 
 	rectangle visarea = screen().visible_area();
 	// DACRATE is the quarter pixel clock and period will be for a field, not a frame
-	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC) / 2;
+	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC.value()) / 2;
 
 	if (width <= 0 || height <= 0 || (vi_control & 3) == 0)
 	{
@@ -1294,7 +1294,7 @@ void n64_periphs::ai_dma()
 	ai_status |= 0x40000000;
 
 	// adjust the timer
-	period = attotime::from_hz(DACRATE_NTSC) * (ai_dacrate + 1) * (current->length / 4);
+	period = attotime::from_hz(DACRATE_NTSC.value()) * (ai_dacrate + 1) * (current->length / 4);
 	ai_timer->adjust(period);
 
 	if (((current->address + current->length) & 0x1FFF) == 0)
@@ -1334,7 +1334,7 @@ uint32_t n64_periphs::ai_reg_r(offs_t offset, uint32_t mem_mask)
 		{
 			if (ai_status & 0x40000000)
 			{
-				ret = 4 * (uint32_t)(ai_timer->remaining().as_double() * (double)DACRATE_NTSC / (double)(ai_dacrate + 1));
+				ret = 4 * (uint32_t)(ai_timer->remaining().as_double() * DACRATE_NTSC.dvalue() / (double)(ai_dacrate + 1));
 			}
 			else if (ai_status & 0x80000001)
 			{
@@ -1385,7 +1385,7 @@ void n64_periphs::ai_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case 0x10/4:        // AI_DACRATE_REG
 		{
 			ai_dacrate = data & 0x3fff;
-			const double frequency = (double)DACRATE_NTSC / (double)(ai_dacrate+1);
+			const double frequency = DACRATE_NTSC.dvalue() / (double)(ai_dacrate+1);
 
 			ai_dac[0]->set_frequency(frequency);
 			ai_dac[0]->enable(1);

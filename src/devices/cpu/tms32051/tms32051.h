@@ -57,7 +57,7 @@ class tms32051_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	uint16_t cpuregs_r(offs_t offset);
 	void cpuregs_w(offs_t offset, uint16_t data);
@@ -65,7 +65,7 @@ public:
 	void tms32051_internal_data(address_map &map);
 	void tms32051_internal_pgm(address_map &map);
 protected:
-	tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data);
+	tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor internal_pgm, address_map_constructor internal_data);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -373,7 +373,7 @@ class tms32053_device : public tms32051_device
 {
 public:
 	// construction/destruction
-	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void tms32053_internal_data(address_map &map);
 	void tms32053_internal_pgm(address_map &map);

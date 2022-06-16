@@ -60,7 +60,7 @@ enum
 //-------------------------------------------------
 
 bq48x2_device::bq48x2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, int memsize)
-	: device_t(mconfig, type, tag, owner, 0),
+	: device_t(mconfig, type, tag, owner),
 	  device_nvram_interface(mconfig, *this),
 	  device_rtc_interface(mconfig, *this),
 	  m_interrupt_cb(*this),
@@ -74,13 +74,13 @@ bq48x2_device::bq48x2_device(const machine_config &mconfig, device_type type, co
 //-------------------------------------------------
 
 // 128 KiB memory (including clock registers)
-bq4842_device::bq4842_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bq4842_device::bq4842_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bq48x2_device(mconfig, BQ4842, tag, owner, 128*1024)
 {
 }
 
 // 512 KiB memory (including clock registers)
-bq4852_device::bq4852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bq4852_device::bq4852_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bq48x2_device(mconfig, BQ4852, tag, owner, 512*1024)
 {
 }

@@ -745,7 +745,7 @@ void cgang_state::cgang(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cgang_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(cgang_state::nmi_line_pulse), attotime::from_hz(8_MHz_XTAL/4 / 0x1000));
 
-	PIT8253(config, m_pit[0], 0);
+	PIT8253(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(4_MHz_XTAL/4);
 	m_pit[0]->set_clk<1>(4_MHz_XTAL/4);
 	m_pit[0]->set_clk<2>(4_MHz_XTAL/4);
@@ -753,7 +753,7 @@ void cgang_state::cgang(machine_config &config)
 	m_pit[0]->out_handler<1>().set(FUNC(cgang_state::motor_clock_w<1>));
 	m_pit[0]->out_handler<2>().set(FUNC(cgang_state::motor_clock_w<2>));
 
-	PIT8253(config, m_pit[1], 0);
+	PIT8253(config, m_pit[1]);
 	m_pit[1]->set_clk<0>(4_MHz_XTAL/4);
 	m_pit[1]->set_clk<1>(4_MHz_XTAL/4);
 	m_pit[1]->set_clk<2>(4_MHz_XTAL/4);

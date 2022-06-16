@@ -149,7 +149,7 @@ to a 1602A or 1702A PROM (15 millisecond cycle time).
 class intel_imm6_76_device : public device_t, public device_image_interface
 {
 public:
-	intel_imm6_76_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	intel_imm6_76_device(machine_config const &mconfig, char const *tag, device_t *owner, const XTAL &clock);
 
 	// device_image_interface implementation
 	virtual image_init_result call_load() override;

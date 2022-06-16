@@ -143,7 +143,7 @@ DECOSPR_COLOUR_CB_MEMBER(decospr_device::default_col_cb)
 
 DEFINE_DEVICE_TYPE(DECO_SPRITE, decospr_device, "decospr", "DECO 52 Sprite")
 
-decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DECO_SPRITE, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_gfxregion(0)

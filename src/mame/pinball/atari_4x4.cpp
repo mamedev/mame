@@ -87,7 +87,7 @@ void atari_4x4_state::machine_reset()
 void atari_4x4_state::fourx4(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1'000'000);  // guess
+	M6502(config, m_maincpu, XTAL::u(1'000'000));  // guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &atari_4x4_state::mem_map);
 
 	/* Video */
@@ -96,8 +96,8 @@ void atari_4x4_state::fourx4(machine_config &config)
 	/* Sound */
 	genpin_audio(config);
 	//SPEAKER(config, "speaker").front_center();
-	//DAC_4BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // r23-r26 (68k,33k,18k,8.2k)
-	//DAC_3BIT_BINARY_WEIGHTED(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // r18-r20 (100k,47k,100k)
+	//DAC_4BIT_BINARY_WEIGHTED(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.15); // r23-r26 (68k,33k,18k,8.2k)
+	//DAC_3BIT_BINARY_WEIGHTED(config, m_dac1).add_route(ALL_OUTPUTS, "speaker", 0.15); // r18-r20 (100k,47k,100k)
 	//TIMER(config, "timer_s").configure_periodic(FUNC(atari_s2_state::timer_s), attotime::from_hz(150000));
 }
 

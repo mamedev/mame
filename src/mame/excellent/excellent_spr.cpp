@@ -22,7 +22,7 @@
 
 DEFINE_DEVICE_TYPE(EXCELLENT_SPRITE, excellent_spr_device, "excellent_spr", "Excellent 8-bit Sprite")
 
-excellent_spr_device::excellent_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+excellent_spr_device::excellent_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, EXCELLENT_SPRITE, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, device_video_interface(mconfig, *this)

@@ -61,7 +61,7 @@ INPUT_PORTS_END
 
 void silverball_state::silverball(machine_config &config)
 {
-	PENTIUM(config, m_maincpu, 133'000'000);
+	PENTIUM(config, m_maincpu, XTAL::u(133'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &silverball_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &silverball_state::io_map);
 }

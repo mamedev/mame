@@ -278,20 +278,20 @@ const at_keyboard_device::extended_keyboard_code at_keyboard_device::m_extended_
 DEFINE_DEVICE_TYPE(PC_KEYB, pc_keyboard_device, "pc_keyb", "PC Keyboard")
 DEFINE_DEVICE_TYPE(AT_KEYB, at_keyboard_device, "at_keyb", "AT Keyboard")
 
-pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pc_keyboard_device(mconfig, PC_KEYB, tag, owner, clock)
 {
 	m_type = KEYBOARD_TYPE::PC;
 }
 
-pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_ioport(*this, "pc_keyboard_%u", 0),
 	m_out_keypress_func(*this)
 {
 }
 
-at_keyboard_device::at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+at_keyboard_device::at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pc_keyboard_device(mconfig, AT_KEYB, tag, owner, clock),
 	m_leds(*this, "led%u", 0U),
 	m_scan_code_set(1)

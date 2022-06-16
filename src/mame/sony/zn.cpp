@@ -154,10 +154,10 @@ void zn_state::zn_1mb_vram(machine_config &config)
 	sio0.sck_handler().append(m_znmcu, FUNC(znmcu_device::write_clock));
 	sio0.txd_handler().set(m_cat702[0], FUNC(cat702_device::write_datain));
 
-	CAT702(config, m_cat702[0], 0);
+	CAT702(config, m_cat702[0]);
 	m_cat702[0]->dataout_handler().set(FUNC(zn_state::cat702_dataout<0>));
 
-	ZNMCU(config, m_znmcu, 0);
+	ZNMCU(config, m_znmcu);
 	m_znmcu->dataout_handler().set(FUNC(zn_state::znmcu_dataout));
 	m_znmcu->dsr_handler().set("maincpu:sio0", FUNC(psxsio0_device::write_dsr));
 	m_znmcu->dsw_handler().set_ioport("DSW");
@@ -177,7 +177,7 @@ void zn_state::zn_1mb_vram(machine_config &config)
 	m_spu->add_route(0, "lspeaker", 0.35);
 	m_spu->add_route(1, "rspeaker", 0.35);
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 }
 
 void zn_state::zn_2mb_vram(machine_config &config)
@@ -199,10 +199,10 @@ void zn_state::zn2(machine_config &config)
 	sio0.sck_handler().append(m_znmcu, FUNC(znmcu_device::write_clock));
 	sio0.txd_handler().set(m_cat702[0], FUNC(cat702_device::write_datain));
 
-	CAT702(config, m_cat702[0], 0);
+	CAT702(config, m_cat702[0]);
 	m_cat702[0]->dataout_handler().set(FUNC(zn_state::cat702_dataout<0>));
 
-	ZNMCU(config, m_znmcu, 0);
+	ZNMCU(config, m_znmcu);
 	m_znmcu->dataout_handler().set(FUNC(zn_state::znmcu_dataout));
 	m_znmcu->dsr_handler().set("maincpu:sio0", FUNC(psxsio0_device::write_dsr));
 	m_znmcu->dsw_handler().set_ioport("DSW");
@@ -222,7 +222,7 @@ void zn_state::zn2(machine_config &config)
 	m_spu->add_route(0, "lspeaker", 0.35);
 	m_spu->add_route(1, "rspeaker", 0.35);
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 }
 
 void zn_state::gameboard_cat702(machine_config &config)
@@ -231,7 +231,7 @@ void zn_state::gameboard_cat702(machine_config &config)
 	sio0.sck_handler().append(m_cat702[1], FUNC(cat702_device::write_clock));
 	sio0.txd_handler().append(m_cat702[1], FUNC(cat702_device::write_datain));
 
-	CAT702(config, m_cat702[1], 0);
+	CAT702(config, m_cat702[1]);
 	m_cat702[1]->dataout_handler().set(FUNC(zn_state::cat702_dataout<1>));
 }
 
@@ -900,7 +900,7 @@ void taito_fx1a_state::coh1000ta(machine_config &config)
 
 	MB3773(config, m_mb3773);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
@@ -1456,7 +1456,7 @@ void beastrzrb_state::beastrzrb(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_LOW)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1000000), okim6295_device::PIN7_LOW)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	oki.set_addrmap(0, &beastrzrb_state::oki_map);
@@ -1951,7 +1951,7 @@ void nbajamex_state::nbajamex(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "nbajamex_bankmap").set_map(&nbajamex_state::bank_map).set_options(ENDIANNESS_LITTLE, 32, 24, 0x800000);
 
-	ACCLAIM_RAX(config, m_rax, 0);
+	ACCLAIM_RAX(config, m_rax);
 }
 
 void jdredd_state::jdredd(machine_config &config)
@@ -2394,7 +2394,7 @@ void tecmo_zn_state::link_port_map(address_map &map)
 void tecmo_zn_state::coh1002ml(machine_config &config)
 {
 	coh1002m(config);
-	z80_device &link(Z80(config, "link", 4000000)); // ?
+	z80_device &link(Z80(config, "link", XTAL::u(4000000))); // ?
 	link.set_addrmap(AS_PROGRAM, &tecmo_zn_state::link_map);
 	link.set_addrmap(AS_IO, &tecmo_zn_state::link_port_map);
 }

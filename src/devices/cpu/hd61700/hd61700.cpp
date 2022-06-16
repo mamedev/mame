@@ -102,7 +102,7 @@ DEFINE_DEVICE_TYPE(HD61700, hd61700_cpu_device, "hd61700", "Hitachi HD61700")
 //  hd61700_cpu_device - constructor
 //-------------------------------------------------
 
-hd61700_cpu_device::hd61700_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd61700_cpu_device::hd61700_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: cpu_device(mconfig, HD61700, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 18, -1)
 	, m_ppc(0x0000)

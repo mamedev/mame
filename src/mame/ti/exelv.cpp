@@ -858,21 +858,21 @@ void exelv_state::exl100(machine_config &config)
 
 	TIMER(config, m_timer_k).configure_generic(FUNC(exelv_state::timer_k));
 
-	//SPEECHROM(config, "vsm", 0);
+	//SPEECHROM(config, "vsm");
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
 	// The cassette output is connected into the audio circuit
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	TMS5220C(config, m_tms5220c, 640000);
+	TMS5220C(config, m_tms5220c, XTAL::u(640000));
 	// m_tms5220c->set_speechrom_tag("vsm");
 	m_tms5220c->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "exelvision_cart", "bin,rom");
 
-	CASSETTE(config, m_cass, 0);
+	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
@@ -921,7 +921,7 @@ void exelv_state::exeltel(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
-	SPEECHROM(config, "vsm", 0);
+	SPEECHROM(config, "vsm");
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();

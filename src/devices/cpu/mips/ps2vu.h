@@ -98,7 +98,7 @@ protected:
 		CHIP_TYPE_VU1,
 	};
 
-	sonyvu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor micro_cons, address_map_constructor vu_cons, chip_type chiptype, uint32_t mem_size);
+	sonyvu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor micro_cons, address_map_constructor vu_cons, chip_type chiptype, uint32_t mem_size);
 
 	enum : uint64_t
 	{
@@ -178,13 +178,13 @@ class sonyvu1_device : public sonyvu_device
 {
 public:
 	template <typename T>
-	sonyvu1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gs_tag)
+	sonyvu1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&gs_tag)
 		: sonyvu1_device(mconfig, tag, owner, clock)
 	{
 		m_gs.set_tag(std::forward<T>(gs_tag));
 	}
 
-	sonyvu1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sonyvu1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	ps2_vif1_device* interface();
 
@@ -213,13 +213,13 @@ class sonyvu0_device : public sonyvu_device
 {
 public:
 	template <typename T>
-	sonyvu0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&vu1_tag)
+	sonyvu0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&vu1_tag)
 		: sonyvu0_device(mconfig, tag, owner, clock)
 	{
 		m_vu1.set_tag(std::forward<T>(vu1_tag));
 	}
 
-	sonyvu0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sonyvu0_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	virtual void device_start() override;

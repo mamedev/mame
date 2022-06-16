@@ -74,7 +74,7 @@ DEFINE_DEVICE_TYPE(AMS40041, ams40041_device, "ams40041", "AMS40041 VDU")
 //  ams40041_device - constructor
 //-------------------------------------------------
 
-ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mc6845_device(mconfig, AMS40041, tag, owner, clock)
 	, m_char_rom(*this, DEVICE_SELF)
 	, m_lk(*this, "^LK") // hack

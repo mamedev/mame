@@ -20,7 +20,7 @@ class switchable_rom_device : public device_t, public device_rc2014_card_interfa
 {
 public:
 	// construction/destruction
-	switchable_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	switchable_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -33,7 +33,7 @@ private:
 	required_ioport m_rom_selector;
 };
 
-switchable_rom_device::switchable_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+switchable_rom_device::switchable_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RC2014_SWITCHABLE_ROM, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_rom(*this, "rom")
@@ -112,7 +112,7 @@ class pagable_rom_device : public device_t, public device_rc2014_ext_card_interf
 {
 public:
 	// construction/destruction
-	pagable_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pagable_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -135,7 +135,7 @@ private:
 	required_ioport_array<6> m_page_addr_conf;
 };
 
-pagable_rom_device::pagable_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+pagable_rom_device::pagable_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RC2014_PAGABLE_ROM, tag, owner, clock)
 	, device_rc2014_ext_card_interface(mconfig, *this)
 	, m_bank(0)

@@ -11,7 +11,7 @@ void usb_ohci_device::map(address_map &map)
 {
 }
 
-usb_ohci_device::usb_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+usb_ohci_device::usb_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, USB_OHCI, tag, owner, clock)
 {
 }
@@ -31,7 +31,7 @@ void usb_uhci_device::map(address_map &map)
 {
 }
 
-usb_uhci_device::usb_uhci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+usb_uhci_device::usb_uhci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, USB_UHCI, tag, owner, clock)
 {
 }
@@ -51,7 +51,7 @@ void usb_ehci_device::map(address_map &map)
 {
 }
 
-usb_ehci_device::usb_ehci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+usb_ehci_device::usb_ehci_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: pci_device(mconfig, USB_EHCI, tag, owner, clock)
 {
 }

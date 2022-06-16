@@ -232,7 +232,7 @@ void sh1_device::sh7032_map(address_map &map)
 	map(0x05fffe00, 0x05ffffff).rw(FUNC(sh1_device::sh7032_r), FUNC(sh1_device::sh7032_w)); // SH-7032H internal i/o
 }
 
-sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sh2_device(mconfig, SH2, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh2_device::sh7604_map), this), 32)
 {
 }
@@ -249,7 +249,7 @@ void sh2_device::device_stop()
 
 
 
-sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines)
+sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, int cpu_type, address_map_constructor internal_map, int addrlines)
 	: sh_common_execution(mconfig, type, tag, owner, clock, ENDIANNESS_BIG, internal_map)
 	, m_program_config("program", ENDIANNESS_BIG, 32, addrlines, 0, internal_map)
 	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, addrlines, 0)
@@ -265,13 +265,13 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	m_isdrc = allow_drc();
 }
 
-sh2a_device::sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sh2a_device::sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sh2_device(mconfig, SH2A, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh2a_device::sh7021_map), this), 28)
 {
 	std::fill(std::begin(m_sh7021_regs), std::end(m_sh7021_regs), 0);
 }
 
-sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: sh2_device(mconfig, SH1, tag, owner, clock, CPU_TYPE_SH1, address_map_constructor(FUNC(sh1_device::sh7032_map), this), 28)
 {
 	std::fill(std::begin(m_sh7032_regs), std::end(m_sh7032_regs), 0);

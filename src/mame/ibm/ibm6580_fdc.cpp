@@ -37,7 +37,7 @@ void dw_fdc_device::device_add_mconfig(machine_config &config)
 //  m_mcu->t0_in_cb().set(FUNC(dw_fdc_device::t0_r));
 	m_mcu->t1_in_cb().set(FUNC(dw_fdc_device::t1_r));
 
-	I8255(config, "ppi8255", 0);
+	I8255(config, "ppi8255");
 
 	UPD765A(config, "upd765", 24_MHz_XTAL / 3, false, false);
 //  m_upd_fdc->intrq_wr_callback().set("pic8259", FUNC(pic8259_device::ir4_w));
@@ -47,7 +47,7 @@ void dw_fdc_device::device_add_mconfig(machine_config &config)
 }
 
 
-dw_fdc_device::dw_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dw_fdc_device::dw_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, DW_FDC, tag, owner, clock)
 	, m_out_data(*this)
 	, m_out_clock(*this)

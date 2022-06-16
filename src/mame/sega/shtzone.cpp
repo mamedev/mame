@@ -333,7 +333,7 @@ void shtzone_state::shtzone(machine_config &config)
 	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	BEEP(config, m_buzzer, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_buzzer, XTAL::u(1000)).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	for (int i = 1; i < 5; i++)
 		SMS_CART_SLOT(config, m_slots[i], sms_cart, nullptr);

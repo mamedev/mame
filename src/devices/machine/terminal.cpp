@@ -143,7 +143,7 @@ static const uint8_t terminal_font[256*16] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned w, unsigned h)
+generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, unsigned w, unsigned h)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_io_term_conf(*this, "TERM_CONF")
 	, m_width(w)
@@ -158,7 +158,7 @@ generic_terminal_device::generic_terminal_device(const machine_config &mconfig, 
 {
 }
 
-generic_terminal_device::generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+generic_terminal_device::generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: generic_terminal_device(mconfig, GENERIC_TERMINAL, tag, owner, clock, TERMINAL_WIDTH, TERMINAL_HEIGHT)
 {
 }
@@ -335,11 +335,11 @@ void generic_terminal_device::device_add_mconfig(machine_config &config)
 	screen.set_visarea(0, generic_terminal_device::TERMINAL_WIDTH*8-1, 0, generic_terminal_device::TERMINAL_HEIGHT*10-1);
 	screen.set_screen_update(FUNC(generic_terminal_device::update));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG));
 	keyboard.set_keyboard_callback(FUNC(generic_terminal_device::kbd_put));
 
 	SPEAKER(config, "bell").front_center();
-	BEEP(config, m_beeper, 2'000);
+	BEEP(config, m_beeper, XTAL::u(2'000));
 	m_beeper->add_route(ALL_OUTPUTS, "bell", 0.25);
 }
 

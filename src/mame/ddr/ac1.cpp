@@ -331,7 +331,7 @@ void ac1_state::ac1(machine_config &config)
 	pio.in_pb_callback().set(FUNC(ac1_state::ac1_port_b_r));
 	pio.out_pb_callback().set(FUNC(ac1_state::ac1_port_b_w));
 
-	Z80CTC(config, "ctc", 8'000'000 / 4); // all connections go external
+	Z80CTC(config, "ctc", XTAL::u(8'000'000) / 4); // all connections go external
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

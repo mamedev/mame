@@ -17,7 +17,7 @@ class isa16_3c505_device
 	, public device_isa16_card_interface
 {
 public:
-	isa16_3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	isa16_3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device_t overrides

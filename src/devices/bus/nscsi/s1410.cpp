@@ -13,7 +13,7 @@
 
 DEFINE_DEVICE_TYPE(NSCSI_S1410, nscsi_s1410_device, "scsi_s1410", "Xebec S1410 5.25 Inch Winchester Disk Controller")
 
-nscsi_s1410_device::nscsi_s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nscsi_s1410_device::nscsi_s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	nscsi_harddisk_device(mconfig, NSCSI_S1410, tag, owner, clock)
 {
 }

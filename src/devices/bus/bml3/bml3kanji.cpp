@@ -59,7 +59,7 @@ void bml3bus_kanji_device::bml3_kanji_w(offs_t offset, uint8_t data)
 //  LIVE DEVICE
 //**************************************************************************
 
-bml3bus_kanji_device::bml3bus_kanji_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+bml3bus_kanji_device::bml3bus_kanji_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, BML3BUS_KANJI, tag, owner, clock),
 	device_bml3bus_card_interface(mconfig, *this), m_kanji_addr(0), m_rom(nullptr)
 {

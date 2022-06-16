@@ -256,7 +256,7 @@ INPUT_PORTS_END
 void ecoinf1_state::ecoinf1_older(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, XTAL::u(4000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinf1_state::older_memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinf1_state::older_portmap);
 }

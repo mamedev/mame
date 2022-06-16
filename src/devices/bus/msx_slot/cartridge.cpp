@@ -33,13 +33,13 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_CARTRIDGE,        msx_slot_cartridge_device,        
 DEFINE_DEVICE_TYPE(MSX_SLOT_YAMAHA_EXPANSION, msx_slot_yamaha_expansion_device, "msx_slot_yamaha_expansion", "MSX Yamaha Expansion slot")
 
 
-msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_cartridge_device(mconfig, MSX_SLOT_CARTRIDGE, tag, owner, clock)
 {
 }
 
 
-msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cartrom_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
@@ -361,7 +361,7 @@ void msx_slot_cartridge_device::write(offs_t offset, uint8_t data)
 
 
 
-msx_slot_yamaha_expansion_device::msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+msx_slot_yamaha_expansion_device::msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msx_slot_cartridge_device(mconfig, MSX_SLOT_YAMAHA_EXPANSION, tag, owner, clock)
 {
 }

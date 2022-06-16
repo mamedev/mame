@@ -133,7 +133,7 @@
 
 DEFINE_DEVICE_TYPE(LC89510_TEMP, lc89510_temp_device, "lc89510_temp", "lc89510_temp_device")
 
-lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, LC89510_TEMP, tag, owner, clock)
 	, m_segacd_dma_callback(*this, FUNC(lc89510_temp_device::Fake_CDC_Do_DMA))
 	, m_type1_interrupt_callback(*this, FUNC(lc89510_temp_device::dummy_interrupt_callback))

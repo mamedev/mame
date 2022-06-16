@@ -41,7 +41,7 @@ public:
 
 protected:
 	// construction/destruction
-	generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -65,7 +65,7 @@ class generic_latch_8_device : public generic_latch_base_device
 {
 public:
 	// construction/destruction
-	generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	u8 read();
 	void write(u8 data);
@@ -91,7 +91,7 @@ class generic_latch_16_device : public generic_latch_base_device
 {
 public:
 	// construction/destruction
-	generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	u16 read();
 	void write(u16 data);

@@ -1083,7 +1083,7 @@ void gladiatr_state::gladiatr(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);  /* vclk input mode */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	LS259(config, "filtlatch", 0); // 9R - filters on sound output
+	LS259(config, "filtlatch"); // 9R - filters on sound output
 }
 
 void gladiatr_state::greatgur(machine_config &config)

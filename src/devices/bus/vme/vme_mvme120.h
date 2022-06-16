@@ -31,7 +31,7 @@ public:
 		mvme123_board
 	};
 
-	vme_mvme120_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mvme12x_variant board_id);
+	vme_mvme120_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, mvme12x_variant board_id);
 
 	// Switch and jumper handlers
 	DECLARE_INPUT_CHANGED_MEMBER(s3_autoboot);
@@ -95,10 +95,10 @@ protected:
 class vme_mvme120_card_device : public vme_mvme120_device
 {
 public:
-	vme_mvme120_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_mvme120_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	vme_mvme120_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	vme_mvme120_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_mvme120_device(mconfig, type, tag, owner, clock, mvme120_board)
 	{ }
 
@@ -109,10 +109,10 @@ protected:
 class vme_mvme121_card_device : public vme_mvme120_device
 {
 public:
-	vme_mvme121_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_mvme121_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	vme_mvme121_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	vme_mvme121_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_mvme120_device(mconfig, type, tag, owner, clock, mvme121_board)
 	{ }
 
@@ -124,10 +124,10 @@ protected:
 class vme_mvme122_card_device : public vme_mvme120_device
 {
 public:
-	vme_mvme122_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_mvme122_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	vme_mvme122_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	vme_mvme122_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_mvme120_device(mconfig, type, tag, owner, clock, mvme122_board)
 	{ }
 
@@ -139,10 +139,10 @@ protected:
 class vme_mvme123_card_device : public vme_mvme120_device
 {
 public:
-	vme_mvme123_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_mvme123_card_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	vme_mvme123_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	vme_mvme123_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 		: vme_mvme120_device(mconfig, type, tag, owner, clock, mvme123_board)
 	{ }
 

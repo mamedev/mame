@@ -50,17 +50,17 @@ void interpro_fmcc_device::map(address_map &map)
 DEFINE_DEVICE_TYPE(INTERPRO_MCGA, interpro_mcga_device, "mcga", "Memory Controller Gate Array")
 DEFINE_DEVICE_TYPE(INTERPRO_FMCC, interpro_fmcc_device, "fmcc", "Fast Memory Control Chip")
 
-interpro_mcga_device::interpro_mcga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+interpro_mcga_device::interpro_mcga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 {
 }
 
-interpro_mcga_device::interpro_mcga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+interpro_mcga_device::interpro_mcga_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: interpro_mcga_device(mconfig, INTERPRO_MCGA, tag, owner, clock)
 {
 }
 
-interpro_fmcc_device::interpro_fmcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+interpro_fmcc_device::interpro_fmcc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: interpro_mcga_device(mconfig, INTERPRO_FMCC, tag, owner, clock)
 {
 }

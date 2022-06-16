@@ -51,7 +51,7 @@ class arm7_cpu_device : public cpu_device, public arm7_disassembler::config
 {
 public:
 	// construction/destruction
-	arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_high_vectors() { m_vectorbase = 0xffff0000; }
 
@@ -113,7 +113,7 @@ protected:
 		ARM9_COPRO_ID_MFR_INTEL = 0x69 << 24
 	};
 
-	arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness);
+	arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness);
 
 	void postload();
 
@@ -622,7 +622,7 @@ class arm7_be_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	arm7_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm7_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -630,31 +630,31 @@ class arm7500_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class arm710a_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class arm710t_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	arm710t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm710t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class arm9_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	arm9_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm9_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	arm9_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness);
+	arm9_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness);
 };
 
 
@@ -662,7 +662,7 @@ class arm920t_cpu_device : public arm9_cpu_device
 {
 public:
 	// construction/destruction
-	arm920t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm920t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 
@@ -670,7 +670,7 @@ class arm946es_cpu_device : public arm9_cpu_device
 {
 public:
 	// construction/destruction
-	arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// 946E-S has Protection Unit instead of ARM MMU so CP15 is quite different
 	virtual uint32_t arm7_rt_r_callback(offs_t offset) override;
@@ -684,7 +684,7 @@ public:
 	virtual uint8_t arm7_cpu_read8(uint32_t addr) override;
 
 protected:
-	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 
@@ -701,17 +701,17 @@ class arm11_cpu_device : public arm9_cpu_device
 {
 public:
 	// construction/destruction
-	arm11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	arm11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness);
+	arm11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness);
 };
 
 class arm1176jzf_s_cpu_device : public arm11_cpu_device
 {
 public:
 	// construction/destruction
-	arm1176jzf_s_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arm1176jzf_s_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint32_t arm7_rt_r_callback(offs_t offset) override;
 	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data) override;
@@ -724,35 +724,35 @@ class igs036_cpu_device : public arm946es_cpu_device
 {
 public:
 	// construction/destruction
-	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class pxa250_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	pxa250_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pxa250_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class pxa255_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class pxa270_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	pxa270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pxa270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class sa1110_cpu_device : public arm7_cpu_device
 {
 public:
 	// construction/destruction
-	sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 DECLARE_DEVICE_TYPE(ARM7,         arm7_cpu_device)

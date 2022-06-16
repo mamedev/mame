@@ -46,17 +46,17 @@ DEFINE_DEVICE_TYPE(PIT8253, pit8253_device, "pit8253", "Intel 8253 PIT")
 DEFINE_DEVICE_TYPE(PIT8254, pit8254_device, "pit8254", "Intel 8254 PIT")
 DEFINE_DEVICE_TYPE(FE2010_PIT, fe2010_pit_device, "fe2010_pit", "Faraday FE2010 PIT")
 
-pit_counter_device::pit_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pit_counter_device::pit_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PIT_COUNTER, tag, owner, clock)
 {
 }
 
-pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pit8253_device(mconfig, PIT8253, tag, owner, clock, pit_type::I8253)
 {
 }
 
-pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, pit_type chip_type) :
+pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, pit_type chip_type) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_clk{0, 0, 0},
 	m_out_handler(*this),
@@ -66,12 +66,12 @@ pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, 
 }
 
 
-pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pit8253_device(mconfig, PIT8254, tag, owner, clock, pit_type::I8254)
 {
 }
 
-fe2010_pit_device::fe2010_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+fe2010_pit_device::fe2010_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	pit8253_device(mconfig, FE2010_PIT, tag, owner, clock, pit_type::FE2010)
 {
 }
@@ -82,9 +82,9 @@ fe2010_pit_device::fe2010_pit_device(const machine_config &mconfig, const char *
 
 void pit8253_device::device_add_mconfig(machine_config &config)
 {
-	PIT_COUNTER(config, "counter0", 0);
-	PIT_COUNTER(config, "counter1", 0);
-	PIT_COUNTER(config, "counter2", 0);
+	PIT_COUNTER(config, "counter0");
+	PIT_COUNTER(config, "counter1");
+	PIT_COUNTER(config, "counter2");
 }
 
 

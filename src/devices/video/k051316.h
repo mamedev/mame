@@ -16,7 +16,7 @@ class k051316_device : public device_t, public device_gfx_interface
 public:
 	using zoom_delegate = device_delegate<void (int *code, int *color)>;
 
-	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	static const gfx_layout charlayout4;
 	static const gfx_layout charlayout7;

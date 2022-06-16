@@ -78,7 +78,7 @@ inline void cdp1862_device::initialize_palette()
 //  cdp1862_device - constructor
 //-------------------------------------------------
 
-cdp1862_device::cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cdp1862_device::cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, CDP1862, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_read_rd(*this),

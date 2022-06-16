@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(APPLE2_COMMON, apple2_common_device, "apple2com", "Apple II C
 //  apple2_common_device - constructor
 //-------------------------------------------------
 
-apple2_common_device::apple2_common_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+apple2_common_device::apple2_common_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, APPLE2_COMMON, tag, owner, clock),
 	m_GScpu(*this, finder_base::DUMMY_TAG)
 {

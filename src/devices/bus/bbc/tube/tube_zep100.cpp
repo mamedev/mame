@@ -111,7 +111,7 @@ void bbc_tube_zep100_device::device_add_mconfig(machine_config &config)
 	m_via->ca2_handler().set(m_ppi, FUNC(i8255_device::pc6_w));
 	m_via->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));
 
-	I8255A(config, m_ppi, 0);
+	I8255A(config, m_ppi);
 	m_ppi->out_pa_callback().set(m_via, FUNC(via6522_device::write_pa));
 	m_ppi->in_pb_callback().set(FUNC(bbc_tube_zep100_device::ppi_pb_r));
 	m_ppi->out_pc_callback().set(FUNC(bbc_tube_zep100_device::ppi_pc_w));
@@ -152,7 +152,7 @@ const tiny_rom_entry *bbc_tube_zep100m_device::device_rom_region() const
 //  bbc_tube_zep100_device - constructor
 //-------------------------------------------------
 
-bbc_tube_zep100_device::bbc_tube_zep100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_zep100_device::bbc_tube_zep100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_tube_interface(mconfig, *this)
 	, m_rom_enabled(true)
@@ -164,22 +164,22 @@ bbc_tube_zep100_device::bbc_tube_zep100_device(const machine_config &mconfig, de
 {
 }
 
-bbc_tube_zep100_device::bbc_tube_zep100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_zep100_device::bbc_tube_zep100_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_zep100_device(mconfig, BBC_TUBE_ZEP100, tag, owner, clock)
 {
 }
 
-bbc_tube_zep100l_device::bbc_tube_zep100l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_zep100l_device::bbc_tube_zep100l_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_zep100_device(mconfig, BBC_TUBE_ZEP100L, tag, owner, clock)
 {
 }
 
-bbc_tube_zep100w_device::bbc_tube_zep100w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_zep100w_device::bbc_tube_zep100w_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_zep100_device(mconfig, BBC_TUBE_ZEP100W, tag, owner, clock)
 {
 }
 
-bbc_tube_zep100m_device::bbc_tube_zep100m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_tube_zep100m_device::bbc_tube_zep100m_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: bbc_tube_zep100_device(mconfig, BBC_TUBE_ZEP100M, tag, owner, clock)
 {
 }

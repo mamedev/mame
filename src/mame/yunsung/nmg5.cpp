@@ -985,11 +985,11 @@ void nmg5_state::machine_reset()
 void nmg5_state::nmg5(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);    /* 16 MHz */
+	M68000(config, m_maincpu, XTAL::u(16000000));    /* 16 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmg5_state::nmg5_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nmg5_state::irq6_line_hold));
 
-	Z80(config, m_soundcpu, 4000000);       /* 4 MHz */
+	Z80(config, m_soundcpu, XTAL::u(4000000));       /* 4 MHz */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &nmg5_state::nmg5_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &nmg5_state::sound_io_map);
 
@@ -1005,7 +1005,7 @@ void nmg5_state::nmg5(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_nmg5);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x400);
 
-	DECO_SPRITE(config, m_sprgen, 0);
+	DECO_SPRITE(config, m_sprgen);
 	m_sprgen->set_gfx_region(1);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_flipallx(1);
@@ -1017,11 +1017,11 @@ void nmg5_state::nmg5(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 4000000)); /* 4MHz */
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL::u(4000000))); /* 4MHz */
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, m_oki, 1000000 , okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, XTAL::u(1000000) , okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

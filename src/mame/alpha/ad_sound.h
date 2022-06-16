@@ -35,7 +35,7 @@ class ad_59mc07_device : public device_t
 {
 public:
 	// construction/destruction
-	ad_59mc07_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	ad_59mc07_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	void sound_command_w(uint8_t data) { m_soundlatch->write(data); }
 
@@ -106,7 +106,7 @@ class ad_60mc01_device : public device_t
 {
 public:
 	// construction/destruction
-	ad_60mc01_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	ad_60mc01_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; } // TODO: fix interrupts, missing music?
 

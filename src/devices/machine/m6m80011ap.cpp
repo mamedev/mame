@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(M6M80011AP, m6m80011ap_device, "m6m80011ap", "M6M80011AP EEPR
 //  m6m80011ap_device - constructor
 //-------------------------------------------------
 
-m6m80011ap_device::m6m80011ap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+m6m80011ap_device::m6m80011ap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, M6M80011AP, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_latch(0), m_reset_line(0), m_cmd_stream_pos(0), m_current_cmd(0), m_read_latch(0), m_current_addr(0), m_eeprom_we(0), m_eeprom_state()

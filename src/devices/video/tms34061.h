@@ -31,7 +31,7 @@ public:
 	};
 
 	// construction/destruction
-	tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	void set_rowshift(u8 rowshift) { m_rowshift = rowshift; }
 	void set_vram_size(u32 vramsize) { m_vramsize = vramsize; }

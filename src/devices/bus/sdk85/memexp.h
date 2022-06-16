@@ -33,9 +33,9 @@ class sdk85_romexp_device : public device_t,
 {
 public:
 	// construction/destruction
-	sdk85_romexp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sdk85_romexp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 	template <typename T>
-	sdk85_romexp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&opts, const char *dflt)
+	sdk85_romexp_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&opts, const char *dflt)
 		: sdk85_romexp_device(mconfig, tag, owner, clock)
 	{
 		option_reset();

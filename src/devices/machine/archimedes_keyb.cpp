@@ -230,7 +230,7 @@ ioport_constructor archimedes_keyboard_device::device_input_ports() const
 //  archimedes_keyboard_device - constructor
 //-------------------------------------------------
 
-archimedes_keyboard_device::archimedes_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+archimedes_keyboard_device::archimedes_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, ARCHIMEDES_KEYBOARD, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_mcu(*this, "mcu")
@@ -252,7 +252,7 @@ void archimedes_keyboard_device::device_start()
 {
 	// KART interface
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
-	set_rate(31250);
+	set_rate(XTAL::u(31250));
 
 	m_mouse_timer = timer_alloc(FUNC(archimedes_keyboard_device::update_mouse), this);
 

@@ -16,7 +16,7 @@ class duart_base_device;
 class duart_channel : public device_t, public device_serial_interface
 {
 public:
-	duart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	duart_channel(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -98,7 +98,6 @@ public:
 	optional_device<duart_channel> m_chanD;
 
 	// inline configuration helpers
-	void set_clocks(int clk3, int clk4, int clk5, int clk6);
 	void set_clocks(const XTAL &clk3, const XTAL &clk4, const XTAL &clk5, const XTAL &clk6) {
 		set_clocks(clk3.value(), clk4.value(), clk5.value(), clk6.value());
 	}
@@ -128,7 +127,7 @@ public:
 	bool irq_pending() const { return (ISR & IMR) != 0; }
 
 protected:
-	duart_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	duart_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -167,6 +166,7 @@ private:
 
 	bool m_irq_state;
 
+	void set_clocks(int clk3, int clk4, int clk5, int clk6);
 	uint32_t get_ct_rate();
 	uint16_t get_ct_count();
 	void start_ct(int count);
@@ -198,13 +198,13 @@ private:
 class scn2681_device : public duart_base_device
 {
 public:
-	scn2681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scn2681_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 };
 
 class mc68681_device : public duart_base_device
 {
 public:
-	mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -214,7 +214,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void update_interrupts() override;
-	mc68681_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mc68681_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	bool m_read_vector; // if this is read and IRQ is active, it counts as pulling IACK
@@ -225,7 +225,7 @@ private:
 class sc28c94_device : public duart_base_device
 {
 public:
-	sc28c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sc28c94_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	auto c_tx_cb() { return write_c_tx.bind(); }
 	auto d_tx_cb() { return write_d_tx.bind(); }
@@ -245,14 +245,14 @@ private:
 class mc68340_duart_device : public duart_base_device
 {
 public:
-	mc68340_duart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc68340_duart_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-	mc68340_duart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mc68340_duart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 private:
 	virtual int calc_baud(int ch, bool rx, uint8_t data) override;
@@ -261,7 +261,7 @@ private:
 class xr68c681_device : public mc68681_device
 {
 public:
-	xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;

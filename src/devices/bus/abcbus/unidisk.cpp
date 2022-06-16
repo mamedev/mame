@@ -75,7 +75,7 @@ void abc_unidisk_device::unidisk_io(address_map &map)
 
 void abc_unidisk_device::device_add_mconfig(machine_config &config)
 {
-	TMS9995(config, m_maincpu, 12000000);
+	TMS9995(config, m_maincpu, XTAL::u(12000000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc_unidisk_device::unidisk_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc_unidisk_device::unidisk_io);
 }
@@ -108,7 +108,7 @@ ioport_constructor abc_unidisk_device::device_input_ports() const
 //  abc_unidisk_device - constructor
 //-------------------------------------------------
 
-abc_unidisk_device::abc_unidisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+abc_unidisk_device::abc_unidisk_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ABC_UNIDISK, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	m_maincpu(*this, TMS9995_TAG)

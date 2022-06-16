@@ -90,12 +90,12 @@ DEFINE_DEVICE_TYPE(DMV_K235, dmv_k235_device, "dmv_k235", "K235 8088 with interr
 //  dmv_k230_device - constructor
 //-------------------------------------------------
 
-dmv_k230_device::dmv_k230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k230_device::dmv_k230_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_k230_device(mconfig, DMV_K230, tag, owner, clock)
 {
 }
 
-dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_dmvslot_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
@@ -109,7 +109,7 @@ dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type
 //  dmv_k231_device - constructor
 //-------------------------------------------------
 
-dmv_k231_device::dmv_k231_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k231_device::dmv_k231_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_k230_device(mconfig, DMV_K231, tag, owner, clock)
 {
 }
@@ -118,7 +118,7 @@ dmv_k231_device::dmv_k231_device(const machine_config &mconfig, const char *tag,
 //  dmv_k234_device - constructor
 //-------------------------------------------------
 
-dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_k230_device(mconfig, DMV_K234, tag, owner, clock), m_snr(0)
 {
 }
@@ -127,7 +127,7 @@ dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag,
 //  dmv_k235_device - constructor
 //-------------------------------------------------
 
-dmv_k235_device::dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dmv_k235_device::dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: dmv_k230_device(mconfig, DMV_K235, tag, owner, clock), m_pic(*this, "pic8259"), m_dsw(*this, "DSW")
 {
 }
@@ -193,7 +193,7 @@ void dmv_k235_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &dmv_k235_device::k235_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 }
 

@@ -40,17 +40,17 @@ DEFINE_DEVICE_TYPE(NES_NTDEC_FH,      nes_ntdec_fh_device,      "nes_ntdec_fh", 
 DEFINE_DEVICE_TYPE(NES_NTDEC_N715021, nes_ntdec_n715021_device, "nes_ntdec_n715021", "NES Cart NTDEC N715021 PCB")
 
 
-nes_ntdec_asder_device::nes_ntdec_asder_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ntdec_asder_device::nes_ntdec_asder_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_NTDEC_ASDER, tag, owner, clock), m_latch(0), m_chr_outer(0)
 {
 }
 
-nes_ntdec_fh_device::nes_ntdec_fh_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ntdec_fh_device::nes_ntdec_fh_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_NTDEC_FH, tag, owner, clock)
 {
 }
 
-nes_ntdec_n715021_device::nes_ntdec_n715021_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_ntdec_n715021_device::nes_ntdec_n715021_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: nes_nrom_device(mconfig, NES_NTDEC_N715021, tag, owner, clock)
 {
 }

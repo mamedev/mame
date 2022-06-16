@@ -32,7 +32,7 @@ template class device_finder<device_amiga_keyboard_interface, true>;
 //  amiga_keyboard_bus_device - constructor
 //-------------------------------------------------
 
-amiga_keyboard_bus_device::amiga_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+amiga_keyboard_bus_device::amiga_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, AMIGA_KEYBOARD_INTERFACE, tag, owner, clock),
 	device_single_card_slot_interface<device_amiga_keyboard_interface>(mconfig, *this),
 	m_kbd(nullptr),

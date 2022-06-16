@@ -701,15 +701,15 @@ void esripsys_state::esripsys(machine_config &config)
 	/* Sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MC3410(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	mc3408_device &dacvol(MC3408(config, "dacvol", 0));
+	MC3410(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	mc3408_device &dacvol(MC3408(config, "dacvol"));
 	dacvol.set_output_range(0, 1).add_route(0, m_dac, 1.0, DAC_INPUT_RANGE_HI).add_route(0, m_dac, -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
 
-	TMS5220(config, m_tms, 640000).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	TMS5220(config, m_tms, XTAL::u(640000)).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	/* 6840 PTM */
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", XTAL(8'000'000) / 4));
-	ptm.set_external_clocks(0, 0, 0);
+	ptm.set_external_clocks(XTAL(), XTAL(), XTAL());
 	ptm.irq_callback().set(FUNC(esripsys_state::ptm_irq));
 }
 

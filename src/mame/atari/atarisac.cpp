@@ -94,7 +94,7 @@ INPUT_PORTS_END
 //  atari_sac_device: Constructor
 //-------------------------------------------------
 
-atari_sac_device::atari_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+atari_sac_device::atari_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: atari_jsa_base_device(mconfig, ATARI_SAC, tag, owner, clock, 2)
 	, m_daccpu(*this, "dac")
 	, m_datin(*this, "datin")

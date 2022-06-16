@@ -11,7 +11,7 @@
 class mb87030_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
-	mb87030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb87030_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void map(address_map &map);
 
@@ -58,7 +58,7 @@ public:
 	void ctrl_write(uint32_t value, uint32_t mask) { scsi_bus->ctrl_w(scsi_refid, value, mask); scsi_ctrl_changed(); }
 	uint32_t data_read() { return scsi_bus->data_r(); }
 protected:
-	mb87030_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mb87030_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

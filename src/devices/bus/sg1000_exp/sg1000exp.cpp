@@ -55,7 +55,7 @@ device_sg1000_expansion_slot_interface::~device_sg1000_expansion_slot_interface(
 //  sg1000_expansion_slot_device - constructor
 //-------------------------------------------------
 
-sg1000_expansion_slot_device::sg1000_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sg1000_expansion_slot_device::sg1000_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SG1000_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_sg1000_expansion_slot_interface>(mconfig, *this),
 	m_device(nullptr)

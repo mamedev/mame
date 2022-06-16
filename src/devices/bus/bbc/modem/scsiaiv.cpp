@@ -54,19 +54,19 @@ void bbc_scsiaiv_device::device_add_mconfig(machine_config& config)
 //  bbc_scsiaiv_device - constructor
 //-------------------------------------------------
 
-bbc_scsiaiv_device::bbc_scsiaiv_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock)
+bbc_scsiaiv_device::bbc_scsiaiv_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_bbc_modem_interface(mconfig, *this)
 	, m_scsi(*this, "scsi:7:scsicb")
 {
 }
 
-bbc_scsiaiv_device::bbc_scsiaiv_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+bbc_scsiaiv_device::bbc_scsiaiv_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
 	: bbc_scsiaiv_device(mconfig, BBC_SCSIAIV, tag, owner, clock)
 {
 }
 
-//bbc_vp415_device::bbc_vp415_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+//bbc_vp415_device::bbc_vp415_device(const machine_config& mconfig, const char* tag, device_t* owner, const XTAL &clock)
 //  : bbc_scsiaiv_device(mconfig, BBC_VP415, tag, owner, clock)
 //{
 //}

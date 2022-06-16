@@ -1793,13 +1793,13 @@ void blitz68k_state::ramdac_map(address_map &map)
 void blitz68k_state::ramdac_config(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &blitz68k_state::ramdac_map);
 }
 
 void blitz68k_state::ilpag(machine_config &config)
 {
-	M68000(config, m_maincpu, 11059200 );  // ?
+	M68000(config, m_maincpu, XTAL::u(11059200) );  // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::ilpag_map);
 	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq4_line_hold)); //3 & 6 used, mcu comms?
 

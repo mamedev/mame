@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(PC9801_KBD, pc9801_kbd_device, "pc9801_kbd", "PC-9801 Keyboar
 //  pc9801_kbd_device - constructor
 //-------------------------------------------------
 
-pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, PC9801_KBD, tag, owner, clock),
 	m_write_irq(*this)
 {

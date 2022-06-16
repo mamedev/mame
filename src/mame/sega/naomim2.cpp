@@ -111,7 +111,7 @@ note: if ROM is not mounted its area readed as 0xFF
 
 DEFINE_DEVICE_TYPE(NAOMI_M2_BOARD, naomi_m2_board, "naomi_m2_board", "Sega NAOMI M2 Board")
 
-naomi_m2_board::naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+naomi_m2_board::naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: naomi_board(mconfig, NAOMI_M2_BOARD, tag, owner, clock)
 	, m_cryptdevice(*this, "segam2crypt")
 	, m_region(*this, DEVICE_SELF)
@@ -202,6 +202,6 @@ uint16_t naomi_m2_board::read_callback(uint32_t addr)
 
 void naomi_m2_board::device_add_mconfig(machine_config &config)
 {
-	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
+	SEGA315_5881_CRYPT(config, m_cryptdevice);
 	m_cryptdevice->set_read_cb(FUNC(naomi_m2_board::read_callback));
 }

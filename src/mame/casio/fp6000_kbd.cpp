@@ -148,7 +148,7 @@ ioport_constructor fp6000_kbd_device::device_input_ports() const
 //  fp6000_kbd_device - constructor
 //-------------------------------------------------
 
-fp6000_kbd_device::fp6000_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+fp6000_kbd_device::fp6000_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, FP6000_KBD, tag, owner, clock),
 	device_matrix_keyboard_interface(mconfig, *this, "row_0", "row_1", "row_2", "row_3", "row_4", "row_5"),
 	m_int_handler(*this)

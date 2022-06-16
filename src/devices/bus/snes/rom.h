@@ -14,14 +14,14 @@ class sns_rom_device : public device_t, public device_sns_cart_interface
 {
 public:
 	// construction/destruction
-	sns_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_l(offs_t offset) override;
 	virtual uint8_t read_h(offs_t offset) override;
 
 protected:
-	sns_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -33,7 +33,7 @@ class sns_rom_obc1_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_obc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_obc1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// additional reading and writing
 	virtual uint8_t chip_read(offs_t offset) override;
@@ -58,7 +58,7 @@ class sns_rom_pokemon_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_pokemon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_pokemon_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing (protection device)
 	virtual uint8_t chip_read(offs_t offset) override;
@@ -78,7 +78,7 @@ class sns_rom_tekken2_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_tekken2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_tekken2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing (protection device)
 	virtual uint8_t chip_read(offs_t offset) override;
@@ -102,7 +102,7 @@ class sns_rom_soulblad_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_soulblad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_soulblad_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing (protection device)
 	virtual uint8_t chip_read(offs_t offset) override;
@@ -114,7 +114,7 @@ class sns_rom_mcpirate1_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_mcpirate1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_mcpirate1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_l(offs_t offset) override;
@@ -135,7 +135,7 @@ class sns_rom_mcpirate2_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_mcpirate2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_mcpirate2_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_l(offs_t offset) override;
@@ -156,7 +156,7 @@ class sns_rom_20col_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_20col_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_20col_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing
 	virtual uint8_t read_l(offs_t offset) override;
@@ -176,7 +176,7 @@ class sns_rom_banana_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_banana_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_banana_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing (protection device)
 	virtual uint8_t chip_read(offs_t offset) override;
@@ -196,7 +196,7 @@ class sns_rom_bugs_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_bugs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sns_rom_bugs_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// reading and writing (protection device)
 	virtual uint8_t chip_read(offs_t offset) override;

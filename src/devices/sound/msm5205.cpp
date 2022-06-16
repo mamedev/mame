@@ -62,12 +62,12 @@ DEFINE_DEVICE_TYPE(MSM5205, msm5205_device, "msm5205", "OKI MSM5205 ADPCM")
 DEFINE_DEVICE_TYPE(MSM6585, msm6585_device, "msm6585", "OKI MSM6585 ADPCM")
 
 
-msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msm5205_device(mconfig, MSM5205, tag, owner, clock, 10)
 {
 }
 
-msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 dac_bits)
+msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u8 dac_bits)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_s1(false)
@@ -80,7 +80,7 @@ msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, 
 }
 
 
-msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: msm5205_device(mconfig, MSM6585, tag, owner, clock, 12)
 {
 }

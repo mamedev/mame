@@ -34,7 +34,7 @@ class peribox_device : public bus::ti99::internal::ioport_attached_device
 {
 	friend class peribox_slot_device;
 public:
-	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Next eight methods are called from the console
 	void readz(offs_t offset, uint8_t *value) override;
@@ -63,7 +63,7 @@ public:
 	auto lcp_cb() { return m_slot1_lcp.bind(); }
 
 protected:
-	peribox_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	peribox_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
@@ -122,7 +122,7 @@ protected:
 class peribox_sg_device : public peribox_device
 {
 public:
-	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void device_add_mconfig(machine_config &config) override;
@@ -134,7 +134,7 @@ protected:
 class peribox_ev_device : public peribox_device
 {
 public:
-	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void device_add_mconfig(machine_config &config) override;
@@ -147,10 +147,10 @@ protected:
 class peribox_gen_device : public peribox_device
 {
 public:
-	peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
-	peribox_gen_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	peribox_gen_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
@@ -160,7 +160,7 @@ protected:
 class peribox_genmod_device : public peribox_gen_device
 {
 public:
-	peribox_genmod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	peribox_genmod_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	void device_add_mconfig(machine_config &config) override;
@@ -217,7 +217,7 @@ class peribox_slot_device : public device_t, public device_single_card_slot_inte
 public:
 	template <typename U>
 	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, int slot, U &&opts, const char *dflt)
-		: peribox_slot_device(mconfig, tag, owner, 0)
+		: peribox_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		opts(*this);
@@ -226,7 +226,7 @@ public:
 		m_slotnumber = slot;
 	}
 
-	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// Called from the box (direction to card)
 	void readz(offs_t offset, uint8_t *value);

@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(BBC_PMSGENIE, bbc_pmsgenie_device, "bbc_pmsgenie", "PMS Genie
 //  bbc_palprom_device - constructor
 //-------------------------------------------------
 
-bbc_pmsgenie_device::bbc_pmsgenie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_pmsgenie_device::bbc_pmsgenie_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_PMSGENIE, tag, owner, clock)
 	, device_bbc_rom_interface(mconfig, *this)
 	, m_write_latch(0)

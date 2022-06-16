@@ -104,7 +104,7 @@ void kaneko_view2_tilemap_device::vram_map(address_map &map)
 
 DEFINE_DEVICE_TYPE(KANEKO_TMAP, kaneko_view2_tilemap_device, "kaneko_view2", "Kaneko VIEW2 Tilemaps")
 
-kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KANEKO_TMAP, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, m_vram(*this, "vram_%u", 0U)

@@ -448,7 +448,7 @@ void banprestoms_state::banprestoms(machine_config &config)
 	screen.set_screen_update(FUNC(banprestoms_state::screen_update));
 	screen.set_palette(m_palette);
 
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
 	crtc.layer_en_callback().set(FUNC(banprestoms_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(banprestoms_state::layer_scroll_w));
 
@@ -458,7 +458,7 @@ void banprestoms_state::banprestoms(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH)); // TODO: check frequency and pin 7.
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL::u(1000000), okim6295_device::PIN7_HIGH)); // TODO: check frequency and pin 7.
 	oki.set_addrmap(0, &banprestoms_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 }

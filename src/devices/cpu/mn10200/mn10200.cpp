@@ -45,7 +45,7 @@ void mn10200_device::mn1020012a_internal_map(address_map &map)
 }
 
 
-mn10200_device::mn10200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program)
+mn10200_device::mn10200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, address_map_constructor program)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, program), m_program(nullptr)
 	, m_read_port(*this)
@@ -55,7 +55,7 @@ mn10200_device::mn10200_device(const machine_config &mconfig, device_type type, 
 { }
 
 // device definitions
-mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mn10200_device(mconfig, MN1020012A, tag, owner, clock, address_map_constructor(FUNC(mn1020012a_device::mn1020012a_internal_map), this))
 { }
 

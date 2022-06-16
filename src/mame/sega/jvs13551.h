@@ -14,13 +14,13 @@ class sega_837_13551_device : public jvs_device
 {
 public:
 	template <typename T>
-	sega_837_13551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag)
+	sega_837_13551_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock, T &&jvs_host_tag)
 		: sega_837_13551_device(mconfig, tag, owner, clock)
 	{
 		host.set_tag(std::forward<T>(jvs_host_tag));
 	}
 
-	sega_837_13551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_837_13551_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	template <uint8_t Which, typename T>
 	void set_port_tag(T &&port_tag) { port[Which].set_tag(std::forward<T>(port_tag)); }

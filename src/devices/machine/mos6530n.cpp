@@ -84,7 +84,7 @@ void mos6532_new_device::io_map(address_map &map)
 //  mos6530_device_base - constructor
 //-------------------------------------------------
 
-mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, u32 rsize) :
+mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock, u32 rsize) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_ram(*this, finder_base::DUMMY_TAG, rsize, ENDIANNESS_LITTLE),
 	m_rom(*this, DEVICE_SELF),
@@ -120,7 +120,7 @@ mos6530_device_base::mos6530_device_base(const machine_config &mconfig, device_t
 //  mos6530_new_device - constructor
 //-------------------------------------------------
 
-mos6530_new_device::mos6530_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6530_new_device::mos6530_new_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6530_device_base(mconfig, MOS6530_NEW, tag, owner, clock, 0x40) { }
 
 
@@ -128,7 +128,7 @@ mos6530_new_device::mos6530_new_device(const machine_config &mconfig, const char
 //  mos6532_new_device - constructor
 //-------------------------------------------------
 
-mos6532_new_device::mos6532_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mos6532_new_device::mos6532_new_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: mos6530_device_base(mconfig, MOS6532_NEW, tag, owner, clock, 0x80) { }
 
 

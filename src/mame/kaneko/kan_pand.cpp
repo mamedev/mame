@@ -55,7 +55,7 @@
 
 DEFINE_DEVICE_TYPE(KANEKO_PANDORA, kaneko_pandora_device, "kaneko_pandora", "Kaneko PANDORA GFX")
 
-kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, KANEKO_PANDORA, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_gfx_region(0)

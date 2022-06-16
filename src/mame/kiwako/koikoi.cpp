@@ -47,7 +47,7 @@ to prevent disabling inputs.
 #include "speaker.h"
 #include "tilemap.h"
 
-#define KOIKOI_CRYSTAL 15468000
+#define KOIKOI_CRYSTAL XTAL::u(15468000)
 
 static constexpr int input_tab[] = { 0x22, 0x64, 0x44, 0x68, 0x30, 0x50, 0x70, 0x48, 0x28, 0x21, 0x41, 0x82, 0x81, 0x42 };
 

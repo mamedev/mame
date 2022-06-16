@@ -26,7 +26,7 @@ class apricot_mono_display_device : public device_t, public device_apricot_video
 {
 public:
 	// construction/destruction
-	apricot_mono_display_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apricot_mono_display_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

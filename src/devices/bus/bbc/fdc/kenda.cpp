@@ -99,7 +99,7 @@ const tiny_rom_entry *bbc_kenda_device::device_rom_region() const
 //  bbc_kenda_device - constructor
 //-------------------------------------------------
 
-bbc_kenda_device::bbc_kenda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+bbc_kenda_device::bbc_kenda_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, BBC_KENDA, tag, owner, clock)
 	, device_bbc_fdc_interface(mconfig, *this)
 	, m_fdc(*this, "fdc")

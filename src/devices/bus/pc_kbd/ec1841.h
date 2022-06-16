@@ -26,7 +26,7 @@ class ec_1841_keyboard_device : public device_t, public device_pc_kbd_interface
 {
 public:
 	// construction/destruction
-	ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

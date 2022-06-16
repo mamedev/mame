@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(UPD934G, upd934g_device, "upd934g", "NEC uPD934G")
 //  upd934g_device - constructor
 //-------------------------------------------------
 
-upd934g_device::upd934g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+upd934g_device::upd934g_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, UPD934G, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_data_cb(*this),

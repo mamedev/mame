@@ -50,7 +50,7 @@ void a2065_device::device_add_mconfig(machine_config &config)
 //  a2065_device - constructor
 //-------------------------------------------------
 
-a2065_device::a2065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+a2065_device::a2065_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ZORRO_A2065, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_lance(*this, "lance")

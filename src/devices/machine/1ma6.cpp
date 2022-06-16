@@ -110,7 +110,7 @@ enum {
 	HOLE_TMR_ID
 };
 
-hp_1ma6_device::hp_1ma6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hp_1ma6_device::hp_1ma6_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig , HP_1MA6 , tag , owner , clock)
 	, m_tape(*this , "drive")
 {

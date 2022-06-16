@@ -27,7 +27,7 @@ class e22_kbd_hle_device : public device_t,
 {
 public:
 	// construction/destruction
-	e22_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	e22_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock = XTAL());
 
 	// callbacks
 	auto tx_handler() { return m_tx_handler.bind(); }

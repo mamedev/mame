@@ -30,12 +30,12 @@ class abc77_device :  public device_t, public abc_keyboard_interface
 {
 public:
 	// construction/destruction
-	abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );
 
 protected:
-	abc77_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	abc77_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -89,7 +89,7 @@ class abc55_device :  public abc77_device
 {
 public:
 	// construction/destruction
-	abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

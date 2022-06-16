@@ -31,7 +31,7 @@ public:
 
 protected:
 	// construction/destruction
-	nes_fcmat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_fcmat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -48,7 +48,7 @@ class nes_ftrainer_device : public nes_fcmat_device
 {
 public:
 	// construction/destruction
-	nes_ftrainer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_ftrainer_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides
@@ -62,7 +62,7 @@ class nes_taptapmat_device : public nes_fcmat_device
 {
 public:
 	// construction/destruction
-	nes_taptapmat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_taptapmat_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 protected:
 	// device-level overrides

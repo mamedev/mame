@@ -145,7 +145,7 @@ void am53cf96_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-am53cf96_device::am53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+am53cf96_device::am53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	legacy_scsi_host_adapter(mconfig, AM53CF96, tag, owner, clock),
 	m_irq_handler(*this)
 {

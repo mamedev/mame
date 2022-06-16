@@ -522,7 +522,7 @@ void isgsm_state::isgsm(machine_config &config)
 	config.device_remove("maincpu");
 	config.device_remove("mapper");
 
-	M68000(config, m_maincpu, 16000000); // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
+	M68000(config, m_maincpu, XTAL::u(16000000)); // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
 	m_maincpu->set_addrmap(AS_PROGRAM, &isgsm_state::isgsm_map);
 	m_maincpu->set_vblank_int("screen", FUNC(isgsm_state::irq4_line_hold));
 

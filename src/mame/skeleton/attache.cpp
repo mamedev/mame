@@ -1250,7 +1250,7 @@ void attache816_state::attache816(machine_config &config)
 	m_ctc->zc_callback<1>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	I8255A(config, m_ppi, 0);
+	I8255A(config, m_ppi);
 	m_ppi->out_pa_callback().set(FUNC(attache816_state::x86_comms_w));
 	m_ppi->in_pa_callback().set(FUNC(attache816_state::x86_comms_r));
 	m_ppi->out_pb_callback().set(FUNC(attache816_state::x86_irq_enable));

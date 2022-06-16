@@ -57,7 +57,7 @@
 DEFINE_DEVICE_TYPE(AM7990, am7990_device, "am7990", "Am7990 LANCE Ethernet Controller")
 DEFINE_DEVICE_TYPE(AM79C90, am79c90_device, "am79c90", "Am79C90 C-LANCE Ethernet Controller")
 
-am7990_device_base::am7990_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+am7990_device_base::am7990_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_network_interface(mconfig, *this, 10)
 	, m_intr_out_cb(*this)
@@ -68,12 +68,12 @@ am7990_device_base::am7990_device_base(const machine_config &mconfig, device_typ
 {
 }
 
-am7990_device::am7990_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+am7990_device::am7990_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: am7990_device_base(mconfig, AM7990, tag, owner, clock)
 {
 }
 
-am79c90_device::am79c90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+am79c90_device::am79c90_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: am7990_device_base(mconfig, AM79C90, tag, owner, clock)
 {
 }

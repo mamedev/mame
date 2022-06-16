@@ -351,7 +351,7 @@ void gf1_device::sound_stream_update(sound_stream &stream, std::vector<read_stre
 //  gf1_device - constructor
 //-------------------------------------------------
 
-gf1_device::gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gf1_device::gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	acia6850_device(mconfig, GGF1, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_dma_dram_ctrl(0), m_dma_start_addr(0), m_dram_addr(0), m_timer_ctrl(0), m_timer1_count(0), m_timer2_count(0), m_timer1_value(0), m_timer2_value(0), m_sampling_freq(0), m_sampling_ctrl(0), m_joy_trim_dac(0), m_reset(0), m_active_voices(14), m_irq_source(0),
@@ -1275,7 +1275,7 @@ void isa16_gus_device::device_add_mconfig(machine_config &config)
 
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL::u(31250*16)));
 	acia_clock.signal_handler().set(FUNC(isa16_gus_device::write_acia_clock));
 }
 
@@ -1285,7 +1285,7 @@ ioport_constructor isa16_gus_device::device_input_ports() const
 }
 
 
-isa16_gus_device::isa16_gus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+isa16_gus_device::isa16_gus_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, ISA16_GUS, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
 	m_gf1(*this, "gf1"),

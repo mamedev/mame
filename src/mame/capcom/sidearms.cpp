@@ -608,11 +608,11 @@ GFXDECODE_END
 void sidearms_state::sidearms(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000); /* 4 MHz (?) */
+	Z80(config, m_maincpu, XTAL::u(4000000)); /* 4 MHz (?) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sidearms_state::sidearms_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sidearms_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 4000000); /* 4 MHz (?) */
+	Z80(config, m_audiocpu, XTAL::u(4000000)); /* 4 MHz (?) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::sidearms_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -637,14 +637,14 @@ void sidearms_state::sidearms(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2203_device &ym1(YM2203(config, "ym1", 4000000));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL::u(4000000)));
 	ym1.irq_handler().set_inputline(m_audiocpu, 0);
 	ym1.add_route(0, "mono", 0.15);
 	ym1.add_route(1, "mono", 0.15);
 	ym1.add_route(2, "mono", 0.15);
 	ym1.add_route(3, "mono", 0.25);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 4000000));
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL::u(4000000)));
 	ym2.add_route(0, "mono", 0.15);
 	ym2.add_route(1, "mono", 0.15);
 	ym2.add_route(2, "mono", 0.15);
@@ -700,11 +700,11 @@ void sidearms_state::turtship(machine_config &config)
 void sidearms_state::whizz(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);        /* 4 MHz (?) */
+	Z80(config, m_maincpu, XTAL::u(4000000));        /* 4 MHz (?) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sidearms_state::whizz_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sidearms_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL::u(4000000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::whizz_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &sidearms_state::whizz_io_map);
 
@@ -732,7 +732,7 @@ void sidearms_state::whizz(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL::u(4000000)));
 	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 1.0);
 }

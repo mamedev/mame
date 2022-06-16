@@ -93,7 +93,7 @@ ioport_constructor nes_dorepiano_device::device_input_ports() const
 //  nes_dorepiano_device - constructor
 //-------------------------------------------------
 
-nes_dorepiano_device::nes_dorepiano_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+nes_dorepiano_device::nes_dorepiano_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, NES_DOREPIANO, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_port(*this, "PIANO.%u", 0)

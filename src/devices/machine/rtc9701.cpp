@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(RTC9701, rtc9701_device, "rtc9701", "Epson RTC-9701-JE RTC/EE
 //  rtc9701_device - constructor
 //-------------------------------------------------
 
-rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock)
 	: device_t(mconfig, RTC9701, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_latch(0)

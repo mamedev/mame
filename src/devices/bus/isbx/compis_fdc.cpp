@@ -58,7 +58,7 @@ static void compis_floppies(device_slot_interface &device)
 
 void compis_fdc_device::device_add_mconfig(machine_config &config)
 {
-	I8272A(config, m_fdc, 8'000'000, true);
+	I8272A(config, m_fdc, XTAL::u(8'000'000), true);
 	m_fdc->intrq_wr_callback().set(FUNC(compis_fdc_device::fdc_irq));
 	m_fdc->drq_wr_callback().set(FUNC(compis_fdc_device::fdc_drq));
 	FLOPPY_CONNECTOR(config, m_floppy0, compis_floppies, "525qd", compis_fdc_device::floppy_formats);
@@ -75,7 +75,7 @@ void compis_fdc_device::device_add_mconfig(machine_config &config)
 //  compis_fdc_device - constructor
 //-------------------------------------------------
 
-compis_fdc_device::compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+compis_fdc_device::compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, COMPIS_FDC, tag, owner, clock),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),

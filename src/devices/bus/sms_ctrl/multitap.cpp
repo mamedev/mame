@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(SMS_MULTITAP, sms_multitap_device, "sms_multitap", "Furrtek S
 //  sms_multitap_device - constructor
 //-------------------------------------------------
 
-sms_multitap_device::sms_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sms_multitap_device::sms_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, SMS_MULTITAP, tag, owner, clock),
 	device_sms_control_port_interface(mconfig, *this),
 	m_subctrl1_port(*this, "ctrl1"),

@@ -1115,23 +1115,23 @@ INPUT_PORTS_END
 
 void kpython2_state::kpython2(machine_config &config)
 {
-	R5900LE(config, m_maincpu, 294'912'000, m_vu0);
+	R5900LE(config, m_maincpu, XTAL::u(294'912'000), m_vu0);
 	m_maincpu->set_force_no_drc(true);
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kpython2_state::mem_map);
 
-	SONYPS2_VU0(config, m_vu0, 294'912'000, m_vu1);
-	SONYPS2_VU1(config, m_vu1, 294'912'000, m_gs);
+	SONYPS2_VU0(config, m_vu0, XTAL::u(294'912'000), m_vu1);
+	SONYPS2_VU1(config, m_vu1, XTAL::u(294'912'000), m_gs);
 
-	SONYPS2_TIMER(config, m_timer[0], 294912000/2, true);
-	SONYPS2_TIMER(config, m_timer[1], 294912000/2, true);
-	SONYPS2_TIMER(config, m_timer[2], 294912000/2, false);
-	SONYPS2_TIMER(config, m_timer[3], 294912000/2, false);
+	SONYPS2_TIMER(config, m_timer[0], XTAL::u(294912000)/2, true);
+	SONYPS2_TIMER(config, m_timer[1], XTAL::u(294912000)/2, true);
+	SONYPS2_TIMER(config, m_timer[2], XTAL::u(294912000)/2, false);
+	SONYPS2_TIMER(config, m_timer[3], XTAL::u(294912000)/2, false);
 
 	SONYPS2_INTC(config, m_intc, m_maincpu);
-	SONYPS2_GS(config, m_gs, 294912000/2, m_intc, m_vu1);
-	SONYPS2_DMAC(config, m_dmac, 294912000/2, m_maincpu, m_ram, m_sif, m_gs, m_vu1);
+	SONYPS2_GS(config, m_gs, XTAL::u(294912000)/2, m_intc, m_vu1);
+	SONYPS2_DMAC(config, m_dmac, XTAL::u(294912000)/2, m_maincpu, m_ram, m_sif, m_gs, m_vu1);
 	SONYPS2_SIF(config, m_sif, m_intc);
 
 	SONYPS2_IOP(config, m_iop, XTAL(67'737'600)/2);

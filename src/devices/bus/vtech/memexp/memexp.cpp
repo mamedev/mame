@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(VTECH_MEMEXP_SLOT, vtech_memexp_slot_device, "vtech_memexp_sl
 //  vtech_memexp_slot_device - constructor
 //-------------------------------------------------
 
-vtech_memexp_slot_device::vtech_memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+vtech_memexp_slot_device::vtech_memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, VTECH_MEMEXP_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_vtech_memexp_interface>(mconfig, *this),
 	m_memspace(*this, finder_base::DUMMY_TAG, -1),
@@ -36,6 +36,10 @@ vtech_memexp_slot_device::vtech_memexp_slot_device(const machine_config &mconfig
 	m_nmi_handler(*this),
 	m_reset_handler(*this)
 {
+	option_reset();
+	vtech_memexp_carts(*this);
+	set_default_option(nullptr);
+	set_fixed(false);
 }
 
 //-------------------------------------------------
@@ -125,7 +129,7 @@ device_vtech_memexp_interface::~device_vtech_memexp_interface()
 //  vtech_memexp_device - constructor
 //-------------------------------------------------
 
-vtech_memexp_device::vtech_memexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+vtech_memexp_device::vtech_memexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, const XTAL &clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_vtech_memexp_interface(mconfig, *this),
 	m_mem(*this, "memspace"),

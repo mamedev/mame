@@ -68,7 +68,7 @@ public:
 	typedef delegate<void (uint8_t)> state_change_delegate;
 
 	// construction/destruction
-	fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, const XTAL &clock);
 
 	// explicit decryption helpers
 	void decrypt(offs_t baseaddr, uint32_t size, offs_t regionoffs, uint16_t *opcodesptr, uint8_t state) { decrypt(baseaddr, size, &m_srcbase[regionoffs/2], opcodesptr, state); }
