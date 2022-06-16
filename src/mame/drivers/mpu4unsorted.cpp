@@ -232,10 +232,7 @@ ROM_START( m4chaseig )
 ROM_END
 
 
-ROM_START( m4c9c )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cncs.p1", 0x0000, 0x010000, CRC(10f15e2a) SHA1(c17ab13764d74302246984245485cb7692913b44) )
-ROM_END
+
 
 #define M4CLBVEG_EXTRAS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -1886,8 +1883,6 @@ GAME( 198?, m4rltst,  0,          mod2,       mpu4,    mpu4unsorted_state, init_
 
 // barcrest, to split
 
-// requires stake set to boot (just hangs otherwise)
-GAME(199?, m4c9c,     0,          mod2_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu420p,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Cloud Nine Club (Barcrest) (MPU4) (CNC 2.1)",GAME_FLAGS )
 
 // corrupt vfd (BWB?)
 GAME(199?, m4clbx,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 1)",GAME_FLAGS )
