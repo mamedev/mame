@@ -152,6 +152,7 @@ public:
 	void init_m4altreels_big();
 	void init_m4default_five_std();
 	void init_m4default_five_rev();
+	void init_m4default_seven();
 
 	void mod2(machine_config &config);
 	void mod2_cheatchr(machine_config &config);
@@ -238,6 +239,18 @@ public:
 	template<const uint8_t* Table> void mod4yam_cheatchr_pal(machine_config &config)
 	{
 		mod4yam(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod4yam_alt_cheatchr_pal(machine_config &config)
+	{
+		mod4yam_alt(config);
 
 		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
 
@@ -348,6 +361,10 @@ public:
 	void mod4yam_cheatchr(machine_config &config);
 	void mod4yam_cheatchr_table(machine_config& config, const uint8_t* table);
 	void mod4yam_chr(machine_config &config);
+
+	void mod4yam_alt(machine_config &config);
+
+
 
 	void mpu4_common(machine_config &config);
 	void mpu4_common2(machine_config &config);

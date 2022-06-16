@@ -1914,6 +1914,13 @@ void mpu4_state::init_m4default_five_rev()
 	use_m4_five_reel_rev();
 }
 
+void mpu4_state::init_m4default_seven()
+{
+	init_m4default();
+	use_m4_seven_reel();
+}
+
+
 void mpu4_state::init_big_extenda()
 {
 	init_m4default_big();
@@ -2401,6 +2408,17 @@ void mpu4_state::mod4yam_cheatchr(machine_config &config)
 	mod4yam_cheatchr_table(config, nullptr);
 }
 
+void mpu4_state::mod4yam_alt(machine_config &config)
+{
+	mpu4base(config);
+	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
+
+	mpu4_reels<1, 6>(config);
+
+	YM2413(config, m_ym2413, MPU4_MASTER_CLOCK/4);
+	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 /***********************************************************************************************
@@ -2470,6 +2488,7 @@ void mpu4_state::mod4oki_alt(machine_config &config)
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
+
 
 
 void mpu4_state::mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table)

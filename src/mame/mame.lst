@@ -24434,11 +24434,6 @@ m4brnze                         // Bronze Voyage (unknown)
 m4brnzea                        //
 m4brnzeb                        //
 m4c2                            // Circus Circus 2 (Nova)
-m4calicl                        // California Club (Barcrest)
-m4calicla                       //
-m4caliclb                       //
-m4caliclc                       //
-m4calicld                       //
 m4captb                         // Captain Bear
 m4casmul                        // Casino Multiplay (Barcrest)
 m4casot                         // Casino Old Timer (Barcrest)
@@ -24605,11 +24600,6 @@ m4toptim                        // Top Timer (Barcrest)
 m4toptima                       //
 m4treel                         //
 m4treela                        //
-m4tropcl                        // Tropicana Club (Barcrest)
-m4tropcla                       //
-m4tropclb                       //
-m4tropclc                       //
-m4tropcld                       //
 m4tst2                          // MPU4 Unit Test (Program 2)
 m4twintm                        // Twin Timer (Barcrest)
 m4twist                         // Twist Again (Barcrest)
@@ -29637,6 +29627,11 @@ m4addrcc__c                     //
 m4addrcc__d                     //
 m4bucks                         // Bucks Fizz Club (Barcrest)
 m4bucksa                        //
+m4calicl                        // California Club (Barcrest)
+m4calicla                       //
+m4caliclb                       //
+m4caliclc                       //
+m4calicld                       //
 m4clbshf                        // Club Shuffle (Barcrest)
 m4cojok                         // Carry On Joker (Barcrest)
 m4cojok__a                      //
@@ -29954,6 +29949,11 @@ m4supst__w                      //
 m4supst__x                      //
 m4supst__y                      //
 m4supst__z                      //
+m4tropcl                        // Tropicana Club (Barcrest)
+m4tropcla                       //
+m4tropclb                       //
+m4tropclc                       //
+m4tropcld                       //
 m4tst                           // MPU4 Unit Test (Program 4)
 m4vivalv                        // Viva Las Vegas (Barcrest)
 m4vivalv__0                     //
