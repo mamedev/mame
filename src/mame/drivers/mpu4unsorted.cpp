@@ -1206,23 +1206,6 @@ ROM_START( m4wnud )
 	ROM_LOAD( "wnudge.bin", 0x8000, 0x008000, CRC(1d935575) SHA1(c4177c41473c0fb511e0ee035961f55ad43be14d) )
 ROM_END
 
-ROM_START( m4brnze )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bv25", 0x0000, 0x010000, CRC(5c66f460) SHA1(c7587a6e992549ad8814f77c65b33a17a3641431) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4brnzea )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bv25v2", 0x0000, 0x010000, CRC(a675edb3) SHA1(a3c6ee6a0bfb301fed72b45ee8e363d77b8b8dbb) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4brnzeb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bv55", 0x0000, 0x010000, CRC(93905bc9) SHA1(e8d3cd125dced43fc2cf23cbccc59110561d2a40) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
 
 ROM_START( m4riotrp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1701,36 +1684,36 @@ GAME(199?, m4joljokh, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::s
 
 // Others
 
-GAME(199?, m4sctagt,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Nova","Secret Agent (Nova) (MPU4)",GAME_FLAGS ) // AUX2 LOCKED
+GAME(199?, m4sctagt,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Nova","Secret Agent (Nova) (MPU4)",GAME_FLAGS ) // AUX2 LOCKED
 
 // has D.J.E 1999 copyright in ROM
-GAMEL(1999, m4aao,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4aao,     ROT0,   "Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS, layout_m4aao )
+GAMEL(1999, m4aao,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4aao,     ROT0,   "Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS, layout_m4aao )
 
 // works
-GAME(199?, m4bandgd,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Eurogames","Bands Of Gold (Eurogames) (MPU4)",GAME_FLAGS )
+GAME(199?, m4bandgd,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Eurogames","Bands Of Gold (Eurogames) (MPU4)",GAME_FLAGS )
 
-// works
+// works, not standard protection, but cheatchr works
 GAME(199?, m4bigben,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 1)",GAME_FLAGS )
 GAME(199?, m4bigbena, m4bigben,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 2)",GAME_FLAGS )
 GAME(199?, m4bigbenb, m4bigben,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 3)",GAME_FLAGS )
 GAME(199?, m4bigbend, m4bigben,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 4)",GAME_FLAGS )
 GAME(199?, m4bigbene, m4bigben,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 5)",GAME_FLAGS )
 
-GAME(199?, m4kqclub,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Newby","Kings & Queens Club (Newby) (MPU4)",GAME_FLAGS )
+GAME(199?, m4kqclub,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Newby","Kings & Queens Club (Newby) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4snookr,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Eurocoin","Snooker (Eurocoin) (MPU4)",GAME_FLAGS ) // works?
+GAME(199?, m4snookr,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Eurocoin","Snooker (Eurocoin) (MPU4)",GAME_FLAGS ) // works?
 
-GAME(199?, m4stakex,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Leisurama","Stake X (Leisurama) (MPU4, set 1)",GAME_FLAGS ) // has issues with coins in 'separate bank' (default) mode, reel issues
-GAME(199?, m4stakexa, m4stakex,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Leisurama","Stake X (Leisurama) (MPU4, set 2)",GAME_FLAGS ) // like above, but doesn't default to separate bank?
+GAME(199?, m4stakex,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Leisurama","Stake X (Leisurama) (MPU4, set 1)",GAME_FLAGS ) // has issues with coins in 'separate bank' (default) mode, reel issues
+GAME(199?, m4stakexa, m4stakex,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Leisurama","Stake X (Leisurama) (MPU4, set 2)",GAME_FLAGS ) // like above, but doesn't default to separate bank?
 
-GAME(199?, m4boltbl,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 1)",GAME_FLAGS ) // Reel 1 Fault
-GAME(199?, m4boltbla, m4boltbl,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 2)",GAME_FLAGS )
-GAME(199?, m4boltblb, m4boltbl,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 3)",GAME_FLAGS )
-GAME(199?, m4boltblc, m4boltbl,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 4)",GAME_FLAGS )
+GAME(199?, m4boltbl,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 1)",GAME_FLAGS ) // Reel 1 Fault
+GAME(199?, m4boltbla, m4boltbl,   mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 2)",GAME_FLAGS )
+GAME(199?, m4boltblb, m4boltbl,   mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 3)",GAME_FLAGS )
+GAME(199?, m4boltblc, m4boltbl,   mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Bolt From The Blue (DJE) (MPU4, set 4)",GAME_FLAGS )
 
-GAME(199?, m4stand2,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Stand To Deliver (DJE) (MPU4)",GAME_FLAGS ) // Reel 1 Fault
+GAME(199?, m4stand2,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Stand To Deliver (DJE) (MPU4)",GAME_FLAGS ) // Reel 1 Fault
 
-GAME(199?, m4dblchn,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Double Chance (DJE) (MPU4)",GAME_FLAGS ) // Reels spin forever
+GAME(199?, m4dblchn,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "DJE","Double Chance (DJE) (MPU4)",GAME_FLAGS ) // Reels spin forever
 
 // other issues, only plays an 'alarm' sound when there's money to payout? wrong sound ROM or something else?
 GAME(2001, m4casmul,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "DJE","Casino Multiplay (MPU4)",GAME_FLAGS ) // unprotected, copyright year / manufacturer found in ROM
@@ -1738,23 +1721,14 @@ GAME(2001, m4casmul,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_
 /* Unknown stuff that looks like it might be MPU4, but needs further verification, some could be bad */
 
 // PAL FAIL
-GAME(199?, m4barcrz,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bar Crazy (unknown) (MPU4?)",GAME_FLAGS )
+GAME(199?, m4barcrz,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bar Crazy (unknown) (MPU4?)",GAME_FLAGS )
 
 // gives an error
-GAME(199?, m4bonzbn,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bingo Bonanza (unknown) (MPU4?)",GAME_FLAGS )
+GAME(199?, m4bonzbn,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bingo Bonanza (unknown) (MPU4?)",GAME_FLAGS )
 
 // ERROR CODE 2
 // doesn't look like a Barcrest set, but does use Barcrest style CHR protection? reports ILLEGAL SOFTWARE if check fails 
 GAME(199?, m4matdr,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Matador (unknown) (MPU4?)",GAME_FLAGS )
-
-
-
-
-// runs, no sound (missing samples?), unprotected
-GAME(199?, m4brnze,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bronze Voyage (unknown) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4brnzea,  m4brnze,    mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bronze Voyage (unknown) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4brnzeb,  m4brnze,    mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bronze Voyage (unknown) (MPU4) (set 3)",GAME_FLAGS )
-
 
 /* *if* these are MPU4 they have a different sound system at least - The copyright strings in them are 'AET' tho (Ace?) - Could be related to the Crystal stuff? */
 GAME(199?, m4sbx,     0,          mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 1)",GAME_FLAGS )
@@ -1776,86 +1750,86 @@ GAME(199?, m4fsxa,    m4fsx,      mod4oki,   mpu4,    mpu4unsorted_state, init_m
 GAME(199?, m4fsxb,    m4fsx,      mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 3)",GAME_FLAGS )
 
 // Error 42 then 52, 54
-GAME(199?, m4ccop,    0,          mod4oki_cheatchr,    mpu4_cw, mpu4unsorted_state, init_m4default, ROT0, "Coinworld","Cash Cops (MPU4?) (set 1)",GAME_FLAGS )
-GAME(199?, m4ccopa,   m4ccop,     mod4oki_cheatchr,    mpu4_cw, mpu4unsorted_state, init_m4default, ROT0, "Coinworld","Cash Cops (MPU4?) (set 2)",GAME_FLAGS )
-GAME(199?, m4ccopb,   m4ccop,     mod4oki_cheatchr,    mpu4_cw, mpu4unsorted_state, init_m4default, ROT0, "Coinworld","Cash Cops (MPU4?) (set 3)",GAME_FLAGS )
+GAME(199?, m4ccop,    0,          mod4oki,    mpu4_cw, mpu4unsorted_state, init_m4default, ROT0, "Coinworld","Cash Cops (MPU4?) (set 1)",GAME_FLAGS )
+GAME(199?, m4ccopa,   m4ccop,     mod4oki,    mpu4_cw, mpu4unsorted_state, init_m4default, ROT0, "Coinworld","Cash Cops (MPU4?) (set 2)",GAME_FLAGS )
+GAME(199?, m4ccopb,   m4ccop,     mod4oki,    mpu4_cw, mpu4unsorted_state, init_m4default, ROT0, "Coinworld","Cash Cops (MPU4?) (set 3)",GAME_FLAGS )
 
 // Error 72
-GAME(199?, m4ccc,     0,          mod4oki_cheatchr,    mpu4_cw, mpu4unsorted_state, init_m4default, ROT0, "Coinworld","Criss Cross Crazy (Coinworld) (MPU4?)",GAME_FLAGS )
+GAME(199?, m4ccc,     0,          mod4oki,    mpu4_cw, mpu4unsorted_state, init_m4default, ROT0, "Coinworld","Criss Cross Crazy (Coinworld) (MPU4?)",GAME_FLAGS )
 
 // PAL ERROR
-GAME(199?, m4treel,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Turbo Reels (unknown) (MPU4?) (set 1)",GAME_FLAGS )
-GAME(199?, m4treela,  m4treel,    mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Turbo Reels (unknown) (MPU4?) (set 2)",GAME_FLAGS )
+GAME(199?, m4treel,   0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Turbo Reels (unknown) (MPU4?) (set 1)",GAME_FLAGS )
+GAME(199?, m4treela,  m4treel,    mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Turbo Reels (unknown) (MPU4?) (set 2)",GAME_FLAGS )
 
 // works
-GAME(199?, m4surf,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Super Surfin' (Gemini) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4surfa,   m4surf,     mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Super Surfin' (Gemini) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4surfb,   m4surf,     mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Super Surfin' (Gemini) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4surf,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Super Surfin' (Gemini) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4surfa,   m4surf,     mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Super Surfin' (Gemini) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4surfb,   m4surf,     mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Super Surfin' (Gemini) (MPU4) (set 3)",GAME_FLAGS )
 
 // works
-GAME(199?, m4wife,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Money Or Yer Wife (Gemini) (MPU4)",GAME_FLAGS )
+GAME(199?, m4wife,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Money Or Yer Wife (Gemini) (MPU4)",GAME_FLAGS )
 
 // works, error unless you set %
-GAME(199?, m4blkgd,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Black Gold (Gemini) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4blkgd,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Black Gold (Gemini) (MPU4) (set 1)",GAME_FLAGS )
 // doesn't work, might be bad dump
-GAME(199?, m4blkgda,  m4blkgd,    mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Black Gold (Gemini) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4blkgda,  m4blkgd,    mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Gemini","Black Gold (Gemini) (MPU4) (set 2)",GAME_FLAGS )
 
 // runs, non-reel game?
-GAME(199?, m4zill,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Pure Leisure","Zillionare's Challenge (Pure Leisure) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4zilla,   m4zill,     mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Pure Leisure","Zillionare's Challenge (Pure Leisure) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4zill,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Pure Leisure","Zillionare's Challenge (Pure Leisure) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4zilla,   m4zill,     mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Pure Leisure","Zillionare's Challenge (Pure Leisure) (MPU4) (set 2)",GAME_FLAGS )
 
 // runs but corrupt VFD
-GAME(199?, m4hstr,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Streak (Coinworld) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4hstra,   m4hstr,     mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Streak (Coinworld) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4hstrb,   m4hstr,     mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Streak (Coinworld) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4hstr,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Streak (Coinworld) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4hstra,   m4hstr,     mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Streak (Coinworld) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4hstrb,   m4hstr,     mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Streak (Coinworld) (MPU4) (set 3)",GAME_FLAGS )
 
 // runs but corrupt VFD
-GAME(199?, m4hstrcs,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4hstrcsa, m4hstrcs,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4hstrcsb, m4hstrcs,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4hstrcsc, m4hstrcs,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4hstrcsd, m4hstrcs,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4hstrcs,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4hstrcsa, m4hstrcs,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4hstrcsb, m4hstrcs,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4hstrcsc, m4hstrcs,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4hstrcsd, m4hstrcs,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Casino Happy Streak (Coinworld) (MPU4) (set 5)",GAME_FLAGS )
 
 // Error 1.8
-GAME(199?, m4ddb,     0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Ding Dong Bells (Coinworld) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4ddba,    m4ddb,      mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Ding Dong Bells (Coinworld) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4ddb,     0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Ding Dong Bells (Coinworld) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4ddba,    m4ddb,      mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Ding Dong Bells (Coinworld) (MPU4) (set 2)",GAME_FLAGS )
 
 // runs but corrupt VFD
-GAME(199?, m4hapfrt,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Fruits (Coinworld) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4hapfrta, m4hapfrt,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Fruits (Coinworld) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4hapfrtb, m4hapfrt,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Fruits (Coinworld) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4hapfrt,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Fruits (Coinworld) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4hapfrta, m4hapfrt,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Fruits (Coinworld) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4hapfrtb, m4hapfrt,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Happy Fruits (Coinworld) (MPU4) (set 3)",GAME_FLAGS )
 
 // backwards VFD
-GAME(199?, m4sunday,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Pcp","Sunday Sport (Pcp) (MPU4)",GAME_FLAGS )
+GAME(199?, m4sunday,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Pcp","Sunday Sport (Pcp) (MPU4)",GAME_FLAGS )
 
 // HOPPER FAULT
-GAME(199?, m4jp777,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Jackpot 777 (Cotswold Microsystems) (MPU4)",GAME_FLAGS ) /* Hopper Fault */
+GAME(199?, m4jp777,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Jackpot 777 (Cotswold Microsystems) (MPU4)",GAME_FLAGS ) /* Hopper Fault */
 
 // HOPPER FAULT
-GAME(199?, m4dnj,     0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Double Nudge (Cotswold Microsystems) (MPU4) (set 1)",GAME_FLAGS ) /* Hopper Fault */
-GAME(199?, m4dnja,    m4dnj,      mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Double Nudge (Cotswold Microsystems) (MPU4) (set 2)",GAME_FLAGS ) /* Hopper Fault */
-GAME(199?, m4dnjb,    m4dnj,      mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Double Nudge (Cotswold Microsystems) (MPU4) (set 3)",GAME_FLAGS ) /* Hopper Fault */
+GAME(199?, m4dnj,     0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Double Nudge (Cotswold Microsystems) (MPU4) (set 1)",GAME_FLAGS ) /* Hopper Fault */
+GAME(199?, m4dnja,    m4dnj,      mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Double Nudge (Cotswold Microsystems) (MPU4) (set 2)",GAME_FLAGS ) /* Hopper Fault */
+GAME(199?, m4dnjb,    m4dnj,      mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Cotswold Microsystems","Double Nudge (Cotswold Microsystems) (MPU4) (set 3)",GAME_FLAGS ) /* Hopper Fault */
 
 // PIC CHECK, backwards VFD
-GAME(199?, m4booze,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Extreme","Booze Cruise (Extreme) (MPU4)",GAME_FLAGS )
+GAME(199?, m4booze,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Extreme","Booze Cruise (Extreme) (MPU4)",GAME_FLAGS )
 
  // custom sound system
-GAME(199?, m4cbing,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Redpoint Systems","Cherry Bingo (Redpoint Systems) (MPU4)",GAME_FLAGS )
+GAME(199?, m4cbing,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Redpoint Systems","Cherry Bingo (Redpoint Systems) (MPU4)",GAME_FLAGS )
 
 // just spins wheels badly
-GAME( 199?, m4nod,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Eurotech",   "Nod And A Wink (Eurotech) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
+GAME( 199?, m4nod,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Eurotech",   "Nod And A Wink (Eurotech) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
 
 // LINKUP SUCHE
-GAME( 199?, m4aliz,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Qps",  "AlizBaz (Qps) (German) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+GAME( 199?, m4aliz,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Qps",  "AlizBaz (Qps) (German) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 // SHELF RESONSE
-GAME( 199?, m4coney,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Qps",   "Coney Island (Qps) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+GAME( 199?, m4coney,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Qps",   "Coney Island (Qps) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
-// COIN ALM
-GAME( 199?, m4crzjk,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova?", "Crazy Jokers (Nova?) (MPU4)",GAME_FLAGS )
+// very similar to m4c2 behavior below, but no protection?
+GAME( 199?, m4crzjk,  0,          mod2_alt,       mpu4_invcoin,    mpu4unsorted_state, init_m4default, 0,      "Nova?", "Crazy Jokers (Nova?) (MPU4)",GAME_FLAGS )
 
-// COIN ALM
-GAME( 199?, m4c2,     0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova?", "Circus Circus 2 (Nova?) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE) // COIN   ALM
+// not standard protection, but cheatchr passes it, code crashes after a short time?
+GAME( 199?, m4c2,     0,          mod4oki_alt_cheatchr,    mpu4_invcoin,    mpu4unsorted_state, init_m4default, 0,      "Nova?", "Circus Circus 2 (Nova?) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE) // COIN   ALM
 
 // regular barcrest structure, keine tube (hopper issue)
 GAME( 199?, m4vivan,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::premier_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova",  "Viva Las Vegas (Nova) (MPU4) (GLV 1.2)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
@@ -1872,7 +1846,7 @@ GAME( 199?, m4spotln, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::v
 // runs
 GAME( 199?, m4goldnn, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Nova",  "Golden Years (Nova) (German) (MPU4) (TGY 0.1)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
-// doesn't boot at all?
+// doesn't boot at all? (checking AUX ports?)
 GAME( 199?, m4mgpn,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova",  "Monaco Grand Prix (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 // no protection?
@@ -1896,6 +1870,7 @@ GAME(1988, m4wnud,    0,          mod2,       mpu4,    mpu4unsorted_state, init_
 
 
 // corrupt VFD (many XX), doesn't use standard Barcrest protection, maybe Coinworld?
+// reads a jump offset from 0x800 (where protection would usually map)
 GAME(199?, m4luckwb,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4luckwba, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4luckwbb, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 3)",GAME_FLAGS )
@@ -1908,7 +1883,7 @@ GAME(199?, m4luckwbf, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_
 *
 * Four More
 * - does not appear to be a Barcrest codebase, and game seems to be unprotected
-* - produces no sound even when given an OKI rom from a different game, or with mod4ym, or mod2
+* - produces no sound even when given an OKI rom from a different game, or with mod4ym, or mod2, does access where the AY maps on mod2, but not in a logical way
 *
 *****************************************************************************************************************************************************************************/
 

@@ -7886,3 +7886,36 @@ INPUT_PORTS_END
 
 GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::tricolor_characteriser_prot>,    m4magtbo,    mpu4mod4oki_machines_state, init_m4default_six, ROT0,   "Barcrest","Star Play / Magic Turbo (Barcrest) (MPU4) (XST 0.4)",GAME_FLAGS )
 
+/*****************************************************************************************************************************************************************************
+*
+* Bronze Voyage
+* - this is structured like a Barcrest game, but no copyright is shown, nor is there any protection, bootleg? some sources claim the original is BWB
+* - sample ROM missing, but confirmed as OKI (will attempt to play sounds with ROM from other game)
+* 
+*****************************************************************************************************************************************************************************/
+
+#define M4BRNZE_EXTRAS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "bv5_v2_1.sound", 0x000000, 0x080000, NO_DUMP ) \
+
+ROM_START( m4brnze )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bv25", 0x0000, 0x010000, CRC(5c66f460) SHA1(c7587a6e992549ad8814f77c65b33a17a3641431) )
+	M4BRNZE_EXTRAS
+ROM_END
+
+ROM_START( m4brnzea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bv25v2", 0x0000, 0x010000, CRC(a675edb3) SHA1(a3c6ee6a0bfb301fed72b45ee8e363d77b8b8dbb) )
+	M4BRNZE_EXTRAS
+ROM_END
+
+ROM_START( m4brnzeb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bv55", 0x0000, 0x010000, CRC(93905bc9) SHA1(e8d3cd125dced43fc2cf23cbccc59110561d2a40) )
+	M4BRNZE_EXTRAS
+ROM_END
+
+GAME(199?, m4brnze,   0,          mod4oki,    mpu4,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "bootleg?","Bronze Voyage (BWB) (bootleg?) (MPU4) (BV5 2.1, set 1)",GAME_FLAGS )
+GAME(199?, m4brnzea,  m4brnze,    mod4oki,    mpu4,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "bootleg?","Bronze Voyage (BWB) (bootleg?) (MPU4) (BV5 2.1, set 2)",GAME_FLAGS )
+GAME(199?, m4brnzeb,  m4brnze,    mod4oki,    mpu4,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "bootleg?","Bronze Voyage (BWB) (bootleg?) (MPU4) (BV5 2.1, set 3)",GAME_FLAGS )
