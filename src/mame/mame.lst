@@ -24479,9 +24479,6 @@ m4esctbg                        // Escalera Tobogan (Vifico)
 m4esctbga                       //
 m4esctbgb                       //
 m4exgam                         // Extra Game (Fairplay - Barcrest)
-m4fortcb                        // Fortune Club (Barcrest)
-m4fortcba                       //
-m4fortcbb                       //
 m4fourmr                        // Four More (BWB)
 m4frtgm                         // Fruit Game (Barcrest)
 m4fsx                           // Fun Spot X
@@ -24539,10 +24536,6 @@ m4nod                           //
 m4nspot                         // Night Spot Club (Barcrest)
 m4nspota                        //
 m4nspotb                        //
-m4nudshf                        // Nudge Shuffle (Barcrest)
-m4nudshfa                       //
-m4nudshfb                       //
-m4nudshfc                       //
 m4octo                          // Octopus (Nova)
 m4oldtmr                        // Old Timer (Barcrest)
 m4ordmnd                        // Oriental Diamonds (Barcrest)
@@ -27347,6 +27340,9 @@ m4eaw__w                        //
 m4eaw__x                        //
 m4eaw__y                        //
 m4eaw__z                        //
+m4fortcb                        // Fortune Club (Barcrest)
+m4fortcba                       //
+m4fortcbb                       //
 m4gb006                         // Games Bond 006 (Barcrest)
 m4gb006__a                      //
 m4gb006__b                      //
@@ -29714,6 +29710,10 @@ m4nudbnk__a                     //
 m4nudbnk__b                     //
 m4nudbnk__c                     //
 m4nudbnk__d                     //
+m4nudshf                        // Nudge Shuffle (Barcrest)
+m4nudshfa                       //
+m4nudshfb                       //
+m4nudshfc                       //
 m4przmc                         // Prize Monte Carlo (Barcrest)
 m4przmc__a                      //
 m4przmc__b                      //

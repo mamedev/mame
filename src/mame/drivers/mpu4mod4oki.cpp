@@ -7619,4 +7619,37 @@ GAME(199?, m4chaseia, m4chasei,   mod4oki_alt_bootleg_fixedret<0x24>, mpu4,   mp
 GAME(199?, m4chaseib, m4chasei,   mod4oki_alt_bootleg_fixedret<0x1d>, mpu4,   mpu4mod4oki_machines_state, init_m4default_five_std, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 2)",GAME_FLAGS )
 GAME(199?, m4chaseig, m4chasei,   mod4oki_alt_bootleg_fixedret<0x1d>, mpu4,   mpu4mod4oki_machines_state, init_m4default_five_std, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 3)",GAME_FLAGS ) // copyright removed
 
+/*****************************************************************************************************************************************************************************
+*
+* Fortune Club
+*  - game has issues with the alarms, shows INVALID ALARM instead of proper reel error codes if improperly configured in some cases
+*
+*****************************************************************************************************************************************************************************/
 
+#define M4FORTCB_EXTRAS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "cfosnd.p1", 0x000000, 0x080000, CRC(74bbf913) SHA1(52ddc89ab34b11ede2c0e9b9b27e119b0c1eb2d9) ) \
+	ROM_LOAD( "cfosnd.p2", 0x080000, 0x080000, CRC(1b2bb79a) SHA1(5f19ea000f34bb404ed6c8ea5ec7b809ccb1ae36) )
+
+
+ROM_START( m4fortcb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cfod.p1", 0x0000, 0x010000, CRC(9d0e2b63) SHA1(cce871d2bbe486793de5de9fadfbddf67c382e5c) )
+	M4FORTCB_EXTRAS
+ROM_END
+
+ROM_START( m4fortcba )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cfof.p1", 0x0000, 0x010000, CRC(010b3c1f) SHA1(b44c22c21d22603b277138eabf803e6d46ad4aae) )
+	M4FORTCB_EXTRAS
+ROM_END
+
+ROM_START( m4fortcbb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cfos.p1", 0x0000, 0x010000, CRC(f3b47df4) SHA1(3ad674864ba3a24283af14caaf2c999d4fde11fc) )
+	M4FORTCB_EXTRAS
+ROM_END
+
+GAME(199?, m4fortcb,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 1)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4fortcba, m4fortcb,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 2)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4fortcbb, m4fortcb,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 3)",GAME_FLAGS ) // INVALID ALARM

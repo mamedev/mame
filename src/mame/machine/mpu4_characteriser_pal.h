@@ -1240,6 +1240,12 @@ public:
 	static constexpr uint8_t bucksfizz_characteriser_prot[8] = { 0x00, 0x68, 0x48, 0x60, 0x40, 0x68, 0x48, 0x40 };
 
 
+	// games with sequence starting 00 24 24 2c b0 e0 4c 30 a8 d8 9c 9c bc 1c bc 94
+	// Nudge Shuffle   "NUS 3.1"
+	//                 "NUS 3.0"
+	static constexpr uint8_t nudshf_characteriser_prot[8] = { 0x00, 0x28, 0x20, 0x08, 0x08, 0x20, 0x20, 0x00 };
+
+
 	/***************************************************************
 
 	 Unusual sequences (but correct?)
@@ -1277,12 +1283,6 @@ public:
 	// Dutch Turbo Play   "DTP 1.3"
 	// Dutch Grafitti     "DGR 1.3"
 	static constexpr uint8_t turboplay_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-
-	// games with sequence starting 00 24 24 2c b0 e0 4c 30 a8 d8 9c 9c bc 1c bc 94
-	// Nudge Shuffle   "NUS 3.1"
-	//                 "NUS 3.0"
-	static constexpr uint8_t nudshf_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 
 	// games with sequence starting

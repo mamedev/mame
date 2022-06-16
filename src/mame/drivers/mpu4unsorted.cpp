@@ -308,30 +308,6 @@ ROM_END
 
 
 
-#define M4FORTCB_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "cfosnd.p1", 0x000000, 0x080000, CRC(74bbf913) SHA1(52ddc89ab34b11ede2c0e9b9b27e119b0c1eb2d9) ) \
-	ROM_LOAD( "cfosnd.p2", 0x080000, 0x080000, CRC(1b2bb79a) SHA1(5f19ea000f34bb404ed6c8ea5ec7b809ccb1ae36) )
-
-
-ROM_START( m4fortcb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cfod.p1", 0x0000, 0x010000, CRC(9d0e2b63) SHA1(cce871d2bbe486793de5de9fadfbddf67c382e5c) )
-	M4FORTCB_EXTRAS
-ROM_END
-
-ROM_START( m4fortcba )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cfof.p1", 0x0000, 0x010000, CRC(010b3c1f) SHA1(b44c22c21d22603b277138eabf803e6d46ad4aae) )
-	M4FORTCB_EXTRAS
-ROM_END
-
-ROM_START( m4fortcbb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cfos.p1", 0x0000, 0x010000, CRC(f3b47df4) SHA1(3ad674864ba3a24283af14caaf2c999d4fde11fc) )
-	M4FORTCB_EXTRAS
-ROM_END
-
 
 ROM_START( m4frtgm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -567,25 +543,6 @@ ROM_START( m4nile )
 ROM_END
 
 
-ROM_START( m4nudshf )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "nusx.p1", 0x0000, 0x010000, CRC(87caab84) SHA1(e2492ad0d25ded4d760c4cbe05e9b51ca1a10544) )
-ROM_END
-
-ROM_START( m4nudshfa )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "nus6", 0x0000, 0x010000, CRC(017c5354) SHA1(07491e4b03ab62ad923f8479300c1af4633e3e8c) )
-ROM_END
-
-ROM_START( m4nudshfb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "nuss.bin", 0x0000, 0x010000, CRC(d3b860ee) SHA1(d5d1262c715e4684748b0cae708eeed31b1dc50f) )
-ROM_END
-
-ROM_START( m4nudshfc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "nusxc.p1", 0x0000, 0x010000, CRC(e2557b45) SHA1(a9d1514d4fe3897f6fcef22a5039d6bdff8126ff) )
-ROM_END
 
 
 ROM_START( m4ordmnd )
@@ -1766,10 +1723,6 @@ GAME(199?, m4amhiwy,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m
 
 GAME(199?, m4addrd,   m4addr,     mod2_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Adders & Ladders (Barcrest) (Dutch) (MPU4) (DAL 1.2)",GAME_FLAGS )
 
-GAME(199?, m4nudshf,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 1)",GAME_FLAGS )
-GAME(199?, m4nudshfb, m4nudshf,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 2)",GAME_FLAGS )
-GAME(199?, m4nudshfc, m4nudshf,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 3)",GAME_FLAGS )
-GAME(199?, m4nudshfa, m4nudshf,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.0)",GAME_FLAGS )
 
 GAME(199?, m4rdht,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::redheat_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Red Heat (Barcrest) (Dutch) (MPU4) (DRH 1.2)",GAME_FLAGS )
 
@@ -1817,9 +1770,6 @@ GAME(199?, m4steptm,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::p
 
 GAME(199?, m4wildtm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::wildtime_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Wild Timer (Barcrest) (Dutch) (MPU4) (DWT 1.3)",GAME_FLAGS )
 
-GAME(199?, m4fortcb,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 1)",GAME_FLAGS ) // INVALID ALARM
-GAME(199?, m4fortcba, m4fortcb,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 2)",GAME_FLAGS ) // INVALID ALARM
-GAME(199?, m4fortcbb, m4fortcb,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 3)",GAME_FLAGS ) // INVALID ALARM
 
 // non-english sets
 

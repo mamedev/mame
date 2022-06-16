@@ -1393,6 +1393,37 @@ GAME(199?, m4tropcla, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pa
 GAME(199?, m4tropclb, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 2)",GAME_FLAGS )
 GAME(199?, m4tropclc, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 3)",GAME_FLAGS )
 
+/*****************************************************************************************************************************************************************************
+*
+* Nudge Shuffle
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4nudshf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nusx.p1", 0x0000, 0x010000, CRC(87caab84) SHA1(e2492ad0d25ded4d760c4cbe05e9b51ca1a10544) )
+ROM_END
+
+ROM_START( m4nudshfa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nus6", 0x0000, 0x010000, CRC(017c5354) SHA1(07491e4b03ab62ad923f8479300c1af4633e3e8c) )
+ROM_END
+
+ROM_START( m4nudshfb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nuss.bin", 0x0000, 0x010000, CRC(d3b860ee) SHA1(d5d1262c715e4684748b0cae708eeed31b1dc50f) )
+ROM_END
+
+ROM_START( m4nudshfc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nusxc.p1", 0x0000, 0x010000, CRC(e2557b45) SHA1(a9d1514d4fe3897f6fcef22a5039d6bdff8126ff) )
+ROM_END
+
+
+GAME(199?, m4nudshf,  0,          mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 1)",GAME_FLAGS )
+GAME(199?, m4nudshfb, m4nudshf,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 2)",GAME_FLAGS )
+GAME(199?, m4nudshfc, m4nudshf,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 3)",GAME_FLAGS )
+GAME(199?, m4nudshfa, m4nudshf,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.0)",GAME_FLAGS )
 
 /*****************************************************************************************************************************************************************************
 *
