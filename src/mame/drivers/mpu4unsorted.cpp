@@ -455,14 +455,6 @@ ROM_START( m4rwb )
 	ROM_LOAD( "rwb_2.snd", 0x080000, 0x080000, CRC(54a2b2fd) SHA1(25875ff873bf22df510e7a4c56c336fbabcbdedb) )
 ROM_END
 
-ROM_START( m4magtbo )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "crmtb14.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "scrmtb.snd", 0x000000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
-ROM_END
-
 
 ROM_START( m4ringfr )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -656,10 +648,6 @@ ROM_START( m4wildtm )
 	ROM_LOAD( "wildtimer-snd.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
-ROM_START( m4fourmr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "frmr5p26.bin", 0x8000, 0x008000, CRC(f0c5bd8a) SHA1(39026459008ed5b5bd3a10841799227fef70e5b5) )
-ROM_END
 
 
 
@@ -1508,17 +1496,6 @@ ROM_START( m4vivan )
 ROM_END
 
 
-ROM_START( m4sunseta )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "b2512s.p1", 0x0000, 0x010000, CRC(8c509538) SHA1(eab6a1e44e77cb48cf490616facc74932acc93c5) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( m4sunsetb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "b2512y.p1", 0x0000, 0x010000, CRC(65fa2cd9) SHA1(d2ab1ae25d5425a0788f86535a20d3ebe4a9db2b) )
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-ROM_END
 
 
 
@@ -1633,7 +1610,7 @@ GAME(199?, m4dracb,   m4drac,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::b
 
 GAME(199?, m4vegastg, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Vegas Strip (Barcrest) (German) (MPU4)",GAME_FLAGS ) // 1 DM SW ALM
 
-GAME(199?, m4luckdv,  0,          mod4oki_cheatchr,    mpu4_invcoin,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4)",GAME_FLAGS ) // AUX2 locked
+GAME(199?, m4luckdv,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Czech) (MPU4)",GAME_FLAGS ) // AUX2 locked
 
 GAME(199?, m4luckdvd, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Dutch) (MPU4) (DLD 1.3)",GAME_FLAGS )
 
@@ -1660,19 +1637,19 @@ GAME(199?, m4tbplay,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::t
 // NO METERS
 GAME(199?, m4tbplaya, m4tbplay,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (MPU4) (CTP 0.4)",GAME_FLAGS )
 GAME(199?, m4tbplayb, m4tbplay,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (MPU4) (ZTP 0.7)",GAME_FLAGS )
+// NO METERS, non-standard protection
+GAME(199?, m4remag,   m4tbplay,   mod2_bootleg_fixedret<0x19>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Turbo Play (Barcrest) (bootleg) (MPU4) (ZTP 0.7)",GAME_FLAGS )
+GAME(199?, m4rmg,     m4tbplay,   mod2_bootleg_fixedret<0x6a>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Turbo Play (Barcrest) (bootleg) (MPU4) (CTP 0.4)",GAME_FLAGS )
 
 
-GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::tricolor_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Turbo (Barcrest) (MPU4) (XST 0.4)",GAME_FLAGS ) // Reel A Alarm
 
 // bwb/nova?
 GAME(199?, m4ordmnd,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Oriental Diamonds (Barcrest) (German) (MPU4) (RAB 0.1)",GAME_FLAGS )
 
 // might need samples, but run silent with none, unprotected, reels act strangely, not a Barcrest codebase?
-GAME(199?, m4lineup,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Line Up (BWB) (MPU4) (set 1)",GAME_FLAGS ) // no sound with any system?
-GAME(199?, m4lineupa, m4lineup,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Line Up (BWB) (MPU4) (set 2)",GAME_FLAGS ) // no sound with any system?
+GAME(199?, m4lineup,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Line Up (BWB) (MPU4) (set 1)",GAME_FLAGS ) // no sound with any system?
+GAME(199?, m4lineupa, m4lineup,   mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Line Up (BWB) (MPU4) (set 2)",GAME_FLAGS ) // no sound with any system?
 
-// runs
-GAME(199?, m4fourmr,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Four More (BWB) (MPU4)",GAME_FLAGS ) // no sound with either system?
 
 // runs, unprotected, no sound with any sound system, probably missing samples
 GAME(199?, m4specu,   0,          mod4oki,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Speculator Club (BWB) (MPU4)",GAME_FLAGS ) // no sound with either system
@@ -1770,11 +1747,7 @@ GAME(199?, m4bonzbn,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 // doesn't look like a Barcrest set, but does use Barcrest style CHR protection? reports ILLEGAL SOFTWARE if check fails 
 GAME(199?, m4matdr,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Matador (unknown) (MPU4?)",GAME_FLAGS )
 
-// non-standard protection, "no meters" error
-GAME(199?, m4remag,   0,          mod2_bootleg_fixedret<0x19>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'ZTP 0.7' (MPU4?)",GAME_FLAGS )
 
-// non-standard protection, "no meters" error
-GAME(199?, m4rmg,     0,          mod2_bootleg_fixedret<0x6a>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'CTP 0.4' (MPU4?)",GAME_FLAGS )
 
 
 // runs, no sound (missing samples?), unprotected
@@ -1900,28 +1873,25 @@ GAME( 199?, m4spotln, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::v
 GAME( 199?, m4goldnn, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Nova",  "Golden Years (Nova) (German) (MPU4) (TGY 0.1)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 // doesn't boot at all?
-GAME( 199?, m4mgpn,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova",  "Monaco Grand Prix (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+GAME( 199?, m4mgpn,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova",  "Monaco Grand Prix (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 // no protection?
-GAME(198?, m4funh,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
+GAME(198?, m4funh,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
 
-// these are NOT Mod 2 like the m4sunset sets, so could be misidentified
-GAME(199?, m4sunseta, 0,           mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 1)",GAME_FLAGS )
-GAME(199?, m4sunsetb, m4sunseta,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 2)",GAME_FLAGS )
 
 // REEL 1 FAULT
 // Not the same as Barcrest Everyone's A Winner? has "(C) J.A. Brown 1991" in the ROM
-GAME(1991, m4eaw51,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0, "J.A. Brown", "Everyone's A Winner (J.A. Brown) (MPU4) (EAW 5.1)", GAME_FLAGS )
+GAME(1991, m4eaw51,   0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0, "J.A. Brown", "Everyone's A Winner (J.A. Brown) (MPU4) (EAW 5.1)", GAME_FLAGS )
 
 // REEL 1 FAULT
 // has "(C) J.A. Brown 1993" in the ROM
-GAME(1993, m4twist,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 1)",GAME_FLAGS ) //   REEL 1 FAULT
-GAME(1993, m4twista,  m4twist,    mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 2)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
-GAME(1993, m4twistb,  m4twist,    mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 3)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
+GAME(1993, m4twist,   0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 1)",GAME_FLAGS ) //   REEL 1 FAULT
+GAME(1993, m4twista,  m4twist,    mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 2)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
+GAME(1993, m4twistb,  m4twist,    mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 3)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
 
 // REEL 1 FAULT
 // has "(C) J. Brown 1988" in the ROM (assume same J.A. Brown as above)
-GAME(1988, m4wnud,    0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","unknown MPU4 'W Nudge' (J.A. Brown) (MPU4)",GAME_FLAGS )
+GAME(1988, m4wnud,    0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","unknown MPU4 'W Nudge' (J.A. Brown) (MPU4)",GAME_FLAGS )
 
 
 
@@ -1934,3 +1904,18 @@ GAME(199?, m4luckwbd, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_
 GAME(199?, m4luckwbe, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 6)",GAME_FLAGS )
 GAME(199?, m4luckwbf, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 7)",GAME_FLAGS )
 
+/*****************************************************************************************************************************************************************************
+*
+* Four More
+* - does not appear to be a Barcrest codebase, and game seems to be unprotected
+* - produces no sound even when given an OKI rom from a different game, or with mod4ym, or mod2
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4fourmr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "frmr5p26.bin", 0x8000, 0x008000, CRC(f0c5bd8a) SHA1(39026459008ed5b5bd3a10841799227fef70e5b5) )
+ROM_END
+
+// runs, unprotected, 17 May 1990 BWBNFM26 in ROM
+GAME(1990, m4fourmr,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Four More (BWB) (MPU4)",GAME_FLAGS ) // no sound with either system?

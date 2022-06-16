@@ -24511,7 +24511,6 @@ m4luckwbf                       //
 m4magdrg                        // Magic Dragon (Barcrest)
 m4maglin                        // Magic Liner (Barcrest)
 m4magrep                        // Magic Replay DeLuxe (Barcrest)
-m4magtbo                        // Magic Turbo
 m4matdr                         // Matador (unknown)
 m4mgpn                          // Monaco Grand Prix (Nova)
 m4nile                          // Nile Jewels (Barcrest)
@@ -24546,8 +24545,6 @@ m4stakexa                       // Stake X (Leisurama)
 m4stand2                        // Stand To Deliver (DJE)
 m4steptm                        // Step Timer (Barcrest)
 m4sunday                        // Sunday Sport
-m4sunseta                       //
-m4sunsetb                       //
 m4surf                          // Super Surfin' (Gemini)
 m4surfa                         //
 m4surfb                         //
@@ -28053,6 +28050,7 @@ m4mag7s__w                      //
 m4mag7s__x                      //
 m4mag7s__y                      //
 m4mag7s__z                      //
+m4magtbo                        // Star Play / Magic Turbo
 m4makmnt                        // Make A Mint (Barcrest)
 m4makmnt__0                     //
 m4makmnt__1                     //
@@ -28913,6 +28911,8 @@ m4ssclas__b                     //
 m4ssclas__c                     //
 m4ssclas__d                     //
 m4ssclas__e                     //
+m4sunseta                       // Sunset Boulevard (Barcrest)
+m4sunsetb                       //
 m4supbjc                        // Super Blackjack Club (Barcrest)
 m4supbjca                       //
 m4supbjcb                       //

@@ -7807,3 +7807,82 @@ ROM_END
 
 // doesn't require inverted coins, runs, has Deluxe in the title
 GAME(199?, m4cjdlx,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,    mpu4mod4oki_machines_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels Deluxe (Barcrest) (German) (MPU4) (CJG 0.4)",GAME_FLAGS )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Sunset Boulevard (MOD4OKI type)
+* - this could be misidentified, it was in with other Sunset Boulevard sets, but clearly not the same thing
+* - sample ROM missing, but confirmed as OKI (will attempt to play sounds with ROM from other game)
+*
+*****************************************************************************************************************************************************************************/
+
+#define M4SSB4_EXTRAS \
+	ROM_REGION( 0x200000, "msm6376", 0 ) \
+	ROM_LOAD( "b25_v1_2.sound", 0x000000, 0x080000, NO_DUMP ) \
+
+ROM_START( m4sunseta )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b2512s.p1", 0x0000, 0x010000, CRC(8c509538) SHA1(eab6a1e44e77cb48cf490616facc74932acc93c5) )
+	M4SSB4_EXTRAS
+ROM_END
+
+ROM_START( m4sunsetb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b2512y.p1", 0x0000, 0x010000, CRC(65fa2cd9) SHA1(d2ab1ae25d5425a0788f86535a20d3ebe4a9db2b) )
+	M4SSB4_EXTRAS
+ROM_END
+
+// these are NOT Mod 2 like the m4sunset sets, so could be misidentified
+GAME(199?, m4sunseta, 0,           mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 1)",GAME_FLAGS )
+GAME(199?, m4sunsetb, m4sunseta,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 2)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Star Play
+* - the set was called Magic Turbo, but game boots as Star Play
+* - requires similar inputs to Super Play in mod2 (is this also a Czech game?)
+* - despite using an OKI, most of the samples sound like sampled AY sounds!
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4magtbo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "crmtb14.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "scrmtb.snd", 0x000000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
+ROM_END
+
+INPUT_PORTS_START( m4magtbo )
+	PORT_INCLUDE( mpu4 )
+
+	PORT_MODIFY("DIL1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x08, "Coin Value?" ) PORT_DIPLOCATION("DIL1:04") // needed to boot
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+INPUT_PORTS_END
+
+GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::tricolor_characteriser_prot>,    m4magtbo,    mpu4mod4oki_machines_state, init_m4default_six, ROT0,   "Barcrest","Star Play / Magic Turbo (Barcrest) (MPU4) (XST 0.4)",GAME_FLAGS )
+
