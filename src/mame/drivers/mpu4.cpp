@@ -1895,10 +1895,28 @@ void mpu4_state::init_m_oldtmr()
 	setup_rom_banks();
 }
 
-void mpu4_state::init_m4default_big_fivestd()
+void mpu4_state::init_m4default_big_five_std()
 {
 	init_m4default_big();
 	use_m4_five_reel_std();
+}
+
+void mpu4_state::init_m4default_big_five_rev()
+{
+	init_m4default_big();
+	use_m4_five_reel_rev();
+}
+
+void mpu4_state::init_m4default_big_six()
+{
+	init_m4default_big();
+	use_m4_six_reel_std();
+}
+
+void mpu4_state::init_m4default_big_six_alt()
+{
+	init_m4default_big();
+	use_m4_six_reel_alt();
 }
 
 

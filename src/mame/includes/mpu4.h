@@ -144,7 +144,13 @@ public:
 	void init_m4default_806prot();
 	void init_m4tst2();
 	void init_m4_andycp10c();
-	void init_m4default_big_fivestd();
+	void init_m4default_big_five_std();
+	void init_m4default_big_five_rev();
+
+	void init_m4default_big_six();
+	void init_m4default_big_six_alt();
+
+
 	void init_m_oldtmr();
 	void init_m4tst();
 	void init_big_extenda();

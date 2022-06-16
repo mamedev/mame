@@ -151,29 +151,6 @@ ROM_END
 
 
 
-#define M4CLBX_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "cxs1.hex", 0x000000, 0x080000, CRC(4ce005f1) SHA1(ee0f59a9c7e0222dd63fa63ccff8f194abd01ddb) ) \
-	ROM_LOAD( "cxs2.hex", 0x080000, 0x080000, CRC(495e0730) SHA1(7ba8150fbcf974ac494a82fd373ff02185543e35) )
-
-ROM_START( m4clbx )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "clx12s.p1", 0x0000, 0x020000, CRC(6798c153) SHA1(e621e341a0fed1cb35637edb0769ae1cca72a663) )
-	M4CLBX_EXTRAS
-ROM_END
-
-ROM_START( m4clbxa )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "clx12d.p1", 0x0000, 0x020000, CRC(43e797ba) SHA1(fb2fc843176fe50c1039214d48815d6e9871ae27) )
-	M4CLBX_EXTRAS
-ROM_END
-
-ROM_START( m4clbxb )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "clx12f.p1", 0x0000, 0x020000, CRC(3e6a82fe) SHA1(01ef9a15a3cf9b1191c573b36fb5758e79c3adc1) )
-	M4CLBX_EXTRAS
-ROM_END
-
 
 ROM_START( m4crzjk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -765,20 +742,6 @@ ROM_END
 
 
 
-ROM_START( m4sunscl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sc_xe___.3_3", 0x0000, 0x010000, CRC(e3732cc6) SHA1(77f0368bb29ad00030f83af794a52df92fe97e5d) )
-ROM_END
-
-ROM_START( m4sunscla )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sc_xe_d_.3_3", 0x0000, 0x010000, CRC(b8627c4a) SHA1(ad616d38773cbd82376b518aa15dc3d7027237c5) )
-ROM_END
-
-ROM_START( m4sunsclb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sc_xef__.3_3", 0x0000, 0x010000, CRC(8e7e1100) SHA1(7648ea860a546081388a213845e27312730f46d9) )
-ROM_END
 
 
 /* Vifico MPU4 games.
@@ -1651,16 +1614,9 @@ GAME( 198?, m4rltst,  0,          mod2,       mpu4,    mpu4unsorted_state, init_
 
 // barcrest, to split
 
-
-// corrupt vfd (BWB?)
-GAME(199?, m4clbx,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 1)",GAME_FLAGS )
-GAME(199?, m4clbxa,   m4clbx,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 2)",GAME_FLAGS )
-GAME(199?, m4clbxb,   m4clbx,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 3)",GAME_FLAGS )
-
 GAME(199?, m4ringfr,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Ring Of Fire (Barcrest) (German) (MPU4) (ROF 0.3)",GAME_FLAGS )
 
 GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::jewelcrown_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,  ROT0,   "Barcrest","Royal Jewels (Barcrest) (German) (MPU4) (GRJ 1.4)",GAME_FLAGS )
-
 
 // won't boot with current reel setup, not even in test mode (REEL E ALM)
 GAME(199?, m4maglin,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Liner (Barcrest) (Dutch) (MPU4) (DMA 2.1)",GAME_FLAGS )
@@ -1689,12 +1645,7 @@ GAME(199?, m4twintm,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m
 
 GAME(199?, m4blkbul,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Super Play (Czech) (Barcrest) (MPU4) (XSP 0.8)",GAME_FLAGS ) // complains about coin dip
 
-
-
 GAME(199?, m4gldgat,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Golden Gate (Barcrest) (Dutch) (MPU4) (DGG 2.2)",GAME_FLAGS )
-
-
-
 
 GAME(199?, m4holdtm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Hold Timer (Barcrest) (Dutch) (MPU4) (DHT 1.0)",GAME_FLAGS )
 
@@ -1709,7 +1660,6 @@ GAME(199?, m4univ,    0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pa
 
 GAME(199?, m4frtgm,   0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4) (FRU 2.0)",GAME_FLAGS ) // SAMPLE EEPROM ALARM (and has a weird sample rom..)
 
-
 GAME(199?, m4roadrn,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Road Runner (Barcrest) (Dutch) (MPU4) (DRO 1.9)",GAME_FLAGS )
 
 GAME(199?, m4showtm,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::andybt_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Show Timer (Barcrest) (Dutch) (MPU4) (DSH 1.3)",GAME_FLAGS )
@@ -1717,9 +1667,6 @@ GAME(199?, m4showtm,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::a
 GAME(199?, m4steptm,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::phr_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Step Timer (Barcrest) (Dutch) (MPU4) (DST 1.1)",GAME_FLAGS )
 
 GAME(199?, m4wildtm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::wildtime_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Wild Timer (Barcrest) (Dutch) (MPU4) (DWT 1.3)",GAME_FLAGS )
-
-
-// non-english sets
 
 GAME(199?, m4magrep,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Replay (Barcrest) (Dutch) (MPU4) (DMR 1.3)",GAME_FLAGS )
 
@@ -1792,13 +1739,9 @@ GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::t
 // bwb/nova?
 GAME(199?, m4ordmnd,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Oriental Diamonds (Barcrest) (German) (MPU4) (RAB 0.1)",GAME_FLAGS )
 
-
-
 // might need samples, but run silent with none, unprotected, reels act strangely, not a Barcrest codebase?
 GAME(199?, m4lineup,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Line Up (BWB) (MPU4) (set 1)",GAME_FLAGS ) // no sound with any system?
 GAME(199?, m4lineupa, m4lineup,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Line Up (BWB) (MPU4) (set 2)",GAME_FLAGS ) // no sound with any system?
-
-
 
 // runs
 GAME(199?, m4fourmr,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Four More (BWB) (MPU4)",GAME_FLAGS ) // no sound with either system?
@@ -1806,16 +1749,9 @@ GAME(199?, m4fourmr,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_sta
 // runs, unprotected, no sound with any sound system, probably missing samples
 GAME(199?, m4specu,   0,          mod4oki,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Speculator Club (BWB) (MPU4)",GAME_FLAGS ) // no sound with either system
 
-
-
 // GEEN TUBES (even in test mode)
 GAME(199?, m4topdk,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Top Deck (Barcrest) (Dutch) (MPU4) (DT 2.6)",GAME_FLAGS )
 
-
-// REEL A ALM
-GAME(199?, m4sunscl,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Sunset Club (BWB) (MPU4) (SSC 3.0, set 1)",GAME_FLAGS )
-GAME(199?, m4sunscla, m4sunscl,   mod2_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Sunset Club (BWB) (MPU4) (SSC 3.0, set 2)",GAME_FLAGS )
-GAME(199?, m4sunsclb, m4sunscl,   mod2_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Sunset Club (BWB) (MPU4) (SSC 3.0, set 3)",GAME_FLAGS )
 
 GAME(199?, m4bigban,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (German) (MPU4) (BIG 0.4)",GAME_FLAGS ) // DM1 SW ALM
 

@@ -315,7 +315,7 @@ static const uint32_t m4blsbys_g_keys[2] = { 0x36, 0x010e20 };
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BLSBYS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4blsbys_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big_fivestd, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4blsbys_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big_five_std, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4blsbys,       0,          "bbprog.bin",   0x0000, 0x020000, CRC(c262cfda) SHA1(f004895e0dd3f8420683927915554e19e41bd20b), "BWB","Blues Boys (BWB) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4blsbys__a,    m4blsbys,   "bf_20a__.3_1", 0x0000, 0x020000, CRC(fca7764f) SHA1(a88378247b6710d6122c515c31c39c5cd9678ce2), "BWB","Blues Boys (BWB) (MPU4) (set 2)" )
@@ -350,7 +350,7 @@ GAME_CUSTOM( 199?, m4blsbys__8,    m4blsbys,   "bs_25a_c.2_1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BLSBYS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki_chr_cheat<m4blsbys_g_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big_fivestd, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4blsbys_g_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big_five_std, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4blsbys__g,    m4blsbys,   "bs_05___.3v1", 0x0000, 0x020000, CRC(26e8eb95) SHA1(7d8dbca127e1867714cbeb9d699b2173de724eb2), "BWB","Blues Boys (BWB) (MPU4) (set 26)" )
 GAME_CUSTOM( 199?, m4blsbys__h,    m4blsbys,   "bs_05__c.3v1", 0x0000, 0x020000, CRC(12e51237) SHA1(68235cf5f36862a26d5d44464041dabb01b9f95c), "BWB","Blues Boys (BWB) (MPU4) (set 27)" )

@@ -314,6 +314,7 @@ public:
 	// spend spend spend - This is unusual because the 2nd value DOES need to be different, bit 0x20 can't be set
 	// or the 2nd reel will be in the wrong place.  Does this indicate the lamp reading is more complex than
 	// we believe, or are there 2 parts with the same sequence and one value different?
+	// clubx also needs this version instead
 	static constexpr uint8_t viva_sss_characteriser_prot[8] = { 0x00, 0x40, 0x20, 0x40, 0x40, 0x20, 0x20, 0x40 };
 
 	// games with sequence starting

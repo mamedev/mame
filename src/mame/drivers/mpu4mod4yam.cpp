@@ -1357,6 +1357,33 @@ GAME(199?, m4calicld, m4calicl,   mod4yam_cheatchr_pal<mpu4_characteriser_pal::s
 
 /*****************************************************************************************************************************************************************************
 *
+* Sunset Club
+*  - can't see credit display, needs extender?
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4sunscl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sc_xe___.3_3", 0x0000, 0x010000, CRC(e3732cc6) SHA1(77f0368bb29ad00030f83af794a52df92fe97e5d) )
+ROM_END
+
+ROM_START( m4sunscla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sc_xe_d_.3_3", 0x0000, 0x010000, CRC(b8627c4a) SHA1(ad616d38773cbd82376b518aa15dc3d7027237c5) )
+ROM_END
+
+ROM_START( m4sunsclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sc_xef__.3_3", 0x0000, 0x010000, CRC(8e7e1100) SHA1(7648ea860a546081388a213845e27312730f46d9) )
+ROM_END
+
+GAME(199?, m4sunscl,  0,          mod4yam_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "BWB", "Sunset Club (BWB) (MPU4) (SSC 3.0, set 1)", GAME_FLAGS )
+GAME(199?, m4sunscla, m4sunscl,   mod4yam_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "BWB", "Sunset Club (BWB) (MPU4) (SSC 3.0, set 2)", GAME_FLAGS )
+GAME(199?, m4sunsclb, m4sunscl,   mod4yam_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "BWB", "Sunset Club (BWB) (MPU4) (SSC 3.0, set 3)", GAME_FLAGS )
+
+
+/*****************************************************************************************************************************************************************************
+*
 * Tropicana Club
 *  - can't see credit display, needs extender?
 *
@@ -1392,6 +1419,7 @@ GAME(199?, m4tropcld, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pa
 GAME(199?, m4tropcla, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 1)",GAME_FLAGS )
 GAME(199?, m4tropclb, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 2)",GAME_FLAGS )
 GAME(199?, m4tropclc, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 3)",GAME_FLAGS )
+
 
 /*****************************************************************************************************************************************************************************
 *

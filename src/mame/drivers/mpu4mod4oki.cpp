@@ -7693,3 +7693,36 @@ GAME(199?, m4clbveg,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pa
 GAME(199?, m4clbvega, m4clbveg,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 2)",GAME_FLAGS )
 GAME(199?, m4clbvegb, m4clbveg,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 3)",GAME_FLAGS )
 GAME(199?, m4clbvegc, m4clbveg,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 4)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Club X
+*
+*****************************************************************************************************************************************************************************/
+
+#define M4CLBX_EXTRAS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "cxs1.hex", 0x000000, 0x080000, CRC(4ce005f1) SHA1(ee0f59a9c7e0222dd63fa63ccff8f194abd01ddb) ) \
+	ROM_LOAD( "cxs2.hex", 0x080000, 0x080000, CRC(495e0730) SHA1(7ba8150fbcf974ac494a82fd373ff02185543e35) )
+
+ROM_START( m4clbx )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "clx12s.p1", 0x0000, 0x020000, CRC(6798c153) SHA1(e621e341a0fed1cb35637edb0769ae1cca72a663) )
+	M4CLBX_EXTRAS
+ROM_END
+
+ROM_START( m4clbxa )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "clx12d.p1", 0x0000, 0x020000, CRC(43e797ba) SHA1(fb2fc843176fe50c1039214d48815d6e9871ae27) )
+	M4CLBX_EXTRAS
+ROM_END
+
+ROM_START( m4clbxb )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "clx12f.p1", 0x0000, 0x020000, CRC(3e6a82fe) SHA1(01ef9a15a3cf9b1191c573b36fb5758e79c3adc1) )
+	M4CLBX_EXTRAS
+ROM_END
+
+GAME(199?, m4clbx,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default_big_six,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 1)",GAME_FLAGS )
+GAME(199?, m4clbxa,   m4clbx,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default_big_six,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 2)",GAME_FLAGS )
+GAME(199?, m4clbxb,   m4clbx,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>,    mpu4,    mpu4mod4oki_machines_state, init_m4default_big_six,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 3)",GAME_FLAGS )

@@ -24443,9 +24443,6 @@ m4ccop                          //
 m4ccopa                         //
 m4ccopb                         //
 m4ceptr                         // Ceptor (Barcrest)
-m4clbx                          // Club X (Barcrest)
-m4clbxa                         //
-m4clbxb                         //
 m4clr                           // MPU4 Meter Clear ROM
 m4coney                         // Coney Island (Qps)
 m4crzcav                        // Crazy Cavern (Nova)
@@ -24559,9 +24556,6 @@ m4stakexa                       // Stake X (Leisurama)
 m4stand2                        // Stand To Deliver (DJE)
 m4steptm                        // Step Timer (Barcrest)
 m4sunday                        // Sunday Sport
-m4sunscl                        // Sunset Club (BWB)
-m4sunscla                       //
-m4sunsclb                       //
 m4sunseta                       //
 m4sunsetb                       //
 m4surf                          // Super Surfin' (Gemini)
@@ -27034,6 +27028,9 @@ m4clbveg                        // Club Vegas (Barcrest)
 m4clbvega                       //
 m4clbvegb                       //
 m4clbvegc                       //
+m4clbx                          // Club X (Barcrest)
+m4clbxa                         //
+m4clbxb                         //
 m4coscas                        // Cosmic Casino (Barcrest)
 m4coscas__a                     //
 m4coscas__b                     //
@@ -29786,6 +29783,9 @@ m4sayno__a                      //
 m4sayno__b                      //
 m4sayno__c                      //
 m4sayno__d                      //
+m4sunscl                        // Sunset Club (BWB)
+m4sunscla                       //
+m4sunsclb                       //
 m4supbf                         // Super Bucks Fizz Club (Barcrest)
 m4supbfa                        //
 m4sss                           // Spend Spend Spend (Barcrest)
