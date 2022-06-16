@@ -1901,6 +1901,13 @@ void mpu4_state::init_m4default_big_fivestd()
 	use_m4_five_reel_std();
 }
 
+
+void mpu4_state::init_m4default_five_std()
+{
+	init_m4default();
+	use_m4_five_reel_std();
+}
+
 void mpu4_state::init_big_extenda()
 {
 	init_m4default_big();

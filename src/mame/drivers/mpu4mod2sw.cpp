@@ -2203,6 +2203,50 @@ ROM_END
 // non-standard protection, makes some invalid writes
 GAME(199?, m4holywd,  0,          mod2_bootleg_fixedret<0xd0>,       mpu4,    mpu4mod2_machines_state, init_m4default, ROT0,   "bootleg?","Hollywood (bootleg) (MPU4) (HOL 1.0)",GAME_FLAGS )
 
+/*********************************************************************************************************
+
+   High Rise
+
+*********************************************************************************************************/
+
+ROM_START( m4hirise )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hiix.p1", 0x0000, 0x010000, CRC(c68c816c) SHA1(2ec89d83f3b658700433fc165358290ce58eba64) )
+ROM_END
+
+ROM_START( m4hirisea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hirs.p1", 0x0000, 0x010000, CRC(a38f771e) SHA1(c1502200671389a1fe6dcb9c043d22583d5991dc) )
+ROM_END
+
+ROM_START( m4hiriseb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hirs20dd", 0x0000, 0x010000, CRC(89941670) SHA1(28859adfa79dce53c348c63b46f6f5a068f2b2de) )
+ROM_END
+
+ROM_START( m4hirisec )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hirx.p1", 0x0000, 0x010000, CRC(4280a16b) SHA1(c9179ec17404a6f084679ad5f04e53a50f00af98) )
+ROM_END
+
+ROM_START( m4hirised )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hirxc.p1", 0x0000, 0x010000, CRC(1ad1d942) SHA1(91d02212606e22b280be9640433e013bc50e5ea8) )
+ROM_END
+
+ROM_START( m4hirisee )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hrise206", 0x0000, 0x010000, CRC(58b4bbdd) SHA1(0b76d27147fbadba97328eb9d2dc81cff9d576e0) )
+ROM_END
+
+GAME(199?, m4hirise,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4mod2_machines_state, init_m4default_five_std, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HII 0.3)",GAME_FLAGS )
+GAME(199?, m4hirisea, m4hirise,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4mod2_machines_state, init_m4default_five_std, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HIR 3.1, set 1)",GAME_FLAGS )
+GAME(199?, m4hirisec, m4hirise,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4mod2_machines_state, init_m4default_five_std, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HIR 3.1, set 2)",GAME_FLAGS )
+GAME(199?, m4hirised, m4hirise,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4mod2_machines_state, init_m4default_five_std, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HIR 3.1, set 3)",GAME_FLAGS )
+GAME(199?, m4hirisee, m4hirise,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4mod2_machines_state, init_m4default_five_std, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HIR 3.0)",GAME_FLAGS )
+// non-standard protection
+GAME(199?, m4hiriseb, m4hirise,   mod2_alt_bootleg_fixedret<0x88>,   mpu4,    mpu4mod2_machines_state, init_m4default_five_std, ROT0,   "bootleg?","High Rise (Barcrest) (MPU4) (HIR 1.5, bootleg?)",GAME_FLAGS )
+
 
 /*********************************************************************************************************
 

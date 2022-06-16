@@ -469,35 +469,6 @@ ROM_START( m4hpyjok )
 	ROM_LOAD( "dhjsnd", 0x0000, 0x080000, CRC(8ac4aae6) SHA1(70dba43b398010a8bd0d82cf91553d3f5e0921f0) )
 ROM_END
 
-ROM_START( m4hirise )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hiix.p1", 0x0000, 0x010000, CRC(c68c816c) SHA1(2ec89d83f3b658700433fc165358290ce58eba64) )
-ROM_END
-
-ROM_START( m4hirisea )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hirs.p1", 0x0000, 0x010000, CRC(a38f771e) SHA1(c1502200671389a1fe6dcb9c043d22583d5991dc) )
-ROM_END
-
-ROM_START( m4hiriseb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hirs20dd", 0x0000, 0x010000, CRC(89941670) SHA1(28859adfa79dce53c348c63b46f6f5a068f2b2de) )
-ROM_END
-
-ROM_START( m4hirisec )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hirx.p1", 0x0000, 0x010000, CRC(4280a16b) SHA1(c9179ec17404a6f084679ad5f04e53a50f00af98) )
-ROM_END
-
-ROM_START( m4hirised )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hirxc.p1", 0x0000, 0x010000, CRC(1ad1d942) SHA1(91d02212606e22b280be9640433e013bc50e5ea8) )
-ROM_END
-
-ROM_START( m4hirisee )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hrise206", 0x0000, 0x010000, CRC(58b4bbdd) SHA1(0b76d27147fbadba97328eb9d2dc81cff9d576e0) )
-ROM_END
 
 ROM_START( m4holdtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1953,13 +1924,6 @@ GAME(199?, m4supbfa,  m4supbf,    mod2_alt_cheatchr_pal<mpu4_characteriser_pal::
 
 GAME(199?, m4gldgat,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Golden Gate (Barcrest) (Dutch) (MPU4) (DGG 2.2)",GAME_FLAGS )
 
-GAME(199?, m4hirise,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HII 0.3)",GAME_FLAGS )
-GAME(199?, m4hirisea, m4hirise,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HIR 3.1, set 1)",GAME_FLAGS )
-GAME(199?, m4hirisec, m4hirise,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HIR 3.1, set 2)",GAME_FLAGS )
-GAME(199?, m4hirised, m4hirise,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HIR 3.1, set 3)",GAME_FLAGS )
-GAME(199?, m4hirisee, m4hirise,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HIR 3.0)",GAME_FLAGS )
-// non-standard protection
-GAME(199?, m4hiriseb, m4hirise,   mod2_alt_bootleg_fixedret<0x88>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "bootleg?","High Rise (Barcrest) (MPU4) (HIR 1.5, bootleg?)",GAME_FLAGS )
 
 GAME(199?, m4nspot,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (NS2 2.2, set 1)",GAME_FLAGS )
 GAME(199?, m4nspota,  m4nspot,    mod2_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (NS2 2.2, set 2)",GAME_FLAGS )
@@ -2161,6 +2125,7 @@ GAME(199?, m4barcrz,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 GAME(199?, m4bonzbn,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bingo Bonanza (unknown) (MPU4?)",GAME_FLAGS )
 
 // ERROR CODE 2
+// doesn't look like a Barcrest set, but does use Barcrest style CHR protection? reports ILLEGAL SOFTWARE if check fails 
 GAME(199?, m4matdr,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Matador (unknown) (MPU4?)",GAME_FLAGS )
 
 // non-standard protection, "no meters" error
