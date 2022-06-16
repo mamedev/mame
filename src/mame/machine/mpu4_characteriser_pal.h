@@ -784,6 +784,7 @@ public:
 	//                    "JC8 4.4"
 	//                    "JC8 4.2"
 	// Pot Black Casino   "PO  1.2"
+    //                    "PO  1.1"
 	// Fortune Club       "CFO 1.2"
 	static constexpr uint8_t fortune_characteriser_prot[8] = { 0x00, 0x70, 0x10, 0x60, 0x20, 0x50, 0x10, 0x00 }; // guessed based on lamp positions in Pot Black Casino and Jewel in the Crown
 
@@ -1127,8 +1128,6 @@ public:
 	// Pot Black                  "PBG 1.4"
 	//                            "PBG 1.5"
 	//                            "PBS 0.4"
-	//                            "PO  1.2"
-	//                            "PO  1.1"
 	// Action Club                "A2C 1.1"
 	// Nile Jewels (German)       "GJN 0.8"
 	// Oriental Diamonds (German) "RAB 0.1"

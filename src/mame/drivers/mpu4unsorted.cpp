@@ -720,14 +720,6 @@ ROM_START( m4ordmnd )
 ROM_END
 
 
-ROM_START( m4ptblkc )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "potblackcasinoprg.bin", 0x0000, 0x020000, CRC(29190084) SHA1(c7a778331369c0fac796ef3e306e12c98605f365) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "potblackcasinosnd.p1", 0x000000, 0x080000, CRC(72a3331d) SHA1(b7475ba0ad86a6277e3d4f7b4311a98f3fc29802) )
-	ROM_LOAD( "potblackcasinosnd.p2", 0x080000, 0x080000, CRC(c2460eec) SHA1(7c62fbc69ffaa788bf3839e37a75a812a7b8caef) )
-ROM_END
 
 
 ROM_START( m4prem )
@@ -1002,27 +994,6 @@ ROM_START( m4fourmr )
 ROM_END
 
 
-#define M4LAZY_EXTRAS \
-	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing? */
-
-ROM_START( m4lazy )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "lb_sj___.1_0", 0x0000, 0x020000, CRC(8628dcf1) SHA1(80cb9348e2704d0f72a44b4aa74b24fe03e279bc) )
-	M4LAZY_EXTRAS
-ROM_END
-
-ROM_START( m4lazya )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "lb_sj___.1_2", 0x0000, 0x020000, CRC(2b906f52) SHA1(802bcf6b3679e135308026752a55e55f00f21e85) )
-	M4LAZY_EXTRAS
-ROM_END
-
-ROM_START( m4lazyb )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "lb_sj_d_.1_2", 0x0000, 0x020000, CRC(a7691bad) SHA1(6cda3f3c18c13c04dbe0e4c1e4c817eedc34aa92) )
-	M4LAZY_EXTRAS
-ROM_END
 
 
 ROM_START( m4specu )
@@ -1904,7 +1875,7 @@ ROM_START( m4funh )
 ROM_END
 
 
-// Not the same as Barcrest Everyone's A Winner? has "(C) J.A. Brown 1991" in the ROM
+
 ROM_START( m4eaw51 ) \
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "everyones a winner v2-5p", 0x08000, 0x008000, CRC(eb8f2fc5) SHA1(0d3614bd5ff561d17bef0d1e620f2f812b8fed5b))
@@ -1925,7 +1896,7 @@ GAME( 198?, m4rltst,  0,          mod2,       mpu4,    mpu4unsorted_state, init_
 // requires stake set to boot (just hangs otherwise)
 GAME(199?, m4c9c,     0,          mod2_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu420p,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Cloud Nine Club (Barcrest) (MPU4) (CNC 2.1)",GAME_FLAGS )
 
-// corrupt vfd (bwb?)
+// corrupt vfd (BWB?)
 GAME(199?, m4clbx,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 1)",GAME_FLAGS )
 GAME(199?, m4clbxa,   m4clbx,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 2)",GAME_FLAGS )
 GAME(199?, m4clbxb,   m4clbx,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 3)",GAME_FLAGS )
@@ -2112,30 +2083,20 @@ GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::t
 // bwb/nova?
 GAME(199?, m4ordmnd,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Oriental Diamonds (Barcrest) (German) (MPU4) (RAB 0.1)",GAME_FLAGS )
 
-GAME(199?, m4ptblkc,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::fortune_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Pot Black Casino (Bwb - Barcrest) (MPU4) (PO  1.2)",GAME_FLAGS )
 
-// REEL 1 FAULT, doesn't access protection
-GAME(199?, m4twist,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Twist Again (Barcrest) (MPU4) (set 1)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
-GAME(199?, m4twista,  m4twist,    mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Twist Again (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
-GAME(199?, m4twistb,  m4twist,    mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Twist Again (Barcrest) (MPU4) (set 3)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
 
-// might need samples, but run silent with none, unprotected, reels act strangely
-GAME(199?, m4lineup,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Line Up (Bwb - Barcrest) (MPU4) (set 1)",GAME_FLAGS ) // no sound with any system?
-GAME(199?, m4lineupa, m4lineup,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Line Up (Bwb - Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // no sound with any system?
+// might need samples, but run silent with none, unprotected, reels act strangely, not a Barcrest codebase?
+GAME(199?, m4lineup,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Line Up (BWB) (MPU4) (set 1)",GAME_FLAGS ) // no sound with any system?
+GAME(199?, m4lineupa, m4lineup,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Line Up (BWB) (MPU4) (set 2)",GAME_FLAGS ) // no sound with any system?
 
 
 
 // runs
-GAME(199?, m4fourmr,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Four More (Bwb) (MPU4)",GAME_FLAGS ) // no sound with either system?
-
+GAME(199?, m4fourmr,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Four More (BWB) (MPU4)",GAME_FLAGS ) // no sound with either system?
 
 // runs, unprotected, no sound with any sound system, probably missing samples
-GAME(199?, m4specu,   0,          mod4oki,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Speculator Club (Bwb) (MPU4)",GAME_FLAGS ) // no sound with either system
+GAME(199?, m4specu,   0,          mod4oki,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Speculator Club (BWB) (MPU4)",GAME_FLAGS ) // no sound with either system
 
-// runs
-GAME(199?, m4lazy,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::wta_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (LBD 1.0)",GAME_FLAGS )
-GAME(199?, m4lazya,   m4lazy,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::wta_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (LBD 1.2, set 1)",GAME_FLAGS )
-GAME(199?, m4lazyb,   m4lazy,     mod4oki_cheatchr_pal<mpu4_characteriser_pal::wta_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (LBD 1.2, set 2)",GAME_FLAGS )
 
 
 // GEEN TUBES (even in test mode)
@@ -2143,9 +2104,9 @@ GAME(199?, m4topdk,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::intc
 
 
 // REEL A ALM
-GAME(199?, m4sunscl,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (SSC 3.0, set 1)",GAME_FLAGS )
-GAME(199?, m4sunscla, m4sunscl,   mod2_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (SSC 3.0, set 2)",GAME_FLAGS )
-GAME(199?, m4sunsclb, m4sunscl,   mod2_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (SSC 3.0, set 3)",GAME_FLAGS )
+GAME(199?, m4sunscl,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Sunset Club (BWB) (MPU4) (SSC 3.0, set 1)",GAME_FLAGS )
+GAME(199?, m4sunscla, m4sunscl,   mod2_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Sunset Club (BWB) (MPU4) (SSC 3.0, set 2)",GAME_FLAGS )
+GAME(199?, m4sunsclb, m4sunscl,   mod2_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Sunset Club (BWB) (MPU4) (SSC 3.0, set 3)",GAME_FLAGS )
 
 GAME(199?, m4bigban,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (German) (MPU4) (BIG 0.4)",GAME_FLAGS ) // DM1 SW ALM
 
@@ -2173,7 +2134,8 @@ GAME(199?, m4riotrp,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::b
 
 GAME(199?, m4sctagt,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Nova","Secret Agent (Nova) (MPU4)",GAME_FLAGS ) // AUX2 LOCKED
 
-GAMEL(199?, m4aao,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4aao,     ROT0,   "Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS, layout_m4aao )
+// has D.J.E 1999 copyright in ROM
+GAMEL(1999, m4aao,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4aao,     ROT0,   "Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS, layout_m4aao )
 
 // works
 GAME(199?, m4bandgd,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Eurogames","Bands Of Gold (Eurogames) (MPU4)",GAME_FLAGS )
@@ -2220,8 +2182,6 @@ GAME(199?, m4remag,   0,          mod2_bootleg_fixedret<0x19>,       mpu4,    mp
 // non-standard protection, "no meters" error
 GAME(199?, m4rmg,     0,          mod2_bootleg_fixedret<0x6a>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'CTP 0.4' (MPU4?)",GAME_FLAGS )
 
-// REEL 1 FAULT
-GAME(199?, m4wnud,    0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'W Nudge' (MPU4?)",GAME_FLAGS )
 
 // runs, no sound (missing samples?), unprotected
 GAME(199?, m4brnze,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bronze Voyage (unknown) (MPU4) (set 1)",GAME_FLAGS )
@@ -2352,7 +2312,20 @@ GAME(199?, m4sunseta, 0,           mod4oki_cheatchr_pal<mpu4_characteriser_pal::
 GAME(199?, m4sunsetb, m4sunseta,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 2)",GAME_FLAGS )
 
 // REEL 1 FAULT
-GAME(1991, m4eaw51,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0, "<unknown>", "Everyone's A Winner (EAW 5.1, J.A. Brown) (MPU4)", GAME_FLAGS )
+// Not the same as Barcrest Everyone's A Winner? has "(C) J.A. Brown 1991" in the ROM
+GAME(1991, m4eaw51,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0, "J.A. Brown", "Everyone's A Winner (J.A. Brown) (MPU4) (EAW 5.1)", GAME_FLAGS )
+
+// REEL 1 FAULT
+// has "(C) J.A. Brown 1993" in the ROM
+GAME(1993, m4twist,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 1)",GAME_FLAGS ) //   REEL 1 FAULT
+GAME(1993, m4twista,  m4twist,    mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 2)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
+GAME(1993, m4twistb,  m4twist,    mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","Twist Again (J.A. Brown) (MPU4) (TA 9.6, set 3)",GAME_FLAGS ) // TA 9.6  REEL 1 FAULT
+
+// REEL 1 FAULT
+// has "(C) J. Brown 1988" in the ROM (assume same J.A. Brown as above)
+GAME(1988, m4wnud,    0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "J.A. Brown","unknown MPU4 'W Nudge' (J.A. Brown) (MPU4)",GAME_FLAGS )
+
+
 
 // corrupt VFD (many XX), doesn't use standard Barcrest protection, maybe Coinworld?
 GAME(199?, m4luckwb,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 1)",GAME_FLAGS )

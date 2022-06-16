@@ -1787,13 +1787,13 @@ GAME(199?, m4dblup,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::addr
 
 GAME(199?, m4eighth,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Eighth Wonder (Barcrest) (MPU4) (WON 2.2)",GAME_FLAGS )
 //
-GAME(199?, m4eightha, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 1)",GAME_FLAGS )
-GAME(199?, m4eighthb, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 2)",GAME_FLAGS )
-GAME(199?, m4eighthc, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 3)",GAME_FLAGS )
-GAME(199?, m4eighthd, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 4, bad?)",GAME_FLAGS )
-GAME(199?, m4eighthe, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 5)",GAME_FLAGS )
-GAME(199?, m4eighthf, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 6)",GAME_FLAGS )
-GAME(199?, m4eighthg, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 7)",GAME_FLAGS )
+GAME(199?, m4eightha, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "BWB","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 1)",GAME_FLAGS )
+GAME(199?, m4eighthb, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "BWB","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 2)",GAME_FLAGS )
+GAME(199?, m4eighthc, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "BWB","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 3)",GAME_FLAGS )
+GAME(199?, m4eighthd, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "BWB","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 4, bad?)",GAME_FLAGS )
+GAME(199?, m4eighthe, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "BWB","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 5)",GAME_FLAGS )
+GAME(199?, m4eighthf, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "BWB","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 6)",GAME_FLAGS )
+GAME(199?, m4eighthg, m4eighth,   mod2_cheatchr_pal<mpu4_characteriser_pal::eighth_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "BWB","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 7)",GAME_FLAGS )
 
 GAME(199?, m4frtprs,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Fruit Preserve (Barcrest) (MPU4) (F4P 1.1, set 1)",GAME_FLAGS )
 GAME(199?, m4frtprsa, m4frtprs,   mod2_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Fruit Preserve (Barcrest) (MPU4) (F4P 1.1, set 2)",GAME_FLAGS )
@@ -1898,22 +1898,22 @@ GAME(199?, m4bjsma,   m4bjsm,     mod2_cheatchr, mpu4,            mpu4mod2_machi
 
 GAME(198?, m4supsl,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::nifty_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest",   "Supa Silva (Barcrest) (MPU4) (SS2V 1.0)",GAME_FLAGS )
 
-GAME(199?, m4flshlt,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 1)",GAME_FLAGS )
-GAME(199?, m4flshltb, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 2)",GAME_FLAGS )
-GAME(199?, m4flshltc, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 3)",GAME_FLAGS )
-GAME(199?, m4flshltd, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 4)",GAME_FLAGS )
-GAME(199?, m4flshlte, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 5)",GAME_FLAGS )
-GAME(199?, m4flshltf, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 6)",GAME_FLAGS )
-GAME(199?, m4flshltg, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 7)",GAME_FLAGS )
+GAME(199?, m4flshlt,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Flashlite (BWB) (MPU4) (FLT 1.0, set 1)",GAME_FLAGS )
+GAME(199?, m4flshltb, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Flashlite (BWB) (MPU4) (FLT 1.0, set 2)",GAME_FLAGS )
+GAME(199?, m4flshltc, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Flashlite (BWB) (MPU4) (FLT 1.0, set 3)",GAME_FLAGS )
+GAME(199?, m4flshltd, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Flashlite (BWB) (MPU4) (FLT 1.0, set 4)",GAME_FLAGS )
+GAME(199?, m4flshlte, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Flashlite (BWB) (MPU4) (FLT 1.0, set 5)",GAME_FLAGS )
+GAME(199?, m4flshltf, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Flashlite (BWB) (MPU4) (FLT 1.0, set 6)",GAME_FLAGS )
+GAME(199?, m4flshltg, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Flashlite (BWB) (MPU4) (FLT 1.0, set 7)",GAME_FLAGS )
 //
-GAME(199?, m4flshlta, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::berseralt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (BFL 0.5)",GAME_FLAGS )
+GAME(199?, m4flshlta, m4flshlt,   mod2_cheatchr_pal<mpu4_characteriser_pal::berseralt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Flashlite (BWB) (MPU4) (BFL 0.5)",GAME_FLAGS )
 
-GAME(199?, m4blflsh,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (TBF 0.3)",GAME_FLAGS )
-GAME(199?, m4blflsha, m4blflsh,   mod2_cheatchr_pal<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 1)",GAME_FLAGS )
-GAME(199?, m4blflshb, m4blflsh,   mod2_cheatchr_pal<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 2)",GAME_FLAGS )
-GAME(199?, m4blflshc, m4blflsh,   mod2_cheatchr_pal<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 3)",GAME_FLAGS )
-GAME(199?, m4blflshd, m4blflsh,   mod2_cheatchr_pal<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 4)",GAME_FLAGS )
-GAME(199?, m4blflshe, m4blflsh,   mod2_cheatchr_pal<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (BFL 0.3, set 5)",GAME_FLAGS )
+GAME(199?, m4blflsh,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Blue Flash (BWB) (MPU4) (TBF 0.3)",GAME_FLAGS )
+GAME(199?, m4blflsha, m4blflsh,   mod2_cheatchr_pal<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Blue Flash (BWB) (MPU4) (BFL 0.3, set 1)",GAME_FLAGS )
+GAME(199?, m4blflshb, m4blflsh,   mod2_cheatchr_pal<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Blue Flash (BWB) (MPU4) (BFL 0.3, set 2)",GAME_FLAGS )
+GAME(199?, m4blflshc, m4blflsh,   mod2_cheatchr_pal<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Blue Flash (BWB) (MPU4) (BFL 0.3, set 3)",GAME_FLAGS )
+GAME(199?, m4blflshd, m4blflsh,   mod2_cheatchr_pal<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Blue Flash (BWB) (MPU4) (BFL 0.3, set 4)",GAME_FLAGS )
+GAME(199?, m4blflshe, m4blflsh,   mod2_cheatchr_pal<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Blue Flash (BWB) (MPU4) (BFL 0.3, set 5)",GAME_FLAGS )
 
 GAME(199?, m4ttak,    0,          mod2_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Tic Tac Take (Barcrest) (MPU4) (TIC 2.0)",GAME_FLAGS )
 
@@ -1963,8 +1963,8 @@ GAME(199?, m4c999d,   m4c999,     mod2_bootleg_fixedret<0x9a>, mpu4,            
 	GAME(year, setname, parent, mod2_cheatchr_pal<mpu4_characteriser_pal::hittop_characteriser_prot>, mpu4, mpu4mod2_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1993  B.W.B." and "SC9 5.0"
-GAME_CUSTOM( 199?, m4c999g,   m4c999,   "c9o20__1.1",   0x0000, 0x010000, CRC(e05fa532) SHA1(63d070416a4e6979302901bb33e20c994cb3723e), "Bwb","Cloud 999 (Barcrest) (MPU4) (SC9 5.0)" )
-GAME_CUSTOM( 199?, m4c999h,   m4c999,   "c9o20d_1.1",   0x0000, 0x010000, CRC(047b2d83) SHA1(b83f8fe6477226ef3e75f406020ea4f8b3d55c32), "Bwb","Cloud 999 (Barcrest) (MPU4) (SC9 5.0 D)" )
+GAME_CUSTOM( 199?, m4c999g,   m4c999,   "c9o20__1.1",   0x0000, 0x010000, CRC(e05fa532) SHA1(63d070416a4e6979302901bb33e20c994cb3723e), "BWB","Cloud 999 (Barcrest) (MPU4) (SC9 5.0)" )
+GAME_CUSTOM( 199?, m4c999h,   m4c999,   "c9o20d_1.1",   0x0000, 0x010000, CRC(047b2d83) SHA1(b83f8fe6477226ef3e75f406020ea4f8b3d55c32), "BWB","Cloud 999 (Barcrest) (MPU4) (SC9 5.0 D)" )
 // no copyright string and "SC9 1.0" (hack or early Bwb set?) (still expects regular CHR protection)
 GAME_CUSTOM( 199?, m4c999i,   m4c999,   "c9o02__1.1",   0x0000, 0x010000, CRC(109f7040) SHA1(3fe9da13d9746e1cdaf6dcd539e4af624d2cec71), "hack?","Cloud 999 (Barcrest) (MPU4) (SC9 1.0, hack?, set 1)" )
 GAME_CUSTOM( 199?, m4c999j,   m4c999,   "c9o05__1.1",   0x0000, 0x010000, CRC(2c821aa8) SHA1(33fba7dea0f66e7b0251971864d5a2923f96f8cd), "hack?","Cloud 999 (Barcrest) (MPU4) (SC9 1.0, hack?, set 2)" )
@@ -2105,8 +2105,8 @@ GAME(199?, m4btclok,  0,          mod2_bootleg_fixedret<0x45>, mpu4,            
 GAME(199?, m4brktak,  0,          mod2_bootleg_fixedret<0x45>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Break & Take (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
 
 // runs if you set a stake, missing an extender for the credits display?
-GAME(199?, m4sunclb,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>,       mpu420p,    mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Sun Club (Bwb) (MPU4) (SUC 0.2, set 1)",GAME_FLAGS )
-GAME(199?, m4sunclba, m4sunclb,   mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>,       mpu420p,    mpu4mod2_machines_state, init_m4default, ROT0,   "Bwb","Sun Club (Bwb) (MPU4) (SUC 0.2, set 2)",GAME_FLAGS )
+GAME(199?, m4sunclb,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>,       mpu420p,    mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Sun Club (BWB) (MPU4) (SUC 0.2, set 1)",GAME_FLAGS )
+GAME(199?, m4sunclba, m4sunclb,   mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>,       mpu420p,    mpu4mod2_machines_state, init_m4default, ROT0,   "BWB","Sun Club (BWB) (MPU4) (SUC 0.2, set 2)",GAME_FLAGS )
 
 
 // these were found in with mod4oki sets, but don't attempt to play samples, only use the AY
