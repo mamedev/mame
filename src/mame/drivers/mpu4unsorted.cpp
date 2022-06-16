@@ -1514,8 +1514,8 @@ GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::j
 // GEEN TUBES
 GAME(199?, m4maglin,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Magic Liner (Barcrest) (Dutch) (MPU4) (DMA 2.1)",GAME_FLAGS )
 
-// doesn't seem happy with any 5 reel setup (maybe it uses more?)
-GAME(199?, m4magdrg,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::magicdragon_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4default_five_std, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
+// GEEN TUBES
+GAME(199?, m4magdrg,  0,          mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::magicdragon_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
 
 // GEEN TUBES
 GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::bluediamond_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Blue Diamond (Barcrest) (Dutch) (MPU4) (DBD 1.0)",GAME_FLAGS )
@@ -1686,11 +1686,12 @@ GAME(199?, m4joljokh, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::s
 
 GAME(199?, m4sctagt,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Nova","Secret Agent (Nova) (MPU4)",GAME_FLAGS ) // AUX2 LOCKED
 
-// has D.J.E 1999 copyright in ROM
-GAMEL(1999, m4aao,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4aao,     ROT0,   "Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS, layout_m4aao )
 
-// works
-GAME(199?, m4bandgd,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Eurogames","Bands Of Gold (Eurogames) (MPU4)",GAME_FLAGS )
+// works.  This is not a Barcrest game, but has a standard CHR check after you coin up for the first time, expecting the m4lv sequence back.  Reports ILLEGAL SOFTWARE if it fails
+GAME(199?, m4bandgd,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Eurogames","Bands Of Gold (Eurogames) (MPU4)",GAME_FLAGS )
+
+// ERROR CODE 2. as with m4bandgd this isn't a Barcrest, but does the standard CHR check and shows ILLEGAL SOFTWARE if check fails, assume it is also by Eurogames
+GAME(199?, m4matdr,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Eurogames","Matador (Eurogames) (MPU4)",GAME_FLAGS )
 
 // works, not standard protection, but cheatchr works
 GAME(199?, m4bigben,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Coinworld","Big Ben (Coinworld) (MPU4, set 1)",GAME_FLAGS )
@@ -1718,6 +1719,9 @@ GAME(199?, m4dblchn,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_
 // other issues, only plays an 'alarm' sound when there's money to payout? wrong sound ROM or something else?
 GAME(2001, m4casmul,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "DJE","Casino Multiplay (MPU4)",GAME_FLAGS ) // unprotected, copyright year / manufacturer found in ROM
 
+ // has D.J.E 1999 copyright in ROM
+GAMEL(1999, m4aao,    0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4aao,     ROT0,   "DJE / Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS, layout_m4aao )
+
 /* Unknown stuff that looks like it might be MPU4, but needs further verification, some could be bad */
 
 // PAL FAIL
@@ -1726,9 +1730,6 @@ GAME(199?, m4barcrz,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_
 // gives an error
 GAME(199?, m4bonzbn,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bingo Bonanza (unknown) (MPU4?)",GAME_FLAGS )
 
-// ERROR CODE 2
-// doesn't look like a Barcrest set, but does use Barcrest style CHR protection? reports ILLEGAL SOFTWARE if check fails 
-GAME(199?, m4matdr,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Matador (unknown) (MPU4?)",GAME_FLAGS )
 
 /* *if* these are MPU4 they have a different sound system at least - The copyright strings in them are 'AET' tho (Ace?) - Could be related to the Crystal stuff? */
 GAME(199?, m4sbx,     0,          mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 1)",GAME_FLAGS )
@@ -1739,7 +1740,9 @@ GAME(199?, m4sbxd,    m4sbx,      mod4oki,   mpu4,    mpu4unsorted_state, init_m
 GAME(199?, m4sbxe,    m4sbx,      mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 6)",GAME_FLAGS )
 
 GAME(199?, m4bclimb,  0,          mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Bear Climber (MPU4?)",GAME_FLAGS )
+
 GAME(199?, m4captb,   0,          mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Captain Bear (MPU4?)",GAME_FLAGS )
+
 GAME(199?, m4jungj,   0,          mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 1)",GAME_FLAGS )
 GAME(199?, m4jungja,  m4jungj,    mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 2)",GAME_FLAGS )
 GAME(199?, m4jungjb,  m4jungj,    mod4oki,   mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "AET/Coinworld","Jungle Japes (MPU4?) (set 3)",GAME_FLAGS )
