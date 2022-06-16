@@ -1284,6 +1284,40 @@ GAME_CUSTOM( 199?, m4gbust__q,  m4gbust,    "gb_20_b_.2a3",         0x0000, 0x01
 
 /*****************************************************************************************************************************************************************************
 *
+* Bucks Fizz Club / Super Bucks Fizz Club
+*
+*****************************************************************************************************************************************************************************/
+
+
+ROM_START( m4bucks )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bufs.p1", 0x0000, 0x010000, CRC(e394ae40) SHA1(911077053c47cebba1bed9d359cd38bd676a46f1) )
+ROM_END
+
+ROM_START( m4bucksa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bufd.p1", 0x0000, 0x010000, CRC(02c575d3) SHA1(92dc7a0c298e4d2d19bf754a5c82cc15e4e6456c) )
+ROM_END
+
+ROM_START( m4supbf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sbff.p1", 0x0000, 0x010000, CRC(f27feba0) SHA1(157bf28e2d5fc2fa58bed11b3285cf56ae18abb8) )
+ROM_END
+
+ROM_START( m4supbfa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sbfs.p1", 0x0000, 0x010000, CRC(c8c52d5e) SHA1(d53513b9faabc307623a7c2f5be0225fb812beeb) )
+ROM_END
+
+
+GAME(199?, m4bucks,   0,          mod4yam_cheatchr_pal<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4) (BUF 1.2, set 1)",GAME_FLAGS )
+GAME(199?, m4bucksa,  m4bucks,    mod4yam_cheatchr_pal<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4) (BUF 1.2, set 2)",GAME_FLAGS )
+GAME(199?, m4supbf,   0,          mod4yam_cheatchr_pal<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (SBF 2.0, set 1)",GAME_FLAGS )
+GAME(199?, m4supbfa,  m4supbf,    mod4yam_cheatchr_pal<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (SBF 2.0, set 2)",GAME_FLAGS )
+
+
+/*****************************************************************************************************************************************************************************
+*
 * Misc Other Sets
 *
 *****************************************************************************************************************************************************************************/

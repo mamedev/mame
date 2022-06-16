@@ -151,6 +151,7 @@ public:
 	void init_m4altreels();
 	void init_m4altreels_big();
 	void init_m4default_five_std();
+	void init_m4default_five_rev();
 
 	void mod2(machine_config &config);
 	void mod2_cheatchr(machine_config &config);

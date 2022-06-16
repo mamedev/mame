@@ -107,13 +107,6 @@ ROM_END
 
 
 
-ROM_START( m4bucks )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bufd.p1", 0x0000, 0x010000, CRC(02c575d3) SHA1(92dc7a0c298e4d2d19bf754a5c82cc15e4e6456c) )
-	ROM_LOAD( "bufs.p1", 0x0000, 0x010000, CRC(e394ae40) SHA1(911077053c47cebba1bed9d359cd38bd676a46f1) )
-ROM_END
-
-
 ROM_START( m4calicl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ca2s.p1", 0x0000, 0x010000, CRC(fad153fd) SHA1(bd1f1a5c73624df45d01cb4853d87e998e434d7a) )
@@ -775,16 +768,6 @@ ROM_START( m4steptm )
 ROM_END
 
 
-
-ROM_START( m4supbf )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sbff.p1", 0x0000, 0x010000, CRC(f27feba0) SHA1(157bf28e2d5fc2fa58bed11b3285cf56ae18abb8) )
-ROM_END
-
-ROM_START( m4supbfa )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sbfs.p1", 0x0000, 0x010000, CRC(c8c52d5e) SHA1(d53513b9faabc307623a7c2f5be0225fb812beeb) )
-ROM_END
 
 
 #define M4TECHNO_EXTRAS \
@@ -1915,12 +1898,6 @@ GAME(199?, m4caliclb, m4calicl,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::
 GAME(199?, m4caliclc, m4calicl,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (CAL 2.0, set 1)",GAME_FLAGS )
 GAME(199?, m4calicld, m4calicl,   mod2_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (CAL 2.0, set 2)",GAME_FLAGS )
 
-// REEL E ALARM
-GAME(199?, m4bucks,   0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4) (BUF 1.2)",GAME_FLAGS )
-
-// REEL E ALARM
-GAME(199?, m4supbf,   0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (SBF 2.0, set 1)",GAME_FLAGS )
-GAME(199?, m4supbfa,  m4supbf,    mod2_alt_cheatchr_pal<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (SBF 2.0, set 2)",GAME_FLAGS )
 
 GAME(199?, m4gldgat,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Golden Gate (Barcrest) (Dutch) (MPU4) (DGG 2.2)",GAME_FLAGS )
 

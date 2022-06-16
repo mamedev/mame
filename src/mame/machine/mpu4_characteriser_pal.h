@@ -1234,6 +1234,12 @@ public:
 	static constexpr uint8_t hirise_characteriser_prot[8] = { 0x00, 0x68, 0x08, 0x60, 0x20, 0x48, 0x08, 0x00 }; // matches bootleg
 
 
+	// games with sequence starting   00 48 a0 54 2c 88 94 14 2c a4 50 24 48 a4 78 c0 70
+	// Bucks Fizz Club        "BUF 1.2"
+	// Super Bucks Fizz Club  "SBF 2.0"
+	static constexpr uint8_t bucksfizz_characteriser_prot[8] = { 0x00, 0x68, 0x48, 0x60, 0x40, 0x68, 0x48, 0x40 };
+
+
 	/***************************************************************
 
 	 Unusual sequences (but correct?)
@@ -1363,11 +1369,6 @@ public:
 	// games with sequence starting  00 50 10 a0 c4 c4 74 30 b0 34 00 f0 14 80 f4 04
 	// Dutch Techno Reel  "DTE 1.3" (doesn't boot) (REEL F)
 	static constexpr uint8_t techno_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-
-	// games with sequence starting   00 48 a0 54 2c 88 94 14 2c a4 50 24 48 a4 78 c0 70
-	// Bucks Fizz Club        "BUF 1.2" (doesn't boot) (REEL E)
-	// Super Bucks Fizz Club  "SBF 2.0" (doesn't boot)
-	static constexpr uint8_t bucksfizz_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 
 	/***************************************************************

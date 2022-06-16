@@ -24433,7 +24433,6 @@ m4booze                         // Booze Cruise
 m4brnze                         // Bronze Voyage (unknown)
 m4brnzea                        //
 m4brnzeb                        //
-m4bucks                         // Bucks Fizz Club (Barcrest)
 m4c2                            // Circus Circus 2 (Nova)
 m4calicl                        // California Club (Barcrest)
 m4calicla                       //
@@ -24591,8 +24590,6 @@ m4sunscla                       //
 m4sunsclb                       //
 m4sunseta                       //
 m4sunsetb                       //
-m4supbf                         // Super Bucks Fizz Club (Barcrest)
-m4supbfa                        //
 m4surf                          // Super Surfin' (Gemini)
 m4surfa                         //
 m4surfb                         //
@@ -29638,6 +29635,8 @@ m4addrcc__a                     //
 m4addrcc__b                     //
 m4addrcc__c                     //
 m4addrcc__d                     //
+m4bucks                         // Bucks Fizz Club (Barcrest)
+m4bucksa                        //
 m4clbshf                        // Club Shuffle (Barcrest)
 m4cojok                         // Carry On Joker (Barcrest)
 m4cojok__a                      //
@@ -29792,6 +29791,8 @@ m4sayno__a                      //
 m4sayno__b                      //
 m4sayno__c                      //
 m4sayno__d                      //
+m4supbf                         // Super Bucks Fizz Club (Barcrest)
+m4supbfa                        //
 m4sss                           // Spend Spend Spend (Barcrest)
 m4sss__b                        //
 m4sss__c                        //
