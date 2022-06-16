@@ -1391,7 +1391,7 @@ GAME(199?, m4tropcl,  0,          mod4yam_alt_cheatchr_pal<mpu4_characteriser_pa
 GAME(199?, m4tropcld, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TRO 2.0, set 2)",GAME_FLAGS )
 GAME(199?, m4tropcla, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 1)",GAME_FLAGS )
 GAME(199?, m4tropclb, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 2)",GAME_FLAGS )
-GAME(199?, m4tropclc, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpumpu4mod4yam_machines_state4unsorted_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 3)",GAME_FLAGS )
+GAME(199?, m4tropclc, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 3)",GAME_FLAGS )
 
 
 /*****************************************************************************************************************************************************************************

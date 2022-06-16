@@ -149,54 +149,6 @@ ROM_START( m4ceptr )
 ROM_END
 
 
-#define M4CHASEI_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "cha.s1", 0x000000, 0x080000, CRC(8200b6bc) SHA1(bcc4ffbddcdcc1dd994fe29e9b24e83272f59442) ) \
-	ROM_LOAD( "cha.s2", 0x080000, 0x080000, CRC(542863fa) SHA1(501d66b2badb5036bb5dd8bac3cdb681f630a982) )
-
-ROM_START( m4chasei )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ci2c.p1", 0x0000, 0x010000, CRC(fc49a2e1) SHA1(f4f02e168cd9bf0245c2b7340fe151da66f09c5c) )
-	M4CHASEI_EXTRAS
-ROM_END
-
-ROM_START( m4chaseia )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ch20p8pn.rom", 0x0000, 0x010000, CRC(712bd2e7) SHA1(0e83fa077f42a051aaa07a7e13196955b0ac840d) )
-	M4CHASEI_EXTRAS
-ROM_END
-
-ROM_START( m4chaseib )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "chin2010l", 0x0000, 0x010000, CRC(7fe97181) SHA1(1ccf65ff108bdaa46efcb3f831fccc953297b9ac) )
-	M4CHASEI_EXTRAS
-ROM_END
-
-ROM_START( m4chaseic )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ci2k.p1", 0x0000, 0x010000, CRC(8d715b8a) SHA1(5dd6f8d3d6710b0741df37af8792d942f41062d2) )
-	M4CHASEI_EXTRAS
-ROM_END
-
-ROM_START( m4chaseid )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ci2s.p1", 0x0000, 0x010000, CRC(8175e1e3) SHA1(9a4b0a0288508e7900ceac8bc3b245ac1f898b19) )
-	M4CHASEI_EXTRAS
-ROM_END
-
-ROM_START( m4chaseie )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ci2y.p1", 0x0000, 0x010000, CRC(80410946) SHA1(60a4f73eb9a35e5c246d8ef7b25bcf25b28bf8ed) )
-	M4CHASEI_EXTRAS
-ROM_END
-
-
-ROM_START( m4chaseig )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ci_20.10", 0x0000, 0x010000, CRC(80a4bfb3) SHA1(b3c11bd621457d190eeab423bc15895b0c7cf6da) ) // found in cash inferno set.
-	M4CHASEI_EXTRAS
-ROM_END
-
 
 
 
@@ -1807,14 +1759,6 @@ GAME(199?, m4clbvega, m4clbveg,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pa
 GAME(199?, m4clbvegb, m4clbveg,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 3)",GAME_FLAGS )
 GAME(199?, m4clbvegc, m4clbveg,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 4)",GAME_FLAGS )
 
-GAME(199?, m4chasei,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (CI2 0.1, set 1)",GAME_FLAGS )
-GAME(199?, m4chaseic, m4chasei,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (CI2 0.1, set 2)",GAME_FLAGS )
-GAME(199?, m4chaseid, m4chasei,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (CI2 0.1, set 3)",GAME_FLAGS )
-GAME(199?, m4chaseie, m4chasei,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (CI2 0.1, set 4)",GAME_FLAGS )
-// different protection, not original
-GAME(199?, m4chaseia, m4chasei,   mod4oki_alt_bootleg_fixedret<0x24>, mpu4,   mpu4unsorted_state, init_m4altreels, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 1)",GAME_FLAGS )
-GAME(199?, m4chaseib, m4chasei,   mod4oki_alt_bootleg_fixedret<0x1d>, mpu4,   mpu4unsorted_state, init_m4altreels, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 2)",GAME_FLAGS )
-GAME(199?, m4chaseig, m4chasei,   mod4oki_alt_bootleg_fixedret<0x1d>, mpu4,   mpu4unsorted_state, init_m4altreels, ROT0,   "hack","Chase Invaders (Barcrest) (MPU4) (8V1 0.1, hack, set 3)",GAME_FLAGS ) // copyright removed
 
 GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::bluediamond_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Blue Diamond (Barcrest) (Dutch) (MPU4) (DBD 1.0)",GAME_FLAGS )
 

@@ -24443,13 +24443,6 @@ m4ccop                          //
 m4ccopa                         //
 m4ccopb                         //
 m4ceptr                         // Ceptor (Barcrest)
-m4chasei                        // Chase Invaders (Barcrest)
-m4chaseia                       //
-m4chaseib                       //
-m4chaseic                       //
-m4chaseid                       //
-m4chaseie                       //
-m4chaseig                       //
 m4clbveg                        // Club Vegas (Barcrest)
 m4clbvega                       //
 m4clbvegb                       //
@@ -27044,6 +27037,13 @@ m4cashmn__y                     //
 m4cashmn__z                     //
 m4cashmn__za                    //
 m4cashmn__zb                    //
+m4chasei                        // Chase Invaders (Barcrest)
+m4chaseia                       //
+m4chaseib                       //
+m4chaseic                       //
+m4chaseid                       //
+m4chaseie                       //
+m4chaseig                       //
 m4coscas                        // Cosmic Casino (Barcrest)
 m4coscas__a                     //
 m4coscas__b                     //
