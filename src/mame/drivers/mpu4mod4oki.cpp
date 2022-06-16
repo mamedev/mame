@@ -7653,3 +7653,43 @@ ROM_END
 GAME(199?, m4fortcb,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 1)",GAME_FLAGS ) // INVALID ALARM
 GAME(199?, m4fortcba, m4fortcb,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 2)",GAME_FLAGS ) // INVALID ALARM
 GAME(199?, m4fortcbb, m4fortcb,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 3)",GAME_FLAGS ) // INVALID ALARM
+
+/*****************************************************************************************************************************************************************************
+*
+* Club Vegas
+*
+*****************************************************************************************************************************************************************************/
+
+#define M4CLBVEG_EXTRAS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "cvegass1.hex", 0x000000, 0x080000, CRC(13a8c857) SHA1(c66e10bca1ad54f467b9c5eacd502c54397c09b2) ) \
+	ROM_LOAD( "cvegass2.hex", 0x080000, 0x080000, CRC(88b37145) SHA1(1c6c9ad2010e1688d3370d1f2a5ae83dc683b500) )
+
+ROM_START( m4clbveg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "clas.p1", 0x0000, 0x010000, CRC(6aad03f0) SHA1(2f611cc6f020e334dc4b87d2d907727ba15ff7ff) )
+	M4CLBVEG_EXTRAS
+ROM_END
+
+ROM_START( m4clbvega )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "claf.p1", 0x0000, 0x010000, CRC(79b83184) SHA1(7319a405b2b0b274e03f5cd1465436f8548065e4) )
+	M4CLBVEG_EXTRAS
+ROM_END
+
+ROM_START( m4clbvegb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "clal.p1", 0x0000, 0x010000, CRC(db0bb5a2) SHA1(2735e02642fb92bb824e3b1f415a1a3ef13a856d) )
+	M4CLBVEG_EXTRAS
+ROM_END
+
+ROM_START( m4clbvegc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "clad.p1", 0x0000, 0x010000, CRC(4fa45cce) SHA1(58a5d6cc8608eb1aa453429e26eacea589afa524) )
+	M4CLBVEG_EXTRAS
+ROM_END
+
+GAME(199?, m4clbveg,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 1)",GAME_FLAGS )
+GAME(199?, m4clbvega, m4clbveg,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 2)",GAME_FLAGS )
+GAME(199?, m4clbvegb, m4clbveg,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 3)",GAME_FLAGS )
+GAME(199?, m4clbvegc, m4clbveg,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu420p,    mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 4)",GAME_FLAGS )

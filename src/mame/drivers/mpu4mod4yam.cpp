@@ -1425,6 +1425,34 @@ GAME(199?, m4nudshfb, m4nudshf,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pa
 GAME(199?, m4nudshfc, m4nudshf,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 3)",GAME_FLAGS )
 GAME(199?, m4nudshfa, m4nudshf,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.0)",GAME_FLAGS )
 
+
+/*****************************************************************************************************************************************************************************
+*
+* Night Spot
+*
+*****************************************************************************************************************************************************************************/
+
+
+ROM_START( m4nspot )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ns2s.p1", 0x0000, 0x010000, CRC(ba0f5a81) SHA1(7015176d4528636cb8a753249c824c37941e8eae) )
+ROM_END
+
+ROM_START( m4nspota )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ns2d.p1", 0x0000, 0x010000, CRC(5e66b7e0) SHA1(e82044e3c1e5cf3a2baf1fde7b7ab8b6e221d360) )
+ROM_END
+
+ROM_START( m4nspotb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nits.p1", 0x0000, 0x010000, CRC(47c965e6) SHA1(41a337a9a367c4e704a60e32d56b262d03f97b59) )
+ROM_END
+
+GAME(199?, m4nspot,   0,          mod4yam_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (NS2 2.2, set 1)",GAME_FLAGS )
+GAME(199?, m4nspota,  m4nspot,    mod4yam_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (NS2 2.2, set 2)",GAME_FLAGS )
+GAME(199?, m4nspotb,  m4nspot,    mod4yam_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (NIT 1.1)",GAME_FLAGS )
+
+
 /*****************************************************************************************************************************************************************************
 *
 * Misc Other Sets

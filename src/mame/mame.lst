@@ -24443,10 +24443,6 @@ m4ccop                          //
 m4ccopa                         //
 m4ccopb                         //
 m4ceptr                         // Ceptor (Barcrest)
-m4clbveg                        // Club Vegas (Barcrest)
-m4clbvega                       //
-m4clbvegb                       //
-m4clbvegc                       //
 m4clbx                          // Club X (Barcrest)
 m4clbxa                         //
 m4clbxb                         //
@@ -24533,9 +24529,6 @@ m4matdr                         // Matador (unknown)
 m4mgpn                          // Monaco Grand Prix (Nova)
 m4nile                          // Nile Jewels (Barcrest)
 m4nod                           //
-m4nspot                         // Night Spot Club (Barcrest)
-m4nspota                        //
-m4nspotb                        //
 m4octo                          // Octopus (Nova)
 m4oldtmr                        // Old Timer (Barcrest)
 m4ordmnd                        // Oriental Diamonds (Barcrest)
@@ -27037,6 +27030,10 @@ m4chaseic                       //
 m4chaseid                       //
 m4chaseie                       //
 m4chaseig                       //
+m4clbveg                        // Club Vegas (Barcrest)
+m4clbvega                       //
+m4clbvegb                       //
+m4clbvegc                       //
 m4coscas                        // Cosmic Casino (Barcrest)
 m4coscas__a                     //
 m4coscas__b                     //
@@ -29705,6 +29702,9 @@ m4montezg
 m4montezh
 m4montezi
 m4montezj
+m4nspot                         // Night Spot Club (Barcrest)
+m4nspota                        //
+m4nspotb                        //
 m4nudbnk                        // Nudge Banker (Barcrest)
 m4nudbnk__a                     //
 m4nudbnk__b                     //

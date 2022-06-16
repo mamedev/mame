@@ -151,36 +151,6 @@ ROM_END
 
 
 
-
-#define M4CLBVEG_EXTRAS \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "cvegass1.hex", 0x0000, 0x080000, CRC(13a8c857) SHA1(c66e10bca1ad54f467b9c5eacd502c54397c09b2) ) \
-	ROM_LOAD( "cvegass2.hex", 0x0000, 0x080000, CRC(88b37145) SHA1(1c6c9ad2010e1688d3370d1f2a5ae83dc683b500) )
-
-ROM_START( m4clbveg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "clas.p1", 0x0000, 0x010000, CRC(6aad03f0) SHA1(2f611cc6f020e334dc4b87d2d907727ba15ff7ff) )
-	M4CLBVEG_EXTRAS
-ROM_END
-
-ROM_START( m4clbvega )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "claf.p1", 0x0000, 0x010000, CRC(79b83184) SHA1(7319a405b2b0b274e03f5cd1465436f8548065e4) )
-	M4CLBVEG_EXTRAS
-ROM_END
-
-ROM_START( m4clbvegb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "clal.p1", 0x0000, 0x010000, CRC(db0bb5a2) SHA1(2735e02642fb92bb824e3b1f415a1a3ef13a856d) )
-	M4CLBVEG_EXTRAS
-ROM_END
-
-ROM_START( m4clbvegc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "clad.p1", 0x0000, 0x010000, CRC(4fa45cce) SHA1(58a5d6cc8608eb1aa453429e26eacea589afa524) )
-	M4CLBVEG_EXTRAS
-ROM_END
-
 #define M4CLBX_EXTRAS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cxs1.hex", 0x000000, 0x080000, CRC(4ce005f1) SHA1(ee0f59a9c7e0222dd63fa63ccff8f194abd01ddb) ) \
@@ -516,20 +486,6 @@ ROM_START( m4magrep )
 ROM_END
 
 
-ROM_START( m4nspot )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ns2s.p1", 0x0000, 0x010000, CRC(ba0f5a81) SHA1(7015176d4528636cb8a753249c824c37941e8eae) )
-ROM_END
-
-ROM_START( m4nspota )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ns2d.p1", 0x0000, 0x010000, CRC(5e66b7e0) SHA1(e82044e3c1e5cf3a2baf1fde7b7ab8b6e221d360) )
-ROM_END
-
-ROM_START( m4nspotb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "nits.p1", 0x0000, 0x010000, CRC(47c965e6) SHA1(41a337a9a367c4e704a60e32d56b262d03f97b59) )
-ROM_END
 
 ROM_START( m4nile )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -1711,11 +1667,6 @@ GAME(199?, m4maglin,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::v
 
 GAME(199?, m4magdrg,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::magicdragon_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
 
-GAME(199?, m4clbveg,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 1)",GAME_FLAGS )
-GAME(199?, m4clbvega, m4clbveg,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 2)",GAME_FLAGS )
-GAME(199?, m4clbvegb, m4clbveg,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 3)",GAME_FLAGS )
-GAME(199?, m4clbvegc, m4clbveg,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (CLA 2.4, set 4)",GAME_FLAGS )
-
 
 GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::bluediamond_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Blue Diamond (Barcrest) (Dutch) (MPU4) (DBD 1.0)",GAME_FLAGS )
 
@@ -1743,9 +1694,6 @@ GAME(199?, m4blkbul,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::
 GAME(199?, m4gldgat,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Golden Gate (Barcrest) (Dutch) (MPU4) (DGG 2.2)",GAME_FLAGS )
 
 
-GAME(199?, m4nspot,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (NS2 2.2, set 1)",GAME_FLAGS )
-GAME(199?, m4nspota,  m4nspot,    mod2_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (NS2 2.2, set 2)",GAME_FLAGS )
-GAME(199?, m4nspotb,  m4nspot,    mod2_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (NIT 1.1)",GAME_FLAGS )
 
 
 GAME(199?, m4holdtm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Hold Timer (Barcrest) (Dutch) (MPU4) (DHT 1.0)",GAME_FLAGS )
