@@ -3217,7 +3217,7 @@ license:CC0
 		<description>World Heroes 2 (ALH-006)</description>
 		<year>1993</year>
 		<publisher>ADK</publisher>
-		<info name="serial" value="ALH-006, ALH-006"/>
+		<info name="serial" value="ALH-006"/>
 		<info name="release" value="19930604"/>
 		<info name="alt_title" value="ワールドヒーローズ2"/>
 		<sharedfeat name="release" value="AES" />
@@ -5502,7 +5502,7 @@ license:CC0
 
 	<software name="moshougi">
 		<description>Shougi no Tatsujin - Master of Shougi</description>
-		<year>1990</year>
+		<year>1995</year>
 		<publisher>ADK / SNK</publisher>
 		<info name="serial" value="NGM-203 / ADM-010 (MVS), NGH-203 / ADH-010 (AES)"/>
 		<info name="release" value="19950928 (MVS), 19951013 (AES)"/>
@@ -6624,7 +6624,7 @@ license:CC0
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGM-2320"/>
-		<info name="release" value="1990728"/>
+		<info name="release" value="19970728"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '97"/>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
@@ -6661,7 +6661,7 @@ license:CC0
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGH-2320"/>
-		<info name="release" value="19970321"/>
+		<info name="release" value="19970925"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '97"/>
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
@@ -7670,7 +7670,7 @@ license:CC0
 
 	<software name="flipshot">
 		<description>Battle Flip Shot</description>
-		<year>1999</year>
+		<year>1998</year>
 		<publisher>Visco</publisher>
 		<info name="serial" value="NGM-2470"/>
 		<info name="release" value="19981208"/>
@@ -8259,7 +8259,7 @@ license:CC0
 		<description>Garou - Mark of the Wolves (NGH-2530)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
-		<info name="serial" value="NGM-2530"/>
+		<info name="serial" value="NGH-2530"/>
 		<info name="release" value="19991126"/>
 		<info name="alt_title" value="餓狼"/>
 		<sharedfeat name="release" value="AES" />
@@ -9133,7 +9133,7 @@ license:CC0
 		<description>The King of Fighters 2002 (NGM-2650 ~ NGH-2650)</description>
 		<year>2002</year>
 		<publisher>Eolith / Playmore</publisher>
-		<info name="serial" value="NGM-2650 (MVS), NGM-2650 (AES)"/>
+		<info name="serial" value="NGM-2650 (MVS), NGH-2650 (AES)"/>
 		<info name="release" value="20021010 (MVS), 20021219 (AES)"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ 2002"/>
 		<sharedfeat name="release" value="MVS,AES" />
@@ -9182,9 +9182,9 @@ license:CC0
 
 	<software name="matrim">
 		<description>Matrimelee / Shin Gouketsuji Ichizoku Toukon (NGM-2660 ~ NGH-2660)</description>
-		<year>2002</year>
+		<year>2003</year>
 		<publisher>Noise Factory / Atlus</publisher>
-		<info name="serial" value="NGM-2660 (MVS), NGM-2660 (AES)"/>
+		<info name="serial" value="NGM-2660 (MVS), NGH-2660 (AES)"/>
 		<info name="release" value="20030320 (MVS), 20030529 (AES)"/>
 		<info name="alt_title" value="新・豪血寺一族 闘婚"/>
 		<sharedfeat name="release" value="MVS,AES" />
@@ -9849,11 +9849,11 @@ license:CC0
 				<rom offset="0x00000" size="0x80000" name="008-mg1.m1" crc="d163c690" sha1="1dfd04d20c5985037f07cd01000d0b04f3a8f4f4" />    <!-- M27C4001 -->
 			</dataarea>
 			<dataarea name="ymsnd:adpcma" size="0x0200000">
-				<rom name="008-v1.v1" offset="0x000000" size="0x200000" crc="443eadba" sha1="3def3c22f0e276bc4c2fc7ff70ce473c08b0d2df" />   <!--  mask rom TC5316200 -->
+				<rom name="008-v1.v1" offset="0x000000" size="0x200000" crc="443eadba" sha1="3def3c22f0e276bc4c2fc7ff70ce473c08b0d2df" />   <!-- mask rom TC5316200 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x1000000">
-				<rom loadflag="load16_byte" name="008-c1.c1" offset="0x000000" size="0x800000" crc="a9acbf18" sha1="d55122c70cbe78c2679598dc07863e1d1d1a31df" />    <!--  mask rom TC5364205 -->
-				<rom loadflag="load16_byte" name="008-c2.c2" offset="0x000001" size="0x800000" crc="6289eef9" sha1="a2ede77bb2468a2e1486d74745a22a5451026039" />    <!--  mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="008-c1.c1" offset="0x000000" size="0x800000" crc="a9acbf18" sha1="d55122c70cbe78c2679598dc07863e1d1d1a31df" />    <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="008-c2.c2" offset="0x000001" size="0x800000" crc="6289eef9" sha1="a2ede77bb2468a2e1486d74745a22a5451026039" />    <!-- mask rom TC5364205 -->
 			</dataarea>
 		</part>
 	</software>
@@ -9879,11 +9879,11 @@ license:CC0
 				<rom offset="0x00000" size="0x80000" name="008-mg1.m1" crc="d163c690" sha1="1dfd04d20c5985037f07cd01000d0b04f3a8f4f4" />    <!-- M27C4001 -->
 			</dataarea>
 			<dataarea name="ymsnd:adpcma" size="0x0200000">
-				<rom name="008-v1.v1" offset="0x000000" size="0x200000" crc="443eadba" sha1="3def3c22f0e276bc4c2fc7ff70ce473c08b0d2df" />   <!--  mask rom TC5316200 -->
+				<rom name="008-v1.v1" offset="0x000000" size="0x200000" crc="443eadba" sha1="3def3c22f0e276bc4c2fc7ff70ce473c08b0d2df" />   <!-- mask rom TC5316200 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x1000000">
-				<rom loadflag="load16_byte" name="008-c1.c1" offset="0x000000" size="0x800000" crc="a9acbf18" sha1="d55122c70cbe78c2679598dc07863e1d1d1a31df" />    <!--  mask rom TC5364205 -->
-				<rom loadflag="load16_byte" name="008-c2.c2" offset="0x000001" size="0x800000" crc="6289eef9" sha1="a2ede77bb2468a2e1486d74745a22a5451026039" />    <!--  mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="008-c1.c1" offset="0x000000" size="0x800000" crc="a9acbf18" sha1="d55122c70cbe78c2679598dc07863e1d1d1a31df" />    <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="008-c2.c2" offset="0x000001" size="0x800000" crc="6289eef9" sha1="a2ede77bb2468a2e1486d74745a22a5451026039" />    <!-- mask rom TC5364205 -->
 			</dataarea>
 		</part>
 	</software>
@@ -10811,7 +10811,7 @@ license:CC0
 
 	<software name="matrimbl" cloneof="matrim">
 		<description>Matrimelee / Shin Gouketsuji Ichizoku Toukon (bootleg)</description>
-		<year>2002</year>
+		<year>2003</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />

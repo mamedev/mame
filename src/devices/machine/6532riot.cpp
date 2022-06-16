@@ -114,7 +114,7 @@ uint8_t riot6532_device::get_timer()
 
 
 
-void riot6532_device::timer_end()
+TIMER_CALLBACK_MEMBER(riot6532_device::timer_end)
 {
 	assert(m_timerstate != TIMER_IDLE);
 
@@ -450,7 +450,7 @@ void riot6532_device::device_start()
 	m_irq_cb.resolve_safe();
 
 	/* allocate timers */
-	m_timer = timer_alloc(TIMER_END_CB);
+	m_timer = timer_alloc(FUNC(riot6532_device::timer_end), this);
 
 	/* register for save states */
 	save_item(NAME(m_port[0].m_in));
@@ -500,16 +500,4 @@ void riot6532_device::device_reset()
 	m_timershift = 10;
 	m_timerstate = TIMER_COUNTING;
 	m_timer->adjust(attotime::from_ticks(256 << m_timershift, clock()));
-}
-
-void riot6532_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-		case TIMER_END_CB:
-			timer_end();
-			break;
-		default:
-			throw emu_fatalerror("Unknown id in riot6532_device::device_timer");
-	}
 }

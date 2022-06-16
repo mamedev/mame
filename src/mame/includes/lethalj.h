@@ -18,11 +18,6 @@
 class lethalj_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_GEN_EXT1_INT
-	};
-
 	lethalj_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -59,8 +54,9 @@ private:
 	void lethalj_map(address_map &map);
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void video_start() override;
+
+	TIMER_CALLBACK_MEMBER(gen_ext1_int);
 
 	required_device<tms34010_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -75,14 +71,14 @@ private:
 	optional_ioport m_light1_y;
 	output_finder<3> m_lamps;
 
-	emu_timer *m_gen_ext1_int_timer;
-	uint16_t m_blitter_data[8];
+	emu_timer *m_gen_ext1_int_timer = nullptr;
+	uint16_t m_blitter_data[8]{};
 	std::unique_ptr<uint16_t[]> m_screenram;
-	uint8_t m_vispage;
-	int m_blitter_rows;
-	uint16_t m_gunx;
-	uint16_t m_guny;
-	uint8_t m_blank_palette;
+	uint8_t m_vispage = 0;
+	int m_blitter_rows = 0;
+	uint16_t m_gunx = 0;
+	uint16_t m_guny = 0;
+	uint8_t m_blank_palette = 0;
 };
 
 #endif // MAME_INCLUDES_LETHALJ_H

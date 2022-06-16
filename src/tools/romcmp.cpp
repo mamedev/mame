@@ -211,9 +211,7 @@ struct fileinfo
 			{
 				printf("%-23s %-23s 1ST AND 2ND HALF IDENTICAL\n", (side & 1) ? name.c_str() : "", (side & 2) ? name.c_str() : "");
 				util::hash_collection hash;
-				hash.begin();
-				hash.buffer(buf.get(), size / 2);
-				hash.end();
+				hash.compute(buf.get(), size / 2);
 				printf("%-23s %-23s                  %s\n", (side & 1) ? name.c_str() : "", (side & 2) ? name.c_str() : "", hash.attribute_string().c_str());
 			}
 			else

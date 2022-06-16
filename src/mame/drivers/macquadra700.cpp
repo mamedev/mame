@@ -247,8 +247,33 @@ void macquadra_state::machine_start()
 	m_last_taken_interrupt = -1;
 	m_irq_count = m_ca2_data = 0;
 
-	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::mac_6015_tick),this));
+	m_6015_timer = timer_alloc(FUNC(macquadra_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
+
+	save_item(NAME(m_cursor_line));
+	save_item(NAME(m_dafb_int_status));
+	save_item(NAME(m_dafb_scsi1_drq));
+	save_item(NAME(m_dafb_scsi2_drq));
+	save_item(NAME(m_dafb_mode));
+	save_item(NAME(m_dafb_base));
+	save_item(NAME(m_dafb_stride));
+	save_item(NAME(m_dafb_colors));
+	save_item(NAME(m_dafb_count));
+	save_item(NAME(m_dafb_clutoffs));
+	save_item(NAME(m_dafb_montype));
+	save_item(NAME(m_dafb_vbltime));
+	save_item(NAME(m_dafb_palette));
+	save_item(NAME(m_via2_ca1_hack));
+	save_item(NAME(m_nubus_irq_state));
+	save_item(NAME(m_adb_irq_pending));
+	save_item(NAME(m_hdsel));
+	save_item(NAME(m_via_interrupt));
+	save_item(NAME(m_via2_interrupt));
+	save_item(NAME(m_scc_interrupt));
+	save_item(NAME(m_last_taken_interrupt));
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_ca2_data));
+	save_item(NAME(m_overlay));
 }
 
 void macquadra_state::machine_reset()
@@ -351,8 +376,8 @@ TIMER_CALLBACK_MEMBER(macquadra_state::dafb_cursor_tick)
 
 void macquadra_state::video_start() // DAFB
 {
-	m_vbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::dafb_vbl_tick),this));
-	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::dafb_cursor_tick),this));
+	m_vbl_timer = timer_alloc(FUNC(macquadra_state::dafb_vbl_tick), this);
+	m_cursor_timer = timer_alloc(FUNC(macquadra_state::dafb_cursor_tick), this);
 
 	m_vbl_timer->adjust(attotime::never);
 	m_cursor_timer->adjust(attotime::never);
@@ -525,19 +550,18 @@ void macquadra_state::dafb_dac_w(offs_t offset, uint32_t data, uint32_t mem_mask
 
 uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	auto const vram8 = util::big_endian_cast<uint8_t const>(m_vram.target()) + m_dafb_base;
+
 	switch (m_dafb_mode)
 	{
 		case 0: // 1bpp
 		{
-			uint8_t const *vram8 = (uint8_t *)m_vram.target();
-			vram8 += m_dafb_base;
-
 			for (int y = 0; y < 870; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
-				for (int x = 0; x < 1152; x+=8)
+				for (int x = 0; x < 1152/8; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_dafb_stride) + ((x/8)^3)];
+					uint8_t const pixels = vram8[(y * m_dafb_stride) + x];
 
 					*scanline++ = m_dafb_palette[(pixels>>7)&1];
 					*scanline++ = m_dafb_palette[(pixels>>6)&1];
@@ -554,15 +578,12 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 
 		case 1: // 2bpp
 		{
-			uint8_t const *vram8 = (uint8_t *)m_vram.target();
-			vram8 += m_dafb_base;
-
 			for (int y = 0; y < 870; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152/4; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_dafb_stride) + x];
 
 					*scanline++ = m_dafb_palette[((pixels>>6)&3)];
 					*scanline++ = m_dafb_palette[((pixels>>4)&3)];
@@ -575,15 +596,12 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 
 		case 2: // 4bpp
 		{
-			uint8_t const *vram8 = (uint8_t *)m_vram.target();
-			vram8 += m_dafb_base;
-
 			for (int y = 0; y < 870; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152/2; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_dafb_stride) + x];
 
 					*scanline++ = m_dafb_palette[(pixels>>4)];
 					*scanline++ = m_dafb_palette[(pixels&0xf)];
@@ -594,15 +612,12 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 
 		case 3: // 8bpp
 		{
-			uint8_t const *vram8 = (uint8_t *)m_vram.target();
-			vram8 += m_dafb_base;
-
 			for (int y = 0; y < 870; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_dafb_stride) + x];
 					*scanline++ = m_dafb_palette[pixels];
 				}
 			}
@@ -613,7 +628,7 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 			for (int y = 0; y < 480; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
-				uint32_t const *base = (uint32_t *)&m_vram[(y * (m_dafb_stride/4)) + (m_dafb_base/4)];
+				uint32_t const *base = &m_vram[(y * (m_dafb_stride/4)) + (m_dafb_base/4)];
 				for (int x = 0; x < 640; x++)
 				{
 					*scanline++ = *base++;
@@ -1038,4 +1053,4 @@ ROM_START( macqd700 )
 	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
 ROM_END
 
-COMP( 1991, macqd700, 0, 0, macqd700, macadb, macquadra_state, init_macqd700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
+COMP( 1991, macqd700, 0, 0, macqd700, macadb, macquadra_state, init_macqd700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)

@@ -116,7 +116,7 @@ void tmpz84c015_device::device_start()
 	m_wdtout_cb.resolve();
 
 	// setup watchdog timer
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tmpz84c015_device::watchdog_timeout), this));
+	m_watchdog_timer = timer_alloc(FUNC(tmpz84c015_device::watchdog_timeout), this);
 
 	// register for save states
 	save_item(NAME(m_irq_priority));

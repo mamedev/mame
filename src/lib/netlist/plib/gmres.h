@@ -4,6 +4,10 @@
 #ifndef PLIB_GMRES_H_
 #define PLIB_GMRES_H_
 
+// Names
+// spell-checker: words Burkardt, Saad, Yousef, Givens
+//
+
 ///
 /// \file gmres.h
 ///
@@ -19,27 +23,27 @@ namespace plib
 {
 
 	template <int k>
-	struct do_khelper
+	struct do_k_helper
 	{
 		static constexpr bool value = true;
 	};
 
 	template <>
-	struct do_khelper<-1>
+	struct do_k_helper<-1>
 	{
 		static constexpr float value = 0.0;
 	};
 
-	template <typename FT, int SIZE>
+	template <typename ARENA, typename FT, int SIZE>
 	struct mat_precondition_ILU
 	{
-		using mat_type = plib::pmatrix_cr<FT, SIZE>;
+		using mat_type = plib::pmatrix_cr<ARENA, FT, SIZE>;
 		using matLU_type = plib::pLUmatrix_cr<mat_type>;
 
-		mat_precondition_ILU(std::size_t size, std::size_t ilu_scale = 4
-			, std::size_t bw = plib::pmatrix_cr<FT, SIZE>::FILL_INFINITY)
-		: m_mat(narrow_cast<typename mat_type::index_type>(size))
-		, m_LU(narrow_cast<typename mat_type::index_type>(size))
+		mat_precondition_ILU(ARENA &arena, std::size_t size, std::size_t ilu_scale = 4
+			, std::size_t bw = plib::pmatrix_cr<ARENA, FT, SIZE>::FILL_INFINITY)
+		: m_mat(arena, narrow_cast<typename mat_type::index_type>(size))
+		, m_LU(arena, narrow_cast<typename mat_type::index_type>(size))
 		, m_ILU_scale(narrow_cast<std::size_t>(ilu_scale))
 		, m_band_width(bw)
 		{
@@ -53,7 +57,7 @@ namespace plib
 		}
 
 
-		template<typename R, typename V>
+		template <typename R, typename V>
 		void calc_rhs(R &rhs, const V &v)
 		{
 			m_mat.mult_vec(rhs, v);
@@ -64,7 +68,7 @@ namespace plib
 			m_LU.incomplete_LU_factorization(m_mat);
 		}
 
-		template<typename V>
+		template <typename V>
 		void solve_inplace(V &v)
 		{
 			m_LU.solveLU(v);
@@ -78,36 +82,35 @@ namespace plib
 		std::size_t             m_band_width;
 	};
 
-	template <typename FT, int SIZE>
-	struct mat_precondition_diag
+	template <typename ARENA, typename FT, int SIZE>
+	struct mat_precondition_diagonal
 	{
-		mat_precondition_diag(std::size_t size, int dummy = 0)
-		: m_mat(size)
-		, m_diag(size)
-		, nzcol(size)
+		mat_precondition_diagonal(ARENA &arena, std::size_t size, [[maybe_unused]] int dummy = 0)
+		: m_mat(arena, size)
+		, m_diagonal(size)
+		, nz_col(size)
 		{
-			plib::unused_var(dummy);
 		}
 
 		template <typename M>
 		void build(M &fill)
 		{
 			m_mat.build_from_fill_mat(fill, 0);
-			for (std::size_t i = 0; i< m_diag.size(); i++)
+			for (std::size_t i = 0; i< m_diagonal.size(); i++)
 			{
-				for (std::size_t j = 0; j< m_diag.size(); j++)
+				for (std::size_t j = 0; j< m_diagonal.size(); j++)
 				{
 					std::size_t k=m_mat.row_idx[j];
 					while (m_mat.col_idx[k] < i && k < m_mat.row_idx[j+1])
 						k++;
 					if (m_mat.col_idx[k] == i && k < m_mat.row_idx[j+1])
-						nzcol[i].push_back(k);
+						nz_col[i].push_back(k);
 				}
-				nzcol[i].push_back(narrow_cast<std::size_t>(-1));
+				nz_col[i].push_back(narrow_cast<std::size_t>(-1));
 			}
 		}
 
-		template<typename R, typename V>
+		template <typename R, typename V>
 		void calc_rhs(R &rhs, const V &v)
 		{
 			m_mat.mult_vec(rhs, v);
@@ -115,70 +118,69 @@ namespace plib
 
 		void precondition()
 		{
-			for (std::size_t i = 0; i< m_diag.size(); i++)
+			for (std::size_t i = 0; i< m_diagonal.size(); i++)
 			{
 				// ILUT: 265%
 				FT v(0.0);
 #if 0
-				// doesn't works, Mame perforamnce drops significantly%
+				// doesn't works, Mame performance drops significantly%
 				// 136%
 				for (std::size_t j = m_mat.row_idx[i]; j< m_mat.row_idx[i+1]; j++)
 					v += m_mat.A[j] * m_mat.A[j];
-				m_diag[i] = reciprocal(std::sqrt(v));
+				m_diagonal[i] = reciprocal(std::sqrt(v));
 #elif 0
-				// works halfway, i.e. Mame perforamnce 50%
+				// works halfway, i.e. Mame performance 50%
 				// 147% - lowest average solution time with 7.094
 				for (std::size_t j = m_mat.row_idx[i]; j< m_mat.row_idx[i+1]; j++)
 					v += m_mat.A[j] * m_mat.A[j];
-				m_diag[i] = m_mat.A[m_mat.diag[i]] / v;
+				m_diagonal[i] = m_mat.A[m_mat.diagonal[i]] / v;
 #elif 0
-				// works halfway, i.e. Mame perforamnce 50%
+				// works halfway, i.e. Mame performance 50%
 				// sum over column i
 				// 344% - lowest average solution time with 3.06
 				std::size_t nzcolp = 0;
-				const auto &nz = nzcol[i];
+				const auto &nz = nz_col[i];
 				std::size_t j;
 
 				while ((j = nz[nzcolp++])!=narrow_cast<std::size_t>(-1)) // NOLINT(bugprone-infinite-loop)
 				{
 					v += m_mat.A[j] * m_mat.A[j];
 				}
-				m_diag[i] = m_mat.A[m_mat.diag[i]] / v;
+				m_diagonal[i] = m_mat.A[m_mat.diagonal[i]] / v;
 #elif 0
-				// works halfway, i.e. Mame perforamnce 50%
+				// works halfway, i.e. Mame performance 50%
 				// 151%
 				for (std::size_t j = m_mat.row_idx[i]; j< m_mat.row_idx[i+1]; j++)
 					v += plib::abs(m_mat.A[j]);
-				m_diag[i] =  reciprocal(v);
+				m_diagonal[i] =  reciprocal(v);
 #else
 				// 124%
 				for (std::size_t j = m_mat.row_idx[i]; j< m_mat.row_idx[i+1]; j++)
 					v = std::max(v, plib::abs(m_mat.A[j]));
-				m_diag[i] = reciprocal(v);
+				m_diagonal[i] = reciprocal(v);
 #endif
-				//m_diag[i] = reciprocal(m_mat.A[m_mat.diag[i]]);
+				//m_diagonal[i] = reciprocal(m_mat.A[m_mat.diagonal[i]]);
 			}
 		}
 
-		template<typename V>
+		template <typename V>
 		void solve_inplace(V &v)
 		{
-			for (std::size_t i = 0; i< m_diag.size(); i++)
-				v[i] = v[i] * m_diag[i];
+			for (std::size_t i = 0; i< m_diagonal.size(); i++)
+				v[i] = v[i] * m_diagonal[i];
 		}
 
-		plib::pmatrix_cr<FT, SIZE> m_mat;
-		plib::parray<FT, SIZE> m_diag;
-		plib::parray<std::vector<std::size_t>, SIZE > nzcol;
+		plib::pmatrix_cr<ARENA, FT, SIZE> m_mat;
+		plib::parray<FT, SIZE> m_diagonal;
+		plib::parray<std::vector<std::size_t>, SIZE > nz_col;
 	};
 
-	template <typename FT, int SIZE>
+	template <typename ARENA, typename FT, int SIZE>
 	struct mat_precondition_none
 	{
-		mat_precondition_none(std::size_t size, int dummy = 0)
+		mat_precondition_none(std::size_t size, [[maybe_unused]] int dummy = 0)
 		: m_mat(size)
 		{
-			plib::unused_var(dummy);
 		}
 
 		template <typename M>
@@ -187,7 +189,7 @@ namespace plib
 			m_mat.build_from_fill_mat(fill, 0);
 		}
 
-		template<typename R, typename V>
+		template <typename R, typename V>
 		void calc_rhs(R &rhs, const V &v)
 		{
 			m_mat.mult_vec(rhs, v);
@@ -197,16 +199,15 @@ namespace plib
 		{
 		}
 
-		template<typename V>
-		void solve_inplace(V &v)
+		template <typename V>
+		void solve_inplace([[maybe_unused]] V &v)
 		{
-			plib::unused_var(v);
 		}
 
-		plib::pmatrix_cr<FT, SIZE> m_mat;
+		plib::pmatrix_cr<ARENA, FT, SIZE> m_mat;
 	};
 
-	// FIXME: hardcoding RESTART to 20 becomes an issue on very large
+	// FIXME: hard coding RESTART to 20 becomes an issue on very large
 	// systems.
 
 	template <typename FT, int SIZE, int RESTARTMAX = 16>
@@ -258,7 +259,7 @@ namespace plib
 			//------------------------------------------------------------------------
 
 			std::size_t itr_used = 0;
-			auto rho_delta(plib::constants<float_type>::zero());
+			float_type rho_delta(plib::constants<float_type>::zero());
 
 			const    std::size_t n = size();
 
@@ -273,7 +274,7 @@ namespace plib
 				// ==> rho / accuracy = sqrt(y * y)
 				//
 				// This approach will approximate the iterative stop condition
-				// based |xnew - xold| pretty precisely. But it is slow, or expressed
+				// based `|xnew - xold|` pretty precisely. But it is slow, or expressed
 				// differently: The invest doesn't pay off.
 				//
 
@@ -344,10 +345,9 @@ namespace plib
 		}
 
 		template <int k, typename OPS, typename VT>
-		bool do_k(OPS &ops, VT &x, std::size_t &itr_used, FT rho_delta, bool dummy)
+		bool do_k(OPS &ops, VT &x, std::size_t &itr_used, FT rho_delta, [[maybe_unused]] bool dummy)
 		{
-			plib::unused_var(dummy);
-			if (do_k<k-1, OPS>(ops, x, itr_used, rho_delta, do_khelper<k-1>::value))
+			if (do_k<k-1, OPS>(ops, x, itr_used, rho_delta, do_k_helper<k-1>::value))
 				return true;
 
 			constexpr const std::size_t kp1 = k + 1;
@@ -390,11 +390,11 @@ namespace plib
 				// x += m_v[j] * m_y[j]
 				for (std::size_t i = k + 1; i-- > 0;)
 				{
-					auto tmp(m_g[i]);
-					const auto htii=plib::reciprocal(m_ht[i][i]);
+					auto tmp = m_g[i];
+					const auto ht_i_i = plib::reciprocal(m_ht[i][i]);
 					for (std::size_t j = i + 1; j <= k; j++)
 						tmp -= m_ht[i][j] * m_y[j];
-					m_y[i] = tmp * htii;
+					m_y[i] = tmp * ht_i_i;
 					vec_add_mult_scalar(x, m_v[i], m_y[i]);
 				}
 
@@ -510,7 +510,7 @@ namespace plib
 		}
 	private:
 
-		//typedef typename plib::mat_cr_t<FT, SIZE>::index_type mattype;
+		//#typedef typename plib::mat_cr_t<FT, SIZE>::index_type mattype;
 
 		plib::parray<float_type, SIZE> residual;
 		plib::parray<float_type, SIZE> Ax;

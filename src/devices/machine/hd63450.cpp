@@ -50,7 +50,7 @@ void hd63450_device::device_start()
 
 	// Initialise timers and registers
 	for (int x = 0; x < 4; x++)
-		m_timer[x] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hd63450_device::dma_transfer_timer), this));
+		m_timer[x] = timer_alloc(FUNC(hd63450_device::dma_transfer_timer), this);
 
 	save_item(STRUCT_MEMBER(m_reg, csr));
 	save_item(STRUCT_MEMBER(m_reg, cer));

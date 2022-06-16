@@ -88,7 +88,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -109,12 +108,6 @@ private:
 
 	enum
 	{
-		TIMER_IRQ_OFF,
-		TIMER_VIDEO_UPDATE
-	};
-
-	enum
-	{
 		INT_LINE    = 0x01,
 		INT_MOUSE   = 0x02,
 		INT_MIDIIN  = 0x04,
@@ -130,6 +123,7 @@ private:
 	bitmap_ind16 m_bitmap;
 
 	emu_timer *m_video_update_timer;
+	emu_timer *m_irq_off_timer;
 
 	uint8_t m_lmpr, m_hmpr, m_vmpr; /* memory pages */
 	uint8_t m_border;           /* border */
@@ -510,21 +504,6 @@ TIMER_CALLBACK_MEMBER(samcoupe_state::sam_video_update_callback)
 //  MACHINE EMULATION
 //**************************************************************************
 
-void samcoupe_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_IRQ_OFF:
-		irq_off(param);
-		break;
-	case TIMER_VIDEO_UPDATE:
-		sam_video_update_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in samcoupe_state::device_timer");
-	}
-}
-
 TIMER_CALLBACK_MEMBER(samcoupe_state::irq_off)
 {
 	/* adjust STATUS register */
@@ -539,7 +518,7 @@ void samcoupe_state::samcoupe_irq(uint8_t src)
 {
 	/* assert irq and a timer to set it off again */
 	m_maincpu->set_input_line(0, ASSERT_LINE);
-	timer_set(attotime::from_usec(20), TIMER_IRQ_OFF, src);
+	m_irq_off_timer->adjust(attotime::from_usec(20), src);
 
 	/* adjust STATUS register */
 	m_status &= ~src;
@@ -566,7 +545,7 @@ void samcoupe_state::machine_start()
 	m_pages = m_ram->size() / 0x4000; // 16 or 32
 
 	/* schedule our video updates */
-	m_video_update_timer = timer_alloc(TIMER_VIDEO_UPDATE);
+	m_video_update_timer = timer_alloc(FUNC(samcoupe_state::sam_video_update_callback), this);
 	m_video_update_timer->adjust(m_screen->time_until_pos(0, 0));
 
 	// register for save states
@@ -580,6 +559,10 @@ void samcoupe_state::machine_start()
 	save_item(NAME(m_attribute));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(samcoupe_state::postload), this));
+
+	// allocate machine timers
+	m_irq_off_timer = timer_alloc(FUNC(samcoupe_state::irq_off), this);
+	m_irq_off_timer->adjust(attotime::never);
 }
 
 void samcoupe_state::machine_reset()

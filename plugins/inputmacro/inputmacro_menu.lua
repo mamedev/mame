@@ -356,7 +356,7 @@ local function add_edit_items(items)
 
 	local binding = edit_current_macro.binding
 	local activation = binding and input:seq_name(binding) or _p('plugin-inputmacro', '[not set]')
-	table.insert(items, { _p('plugin-inputmacro', 'Activation sequence'), activation, edit_switch_poller and 'lr' or '' })
+	table.insert(items, { _p('plugin-inputmacro', 'Activation combination'), activation, edit_switch_poller and 'lr' or '' })
 	edit_items[#items] = { action = 'binding' }
 
 	local releaseaction = edit_current_macro.earlycancel and _p('plugin-inputmacro', 'Stop immediately') or _p('plugin-inputmacro', 'Complete macro')

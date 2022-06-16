@@ -25,15 +25,16 @@ class nes_fcmat_device :
 	public device_t,
 	public device_nes_control_port_interface
 {
+public:
+	virtual u8 read_exp(offs_t offset) override;
+	virtual void write(u8 data) override;
+
 protected:
 	// construction/destruction
 	nes_fcmat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
-
-	virtual u8 read_exp(offs_t offset) override;
-	virtual void write(u8 data) override;
 
 private:
 	required_ioport_array<4> m_mat;
@@ -50,6 +51,7 @@ public:
 	nes_ftrainer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -63,6 +65,7 @@ public:
 	nes_taptapmat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -70,6 +73,5 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(NES_FTRAINER,  nes_ftrainer_device)
 DECLARE_DEVICE_TYPE(NES_TAPTAPMAT, nes_taptapmat_device)
-
 
 #endif // MAME_BUS_NES_CTRL_FCMAT_H

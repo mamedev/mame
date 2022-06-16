@@ -22,7 +22,7 @@ protected:
 	virtual void init(int iv)=0;
 	virtual void device_start()override=0;
 
-	bool _active;
+	bool m_active;
 };
 
 class ns10_type1_decrypter_device : public ns10_decrypter_device
@@ -36,8 +36,8 @@ protected:
 	ns10_type1_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
-	uint16_t _mask;
-	uint8_t _counter;
+	uint16_t m_mask = 0;
+	uint8_t m_counter = 0;
 	static const int initSbox[16];
 
 	void init(int iv)override;
@@ -57,27 +57,27 @@ protected:
 		gf2_reducer();
 		int gf2_reduce(uint64_t num)const;
 	private:
-		int _gf2Reduction[0x10000];
+		int m_gf2Reduction[0x10000]{};
 	};
 
 	// this encodes the decryption logic, which varies per game
 	// and is probably hard-coded into the CPLD
 	struct ns10_crypto_logic
 	{
-		uint64_t eMask[16];
-		uint64_t dMask[16];
-		uint16_t xMask;
+		uint64_t eMask[16]{};
+		uint64_t dMask[16]{};
+		uint16_t xMask = 0;
 		uint16_t(*nonlinear_calculation)(uint64_t, uint64_t, const gf2_reducer&);  // preliminary encoding; need research
 	};
 
 	ns10_type2_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const ns10_crypto_logic &logic);
 
 private:
-	uint16_t _mask;
-	uint64_t _previous_cipherwords;
-	uint64_t _previous_plainwords;
-	const ns10_crypto_logic& _logic;
-	std::unique_ptr<const gf2_reducer>_reducer;
+	uint16_t m_mask = 0;
+	uint64_t m_previous_cipherwords = 0;
+	uint64_t m_previous_plainwords = 0;
+	const ns10_crypto_logic& m_logic;
+	std::unique_ptr<const gf2_reducer>m_reducer;
 	static const int initSbox[16];
 
 	void init(int iv)override;

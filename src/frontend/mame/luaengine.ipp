@@ -546,7 +546,7 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 								}
 								else
 								{
-									auto result(invoke(cbfunc).get<sol::optional<R> >());
+									auto result(invoke(cbfunc).get<std::optional<R> >());
 									if (result)
 									{
 										return *result;

@@ -78,11 +78,11 @@ private:
 	required_ioport m_linec;
 	required_ioport m_onboard_config;
 
-	uint8_t m_int_vector;
-	bool m_dtr, m_rts, m_txd, m_rxd, m_cassold, m_casspol;
-	u8 m_cass_data[5];
+	uint8_t m_int_vector = 0;
+	bool m_dtr = false, m_rts = false, m_txd = false, m_rxd = false, m_cassold = false, m_casspol = false;
+	u8 m_cass_data[5] = {};
 	std::unique_ptr<u8[]> m_onboard_ram;
-	bool m_onboard_disable;
+	bool m_onboard_disable = false;
 };
 
 #endif // MAME_INCLUDES_POLY88_H

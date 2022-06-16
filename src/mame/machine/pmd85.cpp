@@ -394,10 +394,14 @@ void pmd85_state::ppi2_portc_w(uint8_t data)
 
 uint8_t pmd85_state::ppi3_porta_r()
 {
-	if (memregion("user1")->base())
-		return memregion("user1")->base()[m_ppi_port_outputs[3][1] | (m_ppi_port_outputs[3][2] << 8)];
-	else
-		return 0;
+	if (m_user1)
+	{
+		u16 t = m_ppi_port_outputs[3][1] | (m_ppi_port_outputs[3][2] << 8);
+		if (t < m_user1->bytes())
+			return m_user1->base()[t];
+	}
+
+	return 0;
 }
 
 uint8_t pmd85_state::ppi3_portb_r()
@@ -620,18 +624,6 @@ void pmd85_state::mato_io_w(offs_t offset, uint8_t data)
 	}
 }
 
-void pmd85_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_CASSETTE:
-		cassette_timer_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in pmd85_state::device_timer");
-	}
-}
-
 TIMER_CALLBACK_MEMBER(pmd85_state::cassette_timer_callback)
 {
 	bool data;
@@ -704,7 +696,7 @@ void pmd85_state::common_driver_init()
 {
 	m_previous_level = 0;
 	m_clk_level = m_clk_level_tape = 1;
-	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
+	m_cassette_timer = timer_alloc(FUNC(pmd85_state::cassette_timer_callback), this);
 	m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(2400));
 }
 

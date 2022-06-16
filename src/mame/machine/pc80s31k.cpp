@@ -30,6 +30,8 @@
       \- It then tries to read at memory [0xc0ff], set the value read in [0xf012];
       \- Expects that ROM [0x0000] is not equal to 0xc3;
       Bottom line: Is it trying to access some custom HW?
+    - Hookup a bridge for internal BIOSes (later PC8801 models);
+    - Save state support (resuming fails latch hookups here);
 
 ===================================================================================================
 
@@ -255,13 +257,14 @@ IRQ_CALLBACK_MEMBER(pc80s31_device::irq_cb)
 
 void pc80s31_device::device_add_mconfig(machine_config &config)
 {
-	constexpr XTAL fdc_xtal = XTAL(4'000'000);
-	Z80(config, m_fdc_cpu, fdc_xtal);
+	// TODO: confirm clock arrangement
+	constexpr XTAL fdc_xtal = XTAL(8'000'000);
+	Z80(config, m_fdc_cpu, fdc_xtal / 2);
 	m_fdc_cpu->set_addrmap(AS_PROGRAM, &pc80s31_device::fdc_map);
 	m_fdc_cpu->set_addrmap(AS_IO, &pc80s31_device::fdc_io);
 	m_fdc_cpu->set_irq_acknowledge_callback(FUNC(pc80s31_device::irq_cb));
 
-	UPD765A(config, m_fdc, XTAL(4'000'000), true, true);
+	UPD765A(config, m_fdc, fdc_xtal, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_fdc_cpu, INPUT_LINE_IRQ0);
 
 	for (auto &floppy : m_floppy)
@@ -292,13 +295,11 @@ void pc80s31_device::device_add_mconfig(machine_config &config)
 }
 
 //-------------------------------------------------
-//  device_timer - device-specific timers
+//  tc_zero_tick
 //-------------------------------------------------
 
-void pc80s31_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pc80s31_device::tc_zero_tick)
 {
-	assert(id == 0);
-
 	m_fdc->tc_w(false);
 
 	// several games tries to scan invalid IDs from their structures, if this hits then
@@ -323,7 +324,7 @@ void pc80s31_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void pc80s31_device::device_start()
 {
-	m_tc_zero_timer = timer_alloc(0);
+	m_tc_zero_timer = timer_alloc(FUNC(pc80s31_device::tc_zero_tick), this);
 
 	save_item(NAME(m_irq_vector));
 }

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: kmg, Fabio Priuli
+// copyright-holders:kmg
 /***********************************************************************************************************
 
 
@@ -51,7 +51,6 @@ nes_batmap_srrx_device::nes_batmap_srrx_device(const machine_config &mconfig, co
 
 void nes_batmap_000_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0x0f, 0xff, 0);
 
 	prg16_89ab(0);
@@ -163,7 +162,7 @@ void nes_batmap_000_device::write_h(offs_t offset, u8 data)
  -------------------------------------------------*/
 
 // IRQ based on our MMC3 implementation, details for SRR are unclear
-void nes_batmap_srrx_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_batmap_srrx_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{

@@ -407,7 +407,7 @@ void dc_state::dc_sysctrl_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 					dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
 
 				/* TODO: timing is a guess */
-				machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(ddtdata.length/4), timer_expired_delegate(FUNC(dc_state::ch2_dma_irq),this));
+				m_ch2_dma_irq_timer->adjust(m_maincpu->cycles_to_attotime(ddtdata.length/4));
 			}
 			break;
 
@@ -548,6 +548,8 @@ void dc_state::machine_start()
 
 	// save states
 	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);
+
+	m_ch2_dma_irq_timer = timer_alloc(FUNC(dc_state::ch2_dma_irq), this);
 }
 
 void dc_state::machine_reset()
@@ -559,6 +561,8 @@ void dc_state::machine_reset()
 	memset(dc_sysctrl_regs, 0, sizeof(dc_sysctrl_regs));
 
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;
+
+	m_ch2_dma_irq_timer->adjust(attotime::never);
 }
 
 uint32_t dc_state::dc_aica_reg_r(offs_t offset, uint32_t mem_mask)

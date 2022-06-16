@@ -10,16 +10,16 @@
 
 #pragma once
 
-#include "spectrum.h"
+#include "spec128.h"
+
 #include "machine/beta.h"
 #include "machine/glukrs.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "machine/tsconfdma.h"
+
 #include "tilemap.h"
 
-constexpr u16 with_hblank(u16 pixclocks = 0) { return 88 + pixclocks; }
-constexpr u16 with_vblank(u16 pixclocks = 0) { return 32 + pixclocks; }
 
 class tsconf_state : public spectrum_128_state
 {
@@ -42,19 +42,18 @@ public:
 
 	void tsconf(machine_config &config);
 
+	static constexpr u16 with_hblank(u16 pixclocks) { return 88 + pixclocks; }
+	static constexpr u16 with_vblank(u16 pixclocks) { return 32 + pixclocks; }
+
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_frame);
+	TIMER_CALLBACK_MEMBER(irq_scanline);
 
 private:
-	enum timer_id : u8
-	{
-		TIMER_IRQ_FRAME = TIMER_SCANLINE + 1,
-		TIMER_IRQ_SCANLINE
-	};
-
 	enum gluk_ext : u8
 	{
 		CONF_VERSION = 0x00,
@@ -193,7 +192,7 @@ private:
 
 	address_space *m_program = nullptr;
 	memory_view m_bank0_rom;
-	required_memory_bank_array<5> m_banks;
+	required_memory_bank_array<5> m_banks; // 0..3 - RAM, 4 - ROM
 
 	required_device<at_keyboard_device> m_keyboard;
 

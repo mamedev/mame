@@ -458,8 +458,7 @@ void kc_keyboard_device::device_start()
 	// resolve callbacks
 	m_write_out.resolve_safe();
 
-	m_timer_transmit_pulse = timer_alloc(TIMER_TRANSMIT_PULSE);
-
+	m_timer_transmit_pulse = timer_alloc(FUNC(kc_keyboard_device::transmit_pulse), this);
 	m_timer_transmit_pulse->adjust(attotime::from_usec(1024), 0, attotime::from_usec(1024));
 }
 
@@ -488,61 +487,56 @@ ioport_constructor kc_keyboard_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  transmit_pulse - update transmit state
 //-------------------------------------------------
 
-void kc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(kc_keyboard_device::transmit_pulse)
 {
-	switch(id)
+	if (m_transmit_buffer.pulse_sent < m_transmit_buffer.pulse_count)
 	{
-	case TIMER_TRANSMIT_PULSE:
-		if (m_transmit_buffer.pulse_sent < m_transmit_buffer.pulse_count)
+		// byte containing pulse state
+		int pulse_byte_count = m_transmit_buffer.pulse_sent>>3;
+		// bit within byte containing pulse state
+		int pulse_bit_count = 7 - (m_transmit_buffer.pulse_sent & 0x07);
+
+		// get current pulse state
+		int pulse_state = (m_transmit_buffer.data[pulse_byte_count]>>pulse_bit_count) & 0x01;
+
+		LOG("KC keyboard sending pulse: %02x\n", pulse_state);
+
+		// send pulse
+		m_write_out(pulse_state ? ASSERT_LINE : CLEAR_LINE);
+
+		// update counts
+		m_transmit_buffer.pulse_sent++;
+	}
+	else
+	{
+		// if there is nothing to send, rescan the keyboard
+		static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
+
+		m_transmit_buffer.pulse_sent = 0;
+		m_transmit_buffer.pulse_count = 0;
+
+		// scan all lines (excluding shift)
+		for (int i=0; i<8; i++)
 		{
-			// byte containing pulse state
-			int pulse_byte_count = m_transmit_buffer.pulse_sent>>3;
-			// bit within byte containing pulse state
-			int pulse_bit_count = 7 - (m_transmit_buffer.pulse_sent & 0x07);
+			uint8_t keyboard_line_data = ioport(keynames[i])->read();
 
-			// get current pulse state
-			int pulse_state = (m_transmit_buffer.data[pulse_byte_count]>>pulse_bit_count) & 0x01;
-
-			LOG("KC keyboard sending pulse: %02x\n", pulse_state);
-
-			// send pulse
-			m_write_out(pulse_state ? ASSERT_LINE : CLEAR_LINE);
-
-			// update counts
-			m_transmit_buffer.pulse_sent++;
-		}
-		else
-		{
-			// if there is nothing to send, rescan the keyboard
-			static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
-
-			m_transmit_buffer.pulse_sent = 0;
-			m_transmit_buffer.pulse_count = 0;
-
-			// scan all lines (excluding shift)
-			for (int i=0; i<8; i++)
+			// scan through each bit
+			for (int b=0; b<8; b++)
 			{
-				uint8_t keyboard_line_data = ioport(keynames[i])->read();
-
-				// scan through each bit
-				for (int b=0; b<8; b++)
+				// is pressed?
+				if ((keyboard_line_data & (1<<b)) != 0)
 				{
-					// is pressed?
-					if ((keyboard_line_data & (1<<b)) != 0)
-					{
-						// generate fake code
-						uint8_t code = (i<<3) | b;
-						LOG("Code: %02x\n",code);
+					// generate fake code
+					uint8_t code = (i<<3) | b;
+					LOG("Code: %02x\n",code);
 
-						transmit_scancode(code);
-					}
+					transmit_scancode(code);
 				}
 			}
 		}
-		break;
 	}
 }
 

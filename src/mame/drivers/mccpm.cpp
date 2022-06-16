@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic, Robbbert
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
 mc-CP/M-Computer
@@ -189,7 +189,7 @@ void mccpm_state::machine_reset()
 
 void mccpm_state::machine_start()
 {
-	save_item(NAME(m_fdc_status));;
+	save_item(NAME(m_fdc_status));
 }
 
 static void flop_types(device_slot_interface &device)

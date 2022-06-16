@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "tms57002.h"
-#include "debugger.h"
 #include "57002dsm.h"
 
 

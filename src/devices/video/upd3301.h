@@ -81,6 +81,8 @@ public:
 	void lpen_w(int state);
 	int hrtc_r();
 	int vrtc_r();
+	int lines_per_char() { return m_r; }
+	bool get_display_status();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -89,16 +91,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(hrtc_update);
+	TIMER_CALLBACK_MEMBER(vrtc_update);
 
 private:
-	enum
-	{
-		TIMER_HRTC,
-		TIMER_VRTC,
-		TIMER_DRQ
-	};
-
 	void set_interrupt(int state);
 	void set_drq(int state);
 	void set_display(int state);
@@ -175,7 +172,6 @@ private:
 	// timers
 	emu_timer *m_hrtc_timer;
 	emu_timer *m_vrtc_timer;
-	emu_timer *m_drq_timer;
 };
 
 

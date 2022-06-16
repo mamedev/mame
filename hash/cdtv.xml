@@ -658,10 +658,10 @@ cd32: boot OK, status bar selection boxes draws an extra filled grey box to thei
 		<info name="barcode" value="7 22301 66115 4"/>
 		<info name="sku" value="CDT-3506"/>
 		<part name="cdrom" interface="cdrom">
-			  <!-- <category>Games</category> -->
-			  <!-- http://redump.org/disc/18531/ -->
-			  <!-- <rom name="Classic Board Games (Europe) (En,Ja,Fr,De,Es,It).cue" size="114" crc="2a14355f" md5="cb64d8efa755b6dae5634b4a4fd71053" sha1="28d8e8e1ee93cff118663a3bfa00ebc331e70868"/> -->
-			  <!-- <rom name="Classic Board Games (Europe) (En,Ja,Fr,De,Es,It).bin" size="113926176" crc="5540a1d9" md5="343851d323c2d708ceb39208f98d712d" sha1="3080a6870e2f574672d8349562df52b4014b8427"/> -->
+			<!-- <category>Games</category> -->
+			<!-- http://redump.org/disc/18531/ -->
+			<!-- <rom name="Classic Board Games (Europe) (En,Ja,Fr,De,Es,It).cue" size="114" crc="2a14355f" md5="cb64d8efa755b6dae5634b4a4fd71053" sha1="28d8e8e1ee93cff118663a3bfa00ebc331e70868"/> -->
+			<!-- <rom name="Classic Board Games (Europe) (En,Ja,Fr,De,Es,It).bin" size="113926176" crc="5540a1d9" md5="343851d323c2d708ceb39208f98d712d" sha1="3080a6870e2f574672d8349562df52b4014b8427"/> -->
 			<diskarea name="cdrom">
 				<disk name="classic board games (europe) (en,ja,fr,de,es,it)" sha1="030e99b691f38279c83dae1a4256bb9dcf9c0081"/>
 			</diskarea>
@@ -809,7 +809,7 @@ cd32: boot OK
 			<!-- <rom name="Deutschland Kompakt (Germany).cue" size="95" crc="b5141aa4" md5="82a1b76c21bb7ffbce31f8bb4d334fd9" sha1="14f3b61e99f96cd3a8458c29899c2353db2c28d2"/> -->
 			<!-- <rom name="Deutschland Kompakt (Germany).bin" size="435531600" crc="a68713ab" md5="1003357013af7251e5704f7cc15487da" sha1="922a86de11fd54fdf153e5f2cc808cb6198d1356"/> -->
 			<diskarea name="cdrom">
-				 <disk name="deutschland kompakt (germany)" sha1="3c203d8e3dcbf1dbbf6bd951c92de0e8fe03c2a0"/>
+				<disk name="deutschland kompakt (germany)" sha1="3c203d8e3dcbf1dbbf6bd951c92de0e8fe03c2a0"/>
 			</diskarea>
 		</part>
 	</software>

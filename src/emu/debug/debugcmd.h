@@ -130,6 +130,7 @@ private:
 	void execute_resume(const std::vector<std::string> &params);
 	void execute_next(const std::vector<std::string> &params);
 	void execute_cpulist(const std::vector<std::string> &params);
+	void execute_time(const std::vector<std::string> &params);
 	void execute_comment_add(const std::vector<std::string> &params);
 	void execute_comment_del(const std::vector<std::string> &params);
 	void execute_comment_save(const std::vector<std::string> &params);

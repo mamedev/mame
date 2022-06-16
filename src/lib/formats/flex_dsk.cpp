@@ -75,22 +75,23 @@ const char *flex_format::extensions() const
 	return "dsk";
 }
 
-int flex_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int flex_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return 75;
+		return FIFID_SIZE;
 	return 0;
 }
 
-int flex_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int flex_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
 		return -1;
 
 	uint8_t boot0[256], boot1[256];
+	sysinfo_sector info;
 	size_t actual;
 
 	// Look at the boot sector.
@@ -182,7 +183,7 @@ int flex_format::find_size(util::random_read &io, uint32_t form_factor, const st
 	return -1;
 }
 
-const wd177x_format::format &flex_format::get_track_format(const format &f, int head, int track)
+const wd177x_format::format &flex_format::get_track_format(const format &f, int head, int track) const
 {
 	int n = -1;
 
@@ -1274,4 +1275,4 @@ const flex_format::format flex_format::formats_head1_track0[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_FLEX_FORMAT = &floppy_image_format_creator<flex_format>;
+const flex_format FLOPPY_FLEX_FORMAT;

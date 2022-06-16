@@ -97,7 +97,7 @@ public:
 
 	u8    m_kx46_regs[8];
 	u16   m_kx47_regs[16];
-	int   m_dx, m_dy;
+	int   m_dx = 0, m_dy = 0;
 	u8    m_objcha_line;
 	int   m_z_rejection;
 
@@ -105,7 +105,7 @@ public:
 
 	required_region_ptr<u8> m_gfxrom;
 	int m_gfx_num;
-	int m_bpp;
+	int m_bpp = 0;
 
 	/* alt implementation - to be collapsed */
 	void zdrawgfxzoom32GP(

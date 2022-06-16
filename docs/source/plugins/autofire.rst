@@ -50,9 +50,9 @@ Button 1* or the equivalent for another player, but it might have have a
 different name.  On Konami’s Gradius games, *P1 Button 2* is the primary fire
 button.
 
-Select **Hotkey** to set the input combination you’ll use to activate the
-autofire button.  This can be any combination that MAME supports for activating
-a digital input.
+Select **Hotkey** to set the control (or combination of controls) you’ll use to
+activate the autofire button.  This can be any combination that MAME supports
+for activating a digital input.
 
 **On frames** and **Off frames** are the number of consecutive emulated video
 frames that the emulated button will be held and released for, respectively.
@@ -81,10 +81,10 @@ immediately.
 Notes and potential pitfalls
 ----------------------------
 
-Autofire buttons act as if they’re wired in parallel with MAME’s regular inputs.
-This means that if you set the activation hotkey for an autofire button to a
-button or key that’s also assigned to one of the emulated inputs directly, you
-may get unexpected results.  Using Gradius as an example:
+Autofire buttons act as if they’re wired in parallel with MAME’s regular
+controls.  This means that if you set the activation hotkey for an autofire
+button to a button or key that’s also assigned to one of the emulated inputs
+directly, you may get unexpected results.  Using Gradius as an example:
 
 * Suppose you set button 1 on your controller to fire, and set an autofire
   hotkey to button 1 as well.  Holding the button down to shoot will not trigger
@@ -97,8 +97,8 @@ may get unexpected results.  Using Gradius as an example:
   powerup because the powerup button is also being held down along with the
   autofire button.
 
-It is suggested you choose input combinations for autofire hotkeys that are not
-assigned to any other emulated inputs in the system.
+It is recommended that you choose control combinations for autofire hotkeys that
+are not assigned to any other emulated inputs in the system.
 
 Autofire is not necessarily desirable in all situations.  For example using
 autofire in Super-X with the blue “lightning” weapon equipped at high power

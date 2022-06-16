@@ -80,7 +80,11 @@ ROM_END
 philips_22vp931_device::philips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: laserdisc_device(mconfig, PHILIPS_22VP931, tag, owner, clock),
 		m_i8049_cpu(*this, "vp931"),
-		m_tracktimer(nullptr),
+		m_process_vbi_timer(nullptr),
+		m_irq_off_timer(nullptr),
+		m_strobe_off_timer(nullptr),
+		m_erp_off_timer(nullptr),
+		m_track_timer(nullptr),
 		m_i8049_out0(0),
 		m_i8049_out1(0),
 		m_i8049_port1(0),
@@ -144,8 +148,13 @@ void philips_22vp931_device::device_start()
 	// pass through to the parent
 	laserdisc_device::device_start();
 
-	// allocate a timer
-	m_tracktimer = timer_alloc(TID_HALF_TRACK);
+	// allocate timers
+	m_initial_vbi_timer = timer_alloc(FUNC(philips_22vp931_device::process_vbi_data), this);
+	m_process_vbi_timer = timer_alloc(FUNC(philips_22vp931_device::process_vbi_data), this);
+	m_irq_off_timer = timer_alloc(FUNC(philips_22vp931_device::irq_off), this);
+	m_strobe_off_timer = timer_alloc(FUNC(philips_22vp931_device::data_strobe_off), this);
+	m_erp_off_timer = timer_alloc(FUNC(philips_22vp931_device::erp_off), this);
+	m_track_timer = timer_alloc(FUNC(philips_22vp931_device::half_track_tick), this);
 }
 
 
@@ -181,92 +190,110 @@ void philips_22vp931_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timers set by this
-//  device
+//  process_vbi_data - process VBI data which was
+//  fetched by the parent device
 //-------------------------------------------------
 
-void philips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(philips_22vp931_device::process_vbi_data)
 {
-	switch (id)
+	uint32_t line = param >> 2;
+	int which = param & 3;
+	uint32_t code = 0;
+
+	// fetch the code and compute the DATIC latched value
+	if (line >= LASERDISC_CODE_LINE16 && line <= LASERDISC_CODE_LINE18)
+		code = get_field_code(laserdisc_field_code(line), false);
+
+	// at the start of each line, signal an interrupt and use a timer to turn it off
+	if (which == 0)
 	{
-		case TID_VBI_DATA_FETCH:
-		{
-			uint32_t line = param >> 2;
-			int which = param & 3;
-			uint32_t code = 0;
+		m_i8049_cpu->set_input_line(MCS48_INPUT_IRQ, ASSERT_LINE);
+		m_irq_off_timer->adjust(attotime::from_nsec(5580));
+	}
 
-			// fetch the code and compute the DATIC latched value
-			if (line >= LASERDISC_CODE_LINE16 && line <= LASERDISC_CODE_LINE18)
-				code = get_field_code(laserdisc_field_code(line), false);
+	// clock the data strobe on each subsequent callback
+	else if (code != 0)
+	{
+		m_daticval = code >> (8 * (3 - which));
+		m_datastrobe = 1;
+		m_strobe_off_timer->adjust(attotime::from_nsec(5000));
+	}
 
-			// at the start of each line, signal an interrupt and use a timer to turn it off
-			if (which == 0)
-			{
-				m_i8049_cpu->set_input_line(MCS48_INPUT_IRQ, ASSERT_LINE);
-				timer_set(attotime::from_nsec(5580), TID_IRQ_OFF);
-			}
+	// determine the next bit to fetch and reprime ourself
+	if (++which == 4)
+	{
+		which = 0;
+		line++;
+	}
+	if (line <= LASERDISC_CODE_LINE18 + 1)
+		m_process_vbi_timer->adjust(screen().time_until_pos(line*2, which * 2 * screen().width() / 4), (line << 2) + which);
+}
 
-			// clock the data strobe on each subsequent callback
-			else if (code != 0)
-			{
-				m_daticval = code >> (8 * (3 - which));
-				m_datastrobe = 1;
-				timer_set(attotime::from_nsec(5000), TID_DATA_STROBE_OFF);
-			}
 
-			// determine the next bit to fetch and reprime ourself
-			if (++which == 4)
-			{
-				which = 0;
-				line++;
-			}
-			if (line <= LASERDISC_CODE_LINE18 + 1)
-				timer_set(screen().time_until_pos(line*2, which * 2 * screen().width() / 4), TID_VBI_DATA_FETCH, (line << 2) + which);
-			break;
-		}
+//-------------------------------------------------
+//  process_deferred_data -
+//-------------------------------------------------
 
-		case TID_DEFERRED_DATA:
-			// set the value and mark it pending
-			if (LOG_COMMANDS && m_fromcontroller_pending)
-				printf("Dropped previous command byte\n");
-			m_fromcontroller = param;
-			m_fromcontroller_pending = true;
+TIMER_CALLBACK_MEMBER(philips_22vp931_device::process_deferred_data)
+{
+	// set the value and mark it pending
+	if (LOG_COMMANDS && m_fromcontroller_pending)
+		printf("Dropped previous command byte\n");
+	m_fromcontroller = param;
+	m_fromcontroller_pending = true;
 
-			// track the commands for debugging purposes
-			if (m_cmdcount < std::size(m_cmdbuf))
-			{
-				m_cmdbuf[m_cmdcount++ % 3] = param;
-				if (LOG_COMMANDS && m_cmdcount % 3 == 0)
-					printf("Cmd: %02X %02X %02X\n", m_cmdbuf[0], m_cmdbuf[1], m_cmdbuf[2]);
-			}
-			break;
+	// track the commands for debugging purposes
+	if (m_cmdcount < std::size(m_cmdbuf))
+	{
+		m_cmdbuf[m_cmdcount++ % 3] = param;
+		if (LOG_COMMANDS && m_cmdcount % 3 == 0)
+			printf("Cmd: %02X %02X %02X\n", m_cmdbuf[0], m_cmdbuf[1], m_cmdbuf[2]);
+	}
+}
 
-		case TID_IRQ_OFF:
-			m_i8049_cpu->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
-			break;
 
-		case TID_DATA_STROBE_OFF:
-			m_datastrobe = 0;
-			break;
+//-------------------------------------------------
+//  irq_off -
+//-------------------------------------------------
 
-		case TID_ERP_OFF:
-			m_daticerp = 0;
-			break;
+TIMER_CALLBACK_MEMBER(philips_22vp931_device::irq_off)
+{
+	m_i8049_cpu->set_input_line(MCS48_INPUT_IRQ, CLEAR_LINE);
+}
 
-		case TID_HALF_TRACK:
-			// advance by the count and toggle the state
-			m_trackstate ^= 1;
-			if ((m_trackdir < 0 && !m_trackstate) || (m_trackdir > 0 && m_trackstate))
-			{
-				advance_slider(m_trackdir);
-				m_advanced += m_trackdir;
-			}
-			break;
 
-		// pass everything else onto the parent
-		default:
-			laserdisc_device::device_timer(timer, id, param);
-			break;
+//-------------------------------------------------
+//  data_strobe_off -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(philips_22vp931_device::data_strobe_off)
+{
+	m_datastrobe = 0;
+}
+
+
+//-------------------------------------------------
+//  erp_off -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(philips_22vp931_device::erp_off)
+{
+	m_daticerp = 0;
+}
+
+
+//-------------------------------------------------
+//  half_track_tick - advance the slider by the
+//  current count and toggle the track state
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(philips_22vp931_device::half_track_tick)
+{
+	m_trackstate ^= 1;
+	if ((m_trackdir < 0 && !m_trackstate) || (m_trackdir > 0 && m_trackstate))
+	{
+		advance_slider(m_trackdir);
+		m_advanced += m_trackdir;
 	}
 }
 
@@ -311,7 +338,7 @@ void philips_22vp931_device::player_vsync(const vbi_metadata &vbi, int fieldnum,
 
 	// set the ERP signal to 1 to indicate start of frame, and set a timer to turn it off
 	m_daticerp = 1;
-	timer_set(screen().time_until_pos(15*2), TID_ERP_OFF);
+	m_erp_off_timer->adjust(screen().time_until_pos(15*2));
 }
 
 
@@ -322,8 +349,9 @@ void philips_22vp931_device::player_vsync(const vbi_metadata &vbi, int fieldnum,
 
 int32_t philips_22vp931_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
-	// set the first VBI timer to go at the start of line 16
-	timer_set(screen().time_until_pos(16*2), TID_VBI_DATA_FETCH, LASERDISC_CODE_LINE16 << 2);
+	// player_update is invoked by the parent device at line 16, so call our VBI processing timer directly
+	m_initial_vbi_timer->adjust(screen().time_until_pos(16*2), LASERDISC_CODE_LINE16 << 2);
+	//process_vbi_data(LASERDISC_CODE_LINE16 << 2);
 
 	// play forward by default
 	return fieldnum;
@@ -572,22 +600,18 @@ void philips_22vp931_device::i8049_port1_w(uint8_t data)
 		}
 	}
 
-	// if we have a timer, adjust it
-	if (m_tracktimer != nullptr)
+	// turn off the track timer if we're not tracking
+	if (m_trackdir == 0)
+		m_track_timer->reset();
+
+	// if we just started tracking, or if the speed was changed, reprime the timer
+	else if (((m_i8049_port1 ^ data) & 0x11) != 0)
 	{
-		// turn it off if we're not tracking
-		if (m_trackdir == 0)
-			m_tracktimer->reset();
+		// speeds here are just guesses, but work with the player logic; this is the time per half-track
+		attotime speed = (data & 0x10) ? attotime::from_usec(60) : attotime::from_usec(10);
 
-		// if we just started tracking, or if the speed was changed, reprime the timer
-		else if (((m_i8049_port1 ^ data) & 0x11) != 0)
-		{
-			// speeds here are just guesses, but work with the player logic; this is the time per half-track
-			attotime speed = (data & 0x10) ? attotime::from_usec(60) : attotime::from_usec(10);
-
-			// always start with an initial long delay; the code expects this
-			m_tracktimer->adjust(attotime::from_usec(100), 0, speed);
-		}
+		// always start with an initial long delay; the code expects this
+		m_track_timer->adjust(attotime::from_usec(100), 0, speed);
 	}
 
 	m_i8049_port1 = data;

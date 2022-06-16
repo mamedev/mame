@@ -60,19 +60,19 @@ bool mfm_format::supports_save() const
 	return true;
 }
 
-int mfm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int mfm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[7];
 
 	size_t actual;
 	io.read_at(0, &header, sizeof(header), actual);
 	if ( memcmp( header, MFM_FORMAT_HEADER, 6 ) ==0) {
-		return 100;
+		return FIFID_SIGN;
 	}
 	return 0;
 }
 
-bool mfm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool mfm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	MFMIMG header;
@@ -114,7 +114,7 @@ bool mfm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool mfm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool mfm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	// TODO: HD support
 	size_t actual;
@@ -160,4 +160,4 @@ bool mfm_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	return true;
 }
 
-const floppy_format_type FLOPPY_MFM_FORMAT = &floppy_image_format_creator<mfm_format>;
+const mfm_format FLOPPY_MFM_FORMAT;

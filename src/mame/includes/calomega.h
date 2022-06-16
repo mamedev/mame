@@ -92,10 +92,6 @@ private:
 	void dummy_pia_w(uint8_t data);
 	uint8_t keyb_903_r();
 
-	DECLARE_READ_LINE_MEMBER(timer_r);
-	DECLARE_READ_LINE_MEMBER(vblank_r);
-	DECLARE_READ_LINE_MEMBER(dummy_pia_line_r);
-
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank0_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank1_w);
@@ -150,7 +146,7 @@ private:
 	required_ioport m_grn;
 	required_ioport m_blu;
 
-	uint8_t m_vblank = 0U, m_timer = 0U;
+	uint8_t m_timer = 0U;
 	int m_s903_mux_data = 0;
 	int m_s905_mux_data = 0;
 	int m_pia_data = 0;

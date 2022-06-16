@@ -54,8 +54,8 @@ void warpwarp_sound_device::device_start()
 	m_clock_1v = clock() / 3 / 2 / 384;
 	m_channel = stream_alloc(0, 1, m_clock_16h);
 
-	m_sound_volume_timer = timer_alloc(TIMER_SOUND_VOLUME_DECAY);
-	m_music_volume_timer = timer_alloc(TIMER_MUSIC_VOLUME_DECAY);
+	m_sound_volume_timer = timer_alloc(FUNC(warpwarp_sound_device::sound_decay_tick), this);
+	m_music_volume_timer = timer_alloc(FUNC(warpwarp_sound_device::music_decay_tick), this);
 
 	save_item(NAME(m_sound_latch));
 	save_item(NAME(m_music1_latch));
@@ -71,23 +71,16 @@ void warpwarp_sound_device::device_start()
 	save_item(NAME(m_mcount));
 }
 
-void warpwarp_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(warpwarp_sound_device::sound_decay_tick)
 {
-	switch (id)
-	{
-	case TIMER_SOUND_VOLUME_DECAY:
-		if (--m_sound_volume < 0)
-			m_sound_volume = 0;
-		break;
+	if (--m_sound_volume < 0)
+		m_sound_volume = 0;
+}
 
-	case TIMER_MUSIC_VOLUME_DECAY:
-		if (--m_music_volume < 0)
-			m_music_volume = 0;
-		break;
-
-	default:
-		throw emu_fatalerror("Unknown id in warpwarp_sound_device::device_timer");
-	}
+TIMER_CALLBACK_MEMBER(warpwarp_sound_device::music_decay_tick)
+{
+	if (--m_music_volume < 0)
+		m_music_volume = 0;
 }
 
 void warpwarp_sound_device::sound_w(u8 data)

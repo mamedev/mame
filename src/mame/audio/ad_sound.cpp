@@ -407,7 +407,7 @@ void ad_59mc07_device::device_start()
 	save_item(NAME(m_cymvol));
 	save_item(NAME(m_hihatvol));
 
-	m_adjuster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ad_59mc07_device::frq_adjuster_callback), this));
+	m_adjuster_timer = timer_alloc(FUNC(ad_59mc07_device::frq_adjuster_callback), this);
 	m_adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 

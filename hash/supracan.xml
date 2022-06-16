@@ -110,7 +110,7 @@ license:CC0
 		</part>
 	</software>
 
-		<software name="gamblord">
+	<software name="gamblord">
 		<description>Gambling Lord</description>
 		<year>1996</year>
 		<publisher>Funtech</publisher>
@@ -123,7 +123,7 @@ license:CC0
 		</part>
 	</software>
 
-		<software name="magipool">
+	<software name="magipool">
 		<description>Magical Pool</description>
 		<year>199?</year>
 		<publisher>Funtech</publisher>

@@ -47,7 +47,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_ioport_array<12> m_keys;
 
-	uint8_t m_reg[0x1000];
+	uint8_t m_reg[0x1000]{};
 
 	static const char* const s_def[5];
 	static const char* const s_shift[5];

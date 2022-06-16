@@ -74,7 +74,7 @@ ioport_constructor midiin_device::device_input_ports() const
 void midiin_device::device_start()
 {
 	m_input_cb.resolve_safe();
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(midiin_device::midi_update), this);
 	m_midi.reset();
 	m_timer->enable(false);
 }
@@ -91,69 +91,66 @@ void midiin_device::device_reset()
 }
 
 /*-------------------------------------------------
-    device_timer
+    midi_update
 -------------------------------------------------*/
 
-void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(midiin_device::midi_update)
 {
-	if (id == 0)
+	// if there's a sequence playing, that takes priority
+	midi_event *event = m_sequence.current_event();
+	if (event != nullptr)
 	{
-		// if there's a sequence playing, that takes priority
-		midi_event *event = m_sequence.current_event();
-		if (event != nullptr)
+		attotime curtime = m_timer->expire();
+		if (curtime < m_sequence_start)
 		{
-			attotime curtime = timer.expire();
-			if (curtime < m_sequence_start)
-			{
-				// we could get called before we're supposed to start; show a countdown
-				attotime delta = m_sequence_start - curtime;
-				popmessage("Waiting to start MIDI playback... %d", delta.seconds());
-				m_timer->adjust(std::min(delta, attotime(1, 0)));
-			}
-			else
-			{
-				// update the playback time
-				curtime -= m_sequence_start;
-				popmessage("Playing MIDI file: %d:%02d / %d:%02d", curtime.seconds() / 60, curtime.seconds() % 60, m_sequence.duration().seconds() / 60, m_sequence.duration().seconds() % 60);
-
-				// if it's time to process the current event, do it and advance
-				if (curtime >= event->time())
-				{
-					const u8 force_channel = m_config->read();
-
-					for (u8 curbyte : event->data())
-					{
-						if (force_channel <= 15 && curbyte >= 0x80 && curbyte < 0xf0)
-							curbyte = (curbyte & 0xf0) | force_channel;
-
-						xmit_char(curbyte);
-					}
-					event = m_sequence.advance_event();
-				}
-
-				// if there are more events, set a timer to trigger them
-				// (minimum duration 1 sec so that our playback time doesn't skip)
-				if (event != nullptr)
-					m_timer->adjust(std::min(event->time() - curtime, attotime(1, 0)));
-				else
-					popmessage("End of MIDI file");
-			}
+			// we could get called before we're supposed to start; show a countdown
+			attotime delta = m_sequence_start - curtime;
+			popmessage("Waiting to start MIDI playback... %d", delta.seconds());
+			m_timer->adjust(std::min(delta, attotime(1, 0)));
 		}
-		else if (m_midi)
+		else
 		{
-			uint8_t buf[8192*4];
-			int bytesRead;
+			// update the playback time
+			curtime -= m_sequence_start;
+			popmessage("Playing MIDI file: %d:%02d / %d:%02d", curtime.seconds() / 60, curtime.seconds() % 60, m_sequence.duration().seconds() / 60, m_sequence.duration().seconds() % 60);
 
-			while (m_midi->poll())
+			// if it's time to process the current event, do it and advance
+			if (curtime >= event->time())
 			{
-				bytesRead = m_midi->read(buf);
+				const u8 force_channel = m_config->read();
 
-				if (bytesRead > 0)
+				for (u8 curbyte : event->data())
 				{
-					for (int i = 0; i < bytesRead; i++)
-					{
-						xmit_char(buf[i]);
-					}
+					if (force_channel <= 15 && curbyte >= 0x80 && curbyte < 0xf0)
+						curbyte = (curbyte & 0xf0) | force_channel;
+
+					xmit_char(curbyte);
+				}
+				event = m_sequence.advance_event();
+			}
+
+			// if there are more events, set a timer to trigger them
+			// (minimum duration 1 sec so that our playback time doesn't skip)
+			if (event != nullptr)
+				m_timer->adjust(std::min(event->time() - curtime, attotime(1, 0)));
+			else
+				popmessage("End of MIDI file");
+		}
+	}
+	else if (m_midi)
+	{
+		uint8_t buf[8192*4];
+		int bytesRead;
+
+		while (m_midi->poll())
+		{
+			bytesRead = m_midi->read(buf);
+
+			if (bytesRead > 0)
+			{
+				for (int i = 0; i < bytesRead; i++)
+				{
+					xmit_char(buf[i]);
 				}
 			}
 		}
@@ -173,7 +170,7 @@ image_init_result midiin_device::call_load()
 		// if the parsing succeeds, schedule the start to happen at least
 		// 10 seconds after starting to allow the keyboards to initialize
 		// TODO: this should perhaps be a driver-configurable parameter?
-		if (m_sequence.parse(reinterpret_cast<u8 const *>(ptr()), length()))
+		if (m_sequence.parse(image_core_file(), length()))
 		{
 			m_sequence_start = std::max(machine().time(), attotime(10, 0));
 			m_timer->adjust(attotime::zero);
@@ -273,8 +270,8 @@ static constexpr u32 fourcc_le(char const *string)
 //  midi_parser - constructor
 //-------------------------------------------------
 
-midiin_device::midi_parser::midi_parser(u8 const *data, u32 length, u32 offset) :
-	m_data(data),
+midiin_device::midi_parser::midi_parser(util::random_read &stream, u32 length, u32 offset) :
+	m_stream(stream),
 	m_length(length),
 	m_offset(offset)
 {
@@ -290,7 +287,7 @@ midiin_device::midi_parser::midi_parser(u8 const *data, u32 length, u32 offset) 
 midiin_device::midi_parser midiin_device::midi_parser::subset(u32 length)
 {
 	check_bounds(length);
-	midi_parser result(m_data + m_offset, length, 0);
+	midi_parser result(m_stream, m_offset + length, m_offset);
 	m_offset += length;
 	return result;
 }
@@ -324,6 +321,91 @@ u32 midiin_device::midi_parser::variable()
 			return result;
 	}
 	throw error("Invalid variable length field");
+}
+
+
+//-------------------------------------------------
+//  byte - read 8 bits of data
+//-------------------------------------------------
+
+u8 midiin_device::midi_parser::byte()
+{
+	check_bounds(1);
+
+	u8 result = 0;
+	std::size_t actual = 0;
+	if (m_stream.read_at(m_offset, &result, 1, actual) || actual != 1)
+		throw error("Error reading data");
+	m_offset++;
+	return result;
+}
+
+
+//-------------------------------------------------
+//  word_be - read 16 bits of big-endian data
+//-------------------------------------------------
+
+u16 midiin_device::midi_parser::word_be()
+{
+	check_bounds(2);
+
+	u16 result = 0;
+	std::size_t actual = 0;
+	if (m_stream.read_at(m_offset, &result, 2, actual) || actual != 2)
+		throw error("Error reading data");
+	m_offset += 2;
+	return big_endianize_int16(result);
+}
+
+
+//-------------------------------------------------
+//  triple_be - read 24 bits of big-endian data
+//-------------------------------------------------
+
+u32 midiin_device::midi_parser::triple_be()
+{
+	check_bounds(3);
+
+	u32 result = 0;
+	std::size_t actual = 0;
+	if (m_stream.read_at(m_offset, &result, 3, actual) || actual != 3)
+		throw error("Error reading data");
+	m_offset += 3;
+	return big_endianize_int32(result) >> 8;
+}
+
+
+//-------------------------------------------------
+//  dword_be - read 32 bits of big-endian data
+//-------------------------------------------------
+
+u32 midiin_device::midi_parser::dword_be()
+{
+	check_bounds(4);
+
+	u32 result = 0;
+	std::size_t actual = 0;
+	if (m_stream.read_at(m_offset, &result, 4, actual) || actual != 4)
+		throw error("Error reading data");
+	m_offset += 4;
+	return big_endianize_int32(result);
+}
+
+
+//-------------------------------------------------
+//  dword_le - read 32 bits of little-endian data
+//-------------------------------------------------
+
+u32 midiin_device::midi_parser::dword_le()
+{
+	check_bounds(4);
+
+	u32 result = 0;
+	std::size_t actual = 0;
+	if (m_stream.read_at(m_offset, &result, 4, actual) || actual != 4)
+		throw error("Error reading data");
+	m_offset += 4;
+	return little_endianize_int32(result);
 }
 
 
@@ -364,13 +446,13 @@ midiin_device::midi_event &midiin_device::midi_sequence::event_at(u32 tick)
 //  parse - parse a MIDI sequence from a buffer
 //-------------------------------------------------
 
-bool midiin_device::midi_sequence::parse(u8 const *data, u32 length)
+bool midiin_device::midi_sequence::parse(util::random_read &stream, u32 length)
 {
 	// start with an empty list of events
 	m_list.clear();
 
 	// by default parse the whole data
-	midi_parser buffer(data, length, 0);
+	midi_parser buffer(stream, length, 0);
 
 	// catch errors to make parsing easier
 	try
@@ -403,8 +485,9 @@ bool midiin_device::midi_sequence::parse(u8 const *data, u32 length)
 		m_iterator = m_list.begin();
 		return true;
 	}
-	catch (midi_parser::error &)
+	catch (midi_parser::error &err)
 	{
+		osd_printf_error("MIDI file error: %s\n", err.description());
 		m_list.clear();
 		m_iterator = m_list.begin();
 		return false;

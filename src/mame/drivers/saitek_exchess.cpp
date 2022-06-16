@@ -73,8 +73,8 @@ private:
 	void ram_data_w(u8 data);
 
 	std::unique_ptr<u8[]> m_ram;
-	u8 m_ram_address[2] = { 0, 0 };
-	u64 m_lcd_data[2] = { 0, 0 };
+	u8 m_ram_address[2] = { };
+	u64 m_lcd_data[2] = { };
 };
 
 void exchess_state::machine_start()

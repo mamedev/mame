@@ -2,7 +2,6 @@
 // copyright-holders:Fabio Priuli
 /***************************************************************************
 
-
  Atari 2600 cart with DPC chip (Pitfall II)
 
 ***************************************************************************/
@@ -32,7 +31,7 @@ dpc_device::dpc_device(const machine_config& mconfig, const char* tag, device_t*
 
 void dpc_device::device_start()
 {
-	m_oscillator = timer_alloc(TIMER_OSC);
+	m_oscillator = timer_alloc(FUNC(dpc_device::oscillator_tick), this);
 	m_oscillator->reset();
 
 	save_item(STRUCT_MEMBER(m_df, top));
@@ -52,7 +51,7 @@ void dpc_device::device_start()
 
 void dpc_device::device_reset()
 {
-	for (auto & elem : m_df)
+	for (df_t & elem : m_df)
 	{
 		elem.osc_clk = 0;
 		elem.flag = 0;
@@ -88,20 +87,16 @@ void dpc_device::decrement_counter(uint8_t data_fetcher)
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  oscillator_tick
 //-------------------------------------------------
 
-void dpc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(dpc_device::oscillator_tick)
 {
-	if (id == TIMER_OSC)
+	for (int data_fetcher = 5; data_fetcher < 8; data_fetcher++)
 	{
-		// callback
-		for (int data_fetcher = 5; data_fetcher < 8; data_fetcher++)
+		if (m_df[data_fetcher].osc_clk)
 		{
-			if (m_df[data_fetcher].osc_clk)
-			{
-				decrement_counter(data_fetcher);
-			}
+			decrement_counter(data_fetcher);
 		}
 	}
 }

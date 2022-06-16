@@ -42,12 +42,12 @@ private:
 	required_ioport m_system;
 
 	/* video-related */
-	tilemap_t   *m_bg_tilemap;
-	tilemap_t   *m_fg_tilemap;
-	uint8_t     m_palette_bank;
-	uint8_t     m_column_scroll;
-	uint8_t     m_flipscreen_x;
-	uint8_t     m_flipscreen_y;
+	tilemap_t   *m_bg_tilemap = nullptr;
+	tilemap_t   *m_fg_tilemap = nullptr;
+	uint8_t     m_palette_bank = 0;
+	uint8_t     m_column_scroll = 0;
+	uint8_t     m_flipscreen_x = 0;
+	uint8_t     m_flipscreen_y = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -57,7 +57,7 @@ private:
 	required_device<ls259_device> m_outlatch;
 	required_device<watchdog_timer_device> m_watchdog;
 
-	bool     m_irq_mask;
+	bool     m_irq_mask = false;
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	void marineb_videoram_w(offs_t offset, uint8_t data);

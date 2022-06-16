@@ -1053,10 +1053,11 @@ Notes:
 
       This PCB was found on the following games (so far)....
 
-      Truck Kyosokyoku (TKK2/VER.A)
-      A CDROM drive and CDROM disc is also required
-      The disc is labelled 'TKK2-A'
-
+      -Truck Kyosokyoku (TKK2/VER.A)
+            A CDROM drive and CDROM disc is also required
+            The disc is labelled 'TKK2-A'
+      -Tekno Werk
+            A CDROM drive and CDROM disc is also required
 
 I/O Board (for use with Truck Kyosokyoku)
 ---------

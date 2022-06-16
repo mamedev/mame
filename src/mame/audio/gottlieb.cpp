@@ -712,12 +712,7 @@ gottlieb_sound_p4_device::gottlieb_sound_p4_device(const machine_config &mconfig
 {
 }
 
-gottlieb_sound_p4_device::gottlieb_sound_p4_device(
-		const machine_config &mconfig,
-		device_type type,
-		const char *tag,
-		device_t *owner,
-		uint32_t clock)
+gottlieb_sound_p4_device::gottlieb_sound_p4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this)
 	, m_dcpu(*this, "audiocpu")
@@ -726,6 +721,8 @@ gottlieb_sound_p4_device::gottlieb_sound_p4_device(
 	, m_ay1(*this, "ay1")
 	, m_ay2(*this, "ay2")
 	, m_nmi_timer(nullptr)
+	, m_nmi_clear_timer(nullptr)
+	, m_latch_timer(nullptr)
 	, m_nmi_rate(0)
 	, m_nmi_state(0)
 	, m_dcpu_latch(0)
@@ -748,8 +745,8 @@ void gottlieb_sound_p4_device::write(u8 data)
 	// when data is not 0xff, the transparent latch at A3 allows it to pass through unmolested
 	if (data != 0xff)
 	{
-		// latch data on a timer
-		synchronize(TID_SOUND_LATCH_WRITE, data);
+		// sync the latch data write
+		m_latch_timer->adjust(attotime::zero, data);
 
 		// if the previous data was 0xff, clock an IRQ on each
 		if (m_last_command == 0xff)
@@ -970,10 +967,14 @@ void gottlieb_sound_p4_device::device_add_mconfig(machine_config &config)
 
 void gottlieb_sound_p4_device::device_start()
 {
-	// set up the NMI timer
-	m_nmi_timer = timer_alloc(TID_NMI_GENERATE);
+	// set up the NMI timers
+	m_nmi_timer = timer_alloc(FUNC(gottlieb_sound_p4_device::set_nmi), this);
+	m_nmi_clear_timer = timer_alloc(FUNC(gottlieb_sound_p4_device::clear_nmi), this);
 	m_nmi_rate = 0;
 	nmi_timer_adjust();
+
+	// set up other timers
+	m_latch_timer = timer_alloc(FUNC(gottlieb_sound_p4_device::update_latch), this);
 
 	// register for save states
 	save_item(NAME(m_nmi_rate));
@@ -987,39 +988,36 @@ void gottlieb_sound_p4_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer-based behaviors
+//  handle timer-based behaviors
 //-------------------------------------------------
 
-void gottlieb_sound_p4_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(gottlieb_sound_p4_device::set_nmi)
 {
-	switch (id)
-	{
-		case TID_NMI_GENERATE:
-			// update state
-			m_nmi_state = 1;
-			nmi_state_update();
+	// update state
+	m_nmi_state = 1;
+	nmi_state_update();
 
-			// set a timer to turn it off again on the next SOUND_CLOCK/16
-			timer_set(attotime::from_hz(SOUND2_CLOCK/16), TID_NMI_CLEAR);
+	// set a timer to turn it off again on the next SOUND_CLOCK/16
+	m_nmi_clear_timer->adjust(attotime::from_hz(SOUND2_CLOCK/16));
 
-			// adjust the NMI timer for the next time
-			nmi_timer_adjust();
-			break;
+	// adjust the NMI timer for the next time
+	nmi_timer_adjust();
+}
 
-		case TID_NMI_CLEAR:
-			// update state
-			m_nmi_state = 0;
-			nmi_state_update();
-			break;
+TIMER_CALLBACK_MEMBER(gottlieb_sound_p4_device::clear_nmi)
+{
+	// update state
+	m_nmi_state = 0;
+	nmi_state_update();
+}
 
-		case TID_SOUND_LATCH_WRITE:
-			// each CPU has its own latch
-			m_dcpu_latch = param;
-			m_ycpu_latch = param;
-			if (m_dcpu2)
-				m_dcpu2_latch = param;
-			break;
-	}
+TIMER_CALLBACK_MEMBER(gottlieb_sound_p4_device::update_latch)
+{
+	// each CPU has its own latch
+	m_dcpu_latch = param;
+	m_ycpu_latch = param;
+	if (m_dcpu2)
+		m_dcpu2_latch = param;
 }
 
 

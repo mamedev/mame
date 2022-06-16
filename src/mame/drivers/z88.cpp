@@ -2,17 +2,15 @@
 // copyright-holders:Kevin Thacker,Sandro Ronco
 /******************************************************************************
 
-        z88.c
+        z88.cpp
 
         z88 Notepad computer
 
         system driver
 
         TODO:
-        - speaker controlled by txd
         - cartridges should be hot swappable
         - expansion interface
-        - serial port
 
         Kevin Thacker [MESS driver]
 
@@ -46,110 +44,37 @@ explains why the extra checks are done
 
 */
 
-// cartridges read
-uint8_t z88_state::bank0_cart_r(offs_t offset) { return m_carts[m_bank[0].slot]->read((m_bank[0].page<<14) + offset); }
-uint8_t z88_state::bank1_cart_r(offs_t offset) { return m_carts[m_bank[1].slot]->read((m_bank[1].page<<14) + offset); }
-uint8_t z88_state::bank2_cart_r(offs_t offset) { return m_carts[m_bank[2].slot]->read((m_bank[2].page<<14) + offset); }
-uint8_t z88_state::bank3_cart_r(offs_t offset) { return m_carts[m_bank[3].slot]->read((m_bank[3].page<<14) + offset); }
-
-// cartridges write
-void z88_state::bank0_cart_w(offs_t offset, uint8_t data) { m_carts[m_bank[0].slot]->write((m_bank[0].page<<14) + offset, data); }
-void z88_state::bank1_cart_w(offs_t offset, uint8_t data) { m_carts[m_bank[1].slot]->write((m_bank[1].page<<14) + offset, data); }
-void z88_state::bank2_cart_w(offs_t offset, uint8_t data) { m_carts[m_bank[2].slot]->write((m_bank[2].page<<14) + offset, data); }
-void z88_state::bank3_cart_w(offs_t offset, uint8_t data) { m_carts[m_bank[3].slot]->write((m_bank[3].page<<14) + offset, data); }
-
-
 UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 {
-	// bank 0 is always even
-	if (bank == 0)  page &= 0xfe;
-
-	if (page < 0x20)    // internal ROM
-	{
-		// install read bank
-		if (m_bank_type[bank] != Z88_BANK_ROM)
-		{
-			m_maincpu->space(AS_PROGRAM).install_read_bank(bank<<14, (bank<<14) + 0x3fff, m_banks[bank + 1]);
-			m_maincpu->space(AS_PROGRAM).unmap_write(bank<<14, (bank<<14) + 0x3fff);
-			m_bank_type[bank] = Z88_BANK_ROM;
-		}
-
-		m_banks[bank + 1]->set_entry(page);
-	}
-	else if (page < 0x40)   // internal RAM
-	{
-		if((page & 0x1f) < (m_ram->size()>>14))
-		{
-			// install readwrite bank
-			if (m_bank_type[bank] != Z88_BANK_RAM)
-			{
-				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(bank<<14, (bank<<14) + 0x3fff, m_banks[bank + 1]);
-				m_bank_type[bank] = Z88_BANK_RAM;
-			}
-
-			// set the bank
-			m_banks[bank + 1]->set_entry(page);
-		}
-		else
-		{
-			if (m_bank_type[bank] != Z88_BANK_UNMAP)
-			{
-				m_maincpu->space(AS_PROGRAM).unmap_readwrite(bank<<14, (bank<<14) + 0x3fff);
-				m_bank_type[bank] = Z88_BANK_UNMAP;
-			}
-		}
-	}
-	else    // cartridges
-	{
-		m_bank[bank].slot = (page >> 6) & 3;
-		m_bank[bank].page = page & 0x3f;
-
-		if (m_bank_type[bank] != Z88_BANK_CART)
-		{
-			switch (bank)
-			{
-				case 0:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x3fff, read8sm_delegate(*this, FUNC(z88_state::bank0_cart_r)), write8sm_delegate(*this, FUNC(z88_state::bank0_cart_w)));
-					break;
-				case 1:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, read8sm_delegate(*this, FUNC(z88_state::bank1_cart_r)), write8sm_delegate(*this, FUNC(z88_state::bank1_cart_w)));
-					break;
-				case 2:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(z88_state::bank2_cart_r)), write8sm_delegate(*this, FUNC(z88_state::bank2_cart_w)));
-					break;
-				case 3:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xffff, read8sm_delegate(*this, FUNC(z88_state::bank3_cart_r)), write8sm_delegate(*this, FUNC(z88_state::bank3_cart_w)));
-					break;
-			}
-
-			m_bank_type[bank] = Z88_BANK_CART;
-		}
-	}
-
-
-	// override setting for lower 8k of bank 0
 	if (bank == 0)
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0, 0x1fff, m_banks[0]);
-
-		// enable RAM
-		if (rams)
-			m_maincpu->space(AS_PROGRAM).install_write_bank(0, 0x1fff, m_banks[0]);
-		else
-			m_maincpu->space(AS_PROGRAM).unmap_write(0, 0x1fff);
-
-		m_banks[0]->set_entry(rams & 1);
+		// bank 0 is only 8k (0x2000 - 0x3fff) and bit 0 is used to select the upper/lower
+		// part of a 16k page, for this reason only even pages can be mapped in this bank.
+		m_banks[bank]->set_bank(((page & 0xfe) << 1) | (page & 1));
+		m_boot_view.select(rams ? 1 : 0);
 	}
+	else
+		m_banks[bank]->set_bank(page);
 }
 
+void z88_state::z88_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("bios", 0);
+	map(0x080000, 0x0fffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
+	map(0x100000, 0x1fffff).rw(m_carts[1], FUNC(z88cart_slot_device::read), FUNC(z88cart_slot_device::write));
+	map(0x200000, 0x2fffff).rw(m_carts[2], FUNC(z88cart_slot_device::read), FUNC(z88cart_slot_device::write));
+	map(0x300000, 0x3fffff).rw(m_carts[3], FUNC(z88cart_slot_device::read), FUNC(z88cart_slot_device::write));
+}
 
 void z88_state::z88_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).bankrw(m_banks[0]);
-	map(0x2000, 0x3fff).bankrw(m_banks[1]);
-	map(0x4000, 0x7fff).bankrw(m_banks[2]);
-	map(0x8000, 0xbfff).bankrw(m_banks[3]);
-	map(0xc000, 0xffff).bankrw(m_banks[4]);
+	map(0x0000, 0x1fff).view(m_boot_view);
+	m_boot_view[0](0x0000, 0x1fff).rom().region("bios", 0);
+	m_boot_view[1](0x0000, 0x1fff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
+	map(0x2000, 0x3fff).rw(m_banks[0], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x7fff).rw(m_banks[1], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x8000, 0xbfff).rw(m_banks[2], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xc000, 0xffff).rw(m_banks[3], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 }
 
 void z88_state::z88_io(address_map &map)
@@ -183,6 +108,11 @@ Small note about natural keyboard: currently,
 */
 
 static INPUT_PORTS_START( z88 )
+	PORT_START("BATTERY")
+	PORT_CONFNAME( 0x01, 0x00, "Battery Status" )   PORT_WRITE_LINE_DEVICE_MEMBER("blink", upd65031_device, btl_w)
+	PORT_CONFSETTING( 0x00, DEF_STR( Normal ) )
+	PORT_CONFSETTING( 0x01, "Low" )
+
 	PORT_START("LINE0")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)        PORT_CHAR(13)
@@ -551,26 +481,16 @@ INPUT_PORTS_END
 
 void z88_state::machine_start()
 {
-	m_bios = (uint8_t*)m_bios_region->base();
-	m_ram_base = (uint8_t*)m_ram->pointer();
-
-	// configure the memory banks
-
-	m_banks[0]->configure_entry(0, m_bios);
-	m_banks[0]->configure_entry(1, m_ram_base);
-	m_banks[1]->configure_entries(0, 32, m_bios, 0x4000);
-	m_banks[2]->configure_entries(0, 32, m_bios, 0x4000);
-	m_banks[3]->configure_entries(0, 32, m_bios, 0x4000);
-	m_banks[4]->configure_entries(0, 32, m_bios, 0x4000);
-	m_banks[1]->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
-	m_banks[2]->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
-	m_banks[3]->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
-	m_banks[4]->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
+	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 }
 
 void z88_state::machine_reset()
 {
-	m_bank_type[0] = m_bank_type[1] = m_bank_type[2] = m_bank_type[3] = 0;
+	m_boot_view.select(0);
+	m_banks[0]->set_bank(0);
+	m_banks[1]->set_bank(0);
+	m_banks[2]->set_bank(0);
+	m_banks[3]->set_bank(0);
 }
 
 uint8_t z88_state::kb_r(offs_t offset)
@@ -598,6 +518,23 @@ static void z88_cart(device_slot_interface &device)
 	device.option_add("1024kflash", Z88_1024K_FLASH);   // 1024KB Flash cart
 }
 
+static DEVICE_INPUT_DEFAULTS_START( z88_rs232_defaults )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "FLOW_CONTROL", 0x07, 0x01 ) // Flow Control: RTS
+DEVICE_INPUT_DEFAULTS_END
+
+
+static void z88_rs232_devices(device_slot_interface &device)
+{
+	default_rs232_devices(device);
+	device.option_add("z88_impexp", Z88_IMPEXP);
+}
+
+
 void z88_state::z88(machine_config &config)
 {
 	/* basic machine hardware */
@@ -605,12 +542,17 @@ void z88_state::z88(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &z88_state::z88_mem);
 	m_maincpu->set_addrmap(AS_IO, &z88_state::z88_io);
 
+	ADDRESS_MAP_BANK(config, m_banks[0]).set_map(&z88_state::z88_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x2000);
+	ADDRESS_MAP_BANK(config, m_banks[1]).set_map(&z88_state::z88_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x4000);
+	ADDRESS_MAP_BANK(config, m_banks[2]).set_map(&z88_state::z88_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x4000);
+	ADDRESS_MAP_BANK(config, m_banks[3]).set_map(&z88_state::z88_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x4000);
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(Z88_SCREEN_WIDTH, Z88_SCREEN_HEIGHT);
-	m_screen->set_visarea(0, (Z88_SCREEN_WIDTH - 1), 0, (Z88_SCREEN_HEIGHT - 1));
+	m_screen->set_visarea_full();
 	m_screen->set_palette(m_palette);
 	m_screen->set_screen_update("blink", FUNC(upd65031_device::screen_update));
 
@@ -623,13 +565,24 @@ void z88_state::z88(machine_config &config)
 	m_blink->spkr_wr_callback().set("speaker", FUNC(speaker_sound_device::level_w));
 	m_blink->set_screen_update_callback(FUNC(z88_state::lcd_update));
 	m_blink->set_memory_update_callback(FUNC(z88_state::bankswitch_update));
+	m_blink->txd_wr_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_blink->rts_wr_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_blink->dtr_wr_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_blink->vpp_wr_callback().set(m_carts[3], FUNC(z88cart_slot_device::vpp_w));   // Only on Slot 3
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", z88_rs232_devices, "z88_impexp"));
+	rs232.rxd_handler().set(m_blink, FUNC(upd65031_device::rxd_w));
+	rs232.cts_handler().set(m_blink, FUNC(upd65031_device::cts_w));
+	rs232.dcd_handler().set(m_blink, FUNC(upd65031_device::dcd_w));
+	rs232.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(z88_rs232_defaults));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("32K,64K,256K,512K");
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("32K,64K,256K,512K");
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
 	/* cartridges */
 	Z88CART_SLOT(config, m_carts[1], z88_cart, nullptr);

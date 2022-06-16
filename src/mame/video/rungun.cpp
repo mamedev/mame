@@ -12,18 +12,17 @@
 *************************************************************************/
 
 #include "emu.h"
-
 #include "includes/rungun.h"
+
 
 /* TTL text plane stuff */
 TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
 {
-	uint32_t base_addr = (uintptr_t)tilemap.user_data();
-	uint8_t *lvram = (uint8_t *)m_ttl_vram.get() + base_addr;
-	int attr, code;
+	uint32_t const base_addr = uintptr_t(tilemap.user_data());
+	auto const lvram = util::little_endian_cast<uint8_t const>(m_ttl_vram.get()) + base_addr;
 
-	attr = (lvram[BYTE_XOR_LE(tile_index<<2)] & 0xf0) >> 4;
-	code = ((lvram[BYTE_XOR_LE(tile_index<<2)] & 0x0f) << 8) | (lvram[BYTE_XOR_LE((tile_index<<2)+2)]);
+	int const attr = (lvram[tile_index << 2] & 0xf0) >> 4;
+	int const code = ((lvram[tile_index << 2] & 0x0f) << 8) | lvram[(tile_index << 2) + 2];
 
 	tileinfo.set(m_ttl_gfx_index, code, attr, 0);
 }

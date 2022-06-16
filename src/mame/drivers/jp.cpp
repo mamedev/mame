@@ -89,8 +89,8 @@ private:
 	void update_display();
 
 	u32 m_disp_data = 0U;
-	bool m_adpcm_ff = 0;
-	bool m_game = 0;
+	bool m_adpcm_ff = false;
+	bool m_game = false;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -533,6 +533,33 @@ ROM_START(aqualand)
 	ROM_LOAD("jpaq14sd", 0x68000, 0x8000, CRC(0bdcbbbd) SHA1(555d8ed846079894cfc60041fb724deeaddc4e89))
 ROM_END
 
+/* This set will score 25,000 points for the first four switches, while 'aqualand' only gives 5,000 each.
+   If you use the CPU ROM from 'aqualand' on this machine, the "Diana Variable" (vari-target) locks,
+   while its own ROM works OK. */
+ROM_START(aqualanda)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("aqualand_cpu_a.bin", 0x0000, 0x2000, CRC(55caa233) SHA1(84dde0bf865f3bfc9a620510a9a816f4792a6610))
+
+	ROM_REGION(0x4000, "audiocpu", 0)
+	ROM_LOAD("jpaqsds", 0x0000, 0x4000, CRC(ff1e0cd2) SHA1(ef58d2b59929c7250dd30c413a3ba31ebfd7e09d))
+
+	ROM_REGION(0x80000, "sound1", 0)
+	ROM_LOAD("jpaq-1sd", 0x0000, 0x8000, CRC(7cdf2f7a) SHA1(e00482a6accd11e96fd0d444b3167b7d36332f7b))
+	ROM_LOAD("jpaq-2sd", 0x8000, 0x8000, CRC(db05c774) SHA1(2d40410b70de6ab0de57e94c6d8ada6e8a4a2050))
+	ROM_LOAD("jpaq-3sd", 0x10000, 0x8000, CRC(df38304e) SHA1(ec6f0c99764e3c3fe7e1de09b2d9b59d85d168d5))
+	ROM_LOAD("jpaq-4sd", 0x18000, 0x8000, CRC(8065c03e) SHA1(0731cb76d3be117a82c4ad5b7e23b53e05b3a95a))
+	ROM_LOAD("jpaq-5sd", 0x20000, 0x8000, CRC(a387a1a6) SHA1(20abee033a33e388a5f2ed3896a650766b62cfa2))
+	ROM_LOAD("jpaq-6sd", 0x28000, 0x8000, CRC(55076afb) SHA1(68b86e6855b2a80e37d2fb172bb0c4fa107d4aba))
+	ROM_LOAD("jpaq-7sd", 0x30000, 0x8000, CRC(67675b5b) SHA1(52b7cb310ddeff0bde7f0dfd37f61ab09964a75d))
+	ROM_LOAD("jpaq-8sd", 0x38000, 0x8000, CRC(c9d2d30e) SHA1(ee504b0e2aa69f541c3f4d245cc6525a7c920fa7))
+	ROM_LOAD("jpaq-9sd", 0x40000, 0x8000, CRC(3bc45f9f) SHA1(6d838b1ba94087f9a29af016b68125400dcf1fe5))
+	ROM_LOAD("jpaq10sd", 0x48000, 0x8000, CRC(239cb7f3) SHA1(1abc59bc73cf84ee3b73d500bf57a2a202291fcb))
+	ROM_LOAD("jpaq11sd", 0x50000, 0x8000, CRC(e5b9e70f) SHA1(7db0a13166120fe20bb76072475b092e942629cf))
+	ROM_LOAD("jpaq12sd", 0x58000, 0x8000, CRC(9aa37260) SHA1(6eec14f0d7152bf0cfadabe5b3017b9b6b7aa2d3))
+	ROM_LOAD("jpaq13sd", 0x60000, 0x8000, CRC(5599792e) SHA1(9d844d9f155f299bbe2d512f8ed84410e7a9cfb3))
+	ROM_LOAD("jpaq14sd", 0x68000, 0x8000, CRC(0bdcbbbd) SHA1(555d8ed846079894cfc60041fb724deeaddc4e89))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Faeton #1103
 /-------------------------------------------------------------------*/
@@ -578,6 +605,32 @@ ROM_END
 ROM_START(halleya)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("hc_pgm", 0x0000, 0x2000, CRC(dc5eaa8f) SHA1(2f3af60ba5439f67e9c69de543167ac31abc09f1))
+
+	ROM_REGION(0x4000, "audiocpu", 0)
+	ROM_LOAD("hc_sh", 0x0000, 0x4000, CRC(8af15ded) SHA1(2abc199b612df6180dc116f56ec0027dacf30e77))
+
+	ROM_REGION(0x80000, "sound1", 0)
+	ROM_LOAD("hc_s1",   0x0000,  0x8000, CRC(3146b12f) SHA1(9d3974c267e1b2f8d0a8edc78f4013823e4d5e9b))
+	ROM_LOAD("hc_s2",   0x8000,  0x8000, CRC(8b525f15) SHA1(3ba78a730b11d32fb6ebbcfc52672b9bb5ca5250))
+	ROM_LOAD("hc_s3",   0x10000, 0x8000, CRC(59a7c53d) SHA1(b1d27f06ff8bd44aa5a4c8fd3b405b67684ae644))
+	ROM_LOAD("hc_s4",   0x18000, 0x8000, CRC(14149419) SHA1(e39ba211e8784c8f46d89b7ce8a046443ab87f3a))
+	ROM_LOAD("hc_s5",   0x20000, 0x8000, CRC(9ab8f478) SHA1(116efd8c5524ab8a6a26d4b8187f6559f1940340))
+	ROM_LOAD("hc_s6",   0x28000, 0x8000, CRC(0fd00c1e) SHA1(1b143bf87541be68a37e133ff5dab5d5cff006b5))
+	ROM_LOAD("hc_s7",   0x30000, 0x8000, CRC(731b9b5d) SHA1(153cd93d99e386f1b52be5360d4789b53b112e34))
+	ROM_LOAD("hc_da0",  0x38000, 0x8000, CRC(5172993b) SHA1(4ae8adc59c95efefc48fcf7524b3da6e7d65e9c7))
+	ROM_LOAD("hc_da1",  0x40000, 0x8000, CRC(e9ddc966) SHA1(9fa2bdbafed8b1c1e190f1f99af54ea1d9c81d26))
+	ROM_LOAD("hc_da2",  0x48000, 0x8000, CRC(2e1a89a6) SHA1(adf34ce979b254b19abaf824ff656f647df601db))
+	ROM_LOAD("hc_da3",  0x50000, 0x8000, CRC(00bbabb0) SHA1(2d584c53e32fce1a105bb86aaa91c427bf741f2d))
+	ROM_LOAD("hc_da4",  0x58000, 0x8000, CRC(402358e8) SHA1(8513b0c0bf40363af323577175dfe569bd6b8686))
+	ROM_LOAD("hc_da5",  0x60000, 0x8000, CRC(a6bd8ccd) SHA1(128acc73ba2009ffa29f65fd570917ad0dec4142))
+	ROM_LOAD("hc_da6",  0x68000, 0x8000, CRC(9eba3c37) SHA1(a435cdbeb43f5216f58d6e90522e5a25b3bccaef))
+	ROM_LOAD("hc_da7",  0x70000, 0x8000, CRC(28249d52) SHA1(43cebbe555cae3a49e91deb3cfe715f743507e4a))
+	ROM_LOAD("hc_da8",  0x78000, 0x8000, CRC(3f2e81ee) SHA1(648e2b97fa2d6c4dcd16fef5d8c4b9baeee2f290))
+ROM_END
+
+ROM_START(halleyb)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("halley_alt_cpu.bin", 0x0000, 0x2000, CRC(2ceac07d) SHA1(1b59ebd134f130f0fc88368ab67d4e6d426d97ee))
 
 	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("hc_sh", 0x0000, 0x4000, CRC(8af15ded) SHA1(2abc199b612df6180dc116f56ec0027dacf30e77))
@@ -675,17 +728,19 @@ ROM_END
 } // Anonymous namespace
 
 // 6-digit display
-GAME(1985,  petacon,  0,      jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Petaco (new hardware)",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1985,  petacona, 0,      jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1985,  faeton6d, faeton, jp,     jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Faeton (6 digits)",                    MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1985,  petacon,   0,        jp,  jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Petaco (new hardware, set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  petacona,  0,        jp,  jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Petaco (new hardware, set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  faeton6d,  faeton,   jp,  jp, jp_state, init_6d,    ROT0, "Juegos Populares", "Faeton (6 digits)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // 7-digit display
-GAME(1985,  petaco2,  0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco 2",                             MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1985,  faeton,   0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (7 digits)",                    MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1986,  halley,   0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet",                         MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1986,  halleya,  halley, jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet (alternate version)",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1986,  aqualand, 0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Aqualand",                             MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1986,  america,  0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "America 1492",                         MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1986,  olympus,  0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Olympus (Juegos Populares)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1987,  lortium,  0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Lortium",                              MACHINE_IS_SKELETON_MECHANICAL )
-GAME(19??,  pimbal,   0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Pimbal (Pinball 3000)",                MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1985,  petaco2,   0,        jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco 2",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  faeton,    0,        jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (7 digits)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  halley,    0,        jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet (set 1)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  halleya,   halley,   jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet (set 2)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  halleyb,   halley,   jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet (set 3)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  aqualand,  0,        jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Aqualand (set 1)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  aqualanda, aqualand, jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Aqualand (set 2)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  america,   0,        jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "America 1492",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  olympus,   0,        jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Olympus (Juegos Populares)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  lortium,   0,        jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Lortium",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(19??,  pimbal,    0,        jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Pimbal (Pinball 3000)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

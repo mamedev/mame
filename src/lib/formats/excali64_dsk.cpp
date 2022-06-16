@@ -38,4 +38,4 @@ const excali64_format::format excali64_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_EXCALI64_FORMAT = &floppy_image_format_creator<excali64_format>;
+const excali64_format FLOPPY_EXCALI64_FORMAT;

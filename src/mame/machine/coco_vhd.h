@@ -56,10 +56,10 @@ protected:
 
 private:
 	required_device<cpu_device> m_cpu;
-	address_space *             m_cpu_space;
-	uint32_t                    m_logical_record_number;
-	uint32_t                    m_buffer_address;
-	uint8_t                     m_status;
+	address_space *             m_cpu_space = nullptr;
+	uint32_t                    m_logical_record_number = 0;
+	uint32_t                    m_buffer_address = 0;
+	uint8_t                     m_status = 0;
 };
 
 // device type definition

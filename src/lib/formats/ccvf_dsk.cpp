@@ -47,13 +47,13 @@ const ccvf_format::format ccvf_format::file_formats[] = {
 	{}
 };
 
-int ccvf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int ccvf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	char h[36];
 	size_t actual;
 	io.read_at(0, h, 36, actual);
 	if (!memcmp(h, "Compucolor Virtual Floppy Disk Image", 36))
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }
@@ -88,7 +88,7 @@ floppy_image_format_t::desc_e* ccvf_format::get_desc_8n1(const format &f, int &c
 	return desc;
 }
 
-bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	const format &f = formats[0];
 
@@ -156,4 +156,4 @@ bool ccvf_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_CCVF_FORMAT = &floppy_image_format_creator<ccvf_format>;
+const ccvf_format FLOPPY_CCVF_FORMAT;

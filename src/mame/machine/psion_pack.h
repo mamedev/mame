@@ -57,13 +57,13 @@ protected:
 
 private:
 	// internal device state
-	uint8_t  m_id;                //datapack ID
-	uint8_t  m_size;              //size in 8k blocks
-	uint8_t  m_data;              //data lines
-	uint8_t  m_control;           //control lines
-	uint16_t m_counter;           //address counter
-	uint8_t  m_page;              //active page (only for paged Datapack)
-	uint8_t  m_segment;           //active segment (only for segmented Datapack)
+	uint8_t  m_id = 0;                //datapack ID
+	uint8_t  m_size = 0;              //size in 8k blocks
+	uint8_t  m_data = 0;              //data lines
+	uint8_t  m_control = 0;           //control lines
+	uint16_t m_counter = 0;           //address counter
+	uint8_t  m_page = 0;              //active page (only for paged Datapack)
+	uint8_t  m_segment = 0;           //active segment (only for segmented Datapack)
 };
 
 

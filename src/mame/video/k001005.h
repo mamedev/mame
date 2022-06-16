@@ -68,7 +68,7 @@ private:
 	int m_3dfifo_ptr;
 
 	vertex_t m_vertexb[4];
-	int m_vertexb_ptr;
+	int m_vertexb_ptr = 0;
 
 	uint32_t m_light_r;
 	uint32_t m_light_g;

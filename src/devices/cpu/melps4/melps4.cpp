@@ -40,7 +40,6 @@
 #include "emu.h"
 #include "melps4.h"
 #include "melps4d.h"
-#include "debugger.h"
 
 
 melps4_cpu_device::melps4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, u8 sm_page, u8 int_page)

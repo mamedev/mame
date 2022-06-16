@@ -20,7 +20,6 @@ TODO:
 
 #include "emu.h"
 #include "hmcs40.h"
-#include "debugger.h"
 #include "hmcs40d.h"
 
 #define IS_PMOS 0

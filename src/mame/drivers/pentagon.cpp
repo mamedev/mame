@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic, MetalliC
 #include "emu.h"
-#include "includes/spectrum.h"
 #include "includes/spec128.h"
 
 #include "machine/beta.h"
@@ -32,10 +31,13 @@ public:
 	void pentagon(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
+	rectangle get_screen_area() override;
+
 	void pentagon_port_7ffd_w(uint8_t data);
 	void pentagon_scr_w(offs_t offset, uint8_t data);
 	void pentagon_scr2_w(offs_t offset, uint8_t data);
@@ -47,6 +49,8 @@ private:
 	void pentagon_mem(address_map &map);
 	void pentagon_switch(address_map &map);
 
+	void pentagon_update_memory();
+
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
@@ -55,8 +59,7 @@ private:
 
 	address_space *m_program;
 	uint8_t *m_p_ram;
-	void pentagon_update_memory();
-	rectangle get_screen_area() override;
+	uint16_t m_rom_selection;
 };
 
 void pentagon_state::pentagon_update_memory()
@@ -74,16 +77,16 @@ void pentagon_state::pentagon_update_memory()
 	{
 		/* GLUK */
 		if (strcmp(machine().system().name, "pent1024")==0)
-			m_ROMSelection = 2;
+			m_rom_selection = 2;
 		else
-			m_ROMSelection = BIT(m_port_7ffd_data, 4);
+			m_rom_selection = BIT(m_port_7ffd_data, 4);
 	}
 	else
 		/* ROM switching */
-		m_ROMSelection = BIT(m_port_7ffd_data, 4);
+		m_rom_selection = BIT(m_port_7ffd_data, 4);
 
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-	m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+	m_bank1->set_base(&m_p_ram[0x10000 + (m_rom_selection<<14)]);
 }
 
 void pentagon_state::pentagon_port_7ffd_w(uint8_t data)
@@ -118,13 +121,12 @@ void pentagon_state::pentagon_scr2_w(offs_t offset, uint8_t data)
 
 rectangle pentagon_state::get_screen_area()
 {
-	//TODO Possible because of incorrect z80 we have to adjust x+1 to make AccrossTheEdge look nicer
-	return rectangle{137, 137 + 255, 80, 80 + 191};
+	return rectangle{136, 136 + 255, 80, 80 + 191};
 }
 
 INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
 {
-	timer_set(m_screen->time_until_pos(0) - m_maincpu->clocks_to_attotime(1), TIMER_IRQ_ON, 0);
+	m_irq_on_timer->adjust(m_screen->time_until_pos(0) + /*???*/ m_maincpu->clocks_to_attotime(3));
 }
 
 uint8_t pentagon_state::beta_neutral_r(offs_t offset)
@@ -135,8 +137,8 @@ uint8_t pentagon_state::beta_neutral_r(offs_t offset)
 uint8_t pentagon_state::beta_enable_r(offs_t offset)
 {
 	if (!(machine().side_effects_disabled())) {
-		if (m_ROMSelection == 1) {
-			m_ROMSelection = 3;
+		if (m_rom_selection == 1) {
+			m_rom_selection = 3;
 			if (m_beta->started()) {
 				m_beta->enable();
 				m_bank1->set_base(memregion("beta:beta")->base());
@@ -151,9 +153,9 @@ uint8_t pentagon_state::beta_disable_r(offs_t offset)
 {
 	if (!(machine().side_effects_disabled())) {
 		if (m_beta->started() && m_beta->is_active()) {
-			m_ROMSelection = BIT(m_port_7ffd_data, 4);
+			m_rom_selection = BIT(m_port_7ffd_data, 4);
 			m_beta->disable();
-			m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection << 14)]);
+			m_bank1->set_base(&m_p_ram[0x10000 + (m_rom_selection << 14)]);
 		}
 	}
 
@@ -189,6 +191,15 @@ void pentagon_state::pentagon_switch(address_map &map)
 	map(0x4000, 0xffff).r(FUNC(pentagon_state::beta_disable_r));
 }
 
+void pentagon_state::machine_start()
+{
+	spectrum_128_state::machine_start();
+
+	m_rom_selection = 0;
+
+	save_item(NAME(m_rom_selection));
+}
+
 void pentagon_state::machine_reset()
 {
 	uint8_t *messram = m_ram->pointer();
@@ -218,8 +229,8 @@ void pentagon_state::machine_reset()
 
 void pentagon_state::video_start()
 {
-	m_frame_invert_count = 16;
-	m_screen_location = m_ram->pointer() + (5 << 14);
+	spectrum_128_state::video_start();
+	m_contention_pattern = {};
 }
 
 static const gfx_layout spectrum_charlayout =

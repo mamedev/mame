@@ -122,7 +122,7 @@ protected:
 	};
 
 	std::unique_ptr<c355_sprite []> m_spritelist[2];
-	const c355_sprite *m_sprite_end[2];
+	const c355_sprite *m_sprite_end[2]{};
 	int m_palxor;
 	u16 m_position[4];
 	std::unique_ptr<u16 []> m_spriteram[2];

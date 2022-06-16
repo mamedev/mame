@@ -137,8 +137,8 @@ private:
 	required_memory_bank m_bank;
 	required_ioport m_a8;
 	required_ioport m_swb;
-	emu_timer *m_reset_timer = 0;
-	emu_timer *m_game_select_button_timer = 0;
+	emu_timer *m_reset_timer = nullptr;
+	emu_timer *m_game_select_button_timer = nullptr;
 };
 
 

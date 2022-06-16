@@ -63,7 +63,7 @@ void pcf8593_device::device_start()
 {
 	_logerror( 0, ("pcf8593_init\n"));
 	memset(m_register, 0, sizeof(m_register));
-	m_timer = timer_alloc(TIMER_UPDATE_COUNTER);
+	m_timer = timer_alloc(FUNC(pcf8593_device::clock_tick), this);
 	m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 }
 
@@ -77,7 +77,7 @@ void pcf8593_device::device_reset()
 	m_pin_scl = 1;
 	m_pin_sda = 1;
 	m_active  = false;
-	m_inp     = 0;
+	m_inp     = 0; // FIXME: sda should default 1 not 0.
 	m_mode    = RTC_MODE_RECV;
 	m_bits    = 0;
 	m_pos     = 0;
@@ -87,20 +87,15 @@ void pcf8593_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  clock_tick - advance the RTC if enabled
 //-------------------------------------------------
 
-void pcf8593_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pcf8593_device::clock_tick)
 {
-	switch(id)
-	{
-		case TIMER_UPDATE_COUNTER:
-			_logerror( 2, ("pcf8593_timer_callback (%d)\n", param));
-			// check if counting is enabled
-			if (!(m_data[0] & 0x80))
-				advance_seconds();
-			break;
-	}
+	_logerror( 2, ("pcf8593_timer_callback (%d)\n", param));
+	// check if counting is enabled
+	if (!(m_data[0] & 0x80))
+		advance_seconds();
 }
 
 
@@ -161,6 +156,10 @@ bool pcf8593_device::nvram_write(util::write_stream &file)
 WRITE_LINE_MEMBER(pcf8593_device::scl_w)
 {
 	// send bit
+	// FIXME: Processing on the rising edge of the clock causes sda output to
+	// change while clock is high. This is not allowed.
+	// All received data is currently acknowledge, need to add checks for
+	// valid device-id and ACK/NAK as required.
 	if ((m_active) && (!m_pin_scl) && (state))
 	{
 		switch (m_mode)

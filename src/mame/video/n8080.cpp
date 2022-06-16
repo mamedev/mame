@@ -81,7 +81,7 @@ void helifire_state::next_line()
 
 void spacefev_state::video_start()
 {
-	m_cannon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefev_state::stop_red_cannon),this));
+	m_cannon_timer = timer_alloc(FUNC(spacefev_state::stop_red_cannon), this);
 
 	flip_screen_set(0);
 

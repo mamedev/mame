@@ -30,8 +30,9 @@ constexpr int STATE_DEVSEL(1);
 constexpr int STATE_ADDRESSHIGH(2);
 constexpr int STATE_ADDRESSLOW(3);
 constexpr int STATE_DATAIN(4);
-constexpr int STATE_DATAOUT(5);
-constexpr int STATE_RESET(6);
+constexpr int STATE_READSELACK(5);
+constexpr int STATE_DATAOUT(6);
+constexpr int STATE_RESET(7);
 
 constexpr int DEVSEL_RW(1);
 constexpr int DEVSEL_ADDRESS(0xfe);
@@ -368,110 +369,112 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 			{
 				if( m_scl )
 				{
-					switch( m_state )
-					{
-					case STATE_DEVSEL:
-						m_devsel = m_shift;
-
-						if( m_devsel == 0 && !m_devsel_address_low )
-						{
-							// TODO: Atmel datasheets document 2-wire software reset, but doesn't mention it will lower sda only that it will release it.
-							// ltv_naru however requires it to be lowered, but we don't currently know the manufacturer of the chip used.
-							verboselog( this, 1, "software reset\n" );
-							m_state = STATE_RESET;
-							m_sdar = 0;
-						}
-						else if( !select_device() )
-						{
-							verboselog( this, 1, "devsel %02x: not this device\n", m_devsel );
-							m_state = STATE_IDLE;
-						}
-						else if( ( m_devsel & DEVSEL_RW ) == 0 )
-						{
-							if (m_devsel_address_low)
-							{
-								verboselog( this, 1, "devsel %02x: write (Xicor special, address %02x)\n", m_devsel, m_devsel >> 1);
-								m_byteaddr = (m_devsel & DEVSEL_ADDRESS) >> 1;
-								m_page_offset = 0;
-								m_page_written_size = 0;
-								m_state = STATE_DATAIN;
-							}
-							else
-							{
-								verboselog( this, 1, "devsel %02x: write\n", m_devsel );
-								m_state = skip_addresshigh() ? STATE_ADDRESSLOW : STATE_ADDRESSHIGH;
-							}
-						}
-						else
-						{
-							if (m_devsel_address_low)
-							{
-								verboselog( this, 1, "devsel %02x: read (Xicor special, address %02x)\n", m_devsel, m_devsel >> 1);
-								m_byteaddr = (m_devsel & DEVSEL_ADDRESS) >> 1;
-							}
-							else
-							{
-								verboselog( this, 1, "devsel %02x: read\n", m_devsel );
-							}
-							m_state = STATE_DATAOUT;
-						}
-						break;
-
-					case STATE_ADDRESSHIGH:
-						m_addresshigh = m_shift;
-
-						verboselog(this, 1, "addresshigh %02x\n", m_addresshigh);
-
-						m_state = STATE_ADDRESSLOW;
-						break;
-
-					case STATE_ADDRESSLOW:
-						m_byteaddr = m_shift | (skip_addresshigh() ? ((m_devsel & DEVSEL_ADDRESS) << 7) & address_mask() : m_addresshigh << 8);
-						m_page_offset = 0;
-						m_page_written_size = 0;
-
-						verboselog( this, 1, "addresslow %02x (byteaddr %04x)\n", m_shift, m_byteaddr );
-
-						m_state = STATE_DATAIN;
-						break;
-
-					case STATE_DATAIN:
-						if( m_wc )
-						{
-							verboselog( this, 0, "write not enabled\n" );
-							m_state = STATE_IDLE;
-						}
-						else if( m_write_page_size > 0 )
-						{
-							m_page[ m_page_offset ] = m_shift;
-							verboselog( this, 1, "page[ %04x ] <- %02x\n", m_page_offset, m_page[ m_page_offset ] );
-
-							m_page_offset++;
-							if( m_page_offset == m_write_page_size )
-								m_page_offset = 0;
-							m_page_written_size++;
-							if( m_page_written_size > m_write_page_size)
-								m_page_written_size = m_write_page_size;
-						}
-						else
-						{
-							int offset = data_offset();
-
-							verboselog( this, 1, "data[ %04x ] <- %02x\n", offset, m_shift );
-							m_data[ offset ] = m_shift;
-
-							m_byteaddr++;
-						}
-						break;
-					}
-
 					m_bits++;
 				}
 				else
 				{
 					if( m_bits == 8 )
 					{
-						m_sdar = 0;
+						switch( m_state )
+						{
+						case STATE_DEVSEL:
+							m_devsel = m_shift;
+
+							if( m_devsel == 0 && !m_devsel_address_low )
+							{
+								// TODO: Atmel datasheets document 2-wire software reset, but doesn't mention it will lower sda only that it will release it.
+								// ltv_naru however requires it to be lowered, but we don't currently know the manufacturer of the chip used.
+								verboselog( this, 1, "software reset\n" );
+								m_state = STATE_RESET;
+							}
+							else if( !select_device() )
+							{
+								verboselog( this, 1, "devsel %02x: not this device\n", m_devsel );
+								m_state = STATE_IDLE;
+							}
+							else if( ( m_devsel & DEVSEL_RW ) == 0 )
+							{
+								if (m_devsel_address_low)
+								{
+									verboselog( this, 1, "devsel %02x: write (Xicor special, address %02x)\n", m_devsel, m_devsel >> 1);
+									m_byteaddr = (m_devsel & DEVSEL_ADDRESS) >> 1;
+									m_page_offset = 0;
+									m_page_written_size = 0;
+									m_state = STATE_DATAIN;
+								}
+								else
+								{
+									verboselog( this, 1, "devsel %02x: write\n", m_devsel );
+									m_state = skip_addresshigh() ? STATE_ADDRESSLOW : STATE_ADDRESSHIGH;
+								}
+							}
+							else
+							{
+								if (m_devsel_address_low)
+								{
+									verboselog( this, 1, "devsel %02x: read (Xicor special, address %02x)\n", m_devsel, m_devsel >> 1);
+									m_byteaddr = (m_devsel & DEVSEL_ADDRESS) >> 1;
+								}
+								else
+								{
+									verboselog( this, 1, "devsel %02x: read\n", m_devsel );
+								}
+								m_state = STATE_READSELACK;
+							}
+							break;
+
+						case STATE_ADDRESSHIGH:
+							m_addresshigh = m_shift;
+
+							verboselog(this, 1, "addresshigh %02x\n", m_addresshigh);
+
+							m_state = STATE_ADDRESSLOW;
+							break;
+
+						case STATE_ADDRESSLOW:
+							m_byteaddr = m_shift | (skip_addresshigh() ? ((m_devsel & DEVSEL_ADDRESS) << 7) & address_mask() : m_addresshigh << 8);
+							m_page_offset = 0;
+							m_page_written_size = 0;
+
+							verboselog( this, 1, "addresslow %02x (byteaddr %04x)\n", m_shift, m_byteaddr );
+
+							m_state = STATE_DATAIN;
+							break;
+
+						case STATE_DATAIN:
+							if( m_wc )
+							{
+								verboselog( this, 0, "write not enabled\n" );
+								m_state = STATE_IDLE;
+							}
+							else if( m_write_page_size > 0 )
+							{
+								m_page[ m_page_offset ] = m_shift;
+								verboselog( this, 1, "page[ %04x ] <- %02x\n", m_page_offset, m_page[ m_page_offset ] );
+
+								m_page_offset++;
+								if( m_page_offset == m_write_page_size )
+									m_page_offset = 0;
+								m_page_written_size++;
+								if( m_page_written_size > m_write_page_size)
+									m_page_written_size = m_write_page_size;
+							}
+							else
+							{
+								int offset = data_offset();
+
+								verboselog( this, 1, "data[ %04x ] <- %02x\n", offset, m_shift );
+								m_data[ offset ] = m_shift;
+
+								m_byteaddr++;
+							}
+							break;
+						}
+
+						if( m_state != STATE_IDLE )
+						{
+							m_sdar = 0 ;
+						}
 					}
 					else
 					{
@@ -482,10 +485,19 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 			}
 			break;
 
+		case STATE_READSELACK:
+			m_bits = 0;
+			m_state = STATE_DATAOUT;
+			break;
+
 		case STATE_DATAOUT:
 			if( m_bits < 8 )
 			{
 				if( m_scl )
+				{
+					m_bits++;
+				}
+				else
 				{
 					if( m_bits == 0 )
 					{
@@ -499,7 +511,6 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 					m_sdar = ( m_shift >> 7 ) & 1;
 
 					m_shift = ( m_shift << 1 ) & 0xff;
-					m_bits++;
 				}
 			}
 			else
@@ -512,18 +523,11 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 						m_state = STATE_IDLE;
 					}
 
-					m_bits++;
+					m_bits = 0;
 				}
 				else
 				{
-					if( m_bits == 8 )
-					{
-						m_sdar = 1;
-					}
-					else
-					{
-						m_bits = 0;
-					}
+					m_sdar = 1;
 				}
 			}
 			break;
@@ -531,9 +535,13 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 		case STATE_RESET:
 			if( m_scl )
 			{
-				verboselog(this, 1, "software reset ack\n");
-				m_state = STATE_IDLE;
-				m_sdar = 1;
+				if( m_bits > 8 )
+				{
+					verboselog(this, 1, "software reset ack\n");
+					m_state = STATE_IDLE;
+					m_sdar = 1;
+				}
+				m_bits++;
 			}
 			break;
 		}
@@ -555,7 +563,6 @@ WRITE_LINE_MEMBER( i2cmem_device::write_wc )
 READ_LINE_MEMBER( i2cmem_device::read_sda )
 {
 	int res = m_sdar & 1;
-
 	verboselog( this, 2, "read sda %d\n", res );
 
 	return res;

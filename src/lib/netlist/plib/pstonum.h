@@ -85,7 +85,7 @@ namespace plib
 	template<>
 	struct pstonum_helper<FLOAT128>
 	{
-		// FIXME: use strtoflt128 from quadmath.h
+		// FIXME: use `strtoflt128` from `quadmath.h`
 		template <typename S>
 		FLOAT128 operator()(std::locale loc, const S &arg, bool *err)
 		{

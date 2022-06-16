@@ -38,7 +38,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(vblank_update);
 
 private:
 	void porta_w(uint8_t data);
@@ -56,11 +57,6 @@ private:
 	void draw_block_graph(bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t col);
 
 	void scv_mem(address_map &map);
-
-	enum
-	{
-		TIMER_VB
-	};
 
 	uint8_t m_porta;
 	uint8_t m_portc;
@@ -265,31 +261,21 @@ void scv_state::scv_palette(palette_device &palette) const
 }
 
 
-void scv_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER( scv_state::vblank_update )
 {
-	switch (id)
+	int vpos = m_screen->vpos();
+
+	switch ( vpos )
 	{
-	case TIMER_VB:
-		{
-			int vpos = m_screen->vpos();
-
-			switch( vpos )
-			{
-			case 240:
-				m_maincpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
-				break;
-			case 0:
-				m_maincpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
-				break;
-			}
-
-			m_vb_timer->adjust(m_screen->time_until_pos((vpos + 1) % 262, 0));
-		}
+	case 240:
+		m_maincpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
 		break;
-
-	default:
-		throw emu_fatalerror("Unknown id in scv_state::device_timer");
+	case 0:
+		m_maincpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
+		break;
 	}
+
+	m_vb_timer->adjust(m_screen->time_until_pos((vpos + 1) % 262, 0));
 }
 
 
@@ -596,7 +582,7 @@ WRITE_LINE_MEMBER( scv_state::upd1771_ack_w )
 
 void scv_state::machine_start()
 {
-	m_vb_timer = timer_alloc(TIMER_VB);
+	m_vb_timer = timer_alloc(FUNC(scv_state::vblank_update), this);
 
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portc));

@@ -38,22 +38,22 @@ private:
 	optional_memory_bank m_okibank; // for viostormabbl
 	std::unique_ptr<uint8_t[]> m_decoded;
 
-	uint8_t m_mw_irq_control;
-	int m_cur_sound_region;
-	int m_layer_colorbase[6];
-	int m_oinprion;
-	int m_cbparam;
-	int m_sprite_colorbase;
-	int m_sub1_colorbase;
-	int m_last_psac_colorbase;
-	int m_gametype;
-	int m_roz_enable;
-	int m_roz_rombank;
-	tilemap_t *m_ult_936_tilemap;
-	uint16_t m_clip;
+	uint8_t m_mw_irq_control = 0;
+	int m_cur_sound_region = 0;
+	int m_layer_colorbase[6]{};
+	int m_oinprion = 0;
+	int m_cbparam = 0;
+	int m_sprite_colorbase = 0;
+	int m_sub1_colorbase = 0;
+	int m_last_psac_colorbase = 0;
+	int m_gametype = 0;
+	int m_roz_enable = 0;
+	int m_roz_rombank = 0;
+	tilemap_t *m_ult_936_tilemap = nullptr;
+	uint16_t m_clip = 0;
 
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_nmi_clk;
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_nmi_clk = 0;
 
 	uint16_t eeprom_r(offs_t offset, uint16_t mem_mask = ~0);
 	void mweeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

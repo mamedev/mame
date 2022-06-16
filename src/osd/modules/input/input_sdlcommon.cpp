@@ -267,7 +267,7 @@ void sdl_osd_interface::release_keys()
 {
 	auto keybd = dynamic_cast<input_module_base*>(m_keyboard_input);
 	if (keybd != nullptr)
-		keybd->devicelist()->reset_devices();
+		keybd->devicelist().reset_devices();
 }
 
 bool sdl_osd_interface::should_hide_mouse()

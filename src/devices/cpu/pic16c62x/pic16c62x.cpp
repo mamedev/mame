@@ -55,7 +55,6 @@
 #include "emu.h"
 #include "pic16c62x.h"
 #include "16c62xdsm.h"
-#include "debugger.h"
 
 
 DEFINE_DEVICE_TYPE(PIC16C620,  pic16c620_device,  "pic16c620",   "Microchip PIC16C620")

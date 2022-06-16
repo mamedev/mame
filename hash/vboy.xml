@@ -36,7 +36,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 	<!-- This was built from the final source code using the official compiler VUCC and converted from ISX to ROM. -->
 	<!-- Developers: Japan System Supply - (Planned) Releases: 1996-02-23 (JPN), 1996-08-26 (USA), but the game never got actually released -->
 	<software name="boundh" supported="no">
-		<description>Bound High! (Jpn, USA, Prototype)</description>
+		<description>Bound High! (Jpn, USA, prototype)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="VUE-VBHE-JPN, VUE-VBHE-USA"/>
@@ -167,7 +167,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 	</software>
 
 	<software name="nikochan">
-		<description>Niko-chan Battle (Jpn, Prototype)</description>
+		<description>Niko-chan Battle (Jpn, prototype)</description>
 		<year>1996</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="alt_title" value="ニコちゃんバトル"/>
@@ -251,7 +251,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 	</software>
 
 	<software name="spacepin" cloneof="galactic" supported="no">
-		<description>Space Pinball (Jpn, Prototype)</description>
+		<description>Space Pinball (Jpn, prototype)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="vboy_cart">

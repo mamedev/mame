@@ -64,8 +64,9 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	TIMER_CALLBACK_MEMBER(assert_vblank_irq);
 
 private:
 	required_device<nvram_device> m_rtc;
@@ -135,7 +136,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	address_space *m_memory_space;
+	address_space *m_memory_space = nullptr;
 	uint16_t m_sw_version;
 	uint8_t m_hw_version;
 

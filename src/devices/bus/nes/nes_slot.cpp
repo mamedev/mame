@@ -478,12 +478,6 @@ DECLARE_WRITE_LINE_MEMBER(device_nes_cart_interface::set_irq_line)
 	m_maincpu->set_input_line(m6502_device::IRQ_LINE, state);
 }
 
-void device_nes_cart_interface::reset_cpu()
-{
-	// another hack
-	m_maincpu->set_pc(0xfffc);
-}
-
 //-------------------------------------------------
 //  Other helpers
 //-------------------------------------------------
@@ -535,10 +529,8 @@ void device_nes_cart_interface::nt_w(offs_t offset, uint8_t data)
 {
 	int page = BIT(offset, 10, 2);
 
-	if (!m_nt_writable[page])
-		return;
-
-	m_nt_access[page][offset & 0x3ff] = data;
+	if (m_nt_writable[page])
+		m_nt_access[page][offset & 0x3ff] = data;
 }
 
 uint8_t device_nes_cart_interface::nt_r(offs_t offset)

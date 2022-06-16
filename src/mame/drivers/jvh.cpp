@@ -247,7 +247,7 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1986, icemania, 0, jvh,  jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Ice Mania",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, escape,   0, jvh,  jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Escape",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 19??, movmastr, 0, jvh2, jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Movie Masters",      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1988, formula1, 0, jvh3, jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Formula 1",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, icemania, 0, jvh,  jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Ice Mania",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, escape,   0, jvh,  jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Escape",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, movmastr, 0, jvh2, jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Movie Masters",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, formula1, 0, jvh3, jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Formula 1",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

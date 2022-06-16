@@ -33,10 +33,10 @@ protected:
 
 private:
 	// internal state
-	u8 m_math_regs[6];
-	u16 m_multiply_result;
-	u16 m_divide_quotient;
-	u16 m_divide_remainder;
+	u8 m_math_regs[6]{};
+	u16 m_multiply_result = 0;
+	u16 m_divide_quotient = 0;
+	u16 m_divide_remainder = 0;
 };
 
 

@@ -54,7 +54,7 @@ void ks0164_device::device_start()
 
 	m_stream = stream_alloc(0, 2, clock()/3/2/2/32);
 	space().cache(m_mem_cache);
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(ks0164_device::irq_timer_tick), this);
 
 	m_midi_tx.resolve_safe();
 
@@ -98,7 +98,7 @@ void ks0164_device::device_reset()
 	m_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 }
 
-void ks0164_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ks0164_device::irq_timer_tick)
 {
 	m_timer_interrupt = true;
 	if(m_irqen_76 & 0x40)

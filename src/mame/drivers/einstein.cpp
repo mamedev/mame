@@ -915,6 +915,7 @@ void einstein_state::einstein(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_psg, XTAL_X002 / 4);
 	m_psg->port_b_read_callback().set(FUNC(einstein_state::keyboard_data_read));
+	m_psg->port_a_read_callback().set([]() { return 0xff; });
 	m_psg->port_a_write_callback().set(FUNC(einstein_state::keyboard_line_write));
 	m_psg->add_route(ALL_OUTPUTS, "mono", 0.20);
 
@@ -1032,6 +1033,10 @@ ROM_START( einstein )
 	ROM_SYSTEM_BIOS(1, "mos121", "MOS 1.21")
 	ROMX_LOAD("mos121.i023", 0x0000, 0x2000, CRC(a746eeb6) SHA1(f75aaaa777d0fd92225acba291f6bf428b341d3e), ROM_BIOS(1))
 	ROM_RELOAD(0x2000, 0x2000)
+#if 0
+	// diagnostic rom, see https://github.com/fdivitto/TatungEinsteinDiagnosticFirmware
+	ROM_LOAD("einstein_diag.bin", 0x4000, 0x065a, CRC(21faec06) SHA1(c9b26b79bfa19178dae8e07e14376d5dc88c46b3))
+#endif
 ROM_END
 
 ROM_START( einst256 )

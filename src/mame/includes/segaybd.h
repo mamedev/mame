@@ -101,18 +101,12 @@ private:
 	// internal types
 	typedef delegate<void (uint16_t)> output_delegate;
 
-	// timer IDs
-	enum
-	{
-		TID_IRQ2_GEN
-	};
-
 	// device overrides
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal helpers
+	TIMER_CALLBACK_MEMBER(irq2_gen_tick);
 	void update_irqs();
 
 	// devices
@@ -135,12 +129,12 @@ private:
 	output_delegate m_output_cb2;
 
 	// internal state
-	uint16_t          m_pdrift_bank;
-	emu_timer *     m_scanline_timer;
-	int             m_irq2_scanline;
-	uint8_t           m_timer_irq_state;
-	uint8_t           m_vblank_irq_state;
-	uint8_t           m_misc_io_data;
+	uint16_t          m_pdrift_bank = 0;
+	emu_timer *     m_scanline_timer = nullptr;
+	int             m_irq2_scanline = 0;
+	uint8_t           m_timer_irq_state = 0;
+	uint8_t           m_vblank_irq_state = 0;
+	uint8_t           m_misc_io_data = 0;
 };
 
 #endif // MAME_INCLUDES_SEGAYBD_H

@@ -41,14 +41,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	enum
-	{
-		TIMER_DAC
-	};
-
 	/* video-related */
 	bool m_video_enable;
 	int  m_colorbank;
@@ -160,18 +154,6 @@ MC6845_UPDATE_ROW( mjsister_state::crtc_update_row )
  *
  *************************************/
 
-void mjsister_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch(id)
-	{
-	case TIMER_DAC:
-		dac_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in mjsister_state::device_timer");
-	}
-}
-
 TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
 {
 	uint8_t *DACROM = memregion("samples")->base();
@@ -195,7 +177,7 @@ void mjsister_state::dac_adr_e_w(uint8_t data)
 	m_dac_adr = m_dac_adr_s << 8;
 
 	if (m_dac_busy == 0)
-		synchronize(TIMER_DAC);
+		m_dac_timer->adjust(attotime::zero);
 
 	m_dac_busy = 1;
 }
@@ -409,7 +391,7 @@ void mjsister_state::machine_start()
 	m_vram = make_unique_clear<uint8_t[]>(0x10000);
 	m_vrambank->configure_entries(0, 2, m_vram.get(), 0x8000);
 
-	m_dac_timer = timer_alloc(TIMER_DAC);
+	m_dac_timer = timer_alloc(FUNC(mjsister_state::dac_callback), this);
 
 	save_pointer(NAME(m_vram), 0x10000);
 	save_item(NAME(m_dac_busy));

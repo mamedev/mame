@@ -25,20 +25,6 @@
 class vectrex_base_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_VECTREX_IMAGER_CHANGE_COLOR,
-		TIMER_UPDATE_LEVEL,
-		TIMER_VECTREX_IMAGER_EYE,
-		TIMER_LIGHTPEN_TRIGGER,
-		TIMER_VECTREX_REFRESH,
-		TIMER_VECTREX_ZERO_INTEGRATORS,
-		TIMER_UPDATE_ANALOG,
-		TIMER_UPDATE_BLANK,
-		TIMER_UPDATE_MUX_ENABLE,
-		TIMER_UPDATE_RAMP
-	};
-
 	void vectrex_cart(device_slot_interface &device);
 
 protected:
@@ -60,37 +46,40 @@ protected:
 		m_screen(*this, "screen")
 	{ }
 
-	void vectrex_psg_port_w(uint8_t data);
-	uint8_t vectrex_via_r(offs_t offset);
-	void vectrex_via_w(offs_t offset, uint8_t data);
+	void psg_port_w(uint8_t data);
+	uint8_t via_r(offs_t offset);
+	void via_w(offs_t offset, uint8_t data);
 	virtual void driver_start() override;
 	virtual void video_start() override;
-	uint32_t screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(vectrex_imager_change_color);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(imager_change_color);
 	TIMER_CALLBACK_MEMBER(update_level);
-	TIMER_CALLBACK_MEMBER(vectrex_imager_eye);
+	TIMER_CALLBACK_MEMBER(imager_eye);
+	TIMER_CALLBACK_MEMBER(imager_index);
 	TIMER_CALLBACK_MEMBER(lightpen_trigger);
-	TIMER_CALLBACK_MEMBER(vectrex_refresh);
-	TIMER_CALLBACK_MEMBER(vectrex_zero_integrators);
+	TIMER_CALLBACK_MEMBER(refresh);
+	TIMER_CALLBACK_MEMBER(zero_integrators);
+	TIMER_CALLBACK_MEMBER(update_analog);
+	TIMER_CALLBACK_MEMBER(update_blank);
+	TIMER_CALLBACK_MEMBER(update_mux_enable);
+	TIMER_CALLBACK_MEMBER(update_ramp);
 	void update_vector();
-	uint8_t vectrex_via_pb_r();
-	uint8_t vectrex_via_pa_r();
-	void v_via_pb_w(uint8_t data);
-	void v_via_pa_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(v_via_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(v_via_cb2_w);
+	uint8_t via_pb_r();
+	uint8_t via_pa_r();
+	void via_pb_w(uint8_t data);
+	void via_pa_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	DECLARE_WRITE_LINE_MEMBER(vectrex_via_irq);
+	DECLARE_WRITE_LINE_MEMBER(via_irq);
 
 	void vectrex_base(machine_config &config);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	void configure_imager(bool reset_refresh, const double *imager_angles);
-	void vectrex_configuration();
-	void vectrex_multiplexer(int mux);
-	void vectrex_add_point(int x, int y, rgb_t color, int intensity);
-	void vectrex_add_point_stereo(int x, int y, rgb_t color, int intensity);
+	void screen_configuration();
+	void multiplexer(int mux);
+	void add_point(int x, int y, rgb_t color, int intensity);
+	void add_point_stereo(int x, int y, rgb_t color, int intensity);
 
 	unsigned char m_via_out[2];
 
@@ -98,7 +87,10 @@ protected:
 	optional_device<vectrex_cart_slot_device> m_cart;
 
 	double m_imager_freq = 0;
-	emu_timer *m_imager_timer = nullptr;
+	emu_timer *m_imager_color_timers[3]{};
+	emu_timer *m_imager_eye_timer = nullptr;
+	emu_timer *m_imager_index_timer = nullptr;
+	emu_timer *m_imager_level_timer = nullptr;
 	emu_timer *m_lp_t = nullptr;
 
 	required_device<via6522_device> m_via6522_0;
@@ -133,6 +125,9 @@ private:
 	int m_pen_x = 0;
 	int m_pen_y = 0;
 	emu_timer *m_refresh = nullptr;
+	emu_timer *m_zero_integrators_timer = nullptr;
+	emu_timer *m_update_blank_timer = nullptr;
+	emu_timer *m_update_mux_enable_timer = nullptr;
 	uint8_t m_blank = 0;
 	uint8_t m_ramp = 0;
 	int8_t m_analog[5]{};
@@ -188,7 +183,7 @@ public:
 
 private:
 	void raaspec_led_w(uint8_t data);
-	uint8_t vectrex_s1_via_pb_r();
+	uint8_t s1_via_pb_r();
 
 	void raaspec_map(address_map &map);
 

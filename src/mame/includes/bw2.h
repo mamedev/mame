@@ -77,14 +77,14 @@ public:
 	static void floppy_formats(format_registration &fr);
 
 	// keyboard state
-	uint8_t m_kb;
+	uint8_t m_kb = 0;
 
 	// memory state
-	uint8_t m_bank;
+	uint8_t m_bank = 0;
 
 	// floppy state
-	int m_mtron;
-	int m_mfdbk;
+	int m_mtron = 0;
+	int m_mfdbk = 0;
 
 	// video state
 	optional_shared_ptr<uint8_t> m_video_ram;

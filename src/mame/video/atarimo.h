@@ -116,15 +116,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(force_update);
 
 private:
-	// timer IDs
-	enum
-	{
-		TID_FORCE_UPDATE
-	};
-
 	// internal helpers
 	int compute_log(int value);
 	int round_to_powerof2(int value);
@@ -201,7 +196,7 @@ private:
 	int                     m_slipramsize;        // total size of SLIP RAM, in entries
 
 	// live state
-	emu_timer *             m_force_update_timer;   // timer for forced updating
+	emu_timer *             m_force_update_timer = nullptr;   // timer for forced updating
 	uint32_t                m_bank;               // current bank number
 	uint32_t                m_xscroll;            // xscroll offset
 	uint32_t                m_yscroll;            // yscroll offset

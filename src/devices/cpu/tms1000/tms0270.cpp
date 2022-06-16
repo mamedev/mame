@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "tms0270.h"
-#include "debugger.h"
 
 // TMS0270 is a TMS0980 with earrings and a new hat. The new changes look like a quick afterthought, almost hacky
 // - RAM, ROM, and main instructions PLAs is the same as TMS0980

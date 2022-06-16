@@ -122,7 +122,7 @@ private:
 	struct
 	{
 		uint8_t trap[4]{};
-		std::unique_ptr<uint8_t[]> videoram_base{};
+		std::unique_ptr<uint8_t[]> videoram_base;
 		uint8_t *videoram = nullptr;
 		uint8_t mode_control_6a = 0;
 		uint8_t color_select_68 = 0;

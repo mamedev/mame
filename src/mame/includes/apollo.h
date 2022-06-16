@@ -296,7 +296,7 @@ private:
 	uint32_t ptm_counter = 0U;
 	uint8_t sio_output_data = 0U;
 	int m_dma_channel = 0;
-	bool m_cur_eop = 0;
+	bool m_cur_eop = false;
 };
 
 /*----------- machine/apollo_config.cpp -----------*/
@@ -690,7 +690,6 @@ private:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// serial overrides
 	virtual void rcv_complete() override; // Rx completed receiving byte
@@ -704,9 +703,9 @@ private:
 
 	uint8_t m_xmitring[XMIT_RING_SIZE]{};
 	int m_xmit_read = 0, m_xmit_write = 0;
-	bool m_tx_busy = 0;
+	bool m_tx_busy = false;
 
-	emu_timer* m_poll_timer = 0;
+	emu_timer* m_poll_timer = nullptr;
 
 	devcb_write_line m_tx_w;
 };

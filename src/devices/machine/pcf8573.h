@@ -64,10 +64,11 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+
+	TIMER_CALLBACK_MEMBER(clock_tick);
 
 private:
 	static constexpr uint8_t PCF8573_SLAVE_ADDRESS = 0xd0;
@@ -117,7 +118,7 @@ private:
 	int m_address;
 	int m_status;
 
-	enum { STATE_IDLE, STATE_ADDRESS, STATE_MODE, STATE_DATAIN, STATE_DATAOUT };
+	enum { STATE_IDLE, STATE_ADDRESS, STATE_MODE, STATE_DATAIN, STATE_DATAOUT, STATE_READSELACK };
 };
 
 // device type definition

@@ -51,56 +51,57 @@ Dumping Notes:
 class gpworld_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_IRQ_STOP
-	};
-
 	gpworld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc") ,
+		m_laserdisc(*this, "laserdisc"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_palette_ram(*this, "palette_ram"),
 		m_tile_ram(*this, "tile_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{
+	}
 
 	void gpworld(machine_config &config);
 
-	void init_gpworld();
-
 private:
+	virtual void machine_start() override;
+	virtual void driver_init() override;
+
+	void mainmem(address_map &map);
+	void mainport(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(irq_stop);
+
+	void ldp_write(uint8_t data);
+	void misc_io_write(uint8_t data);
+	void brake_gas_write(uint8_t data);
+	void palette_write(offs_t offset, uint8_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_callback);
+	void draw_tiles(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_pixel(bitmap_rgb32 &bitmap, const rectangle &cliprect, int x, int y, int color, int flip);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	emu_timer *m_irq_stop_timer = nullptr;
+
+	required_device<pioneer_ldv1000_device> m_laserdisc;
+	required_shared_ptr<uint8_t> m_sprite_ram;
+	required_shared_ptr<uint8_t> m_palette_ram;
+	required_shared_ptr<uint8_t> m_tile_ram;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	uint8_t m_nmi_enable = 0;
 	uint8_t m_start_lamp = 0;
 	uint8_t m_ldp_read_latch = 0;
 	uint8_t m_ldp_write_latch = 0;
 	uint8_t m_brake_gas = 0;
-	emu_timer *m_irq_stop_timer = nullptr;
-	required_device<pioneer_ldv1000_device> m_laserdisc;
-	required_shared_ptr<uint8_t> m_sprite_ram;
-	required_shared_ptr<uint8_t> m_palette_ram;
-	required_shared_ptr<uint8_t> m_tile_ram;
 	uint8_t ldp_read();
 	uint8_t pedal_in();
-	void ldp_write(uint8_t data);
-	void misc_io_write(uint8_t data);
-	void brake_gas_write(uint8_t data);
-	void palette_write(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_callback);
-	void draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect);
-	inline void draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
-	void mainmem(address_map &map);
-	void mainport(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -129,7 +130,7 @@ void gpworld_state::draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 	}
 }
 
-void gpworld_state::draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip)
+void gpworld_state::draw_pixel(bitmap_rgb32 &bitmap, const rectangle &cliprect, int x, int y, int color, int flip)
 {
 	if (flip)
 	{
@@ -153,19 +154,15 @@ void gpworld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	const int SPR_GFXOFS_HI = 7;
 	int flip = flip_screen();
 
-	int i;
-
 	uint8_t *GFX = memregion("gfx2")->base();
 
 	/* Heisted from Daphne which heisted it from MAME */
-	for (i = 0; i < 0x800; i += 8)
+	for (int i = 0; i < 0x800; i += 8)
 	{
 		uint8_t *spr_reg = m_sprite_ram + i;
 
 		if (spr_reg[SPR_Y_BOTTOM] && spr_reg[SPR_X_LO] != 0xff)
 		{
-			int row;
-
 			int src  = spr_reg[SPR_GFXOFS_LO] + (spr_reg[SPR_GFXOFS_HI] << 8);
 			int skip = spr_reg[SPR_SKIP_LO] + (spr_reg[SPR_SKIP_HI] << 8);
 
@@ -185,28 +182,23 @@ void gpworld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
             draw_pixel(bitmap,cliprect,sx,sy,0xffffffff,flip);
 */
 
-			for (row = 0; row < height; row++)
+			for (int row = 0; row < height; row++)
 			{
-				int x, y;
-				int src2;
+				int src2 = src + skip;
+				src = src2;
 
-				src = src2 = src + skip;
-
-				x = sx;
-				y = sy+row;
+				int x = sx;
+				int y = sy+row;
 
 				while (1)
 				{
-					int data_lo, data_high;
-					uint8_t pixel1, pixel2, pixel3, pixel4;
+					uint8_t data_lo   = GFX[(src2 & 0x7fff) | (sprite_bank << 16)];
+					uint8_t data_high = GFX[(src2 & 0x7fff) | 0x8000 | (sprite_bank << 16)];
 
-					data_lo   = GFX[(src2 & 0x7fff) | (sprite_bank << 16)];
-					data_high = GFX[(src2 & 0x7fff) | 0x8000 | (sprite_bank << 16)];
-
-					pixel1 = data_high >> 0x04;
-					pixel2 = data_high & 0x0f;
-					pixel3 = data_lo >> 0x04;
-					pixel4 = data_lo & 0x0f;
+					uint8_t pixel1 = data_high >> 0x04;
+					uint8_t pixel2 = data_high & 0x0f;
+					uint8_t pixel3 = data_lo >> 0x04;
+					uint8_t pixel4 = data_lo & 0x0f;
 
 					/* we'll see if this is still applicable */
 					if (src & 0x8000)
@@ -228,19 +220,19 @@ void gpworld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 					}
 
 					/* Daphne says "don't draw the pixel if it's black". */
-					draw_pixel(bitmap,cliprect,x+0,y,m_palette->pen_color(pixel1 + (sprite_color*0x10 + 0x200)),flip);
-					draw_pixel(bitmap,cliprect,x+1,y,m_palette->pen_color(pixel2 + (sprite_color*0x10 + 0x200)),flip);
-					draw_pixel(bitmap,cliprect,x+2,y,m_palette->pen_color(pixel3 + (sprite_color*0x10 + 0x200)),flip);
-					draw_pixel(bitmap,cliprect,x+3,y,m_palette->pen_color(pixel4 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap, cliprect, x+0, y, m_palette->pen_color(pixel1 + sprite_color * 0x10 + 0x200), flip);
+					draw_pixel(bitmap, cliprect, x+1, y, m_palette->pen_color(pixel2 + sprite_color * 0x10 + 0x200), flip);
+					draw_pixel(bitmap, cliprect, x+2, y, m_palette->pen_color(pixel3 + sprite_color * 0x10 + 0x200), flip);
+					draw_pixel(bitmap, cliprect, x+3, y, m_palette->pen_color(pixel4 + sprite_color * 0x10 + 0x200), flip);
 
 					x += 4;
 
 					/* stop drawing when the sprite data is 0xf */
-					if (((data_lo & 0x0f) == 0x0f) && (!(src & 0x8000)))
+					if ((data_lo & 0x0f) == 0x0f && !(src & 0x8000))
 					{
 						break;
 					}
-					else if ((src & 0x8000) && ((data_high & 0xf0) == 0xf0))
+					else if ((src & 0x8000) && (data_high & 0xf0) == 0xf0)
 					{
 						break;
 					}
@@ -264,7 +256,7 @@ uint32_t gpworld_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void gpworld_state::machine_start()
 {
-	m_irq_stop_timer = timer_alloc(TIMER_IRQ_STOP);
+	m_irq_stop_timer = timer_alloc(FUNC(gpworld_state::irq_stop), this);
 }
 
 
@@ -454,16 +446,9 @@ static INPUT_PORTS_START( gpworld )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(gpworld_state::irq_stop)
 {
-	switch (id)
-	{
-	case TIMER_IRQ_STOP:
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in gpworld_state::device_timer");
-	}
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback)
@@ -559,7 +544,7 @@ ROM_START( gpworld )
 ROM_END
 
 
-void gpworld_state::init_gpworld()
+void gpworld_state::driver_init()
 {
 	m_nmi_enable = 0;
 	m_start_lamp = 0;
@@ -568,5 +553,5 @@ void gpworld_state::init_gpworld()
 }
 
 
-/*    YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT          MONITOR  COMPANY  FULLNAME     FLAGS) */
-GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld_state, init_gpworld, ROT0,    "Sega",  "GP World",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT        MONITOR  COMPANY  FULLNAME     FLAGS) */
+GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld_state, empty_init, ROT0,    "Sega",  "GP World",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

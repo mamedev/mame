@@ -28,9 +28,9 @@ private:
 	int convert_raw_to_result(u8 *buf);
 	u8 status_r();
 
-	u8 m_raw_Acx[4], m_raw_Acy[4], m_raw_Bcx[4], m_raw_Bcy[4];
-	int m_Acx, m_Acy, m_Bcx, m_Bcy;
-	int m_Aax, m_Aay, m_Bax, m_Bay;
+	u8 m_raw_Acx[4]{}, m_raw_Acy[4]{}, m_raw_Bcx[4]{}, m_raw_Bcy[4]{};
+	int m_Acx = 0, m_Acy = 0, m_Bcx = 0, m_Bcy = 0;
+	int m_Aax = 0, m_Aay = 0, m_Bax = 0, m_Bay = 0;
 
 	std::string print_hitbox_state(bool result);
 };

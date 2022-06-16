@@ -111,7 +111,6 @@ protected:
 	virtual void sound_start() override;
 	virtual void video_start() override;
 	virtual void device_postload();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	void video_config(machine_config &config, const XTAL clock);
 
@@ -146,46 +145,49 @@ protected:
 	optional_ioport m_system;
 
 	// configuration
-	bool m_is_r3000;
-	bool m_is_cojag;
-	bool m_hacks_enabled;
-	int m_pixel_clock;
-	bool m_using_cart;
+	bool m_is_r3000 = false;
+	bool m_is_cojag = false;
+	bool m_hacks_enabled = false;
+	int m_pixel_clock = 0;
+	bool m_using_cart = false;
 
-	uint32_t m_joystick_data;
+	uint32_t m_joystick_data = 0;
 
 private:
-	uint32_t m_misc_control_data;
-	bool m_eeprom_enable;
-	uint32_t *m_gpu_jump_address;
-	bool m_gpu_command_pending;
-	uint32_t m_gpu_spin_pc;
-	uint32_t *m_main_speedup;
-	int m_main_speedup_hits;
-	uint64_t m_main_speedup_last_cycles;
-	uint64_t m_main_speedup_max_cycles;
-	uint32_t *m_main_gpu_wait;
+	uint32_t m_misc_control_data = 0;
+	bool m_eeprom_enable = false;
+	uint32_t *m_gpu_jump_address = 0;
+	bool m_gpu_command_pending = false;
+	uint32_t m_gpu_spin_pc = 0;
+	uint32_t *m_main_speedup = 0;
+	int m_main_speedup_hits = 0;
+	uint64_t m_main_speedup_last_cycles = 0;
+	uint64_t m_main_speedup_max_cycles = 0;
+	uint32_t *m_main_gpu_wait = 0;
 
 	// driver data
-	uint8_t m_eeprom_bit_count;
-	uint8_t m_protection_check;   /* 0 = check hasn't started yet; 1= check in progress; 2 = check is finished. */
+	uint8_t m_eeprom_bit_count = 0;
+	uint8_t m_protection_check = 0;   /* 0 = check hasn't started yet; 1= check in progress; 2 = check is finished. */
 
 	// audio data
-	uint16_t m_dsp_regs[0x40/2];
-	uint16_t m_serial_frequency;
-	uint8_t m_gpu_irq_state;
-	emu_timer *m_serial_timer;
+	uint16_t m_dsp_regs[0x40/2]{};
+	uint16_t m_serial_frequency = 0;
+	uint8_t m_gpu_irq_state = 0;
+	emu_timer *m_serial_timer = nullptr;
 
 	// blitter variables
-	uint32_t m_blitter_regs[40];
-	uint16_t m_gpu_regs[0x100/2];
-	emu_timer *m_object_timer;
-	uint8_t m_cpu_irq_state;
+	uint32_t m_blitter_regs[40]{};
+	uint16_t m_gpu_regs[0x100/2]{};
+	emu_timer *m_object_timer = nullptr;
+	emu_timer *m_blitter_done_timer = nullptr;
+	emu_timer *m_pit_timer = nullptr;
+	emu_timer *m_gpu_sync_timer = nullptr;
+	uint8_t m_cpu_irq_state = 0;
 	bitmap_rgb32 m_screen_bitmap;
-	uint8_t m_blitter_status;
-	pen_t m_pen_table[65536];
-	uint8_t m_blend_y[65536];
-	uint8_t m_blend_cc[65536];
+	uint8_t m_blitter_status = 0;
+	pen_t m_pen_table[65536]{};
+	uint8_t m_blend_y[65536]{};
+	uint8_t m_blend_cc[65536]{};
 
 	static void (jaguar_state::*const bitmap4[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
 	static void (jaguar_state::*const bitmap8[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
@@ -251,7 +253,7 @@ private:
 	void jerry_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t serial_r(offs_t offset);
 	void serial_w(offs_t offset, uint32_t data);
-	void serial_update();
+	TIMER_CALLBACK_MEMBER(serial_update);
 
 	// from video/jaguar.cpp
 	uint32_t blitter_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -261,6 +263,9 @@ private:
 	uint32_t cojag_gun_input_r(offs_t offset);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void jagpal_ycc(palette_device &palette) const;
+	TIMER_CALLBACK_MEMBER(blitter_done);
+	TIMER_CALLBACK_MEMBER(pit_update);
+	TIMER_CALLBACK_MEMBER(gpu_sync);
 
 	DECLARE_WRITE_LINE_MEMBER( gpu_cpu_int );
 	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
@@ -278,16 +283,6 @@ private:
 	void m68020_map(address_map &map);
 	void r3000_map(address_map &map);
 	void r3000_rom_map(address_map &map);
-
-	// timer IDs
-	enum
-	{
-		TID_SCANLINE,
-		TID_BLITTER_DONE,
-		TID_PIT,
-		TID_SERIAL,
-		TID_GPU_SYNC
-	};
 
 	void gpu_suspend() { m_gpu->suspend(SUSPEND_REASON_SPIN, 1); }
 	void gpu_resume() { m_gpu->resume(SUSPEND_REASON_SPIN); }
@@ -310,7 +305,7 @@ private:
 	inline void verify_host_cpu_irq();
 	uint8_t *memory_base(uint32_t offset) { return reinterpret_cast<uint8_t *>(m_gpu->space(AS_PROGRAM).get_read_ptr(offset)); }
 	void blitter_run();
-	void scanline_update(int param);
+	TIMER_CALLBACK_MEMBER(scanline_update);
 	void set_palette(uint16_t vmode);
 
 	/* from jagobj.cpp */

@@ -277,7 +277,7 @@ void dribling_state::machine_reset()
 void dribling_state::dribling(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 20_MHz_XTAL / 4); // XTAL verified, divider not
+	Z80(config, m_maincpu, 20_MHz_XTAL / 4); // XTAL and divider verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &dribling_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &dribling_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dribling_state::irq_gen));
@@ -298,10 +298,7 @@ void dribling_state::dribling(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 255, 40, 255);
+	screen.set_raw(20_MHz_XTAL / 4, 320, 0, 256, 262, 40, 256);
 	screen.set_screen_update(FUNC(dribling_state::screen_update));
 	screen.set_palette("palette");
 

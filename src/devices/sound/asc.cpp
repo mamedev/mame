@@ -66,7 +66,7 @@ void asc_device::device_start()
 
 	memset(m_regs, 0, sizeof(m_regs));
 
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(asc_device::delayed_stream_update), this);
 
 	save_item(NAME(m_fifo_a_rdptr));
 	save_item(NAME(m_fifo_b_rdptr));
@@ -104,10 +104,10 @@ void asc_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - called when our device timer expires
+//  delayed_stream_update -
 //-------------------------------------------------
 
-void asc_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+TIMER_CALLBACK_MEMBER(asc_device::delayed_stream_update)
 {
 	m_stream->update();
 }

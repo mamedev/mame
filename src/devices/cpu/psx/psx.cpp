@@ -70,7 +70,6 @@
 #include "mdec.h"
 #include "rcnt.h"
 #include "sound/spu.h"
-#include "debugger.h"
 
 #include "psxdefs.h"
 
@@ -1186,16 +1185,16 @@ void psxcpu_device::multiplier_update()
 	case MULTIPLIER_OPERATION_MULT:
 		{
 			int64_t result = mul_32x32( (int32_t)m_multiplier_operand1, (int32_t)m_multiplier_operand2 );
-			m_lo = extract_64lo( result );
-			m_hi = extract_64hi( result );
+			m_lo = result;
+			m_hi = result >> 32;
 		}
 		break;
 
 	case MULTIPLIER_OPERATION_MULTU:
 		{
 			uint64_t result = mulu_32x32( m_multiplier_operand1, m_multiplier_operand2 );
-			m_lo = extract_64lo( result );
-			m_hi = extract_64hi( result );
+			m_lo = result;
+			m_hi = result >> 32;
 		}
 		break;
 
@@ -1982,6 +1981,10 @@ void psxcpu_device::device_start()
 	state_add( PSXCPU_CP2CR29, "zsf3", m_gte.m_cp2cr[ 29 ].d );
 	state_add( PSXCPU_CP2CR30, "zsf4", m_gte.m_cp2cr[ 30 ].d );
 	state_add( PSXCPU_CP2CR31, "flag", m_gte.m_cp2cr[ 31 ].d );
+
+	// initialize the registers once
+	for(int i=0; i != 32; i++)
+		m_r[i] = 0;
 
 	// set our instruction counter
 	set_icountptr(m_icount);

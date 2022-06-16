@@ -149,7 +149,6 @@ private:
 	int m_dmadis = 0;
 	int m_sysscc = 0;
 	int m_sysfs = 0;
-	int m_partst = 0;               // parity test
 
 	void abc1600_mem(address_map &map);
 	void mac_mem(address_map &map);

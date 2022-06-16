@@ -2,26 +2,26 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    Savia 84
+Savia 84
 
-    More data at :
+More data at :
         http://www.nostalcomp.cz/pdfka/savia84.pdf
         http://www.nostalcomp.cz/savia.php
         (use archive.org)
 
-    05/02/2011 Skeleton driver.
-    11/10/2011 Found a new rom. Working [Robbbert]
+2011-02-05 Skeleton driver.
+2011-10-11 Found a new rom. Working [Robbbert]
 
-    I assume all the LEDs are red ones. The LEDs down the
-    left side I assume to be bit 0 through 7 in that order.
+I assume all the LEDs are red ones. The LEDs down the
+ left side I assume to be bit 0 through 7 in that order.
 
-    Pasting:
+Pasting:
         0-F : as is
         DA : ^
         AD : -
         GO : X
 
-    Here is a test program. Copy the text and Paste into the emulator.
+Here is a test program. Copy the text and Paste into the emulator.
     -1800^3E^55^D3^F9^76^XX1800^
 
 ****************************************************************************/

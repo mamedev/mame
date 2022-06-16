@@ -37,7 +37,7 @@ hlcd0488_device::hlcd0488_device(const machine_config &mconfig, const char *tag,
 void hlcd0488_device::device_start()
 {
 	m_write_cols.resolve_safe();
-	m_sync_timer = timer_alloc();
+	m_sync_timer = timer_alloc(FUNC(hlcd0488_device::sync_update), this);
 
 	// register for savestates
 	save_item(NAME(m_latch_pulse));
@@ -55,7 +55,7 @@ void hlcd0488_device::device_start()
 //  handlers
 //-------------------------------------------------
 
-void hlcd0488_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(hlcd0488_device::sync_update)
 {
 	// Latch pulse, when high, resets the %8 latch address counter
 	if (m_latch_pulse)

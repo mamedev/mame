@@ -112,7 +112,7 @@ private:
 	required_ioport m_cpu_speed;
 	required_region_ptr<u8> m_eprom;
 	required_shared_ptr<u8> m_p_ram;
-	bool m_power_on;
+	bool m_power_on = false;
 	bool m_rts;
 	bool m_dtr;
 };

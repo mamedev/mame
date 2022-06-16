@@ -139,15 +139,13 @@ void tsconf_state::tsconf_bank_w(offs_t offset, u8 data)
 
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8, /* 8 x 8 characters */
-	96,   /* 96 characters */
-	1,    /* 1 bits per pixel */
-	{0},  /* no bitplanes */
-	/* x offsets */
-	{STEP8(0, 1)},
-	/* y offsets */
-	{STEP8(0, 8)},
-	8 * 8 /* every char takes 8 bytes */
+	8, 8,          // 8 x 8 characters */
+	96,            // 96 characters */
+	1,             // 1 bits per pixel */
+	{0},           // no bitplanes
+	{STEP8(0, 1)}, // x offsets
+	{STEP8(0, 8)}, // y offsets
+	8 * 8          // every char takes 8 bytes
 };
 
 static const gfx_layout tsconf_charlayout =
@@ -170,7 +168,7 @@ static const gfx_layout tsconf_tile_16cpp_layout =
 	{STEP4(0, 1)},
 	{STEP8(0, 4)},
 	{STEP8(0, 256 * 8)},
-	// Much more tiles when needed. Because tiles are in RAW formut but we don't know region properties.
+	// Much more tiles when needed. Because tiles are in RAW format but we don't know region properties.
 	8 * 4
 };
 
@@ -185,7 +183,7 @@ GFXDECODE_END
 void tsconf_state::video_start()
 {
 	spectrum_128_state::video_start();
-	m_scanline_timer->reset();
+	m_contention_pattern = {}; // disable inherited contention
 
 	m_ts_tilemap[TM_TS_CHAR] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_txt)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
@@ -195,8 +193,8 @@ void tsconf_state::video_start()
 	m_ts_tilemap[TM_TILES1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_ts_tilemap[TM_TILES1]->set_transparent_pen(0);
 
-	m_frame_irq_timer = timer_alloc(TIMER_IRQ_FRAME);
-	m_line_irq_timer = timer_alloc(TIMER_IRQ_SCANLINE);
+	m_frame_irq_timer = timer_alloc(FUNC(tsconf_state::irq_frame), this);
+	m_line_irq_timer = timer_alloc(FUNC(tsconf_state::irq_scanline), this);
 }
 
 void tsconf_state::machine_start()
@@ -294,7 +292,7 @@ void tsconf_state::tsconf(machine_config &config)
 		.add_route(2, "rspeaker", 0.50);
 
 	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
-	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(), 448, 320, with_vblank(), 320);
+	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tsconf);
 	RAM(config, m_cram).set_default_size("512").set_default_value(0);
 	RAM(config, m_sfile).set_default_size("512").set_default_value(0); // 85*6

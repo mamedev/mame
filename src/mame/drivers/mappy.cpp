@@ -1306,8 +1306,8 @@ void mappy_state::machine_start()
 {
 	m_leds.resolve();
 
-	m_namcoio_run_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mappy_state::namcoio_run_timer<0>), this));
-	m_namcoio_run_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mappy_state::namcoio_run_timer<1>), this));
+	m_namcoio_run_timer[0] = timer_alloc(FUNC(mappy_state::namcoio_run_timer<0>), this);
+	m_namcoio_run_timer[1] = timer_alloc(FUNC(mappy_state::namcoio_run_timer<1>), this);
 
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));

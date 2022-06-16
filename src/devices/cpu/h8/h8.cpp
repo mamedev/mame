@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "h8.h"
 #include "h8_dma.h"
 #include "h8_dtc.h"

@@ -87,8 +87,6 @@
 #include "mcs48.h"
 #include "mcs48dsm.h"
 
-#include "debugger.h"
-
 
 /***************************************************************************
     CONSTANTS

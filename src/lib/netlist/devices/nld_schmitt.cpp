@@ -62,7 +62,7 @@ namespace netlist::devices {
 			, m_modacc(m_stmodel)
 			, m_last_state(*this, "m_last_var", 1)
 		{
-			register_subalias("Q", "RVO.1");
+			register_sub_alias("Q", "RVO.1");
 
 			connect("A", "RVI.1");
 			// FIXME: need a symbolic reference from connect as well
@@ -110,8 +110,8 @@ namespace netlist::devices {
 
 		analog_input_t m_A;
 		NETLIB_NAME(power_pins) m_supply;
-		analog::NETLIB_SUB(twoterm) m_RVI;
-		analog::NETLIB_SUB(twoterm) m_RVO;
+		analog::NETLIB_SUB(two_terminal) m_RVI;
+		analog::NETLIB_SUB(two_terminal) m_RVO;
 		param_model_t m_stmodel;
 		schmitt_trigger_model_t m_modacc;
 		state_var<int> m_last_state;

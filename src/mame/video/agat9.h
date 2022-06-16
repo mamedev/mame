@@ -38,10 +38,10 @@ public:
 	uint8_t apple_read(offs_t offset);
 	void apple_write(offs_t offset, uint8_t data);
 
-	bool m_page2;
-	bool m_flash;
-	bool m_mix;
-	bool m_graphics;
+	bool m_page2 = false;
+	bool m_flash = false;
+	bool m_mix = false;
+	bool m_graphics = false;
 	std::unique_ptr<uint16_t[]> m_hires_artifact_map;
 
 protected:
@@ -86,8 +86,8 @@ private:
 		GRAPHICS_MONO_HIRES,
 		APPLE
 	} m_video_mode;
-	int m_mode;
-	int palette_index;
+	int m_mode = 0;
+	int palette_index = 0;
 };
 
 // device type definition

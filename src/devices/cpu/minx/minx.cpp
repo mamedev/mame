@@ -48,7 +48,6 @@ TODO:
 #include "emu.h"
 #include "minx.h"
 #include "minxd.h"
-#include "debugger.h"
 
 #define FLAG_I  0x80
 #define FLAG_D  0x40

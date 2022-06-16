@@ -716,13 +716,7 @@ void lua_engine::initialize()
 			static_cast<char const *(*)(char const *)>(&lang_translate),
 			static_cast<char const *(*)(char const *, char const *)>(&lang_translate));
 	emu["pid"] = &osd_getpid;
-	emu["subst_env"] =
-		[] (const std::string &str)
-		{
-			std::string result;
-			osd_subst_env(result, str);
-			return result;
-		};
+	emu.set_function("subst_env", &osd_subst_env);
 	emu["device_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<device_enumerator>(dev, maxdepth); });
@@ -1157,25 +1151,25 @@ void lua_engine::initialize()
 	auto core_options_entry_type = sol().registry().new_usertype<core_options::entry>("core_options_entry", "new", sol::no_constructor);
 	core_options_entry_type.set("value", sol::overload(
 		[this](core_options::entry &e, bool val) {
-			if(e.type() != OPTION_BOOLEAN)
+			if(e.type() != core_options::option_type::BOOLEAN)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(val ? "1" : "0", OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, float val) {
-			if(e.type() != OPTION_FLOAT)
+			if(e.type() != core_options::option_type::FLOAT)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(string_format("%f", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, int val) {
-			if(e.type() != OPTION_INTEGER)
+			if(e.type() != core_options::option_type::INTEGER)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(string_format("%d", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, const char *val) {
-			if(e.type() != OPTION_STRING)
+			if(e.type() != core_options::option_type::STRING)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(val, OPTION_PRIORITY_CMDLINE);
@@ -1797,6 +1791,7 @@ void lua_engine::initialize()
 	ui_type["single_step"] = sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step);
 	ui_type["show_fps"] = sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps);
 	ui_type["show_profiler"] = sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler);
+	ui_type["image_display_enabled"] = sol::property(&mame_ui_manager::image_display_enabled, &mame_ui_manager::set_image_display_enabled);
 
 
 /*  device_state_entry library

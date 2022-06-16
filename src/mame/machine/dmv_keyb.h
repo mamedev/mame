@@ -44,9 +44,9 @@ private:
 	required_device<i8741a_device> m_maincpu;
 	required_ioport_array<16> m_keyboard;
 
-	uint8_t   m_col;
-	int     m_sd_data_state;
-	int     m_sd_poll_state;
+	uint8_t   m_col = 0;
+	int     m_sd_data_state = 0;
+	int     m_sd_poll_state = 0;
 
 	uint8_t port1_r();
 	uint8_t port2_r();

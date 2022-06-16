@@ -30,7 +30,6 @@ public:
 	menu_custom_ui(mame_ui_manager &mui, render_container &container, std::function<void ()> &&handler);
 
 protected:
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual void menu_dismissed() override;
 
 private:

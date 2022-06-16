@@ -35,7 +35,8 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	void audio_beat_tick();
+	TIMER_CALLBACK_MEMBER(irq_tick);
+	TIMER_CALLBACK_MEMBER(audio_beat_tick);
 	void audio_rampdown_tick(const uint32_t channel);
 	bool audio_envelope_tick(const uint32_t channel);
 	inline uint32_t get_rampdown_frame_count(const uint32_t channel);
@@ -329,15 +330,11 @@ protected:
 		int16_t m_prevsamp[2];
 	};
 
-	static const device_timer_id TIMER_BEAT = 3;
-	static const device_timer_id TIMER_IRQ = 4;
-
 	void check_irqs(const uint16_t changed);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	uint16_t read_space(offs_t offset);
 

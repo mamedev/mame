@@ -171,19 +171,8 @@ void hh_sm510_state::machine_start()
 	}
 
 	// 1kHz display decay ticks
-	m_display_decay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hh_sm510_state::display_decay_tick),this));
+	m_display_decay_timer = timer_alloc(FUNC(hh_sm510_state::display_decay_tick), this);
 	m_display_decay_timer->adjust(attotime::from_hz(1024), 0, attotime::from_hz(1024));
-
-	// zerofill
-	m_inp_mux = 0;
-	m_speaker_data = 0;
-	m_s = 0;
-	m_r = 0;
-	m_display_x_len = 0;
-	m_display_y_len = 0;
-	m_display_z_len = 0;
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
 
 	// register for savestates
 	save_item(NAME(m_inp_mux));
@@ -1465,6 +1454,7 @@ ROM_END
   ИМ-50  Космический полёт   Kosmicheskiy polyot  Space Flight        The Model ID is the same as Весёлая арифметика (Vesyolaya arithmetika, export version: Amusing Arithmetic) (not emulated in MAME)
   ИМ-51  Морская атака       Morskaya ataka       -                   -
   ИМ-53  Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
+  -      Цирк                Circus (Tsirk)       -                   Unknown Model ID
 
 ***************************************************************************/
 
@@ -1489,6 +1479,7 @@ public:
 	void kosmicpt(machine_config &config);
 	void morataka(machine_config &config);
 	void atakaast(machine_config &config);
+	void ecircus(machine_config &config);
 };
 
 // config
@@ -1593,6 +1584,11 @@ void gnw_mmouse_state::morataka(machine_config &config)
 void gnw_mmouse_state::atakaast(machine_config &config)
 {
 	kb1013vk12_common(config, 1620, 1080); // R mask option ?
+}
+
+void gnw_mmouse_state::ecircus(machine_config &config)
+{
+	kb1013vk12_common(config, 1657, 1080); // R mask option ?
 }
 
 // roms
@@ -1707,6 +1703,14 @@ ROM_START( atakaast )
 
 	ROM_REGION( 105570, "screen", 0)
 	ROM_LOAD( "atakaast.svg", 0, 105570, CRC(3d79aacc) SHA1(bc25969f4d6fa75b320130c920ac0bdc8fb44cbd) )
+ROM_END
+
+ROM_START( ecircus )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "ecircus.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 124643, "screen", 0)
+	ROM_LOAD( "ecircus.svg", 0, 124643, CRC(079f25db) SHA1(defa784c80e01ce6affbb424930674114275bea1) )
 ROM_END
 
 
@@ -5326,7 +5330,7 @@ ROM_END
 /***************************************************************************
 
   Nelsonic Game Watches on SM530*, wristwatch with an LCD game on it.
-  *: Older games are on different a MCU, several seen with OKI MSM5055.
+  *: Older games are on a different MCU, several seen with OKI MSM5055.
   Newer ones: to be investigated, maybe SM5x.
 
   Hardware notes:
@@ -9518,8 +9522,8 @@ static INPUT_PORTS_START( trshutvoy )
 	PORT_START("IN.3") // S4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("+")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("-")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(UTF8_MULTIPLY)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"×")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"÷")
 
 	PORT_START("IN.4") // S5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_CHANGED_CB(input_changed) PORT_NAME("ALM")
@@ -9849,8 +9853,8 @@ static INPUT_PORTS_START( nummunch )
 	PORT_START("IN.3") // S4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_CHANGED_CB(input_changed) PORT_NAME("Choose +")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_CHANGED_CB(input_changed) PORT_NAME("Choose -")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CHANGED_CB(input_changed) PORT_NAME("Choose " UTF8_MULTIPLY)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHANGED_CB(input_changed) PORT_NAME("Choose " UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Choose ×")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Choose ÷")
 
 	PORT_START("IN.4") // S5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("1")
@@ -9873,8 +9877,8 @@ static INPUT_PORTS_START( nummunch )
 	PORT_START("IN.7") // S8
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("+")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("-")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(UTF8_MULTIPLY)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"×")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"÷")
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_CB(acl_button)
@@ -10001,6 +10005,7 @@ CONS( 19??, nochnyev,     gnw_mmouse,  0, nochnyev,     gnw_mmouse,   gnw_mmouse
 CONS( 19??, kosmicpt,     gnw_mmouse,  0, kosmicpt,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kosmicheskiy polyot", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 19??, morataka,     gnw_mmouse,  0, morataka,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1992, atakaast,     gnw_mmouse,  0, atakaast,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Ataka asteroidov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 19??, ecircus,      gnw_mmouse,  0, ecircus,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, kosmicmt,     gnw_fire,    0, kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1990, auslalom,     0,           0, auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

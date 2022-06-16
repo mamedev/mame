@@ -20,8 +20,6 @@
 #include "ssp1601.h"
 #include "ssp1601d.h"
 
-#include "debugger.h"
-
 
 /* detect ops with unimplemented/invalid fields.
  * Useful for homebrew or if a new VR revision pops up. */

@@ -20,6 +20,7 @@
 #include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
+#include "cpu/z80/z80.h"
 
 /* Spectrum crystals */
 
@@ -88,19 +89,17 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// until machine/spec_snqk.cpp gets somehow disentangled
 	virtual void plus3_update_memory() { }
 	virtual void spectrum_128_update_memory() { }
 	virtual void ts2068_update_memory() { }
 
-	enum
-	{
-		TIMER_IRQ_ON,
-		TIMER_IRQ_OFF,
-		TIMER_SCANLINE // tsconf assumes it last know. if need more add above or fix references in clones
-	};
+	TIMER_CALLBACK_MEMBER(irq_on);
+	TIMER_CALLBACK_MEMBER(irq_off);
+
+	emu_timer *m_irq_on_timer;
+	emu_timer *m_irq_off_timer;
 
 	int m_port_fe_data;
 	int m_port_7ffd_data;
@@ -113,12 +112,12 @@ protected:
 	optional_shared_ptr<uint8_t> m_video_ram;
 	uint8_t *m_screen_location;
 
-	int m_ROMSelection;
-
-	// Build up the screen bitmap line-by-line as the z80 uses CPU cycles.
-	// Eliminates sprite flicker on various games (E.g. Marauder and
-	// Stormlord) and makes Firefly playable.
-	emu_timer *m_scanline_timer;
+	std::vector<u8> m_contention_pattern;
+	/* Pixel offset in 8px chunk (4T) when current chunk is rendered. */
+	u8 m_border4t_render_at = 0;
+	/* Defines offset in CPU cycles from screen left side. Early model (48/128/+2) typically use -1, later (+2A/+3) +1 */
+	s8 m_contention_offset = -1;
+	u64 m_int_at;
 
 	uint8_t m_ram_disabled_by_beta;
 	uint8_t pre_opcode_fetch_r(offs_t offset);
@@ -126,7 +125,12 @@ protected:
 	uint8_t spectrum_rom_r(offs_t offset);
 	uint8_t spectrum_data_r(offs_t offset);
 	void spectrum_data_w(offs_t offset, uint8_t data);
+	virtual bool is_contended(offs_t offset);
+	virtual bool is_vram_write(offs_t offset);
+	void content_early(s8 shift = 0);
+	void content_late();
 
+	void spectrum_nomreq(offs_t offset, uint8_t data);
 	void spectrum_ula_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_ula_r(offs_t offset);
 	void spectrum_port_w(offs_t offset, uint8_t data);
@@ -141,7 +145,7 @@ protected:
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	void spectrum_io(address_map &map);
@@ -208,35 +212,6 @@ protected:
 	void log_quickload(const char *type, uint32_t start, uint32_t length, uint32_t exec, const char *exec_format);
 	void setup_scr(uint8_t *quickdata, uint32_t quicksize);
 	void setup_raw(uint8_t *quickdata, uint32_t quicksize);
-};
-
-class spectrum_128_state : public spectrum_state
-{
-public:
-	spectrum_128_state(const machine_config &mconfig, device_type type, const char *tag) :
-		spectrum_state(mconfig, type, tag)
-		{ }
-
-	void spectrum_128(machine_config &config);
-
-protected:
-	virtual void video_start() override;
-	virtual void machine_reset() override;
-
-	virtual void spectrum_128_update_memory() override;
-	virtual rectangle get_screen_area() override;
-
-private:
-	uint8_t spectrum_128_pre_opcode_fetch_r(offs_t offset);
-	void spectrum_128_bank1_w(offs_t offset, uint8_t data);
-	uint8_t spectrum_128_bank1_r(offs_t offset);
-	void spectrum_128_port_7ffd_w(offs_t offset, uint8_t data);
-	virtual uint8_t spectrum_port_r(offs_t offset) override;
-	//uint8_t spectrum_128_ula_r();
-
-	void spectrum_128_io(address_map &map);
-	void spectrum_128_mem(address_map &map);
-	void spectrum_128_fetch(address_map &map);
 };
 
 /*----------- defined in drivers/spectrum.cpp -----------*/

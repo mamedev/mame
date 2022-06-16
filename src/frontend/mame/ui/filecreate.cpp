@@ -231,7 +231,7 @@ SELECT FORMAT MENU
 //  ctor
 //-------------------------------------------------
 
-menu_select_format::menu_select_format(mame_ui_manager &mui, render_container &container, const std::vector<floppy_image_format_t *> &formats, int ext_match, floppy_image_format_t **result)
+menu_select_format::menu_select_format(mame_ui_manager &mui, render_container &container, const std::vector<const floppy_image_format_t *> &formats, int ext_match, const floppy_image_format_t **result)
 	: menu(mui, container)
 {
 	m_formats = formats;
@@ -258,11 +258,11 @@ void menu_select_format::populate(float &customtop, float &custombottom)
 	item_append(_("Select image format"), FLAG_DISABLE, nullptr);
 	for (unsigned int i = 0; i != m_formats.size(); i++)
 	{
-		floppy_image_format_t *fmt = m_formats[i];
+		const floppy_image_format_t *fmt = m_formats[i];
 
 		if (i && i == m_ext_match)
 			item_append(menu_item_type::SEPARATOR);
-		item_append(fmt->description(), fmt->name(), 0, fmt);
+		item_append(fmt->description(), fmt->name(), 0, const_cast<floppy_image_format_t *>(fmt));
 	}
 }
 
@@ -290,9 +290,9 @@ SELECT FORMAT MENU
 //  ctor
 //-------------------------------------------------
 
-menu_select_floppy_init::menu_select_floppy_init(mame_ui_manager &mui, render_container &container, const std::vector<floppy_image_device::fs_info> &fs, int *result)
+menu_select_floppy_init::menu_select_floppy_init(mame_ui_manager &mui, render_container &container, std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> &&fs, int *result)
 	: menu(mui, container),
-	  m_fs(fs),
+	  m_fs(std::move(fs)),
 	  m_result(result)
 
 {
@@ -316,7 +316,7 @@ void menu_select_floppy_init::populate(float &customtop, float &custombottom)
 {
 	item_append(_("Select initial contents"), FLAG_DISABLE, nullptr);
 	int id = 0;
-	for (const auto &fmt : m_fs)
+	for (const floppy_image_device::fs_info &fmt : m_fs)
 		item_append(fmt.m_description, fmt.m_name, 0, (void *)(uintptr_t)(id++));
 }
 

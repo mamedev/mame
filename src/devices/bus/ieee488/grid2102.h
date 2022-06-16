@@ -33,7 +33,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_ieee488_interface overrides
 	virtual void ieee488_eoi(int state) override;
@@ -56,7 +55,10 @@ protected:
 
 	void accept_transfer();
 	void update_ndac(int atn);
+
 private:
+	TIMER_CALLBACK_MEMBER(delay_tick);
+
 	int m_gpib_loop_state;
 	int m_floppy_loop_state;
 	uint8_t m_last_recv_byte;
@@ -74,6 +76,7 @@ private:
 	std::queue<uint8_t> m_output_data_buffer;
 	uint16_t io_size;
 	emu_timer *m_delay_timer;
+
 protected:
 	attotime read_delay;
 };

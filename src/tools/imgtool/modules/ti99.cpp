@@ -979,17 +979,15 @@ static imgtoolerr_t open_image_lvl1(imgtool::stream::ptr &&file_handle, ti99_img
 
 	if (img_format == if_harddisk)
 	{
-		const hard_disk_info *info;
-
 		err = imghd_open(*file_handle, &l1_img->harddisk_handle);
 		if (err)
 			return err;
 
-		info = imghd_get_header(&l1_img->harddisk_handle);
-		l1_img->geometry.cylinders = info->cylinders;
-		l1_img->geometry.heads = info->heads;
-		l1_img->geometry.secspertrack = info->sectors;
-		if (info->sectorbytes != 256)
+		const auto &info = imghd_get_header(&l1_img->harddisk_handle);
+		l1_img->geometry.cylinders = info.cylinders;
+		l1_img->geometry.heads = info.heads;
+		l1_img->geometry.secspertrack = info.sectors;
+		if (info.sectorbytes != 256)
 		{
 			imghd_close(&l1_img->harddisk_handle);
 			return IMGTOOLERR_CORRUPTIMAGE; /* TODO: support 512-byte sectors */

@@ -66,13 +66,13 @@ private:
 	void ppi_pb_w(uint8_t data);
 	void ppi_pc_w(uint8_t data);
 
-	int m_break;
-	int m_m1;
+	int m_break = 0;
+	int m_m1 = 0;
 
-	uint8_t m_lednum;
+	uint8_t m_lednum = 0;
 
-	emu_timer *m_led_refresh_timer;
-	address_space *m_program;
+	emu_timer *m_led_refresh_timer = nullptr;
+	address_space *m_program = nullptr;
 
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	TIMER_DEVICE_CALLBACK_MEMBER(check_halt_callback);

@@ -86,7 +86,7 @@ protected:
 	int m_cloud_visible = 0;
 	int m_sound_hw_type = 0;
 	bool m_hotchase_sound_hs = 0;
-	pen_t m_black_pen;
+	pen_t m_black_pen{};
 
 	uint16_t wecleman_protection_r();
 	void wecleman_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

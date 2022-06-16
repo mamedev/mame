@@ -93,11 +93,9 @@ private:
 	uint8_t m_u10b = 0U;
 	uint8_t m_u11a = 0U;
 	uint8_t m_u11b = 0U;
-	bool m_u10_ca2 = 0;
-	bool m_u10_cb1 = 0;
-	bool m_u10_cb2 = 0;
-	bool m_u11_ca1 = 0;
-	bool m_u11_cb2 = 0;
+	bool m_u10_ca2 = false;
+	bool m_u10_cb2 = false;
+	bool m_u11_cb2 = false;
 	uint8_t m_segment[6]{};
 	uint8_t m_lamp_decode = 0U;
 	uint8_t m_solenoid_features[20][4]{};
@@ -132,11 +130,8 @@ private:
 	uint8_t nibble_nvram_r(offs_t offset);
 	void nibble_nvram_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_READ_LINE_MEMBER(u11_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
@@ -561,10 +556,6 @@ READ_LINE_MEMBER( by17_state::u10_ca1_r )
 {
 	return m_io_test->read() & 0x01;
 }
-READ_LINE_MEMBER( by17_state::u10_cb1_r )
-{
-	return m_u10_cb1;
-}
 
 WRITE_LINE_MEMBER( by17_state::u10_ca2_w )
 {
@@ -593,17 +584,6 @@ WRITE_LINE_MEMBER( by17_state::u10_cb2_w )
 		m_lamp_decode = m_u10a & 0x0f;
 
 	m_u10_cb2 = state;
-}
-
-READ_LINE_MEMBER( by17_state::u11_ca1_r )
-{
-	return m_u11_ca1;
-}
-
-READ_LINE_MEMBER( by17_state::u11_cb1_r )
-{
-	/* Pin 32 on MPU J5 AID connector tied low */
-	return 0;
 }
 
 WRITE_LINE_MEMBER( by17_state::u11_cb2_w )
@@ -825,8 +805,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_freq )
 
 	m_zero_crossing_active_timer->adjust(attotime::from_usec(700));
 
-	m_u10_cb1 = true;
-	m_pia_u10->cb1_w(m_u10_cb1);
+	m_pia_u10->cb1_w(true);
 
 	/*** Zero Crossing - power to all Lamp SCRs is cut off and reset ***/
 
@@ -837,8 +816,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_pulse )
 {
 	/*** Line Power to DC Zero Crossing has ended ***/
 
-	m_u10_cb1 = false;
-	m_pia_u10->cb1_w(m_u10_cb1);
+	m_pia_u10->cb1_w(false);
 }
 
 // 555 timer for display refresh
@@ -853,14 +831,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::u11_timer )
 
 	m_display_refresh_timer->adjust(attotime::from_usec(2850));
 
-	m_u11_ca1 = true;
-	m_pia_u11->ca1_w(m_u11_ca1);
+	m_pia_u11->ca1_w(true);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_d_pulse )
 {
-	m_u11_ca1 = false;
-	m_pia_u11->ca1_w(m_u11_ca1);
+	m_pia_u11->ca1_w(false);
 }
 
 
@@ -992,9 +968,7 @@ void by17_state::machine_start()
 	save_item(NAME(m_u11a));
 	save_item(NAME(m_u11b));
 	save_item(NAME(m_u10_ca2));
-	save_item(NAME(m_u10_cb1));
 	save_item(NAME(m_u10_cb2));
-	save_item(NAME(m_u11_ca1));
 	save_item(NAME(m_u11_cb2));
 	save_item(NAME(m_segment));
 	save_item(NAME(m_lamp_decode));
@@ -1038,7 +1012,7 @@ void by17_state::by17(machine_config &config)
 	m_pia_u10->readpb_handler().set(FUNC(by17_state::u10_b_r));
 	m_pia_u10->writepb_handler().set(FUNC(by17_state::u10_b_w));
 	m_pia_u10->readca1_handler().set(FUNC(by17_state::u10_ca1_r));
-	m_pia_u10->readcb1_handler().set(FUNC(by17_state::u10_cb1_r));
+	m_pia_u10->cb1_w(false);
 	m_pia_u10->ca2_handler().set(FUNC(by17_state::u10_ca2_w));
 	m_pia_u10->cb2_handler().set(FUNC(by17_state::u10_cb2_w));
 	m_pia_u10->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
@@ -1050,8 +1024,8 @@ void by17_state::by17(machine_config &config)
 	m_pia_u11->readpa_handler().set(FUNC(by17_state::u11_a_r));
 	m_pia_u11->writepa_handler().set(FUNC(by17_state::u11_a_w));
 	m_pia_u11->writepb_handler().set(FUNC(by17_state::u11_b_w));
-	m_pia_u11->readca1_handler().set(FUNC(by17_state::u11_ca1_r));
-	m_pia_u11->readcb1_handler().set(FUNC(by17_state::u11_cb1_r));
+	m_pia_u11->ca1_w(false);
+	m_pia_u11->cb1_w(0); /* Pin 32 on MPU J5 AID connector tied low */
 	m_pia_u11->ca2_handler().set_output("led0");
 	m_pia_u11->cb2_handler().set(FUNC(by17_state::u11_cb2_w));
 	m_pia_u11->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
@@ -1179,15 +1153,15 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(  1976, bowarrow,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 23)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1976, bowarrowa, bowarrow, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 22)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, freedom,   0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Freedom",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, nightrdr,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 21)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, nightr20,  nightrdr, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 20)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1978, blackjck,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Black Jack (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, evelknie,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Evel Knievel",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL( 1978, matahari,  0,        by17, matahari, by17_state, init_matahari, ROT0, "Bally", "Mata Hari",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_matahari)
-GAME(  1977, eightbll,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 20)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, eightblo,  eightbll, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 17)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL( 1978, pwerplay,  0,        by17, pwerplay, by17_state, init_pwerplay, ROT0, "Bally", "Power Play (Pinball)",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_pwerplay)
+GAME(  1976, bowarrow,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 23)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(  1976, bowarrowa, bowarrow, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 22)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(  1977, freedom,   0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Freedom",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(  1977, nightrdr,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 21)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(  1977, nightr20,  nightrdr, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 20)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(  1978, blackjck,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Black Jack (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(  1977, evelknie,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Evel Knievel",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1978, matahari,  0,        by17, matahari, by17_state, init_matahari, ROT0, "Bally", "Mata Hari",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_by17_matahari)
+GAME(  1977, eightbll,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 20)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(  1977, eightblo,  eightbll, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 17)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1978, pwerplay,  0,        by17, pwerplay, by17_state, init_pwerplay, ROT0, "Bally", "Power Play (Pinball)",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_by17_pwerplay)
 GAME(  1978, stk_sprs,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Strikes and Spares",               MACHINE_IS_SKELETON_MECHANICAL)

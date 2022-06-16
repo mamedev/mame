@@ -6,32 +6,29 @@
 //
 //============================================================
 
-#include "input_module.h"
 #include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
 
-// standard windows headers
-#include <windows.h>
-#include <tchar.h>
-#undef interface
+// MAME headers
+#include "emu.h"
+
+#include "input_windows.h"
+
+#include "winmain.h"
+#include "window.h"
+
+#include "modules/lib/osdlib.h"
+#include "strconv.h"
 
 #include <algorithm>
 #include <functional>
 #include <mutex>
 #include <new>
 
-// MAME headers
-#include "emu.h"
-#include "strconv.h"
-
-// MAMEOS headers
-#include "modules/lib/osdlib.h"
-#include "winmain.h"
-#include "window.h"
-
-#include "input_common.h"
-#include "input_windows.h"
+// standard windows headers
+#include <windows.h>
+#include <tchar.h>
 
 
 namespace {
@@ -350,12 +347,12 @@ public:
 		if (rawinput.data.mouse.usFlags == MOUSE_MOVE_RELATIVE)
 		{
 
-			mouse.lX += rawinput.data.mouse.lLastX * INPUT_RELATIVE_PER_PIXEL;
-			mouse.lY += rawinput.data.mouse.lLastY * INPUT_RELATIVE_PER_PIXEL;
+			mouse.lX += rawinput.data.mouse.lLastX * osd::INPUT_RELATIVE_PER_PIXEL;
+			mouse.lY += rawinput.data.mouse.lLastY * osd::INPUT_RELATIVE_PER_PIXEL;
 
 			// update zaxis
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				mouse.lZ += static_cast<int16_t>(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
+				mouse.lZ += static_cast<int16_t>(rawinput.data.mouse.usButtonData) * osd::INPUT_RELATIVE_PER_PIXEL;
 
 			// update the button states; always update the corresponding mouse buttons
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) mouse.rgbButtons[0] = 0x80;
@@ -408,12 +405,12 @@ public:
 		{
 
 			// update the X/Y positions
-			lightgun.lX = normalize_absolute_axis(rawinput.data.mouse.lLastX, 0, INPUT_ABSOLUTE_MAX);
-			lightgun.lY = normalize_absolute_axis(rawinput.data.mouse.lLastY, 0, INPUT_ABSOLUTE_MAX);
+			lightgun.lX = normalize_absolute_axis(rawinput.data.mouse.lLastX, 0, osd::INPUT_ABSOLUTE_MAX);
+			lightgun.lY = normalize_absolute_axis(rawinput.data.mouse.lLastY, 0, osd::INPUT_ABSOLUTE_MAX);
 
 			// update zaxis
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				lightgun.lZ += static_cast<int16_t>(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
+				lightgun.lZ += static_cast<int16_t>(rawinput.data.mouse.usButtonData) * osd::INPUT_RELATIVE_PER_PIXEL;
 
 			// update the button states; always update the corresponding mouse buttons
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) lightgun.rgbButtons[0] = 0x80;
@@ -489,7 +486,7 @@ public:
 			m_global_inputs_enabled = downcast<windows_options &>(machine.options()).global_inputs();
 
 		// If we added no devices, no need to register for notifications
-		if (devicelist()->empty())
+		if (devicelist().empty())
 			return;
 
 		// finally, register to receive raw input WM_INPUT messages if we found devices
@@ -539,7 +536,7 @@ protected:
 
 		tname.reset();
 
-		TDevice &devinfo = devicelist()->create_device<TDevice>(machine, std::move(utf8_name), std::move(utf8_id), *this);
+		TDevice &devinfo = devicelist().create_device<TDevice>(machine, std::move(utf8_name), std::move(utf8_id), *this);
 
 		// Add the handle
 		devinfo.set_handle(rawinputdevice.hDevice);
@@ -594,14 +591,14 @@ protected:
 
 					// find the device in the list and update
 					auto target_device = std::find_if(
-							devicelist()->begin(),
-							devicelist()->end(),
+							devicelist().begin(),
+							devicelist().end(),
 							[input] (auto const &device)
 							{
 								auto devinfo = dynamic_cast<rawinput_device *>(device.get());
 								return devinfo && (input->header.hDevice == devinfo->device_handle());
 							});
-					if (devicelist()->end() == target_device)
+					if (devicelist().end() == target_device)
 						return false;
 
 					static_cast<rawinput_device *>(target_device->get())->queue_events(input, 1);
@@ -629,14 +626,14 @@ protected:
 
 				// find the device in the list and update
 				auto target_device = std::find_if(
-						devicelist()->begin(),
-						devicelist()->end(),
+						devicelist().begin(),
+						devicelist().end(),
 						[&utf8_id] (auto const &device)
 						{
 							auto devinfo = dynamic_cast<rawinput_device *>(device.get());
 							return devinfo && !devinfo->device_handle() && (devinfo->id() == utf8_id);
 						});
-				if (devicelist()->end() == target_device)
+				if (devicelist().end() == target_device)
 					return false;
 
 				static_cast<rawinput_device *>(target_device->get())->set_handle(rawinputdevice);
@@ -652,15 +649,15 @@ protected:
 
 				// find the device in the list and update
 				auto target_device = std::find_if(
-						devicelist()->begin(),
-						devicelist()->end(),
+						devicelist().begin(),
+						devicelist().end(),
 						[rawinputdevice] (auto const &device)
 						{
 							auto devinfo = dynamic_cast<rawinput_device *>(device.get());
 							return devinfo && (rawinputdevice == devinfo->device_handle());
 						});
 
-				if (devicelist()->end() == target_device)
+				if (devicelist().end() == target_device)
 					return false;
 
 				(*target_device)->reset();
@@ -826,6 +823,8 @@ protected:
 } // anonymous namespace
 
 #else // defined(OSD_WINDOWS)
+
+#include "input_module.h"
 
 MODULE_NOT_SUPPORTED(keyboard_input_rawinput, OSD_KEYBOARDINPUT_PROVIDER, "rawinput")
 MODULE_NOT_SUPPORTED(mouse_input_rawinput, OSD_MOUSEINPUT_PROVIDER, "rawinput")

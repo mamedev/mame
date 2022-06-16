@@ -20,9 +20,9 @@ class g64_format : public floppy_image_format_t
 public:
 	g64_format();
 
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -47,9 +47,9 @@ protected:
 
 	static const uint32_t c1541_cell_size[];
 
-	int generate_bitstream(int track, int head, int speed_zone, std::vector<bool> &trackbuf, floppy_image *image);
+	static int generate_bitstream(int track, int head, int speed_zone, std::vector<bool> &trackbuf, floppy_image *image);
 };
 
-extern const floppy_format_type FLOPPY_G64_FORMAT;
+extern const g64_format FLOPPY_G64_FORMAT;
 
 #endif // MAME_FORMATS_G64_DSK_H

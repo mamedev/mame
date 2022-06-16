@@ -210,22 +210,22 @@ private:
 
 	u16 m_disp_mask = 0U;
 	u16 m_bank_mask = 0U;
-	bool m_parity_poison = 0;
-	bool m_display_enable = 0;
+	bool m_parity_poison = false;
+	bool m_display_enable = false;
 	u8 m_framecnt = 0U;
-	bool m_nvram_protect = 0;
+	bool m_nvram_protect = false;
 
-	bool m_alarm_enable = 0;
-	bool m_alarm_toggle = 0;
+	bool m_alarm_enable = false;
+	bool m_alarm_toggle = false;
 
-	bool m_loopback_control = 0;
-	bool m_comm_rxd = 0;
-	bool m_sio_txda = 0;
-	bool m_aux_rxd = 0;
-	bool m_sio_txdb = 0;
-	bool m_sio_rtsb = 0;
-	bool m_aux_dsr = 0;
-	bool m_sio_wrdyb = 0;
+	bool m_loopback_control = false;
+	bool m_comm_rxd = false;
+	bool m_sio_txda = false;
+	bool m_aux_rxd = false;
+	bool m_sio_txdb = false;
+	bool m_sio_rtsb = false;
+	bool m_aux_dsr = false;
+	bool m_sio_wrdyb = false;
 };
 
 

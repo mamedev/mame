@@ -330,21 +330,21 @@ protected:
 
 private:
 	/* PSG */
-	int m_psg_b;
+	int m_psg_b = 0;
 	/* mouse */
-	uint16_t m_mouse[2];
-	int m_mouse_stat[2];
+	uint16_t m_mouse[2]{};
+	int m_mouse_stat[2]{};
 	/* kanji */
-	int m_kanji_latch;
+	int m_kanji_latch = 0;
 	/* memory */
 	msx_internal_slot_interface m_empty_slot;
-	msx_internal_slot_interface *m_all_slots[4][4][4];
-	msx_internal_slot_interface *m_current_page[4];
-	bool m_slot_expanded[4];
-	uint8_t m_primary_slot;
-	uint8_t m_secondary_slot[4];
-	int m_port_c_old;
-	int m_keylatch;
+	msx_internal_slot_interface *m_all_slots[4][4][4]{};
+	msx_internal_slot_interface *m_current_page[4]{};
+	bool m_slot_expanded[4]{};
+	uint8_t m_primary_slot = 0;
+	uint8_t m_secondary_slot[4]{};
+	int m_port_c_old = 0;
+	int m_keylatch = 0;
 };
 
 
@@ -509,7 +509,7 @@ private:
 	required_device<rp5c01_device> m_rtc;
 
 	/* rtc */
-	int m_rtc_latch;
+	int m_rtc_latch = 0;
 };
 
 

@@ -503,8 +503,8 @@ void a2600_pop_state::machine_start()
 	a2600_base_state::machine_start();
 	m_bank->configure_entries(0, 48, memregion("maincpu")->base(), 0x1000);
 	m_bank->set_entry(0);
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_pop_state::reset_timer_callback),this));
-	m_game_select_button_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_pop_state::game_select_button_timer_callback),this));
+	m_reset_timer = timer_alloc(FUNC(a2600_pop_state::reset_timer_callback), this);
+	m_game_select_button_timer = timer_alloc(FUNC(a2600_pop_state::game_select_button_timer_callback), this);
 }
 
 

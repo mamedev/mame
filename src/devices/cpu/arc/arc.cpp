@@ -10,7 +10,6 @@
 \*********************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "arc.h"
 #include "arcdasm.h"
 

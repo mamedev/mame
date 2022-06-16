@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "mips1.h"
 #include "mips1dsm.h"
-#include "debugger.h"
 #include "softfloat3/source/include/softfloat.h"
 
 #define LOG_GENERAL (1U << 0)

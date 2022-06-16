@@ -188,7 +188,7 @@ void k051960_device::device_start()
 	m_k051960_cb.resolve();
 
 	// allocate scanline timer and start at first scanline
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k051960_device::scanline_callback), this));
+	m_scanline_timer = timer_alloc(FUNC(k051960_device::scanline_callback), this);
 	m_scanline_timer->adjust(screen().time_until_pos(0));
 
 	decode_gfx();

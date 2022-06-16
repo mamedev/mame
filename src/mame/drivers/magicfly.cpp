@@ -441,15 +441,19 @@
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
 
 #define MASTER_CLOCK    XTAL(10'000'000)
 
@@ -476,8 +480,8 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t *m_bg_tilemap;
-	int m_input_selector;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_input_selector = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -1056,6 +1060,8 @@ ROM_START( bchance )
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8-bchance.bin",    0x0000, 0x0104, NO_DUMP )   /* protected */
 ROM_END
+
+} // anonymous namespace
 
 
 /*********************************************

@@ -59,14 +59,9 @@ public:
 	INPUT_CHANGED_MEMBER(set_coin_flag);
 
 protected:
-	enum
-	{
-		TIMER_REFRESH_END
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 	virtual void machine_start() override;
+
+	TIMER_CALLBACK_MEMBER(refresh_end);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -319,16 +314,9 @@ WRITE_LINE_MEMBER(cchasm_state::ctc_timer_2_w)
 }
 
 
-void cchasm_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cchasm_state::refresh_end)
 {
-	switch (id)
-	{
-	case TIMER_REFRESH_END:
-		m_maincpu->set_input_line(2, ASSERT_LINE);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in cchasm_state::device_timer");
-	}
+	m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 
@@ -437,7 +425,7 @@ void cchasm_state::machine_start()
 	m_xcenter = visarea.xcenter() << 16;
 	m_ycenter = visarea.ycenter() << 16;
 
-	m_refresh_end_timer = timer_alloc(TIMER_REFRESH_END);
+	m_refresh_end_timer = timer_alloc(FUNC(cchasm_state::refresh_end), this);
 
 	m_coin_flag = 0;
 	m_sound_flags = 0;

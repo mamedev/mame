@@ -23,12 +23,12 @@ protected:
 	virtual void device_reset() override;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	sound_stream *m_channel;
-	uint8_t m_reg[3];
-	int m_size, m_pos,m_tval,m_nval;
-	unsigned m_mode, m_omode;
-	unsigned m_volume;
-	unsigned m_lfsr;
+	sound_stream *m_channel = nullptr;
+	uint8_t m_reg[3]{};
+	int m_size = 0, m_pos = 0, m_tval = 0, m_nval = 0;
+	unsigned m_mode = 0, m_omode = 0;
+	unsigned m_volume = 0;
+	unsigned m_lfsr = 0;
 };
 
 // device type definition

@@ -67,7 +67,7 @@ class menu_select_format : public menu
 {
 public:
 	menu_select_format(mame_ui_manager &mui, render_container &container,
-					   const std::vector<floppy_image_format_t *> &formats, int ext_match, floppy_image_format_t **result);
+					   const std::vector<const floppy_image_format_t *> &formats, int ext_match, const floppy_image_format_t **result);
 	virtual ~menu_select_format() override;
 
 private:
@@ -75,9 +75,9 @@ private:
 	virtual void handle(event const *ev) override;
 
 	// internal state
-	std::vector<floppy_image_format_t *> m_formats;
-	int                                  m_ext_match;
-	floppy_image_format_t *             *m_result;
+	std::vector<const floppy_image_format_t *> m_formats;
+	int                                        m_ext_match;
+	const floppy_image_format_t *             *m_result;
 };
 
 // ======================> menu_select_floppy_init
@@ -86,7 +86,7 @@ class menu_select_floppy_init : public menu
 {
 public:
 	menu_select_floppy_init(mame_ui_manager &mui, render_container &container,
-		const std::vector<floppy_image_device::fs_info> &fs, int *result);
+		std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> &&fs, int *result);
 	virtual ~menu_select_floppy_init() override;
 
 private:
@@ -94,8 +94,8 @@ private:
 	virtual void handle(event const *ev) override;
 
 	// internal state
-	const std::vector<floppy_image_device::fs_info> &m_fs;
-	int *                                            m_result;
+	std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> m_fs;
+	int *                                                                   m_result;
 };
 
 

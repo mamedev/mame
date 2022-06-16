@@ -102,13 +102,13 @@ WRITE_LINE_MEMBER(thoop2_state::coin2_counter_w)
 void thoop2_state::shareram_w(offs_t offset, uint8_t data)
 {
 	// why isn't there address map functionality for this?
-	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+	util::big_endian_cast<u8>(m_shareram.target())[offset] = data;
 }
 
 uint8_t thoop2_state::shareram_r(offs_t offset)
 {
 	// why isn't there address map functionality for this?
-	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+	return util::big_endian_cast<u8 const>(m_shareram.target())[offset];
 }
 
 

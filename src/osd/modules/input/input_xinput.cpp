@@ -6,29 +6,17 @@
 //
 //============================================================
 
-#include "input_module.h"
 #include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
 
+#include "emu.h"
+
+#include "input_xinput.h"
+
 // standard windows headers
 #include <windows.h>
 
-// XInput header
-#include <xinput.h>
-
-#undef interface
-
-// MAME headers
-#include "emu.h"
-
-// MAMEOS headers
-#include "winutil.h"
-#include "winmain.h"
-
-#include "input_common.h"
-#include "input_windows.h"
-#include "input_xinput.h"
 
 #define XINPUT_LIBRARIES { "xinput1_4.dll", "xinput9_1_0.dll" }
 
@@ -186,7 +174,7 @@ xinput_joystick_device * xinput_api_helper::create_xinput_device(running_machine
 	snprintf(device_name, sizeof(device_name), "XInput Player %u", index + 1);
 
 	// allocate the device object
-	auto &devinfo = module.devicelist()->create_device<xinput_joystick_device>(machine, device_name, device_name, module, shared_from_this());
+	auto &devinfo = module.devicelist().create_device<xinput_joystick_device>(machine, device_name, device_name, module, shared_from_this());
 
 	// Set the player ID
 	devinfo.xinput_state.player_index = index;
@@ -309,6 +297,8 @@ void xinput_joystick_device::configure()
 }
 
 #else // defined(OSD_WINDOWS)
+
+#include "input_module.h"
 
 MODULE_NOT_SUPPORTED(xinput_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "xinput")
 

@@ -51,27 +51,27 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	uint8_t m_shared[0x4000]; // 16k shared memory
-	uint8_t m_zfg;            // z80 flip gate - bit 0 switches memory banks, bit7 is connected to FG bit 0
-	uint8_t m_cn;             // bit0 is used to enable/disable the comm board
-	uint8_t m_fg;             // i960 flip gate - bit0 is stored, bit7 is connected to ZFG bit 0
+	uint8_t m_shared[0x4000]{}; // 16k shared memory
+	uint8_t m_zfg = 0;            // z80 flip gate - bit 0 switches memory banks, bit7 is connected to FG bit 0
+	uint8_t m_cn = 0;             // bit0 is used to enable/disable the comm board
+	uint8_t m_fg = 0;             // i960 flip gate - bit0 is stored, bit7 is connected to ZFG bit 0
 
 	osd_file::ptr m_line_rx;  // rx line - can be either differential, simple serial or toslink
 	osd_file::ptr m_line_tx;  // tx line - is differential, simple serial and toslink
-	char m_localhost[256];
-	char m_remotehost[256];
-	uint8_t m_buffer0[0x1000];
-	uint8_t m_buffer1[0x1000];
+	char m_localhost[256]{};
+	char m_remotehost[256]{};
+	uint8_t m_buffer0[0x1000]{};
+	uint8_t m_buffer1[0x1000]{};
 	uint8_t m_framesync;
 	uint16_t m_frameoffset;
 
 #ifdef M2COMM_SIMULATION
-	uint8_t m_linkenable;
-	uint16_t m_linktimer;
-	uint8_t m_linkalive;
-	uint8_t m_linkid;
-	uint8_t m_linkcount;
-	uint8_t m_zfg_delay;
+	uint8_t m_linkenable = 0;
+	uint16_t m_linktimer = 0;
+	uint8_t m_linkalive = 0;
+	uint8_t m_linkid = 0;
+	uint8_t m_linkcount = 0;
+	uint8_t m_zfg_delay = 0;
 
 	void comm_tick();
 	void read_fg();

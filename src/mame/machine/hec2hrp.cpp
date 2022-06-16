@@ -812,7 +812,7 @@ void hec2hrp_state::hector_init()
 	m_pot0 = m_pot1 = 0x40;
 
 	/* for cassette sync */
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hec2hrp_state::cassette_clock),this));
+	m_cassette_timer = timer_alloc(FUNC(hec2hrp_state::cassette_clock), this);
 	m_cassette_timer->adjust(attotime::from_msec(100), 0, attotime::from_usec(64));/* => real sync scan speed for 15,624Khz*/
 
 	init_sn76477();  /* init R/C values */

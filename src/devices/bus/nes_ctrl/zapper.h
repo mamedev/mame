@@ -29,7 +29,8 @@ public:
 	// construction/destruction
 	nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual u8 read_bit34() override;
+	virtual u8 read_exp(offs_t offset) override;
 
 protected:
 	// construction/destruction
@@ -38,9 +39,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-
-	virtual u8 read_bit34() override;
-	virtual u8 read_exp(offs_t offset) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_device<nes_zapper_sensor_device> m_sensor;
@@ -58,14 +57,13 @@ public:
 	// construction/destruction
 	nes_bandaihs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual u8 read_exp(offs_t offset) override;
+	virtual void write(u8 data) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-
-	virtual u8 read_exp(offs_t offset) override;
-	virtual void write(u8 data) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_ioport m_joypad;

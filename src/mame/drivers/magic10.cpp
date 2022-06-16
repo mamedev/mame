@@ -162,9 +162,9 @@ protected:
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	tilemap_t *m_tilemap[3];
+	tilemap_t *m_tilemap[3]{};
 	required_shared_ptr_array<uint16_t, 3> m_videoram;
-	int8_t m_layer2_offset[2];
+	int8_t m_layer2_offset[2]{};
 
 	required_shared_ptr<uint16_t> m_vregs;
 	required_device<cpu_device> m_maincpu;
@@ -222,7 +222,7 @@ protected:
 
 private:
 	uint16_t r();
-	uint16_t m_ret;
+	uint16_t m_ret = 0;
 
 	void map(address_map &map);
 };

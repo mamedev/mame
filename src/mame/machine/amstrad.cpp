@@ -221,25 +221,6 @@ TIMER_CALLBACK_MEMBER(amstrad_state::amstrad_pc2_low)
 }
 
 
-void amstrad_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_PC2_LOW:
-		amstrad_pc2_low(param);
-		break;
-	case TIMER_VIDEO_UPDATE:
-		amstrad_video_update_timer(param);
-		break;
-	case TIMER_SET_RESOLUTION:
-		cb_set_resolution(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in amstrad_state::device_timer");
-	}
-}
-
-
 /*************************************************************************/
 /* KC Compact
 
@@ -589,7 +570,7 @@ void amstrad_state::amstrad_vh_update_colour(int PenIndex, uint16_t hw_colour_in
 	{
 		int val;
 
-		timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 1);
+		m_video_update_timer->adjust(attotime::from_usec(0), 1);
 
 		/* CPC+/GX4000 - normal palette changes through the Gate Array also makes the corresponding change in the ASIC palette */
 		val = (amstrad_palette[hw_colour_index] & 0xf00000) >> 16; /* red */
@@ -600,7 +581,7 @@ void amstrad_state::amstrad_vh_update_colour(int PenIndex, uint16_t hw_colour_in
 	}
 	else
 	{
-		timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 0);
+		m_video_update_timer->adjust(attotime::from_usec(0), 0);
 	}
 	m_GateArray_render_colours[PenIndex] = hw_colour_index;
 }
@@ -608,7 +589,7 @@ void amstrad_state::amstrad_vh_update_colour(int PenIndex, uint16_t hw_colour_in
 
 void amstrad_state::aleste_vh_update_colour(int PenIndex, uint16_t hw_colour_index)
 {
-	timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 0);
+	m_video_update_timer->adjust(attotime::from_usec(0), 0);
 	m_GateArray_render_colours[PenIndex] = hw_colour_index+32;
 }
 
@@ -975,7 +956,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_vsync_changed)
 	m_gate_array.vsync = state ? 1 : 0;
 
 	/* Schedule a write to PC2 */
-	timer_set(attotime::zero, TIMER_PC2_LOW);
+	m_pc2_low_timer->adjust(attotime::zero);
 }
 
 
@@ -996,7 +977,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_vsync_changed)
 	m_gate_array.vsync = state ? 1 : 0;
 
 	/* Schedule a write to PC2 */
-	timer_set(attotime::zero, TIMER_PC2_LOW);
+	m_pc2_low_timer->adjust(attotime::zero);
 }
 
 
@@ -1075,6 +1056,8 @@ void amstrad_state::video_start()
 	m_gate_array.bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height() );
 	m_gate_array.hsync_after_vsync_counter = 3;
 	std::fill(std::begin(m_GateArray_render_colours), std::end(m_GateArray_render_colours), 0);
+
+	m_video_update_timer = timer_alloc(FUNC(amstrad_state::amstrad_video_update_timer), this);
 }
 
 
@@ -1086,11 +1069,9 @@ uint32_t amstrad_state::screen_update_amstrad(screen_device &screen, bitmap_ind1
 
 
 /* traverses the daisy-chain of expansion devices, looking for the specified device */
-static device_t* get_expansion_device(running_machine &machine, const char* tag)
+device_t* amstrad_state::get_expansion_device(const char* tag)
 {
-	amstrad_state *state = machine.driver_data<amstrad_state>();
-	cpc_expansion_slot_device* exp_port = state->m_exp;
-
+	cpc_expansion_slot_device* exp_port = m_exp;
 	while (exp_port != nullptr)
 	{
 		device_t* temp;
@@ -2056,9 +2037,9 @@ void amstrad_state::amstrad_cpc_io_w(offs_t offset, uint8_t data)
 			break;
 		case 0x01:      /* Write to selected internal 6845 register Write Only */
 			if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )
-				timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 1);
+				m_video_update_timer->adjust(attotime::from_usec(0), 1);
 			else
-				timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 0);
+				m_video_update_timer->adjust(attotime::from_usec(0), 0);
 			m_crtc->register_w(data);
 
 			/* printer port bit 8 */
@@ -2183,7 +2164,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 		m_crtc->set_unscaled_clock( ( m_aleste_mode & 0x02 ) ? ( XTAL(16'000'000) / 8 ) : ( XTAL(16'000'000) / 16 ) );
 	}
 
-	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
+	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device("multiface2"));
 	if(mface2 != nullptr)
 	{
 		if(mface2->multiface_io_write(offset, data) != 0)
@@ -2416,7 +2397,7 @@ void amstrad_state::amstrad_rethinkMemory()
 	}
 
 	/* multiface hardware enabled? */
-	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
+	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device("multiface2"));
 	if(mface2 != nullptr)
 	{
 		if (mface2->multiface_hardware_enabled())
@@ -2449,7 +2430,7 @@ WRITE_LINE_MEMBER(amstrad_state::screen_vblank_amstrad)
 	// rising edge
 	if (state)
 	{
-		cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
+		cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device("multiface2"));
 
 		if(mface2 != nullptr)
 		{
@@ -2609,7 +2590,7 @@ uint8_t amstrad_state::amstrad_ppi_portb_r()
 
 //logerror("amstrad_ppi_portb_r\n");
 	/* Schedule a write to PC2 */
-	timer_set(attotime::zero, TIMER_PC2_LOW);
+	m_pc2_low_timer->adjust(attotime::zero);
 
 	return data;
 }
@@ -2787,122 +2768,121 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 
 /* the following timings have been measured! */
 static const uint8_t amstrad_cycle_table_op[256] = {
-		4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
+	 4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
 	12, 12,  8,  8,  4,  4,  8,  4, 12, 12,  8,  8,  4,  4,  8,  4,
-		8, 12, 20,  8,  4,  4,  8,  4,  8, 12, 20,  8,  4,  4,  8,  4,
-		8, 12, 16,  8, 12, 12, 12,  4,  8, 12, 16,  8,  4,  4,  8,  4,
-		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-		8,  8,  8,  8,  8,  8,  4,  8,  4,  4,  4,  4,  4,  4,  8,  4,
-		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-		8, 12, 12, 12, 12, 16,  8, 16,  8, 12, 12,  4, 12, 20,  8, 16,
-		8, 12, 12, 12, 12, 16,  8, 16,  8,  4, 12, 12, 12,  4,  8, 16,
-		8, 12, 12, 24, 12, 16,  8, 16,  8,  4, 12,  4, 12,  4,  8, 16,
-		8, 12, 12,  4, 12, 16,  8, 16,  8,  8, 12,  4, 12,  4,  8, 16
+	 8, 12, 20,  8,  4,  4,  8,  4,  8, 12, 20,  8,  4,  4,  8,  4,
+	 8, 12, 16,  8, 12, 12, 12,  4,  8, 12, 16,  8,  4,  4,  8,  4,
+	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+	 8,  8,  8,  8,  8,  8,  4,  8,  4,  4,  4,  4,  4,  4,  8,  4,
+	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+	 4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+	 8, 12, 12, 12, 12, 16,  8, 16,  8, 12, 12,  4, 12, 20,  8, 16,
+	 8, 12, 12, 12, 12, 16,  8, 16,  8,  4, 12, 12, 12,  4,  8, 16,
+	 8, 12, 12, 24, 12, 16,  8, 16,  8,  4, 12,  4, 12,  4,  8, 16,
+	 8, 12, 12,  4, 12, 16,  8, 16,  8,  8, 12,  4, 12,  4,  8, 16
 };
 
 static const uint8_t amstrad_cycle_table_cb[256]=
 {
-		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-		4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
-		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
-		4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4
+	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+	4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+	4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+	4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+	4,  4,  4,  4,  4,  4,  8,  4,  4,  4,  4,  4,  4,  4,  8,  4,
+	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4,
+	4,  4,  4,  4,  4,  4, 12,  4,  4,  4,  4,  4,  4,  4, 12,  4
 };
 
 static const uint8_t amstrad_cycle_table_ed[256]=
 {
-		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
 	12, 12, 12, 20,  4, 12,  4,  8, 12, 12, 12, 20,  4, 12,  4,  8,
 	12, 12, 12, 20,  4, 12,  4,  8, 12, 12, 12, 20,  4, 12,  4,  8,
 	12, 12, 12, 20,  4, 12,  4, 16, 12, 12, 12, 20,  4, 12,  4, 16,
 	12, 12, 12, 20,  4, 12,  4,  4, 12, 12, 12, 20,  4, 12,  4,  4,
-		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
 	16, 12, 16, 16,  4,  4,  4,  4, 16, 12, 16, 16,  4,  4,  4,  4,
 	16, 12, 16, 16,  4,  4,  4,  4, 16, 12, 16, 16,  4,  4,  4,  4,
-		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
-		4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4
+	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+	 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4
 };
 
 static const uint8_t amstrad_cycle_table_xy[256]=
 {
-		4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
+	 4, 12,  8,  8,  4,  4,  8,  4,  4, 12,  8,  8,  4,  4,  8,  4,
 	12, 12,  8,  8,  4,  4,  8,  4, 12, 12,  8,  8,  4,  4,  8,  4,
-		8, 12, 20,  8,  4,  4,  8,  4,  8, 12, 20,  8,  4,  4,  8,  4,
-		8, 12, 16,  8, 20, 20, 20,  4,  8, 12, 16,  8,  4,  4,  8,  4,
-		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+	 8, 12, 20,  8,  4,  4,  8,  4,  8, 12, 20,  8,  4,  4,  8,  4,
+	 8, 12, 16,  8, 20, 20, 20,  4,  8, 12, 16,  8,  4,  4,  8,  4,
+	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
 	16, 16, 16, 16, 16, 16,  4, 16,  4,  4,  4,  4,  4,  4, 16,  4,
-		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-		4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
-		8, 12, 12, 12, 12, 16,  8, 16,  8, 12, 12,  4, 12, 20,  8, 16,
-		8, 12, 12, 12, 12, 16,  8, 16,  8,  4, 12, 12, 12,  4,  8, 16,
-		8, 12, 12, 24, 12, 16,  8, 16,  8,  4, 12,  4, 12,  4,  8, 16,
-		8, 12, 12,  4, 12, 16,  8, 16,  8,  8, 12,  4, 12,  4,  8, 16
+	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+	 4,  4,  4,  4,  4,  4, 16,  4,  4,  4,  4,  4,  4,  4, 16,  4,
+	 8, 12, 12, 12, 12, 16,  8, 16,  8, 12, 12,  8, 12, 20,  8, 16,
+	 8, 12, 12, 12, 12, 16,  8, 16,  8,  4, 12, 12, 12,  4,  8, 16,
+	 8, 12, 12, 24, 12, 16,  8, 16,  8,  4, 12,  4, 12,  4,  8, 16,
+	 8, 12, 12,  4, 12, 16,  8, 16,  8,  8, 12,  4, 12,  4,  8, 16
 };
 
-static const uint8_t amstrad_cycle_table_xycb[256]=
-{
-	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-	20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20
+static const uint8_t amstrad_cycle_table_xycb[0x100] = {
+	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,
+	16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16
 };
 
 static const uint8_t amstrad_cycle_table_ex[256]=
 {
-		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		4,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		4,  0,  0,  0,  0,  0,  0,  0,  4,  0,  0,  0,  0,  0,  0,  0,
-		4,  0,  0,  0,  0,  0,  0,  0,  4,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		4,  8,  4,  4,  0,  0,  0,  0,  4,  8,  4,  4,  0,  0,  0,  0,
-		8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
-		8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
-		8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
-		8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	4,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	4,  0,  0,  0,  0,  0,  0,  0,  4,  0,  0,  0,  0,  0,  0,  0,
+	4,  0,  0,  0,  0,  0,  0,  0,  4,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	4,  8,  4,  4,  0,  0,  0,  0,  4,  8,  4,  4,  0,  0,  0,  0,
+	8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
+	8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
+	8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,
+	8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0
 };
 
 #define NEXT_ROM_SLOT   m_rom_count++; \
@@ -2993,7 +2973,7 @@ void amstrad_state::enumerate_roms()
 
 
 	/* add ROMs from ROMbox expansion */
-	device_t* romexp = get_expansion_device(machine(),"rom");
+	device_t* romexp = get_expansion_device("rom");
 	if(romexp)
 	{
 		for(int i = 0; i < 8; i++)
@@ -3100,9 +3080,15 @@ TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
 	m_screen->configure( 1024, height, visarea, refresh );
 }
 
+void amstrad_state::alloc_timers()
+{
+	m_pc2_low_timer = timer_alloc(FUNC(amstrad_state::amstrad_pc2_low), this);
+	m_set_resolution_timer = timer_alloc(FUNC(amstrad_state::cb_set_resolution), this);
+}
 
 MACHINE_START_MEMBER(amstrad_state,amstrad)
 {
+	alloc_timers();
 	m_system_type = SYSTEM_CPC;
 	m_centronics->write_data7(0);
 }
@@ -3119,12 +3105,13 @@ MACHINE_RESET_MEMBER(amstrad_state,amstrad)
 	m_gate_array.hsync = 0;
 	m_gate_array.vsync = 0;
 
-	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
+	m_set_resolution_timer->adjust(attotime::zero);
 }
 
 
 MACHINE_START_MEMBER(amstrad_state,plus)
 {
+	alloc_timers();
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_PLUS;
 	m_centronics->write_data7(0);
@@ -3167,11 +3154,12 @@ MACHINE_RESET_MEMBER(amstrad_state,plus)
 	space.install_write_handler(0x6000, 0x7fff, write8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
 
 	//  multiface_init();
-	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
+	m_set_resolution_timer->adjust(attotime::zero);
 }
 
 MACHINE_START_MEMBER(amstrad_state,gx4000)
 {
+	alloc_timers();
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_GX4000;
 
@@ -3209,11 +3197,12 @@ MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 	space.install_write_handler(0x4000, 0x5fff, write8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
 	space.install_write_handler(0x6000, 0x7fff, write8sm_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
 
-	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
+	m_set_resolution_timer->adjust(attotime::zero);
 }
 
 MACHINE_START_MEMBER(amstrad_state,kccomp)
 {
+	alloc_timers();
 	m_system_type = SYSTEM_CPC;
 	m_centronics->write_data7(0);
 
@@ -3222,7 +3211,7 @@ MACHINE_START_MEMBER(amstrad_state,kccomp)
 	m_gate_array.hsync = 0;
 	m_gate_array.vsync = 0;
 
-	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
+	m_set_resolution_timer->adjust(attotime::zero);
 }
 
 
@@ -3243,6 +3232,7 @@ MACHINE_RESET_MEMBER(amstrad_state,kccomp)
 
 MACHINE_START_MEMBER(amstrad_state,aleste)
 {
+	alloc_timers();
 	m_system_type = SYSTEM_ALESTE;
 	m_centronics->write_data7(0);
 }
@@ -3252,7 +3242,7 @@ MACHINE_RESET_MEMBER(amstrad_state,aleste)
 	amstrad_common_init();
 	amstrad_reset_machine();
 
-	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
+	m_set_resolution_timer->adjust(attotime::zero);
 }
 
 

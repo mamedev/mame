@@ -19,14 +19,14 @@ public:
 	virtual const char *name() const override;
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
-	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	void build_sector_description(const format &f, uint8_t *sectdata, desc_s *sectors, int track, int head) const override;
 
 private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_UNIFLEX_FORMAT;
+extern const uniflex_format FLOPPY_UNIFLEX_FORMAT;
 
 #endif // MAME_FORMATS_UNIFLEX_DSK_H

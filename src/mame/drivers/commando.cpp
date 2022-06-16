@@ -53,6 +53,114 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 // There is also a DMA circuit that copies object data from the CPU RAM to a buffer
 // this also slows down the CPU as it is halted during that time.
 
+/***************************************************************************
+
+Commando (Capcom, 1985)
+Hardware info by Guru
+
+PCB Layout
+----------
+
+Top board (parts face up)
+
+85605-C-1
+   |----------|           |----------|
+|--|----------|-----------|----------|--|
+|                                       |
+|                                       |
+|            MB8416                     |
+|                                       |
+| VT11.5A                               |
+|                                       |
+| VT12.6A                               |
+|                                       |
+| VT13.7A                               |
+|                                       |
+| VT14.8A                               |
+|                                       |
+| VT15.9A                               |
+|                                       |
+| VT16.10A                              |
+|---------------------------------------|
+Notes:
+      MB8416 - Fujitsu MB8416 2kBx8-bit SRAM (background tile RAM)
+         VT* - 27C128 EPROM (background tiles)
+
+
+Middle board (parts face up)
+
+85605-A-2           |----------|           |----------|
+|-------------------|----------|-----------|----------|--|
+|DIP-A  DIP-B  24S10.1D             24S10.1H        12MHz|
+|              24S10.2D                                  |
+|              24S10.3D                                  |
+|                                                        |
+|                                                        |
+|5             VT01.5D                                   |
+|6                                                       |
+|P                                                       |
+|I                                          24S10.6L     |
+|N                                                       |
+|                        MB8128(1)                  6264 |
+|      LM324  YM3014     MB8128(2)                CM03.8M|
+|               YM3014   CM02.9F                  CM04.9M|
+|               YM2203                            CUSTOM |
+|HA1368 VOL VOL YM2203   Z80A(2)                  Z80A(1)|
+|--------------------------------------------------------|
+Notes:
+        Z80A(1) - Z80A CPU. Clock 3.000MHz [12/4] (main CPU)
+        Z80A(2) - Z80A CPU. Clock 3.000MHz [12/4] (sound CPU)
+         YM2203 - Yamaha YM2203 FM Operator Type-N(OPN) sound chip. Clock 1.500MHz [12/8]
+         YM3014 - Yamaha YM3014 Serial Input Floating D/A Converter. Clock 1.000MHz [12/12]
+      MB8128(1) - Mitsubishi M58725 2kBx8-bit SRAM (character/text layer RAM)
+      MB8128(2) - Mitsubishi M58725 2kBx8-bit SRAM (sound program RAM)
+           6264 - Hitachi HM6264 8kBx8-bit SRAM (main program RAM)
+         CUSTOM - DIP48 custom chip. On bootlegs this is replaced by a PAL, 74LS245 and 74LS08 on a plug-in sub-board
+        CM02.9F - 27C128 EPROM (sound program)
+        CM03.8M - 27C128 EPROM (main program)
+        CM04.9M - 27C256 EPROM (main program)
+        VT01.5D - 27C128 EPROM (characters/text layer)
+           DIP* - 8-position DIP switch
+          LM324 - Texas Instruments LM324 Quad Operational Amplifier
+         HA1368 - Hitachi HA1368 5.3W Mono Audio Power Amplifier
+          56PIN - 56-pin edge connector (not JAMMA)
+       24S10.1D - Texas Instruments TBP24S10 bi-polar PROM (red color PROM)
+       24S10.2D - Texas Instruments TBP24S10 bi-polar PROM (green color PROM)
+       24S10.3D - Texas Instruments TBP24S10 bi-polar PROM (blue color PROM)
+       24S10.1H - Texas Instruments TBP24S10 bi-polar PROM (palette selector PROM)
+       24S10.6L - Texas Instruments TBP24S10 bi-polar PROM (interrupt timing PROM)
+          HSync - 15.6196kHz
+          VSync - 59.6170Hz
+
+
+Bottom board (parts face up)
+
+85605-B-1           |----------|           |----------|
+|-------------------|----------|-----------|----------|--|
+|2114                                                    |
+|2114                                                    |
+|                                                        |
+|                                                        |
+|                                2114 2114 2148          |
+|                                2114 2114 2148          |
+|                                                        |
+|                                                        |
+|                  24S10.6E                              |
+|                                                        |
+|                  VT05.7E  VT08.7H                      |
+|                                                        |
+|                  VT06.8E  VT09.8H                      |
+|                                              2148 2148 |
+|                  VT07.9E  VT10.9H                      |
+|--------------------------------------------------------|
+Notes:
+      24S10.6E - Texas Instruments TBP24S10 bi-polar PROM (video timing PROM)
+           VT* - 27C128 EPROM (sprites)
+          2114 - Mitsubishi M5L2114 1kBx4-bit SRAM (sprite RAM)
+          2148 - Intel P2148 1kBx4-bit SRAM (sprite RAM)
+
+***************************************************************************/
+
 
 #include "emu.h"
 #include "includes/commando.h"

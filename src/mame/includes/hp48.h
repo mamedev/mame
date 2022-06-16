@@ -76,7 +76,7 @@ public:
 		const char *read_name = nullptr;
 		write8sm_delegate write;
 		void* data = nullptr;            // non-NULL for banks
-		int isnop;
+		int isnop = 0;
 
 		/* configurable part */
 		uint8_t  state = 0U;             // one of HP48_MODULE_
@@ -142,7 +142,7 @@ private:
 
 	uint8_t *m_videoram = nullptr;
 	uint8_t m_io[64]{};
-	hp48_models m_model{};
+	hp48_models m_model;
 
 	/* OUT register from SATURN (actually 12-bit) */
 	uint16_t m_out = 0U;
@@ -174,6 +174,8 @@ private:
 	emu_timer *m_1st_timer = nullptr;
 	emu_timer *m_2nd_timer = nullptr;
 	emu_timer *m_kbd_timer = nullptr;
+	emu_timer *m_recv_done_timer = nullptr;
+	emu_timer *m_send_done_timer = nullptr;
 	std::unique_ptr<uint8_t[]> m_allocated_ram{};
 	std::unique_ptr<uint8_t[]> m_allocated_rom{};
 };

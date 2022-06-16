@@ -44,7 +44,7 @@ private:
 	required_device<pic8259_device> m_pic;
 	required_device<ram_device> m_ram;
 	bool m_8086_halt;
-	int m_nvi, m_vi;
+	int m_nvi = 0, m_vi = 0;
 
 	IRQ_CALLBACK_MEMBER(int_cb);
 };

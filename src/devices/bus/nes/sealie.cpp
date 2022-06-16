@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: kmg, Fabio Priuli
+// copyright-holders:kmg
 /***********************************************************************************************************
 
 
@@ -77,7 +77,6 @@ void nes_dpcmcart_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, CHRRAM);
 }
 
 void nes_unrom512_device::pcb_reset()

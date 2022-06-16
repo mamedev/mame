@@ -21,6 +21,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_ATOM_FORMAT;
+extern const atom_format FLOPPY_ATOM_FORMAT;
 
 #endif // MAME_FORMATS_ATOM_DSK_H

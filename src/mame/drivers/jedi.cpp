@@ -158,7 +158,7 @@ void jedi_state::main_irq_ack_w(u8 data)
 void jedi_state::machine_start()
 {
 	/* set a timer to run the interrupts */
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jedi_state::generate_interrupt),this));
+	m_interrupt_timer = timer_alloc(FUNC(jedi_state::generate_interrupt), this);
 	m_interrupt_timer->adjust(m_screen->time_until_pos(32), 32);
 
 	/* configure the banks */

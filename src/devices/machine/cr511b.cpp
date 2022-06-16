@@ -50,7 +50,6 @@ cr511b_device::cr511b_device(const machine_config &mconfig, const char *tag, dev
 	m_dten_handler(*this),
 	m_scor_handler(*this),
 	m_xaen_handler(*this),
-	m_frame_timer(nullptr),
 	//m_motor(false),
 	m_enabled(-1),
 	m_cmd(-1)
@@ -70,9 +69,6 @@ void cr511b_device::device_start()
 	m_dten_handler.resolve_safe();
 	m_scor_handler.resolve_safe();
 	m_xaen_handler.resolve_safe();
-
-	m_frame_timer = timer_alloc(0);
-	m_frame_timer->adjust(attotime::never);
 }
 
 //-------------------------------------------------
@@ -82,15 +78,6 @@ void cr511b_device::device_start()
 void cr511b_device::device_reset()
 {
 }
-
-//-------------------------------------------------
-//  device_timer - device-specific timer events
-//-------------------------------------------------
-
-void cr511b_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
-{
-}
-
 
 //**************************************************************************
 //  IMPLEMENTATION

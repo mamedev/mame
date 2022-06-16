@@ -44,7 +44,7 @@ private:
 	void port_40_w(uint8_t data);
 	void port_80_w(uint8_t data);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_int_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

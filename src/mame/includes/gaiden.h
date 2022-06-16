@@ -64,30 +64,30 @@ private:
 	optional_memory_bank m_adpcm_bank;
 
 	/* video-related */
-	tilemap_t   *m_text_layer;
-	tilemap_t   *m_foreground;
-	tilemap_t   *m_background;
+	tilemap_t   *m_text_layer = nullptr;
+	tilemap_t   *m_foreground = nullptr;
+	tilemap_t   *m_background = nullptr;
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_tile_bitmap_bg;
 	bitmap_ind16 m_tile_bitmap_fg;
 	bitmap_ind16 m_tile_bitmap_tx;
-	uint16_t      m_tx_scroll_x;
-	uint16_t      m_tx_scroll_y;
-	uint16_t      m_bg_scroll_x;
-	uint16_t      m_bg_scroll_y;
-	uint16_t      m_fg_scroll_x;
-	uint16_t      m_fg_scroll_y;
-	int8_t        m_tx_offset_y;
-	int8_t        m_bg_offset_y;
-	int8_t        m_fg_offset_y;
-	int8_t        m_spr_offset_y;
+	uint16_t      m_tx_scroll_x = 0;
+	uint16_t      m_tx_scroll_y = 0;
+	uint16_t      m_bg_scroll_x = 0;
+	uint16_t      m_bg_scroll_y = 0;
+	uint16_t      m_fg_scroll_x = 0;
+	uint16_t      m_fg_scroll_y = 0;
+	int8_t        m_tx_offset_y = 0;
+	int8_t        m_bg_offset_y = 0;
+	int8_t        m_fg_offset_y = 0;
+	int8_t        m_spr_offset_y = 0;
 
 	/* misc */
-	int         m_sprite_sizey;
-	int         m_prot;
-	int         m_jumpcode;
-	const int   *m_jumppoints; // raiga, wildfang
-	bool        m_adpcm_toggle;
+	int         m_sprite_sizey = 0;
+	int         m_prot = 0;
+	int         m_jumpcode = 0;
+	const int   *m_jumppoints = nullptr; // raiga, wildfang
+	bool        m_adpcm_toggle = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

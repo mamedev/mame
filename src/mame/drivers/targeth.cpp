@@ -126,13 +126,13 @@ WRITE_LINE_MEMBER(targeth_state::coin2_counter_w)
 void targeth_state::shareram_w(offs_t offset, uint8_t data)
 {
 	// why isn't there address map functionality for this?
-	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+	util::big_endian_cast<u8>(m_shareram.target())[offset] = data;
 }
 
 uint8_t targeth_state::shareram_r(offs_t offset)
 {
 	// why isn't there address map functionality for this?
-	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+	return util::big_endian_cast<u8 const>(m_shareram.target())[offset];
 }
 
 
@@ -176,8 +176,8 @@ void targeth_state::machine_start()
 {
 	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 
-	m_gun_irq_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(targeth_state::gun1_irq), this));
-	m_gun_irq_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(targeth_state::gun2_irq), this));
+	m_gun_irq_timer[0] = timer_alloc(FUNC(targeth_state::gun1_irq), this);
+	m_gun_irq_timer[1] = timer_alloc(FUNC(targeth_state::gun2_irq), this);
 
 	m_gun_irq_timer[0]->adjust(m_screen->time_until_pos(128, 0));
 	m_gun_irq_timer[1]->adjust(m_screen->time_until_pos(160, 0));

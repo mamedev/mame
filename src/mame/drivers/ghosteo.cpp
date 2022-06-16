@@ -81,10 +81,10 @@ enum nand_mode_t
 
 struct nand_t
 {
-	nand_mode_t mode;
-	int page_addr;
-	int byte_addr;
-	int addr_load_ptr;
+	nand_mode_t mode{};
+	int page_addr = 0;
+	int byte_addr = 0;
+	int addr_load_ptr = 0;
 };
 
 
@@ -135,7 +135,7 @@ private:
 	void qs1000_p2_w(uint8_t data);
 	void qs1000_p3_w(uint8_t data);
 
-	int m_rom_pagesize;
+	int m_rom_pagesize = 0;
 	uint32_t s3c2410_gpio_port_r(offs_t offset);
 	void s3c2410_gpio_port_w(offs_t offset, uint32_t data);
 	uint32_t s3c2410_core_pin_r(offs_t offset);

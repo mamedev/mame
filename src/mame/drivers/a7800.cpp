@@ -157,6 +157,8 @@ protected:
 	int m_p2_one_button;
 	int m_bios_enabled;
 
+	emu_timer *m_dma_start_timer = nullptr;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<tia_device> m_tia;
 	required_device<atari_maria_device> m_maria;
@@ -276,7 +278,7 @@ void a7800_state::tia_w(offs_t offset, uint8_t data)
 TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::interrupt)
 {
 	// DMA Begins 7 cycles after hblank
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(7), timer_expired_delegate(FUNC(a7800_state::maria_startdma), this));
+	m_dma_start_timer->adjust(m_maincpu->cycles_to_attotime(7));
 	m_maria->interrupt(m_lines);
 }
 
@@ -1364,6 +1366,8 @@ void a7800_state::machine_start()
 			break;
 		}
 	}
+
+	m_dma_start_timer = timer_alloc(FUNC(a7800_state::maria_startdma), this);
 }
 
 void a7800_state::machine_reset()

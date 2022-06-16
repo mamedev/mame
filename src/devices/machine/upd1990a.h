@@ -55,10 +55,14 @@ protected:
 	upd1990a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+
+	TIMER_CALLBACK_MEMBER(clock_tick);
+	TIMER_CALLBACK_MEMBER(tp_tick);
+	TIMER_CALLBACK_MEMBER(data_out_tick);
+	TIMER_CALLBACK_MEMBER(test_tick);
 
 	enum
 	{
@@ -67,14 +71,6 @@ protected:
 	};
 
 private:
-	enum
-	{
-		TIMER_CLOCK,
-		TIMER_TP,
-		TIMER_DATA_OUT,
-		TIMER_TEST_MODE
-	};
-
 	enum
 	{
 		MODE_REGISTER_HOLD = 0,

@@ -473,7 +473,7 @@ public:
 private:
 	virtual void machine_start() override;
 
-	uint32_t m_held_clock;
+	uint32_t m_held_clock = 0;
 	std::vector<uint8_t> m_file_data;
 	required_device<vgmplay_device> m_vgmplay;
 	required_device<vgmviz_device> m_mixer;
@@ -558,10 +558,10 @@ void vgmplay_device::device_start()
 	for (vgm_chip led = vgm_chip(0); led != CT_COUNT; led = vgm_chip(led + 1))
 		m_act_led_index[led] = m_act_led_expiries.emplace(m_act_led_expiries.end(), led, attotime::never);
 	m_act_led_off = m_act_led_expiries.begin();
-	m_act_led_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vgmplay_device::act_led_expired), this));
+	m_act_led_timer = timer_alloc(FUNC(vgmplay_device::act_led_expired), this);
 
 	for (int i = 0; i < 0xff; i++)
-		m_streams[i].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vgmplay_device::stream_timer_expired), this));
+		m_streams[i].timer = timer_alloc(FUNC(vgmplay_device::stream_timer_expired), this);
 
 	save_item(NAME(m_pc));
 	//save_item(NAME(m_streams));

@@ -72,7 +72,7 @@ void mm74c922_device::device_start()
 	change_output_lines();
 
 	// allocate timers
-	m_scan_timer = timer_alloc();
+	m_scan_timer = timer_alloc(FUNC(mm74c922_device::perform_scan), this);
 	m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(500)); // approximate rate from a 100n capacitor
 
 	// register for state saving
@@ -87,10 +87,10 @@ void mm74c922_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  perform_scan - scan the keyboard matrix
 //-------------------------------------------------
 
-void mm74c922_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mm74c922_device::perform_scan)
 {
 	change_output_lines();
 	clock_scan_counters();

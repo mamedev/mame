@@ -80,7 +80,7 @@ private:
 	u8 m_portc = 0U;
 	u8 m_motor = 0U;
 	u8 m_last_solenoid = 0U;
-	bool m_type = 0;
+	bool m_type = false;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -394,6 +394,6 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1978, rotation, 0,        g627, g627, g627_state, init_v117,  ROT0, "Midway", "Rotation VIII (v. 1.17)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978, rota_115, rotation, g627, g627, g627_state, empty_init, ROT0, "Midway", "Rotation VIII (v. 1.15)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978, rota_101, rotation, g627, g627, g627_state, empty_init, ROT0, "Midway", "Rotation VIII (v. 1.01)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, rotation, 0,        g627, g627, g627_state, init_v117,  ROT0, "Midway", "Rotation VIII (v. 1.17)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, rota_115, rotation, g627, g627, g627_state, empty_init, ROT0, "Midway", "Rotation VIII (v. 1.15)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, rota_101, rotation, g627, g627, g627_state, empty_init, ROT0, "Midway", "Rotation VIII (v. 1.01)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

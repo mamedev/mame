@@ -706,7 +706,7 @@ void ngp_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).unmap_read(0x800000, 0x9fffff);
 	}
 
-	m_seconds_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ngp_state::ngp_seconds_callback),this));
+	m_seconds_timer = timer_alloc(FUNC(ngp_state::ngp_seconds_callback), this);
 	m_seconds_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
 	save_item(NAME(m_io_reg));

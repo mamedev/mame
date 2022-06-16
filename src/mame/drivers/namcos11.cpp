@@ -11,8 +11,14 @@
 
   Issues:
    - Random draw list corruption in soul edge v2 & dunkmania.
-   - soul edge, dunk mania & prime goal ex try to access joypads/memory cards. It is unknown what they would do if they found one.
-   - pocketrc locks up if you try to exit testmode (note: it is not related to unimplemented C76 internal watchdog timer or software reset)
+   - soul edge, dunk mania & prime goal ex try to access joypads/memory cards.
+     It is unknown what they would do if they found one.
+   - pocketrc locks up if you try to exit testmode (note: it is not related to
+     unimplemented C76 internal watchdog timer or software reset)
+     Update: now it always locks up in test mode, regression?
+   - pocketrc long samples and drum loops go out of sync, it sounds better when
+     the C352 is underclocked to match the one in namcos22. It's possibly a BTANB,
+     since current C352 frequency is the same as Tekken/Tekken 2 real PCB.
 
 Known Dumps
 -----------
@@ -1033,10 +1039,10 @@ static INPUT_PORTS_START( pocketrc )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY( "ADC0" )
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX( 0x00, 0xff ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 10 ) PORT_CENTERDELTA( 15 ) PORT_REVERSE
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX( 0x38, 0xc8 ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 10 ) PORT_CENTERDELTA( 10 ) PORT_REVERSE
 
 	PORT_MODIFY( "ADC1" )
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX( 0x00, 0xff ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 15 ) PORT_REVERSE
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX( 0x00, 0x7f ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 10 ) PORT_REVERSE
 
 	PORT_MODIFY( "ADC2" )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )

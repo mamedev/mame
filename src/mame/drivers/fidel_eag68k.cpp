@@ -198,8 +198,7 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_inputs(*this, "IN.%u", 0),
-		m_rotate(true)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine configs
@@ -238,7 +237,7 @@ protected:
 	void leds_w(offs_t offset, u8 data);
 	void digit_w(offs_t offset, u8 data);
 
-	bool m_rotate;
+	bool m_rotate = true;
 	u8 m_select = 0;
 	u8 m_7seg_data = 0;
 	u8 m_led_data = 0;
@@ -561,7 +560,7 @@ void excel68k_state::fex68k(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
-	m_board->set_delay(attotime::from_msec(150));
+	m_board->set_delay(attotime::from_msec(200));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 16);

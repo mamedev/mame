@@ -174,22 +174,19 @@ static INPUT_PORTS_START( wpc_dot )
 	PORT_DIPSETTING(0xf0,"USA 2")
 INPUT_PORTS_END
 
-void wpc_dot_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(wpc_dot_state::vblank_tick)
 {
-	switch(id)
+	if((m_vblank_count % 4) == (m_wpc->get_dmd_firq_line() * 4 / 32))
 	{
-	case TIMER_VBLANK:
-		if((m_vblank_count % 4) == (m_wpc->get_dmd_firq_line()*4/32))
-		{
-			m_maincpu->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
-			m_wpc->set_dmd_firq();
-		}
-		m_vblank_count++;
-		break;
-	case TIMER_IRQ:
-		m_maincpu->set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
-		break;
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+		m_wpc->set_dmd_firq();
 	}
+	m_vblank_count++;
+}
+
+TIMER_CALLBACK_MEMBER(wpc_dot_state::trigger_irq)
+{
+	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 void wpc_dot_state::machine_start()
@@ -228,9 +225,9 @@ void wpc_dot_state::init_wpc_dot()
 	m_dmdbanks[4]->set_entry(4);
 	m_dmdbanks[5]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
 	m_dmdbanks[5]->set_entry(5);
-	m_vblank_timer = timer_alloc(TIMER_VBLANK);
+	m_vblank_timer = timer_alloc(FUNC(wpc_dot_state::vblank_tick), this);
 	m_vblank_timer->adjust(attotime::from_hz(60),0,attotime::from_hz(60*4));
-	m_irq_timer = timer_alloc(TIMER_IRQ);
+	m_irq_timer = timer_alloc(FUNC(wpc_dot_state::trigger_irq), this);
 	m_irq_timer->adjust(attotime::from_hz(976),0,attotime::from_hz(976));
 	m_bankmask = (memregion("code")->bytes() >> 14) - 1;
 	logerror("WPC: ROM bank mask = %02x\n",m_bankmask);
@@ -252,12 +249,12 @@ void wpc_dot_state::ram_w(offs_t offset, uint8_t data)
 		logerror("WPC: Memory protection violation at 0x%04x (mask=0x%04x)\n",offset,m_wpc->get_memprotect_mask());
 }
 
-void wpc_dot_state::wpc_rombank_w(uint8_t data)
+void wpc_dot_state::rombank_w(uint8_t data)
 {
 	m_cpubank->set_entry(data & m_bankmask);
 }
 
-void wpc_dot_state::wpc_dmdbank_w(offs_t offset, uint8_t data)
+void wpc_dot_state::dmdbank_w(offs_t offset, uint8_t data)
 {
 	uint8_t const bank(offset & 0x07);
 	uint8_t const page(offset >> 4);
@@ -274,7 +271,7 @@ void wpc_dot_state::wpc_dmdbank_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(wpc_dot_state::wpcsnd_reply_w)
+WRITE_LINE_MEMBER(wpc_dot_state::snd_reply_w)
 {
 	if(state)
 	{
@@ -283,12 +280,12 @@ WRITE_LINE_MEMBER(wpc_dot_state::wpcsnd_reply_w)
 	}
 }
 
-WRITE_LINE_MEMBER(wpc_dot_state::wpc_irq_w)
+WRITE_LINE_MEMBER(wpc_dot_state::irq_w)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_dot_state::wpc_firq_w)
+WRITE_LINE_MEMBER(wpc_dot_state::firq_w)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE,CLEAR_LINE);
 }
@@ -319,19 +316,19 @@ void wpc_dot_state::wpc_dot(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_dot_state::wpc_dot_map);
 
 	WPCASIC(config, m_wpc, 0);
-	m_wpc->irq_callback().set(FUNC(wpc_dot_state::wpc_irq_w));
-	m_wpc->firq_callback().set(FUNC(wpc_dot_state::wpc_firq_w));
-	m_wpc->bank_write().set(FUNC(wpc_dot_state::wpc_rombank_w));
+	m_wpc->irq_callback().set(FUNC(wpc_dot_state::irq_w));
+	m_wpc->firq_callback().set(FUNC(wpc_dot_state::firq_w));
+	m_wpc->bank_write().set(FUNC(wpc_dot_state::rombank_w));
 	m_wpc->sound_ctrl_read().set(m_wpcsnd, FUNC(wpcsnd_device::ctrl_r)); // ack FIRQ?
 	m_wpc->sound_ctrl_write().set(m_wpcsnd, FUNC(wpcsnd_device::ctrl_w));
 	m_wpc->sound_data_read().set(m_wpcsnd, FUNC(wpcsnd_device::data_r));
 	m_wpc->sound_data_write().set(m_wpcsnd, FUNC(wpcsnd_device::data_w));
-	m_wpc->dmdbank_write().set(FUNC(wpc_dot_state::wpc_dmdbank_w));
+	m_wpc->dmdbank_write().set(FUNC(wpc_dot_state::dmdbank_w));
 
 	SPEAKER(config, "speaker").front_center();
 	WPCSND(config, m_wpcsnd);
 	m_wpcsnd->set_romregion("sound1");
-	m_wpcsnd->reply_callback().set(FUNC(wpc_dot_state::wpcsnd_reply_w));
+	m_wpcsnd->reply_callback().set(FUNC(wpc_dot_state::snd_reply_w));
 	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -698,22 +695,22 @@ ROM_START(tfdmd_l3)
 ROM_END
 
 
-GAME(1991,  tfdmd_l3,   0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "WPC Test Fixture: DMD (L-3)",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  gi_l9,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-9)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  gi_l3,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  gi_l4,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-4)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  gi_l6,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-6)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  gi_l8,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-8)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  hshot_p8,   0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Midway",       "Hot Shot Basketball (P-8)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  hurr_l2,    0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Hurricane (L-2)",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  pz_f4,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (F-4)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  pz_l1,      pz_f4,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (L-1)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  pz_l2,      pz_f4,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (L-2)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  pz_l3,      pz_f4,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (L-3)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  sf_l1,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Slugfest (L-1)",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  t2_l8,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-8)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  t2_l6,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-6)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  t2_p2f,     t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (P-2F) Profanity",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  t2_l4,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-4)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  t2_l3,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-3)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  t2_l2,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-2)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  tfdmd_l3,   0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "WPC Test Fixture: DMD (L-3)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  gi_l9,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-9)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  gi_l3,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  gi_l4,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-4)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  gi_l6,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-6)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  gi_l8,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-8)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  hshot_p8,   0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Midway",       "Hot Shot Basketball (P-8)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  hurr_l2,    0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Hurricane (L-2)",                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  pz_f4,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (F-4)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  pz_l1,      pz_f4,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (L-1)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  pz_l2,      pz_f4,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (L-2)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  pz_l3,      pz_f4,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (L-3)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  sf_l1,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Slugfest (L-1)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  t2_l8,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-8)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  t2_l6,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-6)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  t2_p2f,     t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (P-2F) Profanity",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  t2_l4,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-4)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  t2_l3,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-3)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  t2_l2,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-2)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

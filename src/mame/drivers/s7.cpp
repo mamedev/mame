@@ -48,7 +48,7 @@ Thunderball                       508  1                         unknown
 HyperBall                         509  1                         unknown
 Barracora                         510  ASD hit 1                 ASD
 Varkon                            512  AX hit 1                  AX
-Spellbinder (unreleased)          513  (mnw)
+Spellbinder (unreleased)          513
 Reflex (unreleased)               514
 Time Fantasy                      515  1                         X
 Warlok                            516  1                         X
@@ -59,24 +59,19 @@ Firepower II                      521  AS hit 1                  AS
 Wild Texas                      *(521) AS hit 1                  AS
 Guardian (unreleased)             523
 Star Fighter (unreleased)         524
-Rat Race                          527 (10 produced, see s9.cpp)
 Light Speed (unreleased)          528
 Starlight                         530  AS hit 1                  AS
 
 *Wild Texas is a clone/bootleg of Firepower II, and shows the same game number.
 
 Status:
-- All machines are playable (except Spellbinder).
+- All machines are playable
 - Thunderball: turn Speech DIP off, or you get corrupt sound.
 
 ToDo:
 - Some games have an additional alphanumeric display, or different display arrangements
 - Mechanical sounds vary per machine
 - Hyperball, status display is different
-- Spellbinder, appears to be a non-working beta, runs into the weeds. If num-0 pressed it
-     fills everything with FF and freezes. Uses another PIA at 4000. Display is bad. If
-     game started it will soon end by itself. Makes random loud noises even in attract
-     mode. Doesn't display the game number on first boot, unlike every other game.
 
 *****************************************************************************************/
 
@@ -120,7 +115,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer);
 
 private:
 	void dig0_w(u8 data);
@@ -158,7 +154,7 @@ private:
 	bool m_memprotect = false;
 	u8 m_game = 0U;
 	emu_timer* m_irq_timer = nullptr;
-	static const device_timer_id TIMER_IRQ = 0;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<williams_s6_sound_device> m_s6sound;
 	required_device<pia6821_device> m_pia21;
@@ -629,26 +625,21 @@ WRITE_LINE_MEMBER( s7_state::pia_irq )
 	}
 }
 
-void s7_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(s7_state::irq_timer)
 {
-	switch(id)
+	if(param == 1)
 	{
-	case TIMER_IRQ:
-		if(param == 1)
-		{
-			m_maincpu->set_input_line(M6808_IRQ_LINE, ASSERT_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(32,3580000/4),0);
-			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
-			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
-		}
-		else
-		{
-			m_maincpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
-			m_pia28->ca1_w(1);
-			m_pia28->cb1_w(1);
-		}
-		break;
+		m_maincpu->set_input_line(M6808_IRQ_LINE, ASSERT_LINE);
+		m_irq_timer->adjust(attotime::from_ticks(32,3580000/4),0);
+		m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
+		m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
+	}
+	else
+	{
+		m_maincpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
+		m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
+		m_pia28->ca1_w(1);
+		m_pia28->cb1_w(1);
 	}
 }
 
@@ -667,7 +658,7 @@ void s7_state::machine_start()
 	save_item(NAME(m_game));
 	save_item(NAME(m_comma));
 
-	m_irq_timer = timer_alloc(TIMER_IRQ);
+	m_irq_timer = timer_alloc(FUNC(s7_state::irq_timer), this);
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
 	subdevice<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 }
@@ -981,21 +972,6 @@ ROM_START(vrkon_l1)
 	ROM_LOAD("sound12.716",  0x4800, 0x0800, CRC(d13db2bb) SHA1(862546bbdd1476906948f7324b7434c29df79baa) )
 ROM_END
 
-/*----------------------------------------------------------------------
-/ Spellbinder (#513) Not-working beta.
-/ Reconstructed from the source by jessakey
-/ No soundrom supplied, using one from hyperball (as PinMAME has done).
-/----------------------------------------------------------------------*/
-ROM_START(splbn_l0)
-	ROM_REGION(0x3000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("ic20.532",     0x0000, 0x1000, CRC(ff765ebf) SHA1(14d42735291c3f6e112f19bd49a39e00059cf907) )
-	ROM_LOAD("ic14.532",     0x1000, 0x1000, CRC(940a817a) SHA1(2583ff6f6b6985d3ac85b4f120ebb002a10b65af) )
-	ROM_LOAD("ic17.532",     0x2000, 0x1000, CRC(b38fde72) SHA1(17ef3ca354431307b6a79992c50cb2491b8a7631) )
-
-	ROM_REGION(0x5000, "s6sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("sound12.532",  0x4000, 0x1000, CRC(06051e5e) SHA1(f0ab4be812ceaf771829dd549f2a612156102a93) )
-ROM_END
-
 /*-----------------------------
 / Time Fantasy (#515)
 /-----------------------------*/
@@ -1122,30 +1098,29 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1980, bk_l4,    0,        s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-4)",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, bk_f4,    bk_l4,    s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-4, French speech)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, bk_l3,    bk_l4,    s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-3)",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1980, csmic_l1, 0,        s7, csmic, s7_state, empty_init, ROT0, "Williams",  "Cosmic Gunfight (L-1)",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, jngld_l2, 0,        s7, jngld, s7_state, empty_init, ROT0, "Williams",  "Jungle Lord (L-2)",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, jngld_l1, jngld_l2, s7, jngld, s7_state, empty_init, ROT0, "Williams",  "Jungle Lord (L-1)",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, pharo_l2, 0,        s7, pharo, s7_state, empty_init, ROT0, "Williams",  "Pharaoh (L-2)",                     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, solar_l2, 0,        s7, solar, s7_state, empty_init, ROT0, "Williams",  "Solar Fire (L-2)",                  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, thund_p1, 0,        s7, thund, s7_state, init_1,     ROT0, "Williams",  "Thunderball (P-1)",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, thund_p2, thund_p1, s7, thund, s7_state, init_1,     ROT0, "Williams",  "Thunderball (P-2)",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, thund_p3, thund_p1, s7, thund, s7_state, init_1,     ROT0, "Williams",  "Thunderball (P-3)",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, hypbl_l4, 0,        s7, hypbl, s7_state, empty_init, ROT0, "Williams",  "HyperBall (L-4)",                   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, hypbl_l3, hypbl_l4, s7, hypbl, s7_state, empty_init, ROT0, "Williams",  "HyperBall (L-3)",                   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, hypbl_l2, hypbl_l4, s7, hypbl, s7_state, empty_init, ROT0, "Williams",  "HyperBall (L-2)",                   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, barra_l1, 0,        s7, barra, s7_state, empty_init, ROT0, "Williams",  "Barracora (L-1)",                   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, vrkon_l1, 0,        s7, vrkon, s7_state, empty_init, ROT0, "Williams",  "Varkon (L-1)",                      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, splbn_l0, 0,        s7, s7,    s7_state, empty_init, ROT0, "Williams",  "Spellbinder (L-0)",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, tmfnt_l5, 0,        s7, tmfnt, s7_state, empty_init, ROT0, "Williams",  "Time Fantasy (L-5)",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, wrlok_l3, 0,        s7, wrlok, s7_state, empty_init, ROT0, "Williams",  "Warlok (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, dfndr_l4, 0,        s7, dfndr, s7_state, empty_init, ROT0, "Williams",  "Defender (L-4)",                    MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, jst_l2,   0,        s7, jst,   s7_state, empty_init, ROT0, "Williams",  "Joust (L-2)",                       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, jst_l1,   jst_l2,   s7, jst,   s7_state, empty_init, ROT0, "Williams",  "Joust (L-1)",                       MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, lsrcu_l2, 0,        s7, lsrcu, s7_state, empty_init, ROT0, "Williams",  "Laser Cue (L-2)",                   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1983, fpwr2_l2, 0,        s7, fpwr2, s7_state, empty_init, ROT0, "Williams",  "Firepower II (L-2)",                MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1984, strlt_l1, 0,        s7, strlt, s7_state, empty_init, ROT0, "Williams",  "Star Light (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, bk_l4,    0,        s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-4)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, bk_f4,    bk_l4,    s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-4, French speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, bk_l3,    bk_l4,    s7, bk,    s7_state, empty_init, ROT0, "Williams",  "Black Knight (L-3)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, csmic_l1, 0,        s7, csmic, s7_state, empty_init, ROT0, "Williams",  "Cosmic Gunfight (L-1)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, jngld_l2, 0,        s7, jngld, s7_state, empty_init, ROT0, "Williams",  "Jungle Lord (L-2)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, jngld_l1, jngld_l2, s7, jngld, s7_state, empty_init, ROT0, "Williams",  "Jungle Lord (L-1)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pharo_l2, 0,        s7, pharo, s7_state, empty_init, ROT0, "Williams",  "Pharaoh (L-2)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, solar_l2, 0,        s7, solar, s7_state, empty_init, ROT0, "Williams",  "Solar Fire (L-2)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thund_p1, 0,        s7, thund, s7_state, init_1,     ROT0, "Williams",  "Thunderball (P-1)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thund_p2, thund_p1, s7, thund, s7_state, init_1,     ROT0, "Williams",  "Thunderball (P-2)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, thund_p3, thund_p1, s7, thund, s7_state, init_1,     ROT0, "Williams",  "Thunderball (P-3)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hypbl_l4, 0,        s7, hypbl, s7_state, empty_init, ROT0, "Williams",  "HyperBall (L-4)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hypbl_l3, hypbl_l4, s7, hypbl, s7_state, empty_init, ROT0, "Williams",  "HyperBall (L-3)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hypbl_l2, hypbl_l4, s7, hypbl, s7_state, empty_init, ROT0, "Williams",  "HyperBall (L-2)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, barra_l1, 0,        s7, barra, s7_state, empty_init, ROT0, "Williams",  "Barracora (L-1)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, vrkon_l1, 0,        s7, vrkon, s7_state, empty_init, ROT0, "Williams",  "Varkon (L-1)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tmfnt_l5, 0,        s7, tmfnt, s7_state, empty_init, ROT0, "Williams",  "Time Fantasy (L-5)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wrlok_l3, 0,        s7, wrlok, s7_state, empty_init, ROT0, "Williams",  "Warlok (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dfndr_l4, 0,        s7, dfndr, s7_state, empty_init, ROT0, "Williams",  "Defender (L-4)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jst_l2,   0,        s7, jst,   s7_state, empty_init, ROT0, "Williams",  "Joust (L-2)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jst_l1,   jst_l2,   s7, jst,   s7_state, empty_init, ROT0, "Williams",  "Joust (L-1)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, lsrcu_l2, 0,        s7, lsrcu, s7_state, empty_init, ROT0, "Williams",  "Laser Cue (L-2)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, fpwr2_l2, 0,        s7, fpwr2, s7_state, empty_init, ROT0, "Williams",  "Firepower II (L-2)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, strlt_l1, 0,        s7, strlt, s7_state, empty_init, ROT0, "Williams",  "Star Light (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 // same hardware, unknown manufacturer, clone of fpwr2
-GAME( 1983, wldtexas, fpwr2_l2, s7, fpwr2, s7_state, empty_init, ROT0, "<unknown>", "Wild Texas",                        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, wldtexas, fpwr2_l2, s7, fpwr2, s7_state, empty_init, ROT0, "<unknown>", "Wild Texas",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

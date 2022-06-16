@@ -161,7 +161,7 @@
    16.6 | Nudge Bingo              |    ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
    16.7 | Poker                    |    ?    |         | PCG      | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
    16.8 | Keno                     |   903   | MAR/83  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
-   17.0 | Poker                    |   905   |         | POKERCGs | 6300010 | PKRCLR   | 6600020 | Amusement     | No   |      | No
+   17.0 | Poker                    |   905   |         | POKERCGs | 6300010 | PKRCLR   | 6600020 | Amusement     | Yes  |      | Yes
    17.1 | Nudge Bingo              |    ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
    17.2 | Double/Double Poker      |   905   | MAY/83  | JKRPKR   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
    17.3 | Casino Poker             |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
@@ -890,44 +890,29 @@ TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_2 )
 	// logerror("Timer_2 event : state=%d\n", m_timer);
 }
 
-READ_LINE_MEMBER(calomega_state::timer_r)
-{
-	// logerror("timer_1 read : state=%d\n", m_timer);
-	return m_timer;
-}
-
 WRITE_LINE_MEMBER(calomega_state::vblank0_w)
 {
-	m_vblank = state;
 	m_pia[0]->read(0);
 	m_pia[0]->read(0);
 	m_pia[1]->cb1_w(state);
 	// m_pia[1]->read(3);  // CRB
-	// logerror("V_BLANK_0 event : state=%d\n", m_vblank);
+	// logerror("V_BLANK_0 event : state=%d\n", state);
 }
 
 WRITE_LINE_MEMBER(calomega_state::vblank1_w)
 {
-	m_vblank = state;
 	m_pia[0]->read(2);
 	m_pia[0]->cb1_w(state);
-	// logerror("V_BLANK_1 event (sale ): state=%d\n", m_vblank);
+	// logerror("V_BLANK_1 event (sale ): state=%d\n", state);
 }
 
 WRITE_LINE_MEMBER(calomega_state::vblank2_w)
 {
-	m_vblank = state;
 	m_pia[1]->read(0);
 	m_pia[1]->read(0);
 	m_pia[1]->cb1_w(state);
 
-	// logerror("V_BLANK_2 event : state=%d\n", m_vblank);
-}
-
-READ_LINE_MEMBER(calomega_state::vblank_r)
-{
-	// logerror("V_BLANK read : state=%d\n", m_vblank);
-	return m_vblank;
+	// logerror("V_BLANK_2 event : state=%d\n", state);
 }
 
 WRITE_LINE_MEMBER(calomega_state::pia1_cb2_w)
@@ -948,10 +933,6 @@ void calomega_state::dummy_pia_w(uint8_t data)
 	m_pia_data = data;
 }
 
-READ_LINE_MEMBER(calomega_state::dummy_pia_line_r)
-{
-	return false;
-}
 WRITE_LINE_MEMBER(calomega_state::dummy_pia_line_w)
 {
 }
@@ -3198,6 +3179,87 @@ static INPUT_PORTS_START( comg159 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( comg170 )
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Learn")        PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Clr Data")     PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Audit")        PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_NAME("Coin-In A")    PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_NAME("Coin-In B")    PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// For System 905, SW1 uses the whole PIA1 portA.
+
+	PORT_START("SW1")    // settings (PIA1)
+	PORT_DIPNAME( 0x07, 0x07, "Max Bet" )                        PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x00, "01" )
+	PORT_DIPSETTING(    0x01, "02" )
+	PORT_DIPSETTING(    0x02, "03" )
+	PORT_DIPSETTING(    0x03, "04" )
+	PORT_DIPSETTING(    0x04, "05" )
+	PORT_DIPSETTING(    0x05, "10" )
+	PORT_DIPSETTING(    0x06, "20" )
+	PORT_DIPSETTING(    0x07, "50" )
+	PORT_DIPNAME( 0x08, 0x08, "Attract" )                        PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Lower Pair to Win" )              PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, "Jacks" )
+	PORT_DIPSETTING(    0x20, "Queens" )
+	PORT_DIPSETTING(    0x30, "Kings" )
+	PORT_DIPSETTING(    0x10, "Aces" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Coin Lockout" )                   PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0xc0, "No Lockout" )
+	PORT_DIPSETTING(    0x40, "No Lockout" )
+	PORT_DIPSETTING(    0x80, "1-Coin Lockout" )
+	PORT_DIPSETTING(    0x00, "2-Coin Lockout" )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( comg172 )
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
@@ -4533,8 +4595,8 @@ void calomega_state::sys903(machine_config &config)
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_903a_w));
-	m_pia[0]->readca1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
-	m_pia[0]->readcb1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->ca1_w(0);                                                       // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->cb1_w(0);                                                       // Timer Interrupt Ack.     (CPU -> PIA)
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
@@ -4545,7 +4607,7 @@ void calomega_state::sys903(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));        // Mux. Scan Lines.(Upper nibble) - Hopper b0-b1 (Lower Nibble).
 	m_pia[1]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // M4 pulsed out
 	m_pia[1]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // M5 pulsed out
-	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.   (CPU -> PIA)
+	m_pia[1]->cb1_w(0);                                                       // V_BLANK Interrupt Ack.   (CPU -> PIA)
 	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
 
 	// video hardware
@@ -4606,8 +4668,8 @@ void calomega_state::sys903kb(machine_config &config)
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_903a_w));
-	m_pia[0]->readca1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
-	m_pia[0]->readcb1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->ca1_w(0);                                                       // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->cb1_w(0);                                                       // Timer Interrupt Ack.     (CPU -> PIA)
 	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
@@ -4618,7 +4680,7 @@ void calomega_state::sys903kb(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));        // Mux. Scan Lines.(Upper nibble) - Hopper b0-b1 (Lower Nibble).
 	m_pia[1]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // M4 pulsed out
 	m_pia[1]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // M5 pulsed out
-	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.   (CPU -> PIA)
+	m_pia[1]->cb1_w(0);                                                       // V_BLANK Interrupt Ack.   (CPU -> PIA)
 	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
 
 	// video hardware
@@ -4741,8 +4803,8 @@ void calomega_state::sys906(machine_config &config)
 	PIA6821(config.replace(), m_pia[1], 0);
 	m_pia[1]->readpa_handler().set(FUNC(calomega_state::pia1_ain_r));         // Mux. Button read.
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::pia1_bin_r));
-	m_pia[1]->readca1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.      (CPU -> PIA)
-	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.    (CPU -> PIA)
+	m_pia[1]->ca1_w(0);                                                       // Timer Interrupt Ack.      (CPU -> PIA)
+	m_pia[1]->cb1_w(0);                                                       // V_BLANK Interrupt Ack.    (CPU -> PIA)
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::pia1_aout_w));       // Mux. Scan lines
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::pia1_bout_w));       // Lamps 1 to 8
 	m_pia[1]->cb2_handler().set(FUNC(calomega_state::pia1_cb2_w));            // V_BLANK interrupt line input (from Vertical Synch)
@@ -5106,6 +5168,40 @@ ROM_START( comg168 )  // Cal Omega v16.8 (Keno)
 
 	ROM_REGION(0x1000, "kstec", 0)
 	ROM_LOAD( "903kstec.0", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
+ROM_END
+
+/*
+  Cal Omega v17.0 (Amusement Poker)
+
+  Discard poker game with attract.
+  The game is only for amusement. It doesn't give back money.
+
+  To clean the credits, enter the audit mode and press the service button.
+  In audit mode, pressing the BET button a column of extra red values appear.
+  To exit the audit mode, just press DEAL.
+
+  Test Mode: Press F2.
+  To exit pres DISCARD buttons 1, 2 & 3 simultaneously.
+
+*/
+ROM_START( comg170 )  // Cal Omega v17.0 (Amusement Poker)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket
+	ROM_LOAD( "17-03.u7",   0x5000, 0x1000, CRC(56ca24db) SHA1(27793d48060b6d1ee080da27d19737a724395f35) )
+	ROM_LOAD( "17-04.u8",   0x6000, 0x1000, CRC(9fcc5761) SHA1(9b1fb265219517c89af8d3700b04d9487b1db45e) )
+	ROM_LOAD( "17-05.u9",   0x7000, 0x1000, CRC(cfdbd4b9) SHA1(7f7d5b0d86d009c2e1af54338d9ead24c97eb3e7) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "pkcg0.u67",  0x0000, 0x0800, CRC(b626ad89) SHA1(551b75f4559d11a4f8f56e38982114a21c77d4e7) )
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "pkcgc.u70",  0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )
+	ROM_LOAD( "pkcgb.u69",  0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )
+	ROM_LOAD( "pkcga.u68",  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
 ROM_START( comg172 )  // Cal Omega v17.2 (Double Double Poker)
@@ -6034,6 +6130,7 @@ GAME(  1983, comg157,  0,        sys903,   comg157,  calomega_state, empty_init,
 GAME(  1983, comg159,  0,        sys905,   comg159,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",           MACHINE_SUPPORTS_SAVE )
 GAMEL( 1983, comg164,  0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.4 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE,  layout_kenokb )    // incomplete dump
 GAMEL( 1983, comg168,  0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                     MACHINE_SUPPORTS_SAVE,                        layout_kenokb )
+GAME(  1983, comg170,  0,        sys905,   comg170,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.0 (Amusement Poker)",          MACHINE_SUPPORTS_SAVE )
 GAME(  1983, comg172,  0,        sys905,   comg172,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",      MACHINE_SUPPORTS_SAVE )
 GAME(  1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",       MACHINE_SUPPORTS_SAVE )
 GAME(  1982, comg176,  0,        sys903,   nudgensw, calomega_state, init_comg176, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge)",                    MACHINE_SUPPORTS_SAVE )

@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "spec128.h"
+
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 

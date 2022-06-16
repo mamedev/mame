@@ -2248,7 +2248,7 @@ void halleys_state::init_benberob()
 
 	init_common();
 
-	m_blitter_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(halleys_state::blitter_reset),this));
+	m_blitter_reset_timer = timer_alloc(FUNC(halleys_state::blitter_reset), this);
 }
 
 

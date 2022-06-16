@@ -94,6 +94,7 @@ private:
 	offs_t m_ef9345_offset = 0;
 	uint8_t m_printer_latch = 0;
 	uint8_t m_printer_signal = 0;
+	emu_timer *m_z80_irq_clear_timer = nullptr;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -334,7 +335,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::z80_irq)
 {
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 
-	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(vg5k_state::z80_irq_clear),this));
+	m_z80_irq_clear_timer->adjust(attotime::from_usec(100));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::vg5k_scanline)
@@ -356,6 +357,8 @@ void vg5k_state::machine_start()
 	save_item(NAME(m_ef9345_offset));
 	save_item(NAME(m_printer_latch));
 	save_item(NAME(m_printer_signal));
+
+	m_z80_irq_clear_timer = timer_alloc(FUNC(vg5k_state::z80_irq_clear), this);
 }
 
 void vg5k_state::machine_reset()

@@ -59,13 +59,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	enum
-	{
-		TIMER_GET_DEVICES
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
 private:
 	required_device_array<ppc_device, 2> m_ppc;
 	required_device<lsi53c810_device> m_lsi53c810;
@@ -112,6 +105,7 @@ private:
 	void at_dma8237_1_w(offs_t offset, uint8_t data);
 	uint8_t bebox_dma_read_byte(offs_t offset);
 	void bebox_dma_write_byte(offs_t offset, uint8_t data);
+	inline void set_dma_channel(int channel, int state);
 	uint64_t scsi53c810_r(offs_t offset, uint64_t mem_mask = ~0);
 	void scsi53c810_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t bb_slave_64be_r(offs_t offset, uint64_t mem_mask = ~0);

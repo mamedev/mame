@@ -18,8 +18,6 @@ Namco System II
 #include "machine/nvram.h"
 
 
-
-
 uint16_t namcos2_state::namcos2_finallap_prot_r(offs_t offset)
 {
 	static const uint16_t table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
@@ -82,6 +80,16 @@ void namcos2_state::machine_start()
 
 	save_pointer(NAME(m_eeprom), 0x2000);
 	save_item(NAME(m_sendval));
+}
+
+void gollygho_state::machine_start()
+{
+	namcos2_state::machine_start();
+
+	// resolve outputs
+	m_out_digit.resolve();
+	m_out_diorama.resolve();
+	m_out_gun_recoil.resolve();
 }
 
 void namcos2_state::machine_reset()
@@ -351,8 +359,6 @@ uint16_t namcos2_state::namcos2_68k_key_r(offs_t offset)
 		}
 		break;
 	}
-
-
 
 	return machine().rand()&0xffff;
 }

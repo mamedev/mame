@@ -108,6 +108,7 @@ undoukai                        // A17 (c) 1984 Taito
 @source:4enlinea.cpp
 4enlinea                        // (c) 1991 Compumatic / CIC Play
 4enlineb                        // (c) 1991 Compumatic / CIC Play
+dardos                          // (c) 1992 Oper Coin
 k7_olym                         // (c) 1994 K7 Kursaal / NMI Electronics
 k7_olym30                       // (c) 1994 K7 Kursaal / NMI Electronics
 sprtdart                        // (c) 1993 Compumatic / Desarrollos y Recambios S.L.
@@ -122,8 +123,10 @@ unkpacg                         // (c) 19?? ???
 unkpacga                        //
 unkpacgb                        //
 unkpacgc                        //
+unkpacgd                        //
 unksig                          // 1998?
 unksiga                         // 1998?
+unksigb                         // 1998?
 
 @source:4roses.cpp
 4roses                          // (c) 1999 Unknown
@@ -1143,6 +1146,7 @@ masmario                        // (c) 2004 Capcom
 masmarios                       // (c) 2004 Capcom
 masmario2                       // (c) 2005 Capcom
 mmaruchan                       // (c) 2005 Capcom
+mmaruchana                      // (c) 2004 Capcom
 pingu                           // (c) 2006 The Pygos Group / Capcom
 wontame                         // (c) 2008 Capcom
 
@@ -1400,6 +1404,7 @@ draw88pkr                       // 1988, BTE, Inc.
 amust                           //
 
 @source:anes.cpp
+sanma                           // 2001, ANES
 tonpuu                          // 200?, ANES
 
 @source:angelkds.cpp
@@ -1907,6 +1912,7 @@ cactusco                        // (c) 2007
 callwld                         // (c) 2007
 calyking                        // (c) 2005
 canaryrc                        // (c) 2006
+centrion                        // (c) 2007
 cmtonig                         // (c) 2005
 cinhell                         // (c) 2004
 corrida                         // (c) 2005
@@ -2075,6 +2081,7 @@ silkrda6                        // (c) 2006
 silgola6                        // (c) 2002
 skydnca6                        // (c) 2008
 spgcarn                         // (c) 1999
+spgcarnjc                       // (c) 2003
 spgcarnq                        // (c) 2001
 spgfest                         // (c) 2008
 stardrft                        // (c) 2003
@@ -2144,7 +2151,8 @@ arkanoidjbl2                    // bootleg (Beta)
 arkanoidu                       // A75 (c) 1986 Taito America Corporation + Romstar license (US)
 arkanoiduo                      // A75 (c) 1986 Taito America Corporation + Romstar license (US)
 arkatayt                        // bootleg
-arkatour                        // ??? (c) 1987 Taito America Corporation + Romstar license (US)
+arkatour                        // A75 (c) 1987 Taito America Corporation + Romstar license (US)
+arkatour2                       // A75 (c) 1987 Taito America Corporation + Romstar license (US)
 arkbloc2                        // bootleg
 arkbloc3                        // bootleg
 arkblock                        // bootleg
@@ -2251,6 +2259,7 @@ spcrocks                        // J.Estevez        (c) 1981
 
 @source:astinvad.cpp
 astinvad                        // (c) 1980 Stern
+betafrce                        // bootleg
 kamikaze                        // (c) 1979 Leijac Corporation
 kosmokil                        // bootleg
 spaceint                        // [1980] Shoei
@@ -2933,7 +2942,8 @@ a1200xl                         // 1982 Atari 1200 XL
 a130xe                          // 1986 Atari 130 XE
 a400                            // 1979 Atari 400
 a400pal                         // 1979 Atari 400 PAL
-a5200                           // Atari 5200
+a5200                           // 1982 Atari 5200
+a5200a                          // 1983 Atari 5200 (2-port)
 a600xl                          // 1983 Atari 600 XL
 a65xe                           // 1986 Atari 65 XE (XL Extended)
 a65xea                          // 1986? Atari 65 XE Arabic
@@ -3278,6 +3288,9 @@ backfirea                       // MBZ (c) 1995
 
 @source:badlands.cpp
 badlands                        // 136074           (c) 1989
+
+@source:badlands_ms.cpp
+badlandsm
 
 @source:badlandsbl.cpp
 badlandsb                       // bootleg
@@ -9470,6 +9483,7 @@ megadble                        // (c) 1990 Blitz Systems Inc.
 megadblj                        // (c) 1990 Blitz Systems Inc.
 megastrp                        // (c) 1992 Blitz Systems Inc.
 poker52                         // (c) 1993 Blitz Systems Inc. ?
+super97                         // (c) 1997 Cadillac Jack
 surpr5                          // (c) 1997 Cadillac Jack
 steaser                         // (c) 1993 unknown
 texasrls                        // (c) 1998 Cadillac Jack
@@ -9502,6 +9516,7 @@ mineswpr4                       // [1977 Amutech]
 
 @source:blockch.cpp
 blockch
+tvgm8080
 
 @source:blockhl.cpp
 blockhl                         // GX973 (c) 1989
@@ -9957,6 +9972,7 @@ comg157                         // (c) 1983 Cal Omega Inc.
 comg159                         // (c) 1983 Cal Omega Inc.
 comg164                         // (c) 1983 Cal Omega Inc.
 comg168                         // (c) 1983 Cal Omega Inc.
+comg170                         // (c) 1983 Cal Omega Inc.
 comg172                         // (c) 1983 Cal Omega Inc.
 comg175                         // (c) 1984 Cal Omega / Casino Electronics Inc.
 comg176                         // (c) 1982 Cal Omega Inc.
@@ -11505,6 +11521,7 @@ redearth                        // 21/11/1996 (c) 1996 (Euro)
 redearthr1                      // 23/10/1996 (c) 1996 (Euro)
 sfiii                           // 04/02/1997 (c) 1997 (Euro)
 sfiii2                          // 30/09/1997 (c) 1997 (USA)
+sfiii2h                         // 30/09/1997 (c) 1997 (Hispanic)
 sfiii2j                         // 30/09/1997 (c) 1997 (Japan)
 sfiii2n                         // 30/09/1997 (c) 1997 (Asia)
 sfiii3                          // 08/06/1999 (c) 1999 (Euro)
@@ -11654,6 +11671,10 @@ mgprem11                        // (c) 1995
 odeontw                         //
 odeontw2                        // (c) 1999
 
+@source:cucaracha.cpp
+cucaracha                       // (c) 1992 Taito
+cucaracha2                      // (c) 1992 Taito
+
 @source:cultures.cpp
 cultures                        // (c) 1994 Face
 
@@ -11787,6 +11808,7 @@ d6809                           //
 
 @source:d9final.cpp
 d9final                         // (c) 1992 Excellent System
+rpanic                          // (c) 1992 Excellent System / Jaleco
 
 @source:dacholer.cpp
 dacholer                        // (c) 1983
@@ -11809,6 +11831,7 @@ dambustra                       // (c) 1981 South West Research
 dambustruk                      // (c) 1981 South West Research
 
 @source:dangbar.cpp
+bellybmbr                       //
 dangbar                         //
 sspanic                         //
 
@@ -11975,6 +11998,7 @@ mjflove                         // "500" (c) 1996 Dynax
 mjgnight                        // "003" 2000 Techno-Top
 mjmyorn2                        // "71?" (c) 1993 Dynax
 mjmyornt                        // "71" (c) 1992 Dynax
+mjmyorntr                       //
 mjmyster                        // "77" (c) 1994 Dynax
 mjmyuniv                        // "85" (c) 1994 Dynax
 mjmywrld                        // "77" (c) 1994 Dynax
@@ -12645,6 +12669,7 @@ douni                           // 8302  (c) 1983
 dowild                          // 8339A (c) 1984
 idsoccer                        // ????  (c) 1985
 idsoccera                       // ????  (c) 1985
+idsoccert                       // 8461A (c) 1985
 jjack                           // ????  (c) 1984
 kickridr                        // ????  (c) 1984
 spiero                          // ????  (c) 1987
@@ -12756,6 +12781,9 @@ drumsta                         //
 @source:drw80pkr.cpp
 drw80pk2                        // (c) 1983 IGT
 drw80pkr                        // (c) 1982 IGT
+
+@source:ds90.cpp
+x37                             //
 
 @source:dsb46.cpp
 dsb46                           //
@@ -13355,6 +13383,10 @@ ec_unkt                         // Unknown 'T' (MAB PCB) (Concept - Electrocoin)
 @source:efdt.cpp
 efdt                            // El Fin Del Tiempo - (c) 1981 Niemer
 
+@source:efg8080.cpp
+blackhol
+foolrace
+
 @source:egghunt.cpp
 egghunt                         // (c) 1995 Invi Image
 
@@ -13394,6 +13426,7 @@ pvwwcas
 
 @source:electra.cpp
 avenger                         // (c) 1975 Electra
+flyingf                         // (c) 1976 Electra
 
 @source:electron.cpp
 electron                        // 1983 Acorn Electron
@@ -13932,6 +13965,7 @@ wofr1bl                         // bootleg
 feversoc                        // (c) 2004
 
 @source:ffantasy_ms.cpp
+drgninjam                       //
 ffantasym                       //
 
 @source:fgoal.cpp
@@ -14234,6 +14268,9 @@ pbillrdsa                       // (c) 1987 Nihon System (Sega license?)
 freeway
 freewaya
 
+@source:frenzyxprss.cpp
+frenzyxprss                     // (c) 2001 ICE / Uniana
+
 @source:fresh.cpp
 fresh                           // (c) Chain Leisure
 
@@ -14255,7 +14292,6 @@ nmsengen                        // (c) 1991 Video System (Japan)
 
 @source:fruitpc.cpp
 fruitpc                         // ???
-gogostrk                        //
 
 @source:fs3216.cpp
 fs3216                          //
@@ -14358,6 +14394,8 @@ magicrd2c                       // (c) 1996 Impera
 megacard                        // (c) 1993 Fun World
 mongolnw                        // 199? bootleg
 multiwin                        // (c) 1992 Fun World
+multiwina                       // (c) 1991 Fun World
+multiwinb                       // (c) 2001 Amatic
 nevadafw                        // 199? unknown
 nkoulit                         // 1995 JK Amusement
 novoplay                        // (c) 1986 Novomatic
@@ -14631,6 +14669,7 @@ fourplay                        // multigame
 galap1                          // hack
 galap4                          // hack
 galapx                          // hack
+galartic                        // Artic System
 galaxbsf                        // hack
 galaxbsf2                       // bootleg
 galaxcirsa                      // bootleg (Cirsa)
@@ -14694,7 +14733,9 @@ moonal2b                        // [1980] Nichibutsu
 moonaln                         // [Nichibutsu] (Karateco license) or hack
 mooncmw                         // bootleg
 mooncptc                        // bootleg (Petaco S.A.)
+mooncrecm                       // bootleg (Centromatic)
 mooncreg                        // bootleg
+mooncreg2                       // bootleg
 mooncrgx                        // bootleg
 mooncrs2                        // bootleg
 mooncrs3                        // bootleg
@@ -14797,6 +14838,7 @@ superbon                        // bootleg
 superg                          // hack
 supergs                         // Silver Systems hack
 supergx                         // [1980] Nichibutsu
+supershp                        // bootleg
 suprheli                        // bootleg
 swarm                           // hack
 tazmania                        // (c) 1982 Stern
@@ -14934,10 +14976,6 @@ gambl186d                       // EGD
 
 @source:gamecom.cpp
 gamecom                         // Tiger Game.com
-
-@source:gamecstl.cpp
-gamecst2                        // MAME based bootleg, version 2.613
-gamecstl                        // MAME based bootleg
 
 @source:gamecube.cpp
 gcjp                            // (c) 2001 Nintendo
@@ -15373,8 +15411,9 @@ genmod                          // 1990 Myarc / Ron G. Walters Geneve 9640 Mod
 @source:geniusiq.cpp
 iq128                           // 1997 Genius IQ 128 (Germany)
 iq128_fr                        // 1997 Genius PC (France)
-iqtv512                         // IQ TV512 (Germany)
-itunlim                         // 199? IT Unlimited
+iqtv512                         // 1998 IQ TV512 (Germany)
+itunlim                         // 1998 IT Unlimited (UK)
+pcunlim                         // 1997 PC Unlimited (USA/Canada)
 
 @source:geniusjr.cpp
 gj4000                          // Genius Junior 4000 (Germany)
@@ -15549,10 +15588,6 @@ goindolj                        // (c) 1987 Sun a Electronics
 goindolu                        // (c) 1987 Sun a Electronics
 homo                            // bootleg
 
-@source:gokidetor.cpp
-gokidetor                       // (c) 1992 Taito
-gokidetor2                      // (c) 1992 Taito
-
 @source:goldart.cpp
 goldart
 goldartp
@@ -15607,10 +15642,16 @@ genie                           // (c) 198? Video Fun Games Ltd.
 geniea                          // 198?, Unknown
 goldnpkb                        // (c) 1981 Bonanza
 goldnpkc                        // Bootleg
+goldnpkd                        // Bootleg
+goldnpke                        // Intercoast (bootleg)
+goldnpkf                        // Intercoast (bootleg)
 goldnpkr                        // (c) 1981 Bonanza
 goodluck                        // Unknown
 jokercar                        // 199?, unknown
+lespendu                        // (c) 198? Voyageur de L'Espace Inc.
+lespenduj                       // (c) 198? Voyageur de L'Espace Inc.
 maverik                         // 198?, Unknown
+maxidpkr                        // (c) 1990 Blitz System Inc
 megadpkr                        // (c) 1990 Blitz System Inc
 megadpkrb                       // (c) 1990 Blitz System Inc
 ngold                           // 198? Unknown
@@ -15747,6 +15788,7 @@ cmezspin                        // (c) 1991 Dyna Electronics
 cmfun                           // (c) 1995 Dyna Electronics
 cmpacman                        //
 cmpacmana                       //
+cmpacmanb                       //
 cmtetris                        //
 cmtetrsa                        //
 cmtetrsb                        //
@@ -16012,8 +16054,8 @@ gstrikerj                       // (c) [1993] Human
 twcup94                         // (c) 1994 Tecmo
 twcup94a                        // (c) 1994 Tecmo
 twcup94b                        // (c) 1994 Tecmo
-vgoalsca                        // (c) 199? Tecmo
-vgoalsoc                        // (c) 199? Tecmo
+vgoalsoc                        // (c) 1994 Tecmo
+vgoalsoca                       // (c) 1994 Tecmo
 
 @source:gsword.cpp
 gsword                          // AC  (c) 1984 Taito Corporation
@@ -16076,45 +16118,46 @@ vegas                           //
 
 @source:gts3a.cpp
 andretti                        //
-andretti4                       //
+andretti0                       //
 barbwire                        //
 bighurt                         //
 brooks                          //
 cueball                         //
-cueball2                        //
-cueball3                        //
+cueballa                        //
+cueballb                        //
 freddy                          //
-freddy4                         //
+freddy3                         //
 gladiatp                        //
 mac_zois                        //
 rescu911                        //
-sfight2                         //
-sfight2a                        //
-sfight2b                        //
+sfightii                        //
+sfightiia                       //
+sfightiib                       //
 shaqattq                        //
 shaqattq2                       //
-smb                             //
-smb1                            //
-smb2                            //
-smb3                            //
+smbp                            //
+smbpa                           //
+smbpb                           //
+smbpc                           //
 smbmush                         //
 snspares                        //
 snspares1                       //
 snspares2                       //
 stargatp                        //
+stargatp0                       //
 stargatp1                       //
 stargatp2                       //
 stargatp3                       //
 stargatp4                       //
-stargatp5                       //
 teedoffp                        //
+teedoffp0                       //
 teedoffp1                       //
-teedoffp3                       //
 waterwld                        //
 waterwld2                       //
 wcsoccer                        //
-wcsoccerd2                      //
+wcsoccer1a                      //
 wipeout                         //
+wipeout2a                       //
 
 @source:gts80.cpp
 blckhole                        //
@@ -16341,6 +16384,7 @@ harddrivb6                      // 136052           (c) 1988
 harddrivc                       // 136068           (c) 1990
 harddrivc1                      // 136068           (c) 1990
 harddrivcb                      // 136068           (c) 1990
+harddrivcbl                     // bootleg
 harddrivcg                      // 136068           (c) 1990
 harddrivg                       // 136052           (c) 1988
 harddrivg4                      // 136052           (c) 1988
@@ -16412,10 +16456,6 @@ hcastlek                        // GX768 (c) 1988
 @source:hds200.cpp
 hds200                          // (c) Human Designed Systems
 
-@source:headonb.cpp
-blackhol
-foolrace                        // bootleg
-
 @source:hec2hrp.cpp
 hec2hr                          //
 hec2hrp                         //
@@ -16439,11 +16479,9 @@ heromem                         // E34 (c) 1997 Taito
 hexion                          // GX122 (c) 1992
 hexionb                         // bootleg
 
-@source:hh_amis2k.cpp
-wildfire                        // Parker Bros
-
 @source:hh_cop400.cpp
 bship82                         // Milton Bradley
+copspa                          // National Semiconductor
 ctstein                         // Castle Toy
 einvaderc                       // Entex
 funjacks                        // Mattel
@@ -16480,6 +16518,7 @@ bbtime                          // Bandai
 bdoramon                        // Bandai
 bfriskyt                        // Bandai
 bmboxing                        // Bambino
+bombman                         // Tomy
 bpengo                          // Bandai
 bultrman                        // Bandai
 bzaxxon                         // Bandai
@@ -16495,18 +16534,24 @@ epacman2r                       // Entex
 estargte                        // Entex
 eturtles                        // Entex
 gckong                          // Gakken
+gdefender                       // Gakken
 gdigdug                         // Gakken
+ggdman                          // Bandai
 ghalien                         // Gakken
 gscobra                         // Gakken
 kingman                         // Tomy
+ktparman                        // Bandai
 machiman                        // Bandai
 msthawk                         // Mattel
 mwcbaseb                        // Mattel
 packmon                         // Bandai
 pairmtch                        // Bandai
 pbqbert                         // Parker Brothers
+puckimon                        // Romtec
+tkjmaru                         // Bandai
 tmtron                          // Tomy
 vinvader                        // VTech
+wantgman                        // Actronics / Hanzawa
 zackman                         // Bandai
 
 @source:hh_melps4.cpp
@@ -16548,13 +16593,19 @@ gravity                         // Mattel
 mbaseb                          // Mattel
 mfootb                          // Mattel
 misatk                          // Mattel
+rw10r                           // Rockwell
+rw12r                           // Rockwell
 rw18r                           // Rockwell
+rw24k                           // Rockwell
+rw30r                           // Rockwell
+rw31r                           // Rockwell
 
 @source:hh_sm510.cpp
 atakaast                        // Elektronika
 auslalom                        // Elektronika
 bassmate                        // Telko
 biathlon                        // Elektronika
+ecircus                         // Elektronika
 ehockey                         // Elektronika
 gnw_ball                        // Nintendo
 gnw_bfight                      // Nintendo
@@ -16760,6 +16811,7 @@ mbdtower                        // Milton Bradley
 mdndclab                        // Mattel
 merlin                          // Parker Bros
 merlina                         // Parker Bros
+mmarvin                         // Entex
 mmerlin                         // Parker Bros
 monkeysee                       // Tandy Corporation
 palmf31                         // Canon
@@ -16986,6 +17038,9 @@ thrilldbu                       // GE713UF (c)1998 ?AB
 hotblock                        // (c) 1993 Nics? / NIX?
 hotblocka                       // (c) 1993 Nics? / NIX?
 hotblockb                       // (c) 1993 Nics? / NIX?
+
+@source:hotchili.cpp
+hotchili                        // (c) 1995 Pacific Gaming Pty Ltd.
 
 @source:hotstuff.cpp
 hotstuff                        //
@@ -17214,12 +17269,13 @@ zhongguo                        // (c) 2000
 
 @source:igs_m036.cpp
 cjddzsp                         // (c) 200?
-lhzb3in1                        // (c) 200?
 cjdh2                           // (c) 200?
 cjdh2a                          // (c) 200?
 cjdh2b                          // (c) 200?
 cjdh2c                          // (c) 200?
 igsm312                         // (c) 200?
+lhtb                            // (c) 200?
+lhzb3in1                        // (c) 200?
 
 @source:igs009.cpp
 gp98                            // (c) 1998
@@ -17252,10 +17308,11 @@ wlcc                            // (c) 1996
 xymg                            // (c) 1996
 
 @source:igs017.cpp
+cpoker2                         // (c) 2000?
 genius6                         // (c) 1998
 genius6a                        // (c) 1997
 genius6b                        // (c) 1997
-happyskl                        // (c) 2001?
+happyskl                        // (c) 2000?
 iqblocka                        // (c) 1996
 iqblockf                        // (c) 1996
 lhzb2                           // (c) 1998
@@ -17265,13 +17322,12 @@ mgdh                            // (c) 1997
 mgdha                           // (c) 1997
 sdmg2                           // (c) 1997
 slqz2                           // (c) 1998
-spkrform                        // (c) ????
+spkrform                        // (c) 2000?
 starzan                         // (c) 2000?
 tarzan                          // (c) 1999
 tarzana                         // (c) 1999
 tarzanc                         // (c) 1999
 tjsb                            // (c) 1997
-unkigs                          // (c) 2001?
 
 @source:igspc.cpp
 eztouch                         // (c) 200?
@@ -17470,6 +17526,9 @@ isbc8605                        //
 isbc8630                        //
 sm1810                          //
 
+@source:isbc660.cpp
+isbc660                         // Intel iSBC 660 System Chassis
+
 @source:isbc8010.cpp
 isbc8010                        //
 isbc8010a                       //
@@ -17520,10 +17579,11 @@ virtpool                        //
 
 @source:itech32.cpp
 bloodstm                        // (c) 1994 Strata/Incredible Technologies
-bloodstm10                      // (c) 1994 Strata/Incredible Technologies
-bloodstm11                      // (c) 1994 Strata/Incredible Technologies
-bloodstm21                      // (c) 1994 Strata/Incredible Technologies
-bloodstm22                      // (c) 1994 Strata/Incredible Technologies
+bloodstm104                     // (c) 1994 Strata/Incredible Technologies
+bloodstm110                     // (c) 1994 Strata/Incredible Technologies
+bloodstm210                     // (c) 1994 Strata/Incredible Technologies
+bloodstm220                     // (c) 1994 Strata/Incredible Technologies
+bloodstm221                     // (c) 1994 Strata/Incredible Technologies
 drivedge                        // (c) 1994 Strata/Incredible Technologies
 gt2k                            // (c) 2000 Incredible Technologies
 gt2kp100                        // (c) 2000 Incredible Technologies
@@ -17859,10 +17919,12 @@ joystand                        // 1997 Yuvo
 @source:jp.cpp
 america                         //
 aqualand                        //
+aqualanda                       //
 faeton                          //
 faeton6d                        //
 halley                          //
 halleya                         //
+halleyb                         //
 lortium                         //
 olympus                         //
 petacon                         //
@@ -19083,18 +19145,34 @@ j80wsprt2                       // Winsprint (JPM)
 j80wsprt3                       // Winsprint (JPM)
 
 @source:jpmsru.cpp
-j_ewnd20                        //
-j_ewnda                         //
-j_ewnud                         // Each Way Nudger
-j_ews                           // Each Way Shifter
-j_ews8a                         //
-j_luck2                         // Lucky Twos
-j_luckac                        // Lucky Aces
-j_nuddup                        // Nudge Double Up
-j_nuddup2                       //
-j_plus2                         // Plus 2
+j_dt                            // Double Top (JPM)
+j_dud                           // Nudge Double Up Deluxe (JPM)
+j_duda                          //
+j_dudb                          //
+j_ewn                           // Each Way Nudger (JPM)
+j_ewna                          //
+j_ewnb                          //
+j_ewnc                          //
+j_ews                           // Each Way Shuffle (JPM)
+j_ewsa                          //
+j_ewsb                          //
+j_ewsdlx                        // Each Way Shuffle Deluxe (CTL)
+j_goldn2                        // Golden 2's (CTL)
+j_la                            // Lucky Aces
+j_lan                           // Lite A Nudge (JPM)
+j_lana                          //
+j_lanb                          //
+j_lc                            // Lucky Casino (JPM)
+j_lca                           //
+j_lt                            // Lucky 2's (JPM)
+j_ndu                           // Nudge Double Up (JPM)
+j_ndua                          //
+j_ndub                          //
+j_plus2                         // Plus 2 (CTL)
+j_ssh                           // Silver Shuffle (CTL)
+j_sup2p                         // Super 2p Shuffle (MDM)
 j_super2                        // Super 2
-j_unk                           //
+j_ts                            // Two Step (JPM)
 
 @source:jpmsys5.cpp
 cashcade                        // Cashcade (JPM)
@@ -19678,6 +19756,7 @@ gs471
 crossmg2
 dobouchn
 fruitsmg
+ggoemon
 kattobas
 koropens
 kzaurus
@@ -19945,6 +20024,9 @@ skywolf3                        // bootleg
 sonofphx                        // bootleg
 srdmissn                        // (c) 1986 Taito Corporation
 
+@source:labtam.cpp
+labtam                          // Labtam 3000 model 3006
+
 @source:labyrunr.cpp
 labyrunr                        // GX771 (c) 1987 (Japan)
 labyrunrk                       // GX771 (c) 1987 (Japan)
@@ -20150,6 +20232,9 @@ wsf3                            // (c) 1990 Leland
 
 @source:lemmings.cpp
 lemmings                        // prototype (c) 1991 Data East USA (US)
+
+@source:lependu.cpp
+lependu                         // 198? Avenir Amusement Inc.
 
 @source:lethal.cpp
 lethalen                        // GX191 (c) 1992
@@ -20462,6 +20547,7 @@ kidnikib                        // bootleg
 kidnikiu                        // (c) 1986 + Data East USA license
 kungfub                         // bootleg
 kungfub2                        // bootleg
+kungfub3s                       // bootleg
 kungfum                         // (c) 1984
 kungfumd                        // (c) 1984 + Data East license
 ldrun                           // (c) 1984 licensed from Broderbund
@@ -20719,21 +20805,27 @@ lunaprk                         // (c) 1998 ABM Games
 altaten                         // 1999 unknown
 
 @source:magicard.cpp
+belslots                        // (c) 1999 Impera
+bigdeal0                        // (c) 2001 Impera
+dallaspk                        // 1993, unknown
 hotslots                        // (c) 2002 Impera
+kajotcrd                        // (c) 1993 Amatic
+lucky7i                         // (c) 199? Impera
 magicard                        // (c) 199? Impera
 magicarda                       // (c) 199? Impera
 magicardb                       // (c) 199? Impera
 magicarde                       // (c) 1994 Impera
+magicardea                      // (c) 1994 Impera
+magicardeb                      // (c) 1994 Impera
+magicardec                      // (c) 1998 Impera
 magicardf                       // (c) 199? Impera
 magicardj                       // (c) 1998 Impera
 magicardw                       // (c) 1993 Impera
 magicle                         // (c) 2001 Impera
-quingo                          // (c) 1999 Impera
-belslots                        // (c) 1999 Impera
-bigdeal0                        // (c) 2001 Impera
 puzzleme                        // (c) 199? Impera
+quingo                          // (c) 1999 Impera
+unkpkr_w                        // 1993, unknown
 unkte06                         // (c) 199? Impera
-lucky7i                         // (c) 199? Impera
 
 @source:magiceyes_pollux_vr3520f.cpp
 didj                            // (c) 2008 Leapfrog
@@ -20809,6 +20901,9 @@ superpacm                       // (c) 1982 Midway
 todruaga                        // (c) 1984
 todruagao                       // (c) 1984
 todruagas                       // (c) 1984 pcb manufactured by Sidam
+
+@source:marblmd2.cpp
+marblmd2
 
 @source:marineb.cpp
 bcruzm12                        // (c) 1983 Sigma Ent. Inc.
@@ -23221,6 +23316,7 @@ mm2a                            // Mephisto MM II
 mm2b                            // Mephisto MM II
 mm2c                            // Mephisto MM II
 mm2d                            // Mephisto MM II
+mm2e                            // Mephisto MM II
 bup                             // Mephisto B&P
 bupa                            // Mephisto B&P
 mm4                             // Mephisto MM IV
@@ -23277,6 +23373,7 @@ mondl68k                        // 1988 Mephisto Mondial 68000XL
 @source:mephisto_montec.cpp
 montec                          // 1987 Mephisto Monte Carlo
 monteca                         // 1987 Mephisto Monte Carlo
+montec4                         // 1989 Mephisto Monte Carlo IV
 montec4le                       // 1990 Mephisto Monte Carlo IV LE
 
 @source:mephisto_polgar.cpp
@@ -23543,6 +23640,9 @@ mice2_6502                      // (c) 1986 Microtek International, Inc.
 mice2_8085                      // (c) 1986 Microtek International, Inc.
 mice2_6809                      // (c) 1986 Microtek International, Inc.
 
+@source:miconkit.cpp
+micon2
+
 @source:micral.cpp
 micral                          //
 questarm
@@ -23561,13 +23661,15 @@ tankbatl                        // (c) 1992 Microprose Games Inc.
 dm3270                          //
 
 @source:microdar.cpp
-dibifuca                        // (c) 199? Compumatic
-dibif743                        // (c) 199? Compumatic
-dibif727                        // (c) 199? Compumatic
 cfarwest                        // (c) 1997 Compumatic
-prospdp                         // (c) 1997 Compumatic
-diolakoa                        // (c) 1997 Compumatic
-diola827                        // (c) 1997 Compumatic
+covidarts                       // (c) 1997 Covielsa
+dibifpspdp                      // (c) 1997 Compumatic / Bifuca
+dibif727                        // (c) 199? Compumatic / Bifuca
+dibif743                        // (c) 199? Compumatic / Bifuca
+dibifuca                        // (c) 199? Compumatic / Bifuca
+diola827                        // (c) 1997 Compumatic / Olakoa
+diolakoa                        // (c) 1997 Compumatic / Olakoa
+minidart                        // (c) 2009 Compumatic
 
 @source:microdec.cpp
 md2                             //
@@ -24000,9 +24102,10 @@ daytonata                       // 1994?   Kyle Hodgetts hack
 daytonagtx                      // 2004    Kyle Hodgetts hack
 desert                          // 1994.07 Desert Tank
 doa                             // 1997.01 Dead or Alive (Revision C)
-doab                            // 1996.12 Dead or Alive (Revision B)
-doaa                            // 1996.11 Dead or Alive (Revision A)
+doaa                            // 1996.12 Dead or Alive (Revision A)
 doaab                           // 1996.11 Dead or Alive (Revision A)
+doaae                           // 1996.11 Dead or Alive (Revision A)
+doab                            // 1996.12 Dead or Alive (Revision B)
 dynabb                          // 1996.08 Dynamite Baseball
 dynabb97                        // 1997.04 Dynamite Baseball 97 (Revision A)
 dynamcop                        // 1998.09 Dynamic Cop (Export)
@@ -24013,7 +24116,8 @@ dyndeka2b                       // 1998.05 Dynamite Deka 2 (Japan)
 fvipers                         // 1995.11 Fighting Vipers (Revision D)
 fvipersb                        // 1995.11 Fighting Vipers (Revision B)
 gunblade                        // 1996.04 Gunblade N.Y. (Revision A)
-hotd                            // 1997.03 The House of the Dead
+hotd                            // 1997.0? The House of the Dead (Revision A)
+hotdo                           // 1997.03 The House of the Dead
 hotdp                           // 1997.01 The House of the Dead (prototype)
 indy500                         // 1995.07 Indy 500 (Revision A, Newer)
 indy500d                        // 1995.07 Indy 500 Deluxe (Revision A)
@@ -24300,7 +24404,7 @@ m3xchngg                        // Exchanges Galore (Barcrest)
 m3xchngu                        // Exchanges Unlimited (Barcrest)
 m3xchngua                       //
 
-@source:mpu4.cpp
+@source:mpu4unsorted.cpp
 m4aao                           // Against All Odds (Eurotek)
 m4addrd                         //
 m4aliz                          // AlizBaz (Qps)
@@ -24348,14 +24452,12 @@ m4ccop                          //
 m4ccopa                         //
 m4ccopb                         //
 m4ceptr                         // Ceptor (Barcrest)
-m4ch30                          // Unknown MPU4 'CH30' (Barcrest)
 m4chasei                        // Chase Invaders (Barcrest)
 m4chaseia                       //
 m4chaseib                       //
 m4chaseic                       //
 m4chaseid                       //
 m4chaseie                       //
-m4chaseif                       //
 m4chaseig                       //
 m4clbveg                        // Club Vegas (Barcrest)
 m4clbvega                       //
@@ -24364,7 +24466,6 @@ m4clbvegc                       //
 m4clbx                          // Club X (Barcrest)
 m4clbxa                         //
 m4clbxb                         //
-m4cld02                         // Unknown MPU4 'CLD 0.2C'
 m4clr                           // MPU4 Meter Clear ROM
 m4coney                         // Coney Island (Qps)
 m4crjwl                         // Crown Jewels Club (Barcrest)
@@ -24386,7 +24487,6 @@ m4crzjwle                       //
 m4crzjwlf                       //
 m4crzjwlg                       //
 m4crzjwlh                       //
-m4czne                          // Cash Zone (Bwb)
 m4dblchn                        // Double Chance (DJE)
 m4ddb                           // Ding Dong Bells (Coinworld)
 m4ddba                          //
@@ -24397,6 +24497,7 @@ m4drac                          // Dracula (Barcrest - Nova)
 m4draca                         //
 m4dracb                         //
 m4dragon                        // Dragon (Nova)
+m4eaw51                         // Everyone's A Winner?
 m4esctbg                        // Escalera Tobogan (Vifico)
 m4esctbga                       //
 m4esctbgb                       //
@@ -24425,9 +24526,7 @@ m4hirisec                       //
 m4hirised                       //
 m4hirisee                       //
 m4holdtm                        // Hold Timer (Barcrest)
-m4holywd                        // Hollywood (Bwb)
 m4hpyjok                        // Happy Joker (Barcrest)
-m4hslo                          // Unknown MPU4 'HOT 3.0'
 m4hstr                          // Happy Streak (Coinworld)
 m4hstra                         //
 m4hstrb                         //
@@ -24482,7 +24581,6 @@ m4ordmnd                        // Oriental Diamonds (Barcrest)
 m4prem                          // Premier (Barcrest)
 m4ptblkc                        // Pot Black Casino (Bwb - Barcrest)
 m4rdht                          // Red Heat (Barcrest)
-m4reeltm                        // Reel Timer (Barcrest)
 m4remag                         // Unknown MPU4 'ZTP 0.7'
 m4ringfr                        // Ring Of Fire (Barcrest)
 m4riotrp                        // Rio Tropico (unknown)
@@ -24515,19 +24613,11 @@ m4sunscla                       //
 m4sunsclb                       //
 m4sunseta                       //
 m4sunsetb                       //
-m4sunsetc                       //
 m4supbf                         // Super Bucks Fizz Club (Barcrest)
 m4supbfa                        //
-m4supbjc                        // Super Blackjack Club (Barcrest)
-m4supbjca                       //
-m4supbjcb                       //
-m4supbjcc                       //
-m4supbjcd                       //
 m4surf                          // Super Surfin' (Gemini)
 m4surfa                         //
 m4surfb                         //
-m4t266                          // Unknown MPU4 'TTO 1.1'
-m4take5                         // Take 5 (Barcrest)
 m4tbplay                        // Turbo Play (Barcrest)
 m4tbplaya                       //
 m4tbplayb                       //
@@ -24551,10 +24641,6 @@ m4twist                         // Twist Again (Barcrest)
 m4twista                        //
 m4twistb                        //
 m4univ                          // Universe (Barcrest)
-m4unkjok                        // Unknown MPU4 'Joker'
-m4unkjoka                       //
-m4unkjokb                       //
-m4unkjokc                       //
 m4vegastg                       //
 m4vivalvd                       //
 m4vivan                         // Viva Las Vegas (Nova)
@@ -25076,7 +25162,6 @@ m4bigmt__a                      //
 m4bigmt__b                      //
 m4bigmt__c                      //
 m4bigmt__d                      //
-m4bigmt__e                      //
 m4bigmt__f                      //
 m4bingbl                        // Bingo Belle (Bwb)
 m4bingbl__a                     //
@@ -25491,6 +25576,17 @@ m4trex__i                       //
 m4trex__j                       //
 m4trex__k                       //
 m4trex__l                       //
+m4tutbwb                        //
+m4tutbwb_a                      //
+m4tutbwb_b                      //
+m4tutbwb_c                      //
+m4tutbwb_d                      //
+m4tutbwb_e                      //
+m4tutbwb_f                      //
+m4tutbwb_g                      //
+m4tutbwb_h                      //
+m4tutbwb_i                      //
+m4tutbwb_j                      //
 m4vdexpr                        // Voodoo Express (Bwb)
 m4vdexpr__a                     //
 m4vdexpr__b                     //
@@ -26014,6 +26110,13 @@ m4c999                          // Cloud 999 (Barcrest)
 m4c999a                         //
 m4c999b                         //
 m4c999c                         //
+m4c999d                         //
+m4c999e                         //
+m4c999f                         //
+m4c999g                         //
+m4c999h                         //
+m4c999i                         //
+m4c999j                         //
 m4cardcs                        // Card Cash (Barcrest)
 m4cashcn                        // Cash Connect (Barcrest)
 m4cashco                        // Cash Counter (Barcrest)
@@ -26025,9 +26128,9 @@ m4cashmx                        // Cash Matrix (Barcrest)
 m4cashmxa                       //
 m4cashzn                        // Cash Zone (Barcrest)
 m4cashzna                       //
+m4czne                          // Cash Zone (Bwb)
 m4celclb                        // Celebration Club (Barcrest)
 m4centpt                        // Centrepoint (Barcrest)
-m4centpta                       // Centrepoint (Barcrest)
 m4cheryo                        // Cherryo (Barcrest)
 m4class                         // First Class (Barcrest)
 m4classa                        //
@@ -26089,6 +26192,7 @@ m4hiroll                        // High Roller (Barcrest)
 m4hittp2                        //
 m4hittp2a                       //
 m4holdon                        // Hold On (Barcrest)
+m4holywd                        // Hollywood (Bwb)
 m4intcep                        // Interceptor (Barcrest)
 m4intcepa                       //
 m4intcepb                       //
@@ -26127,6 +26231,27 @@ m4nicke                         //
 m4nifty                         // Nifty Fifty (Barcrest)
 m4niftya                        //
 m4niftyb                        //
+m4nnww2                         // Nudge Nudge Wink Wink
+m4nnww2__a                      //
+m4nnww2__b                      //
+m4nnww2__c                      //
+m4nnww2__d                      //
+m4nnww2__e                      //
+m4nnww2__f                      //
+m4nnww2__g                      //
+m4nnww2__h                      //
+m4nnww2__i                      //
+m4nnww2__j                      //
+m4nnww2__k                      //
+m4nnww2__l                      //
+m4nnww2__m                      //
+m4nnww2__n                      //
+m4nnww2__o                      //
+m4nnww2__hx1                    //
+m4nnww2__hx2                    //
+m4nnww2__hx3                    //
+m4nnww2__hx4                    //
+m4nnww2__hx5                    //
 m4nudqst                        // Nudge Quest (Barcrest)
 m4nudup                         // Nudge Up (Barcrest)
 m4num1                          // Number One (Barcrest)
@@ -26138,6 +26263,7 @@ m4potlck                        // Pot Luck Club (Barcrest)
 m4potlcka                       //
 m4r2r                           // Reel 2 Reel (Barcrest)
 m4randr                         // Random Roulette (Barcrest)
+m4redunk                        // unknown RED
 m4reelpk                        // Reel Poker (Barcrest)
 m4rsg                           // Ready Steady Go (Barcrest) (type 1)
 m4rsga                          //
@@ -26162,6 +26288,7 @@ m4starbr                        // Stars And Bars (Barcrest)
 m4stards                        // Stardust (Barcrest)
 m4stopcl                        // Stop the Clock (Barcrest)
 m4sunset                        // Sunset Boulevard (Barcrest)
+m4sunsetc                       //
 m4sunsetd                       //
 m4sunsete                       //
 m4sunsetf                       //
@@ -26192,10 +26319,12 @@ m4suptub                        // Super Tubes (Barcrest)
 m4suptuba                       //
 m4suptwo                        // Super Two (Barcrest)
 m4swpnot                        // Swap-A-Note (Barcrest)
-m4swpnota                       // Swap-A-Note (Barcrest)
+m4swpnota                       //
+m4swpnotb                       //
 m4taj                           // Taj Mahal (Barcrest)
 m4take2                         // Take Two (Barcrest)
 m4take2a                        //
+m4t266                          // Unknown MPU4 'TTO 1.1'
 m4tbreel                        // Turbo Reel (Barcrest)
 m4tbrldx                        // Turbo Reel Deluxe (Barcrest)
 m4thehit                        // The Hit (Barcrest)
@@ -26213,306 +26342,15 @@ m4tridic                        // Triple Dice (Barcrest)
 m4ttak                          // Tic Tac Take (unknown)
 m4tupen                         // Tuppenny Cracker (Barcrest - Bootleg)
 m4twilgt                        // Twilight (Barcrest)
+m4unkjok                        // Unknown MPU4 'Joker'
+m4unkjoka                       //
+m4unkjokb                       //
+m4unkjokc                       //
 m4wayin                         // Way In (Barcrest)
 m4wayina                        //
 m4wildms                        // Wild Mystery (Barcrest)
 
-@source:mpu4mod4yam.cpp
-m4acechs                        // Ace Chase (Bwb)
-m4acechs__a                     //
-m4acechs__b                     //
-m4acechs__c                     //
-m4acechs__d                     //
-m4acechs__e                     //
-m4acechs__f                     //
-m4acechs__g                     //
-m4acechs__h                     //
-m4acechs__i                     //
-m4acechs__j                     //
-m4acechs__k                     //
-m4acechs__l                     //
-m4acechs__m                     //
-m4acechs__n                     //
-m4acechs__o                     //
-m4acechs__p                     //
-m4acechs__q                     //
-m4acechs__r                     //
-m4acechs__s                     //
-m4acechs__t                     //
-m4acechs__u                     //
-m4clbshf                        // Club Shuffle (Barcrest)
-m4cojok                         // Carry On Joker (Barcrest)
-m4cojok__a                      //
-m4cojok__b                      //
-m4cojok__c                      //
-m4cojok__d                      //
-m4cojok__e                      //
-m4cojok__f                      //
-m4fastfw                        // Fast Forward (Barcrest - Bwb)
-m4fastfw__a                     //
-m4fastfw__b                     //
-m4fastfw__c                     //
-m4fastfw__d                     //
-m4fastfw__e                     //
-m4fastfw__f                     //
-m4gambal                        // Gamball (Barcrest)
-m4gambal__a                     //
-m4gambal__b                     //
-m4gambal__c                     //
-m4graff                         // Graffiti (Barcrest)
-m4graff__a                      //
-m4graff__b                      //
-m4graffd                        //
-m4joljokd                       //
-m4monte                         // Monte Carlo (Barcrest)
-m4monte__a                      //
-m4monte__b                      //
-m4monte__c                      //
-m4monte__d                      //
-m4monte__e                      //
-m4monte__f                      //
-m4monte__g                      //
-m4monte__h                      //
-m4monte__i                      //
-m4monte__j                      //
-m4monte__k                      //
-m4monte__l                      //
-m4monte__m                      //
-m4montez
-m4monteza
-m4montezb
-m4montezc
-m4montezd
-m4monteze
-m4montezf
-m4montezg
-m4montezh
-m4montezi
-m4montezj
-m4nudbnk                        // Nudge Banker (Barcrest)
-m4nudbnk__a                     //
-m4nudbnk__b                     //
-m4nudbnk__c                     //
-m4nudbnk__d                     //
-m4przmc                         // Prize Monte Carlo (Barcrest)
-m4przmc__a                      //
-m4przmc__b                      //
-m4przmc__c                      //
-m4przmc__d                      //
-m4przmc__e                      //
-m4przmc__f                      //
-m4przsss                        // Prize Spend Spend Spend (Barcrest)
-m4przsss__0                     //
-m4przsss__a                     //
-m4przsss__b                     //
-m4przsss__c                     //
-m4przsss__d                     //
-m4przsss__e                     //
-m4przsss__f                     //
-m4przsss__g                     //
-m4przsss__h                     //
-m4przsss__i                     //
-m4przsss__j                     //
-m4przsss__k                     //
-m4przsss__l                     //
-m4przsss__m                     //
-m4przsss__n                     //
-m4przsss__o                     //
-m4przsss__p                     //
-m4przsss__q                     //
-m4przsss__r                     //
-m4przsss__s                     //
-m4przsss__t                     //
-m4przsss__u                     //
-m4przsss__v                     //
-m4przsss__w                     //
-m4przsss__x                     //
-m4przsss__y                     //
-m4przsss__z                     //
-m4ra                            // Red Alert (Barcrest)
-m4ra__a                         //
-m4ra__b                         //
-m4ra__c                         //
-m4ra__d                         //
-m4ra__e                         //
-m4ra__f                         //
-m4ra__g                         //
-m4ra__h                         //
-m4ra__i                         //
-m4ra__j                         //
-m4ra__k                         //
-m4ra__l                         //
-m4ra__m                         //
-m4ra__n                         //
-m4ra__o                         //
-m4ra__p                         //
-m4ra__q                         //
-m4ra__r                         //
-m4sayno                         // Say No More (Barcrest)
-m4sayno__a                      //
-m4sayno__b                      //
-m4sayno__c                      //
-m4sayno__d                      //
-m4sss                           // Spend Spend Spend (Barcrest)
-m4sss__a                        //
-m4sss__b                        //
-m4sss__c                        //
-m4sss__d                        //
-m4sss__e                        //
-m4sss__f                        //
-m4sss__g                        //
-m4sss__h                        //
-m4sss__i                        //
-m4sss__j                        //
-m4sss__k                        //
-m4sss__l                        //
-m4sstrek                        // Super Streak (bootleg)
-m4stc                           // Unknown MPU4 'STC 0.1' (Barcrest)
-m4supst                         // Super Streak (Barcrest)
-m4supst__0                      //
-m4supst__1                      //
-m4supst__2                      //
-m4supst__3                      //
-m4supst__4                      //
-m4supst__5                      //
-m4supst__6                      //
-m4supst__7                      //
-m4supst__8                      //
-m4supst__9                      //
-m4supst__a                      //
-m4supst__a0                     //
-m4supst__a1                     //
-m4supst__a2                     //
-m4supst__a3                     //
-m4supst__a4                     //
-m4supst__a5                     //
-m4supst__a6                     //
-m4supst__a7                     //
-m4supst__a8                     //
-m4supst__a9                     //
-m4supst__aa                     //
-m4supst__ab                     //
-m4supst__ac                     //
-m4supst__ad                     //
-m4supst__ae                     //
-m4supst__af                     //
-m4supst__ag                     //
-m4supst__ah                     //
-m4supst__ai                     //
-m4supst__aj                     //
-m4supst__ak                     //
-m4supst__al                     //
-m4supst__am                     //
-m4supst__an                     //
-m4supst__ao                     //
-m4supst__ap                     //
-m4supst__aq                     //
-m4supst__ar                     //
-m4supst__as                     //
-m4supst__at                     //
-m4supst__au                     //
-m4supst__av                     //
-m4supst__aw                     //
-m4supst__ax                     //
-m4supst__ay                     //
-m4supst__az                     //
-m4supst__b                      //
-m4supst__b0                     //
-m4supst__b1                     //
-m4supst__b2                     //
-m4supst__b3                     //
-m4supst__b4                     //
-m4supst__b5                     //
-m4supst__ba                     //
-m4supst__bb                     //
-m4supst__bc                     //
-m4supst__bd                     //
-m4supst__be                     //
-m4supst__bf                     //
-m4supst__bg                     //
-m4supst__bh                     //
-m4supst__bi                     //
-m4supst__bj                     //
-m4supst__bk                     //
-m4supst__bl                     //
-m4supst__bm                     //
-m4supst__bn                     //
-m4supst__bo                     //
-m4supst__bp                     //
-m4supst__bq                     //
-m4supst__br                     //
-m4supst__bs                     //
-m4supst__bt                     //
-m4supst__bu                     //
-m4supst__bv                     //
-m4supst__bw                     //
-m4supst__bx                     //
-m4supst__by                     //
-m4supst__bz                     //
-m4supst__c                      //
-m4supst__d                      //
-m4supst__e                      //
-m4supst__f                      //
-m4supst__g                      //
-m4supst__h                      //
-m4supst__i                      //
-m4supst__j                      //
-m4supst__k                      //
-m4supst__l                      //
-m4supst__m                      //
-m4supst__n                      //
-m4supst__o                      //
-m4supst__p                      //
-m4supst__q                      //
-m4supst__r                      //
-m4supst__s                      //
-m4supst__t                      //
-m4supst__u                      //
-m4supst__v                      //
-m4supst__w                      //
-m4supst__x                      //
-m4supst__y                      //
-m4supst__z                      //
-m4tst                           // MPU4 Unit Test (Program 4)
-m4vivalv                        // Viva Las Vegas (Barcrest)
-m4vivalv__0                     //
-m4vivalv__1                     //
-m4vivalv__2                     //
-m4vivalv__3                     //
-m4vivalv__4                     //
-m4vivalv__5                     //
-m4vivalv__6                     //
-m4vivalv__7                     //
-m4vivalv__8                     //
-m4vivalv__9                     //
-m4vivalv__a                     //
-m4vivalv__b                     //
-m4vivalv__c                     //
-m4vivalv__e                     //
-m4vivalv__f                     //
-m4vivalv__g                     //
-m4vivalv__h                     //
-m4vivalv__i                     //
-m4vivalv__j                     //
-m4vivalv__k                     //
-m4vivalv__l                     //
-m4vivalv__m                     //
-m4vivalv__n                     //
-m4vivalv__o                     //
-m4vivalv__p                     //
-m4vivalv__q                     //
-m4vivalv__r                     //
-m4vivalv__s                     //
-m4vivalv__t                     //
-m4vivalv__u                     //
-m4vivalv__v                     //
-m4vivalv__w                     //
-m4vivalv__x                     //
-m4vivalv__y                     //
-m4vivalv__z                     //
-m4voodoo                        // Voodoo 1000 (Barcrest)
-
-@source:mpu4sw.cpp
+@source:mpu4mod4oki.cpp
 m4actbnk                        // Action Bank (Barcrest)
 m4actbnk__a                     //
 m4actbnk__b                     //
@@ -26523,70 +26361,6 @@ m4actbnk__f                     //
 m4actbnk__g                     //
 m4actbnk__h                     //
 m4actbnk__i                     //
-m4addr                          // Adders & Ladders (Barcrest)
-m4addr_h1                       //
-m4addr_h2                       //
-m4addr10                        //
-m4addr10_a                      //
-m4addr10c                       //
-m4addr10c_a                     //
-m4addr10d                       //
-m4addr10d_a                     //
-m4addr10yd                      //
-m4addr10yd_a                    //
-m4addr3                         //
-m4addr3_a                       //
-m4addr3_b                       //
-m4addr3_c                       //
-m4addr3_d                       //
-m4addr3d                        //
-m4addr3d_a                      //
-m4addr3d_b                      //
-m4addr3d_c                      //
-m4addr3yd                       //
-m4addr3yd_a                     //
-m4addr3yd_b                     //
-m4addr3yd_c                     //
-m4addr4                         //
-m4addr4_a                       //
-m4addr4c                        //
-m4addr4c_a                      //
-m4addr4c_b                      //
-m4addr4d                        //
-m4addr4yd                       //
-m4addr5                         //
-m4addr5_a                       //
-m4addr5c                        //
-m4addr5c_a                      //
-m4addr5d                        //
-m4addr5d_a                      //
-m4addr5yd                       //
-m4addr5yd_a                     //
-m4addr6lc                       //
-m4addr6ld                       //
-m4addr6lk                       //
-m4addr6ly                       //
-m4addr6lybd                     //
-m4addr6lyd                      //
-m4addrc                         // Adders & Ladders Classic (Barcrest)
-m4addrc__a                      //
-m4addrc__b                      //
-m4addrc__c                      //
-m4addrc__d                      //
-m4addrc__e                      //
-m4addrc__f                      //
-m4addrc__h                      //
-m4addrc__i                      //
-m4addrc__j                      //
-m4addrc__k                      //
-m4addrc__l                      //
-m4addrc__m                      //
-m4addrc__n                      //
-m4addrcc                        // Adders & Ladders Classic Club (Barcrest)
-m4addrcc__a                     //
-m4addrcc__b                     //
-m4addrcc__c                     //
-m4addrcc__d                     //
 m4andybt                        // Andy's Big Time Club (Barcrest)
 m4andybt__a                     //
 m4andybt__b                     //
@@ -27047,10 +26821,6 @@ m4c9__7                         //
 m4c9__8                         //
 m4c9__9                         //
 m4c9__a                         //
-m4c9__a0                        //
-m4c9__a1                        //
-m4c9__a2                        //
-m4c9__a3                        //
 m4c9__aa                        //
 m4c9__ab                        //
 m4c9__ac                        //
@@ -27075,8 +26845,6 @@ m4c9__au                        //
 m4c9__av                        //
 m4c9__aw                        //
 m4c9__ax                        //
-m4c9__ay                        //
-m4c9__az                        //
 m4c9__b                         //
 m4c9__c                         //
 m4c9__d                         //
@@ -27089,7 +26857,6 @@ m4c9__j                         //
 m4c9__k                         //
 m4c9__l                         //
 m4c9__m                         //
-m4c9__n                         //
 m4c9__o                         //
 m4c9__p                         //
 m4c9__q                         //
@@ -27574,7 +27341,6 @@ m4eaw__bu                       //
 m4eaw__bv                       //
 m4eaw__bw                       //
 m4eaw__bx                       //
-m4eaw__bz                       //
 m4eaw__c                        //
 m4eaw__d                        //
 m4eaw__e                        //
@@ -27603,30 +27369,6 @@ m4gb006                         // Games Bond 006 (Barcrest)
 m4gb006__a                      //
 m4gb006__b                      //
 m4gb006__c                      //
-m4gbust                         // Ghost Buster (Barcrest)
-m4gbust__a                      //
-m4gbust__b                      //
-m4gbust__c                      //
-m4gbust__d                      //
-m4gbust__e                      //
-m4gbust__f                      //
-m4gbust__g                      //
-m4gbust__h                      //
-m4gbust__i                      //
-m4gbust__j                      //
-m4gbust__k                      //
-m4gbust__l                      //
-m4gbust__m                      //
-m4gbust__n                      //
-m4gbust__o                      //
-m4gbust__p                      //
-m4gbust__q                      //
-m4gbust__r                      //
-m4gbust__s                      //
-m4gbust__t                      //
-m4gbust__u                      //
-m4gbust__v                      //
-m4gbust__w                      //
 m4gclue                         // Give Us A Clue (Barcrest)
 m4gclue__a                      //
 m4gclue__b                      //
@@ -27844,33 +27586,6 @@ m4hotrod__s                     //
 m4hotrod__t                     //
 m4hotrod__u                     //
 m4hotrod__v                     //
-m4hypclb                        // Hyper Viper Club (Barcrest)
-m4hypclb__a                     //
-m4hypclb__b                     //
-m4hypclb__c                     //
-m4hypvip                        // Hyper Viper (Barcrest)
-m4hypvip__a                     //
-m4hypvip__b                     //
-m4hypvip__c                     //
-m4hypvip__d                     //
-m4hypvip__e                     //
-m4hypvip__f                     //
-m4hypvip__g                     //
-m4hypvip__h                     //
-m4hypvip__i                     //
-m4hypvip__j                     //
-m4hypvip__k                     //
-m4hypvip__l                     //
-m4hypvip__m                     //
-m4hypvip__n                     //
-m4hypvip__o                     //
-m4hypvip__p                     //
-m4hypvip__q                     //
-m4hypvip__r                     //
-m4hypvip__s                     //
-m4hypvip__t                     //
-m4hypvip__u                     //
-m4hypvip__v                     //
 m4jolgem                        // Jolly Gems (Barcrest)
 m4jolgem__0                     //
 m4jolgem__1                     //
@@ -28431,15 +28146,6 @@ m4nhtt__h                       //
 m4nhtt__i                       //
 m4nhtt__j                       //
 m4nnww                          // Nudge Nudge Wink Wink (Barcrest)
-m4nnww__0                       //
-m4nnww__1                       //
-m4nnww__2                       //
-m4nnww__3                       //
-m4nnww__4                       //
-m4nnww__5                       //
-m4nnww__6                       //
-m4nnww__7                       //
-m4nnww__8                       //
 m4nnww__9                       //
 m4nnww__a                       //
 m4nnww__aa                      //
@@ -28460,14 +28166,8 @@ m4nnww__ao                      //
 m4nnww__ap                      //
 m4nnww__aq                      //
 m4nnww__ar                      //
-m4nnww__as                      //
-m4nnww__at                      //
-m4nnww__au                      //
-m4nnww__av                      //
-m4nnww__aw                      //
 m4nnww__ax                      //
 m4nnww__ay                      //
-m4nnww__az                      //
 m4nnww__b                       //
 m4nnww__c                       //
 m4nnww__d                       //
@@ -28491,8 +28191,6 @@ m4nnww__u                       //
 m4nnww__v                       //
 m4nnww__w                       //
 m4nnww__x                       //
-m4nnww__y                       //
-m4nnww__z                       //
 m4nnwwc                         // Nudge Nudge Wink Wink Classic (Barcrest)
 m4nnwwc__0                      //
 m4nnwwc__1                      //
@@ -28762,8 +28460,6 @@ m4przmns__l                     //
 m4przmns__m                     //
 m4przmns__n                     //
 m4przmon                        // Prize Money (Barcrest)
-m4przmon__0                     //
-m4przmon__1                     //
 m4przmon__a                     //
 m4przmon__b                     //
 m4przmon__c                     //
@@ -28780,16 +28476,6 @@ m4przmon__m                     //
 m4przmon__n                     //
 m4przmon__o                     //
 m4przmon__p                     //
-m4przmon__q                     //
-m4przmon__r                     //
-m4przmon__s                     //
-m4przmon__t                     //
-m4przmon__u                     //
-m4przmon__v                     //
-m4przmon__w                     //
-m4przmon__x                     //
-m4przmon__y                     //
-m4przmon__z                     //
 m4przrf                         // Prize Rich And Famous (Barcrest)
 m4przrf__a                      //
 m4przrf__b                      //
@@ -29062,7 +28748,6 @@ m4rhr__5                        //
 m4rhr__6                        //
 m4rhr__7                        //
 m4rhr__8                        //
-m4rhr__9                        //
 m4rhr__a                        //
 m4rhr__a0                       //
 m4rhr__a1                       //
@@ -29130,6 +28815,7 @@ m4rhrc__5                       //
 m4rhrc__6                       //
 m4rhrc__7                       //
 m4rhrc__8                       //
+m4rhrc__9                       //
 m4rhrc__a                       //
 m4rhrc__aa                      //
 m4rhrc__b                       //
@@ -29251,24 +28937,12 @@ m4ssclas__b                     //
 m4ssclas__c                     //
 m4ssclas__d                     //
 m4ssclas__e                     //
-m4ssclas__f                     //
-m4suphv                         // Super Hyper Viper (Barcrest)
-m4suphv__a                      //
-m4suphv__b                      //
-m4suphv__c                      //
-m4suphv__d                      //
-m4suphv__e                      //
-m4suphv__f                      //
-m4suphv__g                      //
-m4suphv__h                      //
-m4suphv__i                      //
-m4suphv__j                      //
-m4suphv__k                      //
-m4suphv__l                      //
-m4suphv__m                      //
-m4suphv__n                      //
-m4suphv__o                      //
-m4suphv__p                      //
+m4supbjc                        // Super Blackjack Club (Barcrest)
+m4supbjca                       //
+m4supbjcb                       //
+m4supbjcc                       //
+m4supbjcd                       //
+m4take5                         // Top Tenner / Take 5 (bootleg)
 m4takepk                        // Take Your Pick (Barcrest)
 m4takepk__0                     //
 m4takepk__1                     //
@@ -29617,12 +29291,6 @@ m4tutfrt__7                     //
 m4tutfrt__8                     //
 m4tutfrt__9                     //
 m4tutfrt__a                     //
-m4tutfrt__a0                    //
-m4tutfrt__a1                    //
-m4tutfrt__a2                    //
-m4tutfrt__a3                    //
-m4tutfrt__a4                    //
-m4tutfrt__a5                    //
 m4tutfrt__aa                    //
 m4tutfrt__ab                    //
 m4tutfrt__ac                    //
@@ -29643,11 +29311,6 @@ m4tutfrt__ar                    //
 m4tutfrt__as                    //
 m4tutfrt__at                    //
 m4tutfrt__au                    //
-m4tutfrt__av                    //
-m4tutfrt__aw                    //
-m4tutfrt__ax                    //
-m4tutfrt__ay                    //
-m4tutfrt__az                    //
 m4tutfrt__b                     //
 m4tutfrt__c                     //
 m4tutfrt__d                     //
@@ -29754,8 +29417,9 @@ m4vegast__r                     //
 m4vegast__s                     //
 m4vegast__t                     //
 m4vegast__u                     //
-m4vegast__v                     //
 m4vegast__x                     //
+m4vegast__0                     //
+m4vegast__1                     //
 m4vivaes                        // Viva Espana (Barcrest)
 m4vivaes__0                     //
 m4vivaes__1                     //
@@ -29890,6 +29554,442 @@ m4wta__w                        //
 m4wta__x                        //
 m4wta__y                        //
 m4wta__z                        //
+
+@source:mpu4mod4yam.cpp
+m4acechs                        // Ace Chase (Bwb)
+m4acechs__a                     //
+m4acechs__b                     //
+m4acechs__c                     //
+m4acechs__d                     //
+m4acechs__e                     //
+m4acechs__f                     //
+m4acechs__g                     //
+m4acechs__h                     //
+m4acechs__i                     //
+m4acechs__j                     //
+m4acechs__k                     //
+m4acechs__l                     //
+m4acechs__m                     //
+m4acechs__n                     //
+m4acechs__o                     //
+m4acechs__p                     //
+m4acechs__q                     //
+m4acechs__r                     //
+m4acechs__s                     //
+m4acechs__t                     //
+m4acechs__u                     //
+m4addr                          // Adders & Ladders (Barcrest)
+m4addr_h1                       //
+m4addr_h2                       //
+m4addr10                        //
+m4addr10_a                      //
+m4addr10c                       //
+m4addr10c_a                     //
+m4addr10d                       //
+m4addr10d_a                     //
+m4addr10yd                      //
+m4addr10yd_a                    //
+m4addr3                         //
+m4addr3_a                       //
+m4addr3_b                       //
+m4addr3_c                       //
+m4addr3_d                       //
+m4addr3d                        //
+m4addr3d_a                      //
+m4addr3d_b                      //
+m4addr3d_c                      //
+m4addr3yd                       //
+m4addr3yd_a                     //
+m4addr3yd_b                     //
+m4addr3yd_c                     //
+m4addr4                         //
+m4addr4_a                       //
+m4addr4c                        //
+m4addr4c_a                      //
+m4addr4c_b                      //
+m4addr4d                        //
+m4addr4yd                       //
+m4addr5                         //
+m4addr5_a                       //
+m4addr5c                        //
+m4addr5c_a                      //
+m4addr5d                        //
+m4addr5d_a                      //
+m4addr5yd                       //
+m4addr5yd_a                     //
+m4addr6lc                       //
+m4addr6ld                       //
+m4addr6lk                       //
+m4addr6ly                       //
+m4addr6lybd                     //
+m4addr6lyd                      //
+m4addrc                         // Adders & Ladders Classic (Barcrest)
+m4addrc__a                      //
+m4addrc__b                      //
+m4addrc__c                      //
+m4addrc__d                      //
+m4addrc__h                      //
+m4addrc__i                      //
+m4addrc__j                      //
+m4addrc__k                      //
+m4addrc__l                      //
+m4addrc__m                      //
+m4addrcc                        // Adders & Ladders Classic Club (Barcrest)
+m4addrcc__a                     //
+m4addrcc__b                     //
+m4addrcc__c                     //
+m4addrcc__d                     //
+m4clbshf                        // Club Shuffle (Barcrest)
+m4cojok                         // Carry On Joker (Barcrest)
+m4cojok__a                      //
+m4cojok__b                      //
+m4cojok__c                      //
+m4cojok__d                      //
+m4cojok__e                      //
+m4cojok__f                      //
+m4fastfw                        // Fast Forward (Barcrest - Bwb)
+m4fastfw__a                     //
+m4fastfw__b                     //
+m4fastfw__c                     //
+m4fastfw__d                     //
+m4fastfw__e                     //
+m4fastfw__f                     //
+m4gambal                        // Gamball (Barcrest)
+m4gambal__a                     //
+m4gambal__b                     //
+m4gambal__c                     //
+m4gbust                         // Ghost Buster (Barcrest)
+m4gbust__a                      //
+m4gbust__b                      //
+m4gbust__c                      //
+m4gbust__d                      //
+m4gbust__e                      //
+m4gbust__f                      //
+m4gbust__g                      //
+m4gbust__h                      //
+m4gbust__i                      //
+m4gbust__j                      //
+m4gbust__k                      //
+m4gbust__l                      //
+m4gbust__m                      //
+m4gbust__n                      //
+m4gbust__o                      //
+m4gbust__p                      //
+m4gbust__q                      //
+m4gbust__r                      //
+m4gbust__s                      //
+m4gbust__t                      //
+m4gbust__u                      //
+m4gbust__v                      //
+m4gbust__w                      //
+m4graff                         // Graffiti (Barcrest)
+m4graff__a                      //
+m4graff__b                      //
+m4graffd                        //
+m4hslo                          // Hot Slot (bootleg)
+m4hypclb                        // Hyper Viper Club (Barcrest)
+m4hypclb__a                     //
+m4hypclb__b                     //
+m4hypclb__c                     //
+m4joljokd                       //
+m4monte                         // Monte Carlo (Barcrest)
+m4monte__a                      //
+m4monte__b                      //
+m4monte__c                      //
+m4monte__d                      //
+m4monte__e                      //
+m4monte__f                      //
+m4monte__g                      //
+m4monte__h                      //
+m4monte__i                      //
+m4monte__j                      //
+m4monte__k                      //
+m4monte__l                      //
+m4monte__m                      //
+m4monteza
+m4montezb
+m4montezc
+m4montezd
+m4monteze
+m4montezf
+m4montezg
+m4montezh
+m4montezi
+m4montezj
+m4nudbnk                        // Nudge Banker (Barcrest)
+m4nudbnk__a                     //
+m4nudbnk__b                     //
+m4nudbnk__c                     //
+m4nudbnk__d                     //
+m4przmc                         // Prize Monte Carlo (Barcrest)
+m4przmc__a                      //
+m4przmc__b                      //
+m4przmc__c                      //
+m4przmc__d                      //
+m4przmc__e                      //
+m4przmc__f                      //
+m4przmc__g                      //
+m4przmc__h                     //
+m4przmc__i                     //
+m4przmc__j                     //
+m4przmc__k                     //
+m4przmc__l                     //
+m4przmc__m                     //
+m4przmc__n                     //
+m4przmc__o                     //
+m4przmc__p                     //
+m4przmc__q                     //
+m4przmc__r                     //
+m4przmc__s                     //
+m4przsss                        // Prize Spend Spend Spend (Barcrest)
+m4przsss__0                     //
+m4przsss__1                     //
+m4przsss__a                     //
+m4przsss__b                     //
+m4przsss__c                     //
+m4przsss__d                     //
+m4przsss__e                     //
+m4przsss__f                     //
+m4przsss__g                     //
+m4przsss__h                     //
+m4przsss__i                     //
+m4przsss__j                     //
+m4przsss__k                     //
+m4przsss__l                     //
+m4przsss__m                     //
+m4przsss__n                     //
+m4przsss__o                     //
+m4przsss__p                     //
+m4przsss__q                     //
+m4przsss__r                     //
+m4przsss__s                     //
+m4przsss__t                     //
+m4przsss__u                     //
+m4przsss__v                     //
+m4przsss__w                     //
+m4przsss__x                     //
+m4przsss__y                     //
+m4przsss__z                     //
+m4ra                            // Red Alert (Barcrest)
+m4ra__a                         //
+m4ra__b                         //
+m4ra__c                         //
+m4ra__d                         //
+m4ra__e                         //
+m4ra__f                         //
+m4ra__g                         //
+m4ra__h                         //
+m4ra__i                         //
+m4ra__j                         //
+m4ra__k                         //
+m4ra__l                         //
+m4ra__m                         //
+m4ra__n                         //
+m4ra__o                         //
+m4ra__p                         //
+m4ra__q                         //
+m4sayno                         // Say No More (Barcrest)
+m4sayno__a                      //
+m4sayno__b                      //
+m4sayno__c                      //
+m4sayno__d                      //
+m4sss                           // Spend Spend Spend (Barcrest)
+m4sss__b                        //
+m4sss__c                        //
+m4sss__d                        //
+m4sss__e                        //
+m4sss__f                        //
+m4sss__g                        //
+m4sss__h                        //
+m4sss__i                        //
+m4sss__j                        //
+m4sss__k                        //
+m4sss__l                        //
+m4sstrek                        // Super Streak (bootleg)
+m4stc                           //
+m4shv                           // Super Hyper Viper (Barcrest)
+m4shv__0
+m4shv__1
+m4shv__10
+m4shv__11
+m4shv__12
+m4shv__2
+m4shv__3
+m4shv__4
+m4shv__5
+m4shv__6
+m4shv__7
+m4shv__8
+m4shv__9
+m4shv__a
+m4shv__b
+m4shv__c
+m4shv__d
+m4shv__e
+m4shv__f
+m4shv__g
+m4shv__h
+m4shv__i
+m4shv__j
+m4shv__k
+m4shv__l
+m4shv__m
+m4shv__n
+m4shv__o
+m4shv__p
+m4shv__q
+m4shv__r
+m4shv__s
+m4shv__t
+m4shv__u
+m4shv__v
+m4shv__w
+m4shv__x
+m4shv__y
+m4shv__z
+m4supst                         // Super Streak (Barcrest)
+m4supst__0                      //
+m4supst__1                      //
+m4supst__2                      //
+m4supst__3                      //
+m4supst__4                      //
+m4supst__5                      //
+m4supst__6                      //
+m4supst__7                      //
+m4supst__8                      //
+m4supst__9                      //
+m4supst__a                      //
+m4supst__a0                     //
+m4supst__a1                     //
+m4supst__a2                     //
+m4supst__a3                     //
+m4supst__a4                     //
+m4supst__a5                     //
+m4supst__a6                     //
+m4supst__a7                     //
+m4supst__a8                     //
+m4supst__a9                     //
+m4supst__aa                     //
+m4supst__ab                     //
+m4supst__ac                     //
+m4supst__ad                     //
+m4supst__ae                     //
+m4supst__af                     //
+m4supst__ag                     //
+m4supst__ah                     //
+m4supst__ai                     //
+m4supst__aj                     //
+m4supst__ak                     //
+m4supst__al                     //
+m4supst__am                     //
+m4supst__an                     //
+m4supst__ao                     //
+m4supst__ap                     //
+m4supst__aq                     //
+m4supst__ar                     //
+m4supst__as                     //
+m4supst__at                     //
+m4supst__au                     //
+m4supst__av                     //
+m4supst__aw                     //
+m4supst__ax                     //
+m4supst__ay                     //
+m4supst__az                     //
+m4supst__b                      //
+m4supst__b0                     //
+m4supst__b1                     //
+m4supst__b2                     //
+m4supst__b3                     //
+m4supst__b4                     //
+m4supst__b5                     //
+m4supst__b6                     //
+m4supst__b7                     //
+m4supst__ba                     //
+m4supst__bb                     //
+m4supst__bc                     //
+m4supst__bd                     //
+m4supst__be                     //
+m4supst__bf                     //
+m4supst__bg                     //
+m4supst__bh                     //
+m4supst__bi                     //
+m4supst__bj                     //
+m4supst__bk                     //
+m4supst__bl                     //
+m4supst__bm                     //
+m4supst__bn                     //
+m4supst__bo                     //
+m4supst__bp                     //
+m4supst__bq                     //
+m4supst__br                     //
+m4supst__bs                     //
+m4supst__bt                     //
+m4supst__bu                     //
+m4supst__bv                     //
+m4supst__bw                     //
+m4supst__bx                     //
+m4supst__by                     //
+m4supst__bz                     //
+m4supst__c                      //
+m4supst__d                      //
+m4supst__e                      //
+m4supst__f                      //
+m4supst__g                      //
+m4supst__h                      //
+m4supst__i                      //
+m4supst__j                      //
+m4supst__k                      //
+m4supst__l                      //
+m4supst__m                      //
+m4supst__n                      //
+m4supst__o                      //
+m4supst__p                      //
+m4supst__q                      //
+m4supst__r                      //
+m4supst__s                      //
+m4supst__t                      //
+m4supst__u                      //
+m4supst__v                      //
+m4supst__w                      //
+m4supst__x                      //
+m4supst__y                      //
+m4supst__z                      //
+m4tst                           // MPU4 Unit Test (Program 4)
+m4vivalv                        // Viva Las Vegas (Barcrest)
+m4vivalv__0                     //
+m4vivalv__1                     //
+m4vivalv__2                     //
+m4vivalv__3                     //
+m4vivalv__4                     //
+m4vivalv__5                     //
+m4vivalv__6                     //
+m4vivalv__a                     //
+m4vivalv__b                     //
+m4vivalv__c                     //
+m4vivalv__d                     //
+m4vivalv__e                     //
+m4vivalv__f                     //
+m4vivalv__g                     //
+m4vivalv__h                     //
+m4vivalv__i                     //
+m4vivalv__j                     //
+m4vivalv__k                     //
+m4vivalv__l                     //
+m4vivalv__m                     //
+m4vivalv__n                     //
+m4vivalv__o                     //
+m4vivalv__p                     //
+m4vivalv__q                     //
+m4vivalv__r                     //
+m4vivalv__s                     //
+m4vivalv__t                     //
+m4vivalv__u                     //
+m4vivalv__v                     //
+m4vivalv__w                     //
+m4vivalv__x                     //
+m4vivalv__y                     //
+m4vivalv__z                     //
+m4voodoo                        // Voodoo 1000 (Barcrest)
 
 @source:mpu4union.cpp
 m4crzbn                         // Crazy Bingo
@@ -31725,6 +31825,9 @@ mvme162                         // (c) 1993 Motorola
 18w                             // 653 (c) 1979 Midway
 18w2                            // 653 (c) 1979 Midway
 
+@source:mw4pole.cpp
+mw4pole                         // (c) 1995 Waldorf Electronics GmbH Germany
+
 @source:mw8080bw.cpp
 280zzzap                        // 610 [1976]
 blueshrk                        // 742 [1978]
@@ -32052,7 +32155,8 @@ nflclsfb                        // 2003.?? NFL Classic Football
 pacmball                        // 2003.?? Pacman Ball
 panikuru                        // 2002.03 Panicuru Panekuru
 ptblank3                        // 2000.12 Point Blank 3 (GNN2 Ver.A)
-sekaikh                         // 2004.04 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
+sekaikh                         // 2004.0? Sekai Kaseki Hakken (Japan, SKH1 Ver.B)
+sekaikha                        // 2004.04 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
 startrgn                        // 2002.07 Star Trigon (STT1 Ver.A)
 taiko6                          // 2004.?? Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
 unks10md                        // 200?.?? unknown Namco System 10 medal game (MTL1 SPRB0)
@@ -32971,7 +33075,7 @@ maglord                         // 0005 (c) 1990 Alpha Denshi Co.
 maglordh                        // 0005 (c) 1990 Alpha Denshi Co.
 mahretsu                        // 0004 (c) 1990 SNK
 marukodq                        // 0206 (c) 1995 Takara
-matrim                          // 0266 (c) 2002 Atlus
+matrim                          // 0266 (c) 2003 Atlus
 matrimbl                        // bootleg
 miexchng                        // 0231 (c) 1997 Face
 minasan                         // 0027 (c) 1990 Monolith Corp.
@@ -33127,9 +33231,11 @@ svcpcba                         // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
 neoprint                        //
 npcartv1                        //
 npcramen                        //
+npeurver                        //
 npfpit                          //
 npmillen                        //
 npotogib                        //
+nppopeye                        //
 nprsp                           //
 npscv1                          //
 npskv                           //
@@ -33536,6 +33642,7 @@ tdragon2a                       // UPL-93091 (c) 1993 NMK
 tdragon3h
 tdragonb                        // bootleg
 tdragonb2                       // bootleg
+tdragonb3                       // bootleg
 tharrier                        // UPL-89053 (c) 1989 UPL
 tharrierb                       // Lettering bootleg
 tharrieru                       // UPL-89053 (c) 1989 UPL + American Sammy license
@@ -33676,6 +33783,7 @@ sexperta2                       //
 sexpertb                        //
 sexpertc                        //
 sexpertc1                       //
+sexpertc2                       //
 sfortea                         //
 sfortea1                        //
 sfortea2                        //
@@ -34079,6 +34187,9 @@ pangofun                        // (c) 1995 InfoCube
 panicr                          // Seibu / Taito
 panicrg                         // Seibu / TV-Tuning (Germany)
 
+@source:paokaipc.cpp
+gogostrk                        //
+
 @source:paradise.cpp
 madball                         // (c) 1998 Yun Sung
 madballn                        // (c) 1998 Yun Sung
@@ -34195,6 +34306,7 @@ sx16                            // Sanyo SX-16
 zdsupers                        // Zenith SuperSport
 zdz150                          // Zenith Z-150 series
 zdz160                          // Zenith Z-160 series
+zdz180                          // Zenith Z-180 series
 ledgmodd                        // Leading Edge Model D
 ledgmodm                        // Leading Edge Model M
 eaglepc2                        // Eagle PC-2
@@ -35174,6 +35286,7 @@ kov2                            // (c) 2000 Knights of Valor 2
 kov2100                         //
 kov2101                         //
 kov2102                         //
+kov21022                        //
 kov2103                         //
 kov2104                         //
 kov2106                         //
@@ -35337,10 +35450,15 @@ kok                             //
 
 @source:photoply.cpp
 photoply98sp                    // (c) 1998 Funworld
+photoply99nl                    // (c) 1999 Funworld
 photoply99sp                    // (c) 1999 Funworld
 photoply2k                      // (c) 2000 Funworld
+photoply2knl                    // (c) 2000 Funworld
 photoply2ksp                    // (c) 2000 Funworld
 photoply2k1it                   // (c) 2001 Funworld
+photoply2k1nl                   // (c) 2001 Funworld
+photoply2k1mtnl                 // (c) 2001 Funworld
+photoply2k2be                   // (c) 2002 Funworld
 photoply2k4                     // (c) 2004 Funworld
 
 @source:photoplys.cpp
@@ -35362,6 +35480,7 @@ picno2                          // Konami Picno 2 (1993)
 dumpump                         //
 fidlstix                        //
 hoopitup                        //
+hoopitup21                      //
 hoopshot                        //
 jackbean                        //
 piggypas                        //
@@ -35641,6 +35760,7 @@ hb_jailb                        // Jail Break (Qps)
 hb_jailba                       //
 hb_jkrwl                        // Jokers Wild (Fairgames)
 hb_jkrwla                       //
+hb_junglet                      // Jungle Treasures (Sega)
 hb_medal                        // Medallion Job (Qps)
 hb_mrmon                        // Mr. Money (Qps)
 hb_mrmona                       //
@@ -35794,7 +35914,6 @@ poly61                          //
 breakout                        // (c) 1976 Atari
 pong                            // (c) 1972 Atari
 pongd                           // (c) 1973 Atari
-pongf                           // (c) 1972 Atari
 rebound                         //
 
 @source:poolshrk.cpp
@@ -36408,6 +36527,9 @@ rainbow                         // 1983 DEC Rainbow 100-B
 rainbow100a                     // 1982 DEC Rainbow 100-A
 rainbow190                      // 1985 DEC Rainbow 190
 
+@source:rallypnt.cpp
+rallypnt2
+
 @source:rallyx.cpp
 commsega                        // (c) 1983 Sega
 cottong                         // bootleg
@@ -36690,6 +36812,7 @@ mt32                            //
 
 @source:roland_pr100.cpp
 pr100                           //
+pr100_201                       //
 
 @source:roland_r8.cpp
 r8                              //
@@ -36794,7 +36917,7 @@ cafetime                        // "63" (c) 1992 Dynax
 chalgirl                        // bootleg
 daisyari                        // (c) 1989 Best System
 dondenmj                        // "03" (c) 1986 Dyna Electronics
-ichiban                         // (c) 199? Excel
+ichiban                         // (c) 1993 Excel
 ippatsu                         // 01? (c) 1986 Dyna Electronics
 jangtaku                        // (c) 1986 Dyna Computer
 janoh                           // (c) 1984 Toaplan
@@ -36825,6 +36948,7 @@ mjvegasa                        // "50" 1991 Dynax
 mjyarou                         // (c) 1986 Visco / Video System
 mjyarou2                        // (c) 1986 Visco / Video System
 openmj                          // (c) 1982 Nichibutsu
+pongboo2                        // (c) 1997 OCT
 royalmah                        // Falcon bootleg
 royalmj                         // (c) 1982 Nichibutsu
 rkjanoh2                        // SNK / Dyna Corp
@@ -37068,7 +37192,6 @@ jst_l2                          //
 lsrcu_l2                        //
 pharo_l2                        //
 solar_l2                        //
-splbn_l0                        //
 strlt_l1                        //
 thund_p1                        //
 thund_p2                        //
@@ -37081,14 +37204,12 @@ wrlok_l3                        //
 @source:s8.cpp
 pfevr_l2                        //
 pfevr_p3                        //
-
-@source:s8a.cpp
+ratrc_l1                        //
 scrzy_l1                        //
 
 @source:s9.cpp
 comet_l4                        //
 comet_l5                        //
-ratrc_l1                        //
 sorcr_l1                        //
 sorcr_l2                        //
 sshtl_l3                        //
@@ -37117,6 +37238,7 @@ chesstrvi
 @source:saitek_corona.cpp
 corona
 coronaa
+coronab
 
 @source:saitek_cp2000.cpp
 cp2000
@@ -37440,6 +37562,9 @@ savia84                         //
 @source:savquest.cpp
 savquest                        //
 
+@source:sb180.cpp
+sb180                          //
+
 @source:sb8085.cpp
 sb8085                          //
 
@@ -37524,6 +37649,9 @@ scorpio                         //
 @source:scotrsht.cpp
 scotrsht                        // GX545 (c) 1985
 
+@source:scrablex.cpp
+scrablex                        // Selchow & Righter
+
 @source:scramble.cpp
 800fath                         // (c) 1981 Amenip + U.S. Billiards license
 800fatha                        // (c) 1981 Amenip + U.S. Billiards license
@@ -37570,6 +37698,7 @@ scyclone                        // (c) 1980 Taito Corporation
 croupier                        // (c) 1997 Playmark
 croupiera                       // (c) 1997 Playmark
 luckboom                        //
+magictch                        //
 sderby                          // (c) 1996
 sderbya                         // (c) 1996
 shinygld                        //
@@ -37695,12 +37824,17 @@ westdrm                         //
 astrofl                         // 834-5803 (c) 1986
 fantzn2                         // (c) 1988
 hangonjr                        // (c) 1985
+megrescu                        // (c) 1987
 opaopa                          // (c) 1987
 opaopan                         // (c) 1987
 ridleofp                        // (c) 1986 Sega / Nasco
 slapshtr                        // (c) 1986 Sega
 tetrisse                        // (c) 1988
 transfrm                        // 834-5803 (c) 1986
+
+@source:segafruit.cpp
+m3001
+m4001
 
 @source:segag80r.cpp
 005                             // (c) 1981
@@ -37762,10 +37896,6 @@ cobraseg                        // (c) ????
 galaxyr                         // (c) 1983
 galaxyrp                        // (c) 1983
 sblazerp                        // (c) 1983
-
-@source:segam1.cpp
-bingpty                         // ?
-unkm1                           // ?
 
 @source:segaorun.cpp
 outrun                          // Revision B
@@ -37934,7 +38064,6 @@ hwchamp                         // (c) 1987 (Unprotected)
 hwchampa                        // (c) 1987 (Unprotected)
 hwchampj                        // (c) 1987 (FD1094)
 hwchampjd                       //
-isgsm                           //
 lockonph                        //
 mvp                             // (c) 1989 (FD1094)
 mvpd                            //
@@ -37957,7 +38086,6 @@ sdibl3                          // bootleg
 sdibl4                          // bootleg
 sdibl5                          // bootleg
 sdibl6                          // bootleg
-shinfz                          //
 shinobi2                        // (c) 1987 (FD1094)
 shinobi2d                       //
 shinobi3                        // (c) 1987 (MC-8123B)
@@ -37969,7 +38097,6 @@ snapper                         // (c) 1990 Philko - korean clone board
 sonicbom                        // (c) 1987 (FD1094)
 sonicbomd                       //
 suprleag                        // (c) 1987 (FD1094)
-tetrbx                          //
 tetris1                         // (c) 1988 (FD1094) S16B
 tetris1d                        //
 tetris2                         // (c) 1988 (FD1094) S16B
@@ -37991,6 +38118,11 @@ wrestwar1                       // (c) 1989 (FD1094)
 wrestwar1d                      //
 wrestwar2                       // (c) 1989 (FD1094)
 wrestwar2d                      //
+
+@source:segas16b_isgsm.cpp
+isgsm                           //
+shinfz                          //
+tetrbx                          //
 
 @source:segas18.cpp
 astorm                          // 1990.?? Alien Storm (World, FD1094, 2 Players)
@@ -38138,6 +38270,12 @@ svs                             // 1994.?? Super Visual Soccer
 titlef                          // 1993.?? Title Fight (World)
 titlefj                         // 1993.03 Title Fight (Japan)
 titlefu                         // 1993.04 Title Fight (US)
+
+@source:segasm1.cpp
+tinkerbl                        // (c) 1990 Sega
+blicks                          // (c) 1991 Sega
+unkm1                           // (c) 1992 Sega
+bingpty                         // (c) 1994 Sega
 
 @source:segasp.cpp
 aminosan                        // 2010.?? Aminosan (satellite)
@@ -38821,13 +38959,13 @@ sidepcktj                       // (c) 1986 Data East Corporation
 sigma21                         //
 
 @source:sigmab31.cpp
-cptlucky                        // (c) 199? Sigma
+cptlucky                        // (c) 1988 Sigma
 
 @source:sigmab52.cpp
 jwildb52                        // (c) 199? Sigma
 jwildb52a                       // (c) 199? Sigma
 jwildb52h                       // (c) 199? Sigma
-s8waysfc                        // (c) 199? Sigma
+s8waysfc                        // (c) 1989 Sigma
 
 @source:sigmab98.cpp
 animalc                         // (c) 2000 Sammy
@@ -38896,6 +39034,11 @@ simpsons2pj                     // GX072 (c) 1991 (Japan)
 simpsons4pa                     // GX072 (c) 1991 (Asia)
 simpsons4pe                     // GX072 (c) 1991 (World)
 
+@source:sis630.cpp
+gamecst2                        // MAME based bootleg, version 2.613
+gamecstl                        // MAME based bootleg
+shutms11                        // (c) 2000
+
 @source:sitcom.cpp
 sitcom                          //
 sitcomtmr                       //
@@ -38947,6 +39090,7 @@ skykids                         // (c) 1985
 @source:skylncr.cpp
 bdream97                        // Bootleg?
 butrfly                         // (c) 1995 Bordun International
+butrflybl                       // Bootleg
 gallag50                        // Bootleg?
 leader                          // Bootleg?
 leadera                         // Bootleg?
@@ -38957,9 +39101,12 @@ neraidou                        // Bootleg?
 olymp                           // Z Games
 rolla                           //
 score5                          // Z Games
+seadevil                        // Z Games
 skylncr                         // (c) 1995 Bordun International
 sonikfig                        // Z Games
+spcliner                        // Z Games
 speedway                        //
+speedwaya                       //
 sstar97                         // (c) 199? Bordun International
 superb2k                        // Random Games
 tigerslt                        // Bootleg?
@@ -38986,6 +39133,9 @@ tigerhb2                        // bootleg but (c) 1985 Taito Corporation
 tigerhb3                        // bootleg but (c) 1985 Taito Corporation
 tigerhb4                        // bootleg but (c) 1985 Taito Corporation
 tigerhj                         // A47 (c) 1985 Taito Corporation   GX-551 [not a Konami board!]
+
+@source:slapfght_ms.cpp
+slapfighm
 
 @source:slapshot.cpp
 opwolf3                         // D74 (c) 1994 Taito Corporation Japan
@@ -39199,6 +39349,7 @@ ballboy3p                       // bootleg
 cookbib2                        // (c) 1996 SemiCom
 cookbib2a                       // (c) 1996 SemiCom
 cookbib2b                       // (c) 1996 SemiCom
+cookbib2c                       // (c) 1996 SemiCom
 cookbib3                        // (c) 1997 SemiCom
 finalttr                        // (c) 1993 Jeil Computer System
 honeydol                        // (c) 1995 Barko Corp
@@ -39320,6 +39471,9 @@ meteor                          // (c) 1981 Venture Line
 meteors                         // (c) 1981 Amusement World
 spcforc2                        // bootleg
 spcforce                        // (c) 1980 Venture Line
+
+@source:spdamjes.cpp
+spdamjes                        // (c) 19?? T-90 S.A.
 
 @source:spdheat.cpp
 spdheat                         // A55 (c) 1985 Taito Corporation (World)
@@ -40345,7 +40499,8 @@ suprridr                        // (c) 1983 Venture Line + Taito license
 suprslam                        // (c) 1995 Banpresto
 
 @source:supstarf.cpp
-supstarf                        //
+supstarf                        // (c) 1986 Recreativos Franco
+supstarfa                       // (c) 1986 Recreativos Franco
 
 @source:surpratk.cpp
 suratk                          // GX911 (c) 1990 (World)
@@ -40942,9 +41097,10 @@ zooo                            // 2004.05 Zooo
 @source:taitojc.cpp
 dangcurv                        // 1995.?? E09 (c) 1995 Taito Corporation
 dangcurvj                       // 1995.?? E09 (c) 1995 Taito Corporation
-dendego                         // 1997.03 E35 (c) 1996 Taito Corporation (Japan) - Ver 2.2 J
+dendego                         // 1997.04 E35 (c) 1996 Taito Corporation (Japan) - Ver 2.3 J
 dendego2                        // 1998.03 E52 (c) 1998 Taito Corporation (Japan) - Ver 2.5 J
 dendego23k                      // 1998.08 E52 (c) 1998 Taito Corporation (Japan) - Ver 2.20 J
+dendegoa                        // 1997.03 E35 (c) 1996 Taito Corporation (Japan) - Ver 2.2 J
 dendegox                        // 1997.09 E35 (c) 1996 Taito Corporation (Japan) - Ver 2.4 J
 landgear                        // 1996.?? E17 (c) 1995 Taito Corporation Japan (World) - Ver 4.2 O
 landgeara                       // 1996.?? E17 (c) 1995 Taito Corporation Japan (World) - Ver 3.1 O
@@ -41092,9 +41248,11 @@ tascr30g
 
 @source:tasman.cpp
 dragsphr                        //
+horses4c                        //
 ivorytsk                        //
 kingtut                         //
 moneybnk                        //
+thequest                        //
 vikingt                         //
 
 @source:tatsumi.cpp
@@ -41194,6 +41352,9 @@ tek4052a                        //
 @source:tek410x.cpp
 tek4107a                        //
 tek4109a                        //
+
+@source:tek43xx.cpp
+tek4319                         //
 
 @source:tek440x.cpp
 tek4404                         // (c) 1984 Tektronix
@@ -41756,6 +41917,8 @@ batrideru                       // (c) 1998 Raizing/8ing
 batsugun                        // TP-030 (c) 1993 Toaplan
 batsuguna                       // TP-030 (c) 1993 Toaplan
 batsugunb                       //
+batsugunc                       // TP-030 (c) 1993 Toaplan
+batsugunbl                      // bootleg
 batsugunsp                      // TP-030 (c) 1993 Toaplan
 bbakraid                        // (c) 1999 8ing
 bbakraidc                       // (c) 1999 8ing
@@ -41772,6 +41935,7 @@ bgareggat2                      // (c) 1996 Raizing/8ing
 bgareggatw                      // (c) 1996 Raizing/8ing
 dogyuun                         // TP-022 (c) 1992 Toaplan
 dogyuuna                        // TP-022 (c) 1992 Toaplan
+dogyuunb                        // TP-022 (c) 1992 Toaplan
 dogyuunt                        // TP-022 (c) 1992 Toaplan
 fixeight                        // TP-026 (c) 1992 + Taito license
 fixeighta                       // TP-026 (c) 1992 + Taito license
@@ -41796,6 +41960,7 @@ grindstma                       // TP-027 (c) 1993 Toaplan + Unite Trading licen
 kbash                           // TP-023 (c) 1993 Toaplan
 kbash2                          // bootleg
 kbashk                          // TP-023 (c) 1993 Toaplan
+kbashp                          // TP-023 (c) 1993 Toaplan
 kingdmgp                        // (c) 1994 Raizing/8ing
 mahoudai                        // (c) 1993 Raizing + Able license
 nprobowl                        // (c) 1996 Zuck + Able license
@@ -41837,6 +42002,10 @@ tokims
 
 @source:tomcat.cpp
 tomcat                          // (proto)          (c) 1985
+
+@source:tomsadvs.cpp
+icecoldice                      // (c) ICE
+tomsadvs                        //
 
 @source:tomy_princ.cpp
 princ                           // Tomy Prin-C (Japan)
@@ -42564,11 +42733,13 @@ invds                           // 367-382 (c) 1979 Sega
 invho2                          // 271-286 (c) 1979 Sega
 invho2a                         // 326-341 (c) 1979 Sega
 invinco                         // 310-318 (c) 1979 Sega
+nostromo                        // bootleg
 nsub                            // 268-275 (c) 1980 Sega
 pulsar                          // 790-805 (c) 1981 Sega
 safari                          // 57-66 [1977 Gremlin?]
 safaria                         // bootleg?
-samurai                         // 289-302 + upgrades (c) 1980 Sega
+samurai                         // 1217-1230 (c) Sega
+samuraij                        // 289-302 + upgrades (c) 1980 Sega
 spacetrk                        // 630-645 (c) 1980 Sega
 spacetrkc                       // (c) 1980 Sega
 sspacaho                        // ? epr00001.bin - epr00008.bin
@@ -42621,6 +42792,7 @@ toureiff                        //
 winner                          //
 
 @source:vigilant.cpp
+bowmen                          // (c) 1994 Ten-Level
 buccanrs                        // (c) 1989 Duintronic
 buccanrsa                       // (c) 1989 Duintronic
 buccanrsb                       // (c) 1989 Duintronic
@@ -42669,8 +42841,8 @@ boxingm                         // 2001
 code1d                          // 2000
 code1da                         // 2000
 code1db                         // 2000
-gticlub2                        // 2001
-gticlub2ea                      // 2001
+gticlub2                        // 2000
+gticlub2ea                      // 2000
 jpark3                          // 2001
 jpark3u                         // 2001
 kviper                          // 1999
@@ -42679,15 +42851,15 @@ mfightcc                        // 2002
 mocapb                          // 2001
 mocapbj                         // 2001
 mocapglf                        // 2001
-p911                            // 2001
+p911                            // 2000
 p9112                           // 2001
-p911ac                          // 2001
-p911ea                          // 2001
-p911ed                          // 2001
-p911j                           // 2001
-p911k                           // 2001
-p911kc                          // 2001
-p911ud                          // 2001
+p911ac                          // 2000
+p911ea                          // 2000
+p911ed                          // 2000
+p911j                           // 2000
+p911k                           // 2000
+p911kc                          // 2000
+p911ud                          // 2000
 ppp2nd                          // 2001
 ppp2nda                         // 2001
 sogeki                          // 2001
@@ -43357,6 +43529,9 @@ wicat                           //
 @source:wico.cpp
 aftor                           //
 
+@source:wildfire.cpp
+wildfire                        // Parker Bros
+
 @source:wildpkr.cpp
 tabpkr                          // 199?, TAB Austira
 wildpkr                         // 199?, TAB Austria.
@@ -43437,6 +43612,7 @@ witchs                          // (c) 1992 Sega / Vic Tokai license
 witchstar                       // (c) 1994 Fovis Korea Co. Ltd.
 
 @source:wiz.cpp
+finger                          // hack
 kungfut                         // (c) 1984 Seibu Kaihatsu
 kungfuta                        // (c) 1984 Seibu Kaihatsu
 scion                           // (c) 1984 Seibu Denshi
@@ -43553,6 +43729,7 @@ nbaf_31a                        //
 ngg_10                          //
 ngg_13                          //
 ngg_p06                         //
+ph_04                           //
 sc_091                          //
 sc_10                           //
 sc_14                           //
@@ -43770,6 +43947,7 @@ ts_lm6                          //
 ts_lx4                          //
 ts_lx5                          //
 ts_pa1                          //
+wcs_l1                          //
 wcs_l2                          //
 wcs_la2                         //
 wcs_p2                          //
@@ -44018,6 +44196,7 @@ xybotsg                         // 136054           (c) 1987
 xyonix                          // [1989 Philko]
 
 @source:y2.cpp
+higurashi                       // (c)2009 AQ Interactive
 kof2002um                       // (c)2009 SNK Playmore / New Channel
 kof2002umj                      // (c)2009 SNK Playmore / New Channel
 
@@ -44065,6 +44244,9 @@ psr70                           // 1985 PSR-70
 
 @source:ympsr340.cpp
 psr340                          // 1999 PSR-340
+
+@source:ymqy70.cpp
+qy70                            // 1997 QY-70
 
 @source:ymrx15.cpp
 rx15                            //
@@ -44458,7 +44640,6 @@ simpr8210                       // Pioneer PR-8210
 
 @source:gsz80.cpp
 gsz80                           // Grant Searle's Simple Z-80 Machine
-rc2014mini                      // RC2014 Mini
 
 @source:gscpm.cpp
 gscpm                           // Grant Searle's Simple CP/M Machine
@@ -44471,3 +44652,21 @@ gs6809                          // Grant Searle's Simple 6809 Machine
 
 @source:ultim809.cpp
 ultim809
+
+@source:rc2014.cpp
+rc2014                          // RC2014 Classic
+rc2014bp5                       // RC2014 Backplane-5
+rc2014bp8                       // RC2014 Backplane-8
+rc2014pro                       // RC2014 Pro
+rc2014bppro                     // RC2014 Backplane Pro
+rc2014cl2                       // RC2014 Classic II
+rc2014zed                       // RC2014 Zed
+rc2014zedp                      // RC2014 Zed Pro
+rc2014mini                      // RC2014 Mini
+rc2014minicpm                   // RC2014 Mini with CP/M upgrade
+rc2014micro                     // RC2014 Micro
+sc105                           // SC105 - Modular Backplane (RC2014)
+sc112                           // SC112 - Modular Backplane (RC2014)
+sc116                           // SC116 - Modular Backplane (RC2014)
+sc133                           // SC133 - Modular Backplane (RC2014)
+sc203                           // SC203 - Modular Z180 Computer

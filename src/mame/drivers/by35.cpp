@@ -216,11 +216,8 @@ protected:
 	uint8_t nibble_nvram_r(offs_t offset);
 	void nibble_nvram_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_READ_LINE_MEMBER(u11_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -240,12 +237,10 @@ protected:
 	static solenoid_feature_data const s_solenoid_features_default;
 
 private:
-	bool m_u10_ca2 = 0;
-	bool m_u10_cb1 = 0;
-	bool m_u10_cb2 = 0;
-	bool m_u11_ca1 = 0;
-	bool m_u11_cb2 = 0;
-	bool m_7d = 0;
+	bool m_u10_ca2 = false;
+	bool m_u10_cb2 = false;
+	bool m_u11_cb2 = false;
+	bool m_7d = false;
 	uint8_t m_segment[6]{};
 	uint8_t m_lamp_decode = 0U;
 	solenoid_feature_data const &m_solenoid_features;
@@ -1095,10 +1090,6 @@ READ_LINE_MEMBER( by35_state::u10_ca1_r )
 {
 	return m_io_test->read() & 0x01;
 }
-READ_LINE_MEMBER( by35_state::u10_cb1_r )
-{
-	return m_u10_cb1;
-}
 
 WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
 {
@@ -1127,17 +1118,6 @@ WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
 		m_lamp_decode = m_u10a & 0x0f;
 
 	m_u10_cb2 = state;
-}
-
-READ_LINE_MEMBER( by35_state::u11_ca1_r )
-{
-	return m_u11_ca1;
-}
-
-READ_LINE_MEMBER( by35_state::u11_cb1_r )
-{
-	/* Pin 32 on MPU J5 AID connector tied low */
-	return 0;
 }
 
 WRITE_LINE_MEMBER( by35_state::u11_cb2_w )
@@ -1383,8 +1363,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_z_freq )
 
 	m_zero_crossing_active_timer->adjust(attotime::from_usec(700));
 
-	m_u10_cb1 = true;
-	m_pia_u10->cb1_w(m_u10_cb1);
+	m_pia_u10->cb1_w(true);
 
 	/*** Zero Crossing - power to all Lamp SCRs is cut off and reset ***/
 
@@ -1394,8 +1373,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_z_pulse )
 {
 	/*** Line Power to DC Zero Crossing has ended ***/
 
-	m_u10_cb1 = false;
-	m_pia_u10->cb1_w(m_u10_cb1);
+	m_pia_u10->cb1_w(false);
 }
 
 // 555 timer for display refresh
@@ -1410,14 +1388,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::u11_timer )
 
 	m_display_refresh_timer->adjust(attotime::from_usec(2850));
 
-	m_u11_ca1 = true;
-	m_pia_u11->ca1_w(m_u11_ca1);
+	m_pia_u11->ca1_w(true);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_d_pulse )
 {
-	m_u11_ca1 = false;
-	m_pia_u11->ca1_w(m_u11_ca1);
+	m_pia_u11->ca1_w(false);
 }
 
 by35_state::solenoid_feature_data const by35_state::s_solenoid_features_default =
@@ -1492,9 +1468,7 @@ void by35_state::machine_start()
 	save_item(NAME(m_u11a));
 	save_item(NAME(m_u11b));
 	save_item(NAME(m_u10_ca2));
-	save_item(NAME(m_u10_cb1));
 	save_item(NAME(m_u10_cb2));
-	save_item(NAME(m_u11_ca1));
 	save_item(NAME(m_u11_cb2));
 	save_item(NAME(m_7d));
 	save_item(NAME(m_segment));
@@ -1536,7 +1510,7 @@ void by35_state::by35(machine_config &config)
 	m_pia_u10->readpb_handler().set(FUNC(by35_state::u10_b_r));
 	m_pia_u10->writepb_handler().set(FUNC(by35_state::u10_b_w));
 	m_pia_u10->readca1_handler().set(FUNC(by35_state::u10_ca1_r));
-	m_pia_u10->readcb1_handler().set(FUNC(by35_state::u10_cb1_r));
+	m_pia_u10->cb1_w(false);
 	m_pia_u10->ca2_handler().set(FUNC(by35_state::u10_ca2_w));
 	m_pia_u10->cb2_handler().set(FUNC(by35_state::u10_cb2_w));
 	m_pia_u10->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
@@ -1548,8 +1522,8 @@ void by35_state::by35(machine_config &config)
 	m_pia_u11->readpa_handler().set(FUNC(by35_state::u11_a_r));
 	m_pia_u11->writepa_handler().set(FUNC(by35_state::u11_a_w));
 	m_pia_u11->writepb_handler().set(FUNC(by35_state::u11_b_w));
-	m_pia_u11->readca1_handler().set(FUNC(by35_state::u11_ca1_r));
-	m_pia_u11->readcb1_handler().set(FUNC(by35_state::u11_cb1_r));
+	m_pia_u11->ca1_w(false);
+	m_pia_u11->cb1_w(0); /* Pin 32 on MPU J5 AID connector tied low */
 	m_pia_u11->ca2_handler().set_output("led0");
 	m_pia_u11->cb2_handler().set(FUNC(by35_state::u11_cb2_w));
 	m_pia_u11->irqa_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
@@ -2881,86 +2855,86 @@ ROM_END
 
 
 // AS-2888 sound
-GAME( 1979, sst,      0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Supersonic",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAMEL(1978, playboy,  0, as2888, playboy,   by35_state, init_by35_6, ROT0, "Bally", "Playboy",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by35_playboy)
-GAME( 1978, lostwrlp, 0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Lost World",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1978, smman,    0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Six Million Dollar Man",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1978, voltan,   0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Voltan Escapes Cosmic Doom",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, startrep, 0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Star Trek (Pinball)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, kiss,     0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Kiss",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, hglbtrtr, 0, as2888, by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Harlem Globetrotters On Tour", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, dollyptn, 0, as2888, by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Dolly Parton",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, paragon,  0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Paragon",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, sst,      0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Supersonic",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAMEL(1978, playboy,  0, as2888, playboy,   by35_state, init_by35_6, ROT0, "Bally", "Playboy",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_by35_playboy)
+GAME( 1978, lostwrlp, 0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Lost World",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, smman,    0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Six Million Dollar Man",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, voltan,   0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Voltan Escapes Cosmic Doom",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, startrep, 0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Star Trek (Pinball)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, kiss,     0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Kiss",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, hglbtrtr, 0, as2888, by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Harlem Globetrotters On Tour", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, dollyptn, 0, as2888, by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Dolly Parton",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, paragon,  0, as2888, by35,      by35_state, init_by35_6, ROT0, "Bally", "Paragon",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // AS-3022 sound
-GAME( 1980, ngndshkr,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Nitro Ground Shaker",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, slbmania,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Silverball Mania",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, futurspa,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Future Spa",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, spaceinv,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Space Invaders",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, rollston,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Rolling Stones",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, mystic,     0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Mystic",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, xenon,      0,        sounds_plus, by35_os40, by35_state, init_by35_6, ROT0, "Bally", "Xenon",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, xenonf,     xenon,    sounds_plus, by35_os40, by35_state, init_by35_6, ROT0, "Bally", "Xenon (French)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, viking,     0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Viking",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, hotdoggn,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Hotdoggin'",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, skatebll,   0,        as3022,      by35_os40, by35_state, init_by35_7, ROT0, "Bally", "Skateball",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, frontier,   0,        as3022,      frontier,  by35_state, init_by35_7, ROT0, "Bally", "Frontier",                          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, speakesy,   0,        as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Speakeasy",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, speakesy4p, speakesy, as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Speakeasy 4 Player",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, bmx,        0,        as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "BMX",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, granslam,   0,        as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Grand Slam",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, granslam4,  granslam, as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Grand Slam (4 Players)",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, goldball,   0,        as3022,      by35,      by35_state, init_by35_7, ROT0, "Bally", "Gold Ball (set 1)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, goldballn,  goldball, as3022,      by35,      by35_state, init_by35_7, ROT0, "Bally", "Gold Ball (Field Service Upgrade)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, ngndshkr,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Nitro Ground Shaker",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, slbmania,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Silverball Mania",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, futurspa,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Future Spa",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spaceinv,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Space Invaders",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rollston,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Rolling Stones",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mystic,     0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Mystic",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, xenon,      0,        sounds_plus, by35_os40, by35_state, init_by35_6, ROT0, "Bally", "Xenon",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, xenonf,     xenon,    sounds_plus, by35_os40, by35_state, init_by35_6, ROT0, "Bally", "Xenon (French)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, viking,     0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Viking",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, hotdoggn,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Hotdoggin'",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, skatebll,   0,        as3022,      by35_os40, by35_state, init_by35_7, ROT0, "Bally", "Skateball",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, frontier,   0,        as3022,      frontier,  by35_state, init_by35_7, ROT0, "Bally", "Frontier",                          MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, speakesy,   0,        as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Speakeasy",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, speakesy4p, speakesy, as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Speakeasy 4 Player",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bmx,        0,        as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "BMX",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, granslam,   0,        as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Grand Slam",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, granslam4,  granslam, as3022,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Grand Slam (4 Players)",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, goldball,   0,        as3022,      by35,      by35_state, init_by35_7, ROT0, "Bally", "Gold Ball (set 1)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, goldballn,  goldball, as3022,      by35,      by35_state, init_by35_7, ROT0, "Bally", "Gold Ball (Field Service Upgrade)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Squawk & Talk sound
-GAME( 1981, flashgdn,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon",                          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, flashgdnf,  flashgdn, squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (French)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, flashgdnv,  flashgdn, sounds_plus,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (Vocalizer sound)",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, flashgdnfv, flashgdn, sounds_plus,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (French Vocalizer sound)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, fball_ii,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball II",                           MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, eballdlx,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 15)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, eballd14,   eballdlx, squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 14)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, embryon,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Embryon",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, fathom,     0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fathom",                                MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, centaur,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Centaur",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, medusa,     0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Medusa",                                MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, vector,     0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Vector",                                MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1981, elektra,    0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Elektra",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, spectrm,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum",                              MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, spectrm4,   spectrm,  squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, rapidfip,   0,        squawk_n_talk,    by35,      by35_state, init_by35_7, ROT0, "Bally", "Rapid Fire",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, m_mpac,     0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1982, mysteria,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mysterian (prototype)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING) // uses 2 sound boards
+GAME( 1981, flashgdn,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon",                          MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, flashgdnf,  flashgdn, squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (French)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, flashgdnv,  flashgdn, sounds_plus,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (Vocalizer sound)",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, flashgdnfv, flashgdn, sounds_plus,      by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Flash Gordon (French Vocalizer sound)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fball_ii,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball II",                           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, eballdlx,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 15)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, eballd14,   eballdlx, squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Eight Ball Deluxe (rev. 14)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, embryon,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Embryon",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fathom,     0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fathom",                                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, centaur,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Centaur",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, medusa,     0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Medusa",                                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, vector,     0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Vector",                                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, elektra,    0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Elektra",                               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, spectrm,    0,        squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum",                              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, spectrm4,   spectrm,  squawk_n_talk,    by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spectrum (ver 4)",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, rapidfip,   0,        squawk_n_talk,    by35,      by35_state, init_by35_7, ROT0, "Bally", "Rapid Fire",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, m_mpac,     0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mr. and Mrs. PacMan",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mysteria,   0,        squawk_n_talk_ay, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Mysterian (prototype)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // uses 2 sound boards
 
 // Cheap Squeak sound
-GAME( 1984, kosteel,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Kings of Steel",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1983, xsandos,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "X's & O's",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1984, spyhuntr, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spy Hunter (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1984, fbclass,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball Classic",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1984, blakpyra, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Black Pyramid",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1985, cybrnaut, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Cybernaut",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1984, kosteel,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Kings of Steel",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, xsandos,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "X's & O's",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, spyhuntr, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Spy Hunter (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, fbclass,  0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Fireball Classic",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, blakpyra, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Black Pyramid",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cybrnaut, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Cybernaut",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Other manufacturers
-GAME( 1984, suprbowl, xsandos,  by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Super Bowl",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, tigerrag, kosteel,  by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Tiger Rag",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, cosflash, flashgdn, by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Cosmic Flash",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, newwave,  blakpyra, by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "New Wave",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, saturn2,  spyhuntr, by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Saturn 2",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, worlddef, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "World Defender",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, spacehaw, cybrnaut, by35,             by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Space Hawks",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, darkshad, 0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Dark Shadow",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, skflight, 0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Skill Flight",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, cobrap,   0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Cobra",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, futrquen, 0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Future Queen",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, f1gpp,    0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix (Nuova Bell Games)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, toppin,   0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Top Pin",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, uboat65,  0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "U-boat 65",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, bullseye, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, bullseyn, bullseye, by35,             by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (Traditional Scoring)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, bbbowlin, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "United",             "Big Ball Bowling (Bowler)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, monrobwl, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, bigbat,   0,        squawk_n_talk_ay, by35, by35_state, init_by35_7, ROT0, "Bally Midway",       "Big Bat (Bat game)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1984, mdntmrdr, 0,        squawk_n_talk_ay, by35, by35_state, init_by35_6, ROT0, "Bally Midway",       "Midnight Marauders (Gun game)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1984, blbeauty, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Stern",              "Black Beauty (Shuffle)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1984, myststar, 0,        by35,             by35, by35_state, init_by35_6, ROT0, "Zaccaria",           "Mystic Star",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, suprbowl, xsandos,  by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Super Bowl",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tigerrag, kosteel,  by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Tiger Rag",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cosflash, flashgdn, by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Cosmic Flash",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, newwave,  blakpyra, by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "New Wave",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, saturn2,  spyhuntr, by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Saturn 2",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, worlddef, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "World Defender",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spacehaw, cybrnaut, by35,             by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Space Hawks",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darkshad, 0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Dark Shadow",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, skflight, 0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Skill Flight",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, cobrap,   0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Cobra",                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, futrquen, 0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Future Queen",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, f1gpp,    0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix (Nuova Bell Games)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toppin,   0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Top Pin",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, uboat65,  0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "U-boat 65",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bullseye, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bullseyn, bullseye, by35,             by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (Traditional Scoring)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bbbowlin, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "United",             "Big Ball Bowling (Bowler)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, monrobwl, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bigbat,   0,        squawk_n_talk_ay, by35, by35_state, init_by35_7, ROT0, "Bally Midway",       "Big Bat (Bat game)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mdntmrdr, 0,        squawk_n_talk_ay, by35, by35_state, init_by35_6, ROT0, "Bally Midway",       "Midnight Marauders (Gun game)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, blbeauty, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Stern",              "Black Beauty (Shuffle)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, myststar, 0,        by35,             by35, by35_state, init_by35_6, ROT0, "Zaccaria",           "Mystic Star",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

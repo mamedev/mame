@@ -4,8 +4,6 @@
 #include "se3208.h"
 #include "se3208dis.h"
 
-#include "debugger.h"
-
 
 /*
     SE3208 CPU Emulator by ElSemi

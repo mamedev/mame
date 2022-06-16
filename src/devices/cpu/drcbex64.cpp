@@ -169,7 +169,7 @@
 #include "emu.h"
 #include "drcbex64.h"
 
-#include "debugger.h"
+#include "debug/debugcpu.h"
 #include "emuopts.h"
 
 #include <cstddef>
@@ -2642,8 +2642,6 @@ void drcbe_x64::op_carry(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 	be_parameter bitp(*this, inst.param(1), PTYPE_MRI);
 
-	Gp const src = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, srcp.ireg());
-
 	// degenerate case: source is immediate
 	if (srcp.is_immediate() && bitp.is_immediate())
 	{
@@ -2660,18 +2658,19 @@ void drcbe_x64::op_carry(Assembler &a, const instruction &inst)
 		a.and_(ecx, inst.size() * 8 - 1);
 	}
 
-	if (bitp.is_immediate())
+	if (srcp.is_memory())
 	{
-		if (srcp.is_memory())
+		if (bitp.is_immediate())
 			a.bt(MABS(srcp.memory(), inst.size()), bitp.immediate());                   // bt     [srcp],bitp
-		else if (srcp.is_int_register())
-			a.bt(src, bitp.immediate());                                                // bt     srcp,bitp
-	}
-	else
-	{
-		if (srcp.is_memory())
+		else
 			a.bt(MABS(srcp.memory(), inst.size()), ecx);                                // bt     [srcp],ecx
-		else if (srcp.is_int_register())
+	}
+	else if (srcp.is_int_register())
+	{
+		Gp const src = Gp::fromTypeAndId((inst.size() == 4) ? RegType::kX86_Gpd : RegType::kX86_Gpq, srcp.ireg());
+		if (bitp.is_immediate())
+			a.bt(src, bitp.immediate());                                                // bt     srcp,bitp
+		else
 			a.bt(src, ecx);                                                             // bt     srcp,ecx
 	}
 }

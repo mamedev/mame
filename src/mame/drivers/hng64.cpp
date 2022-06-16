@@ -2047,8 +2047,8 @@ void hng64_state::machine_start()
 
 	m_irq_pending = 0;
 
-	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
-	m_comhack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::comhack_callback), this));
+	m_3dfifo_timer = timer_alloc(FUNC(hng64_state::hng64_3dfifo_processed), this);
+	m_comhack_timer = timer_alloc(FUNC(hng64_state::comhack_callback), this);
 
 	init_io();
 }
@@ -2350,8 +2350,8 @@ TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqoff_callback)
 
 void hng64_state::init_io()
 {
-	m_tempio_irqon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqon_callback), this));
-	m_tempio_irqoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqoff_callback), this));
+	m_tempio_irqon_timer = timer_alloc(FUNC(hng64_state::tempio_irqon_callback), this);
+	m_tempio_irqoff_timer = timer_alloc(FUNC(hng64_state::tempio_irqoff_callback), this);
 
 	m_port7 = 0x00;
 	m_port1 = 0x00;
@@ -2916,13 +2916,13 @@ ROM_START( buriki )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,    0,     hng64_default, hng64,    hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
+GAME( 1997, hng64,    0,     hng64_default, hng64,          hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64, hng64_drive, hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK", "Roads Edge / Round Trip RV (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
-GAME( 1998, sams64,   hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
-GAME( 1998, xrally,   hng64, hng64_drive, hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
-GAME( 1998, bbust2,   hng64, hng64_shoot, hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters: Second Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
-GAME( 1998, sams64_2, hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
-GAME( 1998, fatfurwa, hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */
-GAME( 1999, buriki,   hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Buriki One: World Grapple Tournament '99 in Tokyo (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 007 */
+GAME( 1997, roadedge, hng64, hng64_drive,   hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK", "Roads Edge / Round Trip RV (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
+GAME( 1998, sams64,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
+GAME( 1998, xrally,   hng64, hng64_drive,   hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
+GAME( 1998, bbust2,   hng64, hng64_shoot,   hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters: Second Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
+GAME( 1998, sams64_2, hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
+GAME( 1998, fatfurwa, hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */
+GAME( 1999, buriki,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Buriki One: World Grapple Tournament '99 in Tokyo (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 007 */

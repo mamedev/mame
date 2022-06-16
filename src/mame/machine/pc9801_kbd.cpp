@@ -47,11 +47,11 @@ pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *
 
 INPUT_CHANGED_MEMBER(pc9801_kbd_device::key_stroke)
 {
-	if(newval && !oldval)
-		m_rx_buf[uint8_t(param) & 0x7f] = 1;
+	if (newval && !oldval)
+		m_rx_buf[param & 0x7f] = 1;
 
-	if(oldval && !newval)
-		m_rx_buf[uint8_t(param) & 0x7f] = 2;
+	if (oldval && !newval)
+		m_rx_buf[param & 0x7f] = 2;
 }
 
 static INPUT_PORTS_START( pc9801_kbd )
@@ -240,7 +240,7 @@ void pc9801_kbd_device::device_start()
 {
 	m_write_irq.resolve_safe();
 
-	m_rxtimer = timer_alloc(RX_TIMER);
+	m_rxtimer = timer_alloc(FUNC(pc9801_kbd_device::rx_timer_tick), this);
 	m_rxtimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 }
 
@@ -251,9 +251,7 @@ void pc9801_kbd_device::device_start()
 
 void pc9801_kbd_device::device_reset()
 {
-	int i;
-
-	for(i=0;i<0x80;i++)
+	for (int i = 0; i < 0x80; i++)
 		m_rx_buf[i] = 0;
 
 	m_keyb_tx = 0xff;
@@ -262,39 +260,34 @@ void pc9801_kbd_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  rx_timer_tick
 //-------------------------------------------------
 
-void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pc9801_kbd_device::rx_timer_tick)
 {
-	if(id == RX_TIMER)
+	/* key up */
+	for (int i = 0; i < 0x80; i++)
 	{
-		int i;
-
-		/* key up */
-		for(i=0;i<0x80;i++)
+		if (m_rx_buf[i] == 2)
 		{
-			if(m_rx_buf[i] == 2)
-			{
-				m_keyb_tx = i | 0x80;
-				m_write_irq(ASSERT_LINE);
-				m_key_avail = true;
-				m_rx_buf[i] = 0;
-				return;
-			}
+			m_keyb_tx = i | 0x80;
+			m_write_irq(ASSERT_LINE);
+			m_key_avail = true;
+			m_rx_buf[i] = 0;
+			return;
 		}
+	}
 
-		/* key down */
-		for(i=0x7f;i>=0;i--)
+	/* key down */
+	for (int i = 0x7f; i >= 0; i--)
+	{
+		if (m_rx_buf[i] == 1)
 		{
-			if(m_rx_buf[i] == 1)
-			{
-				m_keyb_tx = i;
-				m_write_irq(ASSERT_LINE);
-				m_key_avail = true;
-				m_rx_buf[i] = 0;
-				return;
-			}
+			m_keyb_tx = i;
+			m_write_irq(ASSERT_LINE);
+			m_key_avail = true;
+			m_rx_buf[i] = 0;
+			return;
 		}
 	}
 }
@@ -306,7 +299,7 @@ void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int p
 uint8_t pc9801_kbd_device::rx_r(offs_t offset)
 {
 	m_write_irq(CLEAR_LINE);
-	if(!offset)
+	if (!offset)
 	{
 		m_key_avail = false;
 		return m_keyb_tx;

@@ -35,9 +35,9 @@ protected:
 
 private:
 	uint8_t GDROM_Cmd11_Reply[32];
-	uint32_t read_type;   // for command 0x30 only
-	uint32_t data_select; // for command 0x30 only
-	uint32_t transferOffset;
+	uint32_t read_type = 0;   // for command 0x30 only
+	uint32_t data_select = 0; // for command 0x30 only
+	uint32_t transferOffset = 0;
 	bool is_real_gdrom_disc;
 };
 

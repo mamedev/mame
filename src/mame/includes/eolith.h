@@ -89,14 +89,14 @@ private:
 
 	optional_memory_bank m_sndbank;
 
-	int m_coin_counter_bit;
+	int m_coin_counter_bit = 0;
 	std::unique_ptr<uint16_t[]> m_vram;
-	int m_buffer;
+	int m_buffer = 0;
 
 	// speedups - see machine/eolithsp.c
-	int m_speedup_address;
-	int m_speedup_address2;
-	int m_speedup_resume_scanline;
-	int m_speedup_vblank;
-	int m_speedup_scanline;
+	int m_speedup_address = 0;
+	int m_speedup_address2 = 0;
+	int m_speedup_resume_scanline = 0;
+	int m_speedup_vblank = 0;
+	int m_speedup_scanline = 0;
 };

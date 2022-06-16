@@ -67,13 +67,13 @@ protected:
 	required_memory_bank m_mainbank;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	uint8_t     m_flipscreen_x;
-	uint8_t     m_flipscreen_y;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	uint8_t     m_flipscreen_x = 0;
+	uint8_t     m_flipscreen_y = 0;
 
 	/* misc */
-	uint8_t    m_irq_toggle;
-	uint8_t    m_irq_enable;
+	uint8_t    m_irq_toggle = 0;
+	uint8_t    m_irq_enable = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -91,11 +91,11 @@ protected:
 	void scramble_draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect, int maxx);
 	void scramble_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint8_t m_star_mode;
+	uint8_t m_star_mode = 0;
 	rgb_t m_star_color[64];
 	std::unique_ptr<uint8_t[]> m_stars;
-	uint8_t m_stars_enabled;
-	uint8_t m_stars_blink_state;
+	uint8_t m_stars_enabled = 0;
+	uint8_t m_stars_blink_state = 0;
 };
 
 #endif // MAME_INCLUDES_TUTANKHM_H

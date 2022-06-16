@@ -223,6 +223,7 @@ static const sega8_slot slot_list[] =
 	{ SEGA8_NEMESIS, "nemesis" },
 	{ SEGA8_JANGGUN, "janggun" },
 	{ SEGA8_KOREAN, "korean" },
+	{ SEGA8_KOREAN_188IN1, "korean_188in1" },
 	{ SEGA8_KOREAN_NOBANK, "korean_nb" },
 	{ SEGA8_OTHELLO, "othello" },
 	{ SEGA8_CASTLE, "castle" },
@@ -916,6 +917,7 @@ void sg1000mk3_cart(device_slot_interface &device)
 	device.option_add_internal("janggun",  SEGA8_ROM_JANGGUN);
 	device.option_add_internal("hicom",  SEGA8_ROM_HICOM);
 	device.option_add_internal("korean",  SEGA8_ROM_KOREAN);
+	device.option_add_internal("korean_188in1",  SEGA8_ROM_KOREAN_188);
 	device.option_add_internal("korean_nb",  SEGA8_ROM_KOREAN_NB);
 	device.option_add_internal("seojin",  SEGA8_ROM_SEOJIN);
 	device.option_add_internal("othello",  SEGA8_ROM_OTHELLO);
@@ -937,6 +939,7 @@ void sms_cart(device_slot_interface &device)
 	device.option_add_internal("janggun",  SEGA8_ROM_JANGGUN);
 	device.option_add_internal("hicom",  SEGA8_ROM_HICOM);
 	device.option_add_internal("korean",  SEGA8_ROM_KOREAN);
+	device.option_add_internal("korean_188in1",  SEGA8_ROM_KOREAN_188);
 	device.option_add_internal("korean_nb",  SEGA8_ROM_KOREAN_NB);
 }
 

@@ -83,10 +83,10 @@ void dave_device::device_start()
 	m_write_rh.resolve_safe();
 
 	// allocate timers
-	m_timer_1hz = timer_alloc(TIMER_1HZ);
+	m_timer_1hz = timer_alloc(FUNC(dave_device::update_1hz_timer), this);
 	m_timer_1hz->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
 
-	m_timer_50hz = timer_alloc(TIMER_50HZ);
+	m_timer_50hz = timer_alloc(FUNC(dave_device::update_50hz_timer), this);
 	m_timer_50hz->adjust(attotime::from_hz(2000), 0, attotime::from_hz(2000));
 
 	// state saving
@@ -146,27 +146,30 @@ void dave_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  update_1hz_timer -
 //-------------------------------------------------
 
-void dave_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(dave_device::update_1hz_timer)
 {
-	switch (id)
-	{
-	case TIMER_1HZ:
-		m_irq_status ^= IRQ_1HZ_DIVIDER;
+	m_irq_status ^= IRQ_1HZ_DIVIDER;
 
-		if (m_irq_status & IRQ_1HZ_DIVIDER)
-			m_irq_status |= IRQ_1HZ_LATCH;
-		break;
+	if (m_irq_status & IRQ_1HZ_DIVIDER)
+		m_irq_status |= IRQ_1HZ_LATCH;
 
-	case TIMER_50HZ:
-		m_irq_status ^= IRQ_50HZ_DIVIDER;
+	update_interrupt();
+}
 
-		if (m_irq_status & IRQ_50HZ_DIVIDER)
-			m_irq_status |= IRQ_50HZ_LATCH;
-		break;
-	}
+
+//-------------------------------------------------
+//  update_50hz_timer -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(dave_device::update_50hz_timer)
+{
+	m_irq_status ^= IRQ_50HZ_DIVIDER;
+
+	if (m_irq_status & IRQ_50HZ_DIVIDER)
+		m_irq_status |= IRQ_50HZ_LATCH;
 
 	update_interrupt();
 }

@@ -58,10 +58,10 @@ public:
 	void ti990_4v(machine_config &config);
 	void ti990_4(machine_config &config);
 
-	void init_ti990_4();
-	void init_ti990_4v();
-
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	uint8_t panel_read(offs_t offset);
 	void panel_write(offs_t offset, uint8_t data);
 	void external_operation(offs_t offset, uint8_t data);
@@ -71,17 +71,16 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( vdtkey_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( line_interrupt );
 
-	DECLARE_MACHINE_RESET(ti990_4);
-
 	void crumap(address_map &map);
 	void crumap_v(address_map &map);
 	void memmap(address_map &map);
 
 	void        hold_load();
-	void        device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(clear_load);
+
 	int         m_intlines = 0;
 	int         m_int_level = 0;
-	emu_timer*  m_nmi_timer = nullptr;
+	emu_timer*  m_load_timer = nullptr;
 	void        reset_int_lines();
 	void        set_int_line(int line, int state);
 
@@ -92,22 +91,17 @@ private:
 	required_device<fd800_legacy_device> m_fd800;
 };
 
-enum
-{
-	NMI_TIMER_ID = 1
-};
-
 void ti990_4_state::hold_load()
 {
 	m_maincpu->set_input_line(INT_9900_LOAD, ASSERT_LINE);
 	logerror("ti990_4: Triggering LOAD interrupt\n");
-	m_nmi_timer->adjust(attotime::from_msec(100));
+	m_load_timer->adjust(attotime::from_msec(100));
 }
 
 /*
     LOAD interrupt trigger callback
 */
-void ti990_4_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(ti990_4_state::clear_load)
 {
 	m_maincpu->set_input_line(INT_9900_LOAD, CLEAR_LINE);
 	logerror("ti990_4: Released LOAD interrupt\n");
@@ -268,17 +262,17 @@ void ti990_4_state::crumap_v(address_map &map)
     nullptr
 }; */
 
-MACHINE_RESET_MEMBER(ti990_4_state,ti990_4)
+void ti990_4_state::machine_start()
+{
+	m_load_timer = timer_alloc(FUNC(ti990_4_state::clear_load), this);
+}
+
+void ti990_4_state::machine_reset()
 {
 	hold_load();
 	reset_int_lines();
 	m_ckon_state = false;
 	m_maincpu->set_ready(ASSERT_LINE);
-}
-
-void ti990_4_state::init_ti990_4()
-{
-	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
 }
 
 void ti990_4_state::ti990_4(machine_config &config)
@@ -290,8 +284,6 @@ void ti990_4_state::ti990_4(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ti990_4_state::crumap);
 	m_maincpu->extop_cb().set(FUNC(ti990_4_state::external_operation));
 	m_maincpu->intlevel_cb().set(FUNC(ti990_4_state::interrupt_level));
-
-	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
 	// Terminal
 	asr733_device& term(ASR733(config, "asr733", 0));
@@ -365,6 +357,6 @@ ROM_START(ti990_4v)
 	ROM_REGION(vdt911_device::chr_region_len, vdt911_chr_region, ROMREGION_ERASEFF)
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS          INIT          COMPANY              FULLNAME                                                           FLAGS
-COMP( 1976, ti990_4,  0,       0,      ti990_4,  0,     ti990_4_state, init_ti990_4, "Texas Instruments", "TI Model 990/4 Microcomputer System",                             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1976, ti990_4v, ti990_4, 0,      ti990_4v, 0,     ti990_4_state, init_ti990_4, "Texas Instruments", "TI Model 990/4 Microcomputer System with Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS          INIT        COMPANY              FULLNAME                                                           FLAGS
+COMP( 1976, ti990_4,  0,       0,      ti990_4,  0,     ti990_4_state, empty_init, "Texas Instruments", "TI Model 990/4 Microcomputer System",                             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1976, ti990_4v, ti990_4, 0,      ti990_4v, 0,     ti990_4_state, empty_init, "Texas Instruments", "TI Model 990/4 Microcomputer System with Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

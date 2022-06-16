@@ -64,8 +64,8 @@ pce220_serial_device::~pce220_serial_device()
 
 void pce220_serial_device::device_start()
 {
-	m_send_timer = timer_alloc(TIMER_SEND);
-	m_receive_timer = timer_alloc(TIMER_RECEIVE);
+	m_send_timer = timer_alloc(FUNC(pce220_serial_device::send_tick), this);
+	m_receive_timer = timer_alloc(FUNC(pce220_serial_device::receive_tick), this);
 	m_send_timer->reset();
 	m_receive_timer->reset();
 }
@@ -85,85 +85,31 @@ void pce220_serial_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
-void pce220_serial_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(pce220_serial_device::send_tick)
 {
-	if (id == TIMER_SEND && m_enabled)
+	if (!m_enabled)
 	{
-		//send data
-		if (m_bytes_count <= length())
-		{
-			switch(m_state)
-			{
-			case SIO_WAIT:
-				m_ack = 1;  //data send request
-				//waits until is ready to receive
-				if(!m_busy)
-					return;
-				break;
-			case SIO_SEND_START:
-				//send start bit
-				m_xin = 1;
-				break;
-			case SIO_SEND_BIT0:
-			case SIO_SEND_BIT1:
-			case SIO_SEND_BIT2:
-			case SIO_SEND_BIT3:
-			case SIO_SEND_BIT4:
-			case SIO_SEND_BIT5:
-			case SIO_SEND_BIT6:
-			case SIO_SEND_BIT7:
-				m_xin = BIT(~m_current_byte, m_state - SIO_SEND_BIT0);
-				break;
-			case SIO_SEND_PARITY:
-				m_xin = calc_parity(m_current_byte);
-				break;
-			case SIO_SEND_STOP1:
-			case SIO_SEND_STOP2:
-				//stop bit
-				m_xin = m_ack = 0;
-				break;
-			}
-
-			if (m_state == (SIO_SEND_PARITY + SIO_STOP_BIT))
-			{
-				//next byte
-				m_bytes_count++;
-				popmessage("Send %d/%d bytes\n", m_bytes_count , (uint32_t)length());
-				m_state = SIO_WAIT;
-				if (m_bytes_count < length())
-					fread(&m_current_byte, 1);
-				else
-					m_current_byte = SIO_EOT_BYTE;
-			}
-			else
-			{
-				m_state = get_next_state();
-			}
-
-		}
-		else
-		{
-			m_din = m_xin = m_ack = 0;
-		}
+		m_din = m_xin = m_ack = 0;
+		return;
 	}
-	else if (id == TIMER_RECEIVE && m_enabled)
+
+	//send data
+	if (m_bytes_count <= length())
 	{
-		//receive data
 		switch(m_state)
 		{
 		case SIO_WAIT:
-			//wait send request
-			if(m_busy)
+			m_ack = 1;  //data send request
+			//waits until is ready to receive
+			if(!m_busy)
 				return;
-			m_ack = 1; //acknowledge
 			break;
 		case SIO_SEND_START:
-			//wait for the start bit
-			if (!m_xout)
-				return;
+			//send start bit
+			m_xin = 1;
 			break;
 		case SIO_SEND_BIT0:
 		case SIO_SEND_BIT1:
@@ -173,16 +119,15 @@ void pce220_serial_device::device_timer(emu_timer &timer, device_timer_id id, in
 		case SIO_SEND_BIT5:
 		case SIO_SEND_BIT6:
 		case SIO_SEND_BIT7:
-			m_current_byte |= ((~m_xout)&1) << (m_state - SIO_SEND_BIT0);
+			m_xin = BIT(~m_current_byte, m_state - SIO_SEND_BIT0);
 			break;
 		case SIO_SEND_PARITY:
-			if (m_xout != calc_parity(m_current_byte))
-				logerror("SIO %s: byte %d has wrong parity!\n", tag(), m_bytes_count);
+			m_xin = calc_parity(m_current_byte);
 			break;
 		case SIO_SEND_STOP1:
 		case SIO_SEND_STOP2:
-			//receive stop bit
-			m_ack = 0;
+			//stop bit
+			m_xin = m_ack = 0;
 			break;
 		}
 
@@ -190,20 +135,81 @@ void pce220_serial_device::device_timer(emu_timer &timer, device_timer_id id, in
 		{
 			//next byte
 			m_bytes_count++;
-			popmessage("Received %d bytes\n", m_bytes_count);
+			popmessage("Send %d/%d bytes\n", m_bytes_count , (uint32_t)length());
 			m_state = SIO_WAIT;
-			if (m_current_byte != SIO_EOT_BYTE)
-				fwrite(&m_current_byte, 1);
-			m_current_byte = 0;
+			if (m_bytes_count < length())
+				fread(&m_current_byte, 1);
+			else
+				m_current_byte = SIO_EOT_BYTE;
 		}
 		else
 		{
 			m_state = get_next_state();
 		}
+
 	}
 	else
 	{
 		m_din = m_xin = m_ack = 0;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(pce220_serial_device::receive_tick)
+{
+	if (!m_enabled)
+	{
+		m_din = m_xin = m_ack = 0;
+		return;
+	}
+
+	//receive data
+	switch(m_state)
+	{
+	case SIO_WAIT:
+		//wait send request
+		if(m_busy)
+			return;
+		m_ack = 1; //acknowledge
+		break;
+	case SIO_SEND_START:
+		//wait for the start bit
+		if (!m_xout)
+			return;
+		break;
+	case SIO_SEND_BIT0:
+	case SIO_SEND_BIT1:
+	case SIO_SEND_BIT2:
+	case SIO_SEND_BIT3:
+	case SIO_SEND_BIT4:
+	case SIO_SEND_BIT5:
+	case SIO_SEND_BIT6:
+	case SIO_SEND_BIT7:
+		m_current_byte |= ((~m_xout)&1) << (m_state - SIO_SEND_BIT0);
+		break;
+	case SIO_SEND_PARITY:
+		if (m_xout != calc_parity(m_current_byte))
+			logerror("SIO %s: byte %d has wrong parity!\n", tag(), m_bytes_count);
+		break;
+	case SIO_SEND_STOP1:
+	case SIO_SEND_STOP2:
+		//receive stop bit
+		m_ack = 0;
+		break;
+	}
+
+	if (m_state == (SIO_SEND_PARITY + SIO_STOP_BIT))
+	{
+		//next byte
+		m_bytes_count++;
+		popmessage("Received %d bytes\n", m_bytes_count);
+		m_state = SIO_WAIT;
+		if (m_current_byte != SIO_EOT_BYTE)
+			fwrite(&m_current_byte, 1);
+		m_current_byte = 0;
+	}
+	else
+	{
+		m_state = get_next_state();
 	}
 }
 

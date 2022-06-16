@@ -1841,7 +1841,7 @@ void bfcobjam_state::init_bfcobjam()
 	membank("bank2")->set_base(memregion("user1")->base()+0x08000);
 	membank("bank3")->set_base(memregion("user1")->base()+0x0c000);
 
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bfcobjam_state::scanline_callback),this));
+	m_scanline_timer = timer_alloc(FUNC(bfcobjam_state::scanline_callback), this);
 
 	/* Finish this */
 	save_item(NAME(m_data_r));
@@ -2603,9 +2603,8 @@ void bfcobjam_state::genio_w( uint8_t data )
 	}
 
 	//bits 1 and 2 are for upd7759
-	m_upd7759_int->md_w(0);
+	m_upd7759_int->md_w(!BIT(data,1));
 	m_upd7759_int->reset_w(!BIT(data,2));
-	m_upd7759_int->start_w(BIT(data,1));
 }
 
 void bfcobjam_state::upd7759_w(uint8_t data)

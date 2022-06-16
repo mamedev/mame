@@ -1056,10 +1056,11 @@ void apple2e_state::machine_start()
 
 	if ((m_has_laser_mouse) || (m_isace500) || (m_isace2200))
 	{
-		m_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple2e_state::update_laserprn_strobe), this));
+		m_strobe_timer = timer_alloc(FUNC(apple2e_state::update_laserprn_strobe), this);
 		m_next_strobe = 1U;
 	}
 
+	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0;
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -2320,6 +2321,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 				else if (m_accel_unlocked)
 				{
 					// disable acceleration
+					m_accel_fast = false;
 					accel_normal_speed();
 				}
 			}
@@ -2328,6 +2330,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 		case 0x5b: // Zip full speed
 			if (m_accel_unlocked)
 			{
+				m_accel_fast = true;
 				accel_full_speed();
 			}
 			break;
@@ -2343,6 +2346,10 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			if (m_accel_unlocked)
 			{
 				m_accel_gameio = data;
+			}
+			else
+			{
+				do_io(offset, false);
 			}
 			break;
 
@@ -3594,8 +3601,8 @@ void apple2e_state::base_map(address_map &map)
 	m_4000bank[1](0x4000, 0xbfff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::ram4000_w));
 	m_4000bank[2](0x4000, 0xbfff).rw(FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::auxram4000_w));
 	m_4000bank[3](0x4000, 0xbfff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::auxram4000_w));
-	m_4000bank[4](0x4000, 0xbfff).rw(FUNC(apple2e_state::cec4000_r), FUNC(apple2e_state::ram4000_w));
-	m_4000bank[5](0x4000, 0xbfff).rw(FUNC(apple2e_state::cec8000_r), FUNC(apple2e_state::ram8000_w));
+	m_4000bank[4](0x4000, 0x7fff).rw(FUNC(apple2e_state::cec4000_r), FUNC(apple2e_state::ram4000_w));
+	m_4000bank[4](0x8000, 0xbfff).rw(FUNC(apple2e_state::cec8000_r), FUNC(apple2e_state::ram8000_w));
 
 	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_w));
 	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));

@@ -36,6 +36,9 @@
         * There existed a vertical version of Head On as well.
         * According to the manuals, Borderline has the same sound
           board as Tranquillizer Gun.
+        * The relationship between nostromo and startrks isn't clear:
+          is one a bootleg of the other or are both bootlegs of an unknown
+          original?
 
     Known issues/to-do's:
         * Analog sound missing in many games
@@ -716,6 +719,17 @@ static INPUT_PORTS_START( headons )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* no color/bw option */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( startrks )
+	PORT_INCLUDE( headons )
+
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( hocrash )
 	PORT_INCLUDE( headons )
 
@@ -1280,11 +1294,34 @@ void tranqgun_state::tranqgun_prot_w(offs_t offset, uint8_t data)
 	}
 }
 
+uint8_t tranqgun_state::brdrlinet_prot_r()
+{
+	logerror("%s: brdrlinet_prot_r\n", machine().describe_context());
+
+	return m_tranqgun_prot_return;
+}
+
+void tranqgun_state::brdrlinet_prot_w(uint8_t data)
+{
+	logerror("%s: brdrlinet_prot_w %02x\n", machine().describe_context(), data);
+
+	if (data == 0xd8)
+		m_tranqgun_prot_return = 0x02;
+	else if (data == 0x3a)
+		m_tranqgun_prot_return = 0x01;
+}
 
 void tranqgun_state::tranqgun_dualgame_map(address_map &map)
 {
 	vicdual_dualgame_map(map);
 	map(0x4000, 0x7fff).rw(FUNC(tranqgun_state::tranqgun_prot_r), FUNC(tranqgun_state::tranqgun_prot_w));
+}
+
+void tranqgun_state::brdrlinet_dualgame_map(address_map &map)
+{
+	vicdual_dualgame_map(map);
+	map(0x7800, 0x7800).r(FUNC(tranqgun_state::brdrlinet_prot_r));
+	map(0xe9a8, 0xe9a8).w(FUNC(tranqgun_state::brdrlinet_prot_w));
 }
 
 uint8_t carnivalh_state::carnivalh_prot_r(offs_t offset)
@@ -2399,6 +2436,12 @@ void tranqgun_state::tranqgun(machine_config &config)
 	BORDERLINE_AUDIO(config, m_vicdual_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void tranqgun_state::brdrlinet(machine_config &config)
+{
+	tranqgun(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &tranqgun_state::brdrlinet_dualgame_map);
+}
 
 void vicdual_state::brdrline(machine_config &config)
 {
@@ -3212,7 +3255,7 @@ ROM_START( headonn )
 	ROM_LOAD( "prom.g2", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
 
 	ROM_REGION( 0x0040, "user1", 0 )    /* timing PROMs */
-	ROM_LOAD( "prom.b6", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )    /* control PROM */
+	ROM_LOAD( "prom.b6", 0x0000, 0x0020, CRC(7e1cb76b) SHA1(3366ead65d49cab076ccdafbb13726c7e05f8b9a) )    /* control PROM */
 	ROM_LOAD( "prom.f2", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
 ROM_END
 
@@ -3470,7 +3513,30 @@ ROM_START( sspacaho )
 	ROM_LOAD( "316-0206.u14", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    /* control PROM */
 ROM_END
 
+// Found on a Gremlin 'EXTENDED ROM VIDEO LOGIC ASSY NO 800-003' PCB with a '834-0118' sticker and a Sega 96718-P-A riser board.
+// Everything on the board is dated 1979, but possibly the PCB was converted from something else, given the epr numbers are way bigger than the Japanese version ones
 ROM_START( samurai )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-1217.u33",   0x0000, 0x0400, CRC(a1a9cb03) SHA1(1875a86ad5938295dd5db6bb045be46eba8638ba) )
+	ROM_LOAD( "epr-1218.u32",   0x0400, 0x0400, CRC(4b45d07d) SHA1(ff8cb6bae5ed239a0245265ca36305e4fadc7695) )
+	ROM_LOAD( "epr-1219.u31",   0x0800, 0x0400, CRC(9fd4b195) SHA1(001e3952927dac36993b20f6deae343fdb95e2cd) )
+	ROM_LOAD( "epr-1220.u30",   0x0c00, 0x0400, CRC(90370e13) SHA1(6a7419a52299a78aff16689775ce0533ac8aa443) )
+	ROM_LOAD( "epr-1221.u29",   0x1000, 0x0400, CRC(dcc47158) SHA1(801a16aa100fee3f13b4acd426612dde9c906f5d) )
+	ROM_LOAD( "epr-1222.u28",   0x1400, 0x0400, CRC(d2fab27a) SHA1(d289f0451859d87665f8047aabb43494a22fae28) )
+	ROM_LOAD( "epr-1223.u27",   0x1800, 0x0400, CRC(f7e2ad95) SHA1(078055961fc09ee91734e86b30a7b48a03a67f4a) )
+	ROM_LOAD( "epr-1224.u26",   0x1c00, 0x0400, CRC(d46e306b) SHA1(51532a054fc334a04d3e5cad3b41aa3508318bc5) )
+	ROM_LOAD( "epr-1225.u8",    0x2000, 0x0400, CRC(3dd5c41f) SHA1(de400d30b732edd94ad5388e82cdae27d92f0e7f) )
+	ROM_LOAD( "epr-1226.u7",    0x2400, 0x0400, CRC(7c3561b1) SHA1(9f14924dbd753f9389b0516eb5af6241e897e9a1) )
+	ROM_LOAD( "epr-1227.u6",    0x2800, 0x0400, CRC(e72c71a4) SHA1(52b6ea96897f2b5b1ee5aab7c1737e35d986b75e) )
+	ROM_LOAD( "epr-1228.u5",    0x2c00, 0x0400, CRC(d76f4a56) SHA1(77746f6e73c48fa5ca27a097e9b13a36363f3aa8) )
+	ROM_LOAD( "epr-1229.u4",    0x3000, 0x0400, CRC(e0d40395) SHA1(343addf9148c26c3f3e7fbf3005ad6c9b33e3899) )
+	ROM_LOAD( "epr-1230.u3",    0x3400, 0x0400, CRC(55e9a5c4) SHA1(022430a842ec2a38a64d9ede53dc1e1ac0c66efd) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "pr55.clr",     0x0000, 0x0020, CRC(975f5fb0) SHA1(d5917d68ad5549fe5cc997521c3b0a5a279d2231) )
+ROM_END
+
+ROM_START( samuraij )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-289.u33",   0x0000, 0x0400, CRC(a1a9cb03) SHA1(1875a86ad5938295dd5db6bb045be46eba8638ba) )
 	ROM_LOAD( "epr-290.u32",   0x0400, 0x0400, CRC(49fede51) SHA1(58ab1779d555281ec436ae90dcdf4ada42625892) )
@@ -3898,7 +3964,7 @@ ROM_START( brdrlinet )
 	ROM_LOAD( "1171a.u33",      0x0000, 0x0400, CRC(38dd9880) SHA1(1a879ce990129fd34e7265010872ac998d16accf) )
 	ROM_LOAD( "1172a.u32",      0x0400, 0x0400, CRC(1a3adff0) SHA1(3fab79688b739d6a5979638115629d0a61f8878b) )
 	ROM_LOAD( "1173a.u31",      0x0800, 0x0400, CRC(e668734d) SHA1(b01b06f4a107f14001c70e63e072c575cd97c89b) )
-	ROM_LOAD( "1174a.u30.bad",  0x0c00, 0x0400, BAD_DUMP CRC(22c83ae4) SHA1(16da92afe068401a6f27f56b214b600b49d8019f) ) // chip was dead, need another
+	ROM_LOAD( "1174a.u30",      0x0c00, 0x0400, CRC(d1ca5d52) SHA1(2ed9368741a409f7483020c1f7a44edb0a190a46) )
 	ROM_LOAD( "1175a.u29",      0x1000, 0x0400, CRC(116517b8) SHA1(a7ded7cb53735e6cf4994ff70db35dead04828e6) )
 	ROM_LOAD( "1176a.u28",      0x1400, 0x0400, CRC(2b2c4ba8) SHA1(fe9ccb94b9d5d7fb9ec6170a7b71f859b22981d3) )
 	ROM_LOAD( "1177a.u27",      0x1800, 0x0400, CRC(d8cbcc1e) SHA1(632d2ba84d4276155960b176bf7ac514b214e481) )
@@ -4073,6 +4139,21 @@ ROM_START( startrks )
 	ROM_REGION( 0x0040, "user1", 0 )    /* timing PROMs */
 	ROM_LOAD( "82s123.15c", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    /* control PROM */
 	ROM_LOAD( "82s123.14c", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
+ROM_END
+
+ROM_START( nostromo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ns_1.bin", 0x0000, 0x0400, CRC(2ba4202a) SHA1(1e46e36c37c9f1cecb505a1fe393c24d0e271168) )
+	ROM_LOAD( "ns_2.bin", 0x0400, 0x0400, CRC(cf6081b8) SHA1(2294cf6849a8191928f268ba1dbef21659a1475f) )
+	ROM_LOAD( "ns_3.bin", 0x0800, 0x0400, CRC(fd983c0c) SHA1(a4aea8707878dcac8b4e3d9acad94f60eee956c6) )
+	ROM_LOAD( "ns_4.bin", 0x0c00, 0x0400, CRC(79e1dc92) SHA1(53fcf9b7b7e894122419b43adccb1aaf7dab8bf9) )
+	ROM_LOAD( "ns_5.bin", 0x1000, 0x0400, CRC(4deb2ce3) SHA1(2935a4ab4be0190e8efa560e30fa7349d83d3e69) )
+	ROM_LOAD( "ns_6.bin", 0x1400, 0x0400, CRC(e4ddf052) SHA1(8734c87742a1d0b68e679e1650806d0738c432c6) )
+	ROM_LOAD( "ns_7.bin", 0x1800, 0x0400, CRC(a5315dc8) SHA1(ba6d27d03c9f0100fe89ebbf4b58d166bf259fa8) )
+
+	ROM_REGION( 0x0040, "user1", 0 )    // timing PROMs, not dumped for this set but probably same as startrks given how close they are
+	ROM_LOAD( "82s123.15c", 0x0000, 0x0020, BAD_DUMP CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    // control PROM
+	ROM_LOAD( "82s123.14c", 0x0020, 0x0020, BAD_DUMP CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    // sequence PROM
 ROM_END
 
 ROM_START( digger )
@@ -4259,7 +4340,8 @@ GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state,   empty_i
 GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invho2a,    invho2,   invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 2)", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong colors make Head On 2 unplayable (all black)
 GAME( 1980, nsub,       0,        nsub,      nsub,      nsub_state,      empty_init, ROT270, "Sega",                    "N-Sub (upright)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // this is the upright set. cocktail set still needs to be dumped
-GAME( 1980, samurai,    0,        samurai,   samurai,   vicdual_state,   empty_init, ROT270, "Sega",                    "Samurai", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, samurai,    0,        samurai,   samurai,   vicdual_state,   empty_init, ROT270, "Sega",                    "Samurai (World)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, samuraij,   samurai,  samurai,   samurai,   vicdual_state,   empty_init, ROT270, "Sega",                    "Samurai (Japan)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invinco,    0,        invinco,   invinco,   vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invcarht,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Car Hunt (Germany)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invds,      0,        invds,     invds,     vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Deep Scan", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -4278,8 +4360,9 @@ GAME( 1981, brdrline,   0,        brdrline,  brdrline,  vicdual_state,   empty_i
 GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   vicdual_state,   empty_init, ROT270, "Sega",                    "Star Raker", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrlins,   brdrline, brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "bootleg (Sidam)",         "Borderline (Sidam bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrlinb,   brdrline, brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "bootleg (Karateco)",      "Borderline (Karateco bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, brdrlinet,  brdrline, tranqgun,  tranqgun,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Borderline (Tranquillizer Gun conversion)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // official factory conversion
-GAME( 198?, startrks,   0,        headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (Sidam)",         "Star Trek (Head On hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, brdrlinet,  brdrline, brdrlinet, brdrline,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Borderline (Tranquillizer Gun conversion)", MACHINE_SUPPORTS_SAVE ) // official factory conversion
+GAME( 198?, nostromo,   0,        headons,   startrks,  vicdual_state,   empty_init, ROT0,   "bootleg",                 "Nostromo", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // sound board probably differs
+GAME( 198?, startrks,   nostromo, headons,   startrks,  vicdual_state,   empty_init, ROT0,   "bootleg (Sidam)",         "Star Trek (Head On hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, digger,     0,        digger,    digger,    vicdual_state,   empty_init, ROT270, "Sega",                    "Digger", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pulsar,     0,        pulsar,    pulsar,    vicdual_state,   empty_init, ROT270, "Sega",                    "Pulsar", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  vicdual_state,   empty_init, ROT270, "Denki Onkyo",             "Heiankyo Alien", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

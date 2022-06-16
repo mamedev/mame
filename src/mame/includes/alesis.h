@@ -34,11 +34,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	TIMER_CALLBACK_MEMBER(dac_update);
+
 private:
-	static const device_timer_id TIMER_DAC_UPDATE = 1;
 	required_device<dac_word_interface> m_dac;
 	required_region_ptr<int8_t> m_samples;
 
@@ -46,8 +46,8 @@ private:
 	bool        m_output_active;
 	int         m_count;
 	int         m_shift;
-	uint32_t      m_cur_sample;
-	uint8_t       m_cmd[5];
+	uint32_t    m_cur_sample;
+	uint8_t     m_cmd[5]{};
 };
 
 
@@ -156,9 +156,9 @@ protected:
 	void sr16_mem(address_map &map);
 
 private:
-	uint8_t       m_kb_matrix;
-	uint8_t       m_leds;
-	uint8_t       m_lcd_digits[5];
+	uint8_t       m_kb_matrix = 0;
+	uint8_t       m_leds = 0;
+	uint8_t       m_lcd_digits[5]{};
 
 	required_device<hd44780_device> m_lcdc;
 	optional_device<cassette_image_device> m_cassette;

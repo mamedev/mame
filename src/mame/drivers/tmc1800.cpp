@@ -515,7 +515,7 @@ INPUT_CHANGED_MEMBER( nano_state::monitor_pressed )
 	{
 		// TODO: what are the correct values?
 		int t = RES_K(27) * CAP_U(1) * 1000; // t = R26 * C1
-		timer_set(attotime::from_msec(t), TIMER_ID_EF4);
+		m_ef4_timer->adjust(attotime::from_msec(t));
 	}
 }
 
@@ -683,6 +683,10 @@ void tmc1800_state::machine_reset()
 {
 	/* reset CDP1861 */
 	m_vdc->reset();
+
+	/* initialize beeper */
+	m_beeper->set_state(0);
+	m_beeper->set_clock(0);
 }
 
 // OSCOM 1000B
@@ -728,14 +732,9 @@ void tmc2000_state::machine_reset()
 
 // OSCOM Nano
 
-void nano_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nano_state::assert_ef4)
 {
-	switch (id)
-	{
-	case TIMER_ID_EF4:
-		m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
-		break;
-	}
+	m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
 }
 
 void nano_state::machine_start()
@@ -744,12 +743,15 @@ void nano_state::machine_start()
 
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
+
+	/* allocate timers */
+	m_ef4_timer = timer_alloc(FUNC(nano_state::assert_ef4), this);
 }
 
 void nano_state::machine_reset()
 {
 	/* assert EF4 */
-	m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
+	m_ef4_timer->adjust(attotime::zero);
 
 	/* reset CDP1864 */
 	m_cti->reset();
@@ -925,30 +927,10 @@ ROM_START( nano )
 	ROM_LOAD( "mmi6349.ic", 0x000, 0x200, BAD_DUMP CRC(1ec1b432) SHA1(ac41f5e38bcd4b80bd7a5b277a2c600899fd5fb8) ) // equivalent to 82S141
 ROM_END
 
-/* Driver Initialization */
-
-void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_SETUP_BEEP:
-		m_beeper->set_state(0);
-		m_beeper->set_clock(0);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in tmc1800_state::device_timer");
-	}
-}
-
-void tmc1800_state::init_tmc1800()
-{
-	timer_set(attotime::zero, TIMER_SETUP_BEEP);
-}
-
 /* System Drivers */
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS           INIT          COMPANY        FULLNAME       FLAGS
-COMP( 1977, tmc1800,  0,       0,      tmc1800,  tmc1800, tmc1800_state,  init_tmc1800, "Telercas Oy", "Telmac 1800", MACHINE_NOT_WORKING )
+COMP( 1977, tmc1800,  0,       0,      tmc1800,  tmc1800, tmc1800_state,  empty_init,   "Telercas Oy", "Telmac 1800", MACHINE_NOT_WORKING )
 COMP( 1977, osc1000b, tmc1800, 0,      osc1000b, tmc1800, osc1000b_state, empty_init,   "OSCOM Oy",    "OSCOM 1000B", MACHINE_NOT_WORKING )
 COMP( 1980, tmc2000,  0,       0,      tmc2000,  tmc2000, tmc2000_state,  empty_init,   "Telercas Oy", "Telmac 2000", MACHINE_SUPPORTS_SAVE )
 COMP( 1980, nano,     tmc2000, 0,      nano,     nano,    nano_state,     empty_init,   "OSCOM Oy",    "OSCOM Nano",  MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -36,50 +36,46 @@ typedef named_delegate<void (s32)> timer_expired_delegate;
 
 class emu_timer
 {
-	friend class device_scheduler;
-	friend class simple_list<emu_timer>;
-	friend class fixed_allocator<emu_timer>;
-
-	// construction/destruction
-	emu_timer();
-	~emu_timer();
-
-	// allocation and re-use
-	emu_timer &init(running_machine &machine, timer_expired_delegate callback, bool temporary);
-	emu_timer &init(device_t &device, device_timer_id id, bool temporary);
-	emu_timer &release();
-
 public:
 	// getters
-	emu_timer *next() const { return m_next; }
-	running_machine &machine() const noexcept { assert(m_machine != nullptr); return *m_machine; }
-	bool enabled() const { return m_enabled; }
-	int param() const { return m_param; }
+	bool enabled() const noexcept { return m_enabled; }
+	int param() const noexcept { return m_param; }
 
 	// setters
-	bool enable(bool enable = true);
-	void set_param(int param) { m_param = param; }
+	bool enable(bool enable = true) noexcept;
+	void set_param(int param) noexcept { m_param = param; }
 
 	// control
-	void reset(const attotime &duration = attotime::never) { adjust(duration, m_param, m_period); }
-	void adjust(attotime start_delay, s32 param = 0, const attotime &periodicity = attotime::never);
+	void reset(const attotime &duration = attotime::never) noexcept { adjust(duration, m_param, m_period); }
+	void adjust(attotime start_delay, s32 param = 0, const attotime &periodicity = attotime::never) noexcept;
 
 	// timing queries
 	attotime elapsed() const noexcept;
 	attotime remaining() const noexcept;
-	attotime start() const { return m_start; }
-	attotime expire() const { return m_expire; }
-	attotime period() const { return m_period; }
+	attotime start() const noexcept { return m_start; }
+	attotime expire() const noexcept { return m_expire; }
+	attotime period() const noexcept { return m_period; }
 
 private:
+	// construction/destruction
+	emu_timer() noexcept;
+	~emu_timer();
+
+	// allocation and re-use
+	emu_timer &init(
+			running_machine &machine,
+			timer_expired_delegate &&callback,
+			attotime start_delay,
+			int param,
+			bool temporary);
+
 	// internal helpers
-	void register_save();
-	void schedule_next_period();
+	void register_save(save_manager &manager) ATTR_COLD;
+	void schedule_next_period() noexcept;
 	void dump() const;
-	static void device_timer_expired(emu_timer &timer, s32 param);
 
 	// internal state
-	running_machine *   m_machine;      // reference to the owning machine
+	device_scheduler *  m_scheduler;    // reference to the owning machine
 	emu_timer *         m_next;         // next timer in order in the list
 	emu_timer *         m_prev;         // previous timer in order in the list
 	timer_expired_delegate m_callback;  // callback function
@@ -89,8 +85,10 @@ private:
 	attotime            m_period;       // the repeat frequency of the timer
 	attotime            m_start;        // time when the timer was started
 	attotime            m_expire;       // time when the timer will expire
-	device_t *          m_device;       // for device timers, a pointer to the device
-	device_timer_id     m_id;           // for device timers, the ID of the timer
+
+	friend class device_scheduler;
+	friend class fixed_allocator<emu_timer>;
+	friend class simple_list<emu_timer>; // FIXME: fixed_allocator requires this
 };
 
 
@@ -109,25 +107,22 @@ public:
 	// getters
 	running_machine &machine() const noexcept { return m_machine; }
 	attotime time() const noexcept;
-	emu_timer *first_timer() const { return m_timer_list; }
+	emu_timer *first_timer() const noexcept { return m_timer_list; }
 	device_execute_interface *currently_executing() const noexcept { return m_executing_device; }
 	bool can_save() const;
 
 	// execution
 	void timeslice();
-	void abort_timeslice();
+	void abort_timeslice() noexcept;
 	void trigger(int trigid, const attotime &after = attotime::zero);
 	void boost_interleave(const attotime &timeslice_time, const attotime &boost_duration);
 	void suspend_resume_changed() { m_suspend_changes_pending = true; }
 
 	// timers, specified by callback/name
 	emu_timer *timer_alloc(timer_expired_delegate callback);
+	[[deprecated("timer_set is deprecated; please avoid anonymous timers. Use TIMER_CALLBACK_MEMBER and an allocated emu_timer instead.")]]
 	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0);
-	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0) { timer_set(attotime::zero, callback, param); }
-
-	// timers, specified by device/id; generally devices should use the device_t methods instead
-	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0);
-	void timer_set(const attotime &duration, device_t &device, device_timer_id id = 0, int param = 0);
+	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0);
 
 	// debugging
 	void dump_timers() const;
@@ -160,6 +155,7 @@ private:
 
 	// list of active timers
 	emu_timer *                 m_timer_list;               // head of the active list
+	emu_timer *                 m_inactive_timers;          // head of the inactive timer list
 	fixed_allocator<emu_timer>  m_timer_allocator;          // allocator for timers
 
 	// other internal states

@@ -1723,10 +1723,10 @@ void fm7_state::init_fm7()
 {
 //  m_shared_ram = std::make_unique<uint8_t[]>(0x80);
 	m_video_ram = make_unique_clear<uint8_t[]>(0x18000);  // 2 pages on some systems
-	m_beeper_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::beeper_off), this));
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::timer_irq), this));
-	m_subtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::subtimer_irq), this));
-	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::keyboard_poll), this));
+	m_beeper_off_timer = timer_alloc(FUNC(fm7_state::beeper_off), this);
+	m_timer = timer_alloc(FUNC(fm7_state::timer_irq), this);
+	m_subtimer = timer_alloc(FUNC(fm7_state::subtimer_irq), this);
+	m_keyboard_timer = timer_alloc(FUNC(fm7_state::keyboard_poll), this);
 
 	m_init_rom_en = false;
 }
@@ -1746,9 +1746,9 @@ MACHINE_START_MEMBER(fm7_state,fm7)
 
 MACHINE_START_MEMBER(fm77_state,fm77av)
 {
-	m_encoder_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm77_state::av_encoder_ack), this));
-	m_alu_task_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm77_state::av_alu_task_end), this));
-	m_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm77_state::av_vsync), this));
+	m_encoder_ack_timer = timer_alloc(FUNC(fm77_state::av_encoder_ack), this);
+	m_alu_task_end_timer = timer_alloc(FUNC(fm77_state::av_alu_task_end), this);
+	m_vsync_timer = timer_alloc(FUNC(fm77_state::av_vsync), this);
 
 	memset(m_shared_ram,0xff,0x80);
 
@@ -1765,9 +1765,9 @@ MACHINE_START_MEMBER(fm77_state,fm77av)
 
 MACHINE_START_MEMBER(fm11_state,fm11)
 {
-	m_encoder_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm11_state::av_encoder_ack), this));
-	m_alu_task_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm11_state::av_alu_task_end), this));
-	m_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm11_state::av_vsync), this));
+	m_encoder_ack_timer = timer_alloc(FUNC(fm11_state::av_encoder_ack), this);
+	m_alu_task_end_timer = timer_alloc(FUNC(fm11_state::av_alu_task_end), this);
+	m_vsync_timer = timer_alloc(FUNC(fm11_state::av_vsync), this);
 
 	memset(m_shared_ram,0xff,0x80);
 	m_type = SYS_FM11;
@@ -1908,7 +1908,8 @@ void fm7_state::fm7(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("fm7_cass");
 
-	SOFTWARE_LIST(config, "cass_list").set_original("fm7_cass");
+	SOFTWARE_LIST(config, "fm7_cass_list").set_original("fm7_cass");
+	SOFTWARE_LIST(config, "fm8_cass_list").set_compatible("fm8_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fdc_intrq_w));
@@ -1959,6 +1960,8 @@ void fm7_state::fm8(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("fm7_cass");
+
+	SOFTWARE_LIST(config, "fm8_cass_list").set_original("fm8_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fdc_intrq_w));
@@ -2018,7 +2021,8 @@ void fm77_state::fm77av(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("fm7_cass");
 
-	SOFTWARE_LIST(config, "cass_list").set_compatible("fm7_cass");
+	SOFTWARE_LIST(config, "fm7_cass_list").set_compatible("fm7_cass");
+	SOFTWARE_LIST(config, "fm8_cass_list").set_compatible("fm8_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm77_state::fdc_intrq_w));

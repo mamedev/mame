@@ -70,7 +70,6 @@ unknown cycle: CME, SSE, SSS
 
 #include "emu.h"
 #include "tms1k_base.h"
-#include "debugger.h"
 
 tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
 	: cpu_device(mconfig, type, tag, owner, clock)

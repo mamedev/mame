@@ -944,9 +944,9 @@ void model2_state::draw_framebuffer( bitmap_rgb32 &bitmap, const rectangle &clip
 	int xoffs = (-m_crtc_xoffset)/2;
 	int yoffs = m_crtc_yoffset/2;
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.min_y; y < cliprect.max_y; ++y)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{
 			int offset = (x + xoffs) + (y + yoffs)*512;
 			int b = (fbvram[offset] >> 0) & 0x1f;

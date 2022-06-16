@@ -71,10 +71,6 @@ private:
 
 void talkingfb_state::machine_start()
 {
-	// zerofill
-	m_bank = 0;
-	m_inp_mux = 0;
-
 	// register for savestates
 	save_item(NAME(m_bank));
 	save_item(NAME(m_inp_mux));

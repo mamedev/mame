@@ -15,6 +15,9 @@
         * Hard Hat
         * Fax and Fax 2
 
+    TODO:
+        * check whether games besides Venture have coin counter outputs
+
     Known bugs:
         * none at this time
 
@@ -181,13 +184,10 @@ namespace {
 class exidy_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_COLLISION_IRQ
-	};
-
 	exidy_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_dsw(*this, "DSW"),
+		m_in0(*this, "IN0"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -208,15 +208,20 @@ public:
 	void mtrap(machine_config &config);
 	void pepper2(machine_config &config);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(intsource_coins_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_count_w);
+
 protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	required_ioport m_dsw;
+	required_ioport m_in0;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_color_latch;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void video_start() override;
 
 	void base(machine_config &config);
 
@@ -236,6 +241,8 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_enable;
 	optional_shared_ptr<uint8_t> m_characterram;
 
+	emu_timer *m_collision_mob_timer = nullptr;
+	emu_timer *m_collision_bg_timer = nullptr;
 	uint8_t m_collision_mask = 0;
 	uint8_t m_collision_invert = 0;
 	int m_is_2bpp = 0;
@@ -247,10 +254,11 @@ private:
 
 	void mtrap_ocl_w(uint8_t data);
 
-	uint32_t screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(exidy_vblank_interrupt);
 
+	TIMER_CALLBACK_MEMBER(latch_collision);
 	void latch_condition(int collision);
 	void set_1_color(int index, int which);
 	void set_colors();
@@ -279,6 +287,9 @@ public:
 	void spectar(machine_config &config);
 	void rallys(machine_config &config);
 	void phantoma(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(spectar_coins_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(rallys_coin1_r);
 
 	void init_sidetrac();
 	void init_spectar();
@@ -388,13 +399,32 @@ private:
 
 /*************************************
  *
- *  Special Teeter Torture input
+ *  Special inputs
  *
  *************************************/
 
+CUSTOM_INPUT_MEMBER(exidy_state::intsource_coins_r)
+{
+	uint8_t const dsw = m_dsw->read();
+	uint8_t const in0 = m_in0->read();
+	return (BIT(~in0, 7) << 1) | BIT(dsw, 0);
+}
+
+CUSTOM_INPUT_MEMBER(spectar_state::spectar_coins_r)
+{
+	uint8_t const dsw = m_dsw->read();
+	uint8_t const in0 = m_in0->read();
+	return (BIT(~in0, 7) << 1) | BIT(~dsw, 0);
+}
+
+CUSTOM_INPUT_MEMBER(spectar_state::rallys_coin1_r)
+{
+	return BIT(m_in0->read(), 7);
+}
+
 CUSTOM_INPUT_MEMBER(teetert_state::teetert_input_r)
 {
-	uint8_t dial = m_dial->read();
+	uint8_t const dial = m_dial->read();
 
 	int result = (dial != m_last_dial) << 4;
 	if (result != 0)
@@ -412,10 +442,21 @@ CUSTOM_INPUT_MEMBER(teetert_state::teetert_input_r)
 }
 
 
+/*************************************
+ *
+ *  Special inputs
+ *
+ *************************************/
+
+INPUT_CHANGED_MEMBER(exidy_state::coin_count_w)
+{
+	machine().bookkeeping().coin_counter_w(param, newval);
+}
+
 
 /*************************************
  *
- *  Bankswitcher
+ *  Bank switching
  *
  *************************************/
 
@@ -435,6 +476,7 @@ void exidy_state::mtrap_ocl_w(uint8_t data) // Mouse Trap (possibly others) set 
 	output().set_value("led0", !BIT(data, 2));
 	output().set_value("led1", !BIT(data, 4));
 }
+
 
 /*************************************
  *
@@ -639,8 +681,7 @@ static INPUT_PORTS_START( targ )
 
 	PORT_START("INTSOURCE")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(spectar_state, spectar_coins_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
@@ -710,7 +751,7 @@ static INPUT_PORTS_START( rallys )
 	PORT_MODIFY("INTSOURCE")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(spectar_state, rallys_coin1_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( phantoma )
@@ -778,8 +819,7 @@ static INPUT_PORTS_START( mtrap )
 */
 
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exidy_state, intsource_coins_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
@@ -795,7 +835,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( venture )
 	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exidy_state, coin_count_w, 1)
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x00, "20000" )
 	PORT_DIPSETTING(    0x02, "30000" )
@@ -823,7 +863,7 @@ static INPUT_PORTS_START( venture )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exidy_state, coin_count_w, 0)
 
 	PORT_START("INTSOURCE")
 /*
@@ -840,8 +880,7 @@ static INPUT_PORTS_START( venture )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exidy_state, intsource_coins_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
@@ -896,8 +935,7 @@ static INPUT_PORTS_START( teetert )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exidy_state, intsource_coins_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
@@ -956,8 +994,7 @@ static INPUT_PORTS_START( pepper2 )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exidy_state, intsource_coins_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
@@ -1008,8 +1045,7 @@ static INPUT_PORTS_START( fax )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exidy_state, intsource_coins_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
@@ -1297,21 +1333,13 @@ void exidy_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 ***************************************************************************/
 
-void exidy_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(exidy_state::latch_collision)
 {
-	switch (id)
-	{
-	case TIMER_COLLISION_IRQ:
-		/* latch the collision bits */
-		latch_condition(param);
+	/* latch the collision bits */
+	latch_condition(param);
 
-		/* set the IRQ line */
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in exidy_state::device_timer");
-	}
+	/* set the IRQ line */
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -1376,7 +1404,7 @@ void exidy_state::check_collision()
 
 				/* if we got one, trigger an interrupt */
 				if ((current_collision_mask & m_collision_mask) && (count++ < 128))
-					timer_set(m_screen->time_until_pos(org_1_x + sx, org_1_y + sy), TIMER_COLLISION_IRQ, current_collision_mask);
+					m_collision_mob_timer->adjust(m_screen->time_until_pos(org_1_x + sx, org_1_y + sy), current_collision_mask);
 			}
 
 			if (m_motion_object_2_vid.pix(sy, sx) != 0xff)
@@ -1384,7 +1412,7 @@ void exidy_state::check_collision()
 				/* check for background collision (M2CHAR) */
 				if (m_background_bitmap.pix(org_2_y + sy, org_2_x + sx) != 0)
 					if ((m_collision_mask & 0x08) && (count++ < 128))
-						timer_set(m_screen->time_until_pos(org_2_x + sx, org_2_y + sy), TIMER_COLLISION_IRQ, 0x08);
+						m_collision_bg_timer->adjust(m_screen->time_until_pos(org_2_x + sx, org_2_y + sy), 0x08);
 			}
 		}
 }
@@ -1397,7 +1425,7 @@ void exidy_state::check_collision()
  *
  *************************************/
 
-uint32_t exidy_state::screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t exidy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* refresh the colors from the palette (static or dynamic) */
 	set_colors();
@@ -1422,6 +1450,12 @@ uint32_t exidy_state::screen_update_exidy(screen_device &screen, bitmap_ind16 &b
  *  Machine init
  *
  *************************************/
+
+void exidy_state::machine_start()
+{
+	m_collision_mob_timer = timer_alloc(FUNC(exidy_state::latch_collision), this);
+	m_collision_bg_timer = timer_alloc(FUNC(exidy_state::latch_collision), this);
+}
 
 void spectar_state::machine_start()
 {
@@ -1487,7 +1521,7 @@ void exidy_state::base(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART);
-	m_screen->set_screen_update(FUNC(exidy_state::screen_update_exidy));
+	m_screen->set_screen_update(FUNC(exidy_state::screen_update));
 	m_screen->set_palette(m_palette);
 }
 

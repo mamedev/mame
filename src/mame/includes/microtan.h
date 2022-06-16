@@ -72,15 +72,15 @@ protected:
 	optional_ioport m_keypad;
 	optional_device<tanbus_device> m_tanbus;
 
-	uint8_t m_keypad_column;
-	uint8_t m_keyboard_ascii;
-	emu_timer *m_pulse_nmi_timer;
-	uint8_t m_keyrows[10];
-	int m_lastrow;
-	int m_mask;
-	int m_key;
-	int m_repeat;
-	int m_repeater;
+	uint8_t m_keypad_column = 0;
+	uint8_t m_keyboard_ascii = 0;
+	emu_timer *m_pulse_nmi_timer = nullptr;
+	uint8_t m_keyrows[10]{};
+	int m_lastrow = 0;
+	int m_mask = 0;
+	int m_key = 0;
+	int m_repeat = 0;
+	int m_repeater = 0;
 
 	virtual void store_key(int key);
 
@@ -90,9 +90,9 @@ private:
 	optional_memory_region m_gfx1;
 	output_finder<> m_led;
 
-	uint8_t m_chunky_graphics;
+	uint8_t m_chunky_graphics = 0;
 	std::unique_ptr<uint8_t[]> m_chunky_buffer;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	uint8_t sound_r();
 	void sound_w(uint8_t data);

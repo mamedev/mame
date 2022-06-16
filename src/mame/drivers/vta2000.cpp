@@ -3,6 +3,8 @@
 /***************************************************************************
 
 VTA-2000 Terminal
+Made at Ukrainian SSR, Vinnitsa Terminal Plant
+(info from https://prog.world/dataart-has-opened-the-website-of-the-it-museum/ )
 
 Board images : http://fotki.yandex.ru/users/lodedome/album/93699?p=0
 
@@ -46,6 +48,7 @@ public:
 private:
 	void output_00(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	uint8_t m_framecnt = 0;
 
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -101,10 +104,9 @@ void vta2000_state::machine_reset()
 uint32_t vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 /* Cursor is missing. */
 {
-	static uint8_t framecnt=0; // FIXME: static variable
 	uint16_t sy=0,ma=0;
 
-	framecnt++;
+	m_framecnt++;
 
 	for (uint8_t y = 0; y < 25; y++)
 	{
@@ -134,7 +136,7 @@ uint32_t vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind1
 					fg = 2; // highlight
 				else
 					fg = 1;
-				if ((BIT(attr, 1)) && (BIT(framecnt, 5)))
+				if ((BIT(attr, 1)) && (BIT(m_framecnt, 5)))
 					gfx = 0; // blink
 				if ((BIT(attr, 5)) && (ra == 10))
 				{
@@ -236,4 +238,4 @@ ROM_END
 } // Anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS
-COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA2000-15m", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 198?, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA2000-15m", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
