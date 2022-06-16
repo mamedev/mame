@@ -38,6 +38,37 @@ enum class endianness
 #endif
 };
 
+
+// helper for accessing data adjusted for endianness
+template <typename In, typename Out, endianness Endian>
+class offset_endian_cast
+{
+private:
+	static inline constexpr std::ptrdiff_t SWIZZLE = (sizeof(In) / sizeof(Out)) - 1;
+
+	static_assert(!(sizeof(In) % sizeof(Out)), "input size must be a multiple of output size");
+	static_assert(!((sizeof(In) / sizeof(Out)) & SWIZZLE), "ratio of input size to output size must be a power of two");
+
+	Out *m_ptr;
+	std::ptrdiff_t m_offs;
+
+public:
+	constexpr offset_endian_cast(In *ptr, std::ptrdiff_t offs) noexcept : m_ptr(reinterpret_cast<Out *>(ptr)), m_offs(offs) { }
+
+	constexpr Out &operator[](std::ptrdiff_t i) const noexcept { return m_ptr[(m_offs + i) ^ ((Endian != endianness::native) ? SWIZZLE : 0)]; }
+
+	constexpr offset_endian_cast operator+(std::ptrdiff_t i) const noexcept { return offset_endian_cast(*this) += i; }
+	constexpr offset_endian_cast operator-(std::ptrdiff_t i) const noexcept { return offset_endian_cast(*this) -= i; }
+
+	offset_endian_cast &operator+=(std::ptrdiff_t i) noexcept { m_offs += i; return *this; }
+	offset_endian_cast &operator-=(std::ptrdiff_t i) noexcept { m_offs -= i; return *this; }
+	offset_endian_cast &operator++() noexcept { ++m_offs; return *this; }
+	offset_endian_cast &operator--() noexcept { --m_offs; return *this; }
+	offset_endian_cast operator++(int) noexcept { offset_endian_cast result(*this); ++m_offs; return result; }
+	offset_endian_cast operator--(int) noexcept { offset_endian_cast result(*this); --m_offs; return result; }
+};
+
+
 // helper for accessing data adjusted for endianness
 template <typename In, typename Out, endianness Endian>
 class endian_cast
@@ -54,7 +85,22 @@ public:
 	constexpr endian_cast(In *ptr) noexcept : m_ptr(reinterpret_cast<Out *>(ptr)) { }
 
 	constexpr Out &operator[](std::ptrdiff_t i) const noexcept { return m_ptr[i ^ ((Endian != endianness::native) ? SWIZZLE : 0)]; }
+
+	constexpr auto operator+(std::ptrdiff_t offs) const noexcept
+	{
+		using required_const = std::conditional_t<std::is_const_v<Out>, std::add_const_t<In>, In>;
+		using required_cv = std::conditional_t<std::is_volatile_v<Out>, std::add_volatile<required_const>, required_const>;
+		return offset_endian_cast<required_cv, Out, Endian>(reinterpret_cast<required_cv *>(m_ptr), offs);
+	}
+
+	constexpr auto operator-(std::ptrdiff_t offs) const noexcept
+	{
+		using required_const = std::conditional_t<std::is_const_v<Out>, std::add_const_t<In>, In>;
+		using required_cv = std::conditional_t<std::is_volatile_v<Out>, std::add_volatile<required_const>, required_const>;
+		return offset_endian_cast<required_cv, Out, Endian>(reinterpret_cast<required_cv *>(m_ptr), -offs);
+	}
 };
+
 
 
 //**************************************************************************
