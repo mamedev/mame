@@ -1889,12 +1889,6 @@ void mpu4_state::init_m4_andycp10c()
 	use_m4_small_extender();
 }
 
-void mpu4_state::init_m_oldtmr()
-{
-	use_m4_six_reel_std();
-	setup_rom_banks();
-}
-
 void mpu4_state::init_m4default_big_five_std()
 {
 	init_m4default_big();
@@ -1931,6 +1925,13 @@ void mpu4_state::init_m4default_five_rev()
 	init_m4default();
 	use_m4_five_reel_rev();
 }
+
+void mpu4_state::init_m4default_five_alt()
+{
+	init_m4default();
+	use_m4_five_reel_alt();
+}
+
 
 void mpu4_state::init_m4default_six()
 {

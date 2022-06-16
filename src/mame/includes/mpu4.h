@@ -150,14 +150,13 @@ public:
 	void init_m4default_big_six();
 	void init_m4default_big_six_alt();
 
-
-	void init_m_oldtmr();
 	void init_m4tst();
 	void init_big_extenda();
 	void init_m4altreels();
 	void init_m4altreels_big();
 	void init_m4default_five_std();
 	void init_m4default_five_rev();
+	void init_m4default_five_alt();
 	void init_m4default_six();
 	void init_m4default_six_alt();
 	void init_m4default_seven();

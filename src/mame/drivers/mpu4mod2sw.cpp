@@ -2267,6 +2267,67 @@ GAME(199?, m4hiriseb, m4hirise,   mod2_alt_bootleg_fixedret<0x88>,   mpu4,    mp
 // RED 0.4, different protection?, hack, might be a different game, has touchscreen related strings?
 GAME_CUSTOM( 199?, m4redunk,    0,   "redx_20_.8",   0x0000, 0x010000, CRC(b5e8dec5) SHA1(74777ed7f78ef7cc615beadf097380569832a75a), "bootleg","unknown Barcrest MPU4 'RED 0.4' (MPU4) (bootleg)" )
 
+/*********************************************************************************************************
+
+    Super Play
+	 - set was originally called "Black Bull" and as 'Czech' region
+	 - dipswitches probably all different (has coinage dip?)
+
+*********************************************************************************************************/
+
+ROM_START( m4blkbul )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cbb08.epr", 0x0000, 0x010000, CRC(09376df6) SHA1(ba3b101accb6bbfbf75b9d22621dbda4efcb7769) )
+ROM_END
+
+INPUT_PORTS_START( m4blkbul )
+	PORT_INCLUDE( mpu4 )
+
+	PORT_MODIFY("DIL1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x08, "Coin Value?" ) PORT_DIPLOCATION("DIL1:04") // needed to boot
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+INPUT_PORTS_END
+
+GAME(199?, m4blkbul,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,   m4blkbul,    mpu4mod2_machines_state, init_m4altreels, ROT0,   "Barcrest","Super Play (Czech) (Barcrest) (MPU4) (XSP 0.8)",GAME_FLAGS )
+
+
+/*********************************************************************************************************
+
+    Top Run
+	 - currently runs with door open, probably not by Barcrest?
+
+*********************************************************************************************************/
+
+ROM_START( m4toprn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "toprun_v1_1.bin", 0xc000, 0x004000, CRC(9b924324) SHA1(7b155467f30cc22f7cda301ae770fb2a889c9c66) )
+	ROM_LOAD( "toprun_v1_2.bin", 0x8000, 0x004000, CRC(940fafa9) SHA1(2a8b669c51c8df50710bd8b552ab30a5d1a136ab) )
+ROM_END
+
+GAME(199?, m4toprn,   0,          mod2,       mpu4,    mpu4mod2_machines_state, init_m4default, ROT0,   "<unknown>","Top Run (Dutch) (MPU4)",GAME_FLAGS ) // unique behavior  (START UP IN countdown)
+
 
 /*********************************************************************************************************
 

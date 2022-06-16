@@ -78,10 +78,7 @@ ROM_START( m4blkwhd )
 ROM_END
 
 
-ROM_START( m4blkbul )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cbb08.epr", 0x0000, 0x010000, CRC(09376df6) SHA1(ba3b101accb6bbfbf75b9d22621dbda4efcb7769) )
-ROM_END
+
 
 
 ROM_START( m4blkcat )
@@ -230,7 +227,7 @@ ROM_START( m4gnsmk )
 	ROM_LOAD( "sdgu01.s2", 0x080000, 0x080000, CRC(1a46ba28) SHA1(d7154e5f92be8631207620eb313b28990c6a1c7f) )
 	ROM_LOAD( "sdgu01.s3", 0x100000, 0x080000, CRC(88bffcf4) SHA1(1da853193f6a22889edff5aafd9440c676a82ea6) )
 	ROM_LOAD( "sdgu01.s4", 0x180000, 0x080000, CRC(a6160bef) SHA1(807f7d470728a479a55c782fca3df1eacd0b594c) )
-	ROM_END
+ROM_END
 
 ROM_START( m4blkbuld )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -554,11 +551,7 @@ ROM_START( m4topdk )
 ROM_END
 
 
-ROM_START( m4toprn )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "toprun_v1_1.bin", 0xc000, 0x004000, CRC(9b924324) SHA1(7b155467f30cc22f7cda301ae770fb2a889c9c66) )
-	ROM_LOAD( "toprun_v1_2.bin", 0x8000, 0x004000, CRC(940fafa9) SHA1(2a8b669c51c8df50710bd8b552ab30a5d1a136ab) )
-ROM_END
+
 
 #define M4TOPTIM_EXTRAS \
 	ROM_REGION( 0x080000, "msm6376", 0 ) \
@@ -1558,58 +1551,75 @@ GAME(199?, m4ringfr,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::t
 
 GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::jewelcrown_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,  ROT0,   "Barcrest","Royal Jewels (Barcrest) (German) (MPU4) (GRJ 1.4)",GAME_FLAGS )
 
-// won't boot with current reel setup, not even in test mode (REEL E ALM)
-GAME(199?, m4maglin,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Liner (Barcrest) (Dutch) (MPU4) (DMA 2.1)",GAME_FLAGS )
+// GEEN TUBES
+GAME(199?, m4maglin,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Magic Liner (Barcrest) (Dutch) (MPU4) (DMA 2.1)",GAME_FLAGS )
 
-GAME(199?, m4magdrg,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::magicdragon_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
+// doesn't seem happy with any 5 reel setup (maybe it uses more?)
+GAME(199?, m4magdrg,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::magicdragon_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4default_five_std, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
 
+// GEEN TUBES
+GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::bluediamond_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Blue Diamond (Barcrest) (Dutch) (MPU4) (DBD 1.0)",GAME_FLAGS )
 
-GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::bluediamond_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Blue Diamond (Barcrest) (Dutch) (MPU4) (DBD 1.0)",GAME_FLAGS )
+// GEEN TUBES
+GAME(199?, m4amhiwy,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m462_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_five_rev, ROT0,   "Barcrest","American Highway (Barcrest) (Dutch) (MPU4) (DAH 2.0)",GAME_FLAGS )
 
-GAME(199?, m4amhiwy,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m462_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","American Highway (Barcrest) (Dutch) (MPU4) (DAH 2.0)",GAME_FLAGS )
+// GEEN TUBES
+GAME(199?, m4addrd,   0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4default_five_rev, ROT0,   "Barcrest","Adders & Ladders (Barcrest) (Dutch) (MPU4) (DAL 1.2)",GAME_FLAGS )
 
-GAME(199?, m4addrd,   m4addr,     mod2_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Adders & Ladders (Barcrest) (Dutch) (MPU4) (DAL 1.2)",GAME_FLAGS )
+// GEEN TUBES
+GAME(199?, m4rdht,    0,          mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::redheat_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Red Heat (Barcrest) (Dutch) (MPU4) (DRH 1.2)",GAME_FLAGS )
 
+// GEEN TUBES
+GAME(199?, m4rwb,     0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::redwhite_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Red White & Blue (Barcrest) (Dutch) (MPU4) (DRW 1.4)",GAME_FLAGS )
 
-GAME(199?, m4rdht,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::redheat_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Red Heat (Barcrest) (Dutch) (MPU4) (DRH 1.2)",GAME_FLAGS )
+// GEEN TUBES
+GAME(199?, m4salsa,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Salsa (Barcrest) (Dutch) (MPU4) (DSA 1.5)",GAME_FLAGS )
 
-GAME(199?, m4rwb,     0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::redwhite_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Red White & Blue (Barcrest) (Dutch) (MPU4) (DRW 1.4)",GAME_FLAGS )
-
-GAME(199?, m4salsa,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Salsa (Barcrest) (Dutch) (MPU4) (DSA 1.5)",GAME_FLAGS )
-
+// GEEN TUBES
 GAME(199?, m4techno,  0,          mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Techno Reel (Barcrest) (Dutch) (MPU4) (DTE 1.3, set 1)",GAME_FLAGS )
 GAME(199?, m4technoa, m4techno,   mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Techno Reel (Barcrest) (Dutch) (MPU4) (DTE 1.3, set 2)",GAME_FLAGS )
 
-GAME(199?, m4twintm,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m533_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4) (D2T 1.1)",GAME_FLAGS )
+// GEEN TUBES
+GAME(199?, m4twintm,  0,          mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::m533_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4) (D2T 1.1)",GAME_FLAGS )
 
-GAME(199?, m4blkbul,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Super Play (Czech) (Barcrest) (MPU4) (XSP 0.8)",GAME_FLAGS ) // complains about coin dip
+// GEEN TUBES
+GAME(199?, m4gldgat,  0,          mod2_7reel_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Golden Gate (Barcrest) (Dutch) (MPU4) (DGG 2.2)",GAME_FLAGS )
 
-GAME(199?, m4gldgat,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Golden Gate (Barcrest) (Dutch) (MPU4) (DGG 2.2)",GAME_FLAGS )
-
+// GEEN TUBES
 GAME(199?, m4holdtm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Hold Timer (Barcrest) (Dutch) (MPU4) (DHT 1.0)",GAME_FLAGS )
 
+// Tube Sense ALM (this seems like an exported version of one of the Dutch games?)
 GAME(199?, m4exgam,   0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Extra Game (Fairplay - Barcrest) (MPU4) (CEG 2.0)",GAME_FLAGS )
 
+// GEEN TUBES
 GAME(199?, m4toma,    0,          mod2_7reel_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Tomahawk (Barcrest) (Dutch) (MPU4) (DTK 2.3)",GAME_FLAGS )
 
 // GEEN TUBES, confirmed oki
 GAME(199?, m4toptim,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT 1.8, set 1)",GAME_FLAGS )
 GAME(199?, m4toptima, m4toptim,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT 1.8, set 2)",GAME_FLAGS )
 
+// GEEN TUBES
 GAME(199?, m4univ,    0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Universe (Barcrest) (Dutch) (MPU4) (DUN 2.0)",GAME_FLAGS )
 
-GAME(199?, m4frtgm,   0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4) (FRU 2.0)",GAME_FLAGS ) // SAMPLE EEPROM ALARM (and has a weird sample rom..)
+// Sample EPROM Alm
+GAME(199?, m4frtgm,   0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4) (FRU 2.0)",GAME_FLAGS )
 
+// GEEN TUBES
 GAME(199?, m4roadrn,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Road Runner (Barcrest) (Dutch) (MPU4) (DRO 1.9)",GAME_FLAGS )
 
+// GEEN TUBES
 GAME(199?, m4showtm,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::andybt_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Show Timer (Barcrest) (Dutch) (MPU4) (DSH 1.3)",GAME_FLAGS )
 
+// GEEN TUBES
 GAME(199?, m4steptm,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::phr_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Step Timer (Barcrest) (Dutch) (MPU4) (DST 1.1)",GAME_FLAGS )
 
+// GEEN TUBES
 GAME(199?, m4wildtm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::wildtime_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Wild Timer (Barcrest) (Dutch) (MPU4) (DWT 1.3)",GAME_FLAGS )
 
+// GEEN TUBES
 GAME(199?, m4magrep,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Replay (Barcrest) (Dutch) (MPU4) (DMR 1.3)",GAME_FLAGS )
 
+// GEEN TUBES, but German?
 GAME(199?, m4nile,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN 0.8)",GAME_FLAGS ) // DM1 SW ALM
 
 // yes, the ingame display is 'Millenium' not 'Millennium'.  There are also strings from The Crystal Maze in the ROM, probably used as a base project?
@@ -1627,40 +1637,30 @@ GAME(199?, m4luckdv,  0,          mod4oki_cheatchr,    mpu4_invcoin,    mpu4unso
 
 GAME(199?, m4luckdvd, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Dutch) (MPU4) (DLD 1.3)",GAME_FLAGS )
 
-// expects the following response sequence, but check code is standard
-// was the CHR replaced with something else that just happens to give this seuqence, or is this valid somehow?
-// fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc 6c dc bc 7c fc fc fc fc fc fc fc fc fc 00 04 0c 1c 3c 7c fc fc fc fc fc fc fc fc d4 ac 5c bc 7c fc fc fc fc fc fc fc fc fc fc fc fc 00
-GAME(199?, m4luck7,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky 7 (Barcrest) (Dutch) (MPU4)",GAME_FLAGS ) // '1,2' error
-
-// gives a DMD?? message if you attempt to coin it up, is there a mussing Dot Matrix Display ROM of some kind?
-GAME(199?, m4joljokh, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Jolly Joker (Barcrest) (Hungarian) (MPU4) (HJJ 1.4)",GAME_FLAGS )
-
+// GEEN TUBES
 GAME(199?, m4hpyjok,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::redheat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Happy Joker (Barcrest) (Dutch) (MPU4) (DHJ 1.2)",GAME_FLAGS )
 
-GAME(199?, m4gldjok,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::goljok_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Golden Joker (Barcrest) (Dutch) (MPU4) (DGJ 1.2)",GAME_FLAGS )
-
+// GEEN TUBES
 GAME(199?, m4ceptr,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Ceptor (Barcrest) (Dutch) (MPU4) (DCE 1.0)",GAME_FLAGS )
 
-GAME(199?, m4blkcat,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::blkcat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Black Cat (Barcrest) (Dutch) (MPU4) (DBL 1.4)",GAME_FLAGS )
-
+// GEEN TUBES
 GAME(199?, m4gnsmk,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch) (MPU4) (DGU 1.6)",GAME_FLAGS )
+GAME(199?, m4blkbuld, m4gnsmk,    mod4oki_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch) (MPU4) (DGU 1.6) (alt sound roms)",GAME_FLAGS ) // was marked 'Black Bull' but is GunSmoke  not sure either set of sound roms is right
 
-GAME(199?, m4blkbuld, m4blkbul,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch) (MPU4) (DGU 1.6) (alt sound roms)",GAME_FLAGS ) // not sure either set of sound roms is right
+// GEEN TUBES
+GAME(199?, m4blkwhd,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::blackwhite_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_six, ROT0,   "Barcrest","Black & White (Barcrest) (Dutch) (MPU4) (DBW 1.1)",GAME_FLAGS ) // Reel Error
 
-GAME(199?, m4blkwhd,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::blackwhite_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Black & White (Barcrest) (Dutch) (MPU4) (DBW 1.1)",GAME_FLAGS ) // Reel Error
+// GEEN TUBES, these 3 sets are identical, just with different sound ROMs, probably hacks?
+GAME(199?, m4oldtmr,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch) (MPU4) (DOT 1.1)",GAME_FLAGS )
+GAME(199?, m4casot,   m4oldtmr,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'Black and White' sound roms) (DOT 1.1)",GAME_FLAGS ) // uses the same program???
+GAME(199?, m4jpmcla,  m4oldtmr,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_six,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'JPM Classic' sound roms) (DOT 1.1)",GAME_FLAGS ) // uses the same program???
 
-// these 3 sets are identical, just with different sound ROMs, probably hacks?
-GAME(199?, m4oldtmr,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch) (MPU4) (DOT 1.1)",GAME_FLAGS )
-GAME(199?, m4casot,   m4oldtmr,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'Black and White' sound roms) (DOT 1.1)",GAME_FLAGS ) // uses the same program???
-GAME(199?, m4jpmcla,  m4oldtmr,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'JPM Classic' sound roms) (DOT 1.1)",GAME_FLAGS ) // uses the same program???
-
+// GEEN TUBES
 GAME(199?, m4tbplay,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP 1.3)",GAME_FLAGS )
-//
+// NO METERS
 GAME(199?, m4tbplaya, m4tbplay,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (MPU4) (CTP 0.4)",GAME_FLAGS )
 GAME(199?, m4tbplayb, m4tbplay,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (MPU4) (ZTP 0.7)",GAME_FLAGS )
 
-// unprotected? maybe not a Barcrest?
-GAME(199?, m4toprn,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Top Run (Barcrest) (Dutch) (MPU4)",GAME_FLAGS ) // unique behavior  (START UP IN countdown)
 
 GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::tricolor_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Turbo (Barcrest) (MPU4) (XST 0.4)",GAME_FLAGS ) // Reel A Alarm
 
@@ -1680,16 +1680,19 @@ GAME(199?, m4specu,   0,          mod4oki,       mpu4,    mpu4unsorted_state, in
 // GEEN TUBES (even in test mode)
 GAME(199?, m4topdk,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Top Deck (Barcrest) (Dutch) (MPU4) (DT 2.6)",GAME_FLAGS )
 
-
+// GEEN TUBES, runs open door
 GAME(199?, m4bigban,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (German) (MPU4) (BIG 0.4)",GAME_FLAGS ) // DM1 SW ALM
 
+// KEINE TOKENROEHR, runs open door
 GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::mag7s_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Casino (Nova) (German) (MPU4) (CRZ 0.3)",GAME_FLAGS )
 
 // only runs with door open or gets stuck on initializing?
 GAME(199?, m4crzcav,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::bdash_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Cavern (Nova) (MPU4) (GCV 0.5)",GAME_FLAGS )
 
+// can coin up, but start doesn't work? runs open door
 GAME(199?, m4dragon,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Dragon (Nova) (MPU4) (DGL 0.1)",GAME_FLAGS )
 
+// KEINE TOKENROEHR, runs open door
 GAME(199?, m4hilonv,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::bagtel_characteriser_prot>,    mpu4_invcoin,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4) (HNC 0.2)",GAME_FLAGS )
 
 // only runs with door open or gets stuck on initializing?
@@ -1700,8 +1703,24 @@ GAME(1994, m4esctbg,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m
 GAME(1994, m4esctbga, m4esctbg,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m578_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4) (ESC1, set 2)", GAME_FLAGS )
 GAME(1994, m4esctbgb, m4esctbg,   mod4oki_cheatchr_pal<mpu4_characteriser_pal::m578_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4) (ESC1, set 3)", GAME_FLAGS )
 
+// boots but will give HOPPER JAM after a credit
+GAME(199?, m4gldjok,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::goljok_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Golden Joker (Barcrest) (Dutch) (MPU4) (DGJ 1.2)",GAME_FLAGS )
+
+// similar to m4gldjok but can't coin up
+GAME(199?, m4blkcat,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::blkcat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Black Cat (Barcrest) (Dutch) (MPU4) (DBL 1.4)",GAME_FLAGS )
+
 // runs, coins don't work, Dutch?
 GAME(199?, m4riotrp,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::blkcat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Rio Tropico (Barcrest) (Dutch) (MPU4) (DRT 1.0)",GAME_FLAGS )
+
+// expects the following response sequence, but check code is standard
+// was the CHR replaced with something else that just happens to give this seuqence, or is this valid somehow?
+// runs, coins don't work
+// fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc 6c dc bc 7c fc fc fc fc fc fc fc fc fc 00 04 0c 1c 3c 7c fc fc fc fc fc fc fc fc d4 ac 5c bc 7c fc fc fc fc fc fc fc fc fc fc fc fc 00
+GAME(199?, m4luck7,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky 7 (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+
+// gives a DMD?? message if you attempt to coin it up, is there a mussing Dot Matrix Display ROM of some kind?
+GAME(199?, m4joljokh, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Jolly Joker (Barcrest) (Hungarian) (MPU4) (HJJ 1.4)",GAME_FLAGS )
+
 
 // Others
 
@@ -1744,6 +1763,7 @@ GAME(2001, m4casmul,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_
 // PAL FAIL
 GAME(199?, m4barcrz,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bar Crazy (unknown) (MPU4?)",GAME_FLAGS )
 
+// gives an error
 GAME(199?, m4bonzbn,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bingo Bonanza (unknown) (MPU4?)",GAME_FLAGS )
 
 // ERROR CODE 2
@@ -1867,12 +1887,16 @@ GAME( 199?, m4c2,     0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 // regular barcrest structure, keine tube (hopper issue)
 GAME( 199?, m4vivan,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::premier_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "Nova",  "Viva Las Vegas (Nova) (MPU4) (GLV 1.2)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
+// GEEN TUBES
 GAME(199?, m4vivalvd, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::premier_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Viva Las Vegas (Barcrest) (Dutch) (MPU4) (DLV 1.1)",GAME_FLAGS )
 
-GAME(199?, m4prem,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::premier_characteriser_prot> ,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Premier (Barcrest) (Dutch) (MPU4) (DPM 1.4)",GAME_FLAGS )
+// GEEN TUBES
+GAME(199?, m4prem,    0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::premier_characteriser_prot> ,mpu4,    mpu4unsorted_state, init_m4default_six_alt, ROT0,   "Barcrest","Premier (Barcrest) (Dutch) (MPU4) (DPM 1.4)",GAME_FLAGS )
 
+// runs
 GAME( 199?, m4spotln, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Barcrest / Nova",  "Spotlight (Nova) (German) (MPU4) (GSP 0.1)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
+// runs
 GAME( 199?, m4goldnn, 0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Nova",  "Golden Years (Nova) (German) (MPU4) (TGY 0.1)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 // doesn't boot at all?

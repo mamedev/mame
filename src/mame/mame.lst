@@ -24417,7 +24417,6 @@ m4bigbena                       //
 m4bigbenb                       //
 m4bigbend                       //
 m4bigbene                       //
-m4blkbul                        // Black Bull (Barcrest)
 m4blkbuld                       //
 m4blkcat                        // Black Cat (Barcrest)
 m4blkgd                         // Black Gold (Gemini)
@@ -24559,7 +24558,6 @@ m4techno                        // Techno Reel (Barcrest)
 m4technoa                       //
 m4toma                          // Tomahawk (Barcrest)
 m4topdk                         // Top Deck (Barcrest)
-m4toprn                         // Top Run (Barcrest)
 m4toptim                        // Top Timer (Barcrest)
 m4toptima                       //
 m4treel                         //
@@ -26027,6 +26025,7 @@ m4blflshb                       //
 m4blflshc                       //
 m4blflshd                       //
 m4blflshe                       //
+m4blkbul                        // Super Play (Barcrest)
 m4blstbk                        // Blast A Bank (Barcrest)
 m4bluemn                        // Blue Moon (Barcrest)
 m4bluemna                       //
@@ -26271,6 +26270,7 @@ m4topact                        // Top Action (Barcrest)
 m4topacta                       //
 m4topgr                         // Top Gear (Barcrest)
 m4toplot                        // Top The Lot (Barcrest)
+m4toprn                         // Top Run (unknown)
 m4topst                         // Top Stop (Barcrest)
 m4toptak                        // Top Take (Barcrest)
 m4toptena                       //
