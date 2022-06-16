@@ -158,9 +158,13 @@ public:
 	void init_m4altreels_big();
 	void init_m4default_five_std();
 	void init_m4default_five_rev();
+	void init_m4default_six();
+	void init_m4default_six_alt();
 	void init_m4default_seven();
 
 	void mod2(machine_config &config);
+	void mod2_7reel(machine_config &config);
+
 	void mod2_cheatchr(machine_config &config);
 	void mod2_chr(machine_config &config);
 
@@ -206,6 +210,18 @@ public:
 		m_characteriser->set_lamp_table(Table);
 	}
 
+	template<const uint8_t* Table> void mod2_7reel_cheatchr_pal(machine_config &config)
+	{
+		mod2_7reel(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
 	template<const uint8_t* Table> void mod2_alt_cheatchr_pal(machine_config &config)
 	{
 		mod2_alt(config);
@@ -221,6 +237,18 @@ public:
 	template<const uint8_t* Table> void mod4oki_cheatchr_pal(machine_config &config)
 	{
 		mod4oki(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod4oki_7reel_cheatchr_pal(machine_config &config)
+	{
+		mod4oki_7reel(config);
 
 		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
 
@@ -359,6 +387,7 @@ public:
 	void mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table);
 
 	void mod4oki(machine_config &config);
+	void mod4oki_7reel(machine_config &config);
 	void mod4oki_cheatchr(machine_config &config);
 	void mod4oki_cheatchr_table(machine_config &config, const uint8_t* table);
 	void mod4oki_chr(machine_config &config);

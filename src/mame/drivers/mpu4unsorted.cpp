@@ -1577,9 +1577,8 @@ GAME(199?, m4rwb,     0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pa
 
 GAME(199?, m4salsa,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::salsa_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Salsa (Barcrest) (Dutch) (MPU4) (DSA 1.5)",GAME_FLAGS )
 
-// REEL F ALARM
-GAME(199?, m4techno,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Techno Reel (Barcrest) (Dutch) (MPU4) (DTE 1.3, set 1)",GAME_FLAGS )
-GAME(199?, m4technoa, m4techno,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Techno Reel (Barcrest) (Dutch) (MPU4) (DTE 1.3, set 2)",GAME_FLAGS )
+GAME(199?, m4techno,  0,          mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Techno Reel (Barcrest) (Dutch) (MPU4) (DTE 1.3, set 1)",GAME_FLAGS )
+GAME(199?, m4technoa, m4techno,   mod4oki_7reel_cheatchr_pal<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Techno Reel (Barcrest) (Dutch) (MPU4) (DTE 1.3, set 2)",GAME_FLAGS )
 
 GAME(199?, m4twintm,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m533_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4) (D2T 1.1)",GAME_FLAGS )
 
@@ -1591,8 +1590,9 @@ GAME(199?, m4holdtm,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pa
 
 GAME(199?, m4exgam,   0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Extra Game (Fairplay - Barcrest) (MPU4) (CEG 2.0)",GAME_FLAGS )
 
-GAME(199?, m4toma,    0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tomahawk (Barcrest) (Dutch) (MPU4) (DTK 2.3)",GAME_FLAGS )
+GAME(199?, m4toma,    0,          mod2_7reel_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4default_seven, ROT0,   "Barcrest","Tomahawk (Barcrest) (Dutch) (MPU4) (DTK 2.3)",GAME_FLAGS )
 
+// GEEN TUBES, confirmed oki
 GAME(199?, m4toptim,  0,          mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT 1.8, set 1)",GAME_FLAGS )
 GAME(199?, m4toptima, m4toptim,   mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::m400_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT 1.8, set 2)",GAME_FLAGS )
 

@@ -1063,7 +1063,7 @@ void mpu4_state::pia_ic7_porta_w(uint8_t data)
 		m_reel[5]->update( data      &0x0F);
 		m_reel[6]->update((data >> 4)&0x0F);
 		awp_draw_reel(machine(),"reel6", *m_reel[5]);
-		awp_draw_reel(machine(),"reel7", *m_reel[7]);
+		awp_draw_reel(machine(),"reel7", *m_reel[6]);
 	}
 	else if (m_reels)
 	{
@@ -1932,6 +1932,19 @@ void mpu4_state::init_m4default_five_rev()
 	use_m4_five_reel_rev();
 }
 
+void mpu4_state::init_m4default_six()
+{
+	init_m4default();
+	use_m4_six_reel_std();
+}
+
+void mpu4_state::init_m4default_six_alt()
+{
+	init_m4default();
+	use_m4_six_reel_alt();
+}
+
+
 void mpu4_state::init_m4default_seven()
 {
 	init_m4default();
@@ -2302,6 +2315,17 @@ void mpu4_state::mod2(machine_config &config)
 	mpu4_reels<0, 6>(config);
 }
 
+void mpu4_state::mod2_7reel(machine_config &config)
+{
+	mpu4base(config);
+	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
+	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8913->set_resistors_load(820, 0, 0);
+	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	mpu4_reels<0, 7>(config);
+}
+
 void mpu4_state::mod2_cheatchr_table(machine_config &config, const uint8_t* table)
 {
 	mod2(config);
@@ -2456,6 +2480,19 @@ void mpu4_state::mod4oki(machine_config &config)
 
 	mpu4_common2(config);
 	mpu4_reels<0, 6>(config);
+
+	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
+void mpu4_state::mod4oki_7reel(machine_config &config)
+{
+	mpu4base(config);
+	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
+
+	mpu4_common2(config);
+	mpu4_reels<0, 7>(config);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
