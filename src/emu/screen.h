@@ -227,7 +227,6 @@ public:
 		assert(pixclock != 0);
 		set_clock(pixclock);
 		m_refresh = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
-		m_vblank = m_refresh / vtotal * (vtotal - (vbstart - vbend));
 		m_width = htotal;
 		m_height = vtotal;
 		m_visarea.set(hbend, hbstart ? hbstart - 1 : htotal - 1, vbend, vbstart - 1);
@@ -390,7 +389,7 @@ public:
 
 	// timing
 	attotime time_until_pos(int vpos, int hpos = 0) const;
-	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.bottom() + 1); }
+	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.bottom(), m_visarea.right() + 1); }
 	attotime time_until_vblank_end() const;
 	attotime time_until_update() const { return (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
 	attotime scan_period() const { return attotime(0, m_scantime); }

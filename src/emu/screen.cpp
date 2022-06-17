@@ -1003,7 +1003,7 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	if (m_oldstyle_vblank_supplied)
 		m_vblank_period = m_vblank;
 	else
-		m_vblank_period = m_scantime * (height - visarea.height());
+		m_vblank_period = m_scantime * (height - visarea.height() + 1) - m_pixeltime * visarea.width();
 
 	// we are now fully configured with the new parameters
 	// and can safely call time_until_pos(), etc.
@@ -1508,7 +1508,7 @@ void screen_device::pixels(u32 *buffer)
 
 int screen_device::vpos() const
 {
-	attoseconds_t delta = (machine().time() - m_vblank_start_time).as_attoseconds();
+	attoseconds_t delta = (machine().time() - m_vblank_start_time).as_attoseconds() - (m_pixeltime * (m_width - m_visarea.right() - 1));
 	int vpos;
 
 	// round to the nearest pixel
@@ -1529,7 +1529,7 @@ int screen_device::vpos() const
 
 int screen_device::hpos() const
 {
-	attoseconds_t delta = (machine().time() - m_vblank_start_time).as_attoseconds();
+	attoseconds_t delta = (machine().time() - m_vblank_start_time).as_attoseconds() - (m_pixeltime * (m_width - m_visarea.right() - 1));
 
 	// round to the nearest pixel
 	delta += m_pixeltime / 2;
@@ -1565,7 +1565,7 @@ attotime screen_device::time_until_pos(int vpos, int hpos) const
 	attoseconds_t targetdelta = (attoseconds_t)vpos * m_scantime + (attoseconds_t)hpos * m_pixeltime;
 
 	// if we're past that time (within 1/2 of a pixel), head to the next frame
-	attoseconds_t curdelta = (machine().time() - m_vblank_start_time).as_attoseconds();
+	attoseconds_t curdelta = (machine().time() - m_vblank_start_time).as_attoseconds() - (m_pixeltime * (m_width - m_visarea.right() - 1));
 	if (targetdelta <= curdelta + m_pixeltime / 2)
 		targetdelta += m_frame_period;
 	while (targetdelta <= curdelta)
@@ -1637,10 +1637,6 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 
 TIMER_CALLBACK_MEMBER(screen_device::vblank_begin)
 {
-	// reset the starting VBLANK time
-	m_vblank_start_time = machine().time();
-	m_vblank_end_time = m_vblank_start_time + attotime(0, m_vblank_period);
-
 	// if this is the primary screen and we need to update now
 	if (m_is_primary_screen && !(m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 		machine().video().frame_update();
@@ -1649,6 +1645,10 @@ TIMER_CALLBACK_MEMBER(screen_device::vblank_begin)
 	for (auto &item : m_callback_list)
 		item->m_callback(*this, true);
 	m_screen_vblank(1);
+
+	// reset the starting VBLANK time
+	m_vblank_start_time = machine().time();
+	m_vblank_end_time = m_vblank_start_time + attotime(0, m_vblank_period);
 
 	// reset the VBLANK start timer for the next frame
 	m_vblank_begin_timer->adjust(time_until_vblank_start());
