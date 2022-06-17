@@ -24,6 +24,7 @@
     - Tape? (split up to E5101 test batch as tape only?)
     - Network?
     - Ramdisk?
+    - Mouse!
 
 ***************************************************************************/
 
@@ -113,8 +114,9 @@ private:
 	int m_screen_cur_seq[5];
 	static constexpr int screen_320_240_seq[5] = { 0x24, 0x8, 0x72, 0x0, 0x25 };
 	static constexpr int screen_384_200_seq[5] = { 0x16, 0x4, 0x12, 0x1, 0x45 };
-	static constexpr int screen_256_192_seq[5] = { 0x32, 0x12, 0x20, 0x1, 0x49 };
-	static constexpr const int *screen_mode_sequences[3] = { screen_320_240_seq, screen_384_200_seq, screen_256_192_seq };
+	static constexpr int screen_400_192_seq[5] = { 0x14, 0x3, 0x1a, 0x1, 0x45 };
+        static constexpr int screen_256_192_seq[5] = { 0x32, 0x12, 0x20, 0x1, 0x49 };
+	static constexpr const int *screen_mode_sequences[4] = { screen_320_240_seq, screen_384_200_seq, screen_400_192_seq, screen_256_192_seq };
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	bool m_beep_state;
@@ -146,6 +148,7 @@ void juku_state::bank_map(address_map &map)
 {
 	// memory mode 0
 	map(0x00000, 0x03fff).rom().region("maincpu", 0);
+	map(0x00000, 0x03fff).bankw("ram_0000");
 	map(0x04000, 0x0ffff).bankrw("ram_4000");
 	// memory mode 1
 	map(0x10000, 0x1ffff).bankrw("ram_0000");
@@ -354,6 +357,9 @@ void juku_state::screen_scan_sequence(int pos, uint8_t data)
 					screen_mode(384, 200);
 					break;
 				case 2:
+					screen_mode(400, 192);
+					break;
+				case 3:
 					screen_mode(256, 192);
 					break;
 				}
@@ -429,7 +435,7 @@ uint8_t juku_state::fdc_data_r()
 		// cpu tries to read data without drq active. halt it and reset the
 		// pc back to the beginning of the instruction
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, m_maincpu->pc() - 2);
+		m_maincpu->set_state_int(i8080a_cpu_device::I8085_PC, m_maincpu->pc() - 2);
 
 		return 0;
 	}
@@ -444,7 +450,7 @@ void juku_state::fdc_data_w(uint8_t data)
 	{
 		// cpu tries to write data without drq, halt it and reset pc
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, m_maincpu->pc() - 2);
+		m_maincpu->set_state_int(i8080a_cpu_device::I8085_PC, m_maincpu->pc() - 2);
 
 		return;
 	}
@@ -700,5 +706,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY   FULLNAME      FLAGS
-COMP( 1988, juku, 0,      0,      juku,    juku,  juku_state, empty_init, "EKTA",	"Juku E5101", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME      FLAGS
+COMP( 1988, juku, 0,      0,      juku,    juku,  juku_state, empty_init, "EKTA",  "Juku E5101", MACHINE_SUPPORTS_SAVE)
