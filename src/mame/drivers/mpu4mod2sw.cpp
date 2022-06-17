@@ -1808,17 +1808,17 @@ GAME(199?, m4gldstr,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::magi
 GAME(199?, m4grands,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::grandclub_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Grandstand Club (Barcrest) (MPU4) (G2D 4.0)",GAME_FLAGS )
 GAME(199?, m4grandsa, m4grands,   mod2_cheatchr_pal<mpu4_characteriser_pal::grandclub_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Grandstand Club (Barcrest) (MPU4) (GD 1.1)",GAME_FLAGS )
 
-GAME(199?, m4intcep,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Interceptor (Barcrest) (MPU4) (INT 3.0)",GAME_FLAGS ) // set % key
-GAME(199?, m4intcepa, m4intcep,   mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Interceptor (Barcrest) (MPU4) (INT 3.0X)",GAME_FLAGS ) // set % key
+GAME(199?, m4intcep,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Interceptor (Barcrest) (MPU4) (INT 3.0)",GAME_FLAGS ) // set % key
+GAME(199?, m4intcepa, m4intcep,   mod2_cheatchr_pal<mpu4_characteriser_pal::intcep_characteriser_prot>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Interceptor (Barcrest) (MPU4) (INT 3.0X)",GAME_FLAGS ) // set % key
 // non-standard protection? hack?
-GAME(199?, m4intcepb, m4intcep,   mod2_bootleg_fixedret<0x9a>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Interceptor (Barcrest) (MPU4) (INT 1.1)",GAME_FLAGS )
+GAME(199?, m4intcepb, m4intcep,   mod2_bootleg_fixedret<0x9a>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Interceptor (Barcrest) (MPU4) (INT 1.1)",GAME_FLAGS )
 
 GAME(199?, m4megbks,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Mega Bucks (Barcrest) (MPU4) (BUC 4.1X)",GAME_FLAGS )
 GAME(199?, m4megbksa, m4megbks,   mod2_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Mega Bucks (Barcrest) (MPU4) (BUC 4.1CX)",GAME_FLAGS )
 GAME(199?, m4megbksb, m4megbks,   mod2_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Mega Bucks (Barcrest) (MPU4) (BUC 4.1XD)",GAME_FLAGS )
 GAME(199?, m4megbksc, m4megbks,   mod2_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Mega Bucks (Barcrest) (MPU4) (BUC 3.1)",GAME_FLAGS )
 
-GAME(199?, m4mirage,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Mirage (Barcrest) (MPU4) (RAG 4.1)",GAME_FLAGS ) // reel issue during play
+GAME(199?, m4mirage,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Mirage (Barcrest) (MPU4) (RAG 4.1)",GAME_FLAGS ) // reel issue during play
 
 GAME(199?, m4nifty,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::nifty_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nifty Fifty (Barcrest) (MPU4) (NF 2.0)",GAME_FLAGS )
 GAME(199?, m4niftya,  m4nifty,    mod2_cheatchr_pal<mpu4_characteriser_pal::nifty_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nifty Fifty (Barcrest) (MPU4) (NF 2.1, set 1)",GAME_FLAGS )
@@ -1872,7 +1872,7 @@ GAME(199?, m4supslt,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::rr6_
 GAME(199?, m4suptub,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Super Tubes (Barcrest) (MPU4) (S4T 1.0, set 1)",GAME_FLAGS )
 GAME(199?, m4suptuba, m4suptub,   mod2_cheatchr_pal<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Super Tubes (Barcrest) (MPU4) (S4T 1.0, set 2)",GAME_FLAGS )
 
-GAME(199?, m4suptwo,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Super Two (Barcrest) (MPU4) (SUT 1.2)",GAME_FLAGS ) // set % key
+GAME(199?, m4suptwo,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Super Two (Barcrest) (MPU4) (SUT 1.2)",GAME_FLAGS ) // set % key
 
 GAME(199?, m4tiktak,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::tictak_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Tic Tak Cash (Barcrest) (MPU4) (TC 1.1)",GAME_FLAGS )
 
@@ -1925,32 +1925,32 @@ GAME(199?, m4ttak,    0,          mod2_cheatchr_pal<mpu4_characteriser_pal::clbv
 GAME(199?, m4actbnka, m4actbnk,   mod2_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>, mpu4jackpot8tkn, mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, AC3.0) (MPU4)",GAME_FLAGS ) // set jackpot key to 8GBP TOKEN & stake key
 GAME(199?, m4actbnkb, m4actbnk,   mod2_cheatchr_pal<mpu4_characteriser_pal::age_characteriser_prot>, mpu4jackpot8tkn, mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, ACT2.0) (MPU4)",GAME_FLAGS )
 
-GAMEL(199?, m4actclb, 0,          mod2_cheatchr_pal<mpu4_characteriser_pal::kqee2_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4actclb,      ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (ABV 1.9)",GAME_FLAGS, layout_m4actclb ) // set stake to boot
+GAMEL(199?, m4actclb, 0,          mod2_cheatchr_pal<mpu4_characteriser_pal::kqee2_characteriser_prot>, mpu420p,            mpu4mod2_machines_state, init_m4actclb,      ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (ABV 1.9)",GAME_FLAGS, layout_m4actclb ) // set stake to boot
 //
-GAMEL(199?, m4actclba,m4actclb,   mod2_cheatchr_pal<mpu4_characteriser_pal::actclba_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4actclb,      ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (A2C 1.1)",GAME_FLAGS, layout_m4actclb ) //  ^^
+GAMEL(199?, m4actclba,m4actclb,   mod2_cheatchr_pal<mpu4_characteriser_pal::actclba_characteriser_prot>, mpu420p,            mpu4mod2_machines_state, init_m4actclb,      ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (A2C 1.1)",GAME_FLAGS, layout_m4actclb ) //  ^^
 
-GAME(199?, m4bluemn,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.3)",GAME_FLAGS )
-GAME(199?, m4bluemna, m4bluemn,   mod2_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.1)",GAME_FLAGS )
+GAME(199?, m4bluemn,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.3)",GAME_FLAGS )
+GAME(199?, m4bluemna, m4bluemn,   mod2_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.1)",GAME_FLAGS )
 // not using standard protection, hack?
-GAME(199?, m4bluemnb, m4bluemn,   mod2_bootleg_fixedret<0x51>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
+GAME(199?, m4bluemnb, m4bluemn,   mod2_bootleg_fixedret<0x51>, mpu4_70pc,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
 
 GAME(199?, m4take2,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::take2_characteriser_prot>, mpu4,   mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.2)",GAME_FLAGS )
 // not using standard protection, hack?
 GAME(199?, m4take2a,  m4take2,    mod2_bootleg_fixedret<0x11>,                                          mpu4,   mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Take Two (Barcrest) (MPU4) (TTO 1.1) (set 1)",GAME_FLAGS )
 GAME(199?, m4t266,    m4take2,    mod2_bootleg_fixedret<0x11>,                                          mpu4,   mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Take Two (Barcrest) (MPU4) (TTO 1.1) (set 2)",GAME_FLAGS )
 
-GAME(199?, m4pont,    0,          mod2_cheatchr_pal<mpu4_characteriser_pal::pontoon_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 3.0)",GAME_FLAGS ) // set stake to boot
-GAME(199?, m4ponta,   m4pont,     mod2_cheatchr_pal<mpu4_characteriser_pal::pontoon_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 4.0)",GAME_FLAGS )//  ^^
+GAME(199?, m4pont,    0,          mod2_cheatchr_pal<mpu4_characteriser_pal::pontoon_characteriser_prot>, mpu420p,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 3.0)",GAME_FLAGS ) // set stake to boot
+GAME(199?, m4ponta,   m4pont,     mod2_cheatchr_pal<mpu4_characteriser_pal::pontoon_characteriser_prot>, mpu420p,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 4.0)",GAME_FLAGS )//  ^^
 
 GAME(199?, m4loadmn,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (LA 1.0)",GAME_FLAGS )
 GAME(199?, m4loadmna, m4loadmn,   mod2_cheatchr_pal<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (LA 1.1, set 1)",GAME_FLAGS )
 GAME(199?, m4loadmnb, m4loadmn,   mod2_cheatchr_pal<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (LA 1.1, set 2)",GAME_FLAGS )
 
-GAME(199?, m4celclb,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,      ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4) (CEL 1.5)",GAME_FLAGS ) // set stake
+GAME(199?, m4celclb,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu420p,            mpu4mod2_machines_state, init_m4default,      ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4) (CEL 1.5)",GAME_FLAGS ) // set stake
 
 GAME(199?, m4centpt, 0,   mod2_cheatchr_pal<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Centrepoint (Barcrest) (MPU4) (DU 1.3)",GAME_FLAGS )
 
-GAME(199?, m4clbcls,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m533_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4) (CI  1.1)",GAME_FLAGS ) // set stake (still moans tho)
+GAME(199?, m4clbcls,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m533_characteriser_prot>, mpu420p,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4) (CI  1.1)",GAME_FLAGS ) // set stake (still moans tho)
 
 GAME(199?, m4c999,   0,           mod2_cheatchr_pal<mpu4_characteriser_pal::tictak_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default, ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 4.0 V)",GAME_FLAGS )
 // these are bootlegs with non-standard protection
