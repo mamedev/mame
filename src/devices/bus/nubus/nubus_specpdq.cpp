@@ -32,6 +32,8 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
+#include <algorithm>
+
 
 #define SPECPDQ_SCREEN_NAME "specpdq_screen"
 #define SPECPDQ_ROM_REGION  "specpdq_rom"
@@ -91,7 +93,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
-	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
+	m_mode(0), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
 	m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0),
 	m_palette(*this, "palette")
 {
@@ -106,14 +108,13 @@ void nubus_specpdq_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(this, SPECPDQ_ROM_REGION);
+	install_declaration_rom(SPECPDQ_ROM_REGION);
 
 	slotspace = get_slotspace();
 
 //  logerror("[specpdq %p] slotspace = %x\n", this, slotspace);
 
-	m_vram.resize(VRAM_SIZE);
-	m_vram32 = (uint32_t *)&m_vram[0];
+	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
 	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_specpdq_device::vram_r)), write32s_delegate(*this, FUNC(nubus_specpdq_device::vram_w)));
 	nubus().install_device(slotspace+0x400000, slotspace+0xfbffff, read32s_delegate(*this, FUNC(nubus_specpdq_device::specpdq_r)), write32s_delegate(*this, FUNC(nubus_specpdq_device::specpdq_w)));
 
@@ -131,7 +132,7 @@ void nubus_specpdq_device::device_reset()
 	m_clutoffs = 0;
 	m_vbl_disable = 1;
 	m_mode = 0;
-	memset(&m_vram[0], 0, VRAM_SIZE);
+	std::fill(m_vram.begin(), m_vram.end(), 0);
 	memset(m_palette_val, 0, sizeof(m_palette_val));
 
 	m_palette_val[0] = rgb_t(255, 255, 255);
@@ -158,7 +159,7 @@ TIMER_CALLBACK_MEMBER(nubus_specpdq_device::vbl_tick)
 uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// first time?  kick off the VBL timer
-	uint8_t const *const vram = &m_vram[0x9000];
+	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + 0x9000;
 
 	switch (m_mode)
 	{
@@ -168,7 +169,7 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152/8; x++)
 				{
-					uint8_t const pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 512) + x];
 
 					*scanline++ = m_palette_val[(pixels&0x80)];
 					*scanline++ = m_palette_val[((pixels<<1)&0x80)];
@@ -188,7 +189,7 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152/4; x++)
 				{
-					uint8_t const pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 512) + x];
 
 					*scanline++ = m_palette_val[(pixels&0xc0)];
 					*scanline++ = m_palette_val[((pixels<<2)&0xc0)];
@@ -204,7 +205,7 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152/2; x++)
 				{
-					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 1024) + x];
 
 					*scanline++ = m_palette_val[(pixels&0xf0)];
 					*scanline++ = m_palette_val[((pixels<<4)&0xf0)];
@@ -218,7 +219,7 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152; x++)
 				{
-					uint8_t const pixels = vram[(y * 1152) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 1152) + x];
 					*scanline++ = m_palette_val[pixels];
 				}
 			}
@@ -416,60 +417,47 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 			// fill rectangle
 			if (data == 2)
 			{
-				int x, y;
-				uint8_t *vram = &m_vram[m_vram_addr & ~3];
-
-				int ddx = m_vram_addr & 3;
+				auto const vram8 = util::big_endian_cast<uint8_t>(&m_vram[0]) + m_vram_addr;
 
 				LOG("Fill rectangle with %02x %02x %02x %02x, adr %x (%d, %d) width %d height %d delta %d %d\n", m_fillbytes[0], m_fillbytes[1], m_fillbytes[2], m_fillbytes[3], m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_width, m_height, m_patofsx, m_patofsy);
 
-				for (y = 0; y <= m_height; y++)
+				for (int y = 0; y <= m_height; y++)
 				{
-					for (x = 0; x <= m_width; x++)
+					for (int x = 0; x <= m_width; x++)
 					{
-						vram[(y * 1152)+BYTE4_XOR_BE(x + ddx)] = m_fillbytes[((m_patofsx + x) & 0x1f)+(((m_patofsy + y) & 0x7) << 5)];
+						vram8[(y * 1152)+x] = m_fillbytes[((m_patofsx + x) & 0x1f)+(((m_patofsy + y) & 0x7) << 5)];
 					}
 				}
 			}
 			else if (data == 0x100)
 			{
-				int x, y;
-				uint8_t *vram = &m_vram[m_vram_addr & ~3];
-				uint8_t *vramsrc = &m_vram[m_vram_src & ~3];
-
-				int sdx = m_vram_src & 3;
-				int ddx = m_vram_addr & 3;
+				auto const vram8 = util::big_endian_cast<uint8_t>(&m_vram[0]) + m_vram_addr;
+				auto const vramsrc8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + m_vram_src;
 
 				LOG("Copy rectangle forwards, width %d height %d dst %x (%d, %d) src %x (%d, %d)\n", m_width, m_height, m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_vram_src, m_vram_src % 1152, m_vram_src / 1152);
 
-				for (y = 0; y <= m_height; y++)
+				for (int y = 0; y <= m_height; y++)
 				{
-					for (x = 0; x <= m_width; x++)
+					for (int x = 0; x <= m_width; x++)
 					{
-						vram[(y * 1152)+BYTE4_XOR_BE(x + ddx)] = vramsrc[(y * 1152)+BYTE4_XOR_BE(x + sdx)];
+						vram8[(y * 1152)+x] = vramsrc8[(y * 1152)+x];
 					}
 				}
-				(void)vramsrc; (void)sdx;
 			}
 			else if (data == 0x101)
 			{
-				int x, y;
-				uint8_t *vram = &m_vram[m_vram_addr & ~3];
-				uint8_t *vramsrc = &m_vram[m_vram_src & ~3];
-
-				int sdx = m_vram_src & 3;
-				int ddx = m_vram_addr & 3;
+				auto const vram8 = util::big_endian_cast<uint8_t>(&m_vram[0]) + m_vram_addr;
+				auto const vramsrc8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + m_vram_src;
 
 				LOG("Copy rectangle backwards, width %d height %d dst %x (%d, %d) src %x (%d, %d)\n", m_width, m_height, m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_vram_src, m_vram_src % 1152, m_vram_src / 1152);
 
-				for (y = 0; y < m_height; y++)
+				for (int y = 0; y < m_height; y++)
 				{
-					for (x = 0; x < m_width; x++)
+					for (int x = 0; x < m_width; x++)
 					{
-						vram[(-y * 1152)+BYTE4_XOR_BE(-x + ddx)] = vramsrc[(-y * 1152)+BYTE4_XOR_BE(-x + sdx)];
+						vram8[(-y * 1152)-x] = vramsrc8[(-y * 1152)-x];
 					}
 				}
-				(void)vramsrc; (void)sdx;
 			}
 			else
 			{
@@ -498,10 +486,10 @@ uint32_t nubus_specpdq_device::specpdq_r(offs_t offset, uint32_t mem_mask)
 void nubus_specpdq_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
-	COMBINE_DATA(&m_vram32[offset]);
+	COMBINE_DATA(&m_vram[offset]);
 }
 
 uint32_t nubus_specpdq_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
-	return m_vram32[offset] ^ 0xffffffff;
+	return m_vram[offset] ^ 0xffffffff;
 }

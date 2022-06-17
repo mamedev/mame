@@ -147,7 +147,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 private:
 	void color_latch_w(uint8_t data);
@@ -167,12 +166,6 @@ private:
  *  Spaceint color RAM handling
  *
  *************************************/
-
-void spaceint_state::video_start()
-{
-	save_item(NAME(m_color_latch));
-}
-
 
 void spaceint_state::color_latch_w(uint8_t data)
 {
@@ -287,6 +280,8 @@ TIMER_CALLBACK_MEMBER(kamikaze_state::int_gen)
 
 void kamikaze_state::machine_start()
 {
+	base_state::machine_start();
+
 	m_int_timer = timer_alloc(FUNC(kamikaze_state::int_gen), this);
 	m_int_timer->adjust(m_screen->time_until_pos(128), 128);
 	m_int_off_timer = timer_alloc(FUNC(kamikaze_state::int_off), this);
@@ -298,6 +293,8 @@ void kamikaze_state::machine_start()
 
 void kamikaze_state::machine_reset()
 {
+	base_state::machine_reset();
+
 	m_screen_flip = 0;
 	m_screen_red = 0;
 	m_sound_state[0] = 0;
@@ -307,12 +304,17 @@ void kamikaze_state::machine_reset()
 
 void spaceint_state::machine_start()
 {
+	base_state::machine_start();
+
 	save_item(NAME(m_screen_flip));
 	save_item(NAME(m_sound_state));
+	save_item(NAME(m_color_latch));
 }
 
 void spaceint_state::machine_reset()
 {
+	base_state::machine_reset();
+
 	m_screen_flip = 0;
 	m_sound_state[0] = 0;
 	m_sound_state[1] = 0;

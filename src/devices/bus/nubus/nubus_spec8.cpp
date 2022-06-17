@@ -16,6 +16,8 @@
 #include "nubus_spec8.h"
 #include "screen.h"
 
+#include <algorithm>
+
 
 #define SPEC8S3_SCREEN_NAME "spec8s3_screen"
 #define SPEC8S3_ROM_REGION  "spec8s3_rom"
@@ -75,7 +77,7 @@ nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
-	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
+	m_mode(0), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
 	m_vbl_pending(false), m_parameter(0)
 {
 	set_screen(*this, SPEC8S3_SCREEN_NAME);
@@ -89,14 +91,13 @@ void nubus_spec8s3_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(this, SPEC8S3_ROM_REGION);
+	install_declaration_rom(SPEC8S3_ROM_REGION);
 
 	slotspace = get_slotspace();
 
 //  printf("[SPEC8S3 %p] slotspace = %x\n", this, slotspace);
 
-	m_vram.resize(VRAM_SIZE);
-	m_vram32 = (uint32_t *)&m_vram[0];
+	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
 	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_spec8s3_device::vram_r)), write32s_delegate(*this, FUNC(nubus_spec8s3_device::vram_w)));
 	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32s_delegate(*this, FUNC(nubus_spec8s3_device::vram_r)), write32s_delegate(*this, FUNC(nubus_spec8s3_device::vram_w)));
 	nubus().install_device(slotspace+0xd0000, slotspace+0xfffff, read32s_delegate(*this, FUNC(nubus_spec8s3_device::spec8s3_r)), write32s_delegate(*this, FUNC(nubus_spec8s3_device::spec8s3_w)));
@@ -117,7 +118,7 @@ void nubus_spec8s3_device::device_reset()
 	m_mode = 0;
 	m_vbl_pending = false;
 	m_parameter = 0;
-	memset(&m_vram[0], 0, VRAM_SIZE);
+	std::fill(m_vram.begin(), m_vram.end(), 0);
 	memset(m_palette, 0, sizeof(m_palette));
 
 	m_palette[0] = rgb_t(255, 255, 255);
@@ -144,7 +145,7 @@ TIMER_CALLBACK_MEMBER(nubus_spec8s3_device::vbl_tick)
 
 uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t const *const vram = &m_vram[0x400];
+	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + 0x400;
 
 	switch (m_mode)
 	{
@@ -154,7 +155,7 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1024/8; x++)
 				{
-					uint8_t const pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 512) + x];
 
 					*scanline++ = m_palette[pixels&0x80];
 					*scanline++ = m_palette[(pixels<<1)&0x80];
@@ -174,7 +175,7 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1024/4; x++)
 				{
-					uint8_t const pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 512) + x];
 
 					*scanline++ = m_palette[pixels&0xc0];
 					*scanline++ = m_palette[(pixels<<2)&0xc0];
@@ -190,7 +191,7 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1024/2; x++)
 				{
-					uint8_t const pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 512) + x];
 
 					*scanline++ = m_palette[pixels&0xf0];
 					*scanline++ = m_palette[(pixels<<4)&0xf0];
@@ -204,7 +205,7 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1024; x++)
 				{
-					uint8_t const pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 1024) + x];
 					*scanline++ = m_palette[pixels];
 				}
 			}
@@ -334,10 +335,10 @@ uint32_t nubus_spec8s3_device::spec8s3_r(offs_t offset, uint32_t mem_mask)
 void nubus_spec8s3_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
-	COMBINE_DATA(&m_vram32[offset]);
+	COMBINE_DATA(&m_vram[offset]);
 }
 
 uint32_t nubus_spec8s3_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
-	return m_vram32[offset] ^ 0xffffffff;
+	return m_vram[offset] ^ 0xffffffff;
 }
