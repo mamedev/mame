@@ -319,6 +319,18 @@ void hp2640_base_state::machine_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
 
+	// these are set in machine_reset, but device reset callbacks end up reading them before then
+	// (machine_reset is called after all child devices are reset)
+	m_mode_byte = false;
+	m_timer_irq = m_datacom_irq = m_tape_irq = false;
+	m_async_control = 0;
+
+	m_even = true;
+	m_line_done = false;
+	m_dma_addr = 0;
+	m_row_counter = 0;
+	m_row_reset = false;
+
 	// TODO: save more state
 	save_item(NAME(m_mode_byte));
 	save_item(NAME(m_timer_irq));
