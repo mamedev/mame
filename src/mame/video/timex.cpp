@@ -16,9 +16,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/spectrum.h"
 #include "includes/timex.h"
+
 #include "machine/ram.h"
+
 
 inline void tc2048_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {

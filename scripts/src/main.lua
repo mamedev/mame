@@ -215,6 +215,14 @@ end
 		GEN_DIR  .. "resource",
 	}
 
+	configuration { "vs20*"}
+		-- See https://github.com/bkaradzic/GENie/issues/544
+		includedirs {
+			MAME_DIR .. "scripts/resources/windows/" .. _target,
+			GEN_DIR  .. "resource",
+		}
+	configuration { }
+
 
 if (STANDALONE==true) then
 	standalone();
@@ -256,6 +264,12 @@ if (STANDALONE~=true) then
 		resincludedirs {
 			MAME_DIR .. "scripts/resources/windows/mame",
 		}
+		configuration { "vs20*"}
+			-- See https://github.com/bkaradzic/GENie/issues/544
+			includedirs {
+				MAME_DIR .. "scripts/resources/windows/mame",
+			}
+		configuration { }
 	end
 
 	local mainfile = MAME_DIR .. "src/" .. _target .. "/" .. _subtarget .. ".cpp"
@@ -353,6 +367,7 @@ if (STANDALONE~=true) then
 			{ "$(OBJDIR)/" .. _target .. "_" .. _subtarget .. "_vers.res", rcincfile, true },
 		}
 		prebuildcommands {
+			"mkdir \"" .. path.translate(GEN_DIR .. "resource/", "\\") .. "\" 2>NUL",
 			"mkdir \"" .. path.translate(GEN_DIR .. _target .. "/" .. _subtarget .. "/", "\\") .. "\" 2>NUL",
 			"@echo Emitting " .. _target .. "_" .. _subtarget .. "_vers.rc" .. "...",
 			PYTHON .. " \"" .. path.translate(MAME_DIR .. "scripts/build/verinfo.py", "\\") .. "\" -f rc -t " .. _target .. " -s " .. _subtarget .. " -e " .. exename .. " -o \"" .. path.translate(rcversfile) .. "\" -r \"" .. path.translate(rcincfile, "\\") .. "\" \"" .. path.translate(GEN_DIR .. "version.cpp", "\\") .. "\"",

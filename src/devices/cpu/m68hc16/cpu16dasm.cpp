@@ -1370,7 +1370,7 @@ offs_t cpu16_disassembler::disassemble(std::ostream &stream, offs_t pc, const cp
 		{
 			const u16 operand = opcodes.r16(pc + 2);
 			format_index8(stream, operand >> 8, 'x' + BIT(opcode, 12, 2));
-			util::stream_format(stream, ", #$%02X, $%04X", opcode & 0x00ff, (pc + 6 + s8(operand & 0x00ff)) & 0xfffff);
+			util::stream_format(stream, ", #$%02X, $%05X", opcode & 0x00ff, (pc + 6 + s8(operand & 0x00ff)) & 0xfffff);
 			return 4 | SUPPORTED | info.m_flags;
 		}
 		else
@@ -1382,7 +1382,7 @@ offs_t cpu16_disassembler::disassemble(std::ostream &stream, offs_t pc, const cp
 			util::stream_format(stream, ", #$%02X", opcode & 0x00ff);
 			if (BIT(opcode, 9))
 			{
-				util::stream_format(stream, ", $%04X", (pc + 6 + s16(opcodes.r16(pc + 4))) & 0xfffff);
+				util::stream_format(stream, ", $%05X", (pc + 6 + s16(opcodes.r16(pc + 4))) & 0xfffff);
 				return 6 | SUPPORTED | info.m_flags;
 			}
 			else

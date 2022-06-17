@@ -14,6 +14,9 @@ Hardware notes:
 - discrete sound
 - 15 switches (not the usual small dipswitches, but separate large switches)
 
+TV Game 8080 hardware is pretty much the same, but on a completely different
+cheaper looking PCB. It has 13 switches instead of 15.
+
 TODO:
 - missing paddle position read (or maybe ball vs paddle collision detection)
 - interrupts are wrong, it looks like it expects IN.2 0x40 to be low for a while before the 2nd irq
@@ -22,6 +25,7 @@ TODO:
 - identify remaining switches
 - the flyer photo shows a green screen, assumed to be an overlay on a B&W CRT
 - sound emulation
+- verify tvgm8080 title, the only reference is from the instruction card which said: TV.GAME -8080-
 
 ******************************************************************************/
 
@@ -296,6 +300,14 @@ ROM_START( blockch )
 	ROM_LOAD("4.59", 0x0c00, 0x0400, CRC(edf84910) SHA1(292aa16b5f23cae16c03fa7c0e711a5c2a04c27b))
 ROM_END
 
+ROM_START( tvgm8080 )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("1", 0x0000, 0x0400, CRC(1665afec) SHA1(f4ce9d834a396962d86cf8afd3c2d06ee1709ab6))
+	ROM_LOAD("2", 0x0400, 0x0400, CRC(86314a5e) SHA1(b1cf040fceee99d6e192a3506ce71a7a82e426bc))
+	ROM_LOAD("3", 0x0800, 0x0400, CRC(7c8d1319) SHA1(37613d4b8e2da7e91d436015124f1ef37011f910))
+	ROM_LOAD("4", 0x0c00, 0x0400, CRC(bf3423a8) SHA1(acfe811e2c2a20a306b054e58b0a7493d5d90ba6))
+ROM_END
+
 } // anonymous namespace
 
 
@@ -304,5 +316,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        SCREEN  COMPANY, FULLNAME, FLAGS
-GAME( 1978, blockch, 0,      blockch, blockch, blockch_state, empty_init, ROT270, "Sun Electronics / Gifu Tokki", "G.T. Block Challenger", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+//    YEAR  NAME      PARENT   MACHINE  INPUT    CLASS          INIT        SCREEN  COMPANY, FULLNAME, FLAGS
+GAME( 1978, blockch,  0,       blockch, blockch, blockch_state, empty_init, ROT270, "Sun Electronics / Gifu Tokki", "G.T. Block Challenger", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1978, tvgm8080, blockch, blockch, blockch, blockch_state, empty_init, ROT270, "bootleg?", "TV Game 8080", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )

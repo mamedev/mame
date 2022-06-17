@@ -393,7 +393,9 @@ void sshangha_state::sshangha(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4000/4);
 
 	DECO16IC(config, m_tilegen, 0);
-	m_tilegen->set_pf1_size(DECO_64x32);
+	// requires pf1 to be 64x64 for the ending screen to be displayed properly
+	// TODO: confirm arrangement, game barely uses scrolling otherwise
+	m_tilegen->set_pf1_size(DECO_64x64);
 	m_tilegen->set_pf2_size(DECO_64x32);
 	m_tilegen->set_pf1_col_bank(0x10);
 	m_tilegen->set_pf2_col_bank(0x30);
@@ -545,14 +547,14 @@ void sshangha_state::init_sshangha()
 #if SSHANGHA_HACK
 	/* This is a hack to allow you to use the extra features
 	     of the first "Unused" Dip Switch (see notes above). */
-	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
-	RAM[0x000384/2] = 0x4e71;
-	RAM[0x000386/2] = 0x4e71;
-	RAM[0x000388/2] = 0x4e71;
-	RAM[0x00038a/2] = 0x4e71;
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	ROM[0x000384/2] = 0x4e71;
+	ROM[0x000386/2] = 0x4e71;
+	ROM[0x000388/2] = 0x4e71;
+	ROM[0x00038a/2] = 0x4e71;
 	/* To avoid checksum error (only useful for 'sshangha') */
-	RAM[0x000428/2] = 0x4e71;
-	RAM[0x00042a/2] = 0x4e71;
+	ROM[0x000428/2] = 0x4e71;
+	ROM[0x00042a/2] = 0x4e71;
 #endif
 }
 

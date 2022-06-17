@@ -8935,14 +8935,15 @@ void zombraid_state::machine_start()
 void zombraid_state::zombraid(machine_config &config)
 {
 	gundhara(config);
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_START, driver_callback_delegate());
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &zombraid_state::zombraid_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	adc0834_device &adc(ADC0834(config, "adc"));
-	adc.set_input_callback(FUNC(zombraid_state::adc_cb));
+	ADC0834(config, m_adc);
+	m_adc->set_input_callback(FUNC(zombraid_state::adc_cb));
 
 	m_layers[0]->set_xoffsets(-2, -2); // correct for normal, flip screen not working yet
 	m_layers[1]->set_xoffsets(-2, -2);

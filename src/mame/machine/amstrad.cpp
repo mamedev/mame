@@ -1069,11 +1069,9 @@ uint32_t amstrad_state::screen_update_amstrad(screen_device &screen, bitmap_ind1
 
 
 /* traverses the daisy-chain of expansion devices, looking for the specified device */
-static device_t* get_expansion_device(running_machine &machine, const char* tag)
+device_t* amstrad_state::get_expansion_device(const char* tag)
 {
-	amstrad_state *state = machine.driver_data<amstrad_state>();
-	cpc_expansion_slot_device* exp_port = state->m_exp;
-
+	cpc_expansion_slot_device* exp_port = m_exp;
 	while (exp_port != nullptr)
 	{
 		device_t* temp;
@@ -2166,7 +2164,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 		m_crtc->set_unscaled_clock( ( m_aleste_mode & 0x02 ) ? ( XTAL(16'000'000) / 8 ) : ( XTAL(16'000'000) / 16 ) );
 	}
 
-	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
+	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device("multiface2"));
 	if(mface2 != nullptr)
 	{
 		if(mface2->multiface_io_write(offset, data) != 0)
@@ -2399,7 +2397,7 @@ void amstrad_state::amstrad_rethinkMemory()
 	}
 
 	/* multiface hardware enabled? */
-	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
+	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device("multiface2"));
 	if(mface2 != nullptr)
 	{
 		if (mface2->multiface_hardware_enabled())
@@ -2432,7 +2430,7 @@ WRITE_LINE_MEMBER(amstrad_state::screen_vblank_amstrad)
 	// rising edge
 	if (state)
 	{
-		cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
+		cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device("multiface2"));
 
 		if(mface2 != nullptr)
 		{
@@ -2975,7 +2973,7 @@ void amstrad_state::enumerate_roms()
 
 
 	/* add ROMs from ROMbox expansion */
-	device_t* romexp = get_expansion_device(machine(),"rom");
+	device_t* romexp = get_expansion_device("rom");
 	if(romexp)
 	{
 		for(int i = 0; i < 8; i++)

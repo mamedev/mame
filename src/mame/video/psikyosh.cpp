@@ -893,14 +893,14 @@ void psikyosh_state::get_sprites()
 
 	**- End Sprite Format -*/
 
-	const u16 *list = (u16 *)(m_spriteram.target()) + 0x3800 / 2;
+	auto const list = util::big_endian_cast<u16 const>(m_spriteram.target() + 0x3800 / 4);
 	u16 const listlen = 0x800 / 2;
 
 	struct sprite_t *sprite_ptr = m_spritelist.get();
 	u16 listcntr = 0;
 	while (listcntr < listlen)
 	{
-		u16 const listdat = list[BYTE_XOR_BE(listcntr)];
+		u16 const listdat = list[listcntr];
 		u16 const sprnum = (listdat & 0x03ff) * 4;
 
 		s32 ypos = (m_spriteram[sprnum + 0] & 0x03ff0000) >> 16;
@@ -948,9 +948,8 @@ void psikyosh_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	}
 #endif
 
-	gfx_element *gfx;
-	const u16 *zoom_table = (u16 *)m_zoomram.target();
-	const u8 *alpha_table = (u8 *)&(m_vidregs[0]);
+	auto const zoom_table = util::big_endian_cast<u16 const>(m_zoomram.target());
+	auto const alpha_table = util::big_endian_cast<u8 const>(&m_vidregs[0]);
 
 	int i = 0;
 	struct sprite_t *sprite_ptr = m_spritelist.get();
@@ -961,14 +960,14 @@ void psikyosh_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		// sprite vs backgrounds pri
 		if (bg_pri == req_pri)
 		{
-			u32 const zoomy   = zoom_table[BYTE_XOR_BE(sprite_ptr->zoomy)];
-			u32 const zoomx   = zoom_table[BYTE_XOR_BE(sprite_ptr->zoomx)];
+			u32 const zoomy   = zoom_table[sprite_ptr->zoomy];
+			u32 const zoomx   = zoom_table[sprite_ptr->zoomx];
 			s16 alpha         = sprite_ptr->alpha;
 
-			u8 const alphamap = (alpha_table[BYTE4_XOR_BE(alpha)] & 0x80)? 1:0;
-			alpha = alpha_table[BYTE4_XOR_BE(alpha)] & 0x3f;
+			bool const alphamap = BIT(alpha_table[alpha], 7);
+			alpha = alpha_table[alpha] & 0x3f;
 
-			gfx = sprite_ptr->dpth ? m_gfxdecode->gfx(1) : m_gfxdecode->gfx(0);
+			gfx_element *const gfx = sprite_ptr->dpth ? m_gfxdecode->gfx(1) : m_gfxdecode->gfx(0);
 
 			if (alphamap) /* alpha values are per-pen */
 				alpha = -1;
