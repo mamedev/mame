@@ -233,7 +233,7 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				uint32_t const stride = m_stride * 8 / 3;
 				for (int y = 0; y < m_yres; y++)
 				{
-					std::copy_n(&m_vram[y * stride], m_xres, &bitmap.pix(y));
+					std::copy_n(&m_vram[(0xa00 / 4) + (y * stride)], m_xres, &bitmap.pix(y));
 				}
 			}
 			break;
