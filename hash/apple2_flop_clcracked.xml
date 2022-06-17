@@ -48598,4 +48598,31 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ginnread">
+		<description>Ginn Reading Program (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Ginn and Company</publisher>
+		<info name="release" value="2022-06-14"/>
+		<!--"Ginn Reading Program" is a 1984 educational program developed and distributed by Ginn and Company. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ginn reading program (4am crack) disk 1 - program.dsk" size="143360" crc="b3fb08a2" sha1="298781ac2ed9540b5ee2aec551bd380a7f23c143"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Test scoring and reports"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ginn reading program (4am crack) disk 2 - test scoring and reports.dsk" size="143360" crc="c582494a" sha1="804a8de7ad507d305bdaf11acfc1d889ad2dc104"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Data disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ginn reading program (4am crack) disk 3 - data.dsk" size="143360" crc="fef483a9" sha1="e0f16bf0a3478a55d63e02092b2a216852f672aa"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
