@@ -208,7 +208,7 @@ uint32_t nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb
 		case 4: // 24 bpp
 			for (int y = 0; y < 480; y++)
 			{
-				std::copy_n(&m_vram[y * 1024], 640, &bitmap.pix(y));
+				std::copy_n(&m_vram[(y * 1024) + (1024 / 8)], 640, &bitmap.pix(y));
 			}
 			break;
 

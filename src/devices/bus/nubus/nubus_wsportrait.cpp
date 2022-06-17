@@ -48,6 +48,7 @@ void nubus_wsportrait_device::device_add_mconfig(machine_config &config)
 	screen.set_size(1024, 960);
 	screen.set_refresh_hz(75.0);
 	screen.set_visarea(0, 640-1, 0, 870-1);
+	screen.set_physical_aspect(3, 4);
 }
 
 //-------------------------------------------------
