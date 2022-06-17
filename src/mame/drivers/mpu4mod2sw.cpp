@@ -2398,33 +2398,37 @@ GAME(199?, m4copcsh,  0,          mod2_chr_copcash, mpu4,            mpu4mod2_ma
 
 /* Pcp */
 
-GAME(199?, m4cshino,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Cashino Deluxe (Pcp) (MPU4)",GAME_FLAGS ) // runs, but no lamps or other display..
+// runs and plays, but no lamps or other display..
+GAME(199?, m4cshino,  0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Cashino Deluxe (Pcp) (MPU4)",GAME_FLAGS ) 
 
-GAME(199?, m4jjc,     0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Jumping Jack Cash (Pcp) (MPU4) (set 1)",GAME_FLAGS ) // runs, but no lamps or other display..
-GAME(199?, m4jjca,    m4jjc,      mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Jumping Jack Cash (Pcp) (MPU4) (set 2)",GAME_FLAGS ) // runs, but no lamps or other display..
+// runs and plays, but no lamps or other display..
+GAME(199?, m4jjc,     0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Jumping Jack Cash (Pcp) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4jjca,    m4jjc,      mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Jumping Jack Cash (Pcp) (MPU4) (set 2)",GAME_FLAGS )
 
-GAME(199?, m4spton,   0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Spot On (Pcp) (MPU4)",GAME_FLAGS ) // runs, but no lamps or other display..
+// runs and plays, but no lamps or other display..
+GAME(199?, m4spton,   0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Spot On (Pcp) (MPU4)",GAME_FLAGS ) 
 
-GAME(199?, m4exlin,   0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Extra Lines (Pcp) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4exlina,  m4exlin,    mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Extra Lines (Pcp) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4exlin,   0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Extra Lines (Pcp) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4exlina,  m4exlin,    mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Extra Lines (Pcp) (MPU4) (set 2)",GAME_FLAGS )
 
-GAME(199?, m4supjst,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4supjsta, m4supjst,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4supjstb, m4supjst,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4supjstc, m4supjst,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4supjstd, m4supjst,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 5)",GAME_FLAGS )
-GAME(199?, m4supjste, m4supjst,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 6)",GAME_FLAGS )
+GAME(199?, m4supjst,  0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4supjsta, m4supjst,   mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4supjstb, m4supjst,   mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4supjstc, m4supjst,   mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4supjstd, m4supjst,   mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4supjste, m4supjst,   mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Super Jester (Pcp) (MPU4) (set 6)",GAME_FLAGS )
 
-GAME(199?, m4frcrak,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Fruit Cracker (Pcp) (MPU4)",GAME_FLAGS )
+GAME(199?, m4frcrak,  0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Fruit Cracker (Pcp) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4clbrpl,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Club Replay (PCP) (MPU4) (01)",GAME_FLAGS )
+GAME(199?, m4clbrpl,  0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Club Replay (PCP) (MPU4) (01)",GAME_FLAGS )
 
 /* Misc */
 
-GAME(199?, m4spnwin,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Cotswold Microsystems","Spin A Win (Cotswold Microsystems) (MPU4) (set 1)",GAME_FLAGS ) // works?
-GAME(199?, m4spnwina, m4spnwin,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Cotswold Microsystems","Spin A Win (Cotswold Microsystems) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4spnwin,  0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Cotswold Microsystems","Spin A Win (Cotswold Microsystems) (MPU4) (set 1)",GAME_FLAGS ) // works?
+GAME(199?, m4spnwina, m4spnwin,   mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Cotswold Microsystems","Spin A Win (Cotswold Microsystems) (MPU4) (set 2)",GAME_FLAGS )
 
-GAME(199?, m4pick,    0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "JPM","Pick A Fruit (JPM) (MPU4)",GAME_FLAGS )
+// was marked as JPM, but that doesn't seem likely
+GAME(199?, m4pick,    0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "<unknown>","Pick A Fruit (Dutch) (MPU4)",GAME_FLAGS )
 
-GAMEL(1989?, m4conn4, 0,          mod2_cheatchr, connect4,        mpu4mod2_machines_state, init_connect4,      ROT0, "Dolbeck Systems","Connect 4",MACHINE_IMPERFECT_GRAPHICS|MACHINE_REQUIRES_ARTWORK,layout_connect4 )
+GAMEL(1989?, m4conn4, 0,          mod2, connect4,        mpu4mod2_machines_state, init_connect4,      ROT0, "Dolbeck Systems","Connect 4",MACHINE_IMPERFECT_GRAPHICS|MACHINE_REQUIRES_ARTWORK,layout_connect4 )
 
