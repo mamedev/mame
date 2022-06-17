@@ -127,6 +127,8 @@ protected:
 
 	u8 m_vregs;
 
+	u8 m_thunderl_protection_reg;
+
 	int m_tilemaps_flip;
 	int m_samples_bank;
 
@@ -139,8 +141,9 @@ protected:
 	u16 seta_dsw_r(offs_t offset);
 
 	u16 zingzipbl_unknown_r();
+	DECLARE_MACHINE_START(thunderl);
 	u16 thunderl_protection_r();
-	void thunderl_protection_w(u16 data);
+	void thunderl_protection_w(offs_t offset, u16 data);
 	void utoukond_sound_control_w(u8 data);
 	u16 extra_r();
 

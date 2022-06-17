@@ -3026,15 +3026,89 @@ void kiwame_state::kiwame_map(address_map &map)
                         Thunder & Lightning / Wit's
 ***************************************************************************/
 
+/* Protection only present in thunderl set.
+   Implemented using a registered PALCE16V8H: TL-9. Main CPU performs several writtings to the address space 
+   mapped to the PAL to save a value into PAL registers. Eventually, CPU reads back that value and performs some checkings.
+   If the value is not the proper one, a soft reset is done.
+   Address during writting operation is mapped in the following way:
+
+   A2  -> I2
+   A3  -> I3
+   A6  -> I4
+   A8  -> I5
+   A11 -> I6
+   A13 -> I7
+   A15 -> I8
+   A16 -> I9
+
+   Data sent by the CPU during these writting operations is not used to calculate the protection register value, only some
+   address lines are used to compute the value, as shown above.
+   Every write operation done to the PAL discards the previous stored value in the registers and stores a new computed value,
+   following the logic equations programmed in the PAL.
+
+   (I1 = CLK : pulses when accessing to writting handler and acts as clock for internal latches in PAL)
+   (I11 = /OE : asserted when accessing to reading handler. Sub-address used for reading here is no used to compute the result value
+
+   I19  -> D0
+   I18  -> D1
+   I17  -> D2
+   I16  -> D3
+   I15  -> D4
+   I14  -> D5
+   I13  -> D6
+   I12  -> D7
+*/
 u16 seta_state::thunderl_protection_r()
 {
 //  logerror("PC %06X - Protection Read\n", m_maincpu->pc());
-	return 0x00dd;
+
+	return m_thunderl_protection_reg;
 }
-void seta_state::thunderl_protection_w(u16 data)
+void seta_state::thunderl_protection_w(offs_t offset, u16 data)
 {
-//  logerror("PC %06X - Protection Written: %04X <- %04X\n", m_maincpu->pc(), offset * 2, data);
+	const u32 addr = offset * 2;
+	// data byte written here is not used to save the value into the protection register
+	/*
+	const u8 init_prot_data =
+		((addr & 0x04) >> 2)                       // A2 (addr & 2^address_bit) >> (address_bit - current_data_bit)
+		| ((addr & 0x8) >> 2)                      // A3
+		| ((addr & 0x40) >> 4)                     // A6 
+		| ((addr & 0x100) >> 5)                    // A8
+		| ((addr & 0x800) >> 7)                    // A11
+		| ((addr & 0x2000) >> 8)                   // A13
+		| ((addr & 0x8000) >> 9)                   // A15
+		| ((addr & 0x10000) >> 9);                 // A16
+	*/
+
+	m_thunderl_protection_reg =
+		((addr & 0x04) >> 2)                       // D0 = A2
+		| (((addr & 0x04) >> 1)                    // D1 = A2 & /A3
+			& ((~addr & 0x8) >> 2))
+		| ((addr & 0x04)                           // D2 = A2 | /A6
+			| ((~addr & 0x40) >> 4))
+		| (((addr & 0x04) << 1)                    // D3 = A2 | /A6 | /A8
+			| ((~addr & 0x40) >> 3)
+			| ((~addr & 0x100) >> 5))
+		| (((addr & 0x8) << 1)                     // D4 = A3 & /A11 & A15
+			& ((~addr & 0x800) >> 7)
+			& ((addr & 0x8000) >> 11))
+		| (((addr & 0x40) >> 1)                    // D5 = A6 & A13
+			& ((addr & 0x2000) >> 8))
+		| (((addr & 0x40)                          // D6 = (A6 | /A16) & (A13 | /A16)
+				| ((~addr & 0x10000) >> 10))
+			& (((addr & 0x2000) >> 7)
+				| ((~addr & 0x10000) >> 10)))
+		| ((((addr & 0x40) << 1)                   // D7 = (A6 | /A16) & (A13 | /A16) & (A2 | /A6 | /A8)
+				| ((~addr & 0x10000) >> 9))
+			& (((addr & 0x2000) >> 6)
+				| ((~addr & 0x10000) >> 9))
+			& (((addr & 0x04) << 6)
+				| ((~addr & 0x40) << 1)
+				| ((~addr & 0x100) >> 1)));
+
+	//  logerror("PC %06X - Protection Written: %04X <- %04X\n", m_maincpu->pc(), addr, data);
 }
+
 
 /* Similar to downtown etc. */
 
@@ -3045,7 +3119,7 @@ void seta_state::thunderl_map(address_map &map)
 	map(0x100000, 0x103fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0x200000, 0x200001).rw(FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
 	map(0x300000, 0x300001).nopw();                        // ?
-	map(0x400000, 0x40ffff).w(FUNC(seta_state::thunderl_protection_w));    // Protection (not in wits)
+	map(0x400000, 0x41ffff).w(FUNC(seta_state::thunderl_protection_w));    // Protection (not in wits)
 	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
 	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
@@ -9535,6 +9609,7 @@ void seta_state::rezon(machine_config &config)
 /***************************************************************************
                         Thunder & Lightning / Wit's
 ***************************************************************************/
+MACHINE_START_MEMBER(seta_state, thunderl) { save_item(NAME(m_thunderl_protection_reg)); }
 
 /*  thunderl lev 2 = lev 3 - other levels lead to an error */
 
@@ -9560,6 +9635,8 @@ void seta_state::thunderl(machine_config &config)
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
+
+	MCFG_MACHINE_START_OVERRIDE(seta_state, thunderl)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
@@ -10468,6 +10545,9 @@ ROM_START( thunderl )
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "r28", 0x000000, 0x080000, CRC(a043615d) SHA1(e483fa9fd8e922578a9d7b6ced0750643089ca78) )
 	ROM_LOAD( "r27", 0x080000, 0x080000, CRC(cb8425a3) SHA1(655afa295fbe99acc79c4004f03ed832560cff5b) )
+
+	ROM_REGION(0x200, "plds", 0)        /* Protection */
+	ROM_LOAD("tl-9", 0x000000, 0x117, CRC(3b62882d) SHA1(a590648cb013f20d837f18ddb2e839a89bac5fcb))
 ROM_END
 
 ROM_START( thunderlbl )
