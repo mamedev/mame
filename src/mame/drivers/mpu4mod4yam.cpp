@@ -194,9 +194,7 @@ GAME_CUSTOM( 199?, m4addrc__j,   m4addr, mod4yam_bootleg_fixedret<0x5f>, m4addr,
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m578_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
-
-// REEL A SETUP ALM
+	GAME(year, setname, parent, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m578_characteriser_prot>, mpu420p, mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1991 BARCREST" and "ADC 1.1"
 GAME_CUSTOM( 199?, m4addrcc,       0,          "adcs.p1", 0x0000, 0x010000, CRC(7247de78) SHA1(e390b4e912d7bc8c1ca5e42bf2e2753d4c2b4d17), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (ADC 1.1)" )
@@ -1502,10 +1500,6 @@ ROM_START( m4clbshf )
 	ROM_LOAD( "csss.p1", 0x0000, 0x010000, CRC(32dd9b96) SHA1(93831858b2f0ada8e4a0aa2fae59d12c53287df1) )
 ROM_END
 
-ROM_START( m4graffd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "grafittirom.bin", 0x0000, 0x010000, CRC(36135d6e) SHA1(e71eedabae36971739f8a6fd56a4a954de29944b) )
-ROM_END
 
 ROM_START( m4voodoo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1516,11 +1510,11 @@ GAME(198?, m4tst, 0, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4default, 
 
 GAME(199?, m4joljokd, 0,       mod4yam_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) (Dutch) (MPU4) (DJJ 1.5)",GAME_FLAGS) // Geen Tubes
 
-GAME(199?, m4clbshf,  0,        mod4yam_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4) (CSS 1.0)",GAME_FLAGS) // set stake (runs if you do)
+GAME(199?, m4clbshf,  0,        mod4yam_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>, mpu420p, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4) (CSS 1.0)",GAME_FLAGS) // set stake (runs if you do)
 
+// GEEN TUBES
 GAME(199?, m4voodoo,  0,        mod4yam_cheatchr_pal<mpu4_characteriser_pal::m435_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (Dutch) (MPU4) (DDO 3.2)",GAME_FLAGS ) // ROL F SETUP ALM
 
-GAME(199?, m4graffd,  0,  mod4yam_cheatchr_pal<mpu4_characteriser_pal::turboplay_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Grafitti (Barcrest) (Dutch) (MPU4) (DGR 1.3)",GAME_FLAGS ) // ROL D SETUP ALM
 
 ROM_START( m4hslo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1528,4 +1522,4 @@ ROM_START( m4hslo )
 ROM_END
 
 // non-standard protection
-GAME(199?, m4hslo,    0,          mod4yam_bootleg_fixedret<0x56>,       mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "(bootleg)","Hot Slot (bootleg) (MPU4) (HOT 3.0)",GAME_FLAGS )
+GAME(199?, m4hslo,    0,          mod4yam_bootleg_fixedret<0x56>,       mpu4_70pc,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "(bootleg)","Hot Slot (bootleg) (MPU4) (HOT 3.0)",GAME_FLAGS )

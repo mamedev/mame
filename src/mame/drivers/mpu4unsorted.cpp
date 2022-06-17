@@ -1882,18 +1882,3 @@ GAME(199?, m4luckwbd, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_
 GAME(199?, m4luckwbe, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 6)",GAME_FLAGS )
 GAME(199?, m4luckwbf, m4luckwb,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "<unknown>","Lucky Wild Boar (MPU4) (set 7)",GAME_FLAGS )
 
-/*****************************************************************************************************************************************************************************
-*
-* Four More
-* - does not appear to be a Barcrest codebase, and game seems to be unprotected
-* - produces no sound even when given an OKI rom from a different game, or with mod4ym, or mod2, does access where the AY maps on mod2, but not in a logical way
-*
-*****************************************************************************************************************************************************************************/
-
-ROM_START( m4fourmr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "frmr5p26.bin", 0x8000, 0x008000, CRC(f0c5bd8a) SHA1(39026459008ed5b5bd3a10841799227fef70e5b5) )
-ROM_END
-
-// runs, unprotected, 17 May 1990 BWBNFM26 in ROM
-GAME(1990, m4fourmr,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "BWB","Four More (BWB) (MPU4)",GAME_FLAGS ) // no sound with either system?

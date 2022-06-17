@@ -94,6 +94,7 @@ INPUT_PORTS_EXTERN( mpu4jackpot8per );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p90pc );
+INPUT_PORTS_EXTERN( mpu4_70pc );
 
 // currently in mpu4.cpp this may get moved into the driver, or renamed to something more generic based on the setup
 INPUT_PORTS_EXTERN( grtecp );

@@ -376,7 +376,7 @@ GAME_CUSTOM( 1994, m4andycp10c_a,      m4andycp, mod4oki_bootleg_fixedret<0x1c>,
 *
 *****************************************************************************************************************************************************************************/
 
-// REEL A ERROR
+// GEEN TUBES, can run with door open
 
 #define M4ANDYCP_DUT_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -391,7 +391,7 @@ ROM_START( m4andycpdut )
 ROM_END
 
 // blank copyright  and "DAC 1.3" (6 reel game, not the same as the UK version?)
-GAME(199?, m4andycpdut, m4andycp, mod4oki_cheatchr_pal<mpu4_characteriser_pal::phr_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default, ROT0, "Barcrest", "Andy Capp (Barcrest) (Dutch) (MPU4) (DAC 1.3)", GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4andycpdut, m4andycp, mod4oki_cheatchr_pal<mpu4_characteriser_pal::phr_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_six, ROT0, "Barcrest", "Andy Capp (Barcrest) (Dutch) (MPU4) (DAC 1.3)", GAME_FLAGS|MACHINE_NO_SOUND )
 
 
 /*****************************************************************************************************************************************************************************
@@ -6347,8 +6347,6 @@ GAME_CUSTOM( 199?, m4rhog2__m,  m4rhog2,    "2rh06y.p1",    0x0000, 0x020000, CR
 *
 *****************************************************************************************************************************************************************************/
 
-// REEL A ERROR at best
-
 #define M4LUCKSC_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "clusnd.p1", 0x000000, 0x080000, CRC(9c1042ba) SHA1(e4630bbcb3fe2f7d133275892eaf58c12402c610) ) \
@@ -6361,7 +6359,7 @@ GAME_CUSTOM( 199?, m4rhog2__m,  m4rhog2,    "2rh06y.p1",    0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LUCKSC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::m683_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_big_five_rev, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1996 BARCREST" and "CLU 1.4"
 GAME_CUSTOM( 199?, m4lucksc,       0,          "clu14s.p1",    0x0000, 0x020000, CRC(5f66d7cc) SHA1(bd8a832739d7aef4d04b89a94dd2886e89a6e0c2), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (CLU 1.4)" )
@@ -6387,7 +6385,7 @@ GAME_CUSTOM( 199?, m4lucksc__j,    m4lucksc,   "ls301f.p1",    0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LUCKSC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::wta_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::wta_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_big_five_rev, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1998   BWB" and "LSC 1.0"
 GAME_CUSTOM( 199?, m4lucksc__l,    m4lucksc,   "lsc_.1_1",     0x0000, 0x020000, CRC(79ce3db0) SHA1(409e9d3b08284dee3af696fb7c839c0ca35eddee), "BWB","Lucky Strike Club (Barcrest) (MPU4) (LSC 1.0)" )
@@ -6398,8 +6396,6 @@ GAME_CUSTOM( 199?, m4lucksc__l,    m4lucksc,   "lsc_.1_1",     0x0000, 0x020000,
 * Top Dog
 *
 *****************************************************************************************************************************************************************************/
-
-// all give ALARM 17
 
 #define M4TOPDOG_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -6594,8 +6590,6 @@ GAME_CUSTOM( 199?, m4kingqc__5,    m4kingqc,   "cn_30btc.1_1", 0x0000, 0x010000,
 *
 *****************************************************************************************************************************************************************************/
 
-// Reel A Error
-
 #define M4TYPCL_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "ctpsnd02.p1", 0x000000, 0x080000, CRC(6fdd5051) SHA1(3f713314b303d6e1f78e3ca050bed7a45f43d5b3) ) \
@@ -6608,7 +6602,7 @@ GAME_CUSTOM( 199?, m4kingqc__5,    m4kingqc,   "cn_30btc.1_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TYPCL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::m441_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::m441_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_big_five_rev, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1996 BARCREST" and "CTP 1.2"
 GAME_CUSTOM( 199?, m4typcl,     0,          "ctp12s.p1",    0x0000, 0x020000, CRC(5f0bbd2a) SHA1(ba1fa09ea7b4713a99b2033bdbbf6b15f973dcca), "Barcrest","Take Your Pick Club (Barcrest) (MPU4) (CTP 1.2)" )
@@ -6747,7 +6741,6 @@ GAME_CUSTOM( 199?, m4thestr__y,    m4thestr,   "ts_39b_c.1_1", 0x0000, 0x010000,
 *
 *****************************************************************************************************************************************************************************/
 
-// ALARM 17
 
 #define M4CPYCAT_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", 0 ) \
@@ -6813,7 +6806,6 @@ GAME_CUSTOM( 199?, m4cpycat__3,    m4cpycat,   "co_30_kp.4_1", 0x0000, 0x010000,
 *
 *****************************************************************************************************************************************************************************/
 
-// some kind of error
 
 #define M4BNKROL_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -6827,7 +6819,7 @@ GAME_CUSTOM( 199?, m4cpycat__3,    m4cpycat,   "co_30_kp.4_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BNKROL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4altreels_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_alt_cheatchr_pal<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_big_six, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1996 BARCREST" and "CBR 0.5"
 GAME_CUSTOM( 199?, m4bnkrol,       0,          "cbr05s.p1", 0x0000, 0x020000, CRC(a8b53a0d) SHA1(661ab61aa8f427b92fdee02539f19e5dd2243da7), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (CBR 0.5)" )
@@ -6876,7 +6868,6 @@ GAME_CUSTOM( 199?, m4rhrcl__c,  m4rhrcl,    "rhrc.hex", 0x0000, 0x010000, CRC(e4
 *
 *****************************************************************************************************************************************************************************/
 
-// REEL A ALM
 
 #define M4RHOGC_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -6889,7 +6880,7 @@ GAME_CUSTOM( 199?, m4rhrcl__c,  m4rhrcl,    "rhrc.hex", 0x0000, 0x010000, CRC(e4
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHOGC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::m441_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::m441_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_five_rev, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1991 BARCREST" and "RHC 0.5"
 GAME_CUSTOM( 199?, m4rhogc,     0,          "rhcs.p1", 0x0000, 0x010000, CRC(d1541050) SHA1(ef1ee3b9319e2a357540cf0de902de439267c3e2), "Barcrest","Road Hog Club (Barcrest) (MPU4) (RHC 0.5)" )
@@ -7253,12 +7244,11 @@ GAME_CUSTOM( 199?, m4squid__c,  m4squid,    "sq__xb_x.2_0", 0x0000, 0x020000, CR
 *
 *****************************************************************************************************************************************************************************/
 
-// does not show anything meaningful
 
 #define M4CALAMA_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "cala1.hex", 0x0000, 0x080000, CRC(c9768f65) SHA1(a8f2946fdba640033da0e21d4e18293b3fc004bf) ) \
-	ROM_LOAD( "cala2.hex", 0x0000, 0x080000, CRC(56bd2950) SHA1(b109c726514c3ee04c1bbdf5f518f60dfd0375a8) )
+	ROM_LOAD( "cala1.hex", 0x000000, 0x080000, CRC(c9768f65) SHA1(a8f2946fdba640033da0e21d4e18293b3fc004bf) ) \
+	ROM_LOAD( "cala2.hex", 0x080000, 0x080000, CRC(56bd2950) SHA1(b109c726514c3ee04c1bbdf5f518f60dfd0375a8) )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -7267,7 +7257,7 @@ GAME_CUSTOM( 199?, m4squid__c,  m4squid,    "sq__xb_x.2_0", 0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CALAMA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_big_five_rev, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1996 BARCREST" and "CAC 0.3"
 GAME_CUSTOM( 199?, m4calama,       0,          "cac03s.p1",    0x0000, 0x020000, CRC(edc97795) SHA1(58fb91809c7f475fbceacfc1c3bda41b86dff54b), "Barcrest","Calamari Club (Barcrest) (MPU4) (CAC 0.3)" )
@@ -7285,7 +7275,7 @@ GAME_CUSTOM( 199?, m4calama__b,    m4calama,   "ca301f.p1",    0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CALAMA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_pal<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4default_big_five_rev, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1996 BARCREST" and "BC3 0.2"
 GAME_CUSTOM( 199?, m4calama__g,    m4calama,   "bc302s.p1",    0x0000, 0x020000, CRC(b349bd2d) SHA1(9b026bece40584c4f53c30f3dacc91942c871a9f), "Barcrest","Calamari Club (Barcrest) (MPU4) (BC3 0.2)" )

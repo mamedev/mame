@@ -1049,7 +1049,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic6_cb2_w)
 	{
 		if ( state ) m_ay8913_address |=  0x02;
 		else         m_ay8913_address &= ~0x02;
-		update_ay(m_pia6);
+		update_ay(m_pia5); // using m_pia5 here allows m4fourmr to have sound
 	}
 }
 
@@ -1640,7 +1640,28 @@ INPUT_PORTS_START( mpu4jackpot8per )
 	PORT_CONFSETTING(    0xf0, "98" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( mpu4_70pc )
+	PORT_INCLUDE( mpu4 )
 
+	PORT_MODIFY("ORANGE2")
+	PORT_CONFNAME( 0xf0, 0x10, "Percentage Key" )
+	PORT_CONFSETTING(    0x00, "Not fitted / 68% (Invalid for UK Games)"  )
+	PORT_CONFSETTING(    0x10, "70" )
+	PORT_CONFSETTING(    0x20, "72" )
+	PORT_CONFSETTING(    0x30, "74" )
+	PORT_CONFSETTING(    0x40, "76" )
+	PORT_CONFSETTING(    0x50, "78" )
+	PORT_CONFSETTING(    0x60, "80" )
+	PORT_CONFSETTING(    0x70, "82" )
+	PORT_CONFSETTING(    0x80, "84" )
+	PORT_CONFSETTING(    0x90, "86" )
+	PORT_CONFSETTING(    0xa0, "88" )
+	PORT_CONFSETTING(    0xb0, "90" )
+	PORT_CONFSETTING(    0xc0, "92" )
+	PORT_CONFSETTING(    0xd0, "94" )
+	PORT_CONFSETTING(    0xe0, "96" )
+	PORT_CONFSETTING(    0xf0, "98" )
+INPUT_PORTS_END
 
 
 INPUT_PORTS_START( grtecp )
