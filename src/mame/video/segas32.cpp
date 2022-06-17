@@ -1183,11 +1183,11 @@ void segas32_state::update_bitmap(screen_device &screen, segas32_state::layer_in
 					/* 8bpp mode case */
 					if (bpp == 8)
 					{
-						uint8_t const *src = (uint8_t *)&m_videoram[512/2 * ((y + yscroll) & 0xff)];
+						auto const src = util::little_endian_cast<uint8_t const>(&m_videoram[512/2 * ((y + yscroll) & 0xff)]);
 						for (int x = extents[0]; x < extents[1]; x++)
 						{
 							int effx = (x + xscroll) & 0x1ff;
-							int pix = src[BYTE_XOR_LE(effx)] + color;
+							int pix = src[effx] + color;
 							if ((pix & 0xff) == 0)
 								pix = 0, transparent++;
 							dst[x] = pix;

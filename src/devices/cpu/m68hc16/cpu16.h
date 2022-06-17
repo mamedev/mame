@@ -121,16 +121,6 @@ private:
 	s32 m_icount;
 };
 
-class mc68hc16z1_device : public cpu16_device
-{
-public:
-	// device type constructor
-	mc68hc16z1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-private:
-	void internal_map(address_map &map);
-};
-
 // device type declaration
 DECLARE_DEVICE_TYPE(MC68HC16Z1, mc68hc16z1_device)
 

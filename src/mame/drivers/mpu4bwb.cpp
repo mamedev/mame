@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* MPU4 BwB games
- - these are Bwb originals, not rebuilds..
+/* MPU4 BWB games
+ - these are BWB originals, not rebuilds..
    typically they have large 0x3f fills in rom..
    some have information about the various set
    types in unused areas
@@ -9,30 +9,130 @@
    some QPS sets also have large 0x3f fills but
    seem to be unrelated.
 
+    ----------------------------------------
+    This file is home to the following BWB originals
 
- Excalibur
- Exotic Fruits
- Jumping Jack Flash
- Mad Money Classic
- Orlando Magic
- X-change
- X-s
- X-treme
+    Abracadabra
+    Big Match, ThE
+    Bingo Belle
+    Bingo Belle (Showcase cabinet version)
+    Bingo Club
+    Blues Boys
+    Championship Soccer
+    Cup Final
+    Dancing Diamonds
+    Daytona
+    Excalibur
+    Exotic Fruits
+    Fire & Ice
+    Harlequin
+    Heaven & Hell
+    Indy Cars
+    Jackpot Jokers
+    Jumping Jack Flash
+    Lucky Number 7
+    Mad Money
+    Mad Money Classic
+    Money Mummy Money
+    Orlando Magic
+    Prize Bingo
+    Quids In
+    Quids In (Showcase cabinet version)
+    Rack Em Up
+    Rainbow Gold
+    Red Hot Fever
+    Sinbad
+    Sky Sports
+    Soul Sister
+    Spin The Bottle
+    Stars & Stripes
+    Super League
+    Super Soccer
+    Sure Thing
+    T-Rex
+    Tutti Fruity
+    Volcano
+    Voodoo Express
+    X-change
+    X-s
+    X-treme
+
+    ----------------------------------------
+    German games by BWB and Nova also in here
+
+    Blues Boys (Nova, German version)
+    Cup Final (Nova, German version)
+    World Cup (Nova, German version)
+    Excalibur (Nova, German version)
+    Olympic Gold (Nova, German version)
+    Find The Lady (Nova, German version)
+    Sinbad (Nova, German version)
 
 */
 
 #include "emu.h"
 #include "includes/mpu4.h"
 
-INPUT_PORTS_EXTERN( mpu4 );
+namespace {
+
+class mpu4bwb_machines_state : public mpu4_state
+{
+public:
+
+	mpu4bwb_machines_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mpu4_state(mconfig, type, tag)
+	{
+	}
+};
+
+} // anonymous namespace
+
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
+
+/*****************************************************************************************************************************************************************************
+*
+* Abracadabra
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4abra_keys[2] = { 0x11, 0x192703 };
+
+#define M4ABRA_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ABRA_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, bwboki_chr_cheat<m4abra_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
+GAME_CUSTOM( 199?, m4abra,       0,      "nn_sj___.4_0", 0x0000, 0x040000, CRC(48437d29) SHA1(72a2e9337fc0a004c382931f3af856253c44ed61), "Bwb","Abracadabra (Bwb) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4abra__a,    m4abra, "nn_sja__.4_0", 0x0000, 0x040000, CRC(766cd4ae) SHA1(4d630b967ede615d325f524c2e4c92c7e7a60886), "Bwb","Abracadabra (Bwb) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4abra__b,    m4abra, "nn_sjb__.4_0", 0x0000, 0x040000, CRC(ca77a68a) SHA1(e753c065d299038bae4c451e647b9bcda36421d9), "Bwb","Abracadabra (Bwb) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4abra__c,    m4abra, "nn_sjk__.4_0", 0x0000, 0x040000, CRC(19018556) SHA1(6df993939e70a24621d4e732d0670d64fac1cf56), "Bwb","Abracadabra (Bwb) (MPU4) (set 4)" )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* The Big Match
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4bigmt_keys[2] = { 0x10, 0x241215 };
 
 #define M4BIGMT_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "altmsm6376", 0 ) /* this is NOT the same, some samples are changed */ \
 	ROM_LOAD( "bigmsnd", 0x0000, 0x07db60, CRC(876c53ae) SHA1(ea2511ec9ba4ff67879212c6e2ba908873130a4e) ) \
 	ROM_REGION( 0x180000, "msm6376", 0 ) \
 	ROM_LOAD( "tbmsnd.hex", 0x0000, 0x080000, CRC(e98da8de) SHA1(36668f2b82778f441224c94831f5b95efb9fa92b) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -40,16 +140,25 @@ INPUT_PORTS_EXTERN( mpu4 );
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BIGMT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4bigmt_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bigmt,     0,          "bigm1320",     0x0000, 0x010000, CRC(a5085347) SHA1(93a7f7656e53461270e04190ff538959d6c917c1), "Bwb","The Big Match (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4bigmt__a,  m4bigmt,    "tb_20___.7_1", 0x0000, 0x010000, CRC(22fae0f0) SHA1(a875adccf96fbbff69f5fe76720514767cdcae66), "Bwb","The Big Match (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4bigmt__b,  m4bigmt,    "tb_20_b_.7_1", 0x0000, 0x010000, CRC(40d140a3) SHA1(fd4de8dd827db933481f671e4f10684c3b7a363a), "Bwb","The Big Match (Bwb) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4bigmt__c,  m4bigmt,    "tb_20_d_.7_1", 0x0000, 0x010000, CRC(86ed18c5) SHA1(1699645532134bd830e3fc2c3ff4b67b5d67ba3e), "Bwb","The Big Match (Bwb) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4bigmt__d,  m4bigmt,    "tb_20_k_.7_1", 0x0000, 0x010000, CRC(e4c6b896) SHA1(ccf656d14ad68edb0aea99d4d3621540b899cdb7), "Bwb","The Big Match (Bwb) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4bigmt__e,  m4bigmt,    "tb______.1_2", 0x0000, 0x004000, CRC(be2a3989) SHA1(5ef857101335f90cd9f6147ec330ae281bb97b2b), "Bwb","The Big Match (Bwb) (MPU4) (set 6)" )
+//GAME_CUSTOM( 199?, m4bigmt__e,  m4bigmt,    "tb______.1_2", 0x0000, 0x004000, CRC(be2a3989) SHA1(5ef857101335f90cd9f6147ec330ae281bb97b2b), "Bwb","The Big Match (Bwb) (MPU4) (set 6)" ) // this is just a corrupt sound ROM with garbage after 0x2000
 GAME_CUSTOM( 199?, m4bigmt__f,  m4bigmt,    "tbi20___.7_1", 0x0000, 0x010000, CRC(104f45cc) SHA1(c28c08b44c46db9d0eade1f60aeda120c3981a03), "Bwb","The Big Match (Bwb) (MPU4) (set 7)" )
 
+
+/*****************************************************************************************************************************************************************************
+*
+* Bingo Belle
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4bingbl_keys[2] = { 0x10, 0x322214 };
 
 #define M4BINGBL_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
@@ -61,8 +170,7 @@ GAME_CUSTOM( 199?, m4bigmt__f,  m4bigmt,    "tbi20___.7_1", 0x0000, 0x010000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BINGBL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
-
+	GAME(year, setname, parent, bwboki_chr_cheat<m4bingbl_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bingbl,       0,          "bb_20a__.8_1", 0x0000, 0x010000, CRC(10f29ba3) SHA1(739b413f35676834ebafeb121c6059759586ec72), "Bwb","Bingo Belle (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4bingbl__a,    m4bingbl,   "bb_20bg_.8_1", 0x0000, 0x010000, CRC(9969c9ce) SHA1(8c754335e7ff75bc46f02095c2c7d57df046db47), "Bwb","Bingo Belle (Bwb) (MPU4) (set 2)" )
@@ -72,6 +180,16 @@ GAME_CUSTOM( 199?, m4bingbl__d,    m4bingbl,   "bb_20sb_.8_1", 0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4bingbl__e,    m4bingbl,   "bb_20sd_.8_1", 0x0000, 0x010000, CRC(61aa7fbb) SHA1(0bf54a562d04c0b41fc35c5c84f529efa2ae9e10), "Bwb","Bingo Belle (Bwb) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4bingbl__f,    m4bingbl,   "bb_20sk_.8_1", 0x0000, 0x010000, CRC(0381dfe8) SHA1(8d3d232c10f9ec683a82464ee901f0963d9ffcd6), "Bwb","Bingo Belle (Bwb) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4bingbl__g,    m4bingbl,   "bbi20___.8_1", 0x0000, 0x010000, CRC(eae04eac) SHA1(bcc619868a065d92d09fa3b2411958b373b3edde), "Bwb","Bingo Belle (Bwb) (MPU4) (set 8)" )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Bingo Belle (Showcase cabinet version)
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4bingbs_keys[2] = { 0x10, 0x322214 };
 
 #define M4BINGBS_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
@@ -83,7 +201,7 @@ GAME_CUSTOM( 199?, m4bingbl__g,    m4bingbl,   "bbi20___.8_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BINGBS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4bingbs_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bingbs,       0,          "bp_20a__.2_1", 0x0000, 0x010000, CRC(ca005003) SHA1(271ff0dbee529ca15c79c9aa1047efa8993ea073), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4bingbs__a,    m4bingbs,   "bp_20bg_.2_1", 0x0000, 0x010000, CRC(1b59c32f) SHA1(0c7df33f921639bfedbddd969dcbcd62e38ff912), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 2)" )
@@ -93,9 +211,20 @@ GAME_CUSTOM( 199?, m4bingbs__d,    m4bingbs,   "bp_20sb_.2_1", 0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4bingbs__e,    m4bingbs,   "bp_20sd_.2_1", 0x0000, 0x010000, CRC(bb58b41b) SHA1(253859ab6d8033eeb94ad5c4586eadc8792bd436), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4bingbs__f,    m4bingbs,   "bp_20sk_.2_1", 0x0000, 0x010000, CRC(d9731448) SHA1(2f054a99c5d1570b6e0307542c50421408a610dc), "Bwb","Bingo Belle Showcase (Bwb) (MPU4) (set 7)" )
 
+
+/*****************************************************************************************************************************************************************************
+*
+* Bingo Club
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4bingcl_keys[2] = { 0x03, 0x072114 };
+
 #define M4BINGCL_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* Missing, or not OKI? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -103,18 +232,28 @@ GAME_CUSTOM( 199?, m4bingbs__f,    m4bingbs,   "bp_20sk_.2_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BINGCL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4bingcl_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bingcl,       0,          "bc_xe___.2_1", 0x0000, 0x010000, CRC(3abbc215) SHA1(b5e59b30c07c4ffef69c5729f1a28d7ee55636bd), "Bwb","Bingo Club (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4bingcl__a,    m4bingcl,   "bc_xe_b_.2_1", 0x0000, 0x010000, CRC(3e11c5c0) SHA1(2d9bc987fed040664f211bb9d13984b6cba5e25f), "Bwb","Bingo Club (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4bingcl__b,    m4bingcl,   "bc_xe_d_.2_1", 0x0000, 0x010000, CRC(0a3a162f) SHA1(1b0857039b0442269b8fd4c063fc99b3b50cc312), "Bwb","Bingo Club (Bwb) (MPU4) (set 3)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Blues Boys
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4blsbys_keys[2] = { 0x42, 0x362709 };
+static const uint32_t m4blsbys_g_keys[2] = { 0x36, 0x010e20 };
 
 #define M4BLSBYS_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "bbsnd.p1",  0x000000, 0x080000,  CRC(715c9e95) SHA1(6a0c9c63e56cfc21bf77cf29c1b844b8e0844c1e) ) \
 	ROM_LOAD( "bbsnd.p2",  0x080000, 0x080000,  CRC(594a87f8) SHA1(edfef7d08fab41fb5814c92930f08a565371eae1) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -122,7 +261,7 @@ GAME_CUSTOM( 199?, m4bingcl__b,    m4bingcl,   "bc_xe_d_.2_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BLSBYS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, bwboki, mpu4, mpu4_state, init_m_blsbys, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4blsbys_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m_blsbys, ROT0, company, title, GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4blsbys,       0,          "bbprog.bin",   0x0000, 0x020000, CRC(c262cfda) SHA1(f004895e0dd3f8420683927915554e19e41bd20b), "Bwb","Blues Boys (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4blsbys__a,    m4blsbys,   "bf_20a__.3_1", 0x0000, 0x020000, CRC(fca7764f) SHA1(a88378247b6710d6122c515c31c39c5cd9678ce2), "Bwb","Blues Boys (Bwb) (MPU4) (set 2)" )
@@ -131,35 +270,45 @@ GAME_CUSTOM( 199?, m4blsbys__c,    m4blsbys,   "bf_20s__.3_1", 0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4blsbys__d,    m4blsbys,   "bf_20s__.6_1", 0x0000, 0x020000, CRC(af7462cb) SHA1(188935ebb574e0b09f9e0e5f094eb99ed7df5075), "Bwb","Blues Boys (Bwb) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4blsbys__e,    m4blsbys,   "bf_20sb_.3_1", 0x0000, 0x020000, CRC(d2ff1a12) SHA1(d425985a8d109c9e3729618a995eeac1f3bf643c), "Bwb","Blues Boys (Bwb) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4blsbys__f,    m4blsbys,   "bf_20sb_.6_1", 0x0000, 0x020000, CRC(7548bdf1) SHA1(a366c10f35d85b1f3c103787dd5b2e6600ecf6c8), "Bwb","Blues Boys (Bwb) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4blsbys__g,    m4blsbys,   "bs_05___.3v1", 0x0000, 0x020000, CRC(26e8eb95) SHA1(7d8dbca127e1867714cbeb9d699b2173de724eb2), "Bwb","Blues Boys (Bwb) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4blsbys__h,    m4blsbys,   "bs_05__c.3v1", 0x0000, 0x020000, CRC(12e51237) SHA1(68235cf5f36862a26d5d44464041dabb01b9f95c), "Bwb","Blues Boys (Bwb) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4blsbys__i,    m4blsbys,   "bs_05_b_.3v1", 0x0000, 0x020000, CRC(a8ec1731) SHA1(5acd86b1018301df5c3caa388bbbee0c0daacb40), "Bwb","Blues Boys (Bwb) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4blsbys__j,    m4blsbys,   "bs_05_d_.3v1", 0x0000, 0x020000, CRC(5def4142) SHA1(e0019979f65e240002455d5aa41e1492dc517740), "Bwb","Blues Boys (Bwb) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4blsbys__k,    m4blsbys,   "bs_05_k_.3v1", 0x0000, 0x020000, CRC(d023bad9) SHA1(54c995c5166f018c41dd7007163f07f054f564e9), "Bwb","Blues Boys (Bwb) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4blsbys__l,    m4blsbys,   "bs_05_kc.3v1", 0x0000, 0x020000, CRC(0b8911da) SHA1(1426944c01edbf6edb664f961fe75befd3e81e65), "Bwb","Blues Boys (Bwb) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4blsbys__m,    m4blsbys,   "bs_05a__.2_1", 0x0000, 0x020000, CRC(88af47c9) SHA1(e5dfd572b47f2cff6e6ef68bd9016a3e5b2273b2), "Bwb","Blues Boys (Bwb) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4blsbys__n,    m4blsbys,   "bs_05a__.3v1", 0x0000, 0x020000, CRC(055fdf72) SHA1(118272ca35d1ea059b6905a7cd515dbfc11fdbc5), "Bwb","Blues Boys (Bwb) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4blsbys__o,    m4blsbys,   "bs_05a_c.3v1", 0x0000, 0x020000, CRC(737999c4) SHA1(957fd06f7937b85436ef7011d47c559729d17d51), "Bwb","Blues Boys (Bwb) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4blsbys__p,    m4blsbys,   "bs_05b__.3v1", 0x0000, 0x020000, CRC(ea1b09e7) SHA1(9310e3d63b77c4bc2d0d428a630c8aafb500de74), "Bwb","Blues Boys (Bwb) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4blsbys__q,    m4blsbys,   "bs_05b_c.3v1", 0x0000, 0x020000, CRC(3ec0ce9f) SHA1(09472d392350da1593f084a2591125b0d71aca29), "Bwb","Blues Boys (Bwb) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4blsbys__r,    m4blsbys,   "bs_20__c.1_1", 0x0000, 0x020000, CRC(328dc0a6) SHA1(7bea0bac121f2c521d891267fb891479549350aa), "Bwb","Blues Boys (Bwb) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4blsbys__s,    m4blsbys,   "bs_20a__.6_1", 0x0000, 0x020000, CRC(9968e21f) SHA1(8615c8b7f0ae55f0b77f30c84a74d1fba0450a73), "Bwb","Blues Boys (Bwb) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4blsbys__t,    m4blsbys,   "bs_20a__.7_1", 0x0000, 0x020000, CRC(c48bc5d6) SHA1(5aa44d85c1a33ea1aa27e2eaa987ce4fe570b713), "Bwb","Blues Boys (Bwb) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4blsbys__u,    m4blsbys,   "bs_20a_c.1_1", 0x0000, 0x020000, CRC(b9483173) SHA1(a81ef9cb42cd090861b2e0a28a63906cf61c7534), "Bwb","Blues Boys (Bwb) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4blsbys__v,    m4blsbys,   "bs_20a_p.4_1", 0x0000, 0x020000, CRC(fb7ec0aa) SHA1(a0b681a8eacde06825c7e4fcf5b7ef8f64723d96), "Bwb","Blues Boys (Bwb) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4blsbys__w,    m4blsbys,   "bs_20a_s.6_1", 0x0000, 0x020000, CRC(72c5c16e) SHA1(18bdb0f9aff13587d95d871b4124d5a1cc07af04), "Bwb","Blues Boys (Bwb) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4blsbys__x,    m4blsbys,   "bs_20s__.6_1", 0x0000, 0x020000, CRC(1862df89) SHA1(b18f15f2098dfc488a6bdb9a7adff4446268f0d3), "Bwb","Blues Boys (Bwb) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4blsbys__y,    m4blsbys,   "bs_20s_s.6_1", 0x0000, 0x020000, CRC(f3cffcf8) SHA1(bda99c269e85baf64f66788f868879d21a896c5a), "Bwb","Blues Boys (Bwb) (MPU4) (set 26)" )
-GAME_CUSTOM( 199?, m4blsbys__z,    m4blsbys,   "bs_20sb_.6_1", 0x0000, 0x020000, CRC(3278bdcb) SHA1(c694d485c79be983924410ce00d364d233a054c0), "Bwb","Blues Boys (Bwb) (MPU4) (set 27)" )
-GAME_CUSTOM( 199?, m4blsbys__0,    m4blsbys,   "bs_20sbc.1_1", 0x0000, 0x020000, CRC(3a55b728) SHA1(948b353ec92aae1cb801e5e2d2385cd2316f0838), "Bwb","Blues Boys (Bwb) (MPU4) (set 28)" )
-GAME_CUSTOM( 199?, m4blsbys__1,    m4blsbys,   "bs_20sbs.6_1", 0x0000, 0x020000, CRC(d9d59eba) SHA1(91f608dc33541297797f937546fa5759b26af511), "Bwb","Blues Boys (Bwb) (MPU4) (set 29)" )
-GAME_CUSTOM( 199?, m4blsbys__2,    m4blsbys,   "bs_20sd_.6_1", 0x0000, 0x020000, CRC(df087fd9) SHA1(35c85ffe0bef5847a3a72bb33f196f4708f03b28), "Bwb","Blues Boys (Bwb) (MPU4) (set 30)" )
-GAME_CUSTOM( 199?, m4blsbys__3,    m4blsbys,   "bs_20sdc.1_1", 0x0000, 0x020000, CRC(1439c63e) SHA1(fdac1199e98bbecd944431338d2215d434a0c004), "Bwb","Blues Boys (Bwb) (MPU4) (set 31)" )
-GAME_CUSTOM( 199?, m4blsbys__4,    m4blsbys,   "bs_20sds.6_1", 0x0000, 0x020000, CRC(34a55ca8) SHA1(393d0164699a91fcb4eb68ca5246a0744e245873), "Bwb","Blues Boys (Bwb) (MPU4) (set 32)" )
-GAME_CUSTOM( 199?, m4blsbys__5,    m4blsbys,   "bs_25__c.2_1", 0x0000, 0x020000, CRC(d41de6c6) SHA1(43c059ef673de9cc1ef800f3da68b3a6fd54e8f7), "Bwb","Blues Boys (Bwb) (MPU4) (set 33)" )
-GAME_CUSTOM( 199?, m4blsbys__6,    m4blsbys,   "bs_25_bc.2_1", 0x0000, 0x020000, CRC(b692305d) SHA1(4ed96655a4fdfd97fa5783648f8cdea5af0c565e), "Bwb","Blues Boys (Bwb) (MPU4) (set 34)" )
-GAME_CUSTOM( 199?, m4blsbys__7,    m4blsbys,   "bs_25_dc.2_1", 0x0000, 0x020000, CRC(bbe844a5) SHA1(bd1d5d8601b0c36a2f4abaae04a49626cbef23b6), "Bwb","Blues Boys (Bwb) (MPU4) (set 35)" )
-GAME_CUSTOM( 199?, m4blsbys__8,    m4blsbys,   "bs_25a_c.2_1", 0x0000, 0x020000, CRC(0b64cc29) SHA1(43b958321ad5a04aae4629929844643dfcf17819), "Bwb","Blues Boys (Bwb) (MPU4) (set 36)" )
+GAME_CUSTOM( 199?, m4blsbys__r,    m4blsbys,   "bs_20__c.1_1", 0x0000, 0x020000, CRC(328dc0a6) SHA1(7bea0bac121f2c521d891267fb891479549350aa), "Bwb","Blues Boys (Bwb) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4blsbys__s,    m4blsbys,   "bs_20a__.6_1", 0x0000, 0x020000, CRC(9968e21f) SHA1(8615c8b7f0ae55f0b77f30c84a74d1fba0450a73), "Bwb","Blues Boys (Bwb) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4blsbys__t,    m4blsbys,   "bs_20a__.7_1", 0x0000, 0x020000, CRC(c48bc5d6) SHA1(5aa44d85c1a33ea1aa27e2eaa987ce4fe570b713), "Bwb","Blues Boys (Bwb) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4blsbys__u,    m4blsbys,   "bs_20a_c.1_1", 0x0000, 0x020000, CRC(b9483173) SHA1(a81ef9cb42cd090861b2e0a28a63906cf61c7534), "Bwb","Blues Boys (Bwb) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4blsbys__v,    m4blsbys,   "bs_20a_p.4_1", 0x0000, 0x020000, CRC(fb7ec0aa) SHA1(a0b681a8eacde06825c7e4fcf5b7ef8f64723d96), "Bwb","Blues Boys (Bwb) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4blsbys__w,    m4blsbys,   "bs_20a_s.6_1", 0x0000, 0x020000, CRC(72c5c16e) SHA1(18bdb0f9aff13587d95d871b4124d5a1cc07af04), "Bwb","Blues Boys (Bwb) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4blsbys__x,    m4blsbys,   "bs_20s__.6_1", 0x0000, 0x020000, CRC(1862df89) SHA1(b18f15f2098dfc488a6bdb9a7adff4446268f0d3), "Bwb","Blues Boys (Bwb) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4blsbys__y,    m4blsbys,   "bs_20s_s.6_1", 0x0000, 0x020000, CRC(f3cffcf8) SHA1(bda99c269e85baf64f66788f868879d21a896c5a), "Bwb","Blues Boys (Bwb) (MPU4) (set 15)" )
+GAME_CUSTOM( 199?, m4blsbys__z,    m4blsbys,   "bs_20sb_.6_1", 0x0000, 0x020000, CRC(3278bdcb) SHA1(c694d485c79be983924410ce00d364d233a054c0), "Bwb","Blues Boys (Bwb) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4blsbys__0,    m4blsbys,   "bs_20sbc.1_1", 0x0000, 0x020000, CRC(3a55b728) SHA1(948b353ec92aae1cb801e5e2d2385cd2316f0838), "Bwb","Blues Boys (Bwb) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4blsbys__1,    m4blsbys,   "bs_20sbs.6_1", 0x0000, 0x020000, CRC(d9d59eba) SHA1(91f608dc33541297797f937546fa5759b26af511), "Bwb","Blues Boys (Bwb) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4blsbys__2,    m4blsbys,   "bs_20sd_.6_1", 0x0000, 0x020000, CRC(df087fd9) SHA1(35c85ffe0bef5847a3a72bb33f196f4708f03b28), "Bwb","Blues Boys (Bwb) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4blsbys__3,    m4blsbys,   "bs_20sdc.1_1", 0x0000, 0x020000, CRC(1439c63e) SHA1(fdac1199e98bbecd944431338d2215d434a0c004), "Bwb","Blues Boys (Bwb) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4blsbys__4,    m4blsbys,   "bs_20sds.6_1", 0x0000, 0x020000, CRC(34a55ca8) SHA1(393d0164699a91fcb4eb68ca5246a0744e245873), "Bwb","Blues Boys (Bwb) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4blsbys__5,    m4blsbys,   "bs_25__c.2_1", 0x0000, 0x020000, CRC(d41de6c6) SHA1(43c059ef673de9cc1ef800f3da68b3a6fd54e8f7), "Bwb","Blues Boys (Bwb) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4blsbys__6,    m4blsbys,   "bs_25_bc.2_1", 0x0000, 0x020000, CRC(b692305d) SHA1(4ed96655a4fdfd97fa5783648f8cdea5af0c565e), "Bwb","Blues Boys (Bwb) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4blsbys__7,    m4blsbys,   "bs_25_dc.2_1", 0x0000, 0x020000, CRC(bbe844a5) SHA1(bd1d5d8601b0c36a2f4abaae04a49626cbef23b6), "Bwb","Blues Boys (Bwb) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4blsbys__8,    m4blsbys,   "bs_25a_c.2_1", 0x0000, 0x020000, CRC(0b64cc29) SHA1(43b958321ad5a04aae4629929844643dfcf17819), "Bwb","Blues Boys (Bwb) (MPU4) (set 25)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BLSBYS_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, bwboki_chr_cheat<m4blsbys_g_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m_blsbys, ROT0, company, title, GAME_FLAGS )
+
+GAME_CUSTOM( 199?, m4blsbys__g,    m4blsbys,   "bs_05___.3v1", 0x0000, 0x020000, CRC(26e8eb95) SHA1(7d8dbca127e1867714cbeb9d699b2173de724eb2), "Bwb","Blues Boys (Bwb) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4blsbys__h,    m4blsbys,   "bs_05__c.3v1", 0x0000, 0x020000, CRC(12e51237) SHA1(68235cf5f36862a26d5d44464041dabb01b9f95c), "Bwb","Blues Boys (Bwb) (MPU4) (set 27)" )
+GAME_CUSTOM( 199?, m4blsbys__i,    m4blsbys,   "bs_05_b_.3v1", 0x0000, 0x020000, CRC(a8ec1731) SHA1(5acd86b1018301df5c3caa388bbbee0c0daacb40), "Bwb","Blues Boys (Bwb) (MPU4) (set 28)" )
+GAME_CUSTOM( 199?, m4blsbys__j,    m4blsbys,   "bs_05_d_.3v1", 0x0000, 0x020000, CRC(5def4142) SHA1(e0019979f65e240002455d5aa41e1492dc517740), "Bwb","Blues Boys (Bwb) (MPU4) (set 29)" )
+GAME_CUSTOM( 199?, m4blsbys__k,    m4blsbys,   "bs_05_k_.3v1", 0x0000, 0x020000, CRC(d023bad9) SHA1(54c995c5166f018c41dd7007163f07f054f564e9), "Bwb","Blues Boys (Bwb) (MPU4) (set 30)" )
+GAME_CUSTOM( 199?, m4blsbys__l,    m4blsbys,   "bs_05_kc.3v1", 0x0000, 0x020000, CRC(0b8911da) SHA1(1426944c01edbf6edb664f961fe75befd3e81e65), "Bwb","Blues Boys (Bwb) (MPU4) (set 31)" )
+GAME_CUSTOM( 199?, m4blsbys__m,    m4blsbys,   "bs_05a__.2_1", 0x0000, 0x020000, CRC(88af47c9) SHA1(e5dfd572b47f2cff6e6ef68bd9016a3e5b2273b2), "Bwb","Blues Boys (Bwb) (MPU4) (set 32)" )
+GAME_CUSTOM( 199?, m4blsbys__n,    m4blsbys,   "bs_05a__.3v1", 0x0000, 0x020000, CRC(055fdf72) SHA1(118272ca35d1ea059b6905a7cd515dbfc11fdbc5), "Bwb","Blues Boys (Bwb) (MPU4) (set 33)" )
+GAME_CUSTOM( 199?, m4blsbys__o,    m4blsbys,   "bs_05a_c.3v1", 0x0000, 0x020000, CRC(737999c4) SHA1(957fd06f7937b85436ef7011d47c559729d17d51), "Bwb","Blues Boys (Bwb) (MPU4) (set 34)" )
+GAME_CUSTOM( 199?, m4blsbys__p,    m4blsbys,   "bs_05b__.3v1", 0x0000, 0x020000, CRC(ea1b09e7) SHA1(9310e3d63b77c4bc2d0d428a630c8aafb500de74), "Bwb","Blues Boys (Bwb) (MPU4) (set 35)" )
+GAME_CUSTOM( 199?, m4blsbys__q,    m4blsbys,   "bs_05b_c.3v1", 0x0000, 0x020000, CRC(3ec0ce9f) SHA1(09472d392350da1593f084a2591125b0d71aca29), "Bwb","Blues Boys (Bwb) (MPU4) (set 36)" )
 GAME_CUSTOM( 199?, m4blsbys__9,    m4blsbys,   "bs_x3a__.2v1", 0x0000, 0x020000, CRC(99471e88) SHA1(e566cd1368e7234ec546b05528f2fcf345e03697), "Bwb","Blues Boys (Bwb) (MPU4) (set 37)" )
 GAME_CUSTOM( 199?, m4blsbys__aa,   m4blsbys,   "bs_x3s__.2v1", 0x0000, 0x020000, CRC(84249d95) SHA1(3962ee9fde49b25c3485c7bfaecd63c400d8502d), "Bwb","Blues Boys (Bwb) (MPU4) (set 38)" )
 GAME_CUSTOM( 199?, m4blsbys__ab,   m4blsbys,   "bs_x6a__.2v1", 0x0000, 0x020000, CRC(d03ef955) SHA1(03fa4b3b37b71fb61439200d5dd65dab846abc2c), "Bwb","Blues Boys (Bwb) (MPU4) (set 39)" )
@@ -167,29 +316,21 @@ GAME_CUSTOM( 199?, m4blsbys__ac,   m4blsbys,   "bs_x6s__.2v1", 0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4blsbys__ad,   m4blsbys,   "bsix3___.2v1", 0x0000, 0x020000, CRC(4e7451fa) SHA1(b1417f948c7e80f506b90d6608f6dd79739389bf), "Bwb","Blues Boys (Bwb) (MPU4) (set 41)" )
 
 
-#define M4BLUESN_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "bluesboyz.bi2", 0x000000, 0x080000, CRC(7f19a61b) SHA1(dd8742d84df24e118bdbffb1efffad1c71eb2283) ) \
-	ROM_LOAD( "bluesboyz.bi3", 0x080000, 0x080000, CRC(32363184) SHA1(8f3f53ce4d9f9b54c441263def9d8e23880507a1) ) \
-	ROM_LOAD( "bluesboyz.bi4", 0x100000, 0x080000, CRC(aa94281d) SHA1(e15b7bf97b8e307ed465d9b8cb6e5de0044f6fb5) ) \
-	ROM_LOAD( "bluesboyz.bi5", 0x180000, 0x080000, CRC(d8d7aa2e) SHA1(2d8b86fa63e6649d628c7e343d8f5c329c8f8ced) )
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4BLUESN_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
-GAME_CUSTOM( 199?, m4bluesn,   m4blsbys,   "bluesboys.bin", 0x0000, 0x020000, CRC(c1395649) SHA1(3cd0eed1f966f5391fe5de496dc747385ebfb556), "Bwb","Blues Boys (Nova) (MPU4)" )
+/*****************************************************************************************************************************************************************************
+*
+* Championship Soccer
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
 
-
+static const uint32_t m4csoc_keys[2] = { 0x11, 0x101230 };
 
 #define M4CSOC_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "ch_socc.s1", 0x000000, 0x080000, CRC(abaea3f3) SHA1(cf3b6e4ee99680726efd2a839b49b4d86e2bd270) ) \
 	ROM_LOAD( "ch_socc.s2", 0x080000, 0x080000, CRC(2048f5b2) SHA1(b07addfd9d861b1d19d4db248e16c597cf79b159) ) \
 	ROM_LOAD( "ch_socc.s3", 0x100000, 0x080000, CRC(064224b0) SHA1(99a8bacfd3a42f72e40b93d1f7eeea633c3cf366) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -197,8 +338,7 @@ GAME_CUSTOM( 199?, m4bluesn,   m4blsbys,   "bluesboys.bin", 0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CSOC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
-
+	GAME(year, setname, parent, bwboki_chr_cheat<m4csoc_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4csoc,       0,      "chsoc8ac",     0x0000, 0x040000, CRC(8e0471ba) SHA1(3b7e6edbb3490e99af148c0cfe8d39c13c282880), "Bwb","Championship Soccer (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4csoc__a,    m4csoc, "sg_sj___.1_0", 0x0000, 0x040000, CRC(f21cd1aa) SHA1(dc010a315a8d738ad9e5e384197499e08a8d5ef6), "Bwb","Championship Soccer (Bwb) (MPU4) (set 2)" )
@@ -213,10 +353,20 @@ GAME_CUSTOM( 199?, m4csoc__i,    m4csoc, "ch_socc",      0x0000, 0x040000, CRC(e
 GAME_CUSTOM( 199?, m4csoc__j,    m4csoc, "ch_socc.5",    0x0000, 0x040000, CRC(1b2ea78d) SHA1(209534ccd537c0ca9d02301830a52ebc29b93cb7), "Bwb","Championship Soccer (Bwb) (MPU4) (set 11)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Cup Final
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4cpfinl_keys[2] = { 0x10, 0x241215 };
+
 #define M4CPFINL_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", 0 ) \
 	ROM_LOAD( "cupsnd_1.0_2", 0x000000, 0x080000, CRC(54384ce8) SHA1(ff78c4ea16722662a480bff1f85af7efe84b01e5) ) \
 	ROM_LOAD( "cupsnd_1.0_3", 0x080000, 0x080000, CRC(24d3d848) SHA1(64287c3cbe2e9693954bc880d6edf2bc17b0ed65) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -224,8 +374,7 @@ GAME_CUSTOM( 199?, m4csoc__j,    m4csoc, "ch_socc.5",    0x0000, 0x040000, CRC(1
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CPFINL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
-
+	GAME(year, setname, parent, bwboki_chr_cheat<m4cpfinl_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4cpfinl,       0,          "cu_10___.5_1", 0x0000, 0x010000, CRC(47a85443) SHA1(d308b9a6dcb0200f72d5c5b380907d2d55f3e40d), "Bwb","Cup Final (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4cpfinl__a,    m4cpfinl,   "cu_10_b_.5_1", 0x0000, 0x010000, CRC(2583f410) SHA1(447a2316e3c3da6f835699602834f7ca5bafbdf9), "Bwb","Cup Final (Bwb) (MPU4) (set 2)" )
@@ -241,9 +390,19 @@ GAME_CUSTOM( 199?, m4cpfinl__j,    m4cpfinl,   "cui20_d_.5_1", 0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4cpfinl__k,    m4cpfinl,   "cui20_k_.5_1", 0x0000, 0x010000, CRC(9d2a7b78) SHA1(d7c26a47dcbb836650f3021733d09a426ff3a390), "Bwb","Cup Final (Bwb) (MPU4) (set 12)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Dancing Diamonds
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4danced_keys[2] = { 0x10, 0x3b240d };
+
 #define M4DANCED_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", 0 ) \
 	ROM_LOAD( "dd______.1_2", 0x0000, 0x080000, CRC(b9043a08) SHA1(5d87a30f23e8b5e3eaa0584d0d49efc08209882b) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -251,8 +410,7 @@ GAME_CUSTOM( 199?, m4cpfinl__k,    m4cpfinl,   "cui20_k_.5_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DANCED_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
-
+	GAME(year, setname, parent, bwboki_chr_cheat<m4danced_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4danced,       0,          "dd_22bg_.2_1", 0x0000, 0x020000, CRC(f79525a1) SHA1(babfbf8beae423626057235bcad5eae18531160e), "Bwb","Dancing Diamonds (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4danced__a,    m4danced,   "dd_22bg_.4_1", 0x0000, 0x020000, CRC(e50ffa46) SHA1(b42d806422f85573bcbe284b4192f393e3e57306), "Bwb","Dancing Diamonds (Bwb) (MPU4) (set 2)" )
@@ -280,9 +438,19 @@ GAME_CUSTOM( 199?, m4danced__v,    m4danced,   "dd_32sd_.3_1", 0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4danced__w,    m4danced,   "dd_sja__.2_1", 0x0000, 0x020000, CRC(45db5106) SHA1(b12a5c2c3f61cc78a7ff040e1ffff82c225e6d9e), "Bwb","Dancing Diamonds (Bwb) (MPU4) (set 24)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Daytona
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4daytn_keys[2] = { 0x13, 0x1f1e23 };
+
 #define M4DAYTN_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -290,10 +458,7 @@ GAME_CUSTOM( 199?, m4danced__w,    m4danced,   "dd_sja__.2_1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DAYTN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
-
-
-
+	GAME(year, setname, parent, bwboki_chr_cheat<m4daytn_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4daytn,     0,          "da_78___.1_0", 0x0000, 0x040000, CRC(50beafdd) SHA1(0ef6dd4fc9c8cda596fd383e47b9c7976b5d15f0), "Bwb","Daytona (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4daytn__a,  m4daytn,    "da_78_d_.1_0", 0x0000, 0x040000, CRC(d55d3f9a) SHA1(a145379237947601f2ecb84138c113b71842cd34), "Bwb","Daytona (Bwb) (MPU4) (set 2)" )
@@ -312,12 +477,21 @@ GAME_CUSTOM( 199?, m4daytn__m,  m4daytn,    "da_90_d_.1_0", 0x0000, 0x040000, CR
 GAME_CUSTOM( 199?, m4daytn__n,  m4daytn,    "da_92_d_.1_0", 0x0000, 0x040000, CRC(9e99647d) SHA1(34cf734808ffbfa9bc920ad1c93c0a9f7bbba791), "Bwb","Daytona (Bwb) (MPU4) (set 15)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Excalibur
+* - fails to boot (code crashes!)
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4excal_keys[2] = { 0xff, 0xffffffff };
 
 #define M4EXCAL_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", 0 ) \
 	ROM_LOAD( "ex______.1_2", 0x000000, 0x080000, CRC(9305e516) SHA1(5a5c67f97761fe2e042ba31594d1881238d3227b) ) \
 	ROM_LOAD( "ex______.1_3", 0x080000, 0x080000, CRC(29e3709a) SHA1(2e2f089aa2a938158930f235bf821685932d698b) ) \
 	ROM_LOAD( "ex______.1_4", 0x100000, 0x080000, CRC(dd747003) SHA1(cf0a2936c897e3b833984c55f4825c358b723ab8) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -325,7 +499,7 @@ GAME_CUSTOM( 199?, m4daytn__n,  m4daytn,    "da_92_d_.1_0", 0x0000, 0x040000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4EXCAL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4excal_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4excal,     0,          "ex_05a__.6_1", 0x0000, 0x020000, CRC(317fa289) SHA1(8a0e83a764e2a04285367e0f7ebb814fedc81400), "Bwb","Excalibur (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4excal__a,  m4excal,    "ex_20a_6.6_1", 0x0000, 0x020000, CRC(284937c8) SHA1(3be8bf21ab0ff97f67ce170cee48cd08ea325571), "Bwb","Excalibur (Bwb) (MPU4) (set 2)" )
@@ -340,9 +514,19 @@ GAME_CUSTOM( 199?, m4excal__i,  m4excal,    "ex_20sd6.6_1", 0x0000, 0x020000, CR
 GAME_CUSTOM( 199?, m4excal__j,  m4excal,    "ex_20sd8.6_1", 0x0000, 0x020000, CRC(1769d5c3) SHA1(3e5ff338364781e99685cde9e45707dd88d1da11), "Bwb","Excalibur (Bwb) (MPU4) (set 11)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Exotic Fruits
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4exotic_keys[2] = { 0x34, 0x3f0e26 };
+
 #define M4EXOTIC_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -350,7 +534,7 @@ GAME_CUSTOM( 199?, m4excal__j,  m4excal,    "ex_20sd8.6_1", 0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4EXOTIC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4exotic_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4exotic,       0,          "eo_49bg_.2_0", 0x0000, 0x020000, CRC(c3bf2286) SHA1(74090fd0a103a6c311d426f4aae8e7af8b1d3bc0), "Bwb","Exotic Fruits (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4exotic__a,    m4exotic,   "eo_49bm_.2_0", 0x0000, 0x020000, CRC(c748c4ca) SHA1(7d0d498f9edd792ed861c8bf9cf1bb03698d144d), "Bwb","Exotic Fruits (Bwb) (MPU4) (set 2)" )
@@ -360,12 +544,21 @@ GAME_CUSTOM( 199?, m4exotic__d,    m4exotic,   "eo_s9bt_.2g0", 0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4exotic__e,    m4exotic,   "eo_sja__.2_0", 0x0000, 0x020000, CRC(5ca9557f) SHA1(5fa42c56c67b505272d358a54ebe911fdb0b905e), "Bwb","Exotic Fruits (Bwb) (MPU4) (set 6)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Fire & Ice
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4firice_keys[2] = { 0x11, 0x162413 };
 
 #define M4FIRICE_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "fire_ice.s1", 0x000000, 0x080000, CRC(74ee37c1) SHA1(bc9b419dd1fd1c66090f8946247e754c0267baa3) ) \
 	ROM_LOAD( "fire_ice.s2", 0x080000, 0x080000, CRC(b86bafeb) SHA1(ee237f601b970dc5be8096a4018cb6a3edac500f) ) \
 	ROM_LOAD( "fire_ice.s3", 0x100000, 0x080000, CRC(75f349b3) SHA1(1505bec7b69e1eabd679b70d95ae58fd264ca698) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -373,7 +566,7 @@ GAME_CUSTOM( 199?, m4exotic__e,    m4exotic,   "eo_sja__.2_0", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4FIRICE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4firice_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4firice,       0,          "fi_20__d.5_0", 0x0000, 0x040000, CRC(ab46574c) SHA1(d233b137f8f42b9b644b34a627fbcc5b662e8ae1), "Bwb","Fire & Ice (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4firice__a,    m4firice,   "fi_20_bd.5_0", 0x0000, 0x040000, CRC(9b2bc052) SHA1(34b970659218fde097238b852dadedcb928f69fd), "Bwb","Fire & Ice (Bwb) (MPU4) (set 2)" )
@@ -388,10 +581,20 @@ GAME_CUSTOM( 199?, m4firice__i,    m4firice,   "fi_sj_k_.e_0", 0x0000, 0x040000,
 GAME_CUSTOM( 199?, m4firice__j,    m4firice,   "fi_sja__.e_0", 0x0000, 0x040000, CRC(da5e0eff) SHA1(9f5ddce366786bdf898c9410be417c8028cebeb4), "Bwb","Fire & Ice (Bwb) (MPU4) (set 11)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Harlequin
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4harle_keys[2] = { 0x10, 0x220525 };
+
 #define M4HARLE_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "hq______.1_2", 0x000000, 0x080000, CRC(0c8c14be) SHA1(a1268e71ea43772a532b63327f24c64fabd7e715) ) \
 	ROM_LOAD( "hq______.1_3", 0x080000, 0x080000, CRC(5a07e514) SHA1(6e589756c0fc4b0458ca856e918fa3b7cd396c39) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -399,8 +602,7 @@ GAME_CUSTOM( 199?, m4firice__j,    m4firice,   "fi_sja__.e_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4HARLE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
-
+	GAME(year, setname, parent, bwboki_chr_cheat<m4harle_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4harle,     0,          "hq_20a__.1_1", 0x0000, 0x010000, CRC(b8ae3025) SHA1(94a449eff103bf6ba1fc6e85b03061b9ce658ae0), "Bwb","Harlequin (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4harle__a,  m4harle,    "hq_20bg_.1_1", 0x0000, 0x010000, CRC(31356248) SHA1(d8791b1c861ed4388660bbe78f2589db7f1e779e), "Bwb","Harlequin (Bwb) (MPU4) (set 2)" )
@@ -429,11 +631,21 @@ GAME_CUSTOM( 199?, m4harle__w,  m4harle,    "ph_20sd_.2s1", 0x0000, 0x010000, CR
 GAME_CUSTOM( 199?, m4harle__x,  m4harle,    "ph_20sk_.1_1", 0x0000, 0x010000, CRC(8af0e254) SHA1(b7d80ab84684bdabe169623864b9efd0d3881f2e), "Bwb","Harlequin (Bwb) (MPU4) (set 25)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Heaven & Hell
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4hvhel_keys[2] = { 0x11, 0x3f0b26 };
+
 #define M4HVHEL_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", 0 ) \
 	ROM_LOAD( "hh___snd.1_1", 0x000000, 0x080000, CRC(afa7ba60) SHA1(25278046252e49364d4a51de79295b87baf6018e) ) \
 	ROM_LOAD( "hh___snd.1_2", 0x080000, 0x080000, CRC(ec1ec822) SHA1(3fdee0526cb70f4951b7bbced74e32641ded9b7b) ) \
 	ROM_LOAD( "hh___snd.1_3", 0x100000, 0x080000, CRC(d4119155) SHA1(b61c71e1ee0dbfc0bb9eff1a8c019cf11731ee11) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -441,7 +653,8 @@ GAME_CUSTOM( 199?, m4harle__x,  m4harle,    "ph_20sk_.1_1", 0x0000, 0x010000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4HVHEL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4hvhel_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4hvhel,     0,          "hh_20__d.2_0",     0x0000, 0x040000, CRC(801de788) SHA1(417b985714d8f0ebed93b65a3f865e03474ce9e5), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4hvhel__a,  m4hvhel,    "hh_20a_d.2_0",     0x0000, 0x040000, CRC(ea4e7876) SHA1(5bf711c2bdff50fe745edefa0eebf719824d9e5b), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4hvhel__b,  m4hvhel,    "hh_20s_d.2_0",     0x0000, 0x040000, CRC(a519a441) SHA1(f3c19d316c82d1ebbcfdabb6d4eaa6cfa369d287), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 3)" )
@@ -453,6 +666,16 @@ GAME_CUSTOM( 199?, m4hvhel__g,  m4hvhel,    "hh_vc_d_.g_0",     0x0000, 0x040000
 GAME_CUSTOM( 199?, m4hvhel__h,  m4hvhel,    "h_hell._pound5",   0x0000, 0x040000, CRC(cd59c0d0) SHA1(8caad9043a277fa39a3ad2d5ec3388c121e7f697), "Bwb","Heaven & Hell (Bwb) (MPU4) (set 9)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Indy Cars
+* - note, the GAL dumps appear to be characterisers, are the equations valid?
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4indycr_keys[2] = { 0x13, 0x102233 };
+
 #define M4INDYCR_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "gals", 0 ) \
 	ROM_LOAD( "ic___.g", 0x0000, 0x000657, CRC(25cc2b32) SHA1(a065276fe4cc1e55f366ac216b5bc8cf934da9dd) ) \
@@ -462,6 +685,7 @@ GAME_CUSTOM( 199?, m4hvhel__h,  m4hvhel,    "h_hell._pound5",   0x0000, 0x040000
 	ROM_LOAD( "da______.1_2", 0x080000, 0x080000, CRC(32b40094) SHA1(f02c3b088d76116f817b536cf7cec5188b2f73bf) ) \
 	ROM_LOAD( "da______.1_3", 0x100000, 0x080000, CRC(2df33d18) SHA1(40afa32d6c72c6a76e3e2e61db19a16003f4e176) ) \
 	ROM_LOAD( "da______.1_4", 0x180000, 0x080000, CRC(8e254a3b) SHA1(bc3643ea5878bbde110ee6971c5149b3320bcffc) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -469,7 +693,8 @@ GAME_CUSTOM( 199?, m4hvhel__h,  m4hvhel,    "h_hell._pound5",   0x0000, 0x040000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4INDYCR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4indycr_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4indycr,       0,          "ic_sj___.1_0", 0x0000, 0x040000, CRC(4dea0d17) SHA1(4fa19896dbb5e8f21ac7e74efc56de5cadd5bf54), "Bwb","Indy Cars (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4indycr__a,    m4indycr,   "ic_sj___.2_0", 0x0000, 0x040000, CRC(6d0ddf54) SHA1(0985aa9fddb71a499d266c12893aabbab8755319), "Bwb","Indy Cars (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4indycr__b,    m4indycr,   "ic_sj_b_.1_0", 0x0000, 0x040000, CRC(4bc0cb73) SHA1(d4c048ba9578add0104f0c529f20356c3502ea71), "Bwb","Indy Cars (Bwb) (MPU4) (set 3)" )
@@ -478,6 +703,15 @@ GAME_CUSTOM( 199?, m4indycr__d,    m4indycr,   "ic_sj_d_.2_0", 0x0000, 0x040000,
 GAME_CUSTOM( 199?, m4indycr__e,    m4indycr,   "ic_sj_k_.1_0", 0x0000, 0x040000, CRC(857fda64) SHA1(3eb230ea1adf9acb4cf83422c4bb1cde40756310), "Bwb","Indy Cars (Bwb) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4indycr__f,    m4indycr,   "ic_sjs__.1_0", 0x0000, 0x040000, CRC(6310b904) SHA1(0f2cd7ed83f77423bcfb2a71144fab2047dfea13), "Bwb","Indy Cars (Bwb) (MPU4) (set 7)" )
 
+
+/*****************************************************************************************************************************************************************************
+*
+* Jackpot Jokers
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4jakjok_keys[2] = { 0x11, 0x103218 };
 
 #define M4JAKJOK_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -491,7 +725,7 @@ GAME_CUSTOM( 199?, m4indycr__f,    m4indycr,   "ic_sjs__.1_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JAKJOK_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4jakjok_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4jakjok,       0,          "jj_sj___.6_0", 0x0000, 0x040000, CRC(7bc45b0e) SHA1(f30fef8fccdac04859f1ff93198a497eff723020), "Bwb","Jackpot Jokers (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4jakjok__a,    m4jakjok,   "jj_sj_k_.3_0", 0x0000, 0x040000, CRC(c33dd82f) SHA1(c1f3f6ca1c45503b7f71e897e5c27368f5efb439), "Bwb","Jackpot Jokers (Bwb) (MPU4) (set 2)" )
@@ -503,6 +737,7 @@ GAME_CUSTOM( 199?, m4jakjok__c,    m4jakjok,   "jj_vc___.7_0", 0x0000, 0x040000,
 	ROM_LOAD( "j_joker.s1", 0x0000, 0x080000, CRC(4ad711d2) SHA1(500381ac2a5075acd606a131cd1b382342cc3a80) ) \
 	ROM_LOAD( "j_joker.s2", 0x0000, 0x080000, CRC(840ba491) SHA1(f7f43d5d8e521a59fdccbd5f22935c525c3d43c2) ) \
 	ROM_LOAD( "j_joker.s3", 0x0000, 0x080000, CRC(2ed74890) SHA1(a3d039b4c3c9dd792300eb045e542a212d4d50ae) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -510,13 +745,23 @@ GAME_CUSTOM( 199?, m4jakjok__c,    m4jakjok,   "jj_vc___.7_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JAKJOKA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4jakjok_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 GAME_CUSTOM( 199?, m4jakjoka, m4jakjok,   "j_joker", 0x0000, 0x040000, CRC(4f0c7ab8) SHA1(af962863ee55f6c2752bbe8a997e3b2102e42431), "Bwb","Jackpot Jokers (alt) (Bwb) (MPU4)" )
 
+
+/*****************************************************************************************************************************************************************************
+*
+* Jumping Jack Flash
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4jflash_keys[2] = { 0x10, 0x3c3801 };
 
 #define M4JFLASH_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -524,7 +769,8 @@ GAME_CUSTOM( 199?, m4jakjoka, m4jakjok,   "j_joker", 0x0000, 0x040000, CRC(4f0c7
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JFLASH_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4jflash_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4jflash,       0,          "jf_25__c.2_1", 0x0000, 0x020000, CRC(4d5f1a12) SHA1(c25b6d899b74231da505bde7b671be001bdcea5d), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4jflash__a,    m4jflash,   "jf_25a_c.2_1", 0x0000, 0x020000, CRC(76722e15) SHA1(4bd107049ad98b848cdaba3a1318373bbd06ab9f), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4jflash__b,    m4jflash,   "jf_25b_c.2_1", 0x0000, 0x020000, CRC(35a927c6) SHA1(6776fe77ad8a85feecdedfad0eac89f9cb826fbf), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 3)" )
@@ -535,6 +781,16 @@ GAME_CUSTOM( 199?, m4jflash__f,    m4jflash,   "jf_25d_c.2_1", 0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4jflash__g,    m4jflash,   "jf_25dkc.2_1", 0x0000, 0x020000, CRC(ef583053) SHA1(23b33f0e49d8efceb4a6690ac58da1ccf6576a1a), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4jflash__h,    m4jflash,   "jf_25k_c.2_1", 0x0000, 0x020000, CRC(d82701b8) SHA1(a784fa11877e05f2219f1452463ec3348c84e879), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4jflash__i,    m4jflash,   "jf_25sbc.2_1", 0x0000, 0x020000, CRC(c6bce1c6) SHA1(708002059d307a02fec32a3cdb6eff995a438631), "Bwb","Jumping Jack Flash (Bwb) (MPU4) (set 10)" )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Lucky Number 7
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4ln7_keys[2] = { 0x10, 0x050107 };
 
 #define M4LN7_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -547,18 +803,28 @@ GAME_CUSTOM( 199?, m4jflash__i,    m4jflash,   "jf_25sbc.2_1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LN7_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4ln7_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4ln7,     0,      "l7_20a__.1_1", 0x0000, 0x010000, CRC(bfe82d2a) SHA1(4477d737a2326602a355758d8fc06220312fc085), "Bwb","Lucky No7 (Bwb) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4ln7__a,  m4ln7,  "l7_20s__.1_1", 0x0000, 0x010000, CRC(0037cd57) SHA1(b5882027269cf71878a73009bc3e40d9fcfac60d), "Bwb","Lucky No7 (Bwb) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4ln7__b,  m4ln7,  "l7_20sb_.1_1", 0x0000, 0x010000, CRC(d53bcd66) SHA1(7f5c65d5ca3dbb8a0c38f169585fc78d512166af), "Bwb","Lucky No7 (Bwb) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4ln7__c,  m4ln7,  "l7_20sd_.1_1", 0x0000, 0x010000, CRC(a82d04cb) SHA1(1abe9e22f6f526ab076163ce79cff841d1b38b0a), "Bwb","Lucky No7 (Bwb) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4ln7__d,  m4ln7,  "l7_20sk_.1_1", 0x0000, 0x010000, CRC(7d2104fa) SHA1(a0a65042f4db8ea5184d41c68ffcf7608580d928), "Bwb","Lucky No7 (Bwb) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4ln7,     0,      "l7_20a__.1_1", 0x0000, 0x010000, CRC(bfe82d2a) SHA1(4477d737a2326602a355758d8fc06220312fc085), "Bwb","Lucky Number 7 (Bwb) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4ln7__a,  m4ln7,  "l7_20s__.1_1", 0x0000, 0x010000, CRC(0037cd57) SHA1(b5882027269cf71878a73009bc3e40d9fcfac60d), "Bwb","Lucky Number 7 (Bwb) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4ln7__b,  m4ln7,  "l7_20sb_.1_1", 0x0000, 0x010000, CRC(d53bcd66) SHA1(7f5c65d5ca3dbb8a0c38f169585fc78d512166af), "Bwb","Lucky Number 7 (Bwb) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4ln7__c,  m4ln7,  "l7_20sd_.1_1", 0x0000, 0x010000, CRC(a82d04cb) SHA1(1abe9e22f6f526ab076163ce79cff841d1b38b0a), "Bwb","Lucky Number 7 (Bwb) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4ln7__d,  m4ln7,  "l7_20sk_.1_1", 0x0000, 0x010000, CRC(7d2104fa) SHA1(a0a65042f4db8ea5184d41c68ffcf7608580d928), "Bwb","Lucky Number 7 (Bwb) (MPU4) (set 5)" )
 
+
+/*****************************************************************************************************************************************************************************
+*
+* Mad Money
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4madmon_keys[2] = { 0x10, 0x351f3a };
 
 #define M4MADMON_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -566,7 +832,8 @@ GAME_CUSTOM( 199?, m4ln7__d,  m4ln7,  "l7_20sk_.1_1", 0x0000, 0x010000, CRC(7d21
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MADMON_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4madmon_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4madmon,       0,          "mm_20a__.7_1", 0x0000, 0x020000, CRC(7df66388) SHA1(4e5bcbcb2fb08b23989c83f11751400f666bbdc2), "Bwb","Mad Money (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4madmon__a,    m4madmon,   "mm_20b__.7_1", 0x0000, 0x020000, CRC(7f592e44) SHA1(05e78347cd09d1e58f0a50a724e0563490ec5185), "Bwb","Mad Money (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4madmon__b,    m4madmon,   "mm_20bg_.7_1", 0x0000, 0x020000, CRC(2cd8dcc2) SHA1(c4a2a423a55c6b0668739429c24c69b25e3824cf), "Bwb","Mad Money (Bwb) (MPU4) (set 3)" )
@@ -581,9 +848,19 @@ GAME_CUSTOM( 199?, m4madmon__j,    m4madmon,   "mm_25b_c.3_1", 0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4madmon__k,    m4madmon,   "mm_25bdc.3_1", 0x0000, 0x020000, CRC(188666c0) SHA1(e8a61c327c73aac2a6b0dc674dee7bc2aa358b27), "Bwb","Mad Money (Bwb) (MPU4) (set 12)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Mad Money Classic
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4madmnc_keys[2] = { 0x10, 0x351f3a };
+
 #define M4MADMNC_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -591,7 +868,7 @@ GAME_CUSTOM( 199?, m4madmon__k,    m4madmon,   "mm_25bdc.3_1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MADMNC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4madmnc_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4madmnc,       0,          "cm_25__c.3_1", 0x0000, 0x020000, CRC(3d9ff5fe) SHA1(b918bb15251514f50a669216c7d00ecf23e64d1b), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4madmnc__a,    m4madmnc,   "cm_25_bc.3_1", 0x0000, 0x020000, CRC(65a7b870) SHA1(58b910d7e002164cbbe1aa32c5e17dfe7cfb507d), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 2)" )
@@ -619,6 +896,14 @@ GAME_CUSTOM( 199?, m4madmnc__v,    m4madmnc,   "cm_49bgc.4_1", 0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4madmnc__w,    m4madmnc,   "cm_49btc.4_1", 0x0000, 0x020000, CRC(4f69ad96) SHA1(50948166fee3cd1e6f0e378076046ee305204d61), "Bwb","Mad Money Classic (Bwb) (MPU4) (set 24)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Money Mummy Money
+* - 3.2 MPU Lamp Drv error (trying extender board A doesn't help)
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4mmm_keys[2] = { 0x11, 0x320926 };
 
 #define M4MMM_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -626,6 +911,7 @@ GAME_CUSTOM( 199?, m4madmnc__w,    m4madmnc,   "cm_49btc.4_1", 0x0000, 0x020000,
 	ROM_LOAD( "mu___snd.1_2", 0x080000, 0x080000, CRC(6ec1910b) SHA1(4920fe0b7c7f4ddb14d56f50598aaf62e5867014) ) \
 	ROM_LOAD( "mu___snd.1_3", 0x100000, 0x080000, CRC(8699378c) SHA1(55c3e310cfde8046e58bf21a8788e697c8275b8d) ) \
 	ROM_LOAD( "mu___snd.1_4", 0x180000, 0x080000, CRC(54b193d8) SHA1(ab24624ce69d352a14f6bd3db127fa1c8c5f07db) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -633,7 +919,8 @@ GAME_CUSTOM( 199?, m4madmnc__w,    m4madmnc,   "cm_49btc.4_1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MMM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4mmm_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_big_extenda ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4mmm,     0,      "mu_sj___.3_0", 0x0000, 0x040000, CRC(abdf9d1c) SHA1(e8c6a056025b44e4ec995b42b2720e6366a97283), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4mmm__a,  m4mmm,  "mu_sja__.3_0", 0x0000, 0x040000, CRC(3d2a9ea4) SHA1(f2ec904c8cef84affaad603edf26a864bd34be29), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4mmm__b,  m4mmm,  "mu_sjk__.3_0", 0x0000, 0x040000, CRC(34e4f8ba) SHA1(606d607faeb43190f5167aa3d10c55d9986b7e58), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 3)" )
@@ -642,10 +929,21 @@ GAME_CUSTOM( 199?, m4mmm__d,  m4mmm,  "mu_ssj__.2_0", 0x0000, 0x040000, CRC(935b
 GAME_CUSTOM( 199?, m4mmm__e,  m4mmm,  "mu_ssja_.2_0", 0x0000, 0x040000, CRC(ff97814c) SHA1(8d9d74e6b0096cdc3226cfa91d7b653855600d5a), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4mmm__f,  m4mmm,  "mu_ssjb_.2_0", 0x0000, 0x040000, CRC(5728973a) SHA1(2cd9c866fcc33150fb8d456f741ac809e0bd2b15), "Bwb","Money Mummy Money (Bwb) (MPU4) (set 7)" )
 
+
+/*****************************************************************************************************************************************************************************
+*
+* Orlando Magic
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4orland_keys[2] = { 0x10, 0x2c081f };
+
 #define M4ORLAND_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "orlandosnd.p1", 0x000000, 0x080000, CRC(2735649d) SHA1(7b27bf2d4091ab581d399679b03f538f449f180c) ) \
 	ROM_LOAD( "orlandosnd.p2", 0x080000, 0x080000, CRC(0741e2ff) SHA1(c49a2809073dd058ba85ae14c888e19d3eb2b133) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -653,7 +951,7 @@ GAME_CUSTOM( 199?, m4mmm__f,  m4mmm,  "mu_ssjb_.2_0", 0x0000, 0x040000, CRC(5728
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ORLAND_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4orland_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big_low ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4orland,       0,          "or 05a v2-1,27c010",   0x0000, 0x020000, CRC(a33c22ee) SHA1(3598a2940f05622405fdef16426f3f5f30dfef29), "Bwb","Orlando Magic (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4orland__a,    m4orland,   "or_05a__.1_1",         0x0000, 0x020000, CRC(3e7fe3ac) SHA1(9f4c0d5b7ba10726376b0654c8ddbc62b62c9eed), "Bwb","Orlando Magic (Bwb) (MPU4) (set 2)" )
@@ -666,9 +964,19 @@ GAME_CUSTOM( 199?, m4orland__g,    m4orland,   "or_20sb_.7_1",         0x0000, 0
 GAME_CUSTOM( 199?, m4orland__h,    m4orland,   "or_20sd_.7_1",         0x0000, 0x020000, CRC(242c552c) SHA1(dce5f0d38c8c6c101337028f30c05a7eb629e703), "Bwb","Orlando Magic (Bwb) (MPU4) (set 9)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Prize Bingo
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4pzbing_keys[2] = { 0x10, 0x141531 };
+
 #define M4PZBING_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -676,7 +984,7 @@ GAME_CUSTOM( 199?, m4orland__h,    m4orland,   "or_20sd_.7_1",         0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PZBING_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4pzbing_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4pzbing,       0,          "pb_20a__.4_1", 0x0000, 0x010000, CRC(52aa92e5) SHA1(3dc20e521677e829967e1d689c9905fb96aee639), "Bwb","Prize Bingo (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4pzbing__a,    m4pzbing,   "pb_20ad_.4_1", 0x0000, 0x010000, CRC(f6bd6ad0) SHA1(092cb895c576ed2e995b62aba21851af6fb90959), "Bwb","Prize Bingo (Bwb) (MPU4) (set 2)" )
@@ -686,10 +994,20 @@ GAME_CUSTOM( 199?, m4pzbing__d,    m4pzbing,   "pb_20s__.4_1", 0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4pzbing__e,    m4pzbing,   "pb_20sb_.4_1", 0x0000, 0x010000, CRC(0234978a) SHA1(f24069883efb69de1024b6efbeb3d6a100ac5b9a), "Bwb","Prize Bingo (Bwb) (MPU4) (set 6)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Quids In
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4quidin_keys[2] = { 0x10, 0x050107 };
+
 #define M4QUIDIN_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "qi_____.1_2", 0x000000, 0x080000, CRC(216209e3) SHA1(af274a7f27ba0e7ac03400e9919537ab36464e64) ) \
 	ROM_LOAD( "qi_____.1_3", 0x080000, 0x080000, CRC(e909c3ec) SHA1(68ce743729aaefd6c20ee447af40d99e0f4c072b) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -697,18 +1015,26 @@ GAME_CUSTOM( 199?, m4pzbing__e,    m4pzbing,   "pb_20sb_.4_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4QUIDIN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
-
-
+	GAME(year, setname, parent, bwboki_chr_cheat<m4quidin_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4quidin,       0,          "qi_20a__.3_1", 0x0000, 0x010000, CRC(88873c45) SHA1(70fa65402dbbe716a089497a8ccb06e0ba2aac6d), "Bwb","Quids In (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4quidin__a,    m4quidin,   "qi_20s__.3_1", 0x0000, 0x010000, CRC(3758dc38) SHA1(d22a379975e948d465e13233a796e0fb07e3c04f), "Bwb","Quids In (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4quidin__b,    m4quidin,   "qi_20sb_.3_1", 0x0000, 0x010000, CRC(e254dc09) SHA1(ad5853c854f628de6203be8d6c3cbaa6a600e340), "Bwb","Quids In (Bwb) (MPU4) (set 3)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Quids In (Showcase cabinet version)
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4quidis_keys[2] = { 0x10, 0x050107 };
+
 #define M4QUIDIS_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -716,7 +1042,7 @@ GAME_CUSTOM( 199?, m4quidin__b,    m4quidin,   "qi_20sb_.3_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4QUIDIS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4quidis_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4quidis,       0,          "pq_20a__.3_1", 0x0000, 0x010000, CRC(7eb762a1) SHA1(4546a7bf43f8ab6eb9713348e3f919de7532eed2), "Bwb","Quids In Showcase (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4quidis__a,    m4quidis,   "pq_20s__.3_1", 0x0000, 0x010000, CRC(71360992) SHA1(0b64f27f0edfdebca41552181ff0f2b5491ec308), "Bwb","Quids In Showcase (Bwb) (MPU4) (set 2)" )
@@ -725,11 +1051,21 @@ GAME_CUSTOM( 199?, m4quidis__c,    m4quidis,   "pq_20sd_.3_1", 0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4quidis__d,    m4quidis,   "pq_20sk_.3_1", 0x0000, 0x010000, CRC(0c20c03f) SHA1(f802daa8ff2c159ba4831ed048e0ddd8469448da), "Bwb","Quids In Showcase (Bwb) (MPU4) (set 5)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Rack Em Up
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4rackem_keys[2] = { 0x11, 0x13222f };
+
 #define M4RACKEM_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "re_snd.p1", 0x000000, 0x080000, CRC(aea88892) SHA1(457dab5cddfb9762f7e0bd61187b8052aee71c28) ) \
 	ROM_LOAD( "re_snd.p2", 0x080000, 0x080000, CRC(57394ec6) SHA1(cba7abebd3ab165e9531017168f51ada6cf35991) ) \
 	ROM_LOAD( "re_snd.p3", 0x100000, 0x080000, CRC(5d5d5309) SHA1(402615633976410225a1ee50c454391dc69a68cb) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -737,7 +1073,7 @@ GAME_CUSTOM( 199?, m4quidis__d,    m4quidis,   "pq_20sk_.3_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RACKEM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4rackem_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4rackem,       0,          "re_sj___.2_0", 0x0000, 0x040000, CRC(e36d3f86) SHA1(a5f522c86482517b8dc735b1012f8f7668c2f18d), "Bwb","Rack Em Up (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rackem__a,    m4rackem,   "re_sj___.3_0", 0x0000, 0x040000, CRC(2f463d2f) SHA1(3410cc8a6d097a4edfcb4c57c237d1d514b507ba), "Bwb","Rack Em Up (Bwb) (MPU4) (set 2)" )
@@ -746,10 +1082,19 @@ GAME_CUSTOM( 199?, m4rackem__c,    m4rackem,   "re_sjs__.2_0", 0x0000, 0x040000,
 GAME_CUSTOM( 199?, m4rackem__d,    m4rackem,   "re_sjsw_.2_0", 0x0000, 0x040000, CRC(66355370) SHA1(d54aab7403e64a67edf2baeaf1321ee5c4aa553d), "Bwb","Rack Em Up (Bwb) (MPU4) (set 5)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Rainbow Gold
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4rbgold_keys[2] = { 0x10, 0x2d371b };
 
 #define M4RBGOLD_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -757,7 +1102,8 @@ GAME_CUSTOM( 199?, m4rackem__d,    m4rackem,   "re_sjsw_.2_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RBGOLD_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4rbgold_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4rbgold,       0,          "rb_20a_p.2a1", 0x0000, 0x010000, CRC(d7e6e514) SHA1(25645b69e86335622df43113908ed88a21f27e30), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rbgold__a,    m4rbgold,   "rb_20a_p.2f1", 0x0000, 0x010000, CRC(62af6db6) SHA1(0dcb679c05f090f8dab7228009a700c31f0179d8), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4rbgold__b,    m4rbgold,   "rb_20sbp.2a1", 0x0000, 0x010000, CRC(ba4c2e74) SHA1(fcc325754f96e742998373c6c5c13a8509f48cd5), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 3)" )
@@ -778,12 +1124,22 @@ GAME_CUSTOM( 199?, m4rbgold__p,    m4rbgold,   "rbixe___.2a1", 0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4rbgold__q,    m4rbgold,   "rbixe___.2s1", 0x0000, 0x010000, CRC(56f40a2b) SHA1(0c6c035d2a3dbef70b1bc95fa38ed62a70770739), "Bwb","Rainbow Gold (Bwb) (MPU4) (set 18)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Red Hot Fever
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4rhfev_keys[2] = { 0x11, 0x3f0e27 };
+
 #define M4RHFEV_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "rf_____.1_1", 0x000000, 0x080000, CRC(ac8d539d) SHA1(8baf14bece50774f93ae9eaf3effabb6882d2c43) ) \
 	ROM_LOAD( "rf_____.1_2", 0x080000, 0x080000, CRC(cc2fadd8) SHA1(681850e2e6164cf8af8e7501ac44f475cc07b742) ) \
 	ROM_LOAD( "rf_____.1_3", 0x100000, 0x080000, CRC(165aaf9f) SHA1(815224fe94a77628cef1dd0d8a238edcb4813006) ) \
 	ROM_LOAD( "rf_____.1_4", 0x180000, 0x080000, CRC(4f7e7b49) SHA1(f9d421eeab73e0c795a08cf166c8807e0b14ec82) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -791,7 +1147,7 @@ GAME_CUSTOM( 199?, m4rbgold__q,    m4rbgold,   "rbixe___.2s1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHFEV_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4rhfev_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4rhfev,     0,          "rt_sj___.7_0", 0x0000, 0x040000, CRC(3dd895ef) SHA1(433ecc268956c94c51dbccefd006b72e0ad8567b), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4rhfev__a,  m4rhfev,    "rt_sja__.7_0", 0x0000, 0x040000, CRC(0ab59402) SHA1(485b4d2efd8f99085ed6ce5b7e07ede001c982c4), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 2)" )
@@ -800,11 +1156,21 @@ GAME_CUSTOM( 199?, m4rhfev__c,  m4rhfev,    "rt_vc___.1_0", 0x0000, 0x040000, CR
 GAME_CUSTOM( 199?, m4rhfev__d,  m4rhfev,    "rt_vc_d_.1_0", 0x0000, 0x040000, CRC(7adef22b) SHA1(d6a584581745c0ce64f646ef0b49cb68343990d0), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 5)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Sinbad
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4sinbd_keys[2] = { 0x10, 0x0c253d };
+
 #define M4SINBD_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
-	/*These were with the last listed set, though I have no reason to believe they aren't valid for all BwB Sinbad games */ \
+	/*These were with the last listed set, though I have no reason to believe they aren't valid for all BwB Sinbad games, both have OKI tables */ \
 	ROM_LOAD( "sinbadbwb1_2snd.bin", 0x000000, 0x080000, CRC(2ee60ce6) SHA1(865860639e8471f97ace0beac2f4c7fddb8ca97c) ) \
-	ROM_LOAD( "sinbadbwb1_3snd.bin", 0x000000, 0x080000, CRC(7701e5cc) SHA1(4f9ff91f2b6b15a9c08396b52fc8509ba476ed8d) )
+	ROM_LOAD( "sinbadbwb1_3snd.bin", 0x080000, 0x080000, CRC(7701e5cc) SHA1(4f9ff91f2b6b15a9c08396b52fc8509ba476ed8d) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -812,7 +1178,7 @@ GAME_CUSTOM( 199?, m4rhfev__d,  m4rhfev,    "rt_vc_d_.1_0", 0x0000, 0x040000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SINBD_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4sinbd_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4sinbd,     0,          "sd_20__c.1_1",         0x0000, 0x020000, CRC(28cd336e) SHA1(45bdf5403c04b7d3a3645b6b44ac3d12e6463a55), "Bwb","Sinbad (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4sinbd__a,  m4sinbd,    "sd_20a__.4_1",         0x0000, 0x020000, CRC(12b8f629) SHA1(c8540ecb217cf0615d7a8d080136926646ca8497), "Bwb","Sinbad (Bwb) (MPU4) (set 2)" )
@@ -841,9 +1207,19 @@ GAME_CUSTOM( 199?, m4sinbd__w,  m4sinbd,    "svi20___.4_1",         0x0000, 0x02
 GAME_CUSTOM( 199?, m4sinbd__x,  m4sinbd,    "sinbadbwb1_1game.bin", 0x0000, 0x020000, CRC(cfe152a7) SHA1(b8ecfa8b763d04515b65eb902c18dba7198191c3), "Bwb","Sinbad (Bwb) (MPU4) (set 25)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Sky Sports
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4sky_keys[2] = { 0x11, 0x1f2d3b };
+
 #define M4SKY_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -851,7 +1227,7 @@ GAME_CUSTOM( 199?, m4sinbd__x,  m4sinbd,    "sinbadbwb1_1game.bin", 0x0000, 0x02
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SKY_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4sky_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4sky,     0,      "sk_s____.3_1", 0x0000, 0x040000, CRC(749af008) SHA1(036514f2bcb84193cfa84313f0617f3196aea73e), "Bwb","Sky Sports (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4sky__a,  m4sky,  "sk_sj___.5_0", 0x0000, 0x040000, CRC(45ae0423) SHA1(94d5b3d4aacb69a18ff3f45681eb5f7fba7657e8), "Bwb","Sky Sports (Bwb) (MPU4) (set 2)" )
@@ -860,11 +1236,21 @@ GAME_CUSTOM( 199?, m4sky__c,  m4sky,  "sk_sja__.5_0", 0x0000, 0x040000, CRC(b2a1
 GAME_CUSTOM( 199?, m4sky__d,  m4sky,  "sk_sjs__.5_0", 0x0000, 0x040000, CRC(d176431f) SHA1(8ca90ef61486fc5a5b6527f913cd05b42ceabe3e), "Bwb","Sky Sports (Bwb) (MPU4) (set 5)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Soul Sister
+* - some sets boot, some sets 7.1 Datapack error, m4souls__f 4.4 without percent key set
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4souls_keys[2] = { 0x10, 0x3e2f0b };
+
 #define M4SOULS_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "ss______.1_2", 0x000000, 0x080000, CRC(ddea9d75) SHA1(fe5f88d49434109d0f51425e790e179dc1a02767) ) \
 	ROM_LOAD( "ss______.1_3", 0x080000, 0x080000, CRC(23d1e57a) SHA1(b17afdaa95522fd7ea6c12f513fa338e1fcb06f6) ) \
 	ROM_LOAD( "ss______.1_4", 0x100000, 0x080000, CRC(0ba3046a) SHA1(ec21fa328669bc7a5baf1ce8b9ac05f38f98e360) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -872,7 +1258,8 @@ GAME_CUSTOM( 199?, m4sky__d,  m4sky,  "sk_sjs__.5_0", 0x0000, 0x040000, CRC(d176
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SOULS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4souls_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4souls,     0,          "ss_06a__.4_1", 0x0000, 0x020000, CRC(00390a21) SHA1(d31d1307301fa4e8cf0ce3677e68a4c1723e4404), "Bwb","Soul Sister (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4souls__a,  m4souls,    "ss_16a__.4_1", 0x0000, 0x020000, CRC(b9ab9612) SHA1(ad30916a0f2cc745741c99d23c23192ae4088daf), "Bwb","Soul Sister (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4souls__b,  m4souls,    "ss_26a__.2_1", 0x0000, 0x020000, CRC(bf9acf05) SHA1(13698b453e975a1801631163d06468f07c181b48), "Bwb","Soul Sister (Bwb) (MPU4) (set 3)" )
@@ -882,10 +1269,19 @@ GAME_CUSTOM( 199?, m4souls__e,  m4souls,    "ss_26sd_.2_1", 0x0000, 0x020000, CR
 GAME_CUSTOM( 199?, m4souls__f,  m4souls,    "ss_26sk_.2_1", 0x0000, 0x020000, CRC(9ae1672e) SHA1(79bcd12fae38dd1b0035e956148ffeaee33b9c71), "Bwb","Soul Sister (Bwb) (MPU4) (set 7)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Spin The Bottle
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4spinbt_keys[2] = { 0x45, 0x250603 };
 
 #define M4SPINBT_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -893,7 +1289,7 @@ GAME_CUSTOM( 199?, m4souls__f,  m4souls,    "ss_26sk_.2_1", 0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SPINBT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4spinbt_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4spinbt,       0,          "sn_37ad_.5_0", 0x0000, 0x040000, CRC(42d6faaa) SHA1(3789e85981b33ffae7c50ccca3278ae62974972d), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4spinbt__a,    m4spinbt,   "sn_37b__.5_0", 0x0000, 0x040000, CRC(3a259a6f) SHA1(1acabb9e725ae1374b87808c4b3d06a329c824d0), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 2)" )
@@ -904,9 +1300,20 @@ GAME_CUSTOM( 199?, m4spinbt__e,    m4spinbt,   "sn_s7a__.5_0", 0x0000, 0x040000,
 GAME_CUSTOM( 199?, m4spinbt__f,    m4spinbt,   "sn_s7ad_.5_0", 0x0000, 0x040000, CRC(a715f0c9) SHA1(bec188edcd0580465859876f8bff2ff5a392a9e1), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4spinbt__g,    m4spinbt,   "sn_s7s__.5_0", 0x0000, 0x040000, CRC(13288cc5) SHA1(2c47dcd8b57d10e0768729ad91dba12521c0d98a), "Bwb","Spin The Bottle (Bwb) (MPU4) (set 8)" )
 
+
+/*****************************************************************************************************************************************************************************
+*
+* Stars & Stripes
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4starst_keys[2] = { 0x11, 0x3f0a26 };
+
 #define M4STARST_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "starsnd3", 0x0000, 0x080000, CRC(96882952) SHA1(bf366670aec5cb545c56caac3c63855db03d8c14) )/* (?)strange id number? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -914,7 +1321,8 @@ GAME_CUSTOM( 199?, m4spinbt__g,    m4spinbt,   "sn_s7s__.5_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4STARST_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4starst_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4starst,       0,          "sr_20__d.3_0", 0x0000, 0x040000, CRC(98f6619b) SHA1(fc0a568e6695c9ad0fda7bc6703c752af26a7777), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4starst__a,    m4starst,   "sr_20_bd.3_0", 0x0000, 0x040000, CRC(ff8209de) SHA1(41a4c20c89b3a04612ad6298276472b888915c89), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4starst__b,    m4starst,   "sr_20_kd.3_0", 0x0000, 0x040000, CRC(4c9a53d5) SHA1(43ebf6c06db58de9c3934e2dbba0d8126f3e2dda), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 3)" )
@@ -928,11 +1336,21 @@ GAME_CUSTOM( 199?, m4starst__i,    m4starst,   "sr_sja__.5_0", 0x0000, 0x040000,
 GAME_CUSTOM( 199?, m4starst__j,    m4starst,   "sr_sjs__.5_0", 0x0000, 0x040000, CRC(89e405e4) SHA1(5aa9053e08c27570731f65502c7fb31f0ea0a678), "Bwb","Stars & Stripes (Bwb) (MPU4) (set 11)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Super League
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4supleg_keys[2] = { 0x11, 0x310926 };
+
 #define M4SUPLEG_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "sls1.hex", 0x000000, 0x080000, CRC(341e3d3e) SHA1(b42ec737e95e766b1b26d6225416ee0c5cad2663) ) \
 	ROM_LOAD( "sls2.hex", 0x080000, 0x080000, CRC(f4ab6f0d) SHA1(4b59608ca16c9d158d4d1ac532e7fbe6ff0da959) ) \
 	ROM_LOAD( "sls3.hex", 0x100000, 0x080000, CRC(dcba96a1) SHA1(d474c63b37cb18a0b3b1299b5cacadfd8cd5458b) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -940,7 +1358,7 @@ GAME_CUSTOM( 199?, m4starst__j,    m4starst,   "sr_sjs__.5_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SUPLEG_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4supleg_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4supleg,       0,          "sl_sj.hex",    0x0000, 0x040000, CRC(254835f7) SHA1(2fafaa3da747edd27d393ad106008e898e465283), "Bwb","Super League (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4supleg__a,    m4supleg,   "sl_sjs.hex",   0x0000, 0x040000, CRC(98942cd3) SHA1(858fde0a350159d089c6a0e0cc2e2eed6ab2092c), "Bwb","Super League (Bwb) (MPU4) (set 2)" )
@@ -953,6 +1371,7 @@ GAME_CUSTOM( 199?, m4supleg__d,    m4supleg,   "sls.hex",      0x0000, 0x040000,
 	ROM_LOAD( "s_leag.s1",0x000000, 0x080000, CRC(e8d90896) SHA1(4c67507f18b5dc966e2df3685dc6c257f5053e61) ) \
 	ROM_LOAD( "sls2.hex", 0x080000, 0x080000, CRC(f4ab6f0d) SHA1(4b59608ca16c9d158d4d1ac532e7fbe6ff0da959) ) \
 	ROM_LOAD( "sls3.hex", 0x100000, 0x080000, CRC(dcba96a1) SHA1(d474c63b37cb18a0b3b1299b5cacadfd8cd5458b) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -960,23 +1379,33 @@ GAME_CUSTOM( 199?, m4supleg__d,    m4supleg,   "sls.hex",      0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SUPLEGW_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4supleg_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4suplegw, m4supleg,   "s_leag._pound5", 0x0000, 0x040000, CRC(4c6bd78e) SHA1(f67793a2a16adacc8d92b57050f02cffa50a1283), "Bwb","Super League (Whitbread / Bwb) (MPU4)" ) //Whitbread?
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Super Soccer
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
 
+static const uint32_t m4supscr_keys[2] = { 0x11, 0x101231 };
 
 #define M4SUPSCR_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 #undef GAME_CUSTOM
+
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SUPSCR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4supscr_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4supscr,       0,          "multistakesoccer.bin", 0x0000, 0x040000, CRC(ce27b6a7) SHA1(f9038336137b0642da4d1520b5d71a047d8fbe12), "Bwb","Super Soccer (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4supscr__a,    m4supscr,   "sm_78___.6_0",         0x0000, 0x040000, CRC(e7022c44) SHA1(da3a5b9954f7e50dce73aeb9c46bd4631c8350d5), "Bwb","Super Soccer (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4supscr__b,    m4supscr,   "sm_78_d_.6_0",         0x0000, 0x040000, CRC(4dbe6a87) SHA1(fe2ce1fca7105afbf459ee6558744f8fee417169), "Bwb","Super Soccer (Bwb) (MPU4) (set 3)" )
@@ -993,27 +1422,49 @@ GAME_CUSTOM( 199?, m4supscr__l,    m4supscr,   "sm_88_d_.6_0",         0x0000, 0
 GAME_CUSTOM( 199?, m4supscr__m,    m4supscr,   "sm_90___.6_0",         0x0000, 0x040000, CRC(cdc7c594) SHA1(acb829257472bc4420c141932b6f4c708ea04f1b), "Bwb","Super Soccer (Bwb) (MPU4) (set 14)" )
 GAME_CUSTOM( 199?, m4supscr__n,    m4supscr,   "sm_90_d_.6_0",         0x0000, 0x040000, CRC(677b8357) SHA1(4ec54f8b7d28c0459152309a58bd5c0db1a2f036), "Bwb","Super Soccer (Bwb) (MPU4) (set 15)" )
 
+
+/*****************************************************************************************************************************************************************************
+*
+* Sure Thing
+* - some sets boot, some sets error 7.1
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4sure_keys[2] = {0x10, 0x281215};
+
 #define M4SURE_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 #undef GAME_CUSTOM
+
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SURE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4sure_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4sure,       0,      "su_xf___.3_1", 0x0000, 0x010000, CRC(f85dae5c) SHA1(4c761c355fb6651f1e0cb041342f8a2ff510dfd2), "Bwb","Sure Thing (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4sure__a,    m4sure, "su_xf_b_.3_1", 0x0000, 0x010000, CRC(9a760e0f) SHA1(fdacdae0e2322daa004b2385616dd34626814d42), "Bwb","Sure Thing (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4sure__b,    m4sure, "su_xf_d_.3_1", 0x0000, 0x010000, CRC(5c4a5669) SHA1(55e1e853fdfdbb43e7b61b59ab642fb013a0db0e), "Bwb","Sure Thing (Bwb) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4sure__c,    m4sure, "suixf___.3_1", 0x0000, 0x010000, CRC(cae80b60) SHA1(23545aaf1cc3a0c8868beafb56eccedbbb6099de), "Bwb","Sure Thing (Bwb) (MPU4) (set 4)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* T-Rex
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4trex_keys[2] = {0x10, 0x112231};
+
 #define M4TREX_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "tr______.1_2", 0x000000, 0x080000, CRC(75687514) SHA1(dc8f5f1db7da164175c241187cf3f0db1dd71fc9) ) \
 	ROM_LOAD( "tr______.1_3", 0x080000, 0x080000, CRC(1e30d4ed) SHA1(8cd916d28f5060d74a0d795f9b75ab597de1cd60) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1021,23 +1472,67 @@ GAME_CUSTOM( 199?, m4sure__c,    m4sure, "suixf___.3_1", 0x0000, 0x010000, CRC(c
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TREX_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4trex_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4trex,       0,      "tr_20a__.2_1", 0x0000, 0x010000, CRC(21150b8e) SHA1(1531bc6fdb8b787fed6f4f98c6463313c55efc3c), "Bwb","Trex (Bwb) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4trex__a,    m4trex, "tr_20a_p.2_1", 0x0000, 0x010000, CRC(ec1b35bc) SHA1(944959c6d1f8e9b0bb33c659b7c515cb7585fed0), "Bwb","Trex (Bwb) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4trex__b,    m4trex, "tr_20ab_.2_1", 0x0000, 0x010000, CRC(f4190bbf) SHA1(45c20c5e56f0bc39e3af5817eb6d705caef14b40), "Bwb","Trex (Bwb) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4trex__c,    m4trex, "tr_20bg_.2_1", 0x0000, 0x010000, CRC(14d8d80c) SHA1(6db190550b18401a067eeb26890af39612fc3012), "Bwb","Trex (Bwb) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4trex__d,    m4trex, "tr_20bt_.2_1", 0x0000, 0x010000, CRC(3ad19bf3) SHA1(4808f8bbb963be30eace75228d4d1decde3282b0), "Bwb","Trex (Bwb) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4trex__e,    m4trex, "tr_20s__.2_1", 0x0000, 0x010000, CRC(2e9460bd) SHA1(8e2ac58cb1686aadad38356a4d47e9502ddbaa52), "Bwb","Trex (Bwb) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4trex__f,    m4trex, "tr_20s_p.2_1", 0x0000, 0x010000, CRC(e39a5e8f) SHA1(d1d507040fefa959d71856395639778e898272aa), "Bwb","Trex (Bwb) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4trex__g,    m4trex, "tr_20sb_.2_1", 0x0000, 0x010000, CRC(fb98608c) SHA1(48b4fbdc289552131b621c870d7af082b6d8916e), "Bwb","Trex (Bwb) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4trex__h,    m4trex, "tr_20sbp.2_1", 0x0000, 0x010000, CRC(36965ebe) SHA1(f2adce7cc97b30b0bf67fd5698b867603973e87a), "Bwb","Trex (Bwb) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4trex__i,    m4trex, "tr_20sd_.2_1", 0x0000, 0x010000, CRC(868ea921) SHA1(3055816747b4773ec67669403a81420fabbe327e), "Bwb","Trex (Bwb) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4trex__j,    m4trex, "tr_20sdp.2_1", 0x0000, 0x010000, CRC(4b809713) SHA1(d70581ff669d19cf5a91b1546f5c02f27aeda2e4), "Bwb","Trex (Bwb) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4trex__k,    m4trex, "tr_20sk_.2_1", 0x0000, 0x010000, CRC(5382a910) SHA1(c8b2811081ec31fecd1b435e775d29e2e6406111), "Bwb","Trex (Bwb) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4trex__l,    m4trex, "tr_20skp.2_1", 0x0000, 0x010000, CRC(9e8c9722) SHA1(7aee25966e6d2107f8a8f89acf6af62a73ff05c9), "Bwb","Trex (Bwb) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4trex,       0,      "tr_20a__.2_1", 0x0000, 0x010000, CRC(21150b8e) SHA1(1531bc6fdb8b787fed6f4f98c6463313c55efc3c), "Bwb","T-Rex (Bwb) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4trex__a,    m4trex, "tr_20a_p.2_1", 0x0000, 0x010000, CRC(ec1b35bc) SHA1(944959c6d1f8e9b0bb33c659b7c515cb7585fed0), "Bwb","T-Rex (Bwb) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4trex__b,    m4trex, "tr_20ab_.2_1", 0x0000, 0x010000, CRC(f4190bbf) SHA1(45c20c5e56f0bc39e3af5817eb6d705caef14b40), "Bwb","T-Rex (Bwb) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4trex__c,    m4trex, "tr_20bg_.2_1", 0x0000, 0x010000, CRC(14d8d80c) SHA1(6db190550b18401a067eeb26890af39612fc3012), "Bwb","T-Rex (Bwb) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4trex__d,    m4trex, "tr_20bt_.2_1", 0x0000, 0x010000, CRC(3ad19bf3) SHA1(4808f8bbb963be30eace75228d4d1decde3282b0), "Bwb","T-Rex (Bwb) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4trex__e,    m4trex, "tr_20s__.2_1", 0x0000, 0x010000, CRC(2e9460bd) SHA1(8e2ac58cb1686aadad38356a4d47e9502ddbaa52), "Bwb","T-Rex (Bwb) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4trex__f,    m4trex, "tr_20s_p.2_1", 0x0000, 0x010000, CRC(e39a5e8f) SHA1(d1d507040fefa959d71856395639778e898272aa), "Bwb","T-Rex (Bwb) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4trex__g,    m4trex, "tr_20sb_.2_1", 0x0000, 0x010000, CRC(fb98608c) SHA1(48b4fbdc289552131b621c870d7af082b6d8916e), "Bwb","T-Rex (Bwb) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4trex__h,    m4trex, "tr_20sbp.2_1", 0x0000, 0x010000, CRC(36965ebe) SHA1(f2adce7cc97b30b0bf67fd5698b867603973e87a), "Bwb","T-Rex (Bwb) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4trex__i,    m4trex, "tr_20sd_.2_1", 0x0000, 0x010000, CRC(868ea921) SHA1(3055816747b4773ec67669403a81420fabbe327e), "Bwb","T-Rex (Bwb) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4trex__j,    m4trex, "tr_20sdp.2_1", 0x0000, 0x010000, CRC(4b809713) SHA1(d70581ff669d19cf5a91b1546f5c02f27aeda2e4), "Bwb","T-Rex (Bwb) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4trex__k,    m4trex, "tr_20sk_.2_1", 0x0000, 0x010000, CRC(5382a910) SHA1(c8b2811081ec31fecd1b435e775d29e2e6406111), "Bwb","T-Rex (Bwb) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4trex__l,    m4trex, "tr_20skp.2_1", 0x0000, 0x010000, CRC(9e8c9722) SHA1(7aee25966e6d2107f8a8f89acf6af62a73ff05c9), "Bwb","T-Rex (Bwb) (MPU4) (set 13)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Tutti Fruity
+* - some sets boot
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4tutbwb_keys[2] = { 0x01, 0x163428 };
+
+#define M4TUTBWB_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4TUTBWB_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, bwboki_chr_cheat<m4tutbwb_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+
+// these were in with the regular Barcrest / Bwb Tutti Fruity sets, but this looks like something different, maybe a Bwn original with the same name?
+// it has a 0x3f fill near the vectors etc. which is typically associated with Bwb originals.
+GAME_CUSTOM( 199?, m4tutbwb,       0,          "tu_05___.1a3",         0x0000, 0x010000, CRC(97acc82d) SHA1(be53e60cb8a33b91a7f5556715ab4befe7170dd2), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4tutbwb_a,     m4tutbwb,   "tu_05_d_.1a3",         0x0000, 0x010000, CRC(33bb3018) SHA1(2c2f49c31919682ac03e61a665ce15d835e22467), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4tutbwb_b,     m4tutbwb,   "tu_10___.1a3",         0x0000, 0x010000, CRC(7878827f) SHA1(ac692ae50e63e632d45e7240c2520df83d2baaf5), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4tutbwb_c,     m4tutbwb,   "tu_20___.1a3",         0x0000, 0x010000, CRC(cada1c42) SHA1(6a4048da89a0bffeebfd21549c2d9812cc275bd5), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4tutbwb_d,     m4tutbwb,   "tu_20_b_.1a3",         0x0000, 0x010000, CRC(a8f1bc11) SHA1(03596171540e6490133f374cca69f4fd0359952e), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4tutbwb_e,     m4tutbwb,   "tu_20_d_.1a3",         0x0000, 0x010000, CRC(6ecde477) SHA1(694296eb226c59069800d6936c9dee2623105db0), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4tutbwb_f,     m4tutbwb,   "tu_20_k_.1a3",         0x0000, 0x010000, CRC(0ce64424) SHA1(7415c9de9982aa7f15f71ef791cbd8ad5a9331d3), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4tutbwb_g,     m4tutbwb,   "tu_20bg_.1a3",         0x0000, 0x010000, CRC(31a6196d) SHA1(1113737dd3b209afda14ec273d923e2057ea7d99), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4tutbwb_h,     m4tutbwb,   "tuf20__1.0",           0x0000, 0x010000, CRC(ddadbcb6) SHA1(2d2934ec73d979de45d0998f8975361d33358dd3), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4tutbwb_i,     m4tutbwb,   "tuf20ad1.0",           0x0000, 0x010000, CRC(5a74ead3) SHA1(3216c8d0c67aaeb18f791a6e1f3f6e30145d6beb), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4tutbwb_j,     m4tutbwb,   "tui05___.1a3",         0x0000, 0x010000, CRC(42e3d400) SHA1(4cf914141dfc1f88704403b467176da77369da06), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 11)" )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Volcano
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4volcan_keys[2] = { 0x11, 0x3f0d26 };
 
 #define M4VOLCAN_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
@@ -1045,6 +1540,7 @@ GAME_CUSTOM( 199?, m4trex__l,    m4trex, "tr_20skp.2_1", 0x0000, 0x010000, CRC(9
 	ROM_LOAD( "vo___snd.1_2", 0x080000, 0x080000, CRC(1eded545) SHA1(0010833e42b33fb0fd621a1059e1cf9a123c3fbd) ) \
 	ROM_LOAD( "vo___snd.1_3", 0x100000, 0x080000, CRC(915f4adf) SHA1(fac6644329ee6ef0026d65d8b94c971e01770d45) ) \
 	ROM_LOAD( "vo___snd.1_4", 0x180000, 0x080000, CRC(fec0fbe9) SHA1(26f651c5558a80e88666403d01cf916c3a13d948) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1052,8 +1548,7 @@ GAME_CUSTOM( 199?, m4trex__l,    m4trex, "tr_20skp.2_1", 0x0000, 0x010000, CRC(9
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VOLCAN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
-
+	GAME(year, setname, parent, bwboki_chr_cheat<m4volcan_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4volcan,       0,          "vo_sj___.5_0",         0x0000, 0x040000, CRC(78096ebf) SHA1(96915bc2eca00fbd82fab8b3f62e697da118acdd), "Bwb","Volcano (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4volcan__a,    m4volcan,   "vo_sj_d_.5_0",         0x0000, 0x040000, CRC(87e0347d) SHA1(be5d5b90739fa8ac10f6504290aa58fcf147f323), "Bwb","Volcano (Bwb) (MPU4) (set 2)" )
@@ -1064,12 +1559,23 @@ GAME_CUSTOM( 199?, m4volcan__e,    m4volcan,   "vo_vc___.2_0",         0x0000, 0
 GAME_CUSTOM( 199?, m4volcan__f,    m4volcan,   "vo_vc_d_.2_0",         0x0000, 0x040000, CRC(7f7341b6) SHA1(23d46ca0eed1e942b2a0d33d6ada2434ded5819b), "Bwb","Volcano (Bwb) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4volcan__g,    m4volcan,   "volcano_bwb_2-0.bin",  0x0000, 0x040000, CRC(20688684) SHA1(fe533341417a3a0b16f485351cb635f4e7d823db), "Bwb","Volcano (Bwb) (MPU4) (set 8)" )
 
+
+/*****************************************************************************************************************************************************************************
+*
+* Voodoo Express
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4vdexpr_keys[2] = { 0x11, 0x3f0d27 };
+
 #define M4VDEXPR_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "vd___snd.1_1", 0x000000, 0x080000, CRC(d66b43a9) SHA1(087cf1571a9afb8c1c7cac13640fa453b614fd53) ) \
 	ROM_LOAD( "vd___snd.1_2", 0x080000, 0x080000, CRC(a501c887) SHA1(c56a05fd8196afb86e665fec3fe7d02b9bf94c1a) ) \
 	ROM_LOAD( "vd___snd.1_3", 0x100000, 0x080000, CRC(70c6bd96) SHA1(ecdd4276ff72939433630e04bba5be3df569e17e) ) \
 	ROM_LOAD( "vd___snd.1_4", 0x180000, 0x080000, CRC(a6753f41) SHA1(b4af3054b62c3f00f2b5a19b816507fc3a62bef4) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1077,7 +1583,7 @@ GAME_CUSTOM( 199?, m4volcan__g,    m4volcan,   "volcano_bwb_2-0.bin",  0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VDEXPR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4vdexpr_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4vdexpr,       0,          "vd_sj___.2_0", 0x0000, 0x040000, CRC(03efd2a5) SHA1(4fc3695c24335aef11ba168f660fb519d8c9d473), "Bwb","Voodoo Express (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4vdexpr__a,    m4vdexpr,   "vd_sj_d_.2_0", 0x0000, 0x040000, CRC(5073b98e) SHA1(66b020b8c096e78e1c9694f1cbc139e97314ab48), "Bwb","Voodoo Express (Bwb) (MPU4) (set 2)" )
@@ -1086,9 +1592,19 @@ GAME_CUSTOM( 199?, m4vdexpr__c,    m4vdexpr,   "vd_sjs__.2_0", 0x0000, 0x040000,
 GAME_CUSTOM( 199?, m4vdexpr__d,    m4vdexpr,   "vd_vc___.1_0", 0x0000, 0x040000, CRC(6326e14a) SHA1(3dbfbb1cfb60dc10c6972aa2fda89c8e3c3107ea), "Bwb","Voodoo Express (Bwb) (MPU4) (set 5)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* X-change
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4xch_keys[2] = { 0x42, 0x3f0c26 };
+
 #define M4XCH_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "xchasnd.bin", 0x0000, 0x080000, CRC(32c44cd5) SHA1(baafb48e6f95ba152942d1e1c273ffb3c95afa82) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1096,7 +1612,7 @@ GAME_CUSTOM( 199?, m4vdexpr__d,    m4vdexpr,   "vd_vc___.1_0", 0x0000, 0x040000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4XCH_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4xch_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4xch,     0,      "ec_25b__.b_0", 0x0000, 0x020000, CRC(cec9e836) SHA1(460ec38566d7608e51b62f1ffebc18a395002ed4), "Bwb","X-change (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4xch__a,  m4xch,  "ec_36bg_.bv0", 0x0000, 0x020000, CRC(c5d1523a) SHA1(813916008d7e7576e4594a6eb79a76c514470f31), "Bwb","X-change (Bwb) (MPU4) (set 2)" )
@@ -1109,12 +1625,33 @@ GAME_CUSTOM( 199?, m4xch__g,  m4xch,  "ec_49bmd.b_0", 0x0000, 0x020000, CRC(2a55
 GAME_CUSTOM( 199?, m4xch__h,  m4xch,  "ec_s9bt_.b_0", 0x0000, 0x020000, CRC(7e0a27d1) SHA1(d4a23a6c358e38a1a66a06b82af85c844f684830), "Bwb","X-change (Bwb) (MPU4) (set 9)" )
 GAME_CUSTOM( 199?, m4xch__i,  m4xch,  "ec_sja__.a_0", 0x0000, 0x020000, CRC(1f923f89) SHA1(84486287d55591c7e81c59a10e8cc722ec21e8f9), "Bwb","X-change (Bwb) (MPU4) (set 10)" )
 GAME_CUSTOM( 199?, m4xch__j,  m4xch,  "ec_sja__.b_0", 0x0000, 0x020000, CRC(16d7b8bb) SHA1(be8ab98a64aa976e25cb302b68323c6781034f2b), "Bwb","X-change (Bwb) (MPU4) (set 11)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4XCH_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, bwboki_chr_cheat<m4xch_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+
+// possibly just a bad dump (half size)
 GAME_CUSTOM( 199?, m4xch__k,  m4xch,  "xchange.bin",  0x0000, 0x010000, CRC(c96cd014) SHA1(6e32d10c18b6b34dbcb21e75925a77e810ffe892), "Bwb","X-change (Bwb) (MPU4) (set 12)" )
 
+
+/*****************************************************************************************************************************************************************************
+*
+* X-s
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4xs_keys[2] = { 0x34, 0x3f0e26 };
 
 #define M4XS_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1122,7 +1659,7 @@ GAME_CUSTOM( 199?, m4xch__k,  m4xch,  "xchange.bin",  0x0000, 0x010000, CRC(c96c
 		ROM_LOAD( name, offset, length, hash ) \
 		M4XS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4xs_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4xs,       0,      "es_39b__.3_0", 0x0000, 0x020000, CRC(ba478372) SHA1(c13f9cc4261e91119aa694ec3ac81d94d9f32d22), "Bwb","X-s (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4xs__a,    m4xs,   "es_39bg_.3_0", 0x0000, 0x020000, CRC(b689f14f) SHA1(0c3253e1f747a979f55d53fe637fc61cf50e01a3), "Bwb","X-s (Bwb) (MPU4) (set 2)" )
@@ -1133,9 +1670,19 @@ GAME_CUSTOM( 199?, m4xs__e,    m4xs,   "es_49bmd.3_0", 0x0000, 0x020000, CRC(115
 GAME_CUSTOM( 199?, m4xs__f,    m4xs,   "es_sja__.3_0", 0x0000, 0x020000, CRC(5909092d) SHA1(64df6ad5ba5ac74592b525af2f4cab8a092a5766), "Bwb","X-s (Bwb) (MPU4) (set 7)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* X-treme
+* - 3.2 MPU Lamp Drv error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4xtrm_keys[2] = { 0x36, 0x301210 };
+
 #define M4XTRM_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1143,15 +1690,61 @@ GAME_CUSTOM( 199?, m4xs__f,    m4xs,   "es_sja__.3_0", 0x0000, 0x020000, CRC(590
 		ROM_LOAD( name, offset, length, hash ) \
 		M4XTRM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4xtrm_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4xtrm,       0,      "et_39bg_.2_0", 0x0000, 0x020000, CRC(db1a3c3c) SHA1(081c934ebfc0a9dfa195bb20f51e025e53d9c4b9), "Bwb","X-treme (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4xtrm__a,    m4xtrm, "et_49bg_.2_0", 0x0000, 0x020000, CRC(f858d927) SHA1(e7ab84c8898a95075a41fb0249e4b103d60e7d85), "Bwb","X-treme (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4xtrm__b,    m4xtrm, "et_sja__.2_0", 0x0000, 0x020000, CRC(8ee2602b) SHA1(b9a779b900ac71ec842dd7eb1643f7a2f1cb6a38), "Bwb","X-treme (Bwb) (MPU4) (set 3)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* German versions from Nova are below.
+*
+* Export cabinets were often different despite having the same game name, so not paired with the above UK releases
+*
+*****************************************************************************************************************************************************************************/
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Blues Boys (Nova, German version)
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4bluesn_keys[2] = { 0x23, 0x1b0b36 };
+
+#define M4BLUESN_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "bluesboyz.bi2", 0x000000, 0x080000, CRC(7f19a61b) SHA1(dd8742d84df24e118bdbffb1efffad1c71eb2283) ) \
+	ROM_LOAD( "bluesboyz.bi3", 0x080000, 0x080000, CRC(32363184) SHA1(8f3f53ce4d9f9b54c441263def9d8e23880507a1) ) \
+	ROM_LOAD( "bluesboyz.bi4", 0x100000, 0x080000, CRC(aa94281d) SHA1(e15b7bf97b8e307ed465d9b8cb6e5de0044f6fb5) ) \
+	ROM_LOAD( "bluesboyz.bi5", 0x180000, 0x080000, CRC(d8d7aa2e) SHA1(2d8b86fa63e6649d628c7e343d8f5c329c8f8ced) )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BLUESN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, bwboki_chr_cheat<m4bluesn_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
+GAME_CUSTOM( 199?, m4bluesn,   m4blsbys,   "bluesboys.bin", 0x0000, 0x020000, CRC(c1395649) SHA1(3cd0eed1f966f5391fe5de496dc747385ebfb556), "Bwb","Blues Boys (Nova) (MPU4)" )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Cup Final (Nova, German version)
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4cfinln_keys[2] = { 0x10, 0x213623 };
+
 #define M4CFINLN_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1159,30 +1752,24 @@ GAME_CUSTOM( 199?, m4xtrm__b,    m4xtrm, "et_sja__.2_0", 0x0000, 0x020000, CRC(8
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CFINLN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4cfinln_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4cfinln,       m4cpfinl,   "cfd_7_1.bin",  0x0000, 0x020000, CRC(e42ec2aa) SHA1(6495448c1d11ce0ab9ad794bc3a0981432e22945), "Bwb","Cup Final (Nova) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4cfinln__a,    m4cpfinl,   "cfd_d0.bin",   0x0000, 0x020000, CRC(179fcf13) SHA1(abd18ed28118ba0a62ab321a9d963105946d5eef), "Bwb","Cup Final (Nova) (MPU4) (set 2)" )
 
-#define M4ABRA_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing? */
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4ABRA_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
-GAME_CUSTOM( 199?, m4abra,       0,      "nn_sj___.4_0", 0x0000, 0x040000, CRC(48437d29) SHA1(72a2e9337fc0a004c382931f3af856253c44ed61), "Bwb","Abracadabra (Bwb) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4abra__a,    m4abra, "nn_sja__.4_0", 0x0000, 0x040000, CRC(766cd4ae) SHA1(4d630b967ede615d325f524c2e4c92c7e7a60886), "Bwb","Abracadabra (Bwb) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4abra__b,    m4abra, "nn_sjb__.4_0", 0x0000, 0x040000, CRC(ca77a68a) SHA1(e753c065d299038bae4c451e647b9bcda36421d9), "Bwb","Abracadabra (Bwb) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4abra__c,    m4abra, "nn_sjk__.4_0", 0x0000, 0x040000, CRC(19018556) SHA1(6df993939e70a24621d4e732d0670d64fac1cf56), "Bwb","Abracadabra (Bwb) (MPU4) (set 4)" )
+
+/*****************************************************************************************************************************************************************************
+*
+* World Cup (Nova, German version)
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4wcnov_keys[2] = { 0x19, 0x0f2029 };
 
 #define M4WCNOV_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1190,12 +1777,23 @@ GAME_CUSTOM( 199?, m4abra__c,    m4abra, "nn_sjk__.4_0", 0x0000, 0x040000, CRC(1
 		ROM_LOAD( name, offset, length, hash ) \
 		M4WCNOV_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4wcnov_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4wcnov,     0,  "wcdsxh__.5_0", 0x0000, 0x080000, CRC(a82d11de) SHA1(ece14fd5f56da8cc788c53d5c1404275e9000b65), "Bwb","World Cup (Nova) (MPU4)" )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Excalibur (Nova, German version)
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4excaln_keys[2] = { 0x10, 0x010e20 };
 
 #define M4EXCALN_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1203,15 +1801,24 @@ GAME_CUSTOM( 199?, m4wcnov,     0,  "wcdsxh__.5_0", 0x0000, 0x080000, CRC(a82d11
 		ROM_LOAD( name, offset, length, hash ) \
 		M4EXCALN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4excaln_keys>, mpu4_impcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4excaln,   m4excal,    "exdsx___.6_0", 0x0000, 0x080000, CRC(fcdc703c) SHA1(927870723106aebbb2b492ce9bfebe4aa25d0325), "Bwb","Excalibur (Nova) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4excaln__a,m4excal,    "exdsx_e_.6_0", 0x0000, 0x080000, CRC(f6421feb) SHA1(5b3cf7fa4bf9711097ed1c9d2d5689329d73193d), "Bwb","Excalibur (Nova) (MPU4) (set 2)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Olympic Gold (Nova, German version)
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4olygn_keys[2] = { 0x19, 0x0f2029};
+
 #define M4OLYGN_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1219,14 +1826,25 @@ GAME_CUSTOM( 199?, m4excaln__a,m4excal,    "exdsx_e_.6_0", 0x0000, 0x080000, CRC
 		ROM_LOAD( name, offset, length, hash ) \
 		M4OLYGN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4olygn_keys>, mpu4_invimpcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4olygn,     0,          "ogdsx___.8_0", 0x0000, 0x040000, CRC(b51a2538) SHA1(d54f37dc14c44ab66e6d6ba6e2df8bc9ed003054), "Bwb","Olympic Gold (German) (Nova) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4olygn__a,  m4olygn,    "ogdsxe__.8_0", 0x0000, 0x040000, CRC(13aa70aa) SHA1(3878c181ec07e24060935bec96e5128e6e4baf31), "Bwb","Olympic Gold (German) (Nova) (MPU4) (set 2)" )
 
 
+/*****************************************************************************************************************************************************************************
+*
+* Find The Lady (Nova, German version)
+* - mech error
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4ftladn_keys[2] = { 0x05, 0x200f03 };
+
 #define M4FTLADN_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1234,12 +1852,27 @@ GAME_CUSTOM( 199?, m4olygn__a,  m4olygn,    "ogdsxe__.8_0", 0x0000, 0x040000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4FTLADN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4ftladn_keys>, mpu4_invimpcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4ftladn,   0,      "fidse___.5_0", 0x00000, 0x20000, CRC(62347bbf) SHA1(2b1cd5adda831a8c74c9484ee1b616259d3e3981), "Bwb","Find the Lady (Nova) (MPU4)" )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Sinbad (Nova, German version)
+* - all give errors
+*
+*****************************************************************************************************************************************************************************/
+
+static const uint32_t m4sinbdn_keys[2] = { 0x10, 0x260c2c };
+static const uint32_t m4sinbdn__a_keys[2] = { 0x10, 0x381d06 };
+static const uint32_t m4sinbdn__b_keys[2] = { 0x10, 0x3e2f0b };
+
 
 #define M4SINBDN_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1247,12 +1880,32 @@ GAME_CUSTOM( 199?, m4ftladn,   0,      "fidse___.5_0", 0x00000, 0x20000, CRC(623
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SINBDN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, bwboki_chr_cheat<m4sinbdn_keys>, mpu4_invimpcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4sinbdn,       0,          "sbds3___.a_1", 0x0000, 0x020000, CRC(9bff0e40) SHA1(f8a1263a58f828554e9df77ed0db78e627666fb5), "Bwb","Sinbad (Nova) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4sinbdn__e,    m4sinbdn,   "sbds3__l.9_0", 0x0000, 0x040000, CRC(e425375a) SHA1(d2bdd8e768fc7764054eff574360f3cfb5f4f66d), "Bwb","Sinbad (Nova) (MPU4) (set 6)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SINBDN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, bwboki_chr_cheat<m4sinbdn__a_keys>, mpu4_invimpcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4sinbdn__a,    m4sinbdn,   "sbds3___.7w1", 0x0000, 0x020000, CRC(23bc9ce0) SHA1(f750de2b781bc902c65de7109e10a5fc2d4e1c61), "Bwb","Sinbad (Nova) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4sinbdn__f,    m4sinbdn,   "sbds3__l.aw0", 0x0000, 0x040000, CRC(c484ef9d) SHA1(62f6644b83dd6abaf80809217edf6a8230a89268), "Bwb","Sinbad (Nova) (MPU4) (set 7)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4SINBDN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, bwboki_chr_cheat<m4sinbdn__b_keys>, mpu4_invimpcoin, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
 GAME_CUSTOM( 199?, m4sinbdn__b,    m4sinbdn,   "sxdsx___.2_0", 0x0000, 0x040000, CRC(4e1f98b5) SHA1(3e16e7a0cdccc9eb1a1bb6f9a0332c4582483eee), "Bwb","Sinbad (Nova) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4sinbdn__c,    m4sinbdn,   "sdd__.3_0",    0x0000, 0x040000, CRC(100098c1) SHA1(b125855c49325972f620463e32fdf124222e27d2), "Bwb","Sinbad (Nova) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4sinbdn__d,    m4sinbdn,   "sdds3__l.1w0", 0x0000, 0x040000, CRC(feedb8cf) SHA1(620b5379164d4da1200d4807199c2dc78d7d89ee), "Bwb","Sinbad (Nova) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4sinbdn__e,    m4sinbdn,   "sbds3__l.9_0", 0x0000, 0x040000, CRC(e425375a) SHA1(d2bdd8e768fc7764054eff574360f3cfb5f4f66d), "Bwb","Sinbad (Nova) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4sinbdn__f,    m4sinbdn,   "sbds3__l.aw0", 0x0000, 0x040000, CRC(c484ef9d) SHA1(62f6644b83dd6abaf80809217edf6a8230a89268), "Bwb","Sinbad (Nova) (MPU4) (set 7)" )

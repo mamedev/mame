@@ -54,6 +54,10 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/osdnet.h",
 		MAME_DIR .. "src/osd/watchdog.cpp",
 		MAME_DIR .. "src/osd/watchdog.h",
+		MAME_DIR .. "src/osd/interface/inputcode.h",
+		MAME_DIR .. "src/osd/interface/inputman.h",
+		MAME_DIR .. "src/osd/interface/inputseq.cpp",
+		MAME_DIR .. "src/osd/interface/inputseq.h",
 		MAME_DIR .. "src/osd/modules/debugger/debug_module.h",
 		MAME_DIR .. "src/osd/modules/font/font_module.h",
 		MAME_DIR .. "src/osd/modules/midi/midi_module.h",
@@ -119,6 +123,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/monitor/monitor_mac.cpp",
 	}
 	includedirs {
+		MAME_DIR .. "src/osd",
 		ext_includedir("asio"),
 	}
 

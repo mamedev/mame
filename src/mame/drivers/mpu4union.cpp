@@ -5,7 +5,17 @@
 #include "emu.h"
 #include "includes/mpu4.h"
 
-INPUT_PORTS_EXTERN( mpu4 );
+namespace {
+
+class mpu4union_machines_state : public mpu4_state
+{
+public:
+
+	mpu4union_machines_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mpu4_state(mconfig, type, tag)
+	{
+	}
+};
 
 ROM_START( m4cwalk )
 	ROM_REGION( 0x010000, "maincpu", 0 )
@@ -249,6 +259,7 @@ ROM_START( m4rckrolb )
 	ROM_LOAD( "rocksnd.bin", 0x0000, 0x080000, CRC(c3e96650) SHA1(71952267d3149786cfef1dd49cc070664bb007a4) )
 ROM_END
 
+} // anonymous namespace
 
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
@@ -256,37 +267,53 @@ ROM_END
 
 /* Union
   these don't boot, at best you get a 'CLEAR' message */
-GAME(199?, m4cwalk,   0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Cake Walk (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4eezee,   0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Eezee Fruits (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4frdrop,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Fruit Drop (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gobana,  0,        mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Union","Go Bananas (Union) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gobanaa, m4gobana, mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Union","Go Bananas (Union) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gobanab, m4gobana, mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Union","Go Bananas (Union) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gobanac, m4gobana, mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Union","Go Bananas (Union) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gobanad, m4gobana, mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Union","Go Bananas (Union) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4lotty,   0,        mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Union","Lotty Time (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4maxmze,  0,        mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Union","Maximize (Union) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4maxmzea, m4maxmze, mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Union","Maximize (Union) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4maxmzeb, m4maxmze, mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Union","Maximize (Union) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4maxmzec, m4maxmze, mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Union","Maximize (Union) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4maxmzed, m4maxmze, mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Union","Maximize (Union) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4mecca,   0,        mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Union","Mecca Money (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4purmad,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Pure Madness (Union)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4revolv,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Revolva (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4rotex,  0,         mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Rotex (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4select, 0,         mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Select (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4supfru, 0,         mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Supafruits (Union) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4supfrua,m4supfru,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Supafruits (Union) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4trimad, 0,         mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Triple Madness (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4unibox, 0,         mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Unibox (Union) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4uniboxa,m4unibox,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Unibox (Union) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4unique, 0,         mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Unique (Union) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4uniquep,m4unique,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Unique (Union) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4crzbn,  0,         mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union","Crazy Bingo (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4cwalk,   0,        mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Cake Walk (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4eezee,   0,        mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Eezee Fruits (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4frdrop,  0,        mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Fruit Drop (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4gobana,  0,        mod2    ,mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Go Bananas (Union) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4gobanaa, m4gobana, mod2    ,mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Go Bananas (Union) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4gobanab, m4gobana, mod2    ,mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Go Bananas (Union) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4gobanac, m4gobana, mod2    ,mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Go Bananas (Union) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4gobanad, m4gobana, mod2    ,mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Go Bananas (Union) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4lotty,   0,        mod2    ,mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Lotty Time (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4maxmze,  0,        mod2    ,mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Maximize (Union) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4maxmzea, m4maxmze, mod2    ,mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Maximize (Union) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4maxmzeb, m4maxmze, mod2    ,mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Maximize (Union) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4maxmzec, m4maxmze, mod2    ,mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Maximize (Union) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4maxmzed, m4maxmze, mod2    ,mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Maximize (Union) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4mecca,   0,        mod2    ,mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Mecca Money (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4purmad,  0,        mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Pure Madness (Union)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4revolv,  0,        mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Revolva (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4rotex,  0,         mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Rotex (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4select, 0,         mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Select (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4supfru, 0,         mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Supafruits (Union) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4supfrua,m4supfru,  mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Supafruits (Union) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4trimad, 0,         mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Triple Madness (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4unibox, 0,         mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Unibox (Union) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4uniboxa,m4unibox,  mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Unibox (Union) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4unique, 0,         mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Unique (Union) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4uniquep,m4unique,  mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Unique (Union) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4crzbn,  0,         mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union","Crazy Bingo (Union) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
 /* Union + Empire
    same as Union above */
-GAME(199?, m4gvibes,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union / Empire","Good Vibrations (Union - Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gvibesa, m4gvibes, mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union / Empire","Good Vibrations (Union - Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4rckrol,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union / Empire","Rock 'n' Roll (Union - Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4rckrola, m4rckrol, mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union / Empire","Rock 'n' Roll (Union - Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4rckrolb, m4rckrol, mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Union / Empire","Rock 'n' Roll (Union - Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4gvibes,  0,        mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union / Empire","Good Vibrations (Union - Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4gvibesa, m4gvibes, mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union / Empire","Good Vibrations (Union - Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4rckrol,  0,        mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union / Empire","Rock 'n' Roll (Union - Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4rckrola, m4rckrol, mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union / Empire","Rock 'n' Roll (Union - Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4rckrolb, m4rckrol, mod4oki, mpu4, mpu4union_machines_state, init_m4default, ROT0,   "Union / Empire","Rock 'n' Roll (Union - Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
