@@ -1242,6 +1242,9 @@ configuration { "linux-*" }
 			"dl",
 			"rt",
 		}
+		flags {
+			"LinkSupportCircularDependencies",
+		}
 		if _OPTIONS["distro"]=="debian-stable" then
 			defines
 			{
