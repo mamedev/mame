@@ -87,6 +87,12 @@ public:
 	template <unsigned I> auto int_callback() { return m_int_cb[I].bind(); }
 	template <unsigned I> void int_w(int state) { m_int_cb[I](state); }
 
+	// wait signal (split for read/write operations)
+	auto wait_io_rd_cb() { return m_wait_rd_cb.bind(); }
+	auto wait_io_wr_cb() { return m_wait_wr_cb.bind(); }
+	void set_wait_io_rd(int state) { m_wait_rd_cb(state); }
+	void set_wait_io_wr(int state) { m_wait_wr_cb(state); }
+
 protected:
 	// device_t overrides
 	virtual void device_start() override;
@@ -99,6 +105,8 @@ private:
 	address_space_config const m_pio_config;
 
 	devcb_write_line::array<8> m_int_cb;
+	devcb_write_line m_wait_rd_cb;
+	devcb_write_line m_wait_wr_cb;
 };
 
 class multibus_slot_device
@@ -138,6 +146,9 @@ protected:
 
 	template <unsigned I> void int_w(int state) { m_bus->int_w<I>(state); }
 	void int_w(unsigned number, int state);
+
+	void set_wait_io_rd(int state) { m_bus->set_wait_io_rd(state); }
+	void set_wait_io_wr(int state) { m_bus->set_wait_io_wr(state); }
 
 	multibus_device *m_bus;
 };
