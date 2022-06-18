@@ -550,19 +550,18 @@ void macquadra_state::dafb_dac_w(offs_t offset, uint32_t data, uint32_t mem_mask
 
 uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	auto const vram8 = util::big_endian_cast<uint8_t const>(m_vram.target()) + m_dafb_base;
+
 	switch (m_dafb_mode)
 	{
 		case 0: // 1bpp
 		{
-			uint8_t const *vram8 = (uint8_t *)m_vram.target();
-			vram8 += m_dafb_base;
-
 			for (int y = 0; y < 870; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
-				for (int x = 0; x < 1152; x+=8)
+				for (int x = 0; x < 1152/8; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_dafb_stride) + ((x/8)^3)];
+					uint8_t const pixels = vram8[(y * m_dafb_stride) + x];
 
 					*scanline++ = m_dafb_palette[(pixels>>7)&1];
 					*scanline++ = m_dafb_palette[(pixels>>6)&1];
@@ -579,15 +578,12 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 
 		case 1: // 2bpp
 		{
-			uint8_t const *vram8 = (uint8_t *)m_vram.target();
-			vram8 += m_dafb_base;
-
 			for (int y = 0; y < 870; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152/4; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_dafb_stride) + x];
 
 					*scanline++ = m_dafb_palette[((pixels>>6)&3)];
 					*scanline++ = m_dafb_palette[((pixels>>4)&3)];
@@ -600,15 +596,12 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 
 		case 2: // 4bpp
 		{
-			uint8_t const *vram8 = (uint8_t *)m_vram.target();
-			vram8 += m_dafb_base;
-
 			for (int y = 0; y < 870; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152/2; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_dafb_stride) + x];
 
 					*scanline++ = m_dafb_palette[(pixels>>4)];
 					*scanline++ = m_dafb_palette[(pixels&0xf)];
@@ -619,15 +612,12 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 
 		case 3: // 8bpp
 		{
-			uint8_t const *vram8 = (uint8_t *)m_vram.target();
-			vram8 += m_dafb_base;
-
 			for (int y = 0; y < 870; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_dafb_stride) + x];
 					*scanline++ = m_dafb_palette[pixels];
 				}
 			}
@@ -638,7 +628,7 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 			for (int y = 0; y < 480; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
-				uint32_t const *base = (uint32_t *)&m_vram[(y * (m_dafb_stride/4)) + (m_dafb_base/4)];
+				uint32_t const *base = &m_vram[(y * (m_dafb_stride/4)) + (m_dafb_base/4)];
 				for (int x = 0; x < 640; x++)
 				{
 					*scanline++ = *base++;

@@ -563,7 +563,7 @@ void sun2_state::vmetype0space_map(address_map &map)
 // type 1 device space
 void sun2_state::vmetype1space_map(address_map &map)
 {
-	map(0x000000, 0x01ffff).ram().share("bw2_vram");
+	map(0x000000, 0x01ffff).ram().share(m_bw2_vram);
 	map(0x020000, 0x020001).rw(FUNC(sun2_state::video_ctrl_r), FUNC(sun2_state::video_ctrl_w));
 	map(0x7f0000, 0x7f07ff).rom().region("bootprom", 0);    // uses MMU loophole to read 32k from a 2k window
 	map(0x7f0800, 0x7f0800).mirror(0x7fe).rw(FUNC(sun2_state::ethernet_r), FUNC(sun2_state::ethernet_w)).cswidth(16);
@@ -625,7 +625,7 @@ void sun2_state::mbustype3space_map(address_map &map)
 uint32_t sun2_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t const *const m_vram = (uint8_t *)m_bw2_vram.target();
+	auto const vram = util::big_endian_cast<uint8_t const>(m_bw2_vram.target());
 
 	if (!(m_bw2_ctrl & 0x8000)) return 0;
 
@@ -634,7 +634,7 @@ uint32_t sun2_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		uint32_t *scanline = &bitmap.pix(y);
 		for (int x = 0; x < 1152/8; x++)
 		{
-			uint8_t const pixels = m_vram[(y * (1152/8)) + (BYTE_XOR_BE(x))];
+			uint8_t const pixels = vram[(y * (1152 / 8)) + x];
 
 			*scanline++ = palette[BIT(pixels, 7)];
 			*scanline++ = palette[BIT(pixels, 6)];
@@ -661,6 +661,8 @@ void sun2_state::machine_start()
 	m_ram_ptr = (uint16_t *)m_ram->pointer();
 	m_ram_size = m_ram->size();
 	m_ram_size_words = m_ram_size >> 1;
+
+	m_bw2_ctrl = 0;
 
 	m_ethernet_status = 0;
 }

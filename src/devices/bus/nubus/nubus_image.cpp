@@ -183,7 +183,7 @@ void nubus_image_device::device_start()
 	uint32_t slotspace;
 	uint32_t superslotspace;
 
-	install_declaration_rom(this, IMAGE_ROM_REGION);
+	install_declaration_rom(IMAGE_ROM_REGION);
 
 	slotspace = get_slotspace();
 	superslotspace = get_super_slotspace();

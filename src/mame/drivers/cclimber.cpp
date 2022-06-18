@@ -163,7 +163,6 @@ TODO:
 
      TODO:
        - COINB DSW is missing
-       - few issues in cocktail mode
 
 -------------------------------------------------------------------
 

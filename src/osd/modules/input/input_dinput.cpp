@@ -389,9 +389,9 @@ void dinput_mouse_device::poll()
 	dinput_device::poll_dinput(&mouse);
 
 	// scale the axis data
-	mouse.lX *= INPUT_RELATIVE_PER_PIXEL;
-	mouse.lY *= INPUT_RELATIVE_PER_PIXEL;
-	mouse.lZ *= INPUT_RELATIVE_PER_PIXEL;
+	mouse.lX *= osd::INPUT_RELATIVE_PER_PIXEL;
+	mouse.lY *= osd::INPUT_RELATIVE_PER_PIXEL;
+	mouse.lZ *= osd::INPUT_RELATIVE_PER_PIXEL;
 }
 
 void dinput_mouse_device::reset()

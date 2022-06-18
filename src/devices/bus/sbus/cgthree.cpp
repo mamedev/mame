@@ -68,14 +68,14 @@ void sbus_cgthree_device::install_device()
 uint32_t sbus_cgthree_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t const *const pens = m_ramdac->pens();
-	uint8_t const *const vram = (uint8_t *)&m_vram[0];
+	auto const vram = util::big_endian_cast<uint8_t const>(&m_vram[0]);
 
 	for (int y = 0; y < 900; y++)
 	{
 		uint32_t *scanline = &bitmap.pix(y);
 		for (int x = 0; x < 1152; x++)
 		{
-			const uint8_t pixel = vram[y * 1152 + BYTE4_XOR_BE(x)];
+			const uint8_t pixel = vram[y * 1152 + x];
 			*scanline++ = pens[pixel];
 		}
 	}

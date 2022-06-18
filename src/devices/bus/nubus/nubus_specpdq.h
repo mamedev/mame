@@ -44,8 +44,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	std::vector<uint8_t> m_vram;
-	uint32_t *m_vram32;
+	std::vector<uint32_t> m_vram;
 	uint32_t m_mode, m_vbl_disable;
 	uint32_t m_palette_val[256], m_colors[3], m_count, m_clutoffs;
 	emu_timer *m_timer;

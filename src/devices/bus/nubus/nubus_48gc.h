@@ -41,7 +41,7 @@ private:
 	screen_device *m_screen;
 	emu_timer *m_timer;
 
-	std::vector<uint8_t> m_vram;
+	std::vector<uint32_t> m_vram;
 	uint32_t m_mode, m_vbl_disable, m_toggle, m_stride, m_base;
 	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
 	uint32_t m_registers[0x100];
