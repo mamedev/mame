@@ -103,13 +103,13 @@ void jmfb_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(this, GC48_ROM_REGION);
+	install_declaration_rom(GC48_ROM_REGION);
 
 	slotspace = get_slotspace();
 
 //  printf("[JMFB %p] slotspace = %x\n", this, slotspace);
 
-	m_vram.resize(VRAM_SIZE);
+	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, &m_vram[0]);
 
 	nubus().install_device(slotspace+0x200000, slotspace+0x2003ff, read32s_delegate(*this, FUNC(jmfb_device::mac_48gc_r)), write32s_delegate(*this, FUNC(jmfb_device::mac_48gc_w)));
@@ -128,12 +128,12 @@ void jmfb_device::device_reset()
 	m_clutoffs = 0;
 	m_count = 0;
 	m_vbl_disable = 1;
-	m_stride = 80;
+	m_stride = 80/4;
 	m_base = 0;
 	m_xres = 640;
 	m_yres = 480;
 	m_mode = 0;
-	memset(&m_vram[0], 0, VRAM_SIZE);
+	std::fill(m_vram.begin(), m_vram.end(), 0);
 	memset(m_palette, 0, sizeof(m_palette));
 }
 
@@ -155,7 +155,7 @@ TIMER_CALLBACK_MEMBER(jmfb_device::vbl_tick)
 
 uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t const *const vram8 = &m_vram[0xa00];
+	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + 0xa00;
 
 	// first time?  kick off the VBL timer
 	if (!m_screen)
@@ -172,7 +172,7 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < m_xres/8; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_stride * 4) + x];
 
 					*scanline++ = m_palette[BIT(pixels, 7)];
 					*scanline++ = m_palette[BIT(pixels, 6)];
@@ -192,7 +192,7 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < m_xres/4; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_stride * 4) + x];
 
 					*scanline++ = m_palette[(pixels>>6)&0x3];
 					*scanline++ = m_palette[(pixels>>4)&0x3];
@@ -208,7 +208,7 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < m_xres/2; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_stride * 4) + x];
 
 					*scanline++ = m_palette[(pixels>>4)&0xf];
 					*scanline++ = m_palette[pixels&0xf];
@@ -222,17 +222,19 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < m_xres; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_stride * 4) + x];
 					*scanline++ = m_palette[pixels];
 				}
 			}
 			break;
 
 		case 4: // 24 bpp
-			for (int y = 0; y < m_yres; y++)
 			{
-				uint32_t const *base = (uint32_t *)&m_vram[y * m_stride];
-				std::copy_n(base, m_xres, &bitmap.pix(y));
+				uint32_t const stride = m_stride * 8 / 3;
+				for (int y = 0; y < m_yres; y++)
+				{
+					std::copy_n(&m_vram[(0xa00 / 4) + (y * stride)], m_xres, &bitmap.pix(y));
+				}
 			}
 			break;
 	}
@@ -254,14 +256,7 @@ void jmfb_device::mac_48gc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case 0xc/4: // stride
 //          printf("%x to stride\n", data);
 			// this value is in DWORDs for 1-8 bpp and, uhh, strange for 24bpp
-			if (m_mode < 4)
-			{
-				m_stride = data*4;
-			}
-			else
-			{
-				m_stride = (data*32)/3;
-			}
+			m_stride = data;
 			break;
 
 		case 0x200/4:   // DAC control

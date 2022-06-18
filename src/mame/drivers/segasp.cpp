@@ -36,6 +36,8 @@ G1 bus PIO or DMA, or directly via banked  area 0x0100xxxx in SH4 address space.
 todo: make this actually readable, we don't support unicode source files
 
  Title                                       PCB ID     REV CFID    Dumped Region  PIC             MAIN BD Serial
+100&Medal Kazaaan!!                         834-15052                 no          ???-????-????   AAFE-xxxxxxxxxxx
+100&Medal Gekikazaaan!!                     834-15148      MDA-C0098B no          ???-????-????   AAFE-xxxxxxxxxxx
 Aminosan (satellite)                        837-15041    F*           ROM  JP     253-5508-0613J  AAFG-01A40195003, Medal
 Battle Police                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Beetle DASH!!                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
@@ -54,9 +56,10 @@ Dinosaur King Ver 4.000                     ???-?????       MDA-C0061 CF   JP   
 Disney: Magical Dream Dance on Stage        ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Future Police Patrol Chase                  ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Issyouni Turbo Drive                        ???-?????                 no          ???-????-????   AAFE-01E91305101
-Issyouni Wan Wan                            ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Issyouni Wanwan (INW 2K7 1ST)               834-14747                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Issyouni Wanwan Waiwai Puppy (INW PUPPY)    834-14826       MDA-C0052 no          ???-????-????   AAFE-xxxxxxxxxxx
 King of Beetle: Battle Terminal             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
-Love & Berry 2K5 Spring/Summer              ???-?????       MDA-C0003 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
+Love & Berry 2K5 Spring/Summer              834-14535       MDA-C0003 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Love & Berry Ver 1.003                      834-14661-02              ROM  EXP    253-5508-0446   AAFE-01D84934906
 Love & Berry Ver 2.000                      834-14661-02              ROM  EXP    253-5508-0446   AAFE-01D8493xxxx
 Love & Berry 3 EXP Ver 1.002                834-14661-01    MDA-C0042 CF   US/EXP 253-5508-0446   AAFE-01D64704904
@@ -69,7 +72,7 @@ Mirage World (SP MRW SATL)                  834-14713                 ROM  ANY  
 Monopoly: The Medal                         ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
 Monopoly: The Medal 2nd Edition             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
 Mushiking 2K6 2ND                           ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
-Mushiking 2K7 1ST                           ???-?????       MDA-C0028 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
+Mushiking 2K7 1ST                           834-14734       MDA-C0028 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Ocha-Ken Hot Medal (Medalink)               837-14790    G            ROM  JP     unknown         AAFE-01G03115212, Satellite Medal
 Puyo Puyo! The Medal Edition (Medalink)     837-14875    F            ROM  JP     253-5508-0568J  AAFE-01E78365014
 Tetris Giant / Tetris Dekaris               834-14970    G  MDA-C0076 CF   ANY    253-5508-0604   AAFE-01G03025212

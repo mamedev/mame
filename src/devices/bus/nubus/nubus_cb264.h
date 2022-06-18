@@ -40,7 +40,7 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	std::vector<uint8_t> m_vram;
+	std::vector<uint32_t> m_vram;
 	uint32_t m_cb264_mode, m_cb264_vbl_disable, m_cb264_toggle;
 	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
 };

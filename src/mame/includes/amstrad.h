@@ -250,6 +250,7 @@ private:
 	uint8_t amstrad_ppi_portb_r();
 	void amstrad_ppi_portc_w(uint8_t data);
 
+	device_t* get_expansion_device(const char* tag);
 	DECLARE_WRITE_LINE_MEMBER( cpc_romdis );
 	void rom_select(uint8_t data);
 

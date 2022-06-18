@@ -3,6 +3,7 @@
 
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
+#include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 
@@ -11,11 +12,15 @@
 #include "sound/okim6376.h"
 #include "sound/upd7759.h"
 #include "sound/ymopl.h"
-#include "machine/steppers.h"
-#include "machine/roc10937.h"
-#include "machine/meters.h"
 
 #include "machine/bacta_datalogger.h"
+#include "machine/meters.h"
+#include "machine/mpu4_characteriser_bootleg.h"
+#include "machine/mpu4_characteriser_pal.h"
+#include "machine/mpu4_characteriser_pal_bwb.h"
+#include "machine/roc10937.h"
+#include "machine/steppers.h"
+
 
 #include "emupal.h"
 
@@ -46,14 +51,6 @@
 #define LOG_IC8(x)  do { if (MPU4VERBOSE) logerror x; } while (0)
 #define LOG_SS(x)   do { if (MPU4VERBOSE) logerror x; } while (0)
 
-
-
-
-
-static const uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
-static const uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
-
-static const uint8_t bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
 
 //reel info
 #define STANDARD_REEL  0    // As originally designed 3/4 reels
@@ -87,19 +84,19 @@ static const uint8_t bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x
 #define HOPPER_NONDUART_A   4
 #define HOPPER_NONDUART_B   5
 
-/* Lookup table for CHR data */
+INPUT_PORTS_EXTERN( mpu4 );
+INPUT_PORTS_EXTERN( mpu4_invcoin );
+INPUT_PORTS_EXTERN( mpu4_impcoin );
+INPUT_PORTS_EXTERN( mpu4_invimpcoin );
+INPUT_PORTS_EXTERN( mpu4_cw );
+INPUT_PORTS_EXTERN( mpu420p );
+INPUT_PORTS_EXTERN( mpu4jackpot8per );
+INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
+INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p );
+INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p90pc );
 
-struct mpu4_chr_table
-{
-	uint8_t call;
-	uint8_t response;
-};
-
-struct bwb_chr_table//dynamically populated table for BwB protection
-{
-	uint8_t response = 0;
-};
-
+// currently in mpu4.cpp this may get moved into the driver, or renamed to something more generic based on the setup
+INPUT_PORTS_EXTERN( grtecp );
 
 class mpu4_state : public driver_device
 {
@@ -128,26 +125,33 @@ public:
 		, m_ym2413(*this, "ym2413")
 		, m_ay8913(*this, "ay8913")
 		, m_dataport(*this, "dataport")
+		, m_characteriser(*this, "characteriser")
+		, m_characteriser_bl(*this, "characteriser_bl")
+		, m_characteriser_blastbank(*this, "characteriser_blastbank")
+		, m_characteriser_bwb(*this, "characteriser_bwb")
+		, m_duart68681(*this, "duart68681")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_triacs(*this, "triac%u", 0U)
-		, m_current_chr_table(nullptr)
 	 { }
 
 	void init_m4default_alt();
-	void init_crystali();
-	void init_m4tst2();
-	void init_crystal();
-	void init_m_frkstn();
-	void init_m4default_big();
 	void init_m4default();
+	void init_m4default_big();
+	void init_m4default_big_low();
+
+
+	void init_m4default_big_aux2inv();
+	void init_m4default_806prot();
+
+	void init_m4tst2();
+
 	void init_m4default_banks();
 	void init_m4default_reels();
 	void init_m4_low_volt_alt();
-	void init_m4_aux1_invert();
-	void init_m4_aux2_invert();
-	void init_m4_door_invert();
+
+
 	void init_m4_five_reel_std();
 	void init_m4_five_reel_rev();
 	void init_m4_five_reel_alt();
@@ -155,7 +159,6 @@ public:
 	void init_m4_six_reel_alt();
 	void init_m4_seven_reel();
 	void init_m4_small_extender();
-	void init_m4_large_extender_a();
 	void init_m4_large_extender_b();
 	void init_m4_large_extender_c();
 	void init_m4_hopper_tubes();
@@ -168,76 +171,208 @@ public:
 	void init_m4_led_b();
 	void init_m4_led_c();
 	void init_m4_led_simple();
+
+
 	void init_m4_andycp10c();
 	void init_m_blsbys();
 	void init_m_oldtmr();
 	void init_m4tst();
-	void init_m_ccelbr();
-	void init_m4gambal();
-	void init_m4debug();
-	void init_m4_showstring();
-	void init_m4_showstring_mod4yam();
-	void init_m4_debug_mod4yam();
-	void init_m4_showstring_mod2();
-	void init_m4_showstring_big();
-	void init_connect4();
+	void init_big_extenda();
+
 	void init_m4altreels();//legacy, will be removed once things are sorted out
-	void init_m_grtecp();//legacy, will be removed once things are sorted out RE: CHR
-	void init_m4tenten();
-	void init_m4actbnk();
-	void init_m4actclb();
-	void init_m4actpak();
-	void init_m4addr();
-	void init_m4aao();
-	void init_m4alladv();
-	void init_m4alpha();
-	void init_m4andycp();
-	void init_m4andybt();
-	void init_m4andyfh();
-	void init_m4andyge();
-	void init_m4apachg();
+	void init_m4altreels_big();
 
 	void bwboki(machine_config &config);
+	void bwboki_chr(machine_config &config);
+
+	template<const uint32_t* Key> void bwboki_chr_cheat(machine_config &config)
+	{
+		bwboki(config);
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser_bwb);
+		MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
+		m_characteriser_bwb->set_common_key(Key[0] & 0xff);
+		m_characteriser_bwb->set_other_key(Key[1]);
+	}
+
+
+
+
 	void mod2(machine_config &config);
+	void mod2_cheatchr(machine_config &config);
+	void mod2_chr(machine_config &config);
+
+	template<const uint8_t ReelNo, uint8_t Type>
+	void mpu4_add_reel(machine_config& config);
+
+	template<uint8_t Type, uint8_t NumberOfReels>
+	void mpu4_reels(machine_config &config);
+
+	template<const uint8_t* Table> void mod2_cheatchr_pal(machine_config &config)
+	{
+		mod2(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod2_alt_cheatchr_pal(machine_config &config)
+	{
+		mod2_alt(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod4oki_cheatchr_pal(machine_config &config)
+	{
+		mod4oki(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod4oki_alt_cheatchr_pal(machine_config &config)
+	{
+		mod4oki_alt(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod4yam_cheatchr_pal(machine_config &config)
+	{
+		mod4yam(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod4oki_5r_cheatchr_pal(machine_config &config)
+	{
+		mod4oki_5r(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<uint8_t Fixed> void mod4oki_5r_bootleg_fixedret(machine_config &config)
+	{
+		mod4oki_5r(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+		m_characteriser_bl->set_bl_fixed_return(Fixed);
+	}
+
+	void mod2_cheatchr_table(machine_config &config, const uint8_t* table);
+
+	// bootleg mod2
+	template<uint8_t Fixed> void mod2_bootleg_fixedret(machine_config &config)
+	{
+		mod2(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+		m_characteriser_bl->set_bl_fixed_return(Fixed);
+	}
+
+	template<uint8_t Fixed> void mod4yam_bootleg_fixedret(machine_config &config)
+	{
+		mod4yam(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+		m_characteriser_bl->set_bl_fixed_return(Fixed);
+	}
+
+	template<uint8_t Fixed> void mod4oki_bootleg_fixedret(machine_config &config)
+	{
+		mod4oki(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+		m_characteriser_bl->set_bl_fixed_return(Fixed);
+	}
+
+	template<uint8_t Fixed> void mod4oki_alt_bootleg_fixedret(machine_config &config)
+	{
+		mod4oki_alt(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+		m_characteriser_bl->set_bl_fixed_return(Fixed);
+	}
+
+
+	void mod2_chr_blastbnk(machine_config &config);
+	void mod2_chr_copcash(machine_config &config);
+
 	void mod2_alt(machine_config &config);
-	void mod4oki(machine_config &config);
+	void mod2_alt_cheatchr(machine_config &config);
+	void mod2_alt_cheatchr_table(machine_config &config, const uint8_t* table);
+
 	void mod4oki_5r(machine_config &config);
+	void mod4oki_5r_chr(machine_config &config);
+	void mod4oki_5r_cheatchr(machine_config &config);
+	void mod4oki_5r_cheatchr_table(machine_config &config, const uint8_t* table);
+
 	void mod4oki_alt(machine_config &config);
+	void mod4oki_alt_cheatchr(machine_config &config);
+	void mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table);
+
+	void mod4oki(machine_config &config);
+	void mod4oki_cheatchr(machine_config &config);
+	void mod4oki_cheatchr_table(machine_config &config, const uint8_t* table);
+	void mod4oki_chr(machine_config &config);
+
 	void mod4yam(machine_config &config);
+	void mod4yam_cheatchr(machine_config &config);
+	void mod4yam_cheatchr_table(machine_config& config, const uint8_t* table);
+	void mod4yam_chr(machine_config &config);
+
 	void mpu4_common(machine_config &config);
 	void mpu4_common2(machine_config &config);
 	void mpu4crys(machine_config &config);
-	void mpu4_std_3reel(machine_config &config);
-	void mpu4_type2_3reel(machine_config &config);
-	void mpu4_type3_3reel(machine_config &config);
-	void mpu4_type4_3reel(machine_config &config);
-	void mpu4_bwb_3reel(machine_config &config);
-	void mpu4_std_4reel(machine_config &config);
-	void mpu4_type2_4reel(machine_config &config);
-	void mpu4_type3_4reel(machine_config &config);
-	void mpu4_type4_4reel(machine_config &config);
-	void mpu4_bwb_4reel(machine_config &config);
-	void mpu4_std_5reel(machine_config &config);
-	void mpu4_type2_5reel(machine_config &config);
-	void mpu4_type3_5reel(machine_config &config);
-	void mpu4_type4_5reel(machine_config &config);
-	void mpu4_bwb_5reel(machine_config &config);
-	void mpu4_std_6reel(machine_config &config);
-	void mpu4_type2_6reel(machine_config &config);
-	void mpu4_type3_6reel(machine_config &config);
-	void mpu4_type4_6reel(machine_config &config);
-	void mpu4_bwb_6reel(machine_config &config);
-	void mpu4_std_7reel(machine_config &config);
-	void mpu4_type2_7reel(machine_config &config);
-	void mpu4_type3_7reel(machine_config &config);
-	void mpu4_type4_7reel(machine_config &config);
-	void mpu4_bwb_7reel(machine_config &config);
 	void mpu4base(machine_config &config);
 
 protected:
 	TIMER_CALLBACK_MEMBER(update_ic24);
 
 	void mpu4_memmap(address_map &map);
+	void mpu4_memmap_characteriser(address_map &map);
+	void mpu4_memmap_bootleg_characteriser(address_map &map);
+	void mpu4_memmap_bl_characteriser_blastbank(address_map &map);
+	void mpu4_memmap_characteriser_bwb(address_map &map);
+
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
 	void led_write_extender(int latch, int data, int column);
@@ -250,33 +385,25 @@ protected:
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_install_mod4bwb_space(address_space &space);
 	void mpu4_config_common();
+
 	DECLARE_MACHINE_START(mod2);
 	DECLARE_MACHINE_RESET(mpu4);
 	DECLARE_MACHINE_START(mpu4yam);
 	DECLARE_MACHINE_START(mpu4oki);
-	DECLARE_MACHINE_START(mpu4oki_alt);
-	DECLARE_MACHINE_START(mod4oki_5r);
-	DECLARE_MACHINE_START(mod2_alt);
 	DECLARE_MACHINE_START(mpu4bwb);
 	DECLARE_MACHINE_START(mpu4cry);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
+
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
-		uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-	{
-		return 0;
-	}
 
 	void bankswitch_w(uint8_t data);
 	uint8_t bankswitch_r();
 	void bankset_w(uint8_t data);
-	void characteriser_w(offs_t offset, uint8_t data);
-	uint8_t characteriser_r(address_space &space, offs_t offset);
-	void bwb_characteriser_w(offs_t offset, uint8_t data);
-	uint8_t bwb_characteriser_r(offs_t offset);
+
 	void mpu4_ym2413_w(offs_t offset, uint8_t data);
 	uint8_t mpu4_ym2413_r(offs_t offset);
-	uint8_t crystal_sound_r();
-	void crystal_sound_w(uint8_t data);
+
 	void ic3ss_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
@@ -318,6 +445,13 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(dataport_rxd);
 
+	uint8_t hack_duart_r()
+	{
+		return machine().rand() & 0x10;
+	}
+
+	uint8_t bootleg806_r(address_space &space, offs_t offset);
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<rocvfd_device> m_vfd;
 	optional_device<ptm6840_device> m_6840ptm;
@@ -340,6 +474,12 @@ protected:
 	optional_device<ym2413_device> m_ym2413;
 	optional_device<ay8913_device> m_ay8913;
 	optional_device<bacta_datalogger_device> m_dataport;
+	optional_device<mpu4_characteriser_pal> m_characteriser;
+	optional_device<mpu4_characteriser_bl> m_characteriser_bl;
+	optional_device<mpu4_characteriser_bl_blastbank> m_characteriser_blastbank;
+	optional_device<mpu4_characteriser_pal_bwb> m_characteriser_bwb;
+
+	optional_device<mc68681_device> m_duart68681;
 
 	// not all systems have this many lamps/LEDs/digits but the driver is too much of a mess to split up now
 
@@ -378,17 +518,12 @@ protected:
 	int m_IC23GC = 0;
 	int m_IC23GB = 0;
 	int m_IC23GA = 0;
-	int m_prot_col = 0;
-	int m_lamp_col = 0;
-	int m_init_col = 0;
+
 	int m_reel_flag = 0;
 	int m_ic23_active = 0;
 	int m_led_lamp = 0;
 	int m_link7a_connected = 0;
 	int m_low_volt_detect_disable = 0;
-	int m_aux1_invert = 0;
-	int m_aux2_invert = 0;
-	int m_door_invert = 0;
 	emu_timer *m_ic24_timer = nullptr;
 	int m_expansion_latch = 0;
 	int m_global_volume = 0;
@@ -411,10 +546,8 @@ protected:
 	int m_card_live = 0;
 	int m_led_extender = 0;
 	int m_bwb_bank = 0;
-	int m_chr_state = 0;
-	int m_chr_counter = 0;
-	int m_chr_value = 0;
-	int m_bwb_return = 0;
+	bool m_default_to_low_bank = false;
+
 	int m_pageval = 0;
 	int m_pageset = 0;
 	int m_hopper = 0;
@@ -424,8 +557,8 @@ protected:
 	int m_t3l = 0;
 	int m_t3h = 0;
 	uint8_t m_numbanks = 0;
-	mpu4_chr_table* m_current_chr_table = nullptr;
-	const bwb_chr_table* m_bwb_chr_table1 = nullptr;
+
+	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
+	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 };
 
-INPUT_PORTS_EXTERN( mpu4 );

@@ -110,14 +110,14 @@ TIMER_CALLBACK_MEMBER(cclimber_audio_device::sample_tick)
 {
 	u8 data = m_rom[m_address >> 1 & 0x1fff];
 
-	// sample end marker, continue from loop point
-	if (data == 0x70)
-		m_address = m_loop_address * 64;
-
 	m_dac->write((m_address & 1) ? (data & 0xf) : (data >> 4));
 
 	if (m_sample_trigger)
 		m_address++;
+
+	// sample end marker, continue from loop point
+	if (data == 0x70)
+		m_address = m_loop_address * 64;
 
 	m_sample_timer->adjust(attotime::from_ticks(256 - m_sample_rate, clock() / m_sample_clockdiv));
 }

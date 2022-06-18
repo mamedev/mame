@@ -229,7 +229,7 @@ void sun3x_state::sun3_80_mem(address_map &map)
 	map(0x00000000, 0x03ffffff).ram().share("p_ram").w(FUNC(sun3x_state::ramwrite_w));
 	map(0x40000000, 0x40000003).rw(FUNC(sun3x_state::cause_buserr_r), FUNC(sun3x_state::cause_buserr_w));
 	map(0x50300000, 0x50300003).r(FUNC(sun3x_state::p4id_r));
-	map(0x50400000, 0x504fffff).ram().share("bw2_vram");
+	map(0x50400000, 0x504fffff).ram().share(m_bw2_vram);
 	map(0x60000000, 0x60001fff).rw(FUNC(sun3x_state::iommu_r), FUNC(sun3x_state::iommu_w));
 	map(0x61000000, 0x61000003).rw(FUNC(sun3x_state::enable_r), FUNC(sun3x_state::enable_w));
 	map(0x61000400, 0x61000403).rw(FUNC(sun3x_state::buserr_r), FUNC(sun3x_state::buserr_w));
@@ -253,7 +253,7 @@ void sun3x_state::sun3_460_mem(address_map &map)
 	map(0x00000000, 0x03ffffff).ram().share("p_ram").w(FUNC(sun3x_state::ramwrite_w));
 	map(0x09000000, 0x09000003).rw(FUNC(sun3x_state::cause_buserr_r), FUNC(sun3x_state::cause_buserr_w));
 	map(0x50300000, 0x50300003).r(FUNC(sun3x_state::p4id_r));
-	map(0x50400000, 0x504fffff).ram().share("bw2_vram");
+	map(0x50400000, 0x504fffff).ram().share(m_bw2_vram);
 	map(0x5c000f14, 0x5c000f17).r(FUNC(sun3x_state::fpa_r));
 	map(0x60000000, 0x60001fff).rw(FUNC(sun3x_state::iommu_r), FUNC(sun3x_state::iommu_w));
 	map(0x61000000, 0x61000003).rw(FUNC(sun3x_state::enable_r), FUNC(sun3x_state::enable_w));
@@ -530,14 +530,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(sun3x_state::sun380_timer)
 uint32_t sun3x_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t const *const m_vram = (uint8_t *)m_bw2_vram.target();
+	auto const vram = util::big_endian_cast<uint8_t const>(m_bw2_vram.target());
 
 	for (int y = 0; y < 900; y++)
 	{
 		uint32_t *scanline = &bitmap.pix(y);
 		for (int x = 0; x < 1152/8; x++)
 		{
-			uint8_t const pixels = m_vram[(y * (1152/8)) + (BYTE4_XOR_BE(x))];
+			uint8_t const pixels = vram[(y * (1152 / 8)) + x];
 
 			*scanline++ = palette[BIT(pixels, 7)];
 			*scanline++ = palette[BIT(pixels, 6)];

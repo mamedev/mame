@@ -4986,3 +4986,58 @@ if (MACHINES["NS32382"]~=null) then
 		MAME_DIR .. "src/devices/machine/ns32382.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/fm_scsi.h,MACHINES["FM_SCSI"] = true
+---------------------------------------------------
+if (MACHINES["FM_SCSI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/fm_scsi.cpp",
+		MAME_DIR .. "src/devices/machine/fm_scsi.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/archimedes_keyb.h,MACHINES["ARCHIMEDES_KEYB"] = true
+---------------------------------------------------
+if (MACHINES["ARCHIMEDES_KEYB"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/archimedes_keyb.cpp",
+		MAME_DIR .. "src/devices/machine/archimedes_keyb.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/cammu.h,MACHINES["CAMMU"] = true
+---------------------------------------------------
+if (MACHINES["CAMMU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cammu.cpp",
+		MAME_DIR .. "src/devices/machine/cammu.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/at.h,MACHINES["AT_MB"] = true
+---------------------------------------------------
+if (MACHINES["AT_MB"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/at.cpp",
+		MAME_DIR .. "src/devices/machine/at.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/saa7191.h,MACHINES["SAA7191"] = true
+---------------------------------------------------
+if (MACHINES["SAA7191"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/saa7191.cpp",
+		MAME_DIR .. "src/devices/machine/saa7191.h",
+	}
+end

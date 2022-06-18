@@ -185,7 +185,7 @@ void psikyo_state::get_sprites()
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	m_sprite_ctrl = m_spriteram->buffer()[0x1ffe / 4] & 0xffff;
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
-	const u16 *spritelist = (u16 *)(m_spriteram->buffer() + 0x1800 / 4);
+	const auto spritelist = util::big_endian_cast<const u16>(m_spriteram->buffer() + 0x1800 / 4);
 
 	u16 const width = m_screen->width();
 	u16 const height = m_screen->height();
@@ -198,10 +198,8 @@ void psikyo_state::get_sprites()
 	/* Look for "end of sprites" marker in the sprites list */
 	for (int offs = 0/2 ; offs < (0x800 - 2)/2 ; offs += 2/2)   // skip last "sprite"
 	{
-		int xstart, ystart, xend, yend, xinc, yinc;
-
 		/* Get next entry in the list */
-		u16 sprite = spritelist[BYTE_XOR_BE(offs)];
+		u16 sprite = spritelist[offs];
 
 		if (sprite == 0xffff)
 			break;
@@ -246,9 +244,11 @@ void psikyo_state::get_sprites()
 			flipy = !flipy;
 		}
 
+		int xstart, xend, xinc;
 		if (flipx)  { xstart = nx - 1;  xend = -1;  xinc = -1; }
 		else        { xstart = 0;       xend = nx;  xinc = +1; }
 
+		int ystart, yend, yinc;
 		if (flipy)  { ystart = ny - 1;  yend = -1;   yinc = -1; }
 		else        { ystart = 0;       yend = ny;   yinc = +1; }
 
@@ -292,7 +292,7 @@ void psikyo_state::get_sprites_bootleg()
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	m_sprite_ctrl = m_spriteram->buffer()[0x1ffe / 4] & 0xffff;
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
-	const u16 *spritelist = (u16 *)(m_spriteram->buffer() + 0x1800 / 4);
+	const auto spritelist = util::big_endian_cast<const u16>(m_spriteram->buffer() + 0x1800 / 4);
 
 	u16 const width = m_screen->width();
 	u16 const height = m_screen->height();
@@ -305,10 +305,8 @@ void psikyo_state::get_sprites_bootleg()
 	/* Look for "end of sprites" marker in the sprites list */
 	for (int offs = 0/2 ; offs < (0x800 - 2)/2 ; offs += 2/2)   // skip last "sprite"
 	{
-		int xstart, ystart, xend, yend, xinc, yinc;
-
 		/* Get next entry in the list */
-		u16 sprite = spritelist[BYTE_XOR_BE(offs)];
+		u16 sprite = spritelist[offs];
 
 		if (sprite == 0xffff)
 			break;
@@ -353,9 +351,11 @@ void psikyo_state::get_sprites_bootleg()
 			flipy = !flipy;
 		}
 
+		int xstart, xend, xinc;
 		if (flipx)  { xstart = nx - 1;  xend = -1;  xinc = -1; }
 		else        { xstart = 0;       xend = nx;  xinc = +1; }
 
+		int ystart, yend, yinc;
 		if (flipy)  { ystart = ny - 1;  yend = -1;   yinc = -1; }
 		else        { ystart = 0;       yend = ny;   yinc = +1; }
 
@@ -495,9 +495,10 @@ u32 psikyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 				m_tilemap[layer]->set_scroll_rows(0x800);
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
+			const auto vregs = util::big_endian_cast<const u16>(m_vregs.target());
 			for (i = 0; i < 256; i++)   /* 256 screen lines */
 			{
-				int x0 = ((u16 *)m_vregs.target())[BYTE_XOR_BE((layer * 0x200)/2 + (i >> tile_rowscroll))];
+				const int x0 = vregs[(layer * 0x200)/2 + (i >> tile_rowscroll)];
 				m_tilemap[layer]->set_scrollx(
 				(i + scrolly[layer]) & 0x7ff,
 				scrollx[layer] + x0 );
@@ -615,9 +616,10 @@ u32 psikyo_state::screen_update_bootleg(screen_device &screen, bitmap_rgb32 &bit
 				m_tilemap[layer]->set_scroll_rows(0x800);
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
+			const auto vregs = util::big_endian_cast<const u16>(m_vregs.target());
 			for (i = 0; i < 256; i++)   /* 256 screen lines */
 			{
-				int x0 = ((u16 *)m_vregs.target())[BYTE_XOR_BE((layer * 0x200)/2 + (i >> tile_rowscroll))];
+				const int x0 = vregs[(layer * 0x200)/2 + (i >> tile_rowscroll)];
 				m_tilemap[layer]->set_scrollx(
 				(i + scrolly[layer]) & 0x7ff,
 				scrollx[layer] + x0);

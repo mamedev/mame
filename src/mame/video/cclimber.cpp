@@ -538,6 +538,9 @@ void cclimber_state::toprollr_draw_bigsprite(screen_device &screen, bitmap_ind16
 	uint8_t x = m_bigsprite_control[3] - 8;
 	uint8_t y = m_bigsprite_control[2];
 
+	if (m_flip_x)
+		x = 0x80 - x;
+
 	m_bs_tilemap->mark_all_dirty();
 
 	m_bs_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));

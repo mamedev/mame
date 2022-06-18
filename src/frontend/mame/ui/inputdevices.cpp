@@ -58,12 +58,12 @@ protected:
 					s32 const value = (input.itemclass() == ITEM_CLASS_ABSOLUTE) ? input.read_as_absolute(ITEM_MODIFIER_NONE) : input.read_as_relative(ITEM_MODIFIER_NONE);
 					if (0 < value)
 					{
-						float const fillright = indcentre + (float(value) / float(INPUT_ABSOLUTE_MAX) * (indright - indcentre));
+						float const fillright = indcentre + (float(value) / float(osd::INPUT_ABSOLUTE_MAX) * (indright - indcentre));
 						container().add_rect(indcentre, indtop, (std::min)(fillright, indright), indbottom, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 					}
 					else if (0 > value)
 					{
-						float const fillleft = indcentre - (float(value) / float(INPUT_ABSOLUTE_MIN) * (indcentre - indleft));
+						float const fillleft = indcentre - (float(value) / float(osd::INPUT_ABSOLUTE_MIN) * (indcentre - indleft));
 						container().add_rect((std::max)(fillleft, indleft), indtop, indcentre, indbottom, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 					}
 					container().add_line(indleft, indtop, indright, indtop, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));

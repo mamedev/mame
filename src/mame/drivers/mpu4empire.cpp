@@ -5,11 +5,27 @@
 #include "emu.h"
 #include "includes/mpu4.h"
 
-INPUT_PORTS_EXTERN( mpu4 );
+namespace {
+
+class mpu4empire_machines_state : public mpu4_state
+{
+public:
+
+	mpu4empire_machines_state(const machine_config& mconfig, device_type type, const char* tag) :
+		mpu4_state(mconfig, type, tag)
+	{
+	}
+
+	void init_m4apachg();
+
+};
 
 #include "m4apachg.lh"
 
-void mpu4_state::init_m4apachg()
+} // anonymous namespace
+
+
+void mpu4empire_machines_state::init_m4apachg()
 {
 	init_m4default();
 	//Derived from Apache_Gold_(Empire)_[C02_800_25jp].gam
@@ -675,7 +691,7 @@ ROM_END
 ROM_START( m4hotcsh )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "hc3_0k.bin", 0x0000, 0x010000, CRC(e3cfa94a) SHA1(d21d2dac4edbf3fde9adab399bdd530e034af122) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "db.chr", 0x00, 0x48, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -686,7 +702,7 @@ ROM_END
 ROM_START( m4hotcsha )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "hc3_0ki.bin", 0x0000, 0x010000, CRC(646f8c29) SHA1(19d60faf77a7a83efc3ea4b614a4bc1dee53b8d8) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "db.chr", 0x00, 0x48, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -698,7 +714,7 @@ ROM_START( m4hotcshb )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "hc3_0kx.bin", 0x0000, 0x010000, CRC(3abebe72) SHA1(fec09ca41e8e43628140456bb44ce6e7c66f5270) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "db.chr", 0x00, 0x48, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -710,7 +726,7 @@ ROM_START( m4hotcshc )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "empire-hotcashv2-0.bin", 0x0000, 0x010000, CRC(b7ec5af3) SHA1(9454feecc7d7c533fed7134118acd2117ebe2591) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "db.chr", 0x00, 0x48, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -860,87 +876,107 @@ ROM_END
    most of these boot (after a single reset to initialize)
    but have broken text, need to check VFD emulation */
 
-GAMEL(199?, m4apachg,  0,        mod4oki, mpu4, mpu4_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
-GAMEL(199?, m4apachga, m4apachg, mod4oki, mpu4, mpu4_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
-GAMEL(199?, m4apachgb, m4apachg, mod4oki, mpu4, mpu4_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
-GAMEL(199?, m4apachgc, m4apachg, mod4oki, mpu4, mpu4_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
-GAMEL(199?, m4apachgd, m4apachg, mod4oki, mpu4, mpu4_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
-GAMEL(199?, m4apachge, m4apachg, mod4oki, mpu4, mpu4_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 6)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
-GAMEL(199?, m4apachgf, m4apachg, mod4oki, mpu4, mpu4_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 7)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachg,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachga, m4apachg, mod4oki, mpu4, mpu4empire_machines_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachgb, m4apachg, mod4oki, mpu4, mpu4empire_machines_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachgc, m4apachg, mod4oki, mpu4, mpu4empire_machines_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachgd, m4apachg, mod4oki, mpu4, mpu4empire_machines_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachge, m4apachg, mod4oki, mpu4, mpu4empire_machines_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 6)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
+GAMEL(199?, m4apachgf, m4apachg, mod4oki, mpu4, mpu4empire_machines_state, init_m4apachg, ROT0, "Empire","Apache Gold (Empire) (MPU4, set 7)",   GAME_FLAGS|MACHINE_NO_SOUND, layout_m4apachg )
 
-GAME(199?, m4bangrs,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Bangers 'n' Cash (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4bangrsa, m4bangrs, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Bangers 'n' Cash (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4bangrsb, m4bangrs, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Bangers 'n' Cash (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4bankrd,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Bank Raid (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4bankrda, m4bankrd, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Bank Raid (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4bankrdb, m4bankrd, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Bank Raid (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4bankrdc, m4bankrd, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Bank Raid (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4bankrdd, m4bankrd, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Bank Raid (Empire) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4bigchs,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Big Cheese (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4bigchsa, m4bigchs, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Big Cheese (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4bigchsb, m4bigchs, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Big Cheese (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4cstrik,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Cash Strike (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4cstrika, m4cstrik, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Cash Strike (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4cstrikb, m4cstrik, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Cash Strike (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4cstrikc, m4cstrik, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Cash Strike (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4chacec,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Chase The Ace [Cards] (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4chaceca, m4chacec, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Chase The Ace [Cards] (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4chacef,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Chase The Ace [Fruits] (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4chacefa, m4chacef, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Chase The Ace [Fruits] (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4chacefb, m4chacef, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Chase The Ace [Fruits] (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4chacefc, m4chacef, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Chase The Ace [Fruits] (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4crzcap,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Crazy Capers (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4crzcapa, m4crzcap, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Crazy Capers (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4crzcapb, m4crzcap, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Crazy Capers (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4crzcapc, m4crzcap, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Crazy Capers (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4crfire,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Crossfire (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND ) // doesn't boot, alarm
-GAME(199?, m4crfirea, m4crfire, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Crossfire (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND ) // doesn't boot, alarm
-GAME(199?, m4eureka,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Eureka (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4eurekaa, m4eureka, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Eureka (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4eurekab, m4eureka, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Eureka (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4fright,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v4.1X)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4frighta, m4fright, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v4.1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4frightb, m4fright, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v4.1i)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4frightc, m4fright, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v?.?, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND ) // bad dump
-GAME(199?, m4frightd, m4fright, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v3.3)",GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4frighte, m4fright, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v3.0)",GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4frightf, m4fright, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v?.?, set 2)",GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gamblr,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","The Gambler (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gamblra, m4gamblr, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","The Gambler (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gamblrb, m4gamblr, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","The Gambler (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gtrain,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Ghost Train (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gtraina, m4gtrain, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Ghost Train (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gtrainb, m4gtrain, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Ghost Train (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4gtrainc, m4gtrain, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Ghost Train (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4goldfv,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Gold Fever (Empire) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4haunt,   0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Haunted House (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4haunta,  m4haunt,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Haunted House (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4hauntb,  m4haunt,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Haunted House (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4hauntc,  m4haunt,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Haunted House (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4hauntd,  m4haunt,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Haunted House (Empire) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4hisprt,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","High Spirits (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4hisprta, m4hisprt, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","High Spirits (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4hisprtb, m4hisprt, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","High Spirits (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4hisprtc, m4hisprt, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","High Spirits (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4hisprtd, m4hisprt, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","High Spirits (Empire) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4hisprte, m4hisprt, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","High Spirits (Empire) (MPU4, set 6)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(1996, m4hotcsh,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Hot Cash (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(1996, m4hotcsha, m4hotcsh, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Hot Cash (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(1996, m4hotcshb, m4hotcsh, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Hot Cash (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(1996, m4hotcshc, m4hotcsh, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Hot Cash (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4monspn,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Money Spinner (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4monspna, m4monspn, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Money Spinner (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4monspnb, m4monspn, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Money Spinner (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4pbnudg,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Pinball Nudger (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4pbnudga, m4pbnudg, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Pinball Nudger (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4pbnudgb, m4pbnudg, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Pinball Nudger (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4pitfal,  0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Pitfall (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND ) // doesn't boot, alarm
-GAME(199?, m4pitfala, m4pitfal, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Pitfall (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND ) // doesn't boot, alarm
-GAME(199?, m4pitfalb, m4pitfal, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Pitfall (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND ) // doesn't boot, alarm
-GAME(199?, m4pitfalc, m4pitfal, mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Pitfall (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND ) // doesn't boot, alarm
-GAME(199?, m4ttrail, 0,         mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Treasure Trail (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4ttraila,m4ttrail,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Treasure Trail (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4ttrailb,m4ttrail,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","Treasure Trail (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4bangrs,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Bangers 'n' Cash (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4bangrsa, m4bangrs, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Bangers 'n' Cash (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4bangrsb, m4bangrs, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Bangers 'n' Cash (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4bankrd,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Bank Raid (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4bankrda, m4bankrd, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Bank Raid (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4bankrdb, m4bankrd, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Bank Raid (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4bankrdc, m4bankrd, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Bank Raid (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4bankrdd, m4bankrd, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Bank Raid (Empire) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4bigchs,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Big Cheese (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4bigchsa, m4bigchs, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Big Cheese (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4bigchsb, m4bigchs, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Big Cheese (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4cstrik,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Cash Strike (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4cstrika, m4cstrik, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Cash Strike (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4cstrikb, m4cstrik, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Cash Strike (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4cstrikc, m4cstrik, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Cash Strike (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4chacec,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Chase The Ace [Cards] (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4chaceca, m4chacec, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Chase The Ace [Cards] (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4chacef,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Chase The Ace [Fruits] (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4chacefa, m4chacef, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Chase The Ace [Fruits] (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4chacefb, m4chacef, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Chase The Ace [Fruits] (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4chacefc, m4chacef, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Chase The Ace [Fruits] (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4crzcap,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Crazy Capers (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4crzcapa, m4crzcap, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Crazy Capers (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4crzcapb, m4crzcap, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Crazy Capers (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4crzcapc, m4crzcap, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Crazy Capers (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4crfire,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Crossfire (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND ) // doesn't boot, alarm
+GAME(199?, m4crfirea, m4crfire, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Crossfire (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND ) // doesn't boot, alarm
+
+GAME(199?, m4eureka,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Eureka (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4eurekaa, m4eureka, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Eureka (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4eurekab, m4eureka, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Eureka (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4fright,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v4.1X)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4frighta, m4fright, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v4.1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4frightb, m4fright, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v4.1i)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4frightc, m4fright, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v?.?, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND ) // bad dump
+GAME(199?, m4frightd, m4fright, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v3.3)",GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4frighte, m4fright, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v3.0)",GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4frightf, m4fright, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Fright Night (Empire) (MPU4, v?.?, set 2)",GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4gamblr,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","The Gambler (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4gamblra, m4gamblr, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","The Gambler (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4gamblrb, m4gamblr, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","The Gambler (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4gtrain,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Ghost Train (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4gtraina, m4gtrain, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Ghost Train (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4gtrainb, m4gtrain, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Ghost Train (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4gtrainc, m4gtrain, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Ghost Train (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4goldfv,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Gold Fever (Empire) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4haunt,   0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Haunted House (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4haunta,  m4haunt,  mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Haunted House (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4hauntb,  m4haunt,  mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Haunted House (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4hauntc,  m4haunt,  mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Haunted House (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4hauntd,  m4haunt,  mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Haunted House (Empire) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4hisprt,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","High Spirits (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4hisprta, m4hisprt, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","High Spirits (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4hisprtb, m4hisprt, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","High Spirits (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4hisprtc, m4hisprt, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","High Spirits (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4hisprtd, m4hisprt, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","High Spirits (Empire) (MPU4, set 5)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4hisprte, m4hisprt, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","High Spirits (Empire) (MPU4, set 6)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(1996, m4hotcsh,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Hot Cash (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(1996, m4hotcsha, m4hotcsh, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Hot Cash (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(1996, m4hotcshb, m4hotcsh, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Hot Cash (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(1996, m4hotcshc, m4hotcsh, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Hot Cash (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4monspn,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Money Spinner (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4monspna, m4monspn, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Money Spinner (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4monspnb, m4monspn, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Money Spinner (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4pbnudg,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Pinball Nudger (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4pbnudga, m4pbnudg, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Pinball Nudger (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4pbnudgb, m4pbnudg, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Pinball Nudger (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
+GAME(199?, m4pitfal,  0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Pitfall (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND ) // doesn't boot, alarm
+GAME(199?, m4pitfala, m4pitfal, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Pitfall (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND ) // doesn't boot, alarm
+GAME(199?, m4pitfalb, m4pitfal, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Pitfall (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND ) // doesn't boot, alarm
+GAME(199?, m4pitfalc, m4pitfal, mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Pitfall (Empire) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND ) // doesn't boot, alarm
+
+GAME(199?, m4ttrail, 0,         mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Treasure Trail (Empire) (MPU4, set 1)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4ttraila,m4ttrail,  mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Treasure Trail (Empire) (MPU4, set 2)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4ttrailb,m4ttrail,  mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","Treasure Trail (Empire) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
+
 // doesn't seem like the other Empire games (starts with RESETTING JNE, licensed, mislabeled?)
 //Looks like the only one to have a proper protection routine, too so I'm guessing it's just a game they distributed, rather than made themselves
-GAME(199?, m4jne,     0,        mod4oki, mpu4, mpu4_state, init_m4default, ROT0, "Empire","The Jackpot's Not Enough (Empire) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4jne,     0,        mod4oki, mpu4, mpu4empire_machines_state, init_m4default, ROT0, "Empire","The Jackpot's Not Enough (Empire) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )

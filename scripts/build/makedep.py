@@ -562,6 +562,7 @@ def parse_command_line():
     subparser.add_argument('sources', metavar='<srcfile>', nargs='+', help='source files to include')
 
     subparser = subparsers.add_parser('sourcesfilter', help='generate driver filter for source files')
+    subparser.add_argument('-l', '--list', metavar='<lstfile>', required=True, help='master driver list file')
     subparser.add_argument('sources', metavar='<srcfile>', nargs='+', help='source files to include')
 
     subparser = subparsers.add_parser('driverlist', help='generate driver list source')
@@ -662,9 +663,13 @@ def scan_source_dependencies(options):
                                 if ext.lower().startswith('.h'):
                                     components = components[:-1]
                                     test_siblings(components, base, depth)
-                                    if components == ('src', 'mame', 'includes'):
-                                        for aspect in ('audio', 'drivers', 'video', 'machine'):
-                                            test_siblings(('src', 'mame', aspect), base, depth)
+                                    if components[:2] == ('src', 'mame'):
+                                        if components[2:] == ('includes', ):
+                                            for aspect in ('audio', 'drivers', 'video', 'machine'):
+                                                test_siblings(('src', 'mame', aspect), base, depth)
+                                        else:
+                                            for aspect in ('_a', '_v', '_m'):
+                                                test_siblings(components, base + aspect, depth)
 
     handler = CppParser.Handler()
     handler.line = line_hook
@@ -741,13 +746,60 @@ def write_project(options, projectfile, mappings, sources):
 
 
 def write_filter(options, filterfile):
+    def do_parse(p):
+        def line_hook(text):
+            text = text.strip()
+            if text.startswith('#'):
+                do_parse(os.path.join(os.path.dirname(n), text[1:].lstrip()))
+            elif text.startswith('@'):
+                parts = text[1:].lstrip().split(':', 1)
+                parts[0] = parts[0].strip()
+                if (parts[0] == 'source') and (len(parts) == 2):
+                    parts[1] = parts[1].strip()
+                    if not parts[1]:
+                        sys.stderr.write('%s:%s: Empty source file name "%s"\n' % (p, parser.input_line, text))
+                        sys.exit(1)
+                    else:
+                        sources.add(parts[1])
+                else:
+                    sys.stderr.write('%s:%s: Unsupported directive "%s"\n' % (p, parser.input_line, text))
+                    sys.exit(1)
+
+        n = os.path.normpath(p)
+        if n not in lists:
+            lists.add(n)
+            try:
+                listfile = io.open(n, 'r', encoding='utf-8')
+            except IOError:
+                sys.stderr.write('Unable to open list file "%s"\n' % (p, ))
+                sys.exit(1)
+            with listfile:
+                handler = CppParser.Handler()
+                handler.line = line_hook
+                parser = CppParser(handler)
+                try:
+                    parser.parse(listfile)
+                except IOError:
+                    sys.stderr.write('Error reading list file "%s"\n' % (p, ))
+                    sys.exit(1)
+                except Exception as e:
+                    sys.stderr.write('Error parsing list file "%s": %s\n' % (p, e))
+                    sys.exit(1)
+
+    lists = set()
+    sources = set()
+    do_parse(options.list)
+
     drivers = set()
     for source in options.sources:
         components = tuple(x for x in split_path(source) if x)
-        if (len(components) > 3) and (components[:3] == ('src', 'mame', 'drivers')):
+        if (len(components) > 3) and (components[:2] == ('src', 'mame')):
             ext = os.path.splitext(components[-1])[1].lower()
             if ext.startswith('.c'):
-                drivers.add('/'.join(components[3:]))
+                if components[2] == 'drivers':
+                    drivers.add('/'.join(components[3:]))
+                elif '/'.join(components[2:]) in sources:
+                    drivers.add('/'.join(components[2:]))
     for driver in sorted(drivers):
         filterfile.write(driver + '\n')
 

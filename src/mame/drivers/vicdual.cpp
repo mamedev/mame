@@ -1294,11 +1294,34 @@ void tranqgun_state::tranqgun_prot_w(offs_t offset, uint8_t data)
 	}
 }
 
+uint8_t tranqgun_state::brdrlinet_prot_r()
+{
+	logerror("%s: brdrlinet_prot_r\n", machine().describe_context());
+
+	return m_tranqgun_prot_return;
+}
+
+void tranqgun_state::brdrlinet_prot_w(uint8_t data)
+{
+	logerror("%s: brdrlinet_prot_w %02x\n", machine().describe_context(), data);
+
+	if (data == 0xd8)
+		m_tranqgun_prot_return = 0x02;
+	else if (data == 0x3a)
+		m_tranqgun_prot_return = 0x01;
+}
 
 void tranqgun_state::tranqgun_dualgame_map(address_map &map)
 {
 	vicdual_dualgame_map(map);
 	map(0x4000, 0x7fff).rw(FUNC(tranqgun_state::tranqgun_prot_r), FUNC(tranqgun_state::tranqgun_prot_w));
+}
+
+void tranqgun_state::brdrlinet_dualgame_map(address_map &map)
+{
+	vicdual_dualgame_map(map);
+	map(0x7800, 0x7800).r(FUNC(tranqgun_state::brdrlinet_prot_r));
+	map(0xe9a8, 0xe9a8).w(FUNC(tranqgun_state::brdrlinet_prot_w));
 }
 
 uint8_t carnivalh_state::carnivalh_prot_r(offs_t offset)
@@ -2413,6 +2436,12 @@ void tranqgun_state::tranqgun(machine_config &config)
 	BORDERLINE_AUDIO(config, m_vicdual_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void tranqgun_state::brdrlinet(machine_config &config)
+{
+	tranqgun(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &tranqgun_state::brdrlinet_dualgame_map);
+}
 
 void vicdual_state::brdrline(machine_config &config)
 {
@@ -3935,7 +3964,7 @@ ROM_START( brdrlinet )
 	ROM_LOAD( "1171a.u33",      0x0000, 0x0400, CRC(38dd9880) SHA1(1a879ce990129fd34e7265010872ac998d16accf) )
 	ROM_LOAD( "1172a.u32",      0x0400, 0x0400, CRC(1a3adff0) SHA1(3fab79688b739d6a5979638115629d0a61f8878b) )
 	ROM_LOAD( "1173a.u31",      0x0800, 0x0400, CRC(e668734d) SHA1(b01b06f4a107f14001c70e63e072c575cd97c89b) )
-	ROM_LOAD( "1174a.u30.bad",  0x0c00, 0x0400, BAD_DUMP CRC(22c83ae4) SHA1(16da92afe068401a6f27f56b214b600b49d8019f) ) // chip was dead, need another
+	ROM_LOAD( "1174a.u30",      0x0c00, 0x0400, CRC(d1ca5d52) SHA1(2ed9368741a409f7483020c1f7a44edb0a190a46) )
 	ROM_LOAD( "1175a.u29",      0x1000, 0x0400, CRC(116517b8) SHA1(a7ded7cb53735e6cf4994ff70db35dead04828e6) )
 	ROM_LOAD( "1176a.u28",      0x1400, 0x0400, CRC(2b2c4ba8) SHA1(fe9ccb94b9d5d7fb9ec6170a7b71f859b22981d3) )
 	ROM_LOAD( "1177a.u27",      0x1800, 0x0400, CRC(d8cbcc1e) SHA1(632d2ba84d4276155960b176bf7ac514b214e481) )
@@ -4331,7 +4360,7 @@ GAME( 1981, brdrline,   0,        brdrline,  brdrline,  vicdual_state,   empty_i
 GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   vicdual_state,   empty_init, ROT270, "Sega",                    "Star Raker", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrlins,   brdrline, brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "bootleg (Sidam)",         "Borderline (Sidam bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrlinb,   brdrline, brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "bootleg (Karateco)",      "Borderline (Karateco bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, brdrlinet,  brdrline, tranqgun,  tranqgun,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Borderline (Tranquillizer Gun conversion)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // official factory conversion
+GAME( 1981, brdrlinet,  brdrline, brdrlinet, brdrline,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Borderline (Tranquillizer Gun conversion)", MACHINE_SUPPORTS_SAVE ) // official factory conversion
 GAME( 198?, nostromo,   0,        headons,   startrks,  vicdual_state,   empty_init, ROT0,   "bootleg",                 "Nostromo", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // sound board probably differs
 GAME( 198?, startrks,   nostromo, headons,   startrks,  vicdual_state,   empty_init, ROT0,   "bootleg (Sidam)",         "Star Trek (Head On hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, digger,     0,        digger,    digger,    vicdual_state,   empty_init, ROT270, "Sega",                    "Digger", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

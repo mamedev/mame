@@ -128,6 +128,8 @@ DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 #define scudsp_readmem(A,MD) m_data->read_dword(A | (MD << 6))
 #define scudsp_writemem(A,MD,B) m_data->write_dword(A | (MD << 6), B)
 
+constexpr uint64_t concat_64(uint32_t hi, uint32_t lo) { return (uint64_t(hi) << 32) | lo; }
+
 uint32_t scudsp_cpu_device::scudsp_get_source_mem_reg_value( uint32_t mode )
 {
 	if ( mode < 0x8 )
