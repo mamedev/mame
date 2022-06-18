@@ -26,34 +26,7 @@
 ///  Also refer to #NETLIB_CONSTRUCTOR.
 #define NETLIB_OBJECT(name)                                                    \
 	class NETLIB_NAME(name)                                                    \
-	: public delegator_t<device_t>
-
-/// \brief Start a derived netlist device class.
-///
-/// Used to define a derived device class based on `plcass`.
-/// The simplest device without inputs or outputs would look like this:
-///
-///      NETLIB_OBJECT_DERIVED(some_object, parent_object)
-///      {
-///      public:
-///          NETLIB_CONSTRUCTOR(some_object) { }
-///      };
-///
-///  Also refer to #NETLIB_CONSTRUCTOR.
-#define NETLIB_OBJECT_DERIVED(name, pclass)                                    \
-	class NETLIB_NAME(name)                                                    \
-	: public delegator_t<NETLIB_NAME(pclass)>
-
-// Only used for analog objects like diodes and resistors
-
-#define NETLIB_BASE_OBJECT(name)                                               \
-	class NETLIB_NAME(name)                                                    \
-	: public delegator_t<base_device_t>
-
-#define NETLIB_CONSTRUCTOR_PASS(cname, ...)                                    \
-public:                                                                        \
-	NETLIB_NAME(cname)(constructor_param_t data)                               \
-	: constructor_type(data, __VA_ARGS__)
+	: public device_t
 
 /// \brief Used to define the constructor of a netlist device.
 ///
@@ -62,12 +35,7 @@ public:                                                                        \
 #define NETLIB_CONSTRUCTOR(cname)                                              \
 public:                                                                        \
 	NETLIB_NAME(cname)(constructor_param_t data)                               \
-	: constructor_type(data)
-
-#define NETLIB_BASE_OBJECT_CONSTRUCTOR(cname)                                  \
-public:                                                                        \
-	NETLIB_NAME(cname)(constructor_param_t data)                               \
-	: constructor_type(data)
+	: device_t(data)
 
 /// \brief Used to define the constructor of a netlist device and define a
 /// default model.
@@ -82,15 +50,7 @@ public:                                                                        \
 #define NETLIB_CONSTRUCTOR_MODEL(cname, cmodel)                                \
 public:                                                                        \
 	NETLIB_NAME(cname)(constructor_param_t data)                               \
-	: constructor_type(data, cmodel)
-
-/// \brief Define an extended constructor and add further parameters to it.
-/// The macro allows to add further parameters to a device constructor. This is
-/// normally used for sub-devices and system devices only.
-#define NETLIB_CONSTRUCTOR_EX(cname, ...)                                      \
-public:                                                                        \
-	NETLIB_NAME(cname)(constructor_param_t data, __VA_ARGS__)                  \
-	: constructor_type(data)
+	: device_t(data, cmodel)
 
 /// \brief Used to define the destructor of a netlist device.
 /// The use of a destructor for netlist device should normally not be necessary.

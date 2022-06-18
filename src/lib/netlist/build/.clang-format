@@ -7,6 +7,8 @@ ColumnLimit: 80
 ContinuationIndentWidth: 4
 ConstructorInitializerIndentWidth: 0
 NamespaceIndentation: All
+CompactNamespaces: true
+FixNamespaceComments: true
 
 IndentAccessModifiers: false
 AccessModifierOffset: -4
@@ -22,12 +24,16 @@ BreakStringLiterals: false
 # AlwaysBreakTemplateDeclarations: MultiLine
 AlwaysBreakTemplateDeclarations: Yes
 # AfterComma does not work <= 13
+#BreakInheritanceList: AfterComma
 #BreakInheritanceList: BeforeComma
-BreakInheritanceList: BeforeComma
+#BreakInheritanceList: false
+SpaceBeforeInheritanceColon: true
 
-AlignAfterOpenBracket: DontAlign
+#AlignAfterOpenBracket: DontAlign
+AlignAfterOpenBracket: Align
 PointerAlignment: Right
 SpacesInAngles: false
+SpaceBeforeAssignmentOperators: true
 AlignConsecutiveDeclarations: true
 
 AllowShortIfStatementsOnASingleLine: false
@@ -38,6 +44,8 @@ AllowAllParametersOfDeclarationOnNextLine: false
 PenaltyBreakComment: 1
 PenaltyBreakAssignment: 1000
 AlwaysBreakBeforeMultilineStrings: true 
+
+PenaltyReturnTypeOnItsOwnLine: 1
 
 # SortIncludes: CaseSensitive # >= 13!
 SortIncludes: true
@@ -60,6 +68,7 @@ IncludeCategories:
     Priority:        10
 
 StatementMacros: 
+  - "NETLIB_DEVICE_IMPL_NS"
   - "TTL_7400_NAND"
   - "TTL_7402_NOR"
   - "NET_C"
@@ -81,10 +90,13 @@ TypenameMacros:
 IndentPPDirectives: BeforeHash
 MacroBlockBegin: "^static NETLIST_START\\(.*\\)|static TRUTHTABLE_START\\(.*\\)$"
 MacroBlockEnd: "^NETLIST_END\\(\\)|TRUTHTABLE_END\\(\\)$"
-CommentPragmas: '^ NOLINT'
 # ReferenceAlignment: Middle
 # Avoid formatting (breaking) doxygen
 CommentPragmas:  '^\\.+'
 # Avoid formatting cspell ignored comments
 CommentPragmas:  '^#.+'
+# Avoid breaking tables
+CommentPragmas:  '^\|.+'
+# Avoid breaking clang-tidy
+CommentPragmas:  '^ NOLINT.+'
 

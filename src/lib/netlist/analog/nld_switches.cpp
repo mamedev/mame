@@ -19,9 +19,11 @@ namespace netlist
 	// SWITCH
 	// ----------------------------------------------------------------------------------------
 
-	NETLIB_BASE_OBJECT(switch1)
+	class nld_switch1 : public base_device_t
 	{
-		NETLIB_BASE_OBJECT_CONSTRUCTOR(switch1)
+	public:
+		nld_switch1(constructor_param_t data)
+		: base_device_t(data)
 		, m_R(*this, "R")
 		, m_POS(*this, "POS", false)
 		{
@@ -50,9 +52,11 @@ namespace netlist
 // SWITCH2
 // ----------------------------------------------------------------------------------------
 
-	NETLIB_BASE_OBJECT(switch2)
+	class nld_switch2 : public base_device_t
 	{
-		NETLIB_BASE_OBJECT_CONSTRUCTOR(switch2)
+	public:
+		nld_switch2(constructor_param_t data)
+		: base_device_t(data)
 		, m_R1(*this, "R1")
 		, m_R2(*this, "R2")
 		, m_POS(*this, "POS", false)

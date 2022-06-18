@@ -61,8 +61,9 @@ namespace netlist
 		}
 	}
 
-	void nlparse_t::register_dev(const pstring &classname,
-		std::initializer_list<const char *>     more_parameters)
+	void
+	nlparse_t::register_dev(const pstring &                     classname,
+							std::initializer_list<const char *> more_parameters)
 	{
 		std::vector<pstring> params;
 		const auto *         i(more_parameters.begin());
@@ -75,9 +76,10 @@ namespace netlist
 		register_dev(classname, name, params);
 	}
 
-	void nlparse_t::register_dev(const pstring &classname, const pstring &name,
-		const std::vector<pstring> &params_and_connections,
-		factory::element_t **       factory_element)
+	void
+	nlparse_t::register_dev(const pstring &classname, const pstring &name,
+							const std::vector<pstring> &params_and_connections,
+							factory::element_t **       factory_element)
 	{
 
 		auto *f = factory().factory_by_name(classname);
@@ -100,7 +102,7 @@ namespace netlist
 		}
 
 		m_abstract.m_device_factory.insert(m_abstract.m_device_factory.end(),
-			{key, f});
+										   {key, f});
 
 		auto parameter_list = plib::psplit(f->param_desc(), ',');
 
@@ -115,8 +117,8 @@ namespace netlist
 				{
 					if (token_ptr == token_end)
 					{
-						auto err = MF_PARAM_COUNT_MISMATCH_2(name,
-							params_and_connections.size());
+						auto err = MF_PARAM_COUNT_MISMATCH_2(
+							name, params_and_connections.size());
 						log().fatal(err);
 						throw nl_exception(err);
 						// break;
@@ -138,15 +140,15 @@ namespace netlist
 				{
 					if (token_ptr == token_end)
 					{
-						auto err = MF_PARAM_COUNT_MISMATCH_2(name,
-							params_and_connections.size());
+						auto err = MF_PARAM_COUNT_MISMATCH_2(
+							name, params_and_connections.size());
 						log().fatal(err);
 						throw nl_exception(err);
 					}
 					pstring fully_qualified_name = name + "." + tp;
 
 					log().debug("Default parameter: {1}\n",
-						fully_qualified_name);
+								fully_qualified_name);
 
 					register_param(fully_qualified_name, *token_ptr);
 
@@ -156,7 +158,7 @@ namespace netlist
 			if (token_ptr != params_and_connections.end())
 			{
 				MF_PARAM_COUNT_EXCEEDED_2 err(name,
-					params_and_connections.size());
+											  params_and_connections.size());
 				log().fatal(err);
 				throw nl_exception(err);
 			}
@@ -166,7 +168,7 @@ namespace netlist
 	}
 
 	void nlparse_t::register_hint(const pstring &object_name,
-		const pstring &                          hint_name)
+								  const pstring &hint_name)
 	{
 		const auto name = build_fqn(object_name) + hint_name;
 		if (!m_abstract.m_hints.insert({name, false}).second)
@@ -179,7 +181,7 @@ namespace netlist
 	void nlparse_t::register_link(const pstring &sin, const pstring &sout)
 	{
 		register_link_fqn(build_fqn(plib::trim(sin)),
-			build_fqn(plib::trim(sout)));
+						  build_fqn(plib::trim(sout)));
 	}
 
 	void nlparse_t::register_link_arr(const pstring &terms)
@@ -217,8 +219,8 @@ namespace netlist
 
 	void nlparse_t::namespace_pop() { m_namespace_stack.pop(); }
 
-	void nlparse_t::register_param_fp(const pstring &param,
-		const nl_fptype                              value)
+	void
+	nlparse_t::register_param_fp(const pstring &param, const nl_fptype value)
 	{
 		if (plib::abs(value - plib::floor(value)) > nlconst::magic(1e-30)
 			|| plib::abs(value) > nlconst::magic(1e9))
@@ -260,8 +262,8 @@ namespace netlist
 		}
 	}
 
-	void nlparse_t::register_default_param(const pstring &name,
-		const pstring &                                   def)
+	void
+	nlparse_t::register_default_param(const pstring &name, const pstring &def)
 	{
 		// strip " from stringified strings
 		pstring val(def);
@@ -270,7 +272,7 @@ namespace netlist
 		// Replace "@." with the current namespace
 		val = plib::replace_all(val, "@.", namespace_prefix());
 		m_abstract.m_default_params.emplace_back(namespace_prefix() + name,
-			val);
+												 val);
 	}
 
 	factory::list_t &nlparse_t::factory() noexcept
@@ -283,15 +285,16 @@ namespace netlist
 		return m_abstract.m_factory;
 	}
 
-	void nlparse_t::register_lib_entry(const pstring &name,
-		const pstring &def_params, plib::source_location &&loc)
+	void nlparse_t::register_lib_entry(const pstring &         name,
+									   const pstring &         def_params,
+									   plib::source_location &&loc)
 	{
 		factory().add(plib::make_unique<factory::library_element_t, host_arena>(
 			name, factory::properties(def_params, std::move(loc))));
 	}
 
 	void nlparse_t::register_frontier(const pstring &attach,
-		const pstring &r_IN, const pstring &r_OUT)
+									  const pstring &r_IN, const pstring &r_OUT)
 	{
 		pstring frontier_name = plib::pfmt("frontier_{1}")(m_frontier_cnt);
 		m_frontier_cnt++;
@@ -329,10 +332,10 @@ namespace netlist
 	}
 
 	void nlparse_t::truth_table_create(tt_desc &desc, const pstring &def_params,
-		plib::source_location &&loc)
+									   plib::source_location &&loc)
 	{
-		auto fac = factory::truth_table_create(desc,
-			netlist::factory::properties(def_params, std::move(loc)));
+		auto fac = factory::truth_table_create(
+			desc, netlist::factory::properties(def_params, std::move(loc)));
 		factory().add(std::move(fac));
 	}
 
@@ -346,8 +349,8 @@ namespace netlist
 		return namespace_prefix() + obj_name;
 	}
 
-	void nlparse_t::register_alias_no_fqn(const pstring &alias,
-		const pstring &                                  out)
+	void
+	nlparse_t::register_alias_no_fqn(const pstring &alias, const pstring &out)
 	{
 		if (!m_abstract.m_alias.insert({alias, out}).second)
 		{
@@ -372,14 +375,14 @@ namespace netlist
 	}
 
 	bool nlparse_t::parse_tokens(const plib::detail::token_store_t &tokens,
-		const pstring &                                             name)
+								 const pstring &                    name)
 	{
 		parser_t parser(*this);
 		return parser.parse(tokens, name);
 	}
 
-	bool nlparse_t::parse_stream(plib::istream_uptr &&in_stream,
-		const pstring &                               name)
+	bool
+	nlparse_t::parse_stream(plib::istream_uptr &&in_stream, const pstring &name)
 	{
 #if 0
 		auto key = in_stream.filename();
@@ -401,8 +404,8 @@ namespace netlist
 #else
 		const auto filename = in_stream.filename();
 		auto       preprocessed = std::make_unique<std::stringstream>(
-            putf8string(plib::ppreprocessor(m_includes, &m_defines)
-                            .process(std::move(in_stream), filename)));
+			putf8string(plib::ppreprocessor(m_includes, &m_defines)
+							.process(std::move(in_stream), filename)));
 
 		parser_t::token_store_t st;
 		parser_t                parser(*this);
@@ -447,7 +450,7 @@ namespace netlist
 				|| (link->second == pin_fully_qualified_name))
 			{
 				log().verbose("removing connection: {1} <==> {2}\n",
-					link->first, link->second);
+							  link->first, link->second);
 				link = m_abstract.m_links.erase(link);
 				found = true;
 			}
@@ -516,7 +519,7 @@ namespace netlist
 	}
 
 	pstring setup_t::get_initial_param_val(const pstring &name,
-		const pstring &                                   def) const
+										   const pstring &def) const
 	{
 		// When `get_intial_param_val` is called the parameter `<name>` is
 		// already registered and the value `(value_string())` is set to the
@@ -571,18 +574,20 @@ namespace netlist
 		if (!m_terminals.insert({term.name(), &term}).second)
 		{
 			log().fatal(MF_ADDING_1_2_TO_TERMINAL_LIST(termtype_as_str(term),
-				term.name()));
+													   term.name()));
 			throw nl_exception(MF_ADDING_1_2_TO_TERMINAL_LIST(
 				termtype_as_str(term), term.name()));
 		}
 	}
 
-	void setup_t::register_term(terminal_t &term, terminal_t *other_term,
-		const std::array<terminal_t *, 2> &splitter_terms)
+	void
+	setup_t::register_term(terminal_t &term, terminal_t *other_term,
+						   const std::array<terminal_t *, 2> &splitter_terms)
 	{
 		this->register_term(term);
-		m_connected_terminals.insert({&term,
-			{other_term, splitter_terms[0], splitter_terms[1], nullptr}});
+		m_connected_terminals.insert(
+			{&term,
+			 {other_term, splitter_terms[0], splitter_terms[1], nullptr}});
 	}
 
 	void setup_t::register_param_t(param_t &param)
@@ -638,8 +643,8 @@ namespace netlist
 		return ret;
 	}
 
-	std::vector<pstring> setup_t::get_terminals_for_device_name(
-		const pstring &devname) const
+	std::vector<pstring>
+	setup_t::get_terminals_for_device_name(const pstring &devname) const
 	{
 		std::vector<pstring> terms;
 		for (const auto &t : m_terminals)
@@ -663,7 +668,8 @@ namespace netlist
 					pstring resolved = resolve_alias(t.first);
 					if (resolved != t.first)
 					{
-						auto found = std::find(terms.begin(), terms.end(),
+						auto found = std::find(
+							terms.begin(), terms.end(),
 							resolved.substr(devname.length() + 1));
 						if (found != terms.end())
 							terms.erase(found);
@@ -674,8 +680,8 @@ namespace netlist
 		return terms;
 	}
 
-	detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in,
-		bool required) const
+	detail::core_terminal_t *
+	setup_t::find_terminal(const pstring &terminal_in, bool required) const
 	{
 		const pstring &tname = resolve_alias(terminal_in);
 		auto           ret = m_terminals.find(tname);
@@ -703,8 +709,9 @@ namespace netlist
 		return term;
 	}
 
-	detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in,
-		detail::terminal_type atype, bool required) const
+	detail::core_terminal_t *
+	setup_t::find_terminal(const pstring &       terminal_in,
+						   detail::terminal_type atype, bool required) const
 	{
 		const pstring &tname = resolve_alias(terminal_in);
 		auto           ret = m_terminals.find(tname);
@@ -755,8 +762,8 @@ namespace netlist
 	}
 
 	// NOLINTNEXTLINE(misc-no-recursion)
-	devices::nld_base_proxy *setup_t::get_d_a_proxy(
-		const detail::core_terminal_t &out)
+	devices::nld_base_proxy *
+	setup_t::get_d_a_proxy(const detail::core_terminal_t &out)
 	{
 		auto iter_proxy(m_proxies.find(&out));
 
@@ -770,7 +777,7 @@ namespace netlist
 
 		pstring x = plib::pfmt("proxy_da_{1}_{2}")(out.name())(m_proxy_cnt);
 		auto    new_proxy = (*out_cast)->logic_family()->create_d_a_proxy(
-            m_nlstate, x, *out_cast);
+			m_nlstate, x, *out_cast);
 		m_proxy_cnt++;
 		// connect all existing terminals to new net
 
@@ -785,7 +792,7 @@ namespace netlist
 			if (!connect(new_proxy->proxy_term(), *p))
 			{
 				log().fatal(MF_CONNECTING_1_TO_2(new_proxy->proxy_term().name(),
-					(*p).name()));
+												 (*p).name()));
 				throw nl_exception(MF_CONNECTING_1_TO_2(
 					new_proxy->proxy_term().name(), (*p).name()));
 			}
@@ -802,8 +809,8 @@ namespace netlist
 	}
 
 	// NOLINTNEXTLINE(misc-no-recursion)
-	devices::nld_base_proxy *setup_t::get_a_d_proxy(
-		detail::core_terminal_t &inp)
+	devices::nld_base_proxy *
+	setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 	{
 		gsl_Expects(inp.is_logic());
 
@@ -858,8 +865,8 @@ namespace netlist
 		return ret;
 	}
 
-	detail::core_terminal_t &setup_t::resolve_proxy(
-		detail::core_terminal_t &term)
+	detail::core_terminal_t &
+	setup_t::resolve_proxy(detail::core_terminal_t &term)
 	{
 		if (term.is_logic())
 		{
@@ -902,7 +909,7 @@ namespace netlist
 
 	// NOLINTNEXTLINE(misc-no-recursion)
 	void setup_t::connect_input_output(detail::core_terminal_t &input,
-		detail::core_terminal_t &                               output)
+									   detail::core_terminal_t &output)
 	{
 		if (input.has_net() && input.net().is_rail_net())
 		{
@@ -939,7 +946,7 @@ namespace netlist
 
 	// NOLINTNEXTLINE(misc-no-recursion)
 	void setup_t::connect_terminal_input(detail::core_terminal_t &terminal,
-		detail::core_terminal_t &                                 input)
+										 detail::core_terminal_t &input)
 	{
 		if (input.is_analog())
 		{
@@ -948,11 +955,11 @@ namespace netlist
 		else if (input.is_logic())
 		{
 			log().verbose("connect terminal {1} (in, {2}) to {3}\n",
-				input.name(),
-				input.is_analog()  ? "analog"
-				: input.is_logic() ? "logic"
-								   : "?",
-				terminal.name());
+						  input.name(),
+						  input.is_analog()  ? "analog"
+						  : input.is_logic() ? "logic"
+											 : "?",
+						  terminal.name());
 			auto *proxy = get_a_d_proxy(input);
 
 			// out.net().register_con(proxy->proxy_term());
@@ -967,12 +974,12 @@ namespace netlist
 
 	// NOLINTNEXTLINE(misc-no-recursion)
 	void setup_t::connect_terminal_output(detail::core_terminal_t &terminal,
-		detail::core_terminal_t &                                  output)
+										  detail::core_terminal_t &output)
 	{
 		if (output.is_analog())
 		{
 			log().debug("connect_terminal_output: {1} {2}\n", terminal.name(),
-				output.name());
+						output.name());
 			// no proxy needed, just merge existing terminal net
 			if (terminal.has_net())
 			{
@@ -983,8 +990,8 @@ namespace netlist
 					// to GND and the schematics again externally. This will
 					// cause this warning.
 					// FIXME: Add a hint to suppress the warning.
-					log().info(MI_CONNECTING_1_TO_2_SAME_NET(terminal.name(),
-						output.name(), terminal.net().name()));
+					log().info(MI_CONNECTING_1_TO_2_SAME_NET(
+						terminal.name(), output.name(), terminal.net().name()));
 			}
 			else
 				output.net().add_terminal(terminal);
@@ -1004,7 +1011,7 @@ namespace netlist
 	}
 
 	void setup_t::connect_terminals(detail::core_terminal_t &t1,
-		detail::core_terminal_t &                            t2)
+									detail::core_terminal_t &t2)
 	{
 		if (t1.has_net() && t2.has_net())
 		{
@@ -1025,8 +1032,8 @@ namespace netlist
 		{
 			log().debug("adding analog net ...\n");
 			// FIXME: Nets should have a unique name
-			auto new_net_uptr = plib::make_owned<analog_net_t>(nlstate().pool(),
-				m_nlstate, "net." + t1.name());
+			auto new_net_uptr = plib::make_owned<analog_net_t>(
+				nlstate().pool(), m_nlstate, "net." + t1.name());
 			auto *new_net_ptr = new_net_uptr.get();
 			m_nlstate.register_net(std::move(new_net_uptr));
 			t1.set_net(new_net_ptr);
@@ -1037,7 +1044,7 @@ namespace netlist
 
 	// NOLINTNEXTLINE(misc-no-recursion)
 	bool setup_t::connect_input_input(detail::core_terminal_t &input1,
-		detail::core_terminal_t &                              input2)
+									  detail::core_terminal_t &input2)
 	{
 		bool ret = false;
 		if (input1.has_net()) // if input 1 already has a net
@@ -1055,7 +1062,7 @@ namespace netlist
 				// the above was not successfull - try to connect input2 to
 				// TERMINAL type terminals of input 1 net's terminals
 				for (detail::core_terminal_t *t :
-					input1.net().core_terms_copy())
+					 input1.net().core_terms_copy())
 				{
 					if (t->is_type(detail::terminal_type::TERMINAL))
 						ret = connect(input2, *t);
@@ -1073,7 +1080,7 @@ namespace netlist
 			if (!ret)
 			{
 				for (detail::core_terminal_t *t :
-					input2.net().core_terms_copy())
+					 input2.net().core_terms_copy())
 				{
 					if (t->is_type(detail::terminal_type::TERMINAL))
 						ret = connect(input1, *t);
@@ -1087,7 +1094,7 @@ namespace netlist
 
 	// NOLINTNEXTLINE(misc-no-recursion)
 	bool setup_t::connect(detail::core_terminal_t &t1_in,
-		detail::core_terminal_t &                  t2_in)
+						  detail::core_terminal_t &t2_in)
 	{
 		using namespace detail;
 
@@ -1226,7 +1233,7 @@ namespace netlist
 		{
 			for (auto &link : m_abstract.m_links)
 				log().warning(MF_CONNECTING_1_TO_2(de_alias(link.first),
-					de_alias(link.second)));
+												   de_alias(link.second)));
 
 			log().fatal(
 				MF_LINK_TRIES_EXCEEDED(m_netlist_params->m_max_link_loops()));
@@ -1248,8 +1255,8 @@ namespace netlist
 			detail::core_terminal_t *term = i.second;
 			const pstring            name_da = de_alias(term->name());
 			bool                     is_nc_pin(
-                dynamic_cast<devices::NETLIB_NAME(nc_pin) *>(&term->device())
-                != nullptr);
+				dynamic_cast<devices::NETLIB_NAME(nc_pin) *>(&term->device())
+				!= nullptr);
 			bool is_nc_flagged(false);
 
 			auto hnc = m_abstract.m_hints.find(name_da + sHINT_NC);
@@ -1307,14 +1314,14 @@ namespace netlist
 
 				if (iter_proxy == m_proxies.end() && !tri.is_force_logic())
 				{
-					log().error(ME_TRISTATE_NO_PROXY_FOUND_2(term->name(),
-						term->device().name()));
+					log().error(ME_TRISTATE_NO_PROXY_FOUND_2(
+						term->name(), term->device().name()));
 					err = true;
 				}
 				else if (iter_proxy != m_proxies.end() && tri.is_force_logic())
 				{
-					log().error(ME_TRISTATE_PROXY_FOUND_2(term->name(),
-						term->device().name()));
+					log().error(ME_TRISTATE_PROXY_FOUND_2(
+						term->name(), term->device().name()));
 					err = true;
 				}
 			}
@@ -1419,8 +1426,8 @@ namespace netlist
 	pstring models_t::model_t::value_str(const pstring &entity) const
 	{
 		if (entity != plib::ucase(entity))
-			throw nl_exception(MF_MODEL_PARAMETERS_NOT_UPPERCASE_1_2(entity,
-				model_string(m_map)));
+			throw nl_exception(MF_MODEL_PARAMETERS_NOT_UPPERCASE_1_2(
+				entity, model_string(m_map)));
 		const auto it(m_map.find(entity));
 		if (it == m_map.end())
 			throw nl_exception(
@@ -1434,8 +1441,9 @@ namespace netlist
 		pstring tmp = value_str(entity);
 
 		nl_fptype factor = nlconst::one();
-		auto      p = std::next(tmp.begin(),
-            plib::narrow_cast<pstring::difference_type>(tmp.length() - 1));
+		auto      p = std::next(
+			tmp.begin(),
+			plib::narrow_cast<pstring::difference_type>(tmp.length() - 1));
 		switch (*p)
 		{
 			case 'M': factor = nlconst::magic(1e6); break; // NOLINT
@@ -1458,8 +1466,8 @@ namespace netlist
 		bool err(false);
 		auto val = plib::pstonum_ne<nl_fptype>(tmp, err);
 		if (err)
-			throw nl_exception(MF_MODEL_NUMBER_CONVERSION_ERROR(entity, tmp,
-				"double", m_model));
+			throw nl_exception(MF_MODEL_NUMBER_CONVERSION_ERROR(
+				entity, tmp, "double", m_model));
 		return val * factor;
 	}
 
@@ -1481,7 +1489,7 @@ namespace netlist
 		// FIXME: create proxies based on family type (far future)
 		device_arena::unique_ptr<devices::nld_base_d_to_a_proxy>
 		create_d_a_proxy(netlist_state_t &anetlist, const pstring &name,
-			const logic_output_t *proxied) const override
+						 const logic_output_t *proxied) const override
 		{
 			switch (m_family_type)
 			{
@@ -1500,7 +1508,7 @@ namespace netlist
 
 		device_arena::unique_ptr<devices::nld_base_a_to_d_proxy>
 		create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
-			const logic_input_t *proxied) const override
+						 const logic_input_t *proxied) const override
 		{
 			switch (m_family_type)
 			{
@@ -1619,7 +1627,8 @@ namespace netlist
 	void setup_t::delete_empty_nets()
 	{
 		m_nlstate.nets().erase(
-			std::remove_if(m_nlstate.nets().begin(), m_nlstate.nets().end(),
+			std::remove_if(
+				m_nlstate.nets().begin(), m_nlstate.nets().end(),
 				[](device_arena::owned_ptr<detail::net_t> &net)
 				{
 					if (net->core_terms_empty())
@@ -1627,7 +1636,7 @@ namespace netlist
 						// FIXME: need to remove from state->m_core_terms as
 						// well.
 						net->state().log().verbose("Deleting net {1} ...",
-							net->name());
+												   net->name());
 						net->state().run_state_manager().remove_save_items(
 							net.get());
 						return true;
@@ -1655,8 +1664,8 @@ namespace netlist
 
 		for (auto &e : m_abstract.m_default_params)
 		{
-			auto param(plib::make_unique<param_str_t, host_arena>(nlstate(),
-				e.first, e.second));
+			auto param(plib::make_unique<param_str_t, host_arena>(
+				nlstate(), e.first, e.second));
 			register_param_t(*param);
 			m_defparam_lifetime.push_back(std::move(param));
 		}
@@ -1670,9 +1679,9 @@ namespace netlist
 				|| m_parser.factory()
 					   .is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 			{
-				m_nlstate.register_device(e.first,
-					e.second->make_device(nlstate().pool(), m_nlstate,
-						e.first));
+				m_nlstate.register_device(
+					e.first, e.second->make_device(nlstate().pool(), m_nlstate,
+												   e.first));
 			}
 		}
 
@@ -1704,7 +1713,7 @@ namespace netlist
 							e.second))
 			{
 				auto dev = e.second->make_device(m_nlstate.pool(), m_nlstate,
-					e.first);
+												 e.first);
 				m_nlstate.register_device(dev->name(), std::move(dev));
 			}
 		}
@@ -1713,8 +1722,8 @@ namespace netlist
 
 		for (auto &d : m_nlstate.devices())
 		{
-			auto p = m_abstract.m_hints.find(
-				d.second->name() + sHINT_NO_DEACTIVATE);
+			auto p = m_abstract.m_hints.find(d.second->name()
+											 + sHINT_NO_DEACTIVATE);
 			if (p != m_abstract.m_hints.end())
 			{
 				p->second = true; // mark as used
@@ -1729,7 +1738,7 @@ namespace netlist
 
 		log().verbose("looking for two terms connected to rail nets ...");
 		for (auto &t :
-			m_nlstate.get_device_list<analog::NETLIB_NAME(two_terminal)>())
+			 m_nlstate.get_device_list<analog::NETLIB_NAME(two_terminal)>())
 		{
 			if (t->N().net().is_rail_net() && t->P().net().is_rail_net())
 			{
@@ -1811,8 +1820,8 @@ namespace netlist
 							   : false;
 	}
 
-	plib::istream_uptr source_string_t::stream(
-		[[maybe_unused]] const pstring &name)
+	plib::istream_uptr
+	source_string_t::stream([[maybe_unused]] const pstring &name)
 	{
 		plib::istream_uptr ret(
 			std::make_unique<std::istringstream>(putf8string(m_str)), name);
@@ -1820,8 +1829,8 @@ namespace netlist
 		return ret;
 	}
 
-	plib::istream_uptr source_mem_t::stream(
-		[[maybe_unused]] const pstring &name)
+	plib::istream_uptr
+	source_mem_t::stream([[maybe_unused]] const pstring &name)
 	{
 		plib::istream_uptr ret(
 			std::make_unique<std::istringstream>(m_str, std::ios_base::binary),
@@ -1830,8 +1839,8 @@ namespace netlist
 		return ret;
 	}
 
-	plib::istream_uptr source_file_t::stream(
-		[[maybe_unused]] const pstring &name)
+	plib::istream_uptr
+	source_file_t::stream([[maybe_unused]] const pstring &name)
 	{
 		auto f = std::make_unique<plib::ifstream>(
 			plib::filesystem::u8path(m_filename));
@@ -1843,8 +1852,8 @@ namespace netlist
 		return plib::istream_uptr();
 	}
 
-	plib::istream_uptr source_pattern_t::stream(
-		[[maybe_unused]] const pstring &name)
+	plib::istream_uptr
+	source_pattern_t::stream([[maybe_unused]] const pstring &name)
 	{
 		pstring filename = plib::pfmt(m_pattern)(
 			m_force_lowercase ? plib::lcase(name) : name);
@@ -1869,8 +1878,8 @@ namespace netlist
 		return false;
 	}
 
-	plib::istream_uptr source_proc_t::stream(
-		[[maybe_unused]] const pstring &name)
+	plib::istream_uptr
+	source_proc_t::stream([[maybe_unused]] const pstring &name)
 	{
 		return plib::istream_uptr();
 	}

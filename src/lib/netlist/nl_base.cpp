@@ -563,18 +563,6 @@ namespace netlist
 		if (exec().stats_enabled())
 			m_stats = state().make_pool_object<stats_t>();
 	}
-#if 0
-	core_device_t::core_device_t(core_device_t &owner, const pstring &name)
-		: netlist_object_t(owner.state().exec(), owner.name() + "." + name)
-		, m_hint_deactivate(false)
-		, m_active_outputs(*this, "m_active_outputs", 1)
-	{
-		//printf("owned device: %s\n", this->name().c_str());
-		owner.state().register_device(this->name(), device_arena::owned_ptr<core_device_t>(this, false));
-		if (exec().stats_enabled())
-			m_stats = owner.state().make_pool_object<stats_t>();
-	}
-#endif
 
 	log_type &core_device_t::log() { return state().log(); }
 

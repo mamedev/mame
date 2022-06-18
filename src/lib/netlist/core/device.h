@@ -38,12 +38,7 @@ namespace netlist
 		device_t(device_param_t data, const pstring &model);
 		// only needed by proxies
 		device_t(device_param_t data, const logic_family_desc_t *desc);
-#if 0
-		device_t(device_t &owner, const pstring &name);
-		// pass in a default model - this may be overwritten by PARAM(DEVICE.MODEL, "XYZ(...)")
-		device_t(device_t &owner, const pstring &name,
-			const pstring &model);
-#endif
+
 		device_t(const device_t &) = delete;
 		device_t &operator=(const device_t &) = delete;
 		device_t(device_t &&) noexcept = delete;

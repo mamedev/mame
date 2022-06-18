@@ -97,15 +97,6 @@ namespace netlist
 		struct properties;
 	} // namespace factory
 
-	template <class CX>
-	class delegator_t : public CX
-	{
-	protected:
-		using constructor_type = delegator_t<CX>;
-		using delegated_type = CX;
-		using delegated_type::delegated_type;
-	};
-
 } // namespace netlist
 
 

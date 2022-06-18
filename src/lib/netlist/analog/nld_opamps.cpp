@@ -101,9 +101,11 @@ namespace netlist
 	};
 
 
-	NETLIB_BASE_OBJECT(opamp)
+	class nld_opamp : public base_device_t
 	{
-		NETLIB_BASE_OBJECT_CONSTRUCTOR(opamp)
+	public:
+		nld_opamp(constructor_param_t data)
+		: base_device_t(data)
 		, m_RP(*this, "RP1")
 		, m_G1(*this, "G1")
 		, m_VCC(*this, "VCC", NETLIB_DELEGATE(supply))
