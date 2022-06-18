@@ -115,7 +115,7 @@ private:
 	static constexpr int screen_320_240_seq[5] = { 0x24, 0x8, 0x72, 0x0, 0x25 };
 	static constexpr int screen_384_200_seq[5] = { 0x16, 0x4, 0x12, 0x1, 0x45 };
 	static constexpr int screen_400_192_seq[5] = { 0x14, 0x3, 0x1a, 0x1, 0x45 };
-        static constexpr int screen_256_192_seq[5] = { 0x32, 0x12, 0x20, 0x1, 0x49 };
+	static constexpr int screen_256_192_seq[5] = { 0x32, 0x12, 0x20, 0x1, 0x49 };
 	static constexpr const int *screen_mode_sequences[4] = { screen_320_240_seq, screen_384_200_seq, screen_400_192_seq, screen_256_192_seq };
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

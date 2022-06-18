@@ -1,5 +1,5 @@
 // license: BSD-3-Clause
-// copyright-holders: Dirk Best
+// copyright-holders: Dirk Best, Märt Põder
 /***************************************************************************
 
     Juku E5101/E5104
