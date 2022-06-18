@@ -75,8 +75,6 @@
  *  - Monitor ROM command `ss -r` doesn't show most register values. Not sure what mechanism the APmonitor uses to get the register dump.
  *    (TLB dump is also broken, but unlike the register dump, the TLB dump is broken on the real NWS-5000X too.
  *     Use the `mp` monitor command instead for a working version that shows the TLB correctly, both on real hardware and in emulation)
- *  - NetBSD kernel doesn't work with DRC disabled on the MIPS3 driver. The Sony APbus bootloader doesn't work on MIPS3 with DRC enabled.
- *  - SCSI performance seems variable from run to run, especially when networking is enabled. Will probably need to do some runtime profiling on that.
  *  - Reboot/halt+boot fails because the ESCC FIFO isn't reset properly. For now, the emulator must be hard reset.
  *    It prints out a message (`esccf0: ai->ai_addr points AProm`) and then tries to allocate and use a different FIFO (which fails)
  *
@@ -88,15 +86,12 @@
  *  - Framebuffer (and remaining kb/ms support)
  *  - APbus expansion slots
  *  - Triage and fix the known issues mentioned above
- *  - Save state support
+ *  - Full save state support
  */
 
 #include "emu.h"
 
-// There are two MIPSIII/R4000 implementations in MAME
-// MIPS3 is faster, but to avoid any architectural violations related to implementing functionality
-// in the interpreter but not the DRC, the default for this driver is r4000.cpp
-// MIPS3 will not work out of the box, even if you change the #define.
+// r4000.h has all of the features needed for this driver to function. mips3 isn't there yet because the DRC makes it harder to implement the scache stuff
 #define NO_MIPS3
 #ifndef NO_MIPS3
 #include "cpu/mips/mips3.h"
