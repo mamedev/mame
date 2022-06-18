@@ -215,7 +215,7 @@ void nubus_cb264_device::cb264_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	switch (offset)
 	{
 		case 0x4/4: // 0 = 1 bpp, 1 = 2bpp, 2 = 4bpp, 3 = 8bpp, 4 = 24bpp
-			m_cb264_mode = data;
+			m_cb264_mode = data & 0x7;
 			break;
 
 		case 0x14/4:    // VBL ack
