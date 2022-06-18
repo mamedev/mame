@@ -1058,7 +1058,7 @@ public:
 
 		m_sixaxis_mode = downcast<const sdl_options *>(options())->sixaxis();
 
-		devmap_init(machine, &m_joy_map, SDLOPTION_JOYINDEX, 8, "Joystick mapping");
+		m_joy_map.init(machine, SDLOPTION_JOYINDEX, 8, "Joystick mapping");
 
 		osd_printf_verbose("Joystick: Start initialization\n");
 		for (int physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
