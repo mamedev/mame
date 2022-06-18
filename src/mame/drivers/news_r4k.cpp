@@ -967,8 +967,8 @@ uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
 
 	// Marshal raw data to struct
 	apbus_pte pte;
-	pte.valid = (raw_pte & ENTRY_VALID) > 0;
-	pte.coherent = (raw_pte & ENTRY_COHERENT) > 0;
+	pte.valid = raw_pte & ENTRY_VALID;
+	pte.coherent = raw_pte & ENTRY_COHERENT;
 	pte.pad2 = (raw_pte & ENTRY_PAD) >> ENTRY_PAD_SHIFT;
 	pte.pfnum = raw_pte & ENTRY_PFNUM;
 

@@ -2422,7 +2422,6 @@ uint8_t z80scc_channel::data_read()
 			}
 		}
 
-		// TODO: Datasheet mentions some special conditions related to WRQ on receive
 		check_dma_request();
 	}
 	else
@@ -2981,29 +2980,23 @@ void z80scc_channel::write_rx(int state)
  */
 void z80scc_channel::check_dma_request()
 {
-	// if DTR/REQ is enabled for transmit instead
-	// (usually so WREQ_ON_RX_TX can be used, see the Sony NWS-5000X driver for an example)
 	if (m_wr14 & WR14_DTR_REQ_FUNC)
 	{
-		// Datasheet claims that this doesn't depend on TX enable, but follow WREQ for now
+		// Datasheet claims that this doesn't depend on TX enable, but follow the original WREQ implementation for now
 		set_dtr(((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
 	}
 
-	// don't do anything if wait/request function is not enabled
-	if ((m_wr1 & WR1_WREQ_ENABLE) == 0)
-		return;
-
-	// wait/request function for receive
-	if ((m_wr1 & WR1_WREQ_ON_RX_TX) && (m_wr1 & WR1_WREQ_FUNCTION))
+	if ((m_wr1 & WR1_WREQ_ENABLE) && (m_wr1 & WR1_WREQ_FUNCTION))
 	{
-		m_uart->m_out_wreq_cb[m_index](((m_rr0 & RR0_RX_CHAR_AVAILABLE) && (m_wr3 & WR3_RX_ENABLE)) ? 0 : 1);
-		return;
-	}
-
-	// if dma request function is enabled
-	if (m_wr1 & WR1_WREQ_FUNCTION)
-	{
-		// assert /W//REQ if transmit buffer is empty and transmitter is enabled
-		m_uart->m_out_wreq_cb[m_index](((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
+		if (m_wr1 & WR1_WREQ_ON_RX_TX)
+		{
+			// assert /W//REQ if receive buffer has a character avaliable
+			m_uart->m_out_wreq_cb[m_index]((m_rr0 & RR0_RX_CHAR_AVAILABLE) ? 0 : 1);
+		}
+		else
+		{
+			// assert /W//REQ if transmit buffer is empty and transmitter is enabled
+			m_uart->m_out_wreq_cb[m_index](((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
+		}
 	}
 }
