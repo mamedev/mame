@@ -2982,7 +2982,7 @@ void z80scc_channel::check_dma_request()
 {
 	if (m_wr14 & WR14_DTR_REQ_FUNC)
 	{
-		// Datasheet claims that this doesn't depend on TX enable, but follow the original WREQ implementation for now
+		// Datasheet claims that this doesn't depend on TX enable, but follow the /W//REQ implementation for now
 		set_dtr(((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
 	}
 
