@@ -137,18 +137,18 @@ void upd78k4_device::device_start()
 	}
 	for (int n = 0; n < 16; n++)
 		state_add<u8>(UPD78K4_R0 + n, string_format("R%d", n).c_str(),
-			[this, n]() { return reinterpret_cast<u8 *>(&m_iram[0])[BYTE_XOR_LE(register_base() | n)]; },
-			[this, n](u8 data) { reinterpret_cast<u8 *>(&m_iram[0])[BYTE_XOR_LE(register_base() | n)] = data; }
+			[this, n]() { return util::little_endian_cast<const u8>(&m_iram[0])[register_base() | n]; },
+			[this, n](u8 data) { util::little_endian_cast<u8>(&m_iram[0])[register_base() | n] = data; }
 		).noshow();
 	for (int n = 0; n < 4; n++)
 		state_add<u8>(UPD78K4_X + n, std::array<const char *, 4>{{"X", "A", "C", "B"}}[n],
-			[this, n]() { return reinterpret_cast<u8 *>(&m_iram[0])[BYTE_XOR_LE(register_base() | (m_psw & 0x0020) >> 3 | n)]; },
-			[this, n](u8 data) { reinterpret_cast<u8 *>(&m_iram[0])[BYTE_XOR_LE(register_base() | (m_psw & 0x0020) >> 3 | n)] = data; }
+			[this, n]() { return util::little_endian_cast<const u8>(&m_iram[0])[register_base() | (m_psw & 0x0020) >> 3 | n]; },
+			[this, n](u8 data) { util::little_endian_cast<u8>(&m_iram[0])[register_base() | (m_psw & 0x0020) >> 3 | n] = data; }
 		).noshow();
 	for (int n = 0; n < 8; n++)
 		state_add<u8>(UPD78K4_VPL + n, std::array<const char *, 8>{{"VPL", "VPH", "UPL", "UPH", "E", "D", "L", "H"}}[n],
-			[this, n]() { return reinterpret_cast<u8 *>(&m_iram[0])[BYTE_XOR_LE(register_base() | 0x08 | n)]; },
-			[this, n](u8 data) { reinterpret_cast<u8 *>(&m_iram[0])[BYTE_XOR_LE(register_base() | 0x08 | n)] = data; }
+			[this, n]() { return util::little_endian_cast<const u8>(&m_iram[0])[register_base() | 0x08 | n]; },
+			[this, n](u8 data) { util::little_endian_cast<u8>(&m_iram[0])[register_base() | 0x08 | n] = data; }
 		).noshow();
 
 	// save state
