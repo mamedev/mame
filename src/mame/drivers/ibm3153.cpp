@@ -131,5 +131,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME             FLAGS
-COMP( 1999?, ibm3153, 0,      0,      ibm3153, ibm3153, ibm3153_state, empty_init, "IBM",   "IBM 3153 Terminal", MACHINE_IS_SKELETON)
+//    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  							FULLNAME             FLAGS
+COMP( 1999?, ibm3153, 0,      0,      ibm3153, ibm3153, ibm3153_state, empty_init, "International Business Machines",   "IBM 3153 Terminal", MACHINE_IS_SKELETON)

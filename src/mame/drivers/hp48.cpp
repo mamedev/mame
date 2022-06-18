@@ -4,7 +4,7 @@
 
   Copyright (C) Antoine Mine' 2008
 
-   Hewlett Packard HP48 S/SX & G/GX/G+ and HP49 G
+   Hewlett-Packard HP48 S/SX & G/GX/G+ and HP49 G
 
 **********************************************************************/
 
@@ -34,7 +34,7 @@
 
 
 /*
-  HP48: graphical calculators by Hewlett Packard.
+  HP48: graphical calculators by Hewlett-Packard.
 
   Two main series: S series & G series.
   Each series is subdivised into an 'expandable' model (SX,GX) and a
@@ -1353,11 +1353,11 @@ ROM_START( hp49g )
 	ROMX_LOAD("hp49gv119.rom", 0x00000, 0x200000, CRC(75218a18) SHA1(ec0f661f0aa7158d1f6df61f24410260b5324fa9), ROM_BIOS(5))
 ROM_END
 
-COMP( 1990, hp48sx, 0,      0, hp48sx, hp48sx, hp48_state, init_hp48, "Hewlett Packard", "HP48SX", 0 )
-COMP( 1991, hp48s,  hp48sx, 0, hp48s,  hp48sx, hp48_state, init_hp48, "Hewlett Packard", "HP48S",  0 )
-COMP( 1993, hp48gx, 0,      0, hp48gx, hp48gx, hp48_state, init_hp48, "Hewlett Packard", "HP48GX", 0 )
-COMP( 1993, hp48g,  hp48gx, 0, hp48g,  hp48gx, hp48_state, init_hp48, "Hewlett Packard", "HP48G",  0 )
-COMP( 1998, hp48gp, hp48gx, 0, hp48gp, hp48gx, hp48_state, init_hp48, "Hewlett Packard", "HP48G+", 0 )
-COMP( 1999, hp49g,  0,      0, hp49g,  hp49g,  hp48_state, init_hp48, "Hewlett Packard", "HP49G",  0 )
-COMP( 1995, hp38g,  0,      0, hp48g,  hp48gx, hp48_state, init_hp48, "Hewlett Packard", "HP38G",  0 )
-COMP( 2000, hp39g,  0,      0, hp48g,  hp48gx, hp48_state, init_hp48, "Hewlett Packard", "HP39G",  MACHINE_NOT_WORKING )
+COMP( 1990, hp48sx, 0,      0, hp48sx, hp48sx, hp48_state, init_hp48, "Hewlett-Packard", "HP48SX", 0 )
+COMP( 1991, hp48s,  hp48sx, 0, hp48s,  hp48sx, hp48_state, init_hp48, "Hewlett-Packard", "HP48S",  0 )
+COMP( 1993, hp48gx, 0,      0, hp48gx, hp48gx, hp48_state, init_hp48, "Hewlett-Packard", "HP48GX", 0 )
+COMP( 1993, hp48g,  hp48gx, 0, hp48g,  hp48gx, hp48_state, init_hp48, "Hewlett-Packard", "HP48G",  0 )
+COMP( 1998, hp48gp, hp48gx, 0, hp48gp, hp48gx, hp48_state, init_hp48, "Hewlett-Packard", "HP48G+", 0 )
+COMP( 1999, hp49g,  0,      0, hp49g,  hp49g,  hp48_state, init_hp48, "Hewlett-Packard", "HP49G",  0 )
+COMP( 1995, hp38g,  0,      0, hp48g,  hp48gx, hp48_state, init_hp48, "Hewlett-Packard", "HP38G",  0 )
+COMP( 2000, hp39g,  0,      0, hp48g,  hp48gx, hp48_state, init_hp48, "Hewlett-Packard", "HP39G",  MACHINE_NOT_WORKING )

@@ -28,7 +28,7 @@ This is the world's 1st released dedicated chess computer. Oddly, the rows/colum
 are reversed: left to right is 1-8, bottom to top is A-H, eg. pawn from D2 to D4
 is 4B to 4D here.
 
-The CC1 patent(US4235442) refers to a Hewlett Packard chess program. It was eventually
+The CC1 patent(US4235442) refers to a Hewlett-Packard chess program. It was eventually
 found out that it was written for a HP-9810A by Alan A. Wray in 1974, and CC1 is very
 similar to it. Ron C. Nelson must have ported the algorithms to 8080 when he wrote
 his Altair 8800 chess program, and this is what made it into CC1.

@@ -750,5 +750,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                        FULLNAME             FLAGS
-SYST( 1983, hp3478a,  0,      0,  hp3478a, hp3478a,hp3478a_state, empty_init, "HP", "HP 3478A Multimeter", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      	  INIT        COMPANY      		 FULLNAME             	FLAGS
+SYST( 1983, hp3478a,  0,      0,  hp3478a, hp3478a,hp3478a_state, empty_init, "Hewlett-Packard", "HP 3478A Multimeter", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

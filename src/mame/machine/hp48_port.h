@@ -4,7 +4,7 @@
 
   Copyright (C) Antoine Mine' 2008
 
-   Hewlett Packard HP48 S/SX & G/GX and HP49 G
+   Hewlett-Packard HP48 S/SX & G/GX and HP49 G
 
 **********************************************************************/
 #ifndef MAME_MACHINE_HP84_PORT_H

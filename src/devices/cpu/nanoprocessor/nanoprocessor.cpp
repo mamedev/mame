@@ -48,7 +48,7 @@ namespace {
 	}
 }
 
-DEFINE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device, "nanoprocessor", "Hewlett Packard HP-Nanoprocessor")
+DEFINE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device, "nanoprocessor", "Hewlett-Packard HP-Nanoprocessor")
 
 hp_nanoprocessor_device::hp_nanoprocessor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig, HP_NANOPROCESSOR, tag, owner, clock),
