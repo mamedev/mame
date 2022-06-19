@@ -53,8 +53,8 @@ private:
 	uint32_t m_mode, m_vbl_disable;
 	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
 
-	int16_t m_hstart, m_hend, m_htotal;
-	int16_t m_vstart, m_vend, m_vtotal;
+	int16_t m_hsync, m_hstart, m_hend, m_htotal;
+	int16_t m_vsync, m_vstart, m_vend, m_vtotal;
 	bool m_interlace;
 
 	bool m_vbl_pending;

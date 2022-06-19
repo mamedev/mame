@@ -1,14 +1,28 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, Vas Crabb
 /***************************************************************************
 
   SuperMac Spectrum/8 Series III video card
 
-  There is no sign of acceleration or blitting in any mode, and the acceleration
-  code from the Spectrum PDQ ROM is absent on this one.
+  There is no sign of acceleration or blitting in any mode, and the
+  acceleration code from the Spectrum PDQ ROM is absent on this one.
 
-  On first boot / with clean PRAM, press SPACE repeatedly when it shows the frame
-  that fills the entire screen.  If you get it wrong, delete PRAM and try again.
+  On first boot or with clean PRAM, the firmware will cycle through video
+  modes and prompt you to press space when the desired mode is active (on
+  the monitors available at the time, only one mode would produce a stable
+  image).  If you want to change video later, hold Option as soon as the
+  machine starts.
+
+  The CRTC has 16-bit registers with the bytes written at separate
+  addresses offset by 2.  The most significant byte is at the higher
+  address.
+
+  The video timing control registers are counter preload values, so they
+  effectively function as (65'546 - x) to get the actual number of pixels
+  cells or lines.  They're represented as signed 16-bit integers as that
+  lets you see the negated value.  The horizontal timing register values
+  are in units of four pixels.  The sync pulses are treated as being at
+  the start of the line/frame in the configuration registers.
 
 ***************************************************************************/
 
@@ -122,9 +136,11 @@ void nubus_spec8s3_device::device_start()
 	save_item(NAME(m_colors));
 	save_item(NAME(m_count));
 	save_item(NAME(m_clutoffs));
+	save_item(NAME(m_hsync));
 	save_item(NAME(m_hstart));
 	save_item(NAME(m_hend));
 	save_item(NAME(m_htotal));
+	save_item(NAME(m_vsync));
 	save_item(NAME(m_vstart));
 	save_item(NAME(m_vend));
 	save_item(NAME(m_vtotal));
@@ -146,9 +162,11 @@ void nubus_spec8s3_device::device_reset()
 	std::fill(std::begin(m_colors), std::end(m_colors), 0);
 	m_count = 0;
 	m_clutoffs = 0;
+	m_hsync = -24;
 	m_hstart = -64;
 	m_hend = -320;
 	m_htotal = -332;
+	m_vsync = -3;
 	m_vstart = -33;
 	m_vend = -801;
 	m_vtotal = -804;
@@ -171,7 +189,7 @@ TIMER_CALLBACK_MEMBER(nubus_spec8s3_device::vbl_tick)
 		m_vbl_pending = true;
 	}
 
-	m_timer->adjust(screen().time_until_pos(-m_vend * (m_interlace ? 2 : 1), 0));
+	m_timer->adjust(screen().time_until_pos((m_vsync - m_vend) * (m_interlace ? 2 : 1), 0));
 }
 
 /***************************************************************************
@@ -209,21 +227,25 @@ void nubus_spec8s3_device::update_crtc()
 	}
 
 	// for some reason you temporarily get invalid screen parameters - ignore them
-	if ((m_hend < m_hstart) && (m_htotal < m_hend) && (m_vend < m_vstart) && (m_vtotal < m_vend))
+	if ((m_hstart < m_hsync) && (m_hend < m_hstart) && (m_htotal < m_hend) && (m_vstart < m_vsync) && (m_vend < m_vstart) && (m_vtotal < m_vend))
 	{
 		screen().configure(
 				-4 * m_htotal,
 				-m_vtotal * (m_interlace ? 2 : 1),
 				rectangle(
-					-4 * m_hstart, (-4 * m_hend) - 1,
-					-m_vstart * (m_interlace ? 2 : 1), (-m_vend * (m_interlace ? 2 : 1)) - 1),
-				attotime::from_ticks(-4 * m_htotal * -m_vtotal * (m_interlace ? 2 : 1), clock).attoseconds());
+					4 * (m_hsync - m_hstart),
+					(4 * (m_hsync - m_hend)) - 1,
+					(m_vsync - m_vstart) * (m_interlace ? 2 : 1),
+					((m_vsync - m_vend) * (m_interlace ? 2 : 1)) - 1),
+				attotime::from_ticks(-4 * m_htotal * -m_vtotal, clock).attoseconds());
 
-		m_timer->adjust(screen().time_until_pos(-m_vend * (m_interlace ? 2 : 1), 0));
+		m_timer->adjust(screen().time_until_pos((m_vsync - m_vend) * (m_interlace ? 2 : 1), 0));
 	}
 	else
 	{
-		LOG("Ignoring invalid CRTC parameters (%d %d %d) (%d %d %d)\n", m_hstart, m_hend, m_htotal, m_vstart, m_vend, m_vtotal);
+		LOG("Ignoring invalid CRTC parameters (%d %d %d %d) (%d %d %d %d)\n",
+				m_hsync, m_hstart, m_hend, m_htotal,
+				m_vsync, m_vstart, m_vend, m_vtotal);
 	}
 }
 
@@ -231,22 +253,24 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 {
 	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + 0x400;
 
-	const int vstart = -m_vstart * (m_interlace ? 2 : 1);
-	const int vend = -m_vend * (m_interlace ? 2 : 1);
+	int const hstart = 4 * (m_hsync - m_hstart);
+	int const width = 4 * (m_hstart - m_hend);
+	int const vstart = (m_vsync - m_vstart) * (m_interlace ? 2 : 1);
+	int const vend = (m_vsync - m_vend) * (m_interlace ? 2 : 1);
 
 	switch (m_mode)
 	{
 		case 0: // 1 bpp
 			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y, -4 * m_hstart);
+				uint32_t *scanline = &bitmap.pix(y, hstart);
 				if ((y >= vstart) && (y < vend))
 				{
-					for (int x = 0; x < ((m_hstart - m_hend) / 2); x++)
+					for (int x = 0; x < (width / 8); x++)
 					{
-						uint8_t const pixels = vram8[((y + m_vstart) * 512) + x];
+						uint8_t const pixels = vram8[((y - vstart) * 512) + x];
 
-						*scanline++ = m_palette[pixels & 0x80];
+						*scanline++ = m_palette[(pixels << 0) & 0x80];
 						*scanline++ = m_palette[(pixels << 1) & 0x80];
 						*scanline++ = m_palette[(pixels << 2) & 0x80];
 						*scanline++ = m_palette[(pixels << 3) & 0x80];
@@ -258,7 +282,7 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 				}
 				else
 				{
-					std::fill_n(scanline, (m_hstart - m_hend) * 4, 0);
+					std::fill_n(scanline, width, 0);
 				}
 			}
 			break;
@@ -266,22 +290,22 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 		case 1: // 2 bpp
 			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y, -4 * m_hstart);
+				uint32_t *scanline = &bitmap.pix(y, hstart);
 				if ((y >= vstart) && (y < vend))
 				{
-					for (int x = 0; x < (m_hstart - m_hend); x++)
+					for (int x = 0; x < (width / 4); x++)
 					{
-						uint8_t const pixels = vram8[((y + m_vstart) * 512) + x];
+						uint8_t const pixels = vram8[((y - vstart) * 512) + x];
 
-						*scanline++ = m_palette[pixels&0xc0];
-						*scanline++ = m_palette[(pixels<<2)&0xc0];
-						*scanline++ = m_palette[(pixels<<4)&0xc0];
-						*scanline++ = m_palette[(pixels<<6)&0xc0];
+						*scanline++ = m_palette[(pixels << 0) & 0xc0];
+						*scanline++ = m_palette[(pixels << 2) & 0xc0];
+						*scanline++ = m_palette[(pixels << 4) & 0xc0];
+						*scanline++ = m_palette[(pixels << 6) & 0xc0];
 					}
 				}
 				else
 				{
-					std::fill_n(scanline, (m_hstart - m_hend) * 4, 0);
+					std::fill_n(scanline, width, 0);
 				}
 			}
 			break;
@@ -289,20 +313,20 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 		case 2: // 4 bpp
 			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y, -4 * m_hstart);
+				uint32_t *scanline = &bitmap.pix(y, hstart);
 				if ((y >= vstart) && (y < vend))
 				{
-					for (int x = 0; x < ((m_hstart - m_hend) * 2); x++)
+					for (int x = 0; x < (width / 2); x++)
 					{
-						uint8_t const pixels = vram8[((y + m_vstart) * 512) + x];
+						uint8_t const pixels = vram8[((y - vstart) * 512) + x];
 
-						*scanline++ = m_palette[pixels&0xf0];
-						*scanline++ = m_palette[(pixels<<4)&0xf0];
+						*scanline++ = m_palette[(pixels << 0) & 0xf0];
+						*scanline++ = m_palette[(pixels << 4) & 0xf0];
 					}
 				}
 				else
 				{
-					std::fill_n(scanline, (m_hstart - m_hend) * 4, 0);
+					std::fill_n(scanline, width, 0);
 				}
 			}
 			break;
@@ -310,18 +334,18 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 		case 3: // 8 bpp
 			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y, -4 * m_hstart);
+				uint32_t *scanline = &bitmap.pix(y, hstart);
 				if ((y >= vstart) && (y < vend))
 				{
-					for (int x = 0; x < ((m_hstart - m_hend) * 4); x++)
+					for (int x = 0; x < width; x++)
 					{
-						uint8_t const pixels = vram8[((y + m_vstart) * 1024) + x];
+						uint8_t const pixels = vram8[((y - vstart) * 1024) + x];
 						*scanline++ = m_palette[pixels];
 					}
 				}
 				else
 				{
-					std::fill_n(scanline, (m_hstart - m_hend) * 4, 0);
+					std::fill_n(scanline, width, 0);
 				}
 			}
 			break;
@@ -336,6 +360,13 @@ void nubus_spec8s3_device::spec8s3_w(offs_t offset, uint32_t data, uint32_t mem_
 {
 	switch (offset)
 	{
+		case 0x3804:
+		case 0x3806:
+			crtc_w(m_hsync, offset, data);
+			if (!BIT(offset, 1))
+				update_crtc();
+			break;
+
 		case 0x3808:
 		case 0x380a:
 			crtc_w(m_hstart, offset, data);
@@ -353,6 +384,13 @@ void nubus_spec8s3_device::spec8s3_w(offs_t offset, uint32_t data, uint32_t mem_
 		case 0x3810:
 		case 0x3812:
 			crtc_w(m_htotal, offset, data);
+			if (!BIT(offset, 1))
+				update_crtc();
+			break;
+
+		case 0x3818:
+		case 0x381a:
+			crtc_w(m_vsync, offset, data);
 			if (!BIT(offset, 1))
 				update_crtc();
 			break;
