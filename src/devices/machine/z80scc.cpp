@@ -2982,8 +2982,8 @@ void z80scc_channel::check_dma_request()
 {
 	if (m_wr14 & WR14_DTR_REQ_FUNC)
 	{
-		// Datasheet claims that this doesn't depend on TX enable, but follow the /W//REQ implementation for now
-		set_dtr(((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
+		// assert /DTR//REQ if transmit buffer is empty
+		set_dtr((m_rr0 & RR0_TX_BUFFER_EMPTY) ? 0 : 1);
 	}
 
 	if ((m_wr1 & WR1_WREQ_ENABLE) && (m_wr1 & WR1_WREQ_FUNCTION))
