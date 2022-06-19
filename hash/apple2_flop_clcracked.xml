@@ -48625,4 +48625,25 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mthb0884">
+		<description>Math Blaster (Version 08.05.84) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2022-06-18"/>
+		<!--"Math Blaster" is a 1983 educational program developed by Richard Eckert and Janice Davidson, Ph.D., and distributed by Davidson and Associates. This version is dated August 5, 1984 according to the printed disk label.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math blaster v080584 (4am crack) side a - program.dsk" size="143360" crc="1f40f3e7" sha1="59e80536bfe46e46bd458ac11aacc30d9da56886"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Data disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math blaster v080584 (4am crack) side b - data.dsk" size="143360" crc="fe5f63a4" sha1="1eac6e9205030b23f43c0fcc2cb5055659126407"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
