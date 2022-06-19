@@ -17397,7 +17397,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pinbaldx" supported="no"> <!-- crashes a few seconds after starting a new game -->
+	<software name="pinbaldx" supported="no"> <!-- crashes a few seconds after starting any table -->
 		<!-- Enhanced version of Pinball Fantasies with 3 extra tables -->
 		<description>Pinball Deluxe (Europe)</description>
 		<year>1995</year>
@@ -17430,7 +17430,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pbfantas">
+	<software name="pbfantas" supported="no"> <!-- crashes a few seconds after starting any table -->
 		<description>Pinball Fantasies (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
@@ -17446,7 +17446,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pbmania">
+	<software name="pbmania" supported="no"> <!-- crashes a few seconds after starting any table -->
 		<description>Pinball Mania (Europe)</description>
 		<year>1995</year>
 		<publisher>GameTek</publisher>
