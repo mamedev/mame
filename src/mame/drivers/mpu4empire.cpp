@@ -29,9 +29,9 @@ void mpu4empire_machines_state::init_m4apachg()
 {
 	init_m4default();
 	//Derived from Apache_Gold_(Empire)_[C02_800_25jp].gam
-	init_m4_hopper_duart_a();
-	init_m4_large_extender_b();
-	init_m4default_reels();
+	use_m4_hopper_duart_a();
+	use_m4_large_extender_b();
+	use_m4_standard_reels();
 	//PCKEY =b
 	//STKEY =4
 	//JPKEY =a

@@ -1049,7 +1049,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic6_cb2_w)
 	{
 		if ( state ) m_ay8913_address |=  0x02;
 		else         m_ay8913_address &= ~0x02;
-		update_ay(m_pia6);
+		update_ay(m_pia5); // using m_pia5 here allows m4fourmr to have sound
 	}
 }
 
@@ -1063,7 +1063,7 @@ void mpu4_state::pia_ic7_porta_w(uint8_t data)
 		m_reel[5]->update( data      &0x0F);
 		m_reel[6]->update((data >> 4)&0x0F);
 		awp_draw_reel(machine(),"reel6", *m_reel[5]);
-		awp_draw_reel(machine(),"reel7", *m_reel[7]);
+		awp_draw_reel(machine(),"reel7", *m_reel[6]);
 	}
 	else if (m_reels)
 	{
@@ -1640,7 +1640,28 @@ INPUT_PORTS_START( mpu4jackpot8per )
 	PORT_CONFSETTING(    0xf0, "98" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( mpu4_70pc )
+	PORT_INCLUDE( mpu4 )
 
+	PORT_MODIFY("ORANGE2")
+	PORT_CONFNAME( 0xf0, 0x10, "Percentage Key" )
+	PORT_CONFSETTING(    0x00, "Not fitted / 68% (Invalid for UK Games)"  )
+	PORT_CONFSETTING(    0x10, "70" )
+	PORT_CONFSETTING(    0x20, "72" )
+	PORT_CONFSETTING(    0x30, "74" )
+	PORT_CONFSETTING(    0x40, "76" )
+	PORT_CONFSETTING(    0x50, "78" )
+	PORT_CONFSETTING(    0x60, "80" )
+	PORT_CONFSETTING(    0x70, "82" )
+	PORT_CONFSETTING(    0x80, "84" )
+	PORT_CONFSETTING(    0x90, "86" )
+	PORT_CONFSETTING(    0xa0, "88" )
+	PORT_CONFSETTING(    0xb0, "90" )
+	PORT_CONFSETTING(    0xc0, "92" )
+	PORT_CONFSETTING(    0xd0, "94" )
+	PORT_CONFSETTING(    0xe0, "96" )
+	PORT_CONFSETTING(    0xf0, "98" )
+INPUT_PORTS_END
 
 
 INPUT_PORTS_START( grtecp )
@@ -1826,11 +1847,6 @@ void mpu4_state::mpu4_install_mod4oki_space(address_space &space)
 	space.install_write_handler(0x08c0, 0x08c7, write8sm_delegate(*this, FUNC(mpu4_state::ic3ss_w)));
 }
 
-void mpu4_state::mpu4_install_mod4bwb_space(address_space &space)
-{
-//  space.install_readwrite_handler(0x0810, 0x0810, read8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_r)), write8sm_delegate(*this, FUNC(mpu4_state::bwb_characteriser_w)));
-	mpu4_install_mod4oki_space(space);
-}
 
 
 void mpu4_state::mpu4_config_common()
@@ -1872,105 +1888,12 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 	mpu4_install_mod4oki_space(space);
 }
 
-MACHINE_START_MEMBER(mpu4_state,mpu4bwb)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	mpu4_config_common();
-
-	m_link7a_connected=0;
-	m_mod_number=4;
-	mpu4_install_mod4bwb_space(space);
-}
-
-MACHINE_START_MEMBER(mpu4_state,mpu4cry)
-{
-	mpu4_config_common();
-
-	m_link7a_connected=0;
-	m_mod_number=4;
-}
-
-
-
-void mpu4_state::init_m4_low_volt_alt()
-{
-	//Some games can't use the 50Hz circuit to check voltage issues, handle it here
-	m_low_volt_detect_disable = 1;
-}
-
-void mpu4_state::init_m4_small_extender()
-{
-	m_lamp_extender = SMALL_CARD;
-}
-
-
-
-void mpu4_state::init_m4_large_extender_b()
-{
-	m_lamp_extender = LARGE_CARD_B;
-}
-
-void mpu4_state::init_m4_large_extender_c()
-{
-	m_lamp_extender = LARGE_CARD_C;
-}
-
-void mpu4_state::init_m4_hopper_tubes()
-{
-	m_hopper = TUBES;
-}
-
-void mpu4_state::init_m4_hopper_duart_a()
-{
-	m_hopper = HOPPER_DUART_A;
-}
-
-void mpu4_state::init_m4_hopper_duart_b()
-{
-	m_hopper = HOPPER_DUART_B;
-}
-
-void mpu4_state::init_m4_hopper_duart_c()
-{
-	m_hopper = HOPPER_DUART_C;
-}
-
-void mpu4_state::init_m4_hopper_nonduart_a()
-{
-	m_hopper = HOPPER_NONDUART_A;
-}
-
-void mpu4_state::init_m4_hopper_nonduart_b()
-{
-	m_hopper = HOPPER_NONDUART_B;
-}
-
-void mpu4_state::init_m4_led_a()
-{
-	m_led_extender = CARD_A;
-}
-
-void mpu4_state::init_m4_led_b()
-{
-	m_led_extender = CARD_B;
-}
-
-void mpu4_state::init_m4_led_c()
-{
-	m_led_extender = CARD_C;
-}
-
-void mpu4_state::init_m4_led_simple()
-{
-	m_led_extender = SIMPLE_CARD;
-}
-
 //TODO: Replace with standard six reels once sets are sorted out - is really six_reel_std
 void mpu4_state::init_m4altreels()
 {
 	m_reel_mux = SIX_REEL_1TO8;
 	m_reels = 6;
-	init_m4default_banks();
+	setup_rom_banks();
 }
 
 void mpu4_state::init_m4altreels_big()
@@ -1980,69 +1903,76 @@ void mpu4_state::init_m4altreels_big()
 	m_reels = 6;
 }
 
-void mpu4_state::init_m4default_reels()
-{
-	m_reel_mux = STANDARD_REEL;
-	m_reels = 4;
-}
-
-void mpu4_state::init_m4_five_reel_std()
-{
-	m_reel_mux = FIVE_REEL_5TO8;
-	m_reels = 5;
-}
-
-void mpu4_state::init_m4_five_reel_rev()
-{
-	m_reel_mux = FIVE_REEL_8TO5;
-	m_reels = 5;
-}
-
-void mpu4_state::init_m4_five_reel_alt()
-{
-	m_reel_mux = FIVE_REEL_3TO6;
-	m_reels = 5;
-}
-
-void mpu4_state::init_m4_six_reel_std()
-{
-	m_reel_mux = SIX_REEL_1TO8;
-	m_reels = 6;
-}
-
-void mpu4_state::init_m4_six_reel_alt()
-{
-	m_reel_mux = SIX_REEL_5TO8;
-	m_reels = 6;
-}
-
-void mpu4_state::init_m4_seven_reel()
-{
-	m_reel_mux = SEVEN_REEL;
-	m_reels = 7;
-}
-
 
 void mpu4_state::init_m4_andycp10c()
 {
 	init_m4default();
-	init_m4_small_extender();
+	use_m4_small_extender();
 }
 
-void mpu4_state::init_m_oldtmr()
-{
-	init_m4_six_reel_std();
-	init_m4default_banks();
-}
-
-
-
-
-void mpu4_state::init_m_blsbys()
+void mpu4_state::init_m4default_big_five_std()
 {
 	init_m4default_big();
-	init_m4_five_reel_std();
+	use_m4_five_reel_std();
 }
+
+void mpu4_state::init_m4default_big_five_rev()
+{
+	init_m4default_big();
+	use_m4_five_reel_rev();
+}
+
+void mpu4_state::init_m4default_big_six()
+{
+	init_m4default_big();
+	use_m4_six_reel_std();
+}
+
+void mpu4_state::init_m4default_big_six_alt()
+{
+	init_m4default_big();
+	use_m4_six_reel_alt();
+}
+
+
+void mpu4_state::init_m4default_five_std()
+{
+	init_m4default();
+	use_m4_five_reel_std();
+}
+
+void mpu4_state::init_m4default_five_rev()
+{
+	init_m4default();
+	use_m4_five_reel_rev();
+}
+
+void mpu4_state::init_m4default_five_alt()
+{
+	init_m4default();
+	use_m4_five_reel_alt();
+}
+
+
+void mpu4_state::init_m4default_six()
+{
+	init_m4default();
+	use_m4_six_reel_std();
+}
+
+void mpu4_state::init_m4default_six_alt()
+{
+	init_m4default();
+	use_m4_six_reel_alt();
+}
+
+
+void mpu4_state::init_m4default_seven()
+{
+	init_m4default();
+	use_m4_seven_reel();
+}
+
 
 void mpu4_state::init_big_extenda()
 {
@@ -2056,35 +1986,26 @@ void mpu4_state::init_m4default_big_low()
 	m_default_to_low_bank = true;
 }
 
-
-void mpu4_state::init_m4default_banks()
-{
-	//Initialise paging for non-extended ROM space
-	uint8_t *rom = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 4, &rom[0x01000], 0x10000);
-	membank("bank1")->set_entry(0);
-}
-
 void mpu4_state::init_m4default_alt()
 {
 	m_reel_mux = STANDARD_REEL;
 	m_reels = 8;
-	init_m4default_banks();
+	setup_rom_banks();
 
 	m_bwb_bank=0;
 }
 
 void mpu4_state::init_m4default()
 {
-	init_m4default_reels();
+	use_m4_standard_reels();
 	m_bwb_bank = 0;
-	init_m4default_banks();
+	setup_rom_banks();
 }
 
 
 void mpu4_state::init_m4default_big()
 {
-	init_m4default_reels();
+	use_m4_standard_reels();
 
 	int size = memregion("maincpu")->bytes();
 	if (size <= 0x10000)
@@ -2109,6 +2030,129 @@ void mpu4_state::init_m4default_big()
 	// about the way the regular banking behaves, not related to the CB2 stuff
 	m_bank1->set_entry(m_numbanks);
 
+}
+
+
+// these are not 'init' functions in their own right, they can be called from init functions
+void mpu4_state::use_m4_standard_reels()
+{
+	m_reel_mux = STANDARD_REEL;
+	m_reels = 4;
+}
+
+void mpu4_state::use_m4_five_reel_std()
+{
+	m_reel_mux = FIVE_REEL_5TO8;
+	m_reels = 5;
+}
+
+void mpu4_state::use_m4_five_reel_rev()
+{
+	m_reel_mux = FIVE_REEL_8TO5;
+	m_reels = 5;
+}
+
+void mpu4_state::use_m4_five_reel_alt()
+{
+	m_reel_mux = FIVE_REEL_3TO6;
+	m_reels = 5;
+}
+
+void mpu4_state::use_m4_six_reel_std()
+{
+	m_reel_mux = SIX_REEL_1TO8;
+	m_reels = 6;
+}
+
+void mpu4_state::use_m4_six_reel_alt()
+{
+	m_reel_mux = SIX_REEL_5TO8;
+	m_reels = 6;
+}
+
+void mpu4_state::use_m4_seven_reel()
+{
+	m_reel_mux = SEVEN_REEL;
+	m_reels = 7;
+}
+
+void mpu4_state::use_m4_low_volt_alt()
+{
+	//Some games can't use the 50Hz circuit to check voltage issues, handle it here
+	m_low_volt_detect_disable = 1;
+}
+
+void mpu4_state::use_m4_small_extender()
+{
+	m_lamp_extender = SMALL_CARD;
+}
+
+void mpu4_state::use_m4_large_extender_b()
+{
+	m_lamp_extender = LARGE_CARD_B;
+}
+
+void mpu4_state::use_m4_large_extender_c()
+{
+	m_lamp_extender = LARGE_CARD_C;
+}
+
+void mpu4_state::use_m4_hopper_tubes()
+{
+	m_hopper = TUBES;
+}
+
+void mpu4_state::use_m4_hopper_duart_a()
+{
+	m_hopper = HOPPER_DUART_A;
+}
+
+void mpu4_state::use_m4_hopper_duart_b()
+{
+	m_hopper = HOPPER_DUART_B;
+}
+
+void mpu4_state::use_m4_hopper_duart_c()
+{
+	m_hopper = HOPPER_DUART_C;
+}
+
+void mpu4_state::use_m4_hopper_nonduart_a()
+{
+	m_hopper = HOPPER_NONDUART_A;
+}
+
+void mpu4_state::use_m4_hopper_nonduart_b()
+{
+	m_hopper = HOPPER_NONDUART_B;
+}
+
+void mpu4_state::use_m4_led_a()
+{
+	m_led_extender = CARD_A;
+}
+
+void mpu4_state::use_m4_led_b()
+{
+	m_led_extender = CARD_B;
+}
+
+void mpu4_state::use_m4_led_c()
+{
+	m_led_extender = CARD_C;
+}
+
+void mpu4_state::use_m4_led_simple()
+{
+	m_led_extender = SIMPLE_CARD;
+}
+
+void mpu4_state::setup_rom_banks()
+{
+	//Initialise paging for non-extended ROM space
+	uint8_t *rom = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 4, &rom[0x01000], 0x10000);
+	membank("bank1")->set_entry(0);
 }
 
 /* generate a 50 Hz signal (based on an RC time) */
@@ -2152,51 +2196,14 @@ void mpu4_state::mpu4_memmap_characteriser(address_map &map)
 void mpu4_state::mpu4_memmap_bootleg_characteriser(address_map &map)
 {
 	mpu4_memmap(map);
-	map(0x0800, 0x087f).rw(m_characteriser_bl, FUNC(mpu4_characteriser_bl::read), FUNC(mpu4_characteriser_bl::write));
+	// a few sets use 0x840 for protection, 0x850 is where banking maps, so map up to that point
+	map(0x0800, 0x084f).rw(m_characteriser_bl, FUNC(mpu4_characteriser_bl::read), FUNC(mpu4_characteriser_bl::write));
 }
 
 void mpu4_state::mpu4_memmap_bl_characteriser_blastbank(address_map &map)
 {
 	mpu4_memmap(map);
 	map(0x0800, 0x081f).rw(m_characteriser_blastbank, FUNC(mpu4_characteriser_bl_blastbank::read), FUNC(mpu4_characteriser_bl_blastbank::write));
-}
-
-void mpu4_state::mpu4_memmap_characteriser_bwb(address_map &map)
-{
-	mpu4_memmap(map);
-	map(0x0800, 0x083f).rw(m_characteriser_bwb, FUNC(mpu4_characteriser_pal_bwb::read), FUNC(mpu4_characteriser_pal_bwb::write));
-}
-
-
-
-template<const uint8_t ReelNo, uint8_t Type>
-void mpu4_state::mpu4_add_reel(machine_config &config)
-{
-	switch (Type)
-	{
-	default:
-	case 0x00: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 1, 3, 0x00, 2); break;
-	case 0x01: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 4, 12, 0x00, 2); break;
-	case 0x02: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 92, 3, 0x00, 2); break;
-	case 0x03: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 93, 2, 0x00, 2); break;
-	case 0x04: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 96, 3, 0x00, 2); break; // BWB
-	}
-
-	if (m_reel[ReelNo])
-		m_reel[ReelNo]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<ReelNo>));
-}
-
-template<uint8_t Type, uint8_t NumberOfReels>
-void mpu4_state::mpu4_reels(machine_config &config)
-{
-	if (NumberOfReels>0) mpu4_add_reel<0, Type>(config);
-	if (NumberOfReels>1) mpu4_add_reel<1, Type>(config);
-	if (NumberOfReels>2) mpu4_add_reel<2, Type>(config);
-	if (NumberOfReels>3) mpu4_add_reel<3, Type>(config);
-	if (NumberOfReels>4) mpu4_add_reel<4, Type>(config);
-	if (NumberOfReels>5) mpu4_add_reel<5, Type>(config);
-	if (NumberOfReels>6) mpu4_add_reel<6, Type>(config);
-	if (NumberOfReels>7) mpu4_add_reel<7, Type>(config);
 }
 
 void mpu4_state::mpu4_common(machine_config &config)
@@ -2330,6 +2337,17 @@ void mpu4_state::mod2(machine_config &config)
 	mpu4_reels<0, 6>(config);
 }
 
+void mpu4_state::mod2_7reel(machine_config &config)
+{
+	mpu4base(config);
+	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
+	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8913->set_resistors_load(820, 0, 0);
+	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	mpu4_reels<0, 7>(config);
+}
+
 void mpu4_state::mod2_cheatchr_table(machine_config &config, const uint8_t* table)
 {
 	mod2(config);
@@ -2454,6 +2472,17 @@ void mpu4_state::mod4yam_cheatchr(machine_config &config)
 	mod4yam_cheatchr_table(config, nullptr);
 }
 
+void mpu4_state::mod4yam_alt(machine_config &config)
+{
+	mpu4base(config);
+	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
+
+	mpu4_reels<1, 6>(config);
+
+	YM2413(config, m_ym2413, MPU4_MASTER_CLOCK/4);
+	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 /***********************************************************************************************
@@ -2473,6 +2502,19 @@ void mpu4_state::mod4oki(machine_config &config)
 
 	mpu4_common2(config);
 	mpu4_reels<0, 6>(config);
+
+	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
+	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
+void mpu4_state::mod4oki_7reel(machine_config &config)
+{
+	mpu4base(config);
+	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
+
+	mpu4_common2(config);
+	mpu4_reels<0, 7>(config);
 
 	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
@@ -2523,6 +2565,7 @@ void mpu4_state::mod4oki_alt(machine_config &config)
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
+
 
 
 void mpu4_state::mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table)
@@ -2584,44 +2627,6 @@ void mpu4_state::mod4oki_5r_cheatchr(machine_config &config)
 	mod4oki_5r_cheatchr_table(config, nullptr);
 }
 
-/***********************************************************************************************
-
-  Other configs
-
-***********************************************************************************************/
-
-void mpu4_state::bwboki(machine_config &config)
-{
-	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4bwb)
-	mpu4_common2(config);
-	mpu4_reels<4, 5>(config);
-
-
-	OKIM6376(config, m_msm6376, 128000);     //Adjusted by IC3, default to 16KHz sample. Can also be 85430 at 10.5KHz and 64000 at 8KHz
-	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
-
-void mpu4_state::bwboki_chr(machine_config &config)
-{
-	bwboki(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser_bwb);
-	MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
-}
-
-
-
-
-void mpu4_state::mpu4crys(machine_config &config)
-{
-	mod2(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4cry)
-
-	upd7759_device &upd(UPD7759(config, "upd"));
-	upd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	upd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
 
 /***********************************************************************************************
 

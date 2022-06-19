@@ -315,7 +315,10 @@ license:CC0
 		<element name="reel6" ref="Steppers" state="0">
 			<bounds x="280" y="300" width="50" height="50"/>
 		</element>
-
+		<element name="reel7" ref="Steppers" state="0">
+			<bounds x="340" y="300" width="50" height="50"/>
+		</element>
+		
 		<!-- standard lamps -->
 		<repeat count="16">
 			<param name="s" start="0" increment="8" />
