@@ -15466,7 +15466,7 @@ license:CC0
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="1.000" />
-		<part name="flop10" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="King's Quest 6 [Sierra] [1992] [3.5HD] [Disk 01 of 11].img" size="1228800" crc="06278eac" sha1="8de576ba74478dbdc4ba5e7bdde24c66b4cfe66d"/>
