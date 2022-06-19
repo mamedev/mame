@@ -15167,7 +15167,7 @@ license:CC0
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="0.000.051" />
-		<part name="flop10" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="King's Quest V (v0.000.051) [Sierra] [1990] [5.25HD] [Disk 1 of 9] [Startup Disk].img" size="1228800" crc="787f1fd8" sha1="f67e26a15501d104db11e336700b7c3164f8bcaa"/>
@@ -15229,7 +15229,7 @@ license:CC0
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="0.000.062" />
-		<part name="flop10" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="King's Quest V (v0.000.062) [Sierra] [1991] [5.25HD] [Disk 1 of 5] [Startup Disk].img" size="1228800" crc="b084311c" sha1="5bfdfb0a947ab2e6d0f95db4f5f32bdfc461ea62"/>
