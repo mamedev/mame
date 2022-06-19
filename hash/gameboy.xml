@@ -1755,6 +1755,7 @@ license:CC0
 		<info name="release" value="19901130" />
 		<info name="alt_title" value="バトル・ブル" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="battle bull (japan).bin" size="131072" crc="5c69e449" sha1="74ed574d2179bdf34a6e618a86be9b3e70155370" />
 			</dataarea>
