@@ -155,7 +155,7 @@ TIMER_CALLBACK_MEMBER(jmfb_device::vbl_tick)
 
 uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + 0xa00;
+	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + m_base;
 
 	// first time?  kick off the VBL timer
 	if (!m_screen)
@@ -233,7 +233,7 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				uint32_t const stride = m_stride * 8 / 3;
 				for (int y = 0; y < m_yres; y++)
 				{
-					std::copy_n(&m_vram[(0xa00 / 4) + (y * stride)], m_xres, &bitmap.pix(y));
+					std::copy_n(&m_vram[(m_base / 4) + (y * stride)], m_xres, &bitmap.pix(y));
 				}
 			}
 			break;
@@ -250,7 +250,7 @@ void jmfb_device::mac_48gc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
 		case 0x8/4: // base
 //          printf("%x to base\n", data);
-			m_base = (data*2)<<4;
+			m_base = (data * 2) << 4;
 			break;
 
 		case 0xc/4: // stride

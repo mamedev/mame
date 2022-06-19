@@ -41,17 +41,22 @@ private:
 	uint32_t vram_r(offs_t offset, uint32_t mem_mask = ~0);
 	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
+	void update_crtc();
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	static void crtc_w(int16_t &param, uint32_t offset, uint32_t data);
+
+	emu_timer *m_timer;
 
 	std::vector<uint32_t> m_vram;
 	uint32_t m_mode, m_vbl_disable;
 	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
-	emu_timer *m_timer;
 
-	//uint32_t m_7xxxxx_regs[0x100000/4];
-	//int m_width, m_height, m_patofsx, m_patofsy;
-	//uint32_t m_vram_addr, m_vram_src;
-	//uint8_t m_fillbytes[256];
+	int16_t m_hstart, m_hend, m_htotal;
+	int16_t m_vstart, m_vend, m_vtotal;
+	bool m_interlace;
+
 	bool m_vbl_pending;
 	int m_parameter;
 };
