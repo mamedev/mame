@@ -1723,11 +1723,16 @@ void lua_engine::initialize()
 	 */
 	auto fs_meta_data_type = emu.new_usertype<fs::meta_data>("fs_meta_data", sol::call_constructor, sol::constructors<sol::types<>>());
 	fs_meta_data_type["set"] = [](fs::meta_data &meta, const char *name, const char *value)
-	{
-		std::optional<fs::meta_name> mname = fs::meta_data::from_entry_name(name);
-		if (mname)
-			meta.set(*mname, value);
-	};
+		{
+			std::optional<fs::meta_name> mname = fs::meta_data::from_entry_name(name);
+			if (mname)
+				meta.set(*mname, value);
+		};
+	fs_meta_data_type["get"] = [](const fs::meta_data &meta, const char *name)
+		{
+			std::optional<fs::meta_name> mname = fs::meta_data::from_entry_name(name);
+			return mname && meta.has(*mname) ? meta.get(*mname).as_string() : "";
+		};
 
 	auto fs_meta_description_type = sol().registry().new_usertype<fs::meta_description>("fs_meta_description", sol::no_constructor);
 	fs_meta_description_type["name"] = sol::property([](fs::meta_description const &desc)
