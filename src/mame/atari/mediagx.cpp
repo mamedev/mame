@@ -154,7 +154,8 @@ Keep pressed 9 and press reset to enter service mode.
 
 namespace {
 
-#define SPEEDUP_HACKS   1
+// no speed hacks, @montymxb...
+#define SPEEDUP_HACKS	1
 
 class mediagx_state : public pcat_base_state
 {
@@ -549,15 +550,17 @@ void mediagx_state::memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mas
 			// TODO no clue but this seems important?
 			// guess: crtc params?
 			// ...
-			//printf("----> Checking to write CRTC params?");
+			//printf("----> Checking to write CRTC params?\n");
 		}
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
 		{
+			// set index from data
 			m_pal_index = data;
 			m_ramdac->index_w(data);
 		}
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
 		{
+			// write data at current index
 			m_pal[m_pal_index] = data & 0xff;
 			m_pal_index++;
 			if (m_pal_index >= 768)
@@ -685,6 +688,7 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// not really, was just testing here too
 			// mp0 = m_ports[0].read_safe(0);
 			// r |= mk_parport_outval(mp0 >> 8);
+			r |= mk_parport_outval(0);
 
 		} else if(m_parport_control_reg == 0x18) {
 			// Reset internal pointer to 0
@@ -696,6 +700,10 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			if(mp0 & 1) {
 				// accounts for inverted upper bit
 				r |= 0x9000;
+			} else {
+
+				// default response...must be retained unless all cases are handled
+				r |= mk_parport_outval(0);
 			}
 
 			// don't really think this part helps, but keeping just in case...(historical)
@@ -716,6 +724,9 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// mp0 = m_ports[0].read_safe(0);
 			// r |= mk_parport_outval(mp0 >> 0x8);
 
+			// default response...must be retained unless all cases are handled
+			r |= mk_parport_outval(0);
+
 		} else if(upperReg == 0x3) {
 			// TODO OLD
 			// read from port 2
@@ -724,6 +735,9 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// >>>>>>> 2 LINES ADDED for testing
 			// mp0 = m_ports[0].read_safe(0);
 			// r |= mk_parport_outval(mp0 >> 0x8);
+
+			// default response...must be retained unless all cases are handled
+			r |= mk_parport_outval(0);
 
 		} else if(upperReg == 0x4) {
 			// TODO coin counters coming back on this...but interestingly not needed to update coins
@@ -741,6 +755,12 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			if (mp0 & 0x100 && !(mp0 & 0x400)) {
 				mp0 ^= 0x100;
 			}
+
+			// NOTE: it seems that volume change works like so:
+			// (+) Nothing pressed (i.e. 0x0) results in volume Up
+			// ( ) 4 pressed results in nothing pressed, no volume change
+			// (-) 3 + 4 pressed results in volume down
+			// TODO: maybe adjust this so key '4' is pressed at all times here.
 
 			r |= mk_parport_outval(mp0 >> 0x8);
 
@@ -792,9 +812,6 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 
 				// for testing...
 				// r |= mk_parport_outval(mp0 >> 0x8);
-
-				// another old testing val, can probably be tossed
-				//r |= 0x8800;
 			}
 
 		} else if(upperReg == 0xF) {
@@ -826,6 +843,12 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 				r |= mk_parport_outval(mp0 >> 0x8); // was 0x5
 			}
 
+			// @montymxb, June 5th, 2022
+			// TODO Having this extra default response for 0xFF commands causes coins not to work...possibly other parts as well, but not sure why
+			//else {
+			// 	r |= mk_parport_outval(0);
+			// }
+
 		} else if(upperReg == 0x0) {
 			// TODO some empty data written on start
 
@@ -840,7 +863,7 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 	{
 		// Reading CONTROL
 		// 0x01 causes a busy spin
-		// 0x02 causes a slight shift in the overall access?
+		// 0x02 causes a slight shift in the overall access? (unsure what this really pertains to)
 		// negate bits 0,1, and 3, all are hardware inverted
 
 		// TODO trying some random bouncing on controls too
@@ -990,6 +1013,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 #define AD1847_SAMPLE_DELAY 10
 #define AD1847_SAMPLE_SIZE 1000 / AD1847_SAMPLE_DELAY
 
+// TODO: What else uses this callback for sound, might find a good example to make the audio more stable across devices
 TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
 {
 	m_ad1847_sample_counter = 0;
@@ -1314,12 +1338,25 @@ static INPUT_PORTS_START(mediagx)
 	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
+
+	// TODO what's withe 'p' button? why can't we pause/resume the game as normal?
 INPUT_PORTS_END
 
 void mediagx_state::machine_start()
 {
 	m_dacl = std::make_unique<int16_t[]>(65536);
 	m_dacr = std::make_unique<int16_t[]>(65536);
+
+	// TODO: from tmnt.cpp (for ssriders)
+	// Allows saving!
+	// save_item(NAME(m_toggle));
+	// save_item(NAME(m_last));
+	// save_item(NAME(m_tmnt_soundlatch));
+	// save_item(NAME(m_sprite_colorbase));
+	// save_item(NAME(m_layer_colorbase));
+	// save_item(NAME(m_layerpri));
+	// save_item(NAME(m_sorted_layer));
+	// save_item(NAME(m_irq5_mask));
 }
 
 void mediagx_state::machine_reset()
@@ -1343,6 +1380,7 @@ void mediagx_state::ramdac_map(address_map &map)
 void mediagx_state::mediagx(machine_config &config)
 {
 	/* basic machine hardware */
+	//MEDIAGX(config, m_maincpu, 244000000);
 	//MEDIAGX(config, m_maincpu, 222000000);
 	// Speeds up the CPU execution speed...not necessarily what I want here, but could be nice
 	// tried 222000000, sped it up a lot,, but sound is borked :?
@@ -1368,13 +1406,36 @@ void mediagx_state::mediagx(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	//printf("\n\n--> At the mediaxgx setup position, for refresh rate in Hz\n\n");
-	m_screen->set_refresh_hz(30); // 60
+	// sometimes 72 is fun to try as well
+	// 13.9 seems to do OK, but still lags out once the game starts, tends to desync a bit
+	// TODO: Not perfect, may need to be further resolved still
+	// m_screen->set_refresh_hz(13.9); // 60
+	// somewhere between 13.9 and 13.9375 (maybe 14) is the sweet spot
+	// seems like something around 13.91 or 13.92 could be really on point.
+	m_screen->set_refresh_hz(13.9); // 60
+
+	// todo, just trying some little things here
+	//m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(5500)); // not accurate
 
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 639, 0, 239);
 
 	m_screen->set_screen_update(FUNC(mediagx_state::screen_update));
+
+	/* From SS riders
+	>>> idea, try some of these attributes here, does it improve performance? Especially if we use 60Hz again?
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_thndrx2));
+	screen.set_palette(m_palette);
+
+	WATCHDOG_TIMER(config, "watchdog");
+	*/
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cga);
 
@@ -1399,8 +1460,11 @@ void mediagx_state::init_mediagx()
 	std::fill(std::begin(m_disp_ctrl_reg), std::end(m_disp_ctrl_reg), 0);
 	// clears the 'BIU' control register
 	std::fill(std::begin(m_biu_ctrl_reg), std::end(m_biu_ctrl_reg), 0);
+
+	#if SPEEDUP_HACKS
 	// clears the 'speedup hits' registers, just a cache of some form
 	std::fill(std::begin(m_speedup_hits), std::end(m_speedup_hits), 0);
+	#endif
 }
 
 #if SPEEDUP_HACKS
