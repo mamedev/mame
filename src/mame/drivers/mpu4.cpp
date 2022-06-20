@@ -736,15 +736,11 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 	if ( m_signal_50hz )            m_ic4_input_b |=  0x04; /* 50 Hz */
 	else                            m_ic4_input_b &= ~0x04;
 
-	if (m_ic4_input_b & 0x02)
-	{
-		m_ic4_input_b &= ~0x02;
-	}
-	else
-	{
-		m_ic4_input_b |= 0x02; //Pulse the overcurrent line with every read to show the CPU each lamp has lit
-	}
+/* Dolbeck connect 4 complains if the strobe containing bulb 120 doesn't trigger overcurrent,
+but this is non-fatal. BWB games will definitely complain if overcurrent is triggered, though.
+
 #if 0
+	if ( lamp_overcurrent ) m_ic4_input_b |= 0x02;
 	if ( lamp_undercurrent ) m_ic4_input_b |= 0x01;
 #endif
 
