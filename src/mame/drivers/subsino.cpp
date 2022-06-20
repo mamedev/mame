@@ -4024,8 +4024,10 @@ void subsino_state::init_stbsub()
 void subsino_state::init_stisub()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x0FA0] = 0x28;
-	rom[0x0FA1] = 0x1d; //patch protection check
+	rom[0xfa0] = 0x28;
+	rom[0xfa1] = 0x1d; //patch protection check
+	rom[0x7ed] = 0x18; //patch "winning protection" check
+	rom[0x9bb] = 0x18; //patch "losing protection" check
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
@@ -4105,7 +4107,7 @@ GAMEL( 1994, dinofmly,    0,       dinofmly, sharkpy,  subsino_state, empty_init
 GAMEL( 1995, dinofmlya,   dinofmly,dinofmly, sharkpy,  subsino_state, empty_init,       ROT0, "Tangasoft",       "Dino Family (Portuguese, Tangasoft license)", MACHINE_NOT_WORKING, layout_sharkpy ) // stops with 'error password' message during boot
 
 GAMEL( 1995, stbsub,      0,       stbsub,   stbsub,   subsino_state, init_stbsub,      ROT0, "American Alpha",  "Treasure Bonus (Subsino, v1.6)",              0,                   layout_stisub   ) // board CPU module marked 'Super Treasure Island' (alt title?)
-GAMEL( 1995, stisub,      stbsub,  stbsub,   stbsub,   subsino_state, init_stisub,      ROT0, "Subsino",         "Super Treasure Island (Italy, v1.6)",         MACHINE_NOT_WORKING, layout_stisub   ) // need proper patches
+GAMEL( 1995, stisub,      stbsub,  stbsub,   stbsub,   subsino_state, init_stisub,      ROT0, "Subsino",         "Super Treasure Island (Italy, v1.6)",         0,                   layout_stisub   )
 GAMEL( 1995, tesorone,    stbsub,  stbsub,   tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.41)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone240, stbsub,  stbsub,   tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",          0,                   layout_stisub   )
 GAMEL( 1995, tesorone230, stbsub,  stbsub,   tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.30)",          0,                   layout_stisub   )
