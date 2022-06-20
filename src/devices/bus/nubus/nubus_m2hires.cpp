@@ -32,7 +32,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NUBUS_M2HIRES, nubus_m2hires_device, "nb_m2hr", "Macintosh II Hi-Resolution video card")
+DEFINE_DEVICE_TYPE(NUBUS_M2HIRES, nubus_m2hires_device, "nb_m2hr", "Apple Macintosh II High Resolution Video Card")
 
 
 //-------------------------------------------------
