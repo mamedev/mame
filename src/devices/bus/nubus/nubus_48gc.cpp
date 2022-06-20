@@ -155,7 +155,7 @@ TIMER_CALLBACK_MEMBER(jmfb_device::vbl_tick)
 
 uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + m_base;
+	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + (m_base << 5);
 
 	// first time?  kick off the VBL timer
 	if (!m_screen)
@@ -230,10 +230,11 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		case 4: // 24 bpp
 			{
+				uint32_t const base = (m_base * 8 / 3) << 3;
 				uint32_t const stride = m_stride * 8 / 3;
 				for (int y = 0; y < m_yres; y++)
 				{
-					std::copy_n(&m_vram[(m_base / 4) + (y * stride)], m_xres, &bitmap.pix(y));
+					std::copy_n(&m_vram[base + (y * stride)], m_xres, &bitmap.pix(y));
 				}
 			}
 			break;
@@ -250,10 +251,10 @@ void jmfb_device::mac_48gc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
 		case 0x8/4: // base
 //          printf("%x to base\n", data);
-			m_base = (data * 2) << 4;
+			m_base = data;
 			break;
 
-		case 0xc/4: // stride
+		case 0x00c/4: // stride
 //          printf("%x to stride\n", data);
 			// this value is in DWORDs for 1-8 bpp and, uhh, strange for 24bpp
 			m_stride = data;
