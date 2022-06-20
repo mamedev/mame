@@ -221,6 +221,7 @@ void kbdc8042_device::at_8042_clear_keyboard_received()
 	m_input_buffer_full_mouse_cb(0);
 	m_keyboard.received = 0;
 	m_mouse.received = 0;
+	m_data = 0;
 }
 
 TIMER_CALLBACK_MEMBER(kbdc8042_device::update_timer)

@@ -29,16 +29,17 @@
 #include "nubus_specpdq.h"
 #include "screen.h"
 
+#include <algorithm>
+
 //#define VERBOSE 1
 #include "logmacro.h"
-
-#include <algorithm>
 
 
 #define SPECPDQ_SCREEN_NAME "specpdq_screen"
 #define SPECPDQ_ROM_REGION  "specpdq_rom"
 
 #define VRAM_SIZE   (0x400000)
+
 
 ROM_START( specpdq )
 	ROM_REGION(0x10000, SPECPDQ_ROM_REGION, 0)
@@ -63,8 +64,6 @@ void nubus_specpdq_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
 	screen.set_size(1280, 1024);
 	screen.set_visarea(0, 1152-1, 0, 844-1);
-
-	PALETTE(config, m_palette).set_entries(256);
 }
 
 //-------------------------------------------------
@@ -75,6 +74,16 @@ const tiny_rom_entry *nubus_specpdq_device::device_rom_region() const
 {
 	return ROM_NAME( specpdq );
 }
+
+//-------------------------------------------------
+//  palette_entries - entries in color palette
+//-------------------------------------------------
+
+uint32_t nubus_specpdq_device::palette_entries() const
+{
+	return 256;
+}
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -91,11 +100,13 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const 
 
 nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
-	m_mode(0), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
-	m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0),
-	m_palette(*this, "palette")
+	device_video_interface(mconfig, *this),
+	device_palette_interface(mconfig, *this),
+	m_timer(nullptr),
+	m_mode(0), m_vbl_disable(0),
+	m_count(0), m_clutoffs(0),
+	m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0)
 {
 	set_screen(*this, SPECPDQ_SCREEN_NAME);
 }
@@ -106,13 +117,10 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device
 
 void nubus_specpdq_device::device_start()
 {
-	uint32_t slotspace;
-
 	install_declaration_rom(SPECPDQ_ROM_REGION);
 
-	slotspace = get_slotspace();
-
-//  logerror("[specpdq %p] slotspace = %x\n", this, slotspace);
+	uint32_t const slotspace = get_slotspace();
+	LOG("[specpdq %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
 	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_specpdq_device::vram_r)), write32s_delegate(*this, FUNC(nubus_specpdq_device::vram_w)));
@@ -128,15 +136,20 @@ void nubus_specpdq_device::device_start()
 
 void nubus_specpdq_device::device_reset()
 {
+	std::fill(m_vram.begin(), m_vram.end(), 0);
+	m_mode = 0;
+	m_vbl_disable = 1;
+	std::fill(std::begin(m_colors), std::end(m_colors), 0);
 	m_count = 0;
 	m_clutoffs = 0;
-	m_vbl_disable = 1;
-	m_mode = 0;
-	std::fill(m_vram.begin(), m_vram.end(), 0);
-	memset(m_palette_val, 0, sizeof(m_palette_val));
 
-	m_palette_val[0] = rgb_t(255, 255, 255);
-	m_palette_val[0x80] = rgb_t(0, 0, 0);
+	std::fill(std::begin(m_7xxxxx_regs), std::end(m_7xxxxx_regs), 0);
+	m_width = 0;
+	m_height = 0;
+	m_patofsx = 0;
+	m_patofsy = 0;
+	m_vram_addr = 0;
+	m_vram_src = 0;
 }
 
 
@@ -171,14 +184,14 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 				{
 					uint8_t const pixels = vram8[(y * 512) + x];
 
-					*scanline++ = m_palette_val[(pixels&0x80)];
-					*scanline++ = m_palette_val[((pixels<<1)&0x80)];
-					*scanline++ = m_palette_val[((pixels<<2)&0x80)];
-					*scanline++ = m_palette_val[((pixels<<3)&0x80)];
-					*scanline++ = m_palette_val[((pixels<<4)&0x80)];
-					*scanline++ = m_palette_val[((pixels<<5)&0x80)];
-					*scanline++ = m_palette_val[((pixels<<6)&0x80)];
-					*scanline++ = m_palette_val[((pixels<<7)&0x80)];
+					*scanline++ = pen_color((pixels << 0) & 0x80);
+					*scanline++ = pen_color((pixels << 1) & 0x80);
+					*scanline++ = pen_color((pixels << 2) & 0x80);
+					*scanline++ = pen_color((pixels << 3) & 0x80);
+					*scanline++ = pen_color((pixels << 4) & 0x80);
+					*scanline++ = pen_color((pixels << 5) & 0x80);
+					*scanline++ = pen_color((pixels << 6) & 0x80);
+					*scanline++ = pen_color((pixels << 7) & 0x80);
 				}
 			}
 			break;
@@ -191,10 +204,10 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 				{
 					uint8_t const pixels = vram8[(y * 512) + x];
 
-					*scanline++ = m_palette_val[(pixels&0xc0)];
-					*scanline++ = m_palette_val[((pixels<<2)&0xc0)];
-					*scanline++ = m_palette_val[((pixels<<4)&0xc0)];
-					*scanline++ = m_palette_val[((pixels<<6)&0xc0)];
+					*scanline++ = pen_color((pixels << 0) & 0xc0);
+					*scanline++ = pen_color((pixels << 2) & 0xc0);
+					*scanline++ = pen_color((pixels << 4) & 0xc0);
+					*scanline++ = pen_color((pixels << 6) & 0xc0);
 				}
 			}
 			break;
@@ -207,8 +220,8 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 				{
 					uint8_t const pixels = vram8[(y * 1024) + x];
 
-					*scanline++ = m_palette_val[(pixels&0xf0)];
-					*scanline++ = m_palette_val[((pixels<<4)&0xf0)];
+					*scanline++ = pen_color((pixels << 0) & 0xf0);
+					*scanline++ = pen_color((pixels << 4) & 0xf0);
 				}
 			}
 			break;
@@ -220,7 +233,7 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 				for (int x = 0; x < 1152; x++)
 				{
 					uint8_t const pixels = vram8[(y * 1152) + x];
-					*scanline++ = m_palette_val[pixels];
+					*scanline++ = pen_color(pixels);
 				}
 			}
 			break;
@@ -264,8 +277,12 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 
 			switch (data)
 			{
-				case 0xff7fffff:
+				case 0xffffffff:
 					m_mode = 0;
+					break;
+
+				case 0xff7fffff:
+					m_mode = 1;
 					break;
 
 				case 0xfeffffff:
@@ -282,22 +299,17 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 
 		case 0x120000:  // DAC address
 			LOG("%08x to DAC control %s\n", data,machine().describe_context());
-			m_clutoffs = ((data>>8)&0xff)^0xff;
+			m_clutoffs = ~data & 0xff;
 			break;
 
 		case 0x120001:  // DAC data
-			m_colors[m_count++] = ((data>>8)&0xff)^0xff;
+			m_colors[m_count++] = ~(data >> 8) & 0xff;
 
 			if (m_count == 3)
 			{
 				LOG("RAMDAC: color %d = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
-				m_palette->set_pen_color(m_clutoffs, rgb_t(m_colors[0], m_colors[1], m_colors[2]));
-				m_palette_val[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
-				m_clutoffs++;
-				if (m_clutoffs > 255)
-				{
-					m_clutoffs = 0;
-				}
+				set_pen_color(m_clutoffs, rgb_t(m_colors[0], m_colors[1], m_colors[2]));
+				m_clutoffs = (m_clutoffs + 1) & 0xff;
 				m_count = 0;
 			}
 			break;

@@ -20,6 +20,8 @@ X-1411 : Breakout
 X-1413 : Night Driver
 X-1414 : Streetracer
 
+
+MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx number
 -->
 
 <softwarelist name="a2600" description="Atari 2600 cartridges">
@@ -1125,16 +1127,32 @@ X-1414 : Streetracer
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="asteroids.bin" size="8192" crc="c7d64c94" sha1="d68937e57a367e61eaa4b44550ae8b9d69456661"/>
+				<rom name="co16449.bin" size="8192" crc="c7d64c94" sha1="d68937e57a367e61eaa4b44550ae8b9d69456661"/>
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="asteroide06" cloneof="asteroid">
+		<description>Asteroids (PAL, rev. 06)</description>
+		<year>1981</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2649" />
+		<info name="ROM date" value="4381"/>
+		<info name="programmer" value="Brad Stewart" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="co17449a-06.bin" size="8192" crc="e22bf19f" sha1="1cf68bb50b6e7b0d051d0a16111c49f37f697c8b"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="asteroide" cloneof="asteroid">
-		<description>Asteroids (PAL)</description>
+		<description>Asteroids (PAL, older)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
-		<info name="serial" value="CX2649P" />
+		<info name="serial" value="CX2649" />
 		<info name="programmer" value="Brad Stewart" />
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
@@ -1145,18 +1163,19 @@ X-1414 : Streetracer
 		</part>
 	</software>
 
-	<software name="asteroide1" cloneof="asteroid">
-		<description>Asteroids (PAL) (older)</description>
+	<software name="asteroide03" cloneof="asteroid">
+		<description>Asteroids (PAL, rev. 03)</description>
 		<!-- According to the Programmer he didn't do the title screen, so it must have been added later on by another programmer -->
 		<year>1981</year>
 		<publisher>Atari</publisher>
-		<info name="serial" value="CX2649P" />
+		<info name="serial" value="CX2649" />
+		<info name="ROM date" value="3581"/>
 		<info name="programmer" value="Brad Stewart" />
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">
-				<rom name="asteroids (pal) (older).bin" size="8192" crc="ffcb5e99" sha1="7c0f522d5796c4f307dccf9ce515ab022778b3c7"/>
+				<rom name="co17449-03.bin" size="8192" crc="ffcb5e99" sha1="7c0f522d5796c4f307dccf9ce515ab022778b3c7"/>
 			</dataarea>
 		</part>
 	</software>

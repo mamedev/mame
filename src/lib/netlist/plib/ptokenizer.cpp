@@ -69,16 +69,16 @@ namespace plib {
 		m_unget = c;
 	}
 
-	void tokenizer_t::append_to_store(putf8_reader *reader, token_store_t &tokstor)
+	void tokenizer_t::append_to_store(putf8_reader *reader, token_store_t &store)
 	{
 		clear();
 		m_strm = reader;
 		// Process tokens into queue
 		token_t ret(token_type::UNKNOWN);
-		m_token_queue = &tokstor;
+		m_token_queue = &store;
 		do {
 			ret = get_token_comment();
-			tokstor.push_back(ret);
+			store.push_back(ret);
 		} while (!ret.is_type(token_type::token_type::ENDOFFILE));
 		m_token_queue = nullptr;
 	}
@@ -300,28 +300,26 @@ namespace plib {
 			}
 			return { token_type::STRING, tokstr };
 		}
-		else
+
+		// read identifier till first identifier char or ws
+		pstring tokstr = "";
+		while ((m_identifier_chars.find(c) == pstring::npos) && (m_whitespace.find(c) == pstring::npos))
 		{
-			// read identifier till first identifier char or ws
-			pstring tokstr = "";
-			while ((m_identifier_chars.find(c) == pstring::npos) && (m_whitespace.find(c) == pstring::npos))
+			tokstr += c;
+			// expensive, check for single char tokens
+			if (tokstr.length() == 1)
 			{
-				tokstr += c;
-				// expensive, check for single char tokens
-				if (tokstr.length() == 1)
-				{
-					auto id = m_tokens.find(tokstr);
-					if (id != m_tokens.end())
-						return { id->second, tokstr };
-				}
-				c = getc();
+				auto id = m_tokens.find(tokstr);
+				if (id != m_tokens.end())
+					return { id->second, tokstr };
 			}
-			ungetc(c);
-			auto id = m_tokens.find(tokstr);
-			return (id != m_tokens.end()) ?
-					token_t(id->second, tokstr)
-				:   token_t(token_type::UNKNOWN, tokstr);
+			c = getc();
 		}
+		ungetc(c);
+		auto id = m_tokens.find(tokstr);
+		return (id != m_tokens.end()) ?
+				token_t(id->second, tokstr)
+			:   token_t(token_type::UNKNOWN, tokstr);
 	}
 
 	token_reader_t::token_t tokenizer_t::get_token_comment()

@@ -97,9 +97,11 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(irq_on);
 	TIMER_CALLBACK_MEMBER(irq_off);
+	TIMER_CALLBACK_MEMBER(finish_screen_update);
 
 	emu_timer *m_irq_on_timer;
 	emu_timer *m_irq_off_timer;
+	emu_timer *m_finish_screen_update_timer;
 
 	int m_port_fe_data;
 	int m_port_7ffd_data;

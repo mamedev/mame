@@ -8708,7 +8708,7 @@ the copyright dates recorded.
 TODO: Sort these better given the wide variation in dates/versions/core code (SWP version id, for one thing).
 */
 
-GAME(  199?, v4bios,     0,        mod2,       mpu4vid,     mpu4_state,    init_m4default_banks,     ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
+GAME(  199?, v4bios,     0,        mod2,       mpu4vid,     mpu4_state,    init_m4default,     ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
 
 #define GAME_FLAGS MACHINE_NOT_WORKING
 #define GAME_FLAGS_OK (MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

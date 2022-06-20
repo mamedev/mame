@@ -46,11 +46,11 @@ namespace netlist::devices {
 		NETLIB_RESETI()
 		{
 			/* FIXME make resistances a parameter, properly model other variants */
-			m_R1.set_R(nlconst::magic(5000));
-			m_R2.set_R(nlconst::magic(5000));
-			m_R3.set_R(nlconst::magic(5000));
-			m_ROUT.set_R(nlconst::magic(20));
-			m_RDIS.set_R(nlconst::magic(R_OFF));
+			m_R1().set_R(nlconst::magic(5000));
+			m_R2().set_R(nlconst::magic(5000));
+			m_R3().set_R(nlconst::magic(5000));
+			m_ROUT().set_R(nlconst::magic(20));
+			m_RDIS().set_R(nlconst::magic(R_OFF));
 
 			m_last_out = true;
 			// Check for astable setup, usually TRIG AND THRES connected. Enable
@@ -66,8 +66,8 @@ namespace netlist::devices {
 
 			const auto reset = m_RESET();
 
-			const nl_fptype v_threshold = clamp_hl(m_R2.P()(), nlconst::magic(0.7), nlconst::magic(1.4));
-			const nl_fptype v_trigger = clamp_hl(m_R2.N()(), nlconst::magic(0.7), nlconst::magic(1.4));
+			const nl_fptype v_threshold = clamp_hl(m_R2().P()(), nlconst::magic(0.7), nlconst::magic(1.4));
+			const nl_fptype v_trigger = clamp_hl(m_R2().N()(), nlconst::magic(0.7), nlconst::magic(1.4));
 
 			// avoid artificial oscillation due to overshoot compensation when
 			// the control input is used.
@@ -106,11 +106,11 @@ namespace netlist::devices {
 				m_overshoot = plib::clamp(m_overshoot(), nlconst::zero(), overshoot_limit);
 				//if (this->name() == "IC6_2")
 				//  printf("%f %s %f %f %f\n", exec().time().as_double(), this->name().c_str(), m_overshoot(), m_R2.P()(), m_THRES());
-				m_RDIS.change_state([this]()
+				m_RDIS().change_state([this]()
 					{
-						m_RDIS.set_R(nlconst::magic(R_ON));
+						m_RDIS().set_R(nlconst::magic(R_ON));
 					});
-				m_OUT.push(m_R3.N()());
+				m_OUT.push(m_R3().N()());
 			}
 			else if (!m_last_out && out)
 			{
@@ -121,21 +121,21 @@ namespace netlist::devices {
 				m_undershoot += (v_trigger - m_TRIG());
 				m_undershoot = plib::clamp(m_undershoot(), nlconst::zero(), overshoot_limit);
 #endif
-				m_RDIS.change_state([this]()
+				m_RDIS().change_state([this]()
 					{
-						m_RDIS.set_R(nlconst::magic(R_OFF));
+						m_RDIS().set_R(nlconst::magic(R_OFF));
 					});
 				// FIXME: Should be delayed by 100ns
-				m_OUT.push(m_R1.P()());
+				m_OUT.push(m_R1().P()());
 			}
 			m_last_reset = reset;
 			m_last_out = out;
 		}
-		analog::NETLIB_SUB(R_base) m_R1;
-		analog::NETLIB_SUB(R_base) m_R2;
-		analog::NETLIB_SUB(R_base) m_R3;
-		analog::NETLIB_SUB(R_base) m_ROUT;
-		analog::NETLIB_SUB(R_base) m_RDIS;
+		NETLIB_SUB_NS(analog, R_base) m_R1;
+		NETLIB_SUB_NS(analog, R_base) m_R2;
+		NETLIB_SUB_NS(analog, R_base) m_R3;
+		NETLIB_SUB_NS(analog, R_base) m_ROUT;
+		NETLIB_SUB_NS(analog, R_base) m_RDIS;
 
 		logic_input_t m_RESET;
 		analog_input_t m_THRES;
@@ -151,7 +151,7 @@ namespace netlist::devices {
 
 		nl_fptype clamp_hl(const nl_fptype v, const nl_fptype a, const nl_fptype b) noexcept
 		{
-			const nl_fptype vcc = m_R1.P()();
+			const nl_fptype vcc = m_R1().P()();
 			return plib::clamp(v, b, vcc - a);
 		}
 	};

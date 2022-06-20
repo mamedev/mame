@@ -130,32 +130,6 @@ namespace analog
 
 	};
 
-	// Have a common start for transistors
-
-	NETLIB_BASE_OBJECT(QBJT)
-	{
-	public:
-
-		NETLIB_CONSTRUCTOR_EX(QBJT, const pstring &model = "NPN")
-		, m_model(*this, "MODEL", model)
-		, m_qtype(bjt_type::BJT_NPN)
-		{
-		}
-
-		NETLIB_IS_DYNAMIC(true)
-
-		//NETLIB_RESETI();
-
-		bjt_type qtype() const noexcept { return m_qtype; }
-		bool is_qtype(bjt_type atype) const noexcept { return m_qtype == atype; }
-		void set_qtype(bjt_type atype) noexcept { m_qtype = atype; }
-	protected:
-
-		param_model_t m_model;
-	private:
-		bjt_type m_qtype;
-	};
-
 	// -----------------------------------------------------------------------------
 	// nld_QBJT_switch
 	// -----------------------------------------------------------------------------
@@ -174,9 +148,12 @@ namespace analog
 	//                     E
 	//
 
-	NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
+	class nld_QBJT_switch : public base_device_t
 	{
-		NETLIB_CONSTRUCTOR(QBJT_switch)
+	public:                                                                        \
+		nld_QBJT_switch(constructor_param_t data)
+		: base_device_t(data)
+		, m_model(*this, "MODEL", "NPN")
 		, m_bjt_model(m_model)
 		, m_RB(*this, "m_RB", NETLIB_DELEGATE(terminal_handler))
 		, m_RC(*this, "m_RC", NETLIB_DELEGATE(terminal_handler))
@@ -205,14 +182,17 @@ namespace analog
 				m_RC.solver()->solve_now();
 		}
 
+		NETLIB_IS_DYNAMIC(true)
+
 		NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATE_TERMINALSI();
 
 	private:
+		param_model_t m_model;
 		bjt_model_t m_bjt_model;
-		nld_two_terminal m_RB;
-		nld_two_terminal m_RC;
-		nld_two_terminal m_BC;
+		NETLIB_NAME(two_terminal) m_RB;
+		NETLIB_NAME(two_terminal) m_RC;
+		NETLIB_NAME(two_terminal) m_BC;
 
 		nl_fptype m_gB; // base conductance / switch on
 		nl_fptype m_gC; // collector conductance / switch on
@@ -226,10 +206,12 @@ namespace analog
 	// -----------------------------------------------------------------------------
 
 
-	NETLIB_OBJECT_DERIVED(QBJT_EB, QBJT)
+	class nld_QBJT_EB : public base_device_t
 	{
-	public:
-		NETLIB_CONSTRUCTOR(QBJT_EB)
+	public:                                                                        \
+		nld_QBJT_EB(constructor_param_t data)
+		: base_device_t(data)
+		, m_model(*this, "MODEL", "NPN")
 		, m_bjt_model(m_model)
 		, m_gD_BC(*this, "m_D_BC")
 		, m_gD_BE(*this, "m_D_BE")
@@ -275,17 +257,20 @@ namespace analog
 				m_D_CB.solver()->solve_now();
 		}
 
+		NETLIB_IS_DYNAMIC(true)
+
 		NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATE_TERMINALSI();
 
 	private:
+		param_model_t m_model;
 		bjt_model_t m_bjt_model;
 		generic_diode<diode_e::BIPOLAR> m_gD_BC;
 		generic_diode<diode_e::BIPOLAR> m_gD_BE;
 
-		nld_two_terminal m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
-		nld_two_terminal m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
-		nld_two_terminal m_D_EC;  // 0, -gec, -gcc, 0 | 0
+		NETLIB_NAME(two_terminal) m_D_CB;  // gcc, gce - gcc, gec - gcc, gcc - gce | Ic
+		NETLIB_NAME(two_terminal) m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
+		NETLIB_NAME(two_terminal) m_D_EC;  // 0, -gec, -gcc, 0 | 0
 
 		nl_fptype m_alpha_f;
 		nl_fptype m_alpha_r;
@@ -304,8 +289,8 @@ namespace analog
 	{
 		if (m_RB.solver() == nullptr && m_RC.solver() == nullptr)
 			throw nl_exception(MF_DEVICE_FRY_1(this->name()));
-		NETLIB_NAME(QBJT)::reset();
-		const auto zero(nlconst::zero());
+
+		static constexpr const auto zero(nlconst::zero());
 
 		m_state_on = 0;
 
@@ -322,9 +307,6 @@ namespace analog
 		nl_fptype BF = m_bjt_model.m_BF;
 		nl_fptype NF = m_bjt_model.m_NF;
 		//nl_fptype VJE = m_bjt_model.dValue("VJE", 0.75);
-
-		// FIXME: check for PNP as well and bail out
-		set_qtype(m_bjt_model.m_type);
 
 		nl_fptype alpha = BF / (nlconst::one() + BF);
 
@@ -349,7 +331,7 @@ namespace analog
 
 	NETLIB_UPDATE_TERMINALS(QBJT_switch)
 	{
-		const nl_fptype m = (is_qtype( bjt_type::BJT_NPN) ? 1 : -1);
+		const nl_fptype m = (m_bjt_model.m_type == bjt_type::BJT_NPN) ? nlconst::one() : -nlconst::one();
 
 		const unsigned new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
 		if (m_state_on ^ new_state)
@@ -374,7 +356,7 @@ namespace analog
 	{
 		if (m_D_EB.solver() == nullptr && m_D_CB.solver() == nullptr)
 			throw nl_exception(MF_DEVICE_FRY_1(this->name()));
-		NETLIB_NAME(QBJT)::reset();
+
 		if (m_CJE)
 		{
 			m_CJE->reset();
@@ -389,7 +371,7 @@ namespace analog
 
 	NETLIB_UPDATE_TERMINALS(QBJT_EB)
 	{
-		const nl_fptype polarity(qtype() == bjt_type::BJT_NPN ? nlconst::one() : -nlconst::one());
+		const nl_fptype polarity(m_bjt_model.m_type == bjt_type::BJT_NPN ? nlconst::one() : -nlconst::one());
 
 		m_gD_BE.update_diode(-m_D_EB.deltaV() * polarity);
 		m_gD_BC.update_diode(-m_D_CB.deltaV() * polarity);
@@ -421,9 +403,6 @@ namespace analog
 		nl_fptype BR = m_bjt_model.m_BR;
 		nl_fptype NR = m_bjt_model.m_NR;
 		//nl_fptype VJE = m_m_bjt_model.dValue("VJE", 0.75);
-
-		// FIXME: check for PNP as well and bail out
-		set_qtype(m_bjt_model.m_type);
 
 		m_alpha_f = BF / (nlconst::one() + BF);
 		m_alpha_r = BR / (nlconst::one() + BR);

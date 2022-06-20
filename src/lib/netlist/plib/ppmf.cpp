@@ -83,8 +83,8 @@ namespace plib {
 			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			std::uint8_t const *const vptr = *reinterpret_cast<std::uint8_t const *const *>(byteptr);
 			// and add offset to virtual base from vtable
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			if (sizeof(unknown_base_equiv) == m_size)
+				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 				byteptr += *reinterpret_cast<int const *>(vptr + m_vt_index);
 		}
 

@@ -4448,8 +4448,6 @@ files {
 	MAME_DIR .. "src/mame/machine/bagman.cpp",
 	MAME_DIR .. "src/mame/video/bagman.cpp",
 	MAME_DIR .. "src/mame/drivers/tankbust.cpp",
-	MAME_DIR .. "src/mame/includes/tankbust.h",
-	MAME_DIR .. "src/mame/video/tankbust.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "venture")
