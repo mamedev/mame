@@ -7,11 +7,12 @@
 
 #include "nubus.h"
 
+#include "emupal.h"
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> nubus_spec8s3_device
 
 class nubus_spec8s3_device :
 		public device_t,
@@ -47,11 +48,13 @@ private:
 
 	static void crtc_w(int16_t &param, uint32_t offset, uint32_t data);
 
+	required_device<palette_device> m_palette;
+
 	emu_timer *m_timer;
 
 	std::vector<uint32_t> m_vram;
 	uint32_t m_mode, m_vbl_disable;
-	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
+	uint32_t m_palette_val[256], m_colors[3], m_count, m_clutoffs;
 
 	int16_t m_hsync, m_hstart, m_hend, m_htotal;
 	int16_t m_vsync, m_vstart, m_vend, m_vtotal;

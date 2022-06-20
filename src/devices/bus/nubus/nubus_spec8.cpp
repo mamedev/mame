@@ -43,9 +43,13 @@
 
 
 ROM_START( spec8s3 )
+	ROM_DEFAULT_BIOS("ver13")
+	ROM_SYSTEM_BIOS( 0, "ver12", "Ver. 1.2 (1990)" )
+	ROM_SYSTEM_BIOS( 1, "ver13", "Ver. 1.3 (1993)" )
+
 	ROM_REGION(0x8000, SPEC8S3_ROM_REGION, 0)
-	ROM_LOAD( "1003067-0001d.11b.bin", 0x000000, 0x008000, CRC(12188e2b) SHA1(6552d40364eae99b449842a79843d8c0114c4c70) ) // "1003067-0001D Spec/8 Ser III // Ver. 1.2 (C)Copyright 1990 // SuperMac Technology // All Rights Reserved" 27c256 @11B
-	ROM_LOAD( "1003067-0001e.11b.bin", 0x000000, 0x008000, CRC(39fab193) SHA1(124c9847bf07733d131c977c4395cfbbb6470973) ) // "1003067-0001E Spec/8 Ser III // Ver. 1.3 (C)Copyright 1993 // SuperMac Technology // All Rights Reserved" NMC27C256Q @11B
+	ROMX_LOAD( "1003067-0001d.11b.bin", 0x000000, 0x008000, CRC(12188e2b) SHA1(6552d40364eae99b449842a79843d8c0114c4c70), ROM_BIOS(0) ) // "1003067-0001D Spec/8 Ser III // Ver. 1.2 (C)Copyright 1990 // SuperMac Technology // All Rights Reserved" 27c256 @11B
+	ROMX_LOAD( "1003067-0001e.11b.bin", 0x000000, 0x008000, CRC(39fab193) SHA1(124c9847bf07733d131c977c4395cfbbb6470973), ROM_BIOS(1) ) // "1003067-0001E Spec/8 Ser III // Ver. 1.3 (C)Copyright 1993 // SuperMac Technology // All Rights Reserved" NMC27C256Q @11B
 ROM_END
 
 //**************************************************************************
@@ -75,6 +79,8 @@ void nubus_spec8s3_device::device_add_mconfig(machine_config &config)
 	screen_device &screen(SCREEN(config, SPEC8S3_SCREEN_NAME, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(nubus_spec8s3_device::screen_update));
 	screen.set_raw(64_MHz_XTAL, 332*4, 64*4, 320*4, 804, 33, 801);
+
+	PALETTE(config, m_palette).set_entries(256);
 }
 
 //-------------------------------------------------
@@ -103,6 +109,7 @@ nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
+	m_palette(*this, "palette"),
 	m_timer(nullptr),
 	m_mode(0), m_vbl_disable(0),
 	m_count(0), m_clutoffs(0),
@@ -119,7 +126,7 @@ void nubus_spec8s3_device::device_start()
 {
 	install_declaration_rom(SPEC8S3_ROM_REGION);
 
-	const uint32_t slotspace = get_slotspace();
+	uint32_t const slotspace = get_slotspace();
 	LOG("[SPEC8S3 %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
@@ -132,7 +139,7 @@ void nubus_spec8s3_device::device_start()
 	save_item(NAME(m_vram));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_vbl_disable));
-	save_item(NAME(m_palette));
+	save_item(NAME(m_palette_val));
 	save_item(NAME(m_colors));
 	save_item(NAME(m_count));
 	save_item(NAME(m_clutoffs));
@@ -158,7 +165,7 @@ void nubus_spec8s3_device::device_reset()
 	std::fill(m_vram.begin(), m_vram.end(), 0);
 	m_mode = 0;
 	m_vbl_disable = 1;
-	std::fill(std::begin(m_palette), std::end(m_palette), rgb_t(0));
+	std::fill(std::begin(m_palette_val), std::end(m_palette_val), 0);
 	std::fill(std::begin(m_colors), std::end(m_colors), 0);
 	m_count = 0;
 	m_clutoffs = 0;
@@ -174,8 +181,8 @@ void nubus_spec8s3_device::device_reset()
 	m_vbl_pending = false;
 	m_parameter = 0;
 
-	m_palette[0] = rgb_t(255, 255, 255);
-	m_palette[1] = rgb_t(0, 0, 0);
+	m_palette_val[0] = rgb_t(255, 255, 255);
+	m_palette_val[1] = rgb_t(0, 0, 0);
 
 	update_crtc();
 }
@@ -270,14 +277,14 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 					{
 						uint8_t const pixels = vram8[((y - vstart) * 512) + x];
 
-						*scanline++ = m_palette[(pixels << 0) & 0x80];
-						*scanline++ = m_palette[(pixels << 1) & 0x80];
-						*scanline++ = m_palette[(pixels << 2) & 0x80];
-						*scanline++ = m_palette[(pixels << 3) & 0x80];
-						*scanline++ = m_palette[(pixels << 4) & 0x80];
-						*scanline++ = m_palette[(pixels << 5) & 0x80];
-						*scanline++ = m_palette[(pixels << 6) & 0x80];
-						*scanline++ = m_palette[(pixels << 7) & 0x80];
+						*scanline++ = m_palette_val[(pixels << 0) & 0x80];
+						*scanline++ = m_palette_val[(pixels << 1) & 0x80];
+						*scanline++ = m_palette_val[(pixels << 2) & 0x80];
+						*scanline++ = m_palette_val[(pixels << 3) & 0x80];
+						*scanline++ = m_palette_val[(pixels << 4) & 0x80];
+						*scanline++ = m_palette_val[(pixels << 5) & 0x80];
+						*scanline++ = m_palette_val[(pixels << 6) & 0x80];
+						*scanline++ = m_palette_val[(pixels << 7) & 0x80];
 					}
 				}
 				else
@@ -297,10 +304,10 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 					{
 						uint8_t const pixels = vram8[((y - vstart) * 512) + x];
 
-						*scanline++ = m_palette[(pixels << 0) & 0xc0];
-						*scanline++ = m_palette[(pixels << 2) & 0xc0];
-						*scanline++ = m_palette[(pixels << 4) & 0xc0];
-						*scanline++ = m_palette[(pixels << 6) & 0xc0];
+						*scanline++ = m_palette_val[(pixels << 0) & 0xc0];
+						*scanline++ = m_palette_val[(pixels << 2) & 0xc0];
+						*scanline++ = m_palette_val[(pixels << 4) & 0xc0];
+						*scanline++ = m_palette_val[(pixels << 6) & 0xc0];
 					}
 				}
 				else
@@ -320,8 +327,8 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 					{
 						uint8_t const pixels = vram8[((y - vstart) * 512) + x];
 
-						*scanline++ = m_palette[(pixels << 0) & 0xf0];
-						*scanline++ = m_palette[(pixels << 4) & 0xf0];
+						*scanline++ = m_palette_val[(pixels << 0) & 0xf0];
+						*scanline++ = m_palette_val[(pixels << 4) & 0xf0];
 					}
 				}
 				else
@@ -340,7 +347,7 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 					for (int x = 0; x < width; x++)
 					{
 						uint8_t const pixels = vram8[((y - vstart) * 1024) + x];
-						*scanline++ = m_palette[pixels];
+						*scanline++ = m_palette_val[pixels];
 					}
 				}
 				else
@@ -448,7 +455,8 @@ void nubus_spec8s3_device::spec8s3_w(offs_t offset, uint32_t data, uint32_t mem_
 				const int actual_color = bitswap<8>(m_clutoffs, 0, 1, 2, 3, 4, 5, 6, 7);
 
 				LOG("RAMDAC: color %d = %02x %02x %02x %s\n", actual_color, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
-				m_palette[actual_color] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
+				m_palette->set_pen_color(actual_color, rgb_t(m_colors[0], m_colors[1], m_colors[2]));
+				m_palette_val[actual_color] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs = (m_clutoffs + 1) & 0xff;
 				m_count = 0;
 			}
