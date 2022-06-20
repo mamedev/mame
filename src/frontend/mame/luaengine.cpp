@@ -29,6 +29,10 @@
 #include "softlist.h"
 #include "uiinput.h"
 
+#include "ioprocsfill.h"
+#include "ioprocsvec.h"
+#include "formats/fsblk_vec.h"
+
 #include "corestr.h"
 #include "notifier.h"
 
@@ -560,6 +564,56 @@ void lua_engine::attach_notifiers()
 }
 
 //-------------------------------------------------
+
+namespace
+{
+	class my_floppy_enumerator : public fs::manager_t::floppy_enumerator
+	{
+	public:
+		my_floppy_enumerator(const floppy_image &image)
+			: m_image(image)
+			, m_sector_image_format(nullptr)
+		{
+		}
+
+		virtual void add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override
+		{
+			// did we already figure it out?  if so bail
+			if (m_fsblk)
+				return;
+
+			// is this a new format type?  if so, load it
+			if (m_sector_image_format != &type)
+			{
+				m_sector_image_format = &type;
+				m_sector_image.clear();
+				util::random_read_write_fill_wrapper<util::vector_read_write_adapter<u8>, 0xff> io(m_sector_image);
+				m_sector_image_format->save(io, std::vector<uint32_t>(), (floppy_image *) & m_image);
+			}
+
+			// if we found the right size, use it
+			if (m_sector_image.size() == image_size)
+			{
+				m_fsblk = std::make_unique<fs::fsblk_vec_owned_t>(std::move(m_sector_image));
+				m_sector_image_format = nullptr;
+			}
+		}
+
+		virtual void add_raw(const char *name, u32 key, const char *description) override
+		{
+			// do nothing
+		}
+
+		std::unique_ptr<fs::fsblk_t> m_fsblk;
+
+	private:
+		const floppy_image				m_image;
+		std::vector<u8>					m_sector_image;
+		const floppy_image_format_t *	m_sector_image_format;
+	};
+};
+
+//-------------------------------------------------
 //  initialize - initialize lua hookup to emu engine
 //-------------------------------------------------
 
@@ -578,6 +632,22 @@ void lua_engine::initialize()
 		{ "set", SEEK_SET },
 		{ "cur", SEEK_CUR },
 		{ "end", SEEK_END }
+	};
+
+	static const enum_parser<uint32_t, 5> s_floppy_form_factor_parser =
+	{
+		{ "FF_UNKNOWN", floppy_image::FF_UNKNOWN },
+		{ "FF_3", floppy_image::FF_3 },
+		{ "FF_35", floppy_image::FF_35 },
+		{ "FF_525", floppy_image::FF_525 },
+		{ "FF_8", floppy_image::FF_8 }
+	};
+
+	static const enum_parser<fs::dir_entry_type, 3> s_dir_entry_type_parser =
+	{
+		{ "dir", fs::dir_entry_type::dir},
+		{ "file", fs::dir_entry_type::file},
+		{ "system_file", fs::dir_entry_type::system_file}
 	};
 
 
@@ -1614,11 +1684,38 @@ void lua_engine::initialize()
 	cass_type["position"] = sol::property(&cassette_image_device::get_position);
 	cass_type["length"] = sol::property([] (cassette_image_device &c) { return c.exists() ? c.get_length() : 0.0; });
 
+	auto floppy_image_type = sol().registry().new_usertype<floppy_image>("floppy_image", sol::no_constructor);
+	floppy_image_type["get_form_factor"] = [](const floppy_image &image)
+		{
+			uint32_t form_factor = image.get_form_factor();
+			return s_floppy_form_factor_parser(form_factor);
+		};
+	floppy_image_type["save_to_fsblk"] = [](const floppy_image &image, fs::manager_t const &fs)
+		{
+			my_floppy_enumerator fenum(image);
+			fs.enumerate_f(fenum, image.get_form_factor(), std::vector<u32>());
+			return std::move(fenum.m_fsblk);
+		};
+
 	auto floppy_image_format_type = sol().registry().new_usertype<floppy_image_format_t>("floppy_image_format", sol::no_constructor);
 	floppy_image_format_type["name"] = sol::property(&floppy_image_format_t::name);
 	floppy_image_format_type["description"] = sol::property(&floppy_image_format_t::description);
 	floppy_image_format_type["extensions"] = sol::property(&floppy_image_format_t::extensions);
 	floppy_image_format_type["supports_save"] = sol::property(&floppy_image_format_t::supports_save);
+	floppy_image_format_type["load"] = [](floppy_image_format_t &format, const char *filename, std::string_view form_factor_str)
+		{
+			// DUMMY FOR NOW
+			util::random_read_write::ptr io = util::stdio_read_write(fopen(filename, "r"));
+			uint32_t form_factor = s_floppy_form_factor_parser(form_factor_str);
+
+			// floppy_image needs to be initialized with dummy values
+			std::unique_ptr<floppy_image> img = std::make_unique<floppy_image>(84, 2, floppy_image::FF_UNKNOWN);
+
+			// attempt the load, and if this fails, reset the unique_ptr
+			if (!format.load(*io, form_factor, std::vector<uint32_t>(), img.get()))
+				img.reset();
+			return img;
+		};
 
 	/*  FS meta_data
 	 *
@@ -1670,30 +1767,27 @@ void lua_engine::initialize()
 	fs_manager_type["has_rsrc"] = sol::property(&fs::manager_t::has_rsrc);
 	fs_manager_type["directory_separator"] = sol::property(&fs::manager_t::directory_separator);
 	fs_manager_type["has_subdirectories"] = sol::property(&fs::manager_t::has_subdirectories);
-	fs_manager_type["volume_meta_description"] = sol::property([this](fs::manager_t const &fs)
-		{
-			int index = 1;
-			sol::table ret = sol().create_table();
-			for (const fs::meta_description &desc : fs.volume_meta_description())
-				ret[index++] = desc;
-			return ret;
-		});
-	fs_manager_type["file_meta_description"] = sol::property([this](fs::manager_t const &fs)
-		{
-			int index = 1;
-			sol::table ret = sol().create_table();
-			for (const fs::meta_description &desc : fs.file_meta_description())
-				ret[index++] = desc;
-			return ret;
-		});
-	fs_manager_type["directory_meta_description"] = sol::property([this](fs::manager_t const &fs)
-		{
-			int index = 1;
-			sol::table ret = sol().create_table();
-			for (const fs::meta_description &desc : fs.directory_meta_description())
-				ret[index++] = desc;
-			return ret;
-		});
+	fs_manager_type["volume_meta_description"] = sol::property(&fs::manager_t::volume_meta_description);
+	fs_manager_type["file_meta_description"] = sol::property(&fs::manager_t::file_meta_description);
+	fs_manager_type["directory_meta_description"] = sol::property(&fs::manager_t::directory_meta_description);
+	fs_manager_type["mount"] = &fs::manager_t::mount;
+
+	auto fs_filesystem_type = sol().registry().new_usertype<fs::filesystem_t>("filesystem_t", sol::no_constructor);
+	fs_filesystem_type["root"] = sol::property(&fs::filesystem_t::root);
+
+	auto fs_dir_entry_type = sol().registry().new_usertype<fs::dir_entry>("dir_entry", sol::no_constructor);
+	fs_dir_entry_type["name"] = sol::property([](const fs::dir_entry &ent) { return std::string_view(ent.m_name); });
+	fs_dir_entry_type["type"] = sol::property([](const fs::dir_entry &ent) { return s_dir_entry_type_parser(ent.m_type); });
+	fs_dir_entry_type["key"] = sol::property([](const fs::dir_entry &ent) { return ent.m_key; });
+
+	auto fs_filesystem_dir_type = sol().registry().new_usertype<fs::filesystem_t::dir_t>("dir_t", sol::no_constructor);
+	fs_filesystem_dir_type["contents"] = &fs::filesystem_t::dir_t::contents;
+	fs_filesystem_dir_type["metadata"] = sol::property(&fs::filesystem_t::dir_t::metadata);
+	fs_filesystem_dir_type["file_get"] = &fs::filesystem_t::dir_t::file_get;
+	fs_filesystem_dir_type["dir_get"] = &fs::filesystem_t::dir_t::dir_get;
+
+	auto fs_filesystem_file_type = sol().registry().new_usertype<fs::filesystem_t::file_t>("file_t", sol::no_constructor);
+	fs_filesystem_file_type["metadata"] = sol::property(&fs::filesystem_t::file_t::metadata);
 
 	auto floppy_fs_type = sol().registry().new_usertype<floppy_image_device::fs_info>("floppy_fs_info", sol::no_constructor);
 	floppy_fs_type["manager"] = sol::property(&floppy_image_device::fs_info::manager);
@@ -1730,19 +1824,7 @@ void lua_engine::initialize()
 	floppy_type["cylinder"] = sol::property(&floppy_image_device::cyl_r);
 	floppy_type["get_form_factor"] = [](floppy_image_device &floppy)
 		{
-			switch(floppy.get_form_factor())
-			{
-			case floppy_image::FF_3:
-				return "FF_3";
-			case floppy_image::FF_35:
-				return "FF_35";
-			case floppy_image::FF_525:
-				return "FF_525";
-			case floppy_image::FF_8:
-				return "FF_8";
-			default:
-				return "FF_UNKNOWN";
-			}
+			return s_floppy_form_factor_parser(floppy.get_form_factor());
 		};
 	floppy_type["finish_load"] = &floppy_image_device::finish_load;	// in src/frontends/mame/ui/floppycntrl.cpp, this function was described as a hack
 	floppy_type["init_fs"] = &floppy_image_device::init_fs;

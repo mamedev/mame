@@ -7,7 +7,7 @@
 
 namespace fs {
 
-class fsblk_vec_t : public fsblk_t {
+class fsblk_vec_base_t : public fsblk_t {
 private:
 	class blk_t : public iblock_t {
 	public:
@@ -23,15 +23,41 @@ private:
 	};
 
 public:
-	fsblk_vec_t(std::vector<u8> &data) : m_data(data) {}
-	virtual ~fsblk_vec_t() = default;
+	fsblk_vec_base_t() { };
+	virtual ~fsblk_vec_base_t() = default;
 
 	virtual u32 block_count() const override;
 	virtual block_t get(u32 id) override;
 	virtual void fill(u8 data) override;
 
+protected:
+	virtual std::vector<u8> &vec() = 0;
+	virtual const std::vector<u8> &vec() const = 0;
+};
+
+class fsblk_vec_t : public fsblk_vec_base_t {
+public:
+	fsblk_vec_t(std::vector<u8> &data) : m_data(data) {}
+
+protected:
+	virtual std::vector<u8> &vec() override { return m_data; }
+	virtual const std::vector<u8> &vec() const override { return m_data; }
+
 private:
 	std::vector<u8> &m_data;
+};
+
+
+class fsblk_vec_owned_t : public fsblk_vec_base_t {
+public:
+	fsblk_vec_owned_t(std::vector<u8> &&data) : m_data(std::move(data)) {}
+
+protected:
+	virtual std::vector<u8> &vec() override { return m_data; }
+	virtual const std::vector<u8> &vec() const override { return m_data; }
+
+private:
+	std::vector<u8> m_data;
 };
 
 } // namespace fs
