@@ -18196,6 +18196,1940 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+<!-- Rom Hunter V16 Collection -->
+
+	<software name="airlocke" cloneof="airlock">
+		<description>Airlock (PAL)</description>
+		<year>1983</year>
+		<publisher>Gameworld</publisher>
+		<info name="serial" value="133-004" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="airlock (1983) (gameworld) (133-004) (pal).bin" size="4096" crc="a2d4390b" sha1="a94b103806d33546aa8fac0056cd57b818bfed8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bridgee" cloneof="bridge">
+		<description>Bridge (PAL)</description>
+		<year>1980</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="EAX-006, PAX-006" />
+		<info name="programmer" value="Larry Kaplan" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bridge (1980) (activision, larry kaplan - ariola) (eax-006, pax-006 - 771 006-720) (pal).bin" size="4096" crc="63ceeb81" sha1="066193a13acbc1abfa6fdec29d41f7ad14869a5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xforcee1a" cloneof="xforce">
+		<description>Cross Force (PAL) (Unknown, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="cross force (unknown) (pal) [a].bin" size="4096" crc="a4f7d566" sha1="33033947a4f43586fa2cfa388c9b9e4240686058"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redseac">
+		<description>Red Sea Crossing</description>
+		<year>1983</year>
+		<publisher>Inspirational Video Concepts</publisher>
+		<info name="serial" value="321430" />
+		<info name="programmer" value="Steve Schustack" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="red sea crossing (1983) (inspirational video concepts, steve shustack) (321430) ~.bin" size="4096" crc="e81e232a" sha1="dd92f67873d928e98cc4a2b279b90d7db8d50f5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robottnkh" cloneof="robottnk">
+		<description>Robot Tank (PAL) (HES)</description>
+		<year>19??</year>
+		<publisher>HES</publisher>
+		<info name="programmer" value="Alan Miller" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="robot tank (hes - activision) (pal).bin" size="8192" crc="4bca21b2" sha1="2333bc875ce8fffe7c755c748856c07d079db45c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seaquestu" cloneof="seaquest">
+		<description>Seaquest (PAL) (Unknown)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="seaquest (unknown) (pal).bin" size="4096" crc="36ee509c" sha1="1c4313a49a1e0b6898882fc42f8edfbe41fe8e7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seamonste3" cloneof="seamonst">
+		<description>Sea Monster (PAL)</description>
+		<year>1982</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="PG201" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="sea monster (1982) (bit corporation) (pg201).bin" size="4096" crc="8ee7c4c8" sha1="0c1c3c25b7be02a27bed57908085f386b3693f37"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supermane2" cloneof="superman">
+		<description>Superman (PAL) (Unknown, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="superman (unknown) (pal) [a].bin" size="4096" crc="fd704a03" sha1="69b7ff9241a1b506ad5396cd384531aff708e75b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stampedej" cloneof="stampede">
+		<description>Stampede (2600 Screen Search Console)</description>
+		<year>19??</year>
+		<publisher>Jone Yuan Telephonic Enterprise Co</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="stampede (2600 screen search console) (jone yuan telephonic enterprise co).bin" size="2048" crc="0c90bcf8" sha1="9b8dff2cc1f7212285bebf5e529ec3c7ec971017"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schargere" cloneof="scharger">
+		<description>Starpath Supercharger (PAL)</description>
+		<year>1982</year>
+		<publisher>Arcadia Corporation ~ Starpath Corporation</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_ss" /> <!-- Is this correct? -->
+			<dataarea name="rom" size="2048">
+				<rom name="starpath supercharger (pal).bin" size="2048" crc="12632c98" sha1="41691d8f56bf2adb3c0f127e729563c9fba5d99d"/>
+			</dataarea>
+			<dataarea name="ram" size="6144">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dtictac32" cloneof="3dtictac">
+		<description>3D Tic-Tac-Toe (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Carol Shaw" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="3d tic-tac-toe (32 in 1) (1988) (atari, carol shaw) (cx26163p) (pal).bin" size="2048" crc="e2dd8da6" sha1="fd8f2a6eb9248227edca6ae60de93ca38c0ed2ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airseaba32" cloneof="airseaba">
+		<description>Air-Sea Battle (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Larry Kaplan" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="air-sea battle (32 in 1) (1988) (atari, larry kaplan) (cx26163p) (pal).bin" size="2048" crc="5865356e" sha1="eac7d1fb227d257a206a60da4bf76ee5e571b394"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antparty" cloneof="cosmswrm">
+		<description>Ant Party</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="alt_title" value="Cosmic Swarm" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="ant party (aka cosmic swarm) (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="33f3cb23" sha1="545abc0cda5ab3f76b5f1fb65d954d39daf3e1c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsktball32" cloneof="bsktball">
+		<description>Basketball (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Alan Miller" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="basketball (32 in 1) (1988) (atari, alan miller) (cx26163p) (pal).bin" size="2048" crc="958e0d64" sha1="3a5736b2fb19451463801bb76a818a93f6c5dc29"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blckjack32" cloneof="blckjack">
+		<description>Blackjack (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Bob Whitehead" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="paddles" />
+			<dataarea name="rom" size="2048">
+				<rom name="blackjack (32 in 1) (paddle) (1988) (atari, bob whitehead) (cx26163p) (pal).bin" size="2048" crc="0382e98d" sha1="628ad1bc3b303a7822aca2eb09200f2d118185b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bowling32" cloneof="bowling">
+		<description>Bowling (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Larry Kaplan" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="bowling (32 in 1) (1988) (atari, larry kaplan) (cx26163p) (pal).bin" size="2048" crc="ec82aaff" sha1="68ea43ea0e678cb5419a437a9bdab5c84f5ee1b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boxing32" cloneof="boxing">
+		<description>Boxing (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="boxing (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="fdb0aa75" sha1="559d46d1f9dfe6ba2ed8f2001db8dbe7bcd207ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="checkers32" cloneof="checkers">
+		<description>Checkers (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="checkers (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="6701264d" sha1="0c0cd0f0f768afcef0e7ce32a8640c6914d9ff99"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="combat32" cloneof="combat">
+		<description>Combat (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Joe Decuir, Larry Kaplan, Steve Mayer, Larry Wagner" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="combat (32 in 1) (1988) (atari, joe decuir, larry kaplan, steve mayer, larry wagner) (cx26163p) (pal).bin" size="2048" crc="a52139a8" sha1="5a078ce2087a07bc3c35f8479f0570bfb4ed9c8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fishing" cloneof="fishdrby">
+		<description>Fishing</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="alt_title" value="Fishing Derby" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="fishing (aka fishing derby) (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="f5187a3c" sha1="162852d5d37d46daeaf824b710ddf203f9601ac9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fishdrby32" cloneof="fishdrby">
+		<description>Fishing Derby (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="fishing derby (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="9a59662d" sha1="e77c837d07e5bb1e61fb22e2ff8d898df7346a59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flagcap32" cloneof="flagcap">
+		<description>Flag Capture (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Jim Huether" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="flag capture (32 in 1) (1988) (atari, jim huether) (cx26163p) (pal).bin" size="2048" crc="4609d961" sha1="a519d25d60737605b9b83fc4d1cb7402bfed082d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freewaych" cloneof="freeway">
+		<description>Freeway Chicken</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="alt_title" value="Freeway" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="freeway chicken (aka freeway) (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="8ba61f5e" sha1="37535b791a63c3e35d04ea0d14c0215680d71eda"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freewayra" cloneof="freeway">
+		<description>Freeway Rabbit</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="alt_title" value="Freeway" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="freeway rabbit (aka freeway) (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="e82e2475" sha1="292156b1ad05bbcb9749ded787801841d6beed0d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="funnumb32" cloneof="funnumb">
+		<description>Fun with Numbers (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Gary Palmer" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="fun with numbers (32 in 1) (1988) (atari, gary palmer) (cx26163p) (pal).bin" size="2048" crc="6f13c49c" sha1="51f477f37252b5c32469fc1f616c56ed7cad24bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golf32" cloneof="golf">
+		<description>Golf (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Tom Rudadahl" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="golf (32 in 1) (1988) (atari, tom rudadahl) (cx26163p) (pal).bin" size="2048" crc="b6b24526" sha1="e728c46f6c1608b43a59229fb463f3f87f00e993"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homerun32" cloneof="homerun">
+		<description>Homerun (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Bob Whitehead" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="homerun - horrorrun (32 in 1) (1988) (atari, bob whitehead) (cx26163p) (pal).bin" size="2048" crc="6d479c89" sha1="4ef32864a59cef6e1daafb809a44a588fbeb354c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="humancan32" cloneof="humancan">
+		<description>Human Cannonball (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="human cannonball (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="8743162a" sha1="c5df16d4ea935fc88460c42028cfa1ee6fd54182"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laserbls32" cloneof="laserbls">
+		<description>Laser Blast (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="laser blast (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="5c32a0f0" sha1="7c01dc0bc9f87c01dc93f68b3cc9bfabeda77f83"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minigolf32" cloneof="minigolf">
+		<description>Miniaturer Golf</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Tom Reuterdahl" />
+		<info name="alt_title" value="Miniature Golf" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="miniaturer golf (aka miniature golf) (32 in 1) (1988) (atari, tom reuterdahl) (cx26163p) (pal).bin" size="2048" crc="fcc7a662" sha1="277396e0d4fe82512d994c77e539bf06310bd8f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="football32" cloneof="football">
+		<description>NFL Football</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Bob Whitehead" />
+		<info name="alt_title" value="Football" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="nfl football (aka football) (32 in 1) (1988) (atari, bob whitehead) (cx26163p) (pal).bin" size="2048" crc="e6a734dc" sha1="bd3c477c1e962c2957daad0cf858220710841eb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outlaw32" cloneof="outlaw">
+		<description>Outlaw (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="David Crane" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="outlaw (32 in 1) (1988) (atari, david crane) (cx26163p) (pal).bin" size="2048" crc="b6b28725" sha1="b61073bc30a9285d4fa21e66d06f525361ce05d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversi" cloneof="othello">
+		<description>Reversi</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Ed Logg, Carol Shaw" />
+		<info name="alt_title" value="Othello" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="reversi (aka othello) (32 in 1) (1988) (atari, ed logg, carol shaw) (cx26163p) (pal).bin" size="2048" crc="58e1f930" sha1="3073c74a375635946482f657d36719df1164444d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skiing32" cloneof="skiing">
+		<description>Skiing (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="skiing (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="01fae566" sha1="5f927899d1086f0b721085b04a135f54d5c27d9b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skydiver32" cloneof="skydiver">
+		<description>Sky Diver (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Jim Huether" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="sky diver (32 in 1) (1988) (atari, jim huether) (cx26163p) (pal).bin" size="2048" crc="cdefbf81" sha1="aa319a4c39b785b2e256ed1bb36d4eb4c8f7c55d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slot32" cloneof="slot">
+		<description>Slot Machine (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="David Crane" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="slot machine (32 in 1) (1988) (atari, david crane) (cx26163p) (pal).bin" size="2048" crc="bcccf02f" sha1="2f7af671265b4d8406b98c69154306b58e2bd488"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slotrace32" cloneof="slotrace">
+		<description>Slot Racers (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Warren Robinett" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="slot racers (32 in 1) (1988) (atari, warren robinett) (cx26163p) (pal).bin" size="2048" crc="3260084e" sha1="db1eccfe1601f9c2a5cd7a1df8147872008b8d1d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacewar32" cloneof="spacewar">
+		<description>Space War (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Ian Shepard" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="space war - space star (32 in 1) (1988) (atari, ian shepard) (cx26163p) (pal).bin" size="2048" crc="6f2528fa" sha1="9db15e10cea799b69e0a7d890924c7391fd2ca45"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stampede32" cloneof="stampede">
+		<description>Stampede (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="stampede (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="8780b26e" sha1="e013dec038bdb0e2b57c4730e964e54999d6425a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surround32" cloneof="surround">
+		<description>Surround (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="programmer" value="Alan Miller" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="surround (32 in 1) (1988) (atari, alan miller) (cx26163p) (pal).bin" size="2048" crc="45d3d533" sha1="62cc0bc432c81e9fcbc8a19bbcb68559b548ffdf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennis32" cloneof="tennis">
+		<description>Tennis (32 in 1) (PAL)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="tennis (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="311439e5" sha1="247015261d3b66d31a0b6526e27271abc8112851"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufo" cloneof="spacejoc">
+		<description>UFO</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<info name="alt_title" value="Space Jockey" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="ufo (aka space jockey) (32 in 1) (1988) (atari) (cx26163p) (pal).bin" size="2048" crc="092c05fd" sha1="04e132f901f82c89eb1a1f2a4ba79e97e8b9d786"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepltr" cloneof="timeplt">
+		<description>Time Pilot (Rentacom)</description>
+		<year>19??</year>
+		<publisher>Rentacom</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_ua" />
+			<dataarea name="rom" size="8192">
+				<rom name="time pilot (rentacom).bin" size="8192" crc="e01d6fab" sha1="f6a113576cc786bc085f00c28504589afc9df01c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vanguardr" cloneof="vanguard">
+		<description>Vanguard (Rentacom)</description>
+		<year>19??</year>
+		<publisher>Rentacom</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_ua" />
+			<dataarea name="rom" size="8192">
+				<rom name="vanguard (rentacom).bin" size="8192" crc="8c233723" sha1="f48908b764f608c68bccd5c4e2f04bf4ad50fef5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defenderda" cloneof="defender">
+		<description>Defender (Dactari / Milmar)</description>
+		<year>19??</year>
+		<publisher>Dactari - Milmar</publisher>
+		<info name="programmer" value="Robert C. Polaro" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="defender (dactari - milmar).bin" size="4096" crc="56289967" sha1="7b10a71ebe079f66a61702d72e2df535ec07aab2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defenderh" cloneof="defender">
+		<description>Defender (Hack) (Unknown)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="defender (hack) (unknown).bin" size="4096" crc="f562a195" sha1="73056e3658f2ee46e6120e4150329cccd74771b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eggomanii" cloneof="eggomani">
+		<description>Eggomania (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="Wes Trager, Henry Will" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="paddles" />
+			<dataarea name="rom" size="4096">
+				<rom name="eggomania (canal 3 - intellivision).bin" size="4096" crc="759d2baa" sha1="71b9dfc436c4b6a218ab708115f0958cdd598121"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airseabah" cloneof="airseaba">
+		<description>Air-Sea Battle (Hack) (Unknown)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="air-sea battle (hack) (unknown) (4k).bin" size="4096" crc="2a765130" sha1="af5b9f33ccb7778b42957da4f20f2bc000992366"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enduroi" cloneof="enduro">
+		<description>Enduro (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="Larry Miller" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="enduro (canal 3 - intellivision).bin" size="4096" crc="ebf0378a" sha1="c4ba92a7f2918f3f8e222091d6c47d03ccb7403b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enduroda" cloneof="enduro">
+		<description>Enduro (Dactari / Milmar)</description>
+		<year>19??</year>
+		<publisher>Dactari - Milmar</publisher>
+		<info name="programmer" value="Larry Miller" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="enduro (dactari - milmar).bin" size="4096" crc="dd22a401" sha1="9e7961d20dba8369cd1db65c1a07e913b0ded90f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmarki" cloneof="cosmark">
+		<description>Cosmic Ark (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="Rob Fulop" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="cosmic ark (canal 3 - intellivision).bin" size="4096" crc="625089d4" sha1="167cba5ead0671b80f42f4e9081c67a968ea3d6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fishdrbyi" cloneof="fishdrby">
+		<description>Fishing Derby (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="David Crane" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="fishing derby (canal 3 - intellivision).bin" size="4096" crc="6f5cb383" sha1="6d77d45b0c7443d2d0eb071825b220b3a2befe0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freewayi" cloneof="freeway">
+		<description>Freeway (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="David Crane" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="freeway (canal 3 - intellivision).bin" size="4096" crc="fee6c593" sha1="d9ca1a2f4b39c045a6c4f184d887668ed721936f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keykaperi" cloneof="keykaper">
+		<description>Keystone Kapers (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="Garry Kitchen" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="keystone kapers (canal 3 - intellivision).bin" size="4096" crc="481a8661" sha1="7e722f1184d5291ca53b0aca619915d3ec272926"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riveraidi" cloneof="riveraid">
+		<description>River Raid (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="Carol Shaw" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="river raid (canal 3 - intellivision).bin" size="4096" crc="c3488de2" sha1="0ddf0ed5cc817d899c3a80f1f7ea428494c1e996"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tacscani" cloneof="tacscan">
+		<description>Tac-Scan (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="Jeff Lorenz" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="paddles" />
+			<dataarea name="rom" size="4096">
+				<rom name="tac-scan (canal 3 - intellivision).bin" size="4096" crc="084c366a" sha1="2b0aa1c098dc1f78c040528079d213fa7f6f30ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennisi" cloneof="tennis">
+		<description>Tennis (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="Alan Miller" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="tennis (canal 3 - intellivision) (4k).bin" size="4096" crc="9f8eab1c" sha1="062ed7db6229ca942e83e689e4379ef1d102469d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demonatki" cloneof="demonatk">
+		<description>Demon Attack (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="Rob Fulop" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="demon attack (canal 3 - intellivision).bin" size="4096" crc="2ccafe0c" sha1="72d431246bbccc5c1a6d6701a2a0294af6e81868"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thundergi" cloneof="thunderg">
+		<description>Thunderground (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="Jeff Lorenz" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="thunderground (canal 3 - intellivision).bin" size="4096" crc="4b63ebfc" sha1="2f12c76d74232055b7676b1be42e90cfcb1e4d4b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="icehocki" cloneof="icehock">
+		<description>Ice Hockey (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="Alan Miller" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="ice hockey (canal 3 - intellivision).bin" size="4096" crc="b868ad9c" sha1="5ebcc5938bb8b23bb438efa21d388a85fc9b7fe9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yarsrevi" cloneof="yarsrev">
+		<description>Yars' Revenge (Intellivision)</description>
+		<year>19??</year>
+		<publisher>Intellivision</publisher>
+		<info name="programmer" value="Howard Scott Warshaw" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="yars' revenge (canal 3 - intellivision).bin" size="4096" crc="aea86244" sha1="5febb9f56a989ee6a672d498464744c622147869"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megmaniada" cloneof="megmania">
+		<description>MegaMania (Dactari / Milmar)</description>
+		<year>19??</year>
+		<publisher>Dactari - Milmar</publisher>
+		<info name="programmer" value="Steve Cartwright" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="megamania (dactari - milmar).bin" size="4096" crc="c467903b" sha1="9fad62bd9a47b4b45af814d80e775ce74f37800c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseatakh" cloneof="baseatak">
+		<description>Base Attack (Hack) (Unknown)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="base attack (hack) (unknown).bin" size="4096" crc="0a14f24c" sha1="d0bdd609ebc6e69fb351ba469ff322406bcbab50"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyjinkh" cloneof="skyjink">
+		<description>Sky Jinks (Hack) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="sky jinks (hack) (unknown) (pal).bin" size="2048" crc="01b9b1cb" sha1="c3342fcd4ebe5c77b75b7b946fcd0717d83f49f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skydiverh" cloneof="skydiver">
+		<description>Sky Diver (Hack) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="sky diver (hack) (unknown) (pal).bin" size="2048" crc="b49d16f2" sha1="81a4e5a335ba90184fa884813914e797d0a6a8d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frostbith" cloneof="frostbit">
+		<description>Frostbite (Hack) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="frostbite (hack) (unknown) (pal).bin" size="4096" crc="76588b34" sha1="8ad03667bbf73d3c7760cb82f2c4442f8745483c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fishdrbyh" cloneof="fishdrby">
+		<description>Fishing Derby (Hack) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="fishing derby (hack) (unknown) (pal).bin" size="2048" crc="4e0e1c67" sha1="1f7235f831fe53f63f5a0342620771891c4c8005"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="friscoh" cloneof="peterpen">
+		<description>Frisco (Hack) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="frisco (hack) (unknown) (pal).bin" size="4096" crc="096ae2a0" sha1="6e7a5a171a2bb70c8dee1df8480498a68ba36ce6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantish" cloneof="atlantis">
+		<description>Atlantis (Hack) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atlantis (hack) (unknown) (pal).bin" size="4096" crc="5779ea8f" sha1="8eeb85d98e4319a23b76cccab925734b782dca8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacmanh" cloneof="pacman">
+		<description>Pac-Man (Hack) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="pac-man (hack) (unknown) (pal).bin" size="4096" crc="a7ef0f13" sha1="7abca7ace04fb690324cc36802489414b49a708e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mashh" cloneof="mash">
+		<description>M.A.S.H (Hack) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="m.a.s.h (hack) (unknown) (pal).bin" size="4096" crc="1a74e7dd" sha1="9894f8cbab6acfdccf2231329f9fbe2a948f92c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fishdrbybc" cloneof="fishdrby">
+		<description>Fishing Derby (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="fishing derby (hack) (32 in 1) (bit corporation) (r320).bin" size="2048" crc="1768c29c" sha1="3d3e69c700a7f560dda0083d02efe1ec9356f7ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bowlingbc" cloneof="bowling">
+		<description>Bowling (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="bowling (hack) (32 in 1) (bit corporation) (r320).bin" size="2048" crc="811bafc1" sha1="5c26fb7c0a5e12be5184994a45f8d647a86bf9a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsktballbc" cloneof="bsktball">
+		<description>Basketball (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="basketball (hack) (32 in 1) (bit corporation) (r320).bin" size="2048" crc="59e50087" sha1="714aaa26d1dde81464c792238c075bff65f54c91"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennisbc" cloneof="tennis">
+		<description>Tennis (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="tennis (hack) (32 in 1) (bit corporation) (r320).bin" size="2048" crc="f0d558c7" sha1="994763bfb38a32c57a7417eccda17e904eeaaf6a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golfbc" cloneof="golf">
+		<description>Golf (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="golf (hack) (32 in 1) (bit corporation) (r320).bin" size="2048" crc="550cc75a" sha1="1a8a8701088bc69fd4c888502c2bfa2c9f9e2a46"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="circusabc" cloneof="circusa">
+		<description>Circus Atari (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="paddles" />
+			<dataarea name="rom" size="4096">
+				<rom name="circus atari (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="f596f127" sha1="e420ea6724a5735ea16a642c06b5648bea953ab0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fasteddibc" cloneof="fasteddi">
+		<description>Fast Eddie (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="fast eddie (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="1dac62d7" sha1="a623895764658efede234ae9134eea6aae638513"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sosbc" cloneof="sos">
+		<description>Save Our Ship (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="save our ship (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="830f1e04" sha1="8e9b4163cee3643bf8fe0c5a44396ddcf3c4017d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jawbreakbc" cloneof="jawbreak">
+		<description>Jawbreaker (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="jawbreaker (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="b549fbc4" sha1="fba52c4d96f27aea8731c0f56a5745befea0c787"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="namethisbc" cloneof="namethis">
+		<description>Name This Game (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="name this game (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="ba84732b" sha1="9a7955134e6ec8555a1e8bb3abe8cfacd34529e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lncbc" cloneof="lnc">
+		<description>Lock 'n' Chase (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="lock 'n' chase (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="373442e3" sha1="ba31e86333dc16badc83d8e4239f9a50a5402f9b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bankheisbc" cloneof="bankheis">
+		<description>Bank Heist (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bank heist (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="5d70359e" sha1="d5d55afd9b8ef5e4d392f5b642591276bcc90e28"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongbc" cloneof="dkong">
+		<description>Donkey Kong (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="donkey kong (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="e7670ff5" sha1="b1e7d347c32fa79cbe285971f202ddf1f66b8f0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="videopinbc" cloneof="videopin">
+		<description>Video Pinball (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="video pinball (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="73fe418c" sha1="7e4c6d50465554513d45d20c259120c494605d98"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trickshtbc" cloneof="tricksht">
+		<description>Trick Shot (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="trick shot (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="6b1d3888" sha1="99c5531c653c84f28fffdfa49ae20d6c16fcd752"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="footballbc" cloneof="chmpsocr">
+		<description>Football (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="football (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="6a972704" sha1="48b2127419d436b5902c7011af3cfcc56fdbfedf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amidarbc" cloneof="amidar">
+		<description>Amidar (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="amidar (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="7af5f00e" sha1="1500b33f5f1ff80926b6271212b73c8d81604a5a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othellobc" cloneof="othello">
+		<description>Othello (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_2k" />
+			<dataarea name="rom" size="4096">
+				<rom name="othello (32 in 1) (bit corporation) (r320).bin" size="4096" crc="f79b012c" sha1="153e01badcc77ef75b1781fd26aaa0fce1ebb6f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tacscanbc" cloneof="tacscan">
+		<description>Tac-Scan (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="tac-scan (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="e5ab3915" sha1="699743fa38b03c0fd2533a4d2be342a547b0920f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missilebc" cloneof="missile">
+		<description>Missile Command (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="missile command (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="8bb95bea" sha1="64866212bbb224adbe8da3e405a1a9ef81ded868"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defenderbc" cloneof="defender">
+		<description>Defender (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="defender (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="4d520291" sha1="5ce59994911a48c29d0203a421bc3c1963653fdb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooyanbc" cloneof="pooyan">
+		<description>Pooyan (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="pooyan (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="81a8b4b8" sha1="76009fdfc681a04cb98f6bf021cdfee23f7319ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airraidsbc" cloneof="airraids">
+		<description>Air Raiders (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="air raiders (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="c2a3b8a2" sha1="eb612022bb5a95c74b83e506b6507951345003dc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smastx7bc" cloneof="smastx7">
+		<description>SpaceMaster X-7 (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="spacemaster x-7 (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="82c5ce09" sha1="3bbfa9335d82d2c268f42cce743083c679cfdeb8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demonatkbc" cloneof="demonatk">
+		<description>Demon Attack (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="demon attack (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="ec9184e4" sha1="93bf55528ff9ecde3bdd08c97b3b710733468b85"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinvbc" cloneof="spaceinv">
+		<description>Space Invaders (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="space invaders (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="86f0059b" sha1="52ba017143b492780fc94594a0e18b36ac7db87a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidfghtbc" cloneof="spidfght">
+		<description>Spider Fighter (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="spider fighter (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="7809f8fd" sha1="e3452028f4a953921ab269fe9ff1727f1c095a94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyalienbc" cloneof="skyalien">
+		<description>Sky Alien (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="sky alien (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="c6c0605a" sha1="0e7b93402bf9f190b388b169a239d1ef53302e67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flashgbc" cloneof="spaceadv">
+		<description>Flash Gordon (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="flash gordon (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="dcb9dc1d" sha1="1a744032454b6d88f64b32c60eb312d5d2a4c35b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantisbc" cloneof="atlantis">
+		<description>Atlantis (Hack) (32 in 1) (Bit Corporation)</description>
+		<year>19??</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="R320" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atlantis (hack) (32 in 1) (bit corporation) (r320).bin" size="4096" crc="22d2e4c3" sha1="a8be744059933367923fdb25429919f9a5f33463"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shootarc1" cloneof="shootarc">
+		<description>Shooting Arcade (Prototype 19890307)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26169" />
+		<info name="programmer" value="Tod Frye, Agustin Ortiz Valdiviezo" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f6" />
+			<dataarea name="rom" size="16384">
+				<rom name="shooting arcade (light gun) (03-07-1989) (atari - axlon, tod frye - heuristica, agustin ortiz) (cx26169) (prototype).bin" size="16384" crc="4835cc3d" sha1="fe3641560795e2004b6d61bff0c82046088629da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shootarc2" cloneof="shootarc">
+		<description>Shooting Arcade (Prototype 19890307, Alt)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26169" />
+		<info name="programmer" value="Tod Frye, Agustin Ortiz Valdiviezo" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f6" />
+			<dataarea name="rom" size="16384">
+				<rom name="shooting arcade (light gun) (03-07-1989) (atari - axlon, tod frye - heuristica, agustin ortiz) (cx26169) (prototype) [a1].bin" size="16384" crc="ff1fd7d2" sha1="0803cc4f19edf069050d387a487fca84c7b1a79f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shootarc3" cloneof="shootarc">
+		<description>Shooting Arcade (Prototype 19890307, Alt 2)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26169" />
+		<info name="programmer" value="Tod Frye, Agustin Ortiz Valdiviezo" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f6" />
+			<dataarea name="rom" size="16384">
+				<rom name="shooting arcade (light gun) (03-07-1989) (atari - axlon, tod frye - heuristica, agustin ortiz) (cx26169) (prototype) [a2].bin" size="16384" crc="1e69c033" sha1="7ebd2f45abe74f5b0a6cb1d63c35ab3d36caa9ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shootarc4" cloneof="shootarc">
+		<description>Shooting Arcade (Prototype 19890307, Alt 3)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26169" />
+		<info name="programmer" value="Tod Frye, Agustin Ortiz Valdiviezo" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f6" />
+			<dataarea name="rom" size="16384">
+				<rom name="shooting arcade (light gun) (03-07-1989) (atari - axlon, tod frye - heuristica, agustin ortiz) (cx26169) (prototype) [a3].bin" size="16384" crc="f794cf53" sha1="92608d9237903f442134aaafaaf3c1c11f432ffa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shootarc5" cloneof="shootarc">
+		<description>Shooting Arcade (Prototype 19890307, Alt 4)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26169" />
+		<info name="programmer" value="Tod Frye, Agustin Ortiz Valdiviezo" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f6" />
+			<dataarea name="rom" size="16384">
+				<rom name="shooting arcade (light gun) (03-07-1989) (atari - axlon, tod frye - heuristica, agustin ortiz) (cx26169) (prototype) [a4].bin" size="16384" crc="07f4e9b0" sha1="161c1a913bc7ed7b07bbd7a77f2b1f62dce7462a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shootarc6" cloneof="shootarc">
+		<description>Shooting Arcade (Prototype 19890307, Alt 5)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26169" />
+		<info name="programmer" value="Tod Frye, Agustin Ortiz Valdiviezo" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f6" />
+			<dataarea name="rom" size="16384">
+				<rom name="shooting arcade (light gun) (03-07-1989) (atari - axlon, tod frye - heuristica, agustin ortiz) (cx26169) (prototype) [a5].bin" size="16384" crc="ee09e6d0" sha1="ea15566ba81d369864eae2b649900ae34df4dfab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cclimberp" cloneof="cclimber">
+		<description>Crazy Climber (Prototype)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2683" />
+		<info name="programmer" value="Joe Gaucher, Alex Leavens" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="crazy climber (1983) (atari - roklan, joe gaucher, alex leavens) (cx2683) (prototype).bin" size="8192" crc="71da9510" sha1="9ae3bca3cc6a00d716fe065da3106346006b54ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cclimberp1" cloneof="cclimber">
+		<description>Crazy Climber (Prototype, Alt)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2683" />
+		<info name="programmer" value="Joe Gaucher, Alex Leavens" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="crazy climber (1983) (atari - roklan, joe gaucher, alex leavens) (cx2683) (prototype) [a1].bin" size="8192" crc="84a2e589" sha1="fd8a4fa64955ffb73fb41151c768c178c630e21b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cclimberp2" cloneof="cclimber">
+		<description>Crazy Climber (Prototype, Alt 2)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2683" />
+		<info name="programmer" value="Joe Gaucher, Alex Leavens" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="crazy climber (1983) (atari - roklan, joe gaucher, alex leavens) (cx2683) (prototype) [a2].bin" size="8192" crc="4ae5a335" sha1="13df76152c8f200fb088413923c16f431e12b79b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cclimberp3" cloneof="cclimber">
+		<description>Crazy Climber (Prototype, Alt 3)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2683" />
+		<info name="programmer" value="Joe Gaucher, Alex Leavens" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="crazy climber (1983) (atari - roklan, joe gaucher, alex leavens) (cx2683) (prototype) [a3].bin" size="8192" crc="d5584664" sha1="f016d1923828e7bd4df5ad6a5ecabbb9f0c42688"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surfsup2" cloneof="surfsup">
+		<description>Surf's Up (Prototype, Alt 2)</description>
+		<year>1983</year>
+		<publisher>Amiga</publisher>
+		<info name="serial" value="3125" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f8" />
+			<dataarea name="rom" size="8192">
+				<rom name="surf's up (joyboard) (1983) (amiga - video soft) (3125) (prototype) [a2].bin" size="8192" crc="f34de261" sha1="f903a3e5ed454356da7d27d3c6bd1e15f1d637a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacejoc208" cloneof="spacejoc">
+		<description>Space Jockey (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="space jockey (208 in 1) (unknown) (pal).bin" size="2048" crc="4d76fac2" sha1="caef22bc0ea07040bb16e9c300ca74c287f96660"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fvoyage208" cloneof="fvoyage">
+		<description>Fantastic Voyage (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="fantastic voyage (208 in 1) (unknown) (pal).bin" size="4096" crc="be72caa9" sha1="5d84b54f672b92f870985277d6ea0ac9c1f6e9f5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathgp208" cloneof="mathgp">
+		<description>Math Gran Prix (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="math gran prix (208 in 1) (unknown) (pal).bin" size="4096" crc="1db195c8" sha1="3132590354ba0ec6922ef064bbecd41a3323ab58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bridge208" cloneof="bridge">
+		<description>Bridge (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bridge (208 in 1) (unknown) (pal).bin" size="4096" crc="946d56a2" sha1="2ec31813906d4fcb1160ba756d0f93db8f93089a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raftridr208" cloneof="raftridr">
+		<description>Raft Rider (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="raft rider (208 in 1) (unknown) (pal).bin" size="4096" crc="da081db8" sha1="113c174166edc2e942f56975a1187ee7e417910f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mash208" cloneof="mash">
+		<description>M.A.S.H (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="m.a.s.h (208 in 1) (unknown) (pal).bin" size="4096" crc="ae318b16" sha1="a2ef13317712f56685355b648ca9358efadacb3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chopcomm208" cloneof="chopcomm">
+		<description>Chopper Command (Hack) (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="chopper command (hack) (208 in 1) (unknown) (pal).bin" size="4096" crc="9d6a504a" sha1="738fb28bc043aa1b4786de022f30ccd7f8bcafc6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidkong208">
+		<description>Spider Kong (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Inca Gold" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="spider kong (aka inca gold) (208 in 1) (unknown) (pal).bin" size="4096" crc="5216ecd9" sha1="5c36d0bbe3fcb896877b93cb0ee6955b78cc97ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galactic208" cloneof="nexar">
+		<description>Galatic (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="The Challenge of.... Nexar" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="galatic (aka challenge of.... nexar, the) (208 in 1) (unknown) (pal).bin" size="4096" crc="b7cf92ec" sha1="67797a55be73b373ad0afc67e428a6e8df56ce42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gopher208" cloneof="gopher">
+		<description>Gopher (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="gopher (208 in 1) (unknown) (pal).bin" size="4096" crc="ce950b34" sha1="599910eaeb65de07883280ba8d86e10bd382e9af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miss3000208" cloneof="miss3000">
+		<description>Mission 3,000 A.D. (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="mission 3,000 a.d. (208 in 1) (unknown) (pal).bin" size="4096" crc="781b13bc" sha1="d897b90ae92d338664e02c6ca70ff60d5921b9a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megmania208" cloneof="megmania">
+		<description>MegaMania (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="megamania (208 in 1) (unknown) (pal).bin" size="4096" crc="d2642b73" sha1="e2313c328ef85b455666e061bd474a207852e786"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scbasbal208" cloneof="scbasbal">
+		<description>Super Challenge Baseball (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="super challenge baseball (208 in 1) (unknown) (pal).bin" size="4096" crc="e3ecb275" sha1="5b7799e1c98ca86965fa8b73b8750042edb70952"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missile208" cloneof="missile">
+		<description>Missile Command (Hack) (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="missile command (hack) (208 in 1) (unknown) (pal).bin" size="4096" crc="be2708ff" sha1="8498caaa85d2fb85cff4ad6591b34d9ccc0f7f41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbert208" cloneof="qbert">
+		<description>Q-bert (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="q-bert (208 in 1) (unknown) (pal).bin" size="4096" crc="7d34c0dc" sha1="91966f4ffd0004b12ba50b990c93b25b7ae95457"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="namethis208" cloneof="namethis">
+		<description>Name This Game (Hack) (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="name this game (hack) (208 in 1) (unknown) (pal).bin" size="4096" crc="5917f640" sha1="a150ef56f80242b0fa10873967e49afd79b6d6a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carnival208" cloneof="carnival">
+		<description>Carnival (Hack) (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="carnival (hack) (208 in 1) (unknown) (pal).bin" size="4096" crc="e6246d84" sha1="eca46938b98ce7d908e14c4a126560a9b453f69c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantis208" cloneof="atlantis">
+		<description>Atlantis (Hack) (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atlantis (hack) (208 in 1) (unknown) (pal).bin" size="4096" crc="d55f3e68" sha1="08c54371fd7c72df1f36aae43188705561a3f8bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smastx7208" cloneof="smastx7">
+		<description>SpaceMaster X-7 (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="spacemaster x-7 (208 in 1) (unknown) (pal).bin" size="4096" crc="e0496373" sha1="a278f142b4fcae227ef9147f12fcb894829d1a39"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bankheis208" cloneof="bankheis">
+		<description>Bank Heist (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bank heist (208 in 1) (unknown) (pal).bin" size="4096" crc="29983dd6" sha1="c4ce09be4b997b37b09803d0401e4a75b6f295db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="towinfer208" cloneof="towinfer">
+		<description>Towering Inferno (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="towering inferno (208 in 1) (unknown) (pal).bin" size="4096" crc="861e0a51" sha1="dab9124de3c1d7760c979650d4d83b1c0e6c142d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tubybird208" cloneof="tubybird">
+		<description>Tuby Bird (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Dolphin" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="tuby bird (aka dolphin) (208 in 1) (unknown) (pal).bin" size="4096" crc="716a249d" sha1="7ffec0eeb2608578238ef98ea287d7b487e9d4ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roomdoom208" cloneof="roomdoom">
+		<description>Room of Doom (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="room of doom (208 in 1) (unknown) (pal).bin" size="4096" crc="a96b6539" sha1="b07fa120135082b8d23e7bbcabf1da6ee8eb2df1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong208" cloneof="dkong">
+		<description>Donkey Kong (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="donkey kong (208 in 1) (unknown) (pal).bin" size="4096" crc="e4b511ec" sha1="58c4ddd4aa5466b6885c5410717e564d71ff29d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riveraid208" cloneof="riveraid">
+		<description>River Raid (Hack) (208 in 1) (PAL) (Unknown)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="river raid (hack) (208 in 1) (unknown) (pal).bin" size="4096" crc="8ff1a5f1" sha1="96ae39e103fd46457b0da53074bdf16fee3704fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riveraid2081" cloneof="riveraid">
+		<description>River Raid (Hack) (208 in 1) (PAL) (Unknown, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="river raid (hack) (208 in 1) (unknown) (pal) [a].bin" size="4096" crc="b798275e" sha1="776a306788e1aeb5496454f493db15c2018feba9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commraid208" cloneof="commraid">
+		<description>Commando Raid (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="commando raid (208 in 1) (unknown) (pal).bin" size="4096" crc="405779b8" sha1="8f63c5010008551f8e5fe5ada414f0c2bc44e5e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wormwar208" cloneof="wormwar">
+		<description>Worm War I (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="worm war i (208 in 1) (unknown) (pal).bin" size="4096" crc="4a61b478" sha1="4e72aa7032e382a792b0f483cde9986f12598018"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordzap208" cloneof="wordzap">
+		<description>Word Zapper (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="word zapper (208 in 1) (unknown) (pal).bin" size="4096" crc="14af1a17" sha1="253788380f6f7757cda39d7256c796a95800c909"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="challeng208" cloneof="challeng">
+		<description>Challenge (208 in 1) (Unknown) (PAL)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="challenge (208 in 1) (unknown) (pal).bin" size="4096" crc="96b4c8b1" sha1="bc783303f5b05fd71c418e2cb4cf07e0ba2fd00f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decathlnf" cloneof="decathln">
+		<description>The Activision Decathlon (SECAM)</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="EAZ-030" />
+		<info name="programmer" value="David Crane" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_fe" />
+			<dataarea name="rom" size="8192">
+				<rom name="activision decathlon, the (1983) (activision, david crane) (eaz-030) (secam).bin" size="8192" crc="716d9d1d" sha1="7da9cc2383d09835d345ec7d6e76d223591d2a2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Homebrew -->
+
+	<software name="prinresc">
+		<description>Princess Rescue</description>
+		<year>2013</year>
+		<publisher>AtariAge</publisher>
+		<info name="programmer" value="Chris Spry" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f4" />
+			<dataarea name="rom" size="32768">
+				<rom name="princess rescue.bin" size="32768" crc="560dac0c" sha1="58aa6bba1d0d26c1287135fc9237b684a984b6be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prinrescp" cloneof="prinresc">
+		<description>Princess Rescue (PAL)</description>
+		<year>2013</year>
+		<publisher>AtariAge</publisher>
+		<info name="programmer" value="Chris Spry" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f4" />
+			<dataarea name="rom" size="32768">
+				<rom name="princess rescue (pal).bin" size="32768" crc="85b8e00f" sha1="7380960df4cdce8d3d7318fb003f7bcfde173812"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zippy">
+		<description>Zippy the Porcupine</description>
+		<year>201?</year>
+		<publisher>AtariAge</publisher>
+		<info name="programmer" value="Chris Spry" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="zippy the porcupine.bin" size="65536" crc="d57d3189" sha1="cbe88e316b471a6476f284df8634d5b646b4bdc5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zippyp" cloneof="zippy">
+		<description>Zippy the Porcupine (PAL)</description>
+		<year>201?</year>
+		<publisher>AtariAge</publisher>
+		<info name="programmer" value="Chris Spry" />
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="zippy the porcupine (pal).bin" size="65536" crc="ed346394" sha1="e9885f1b0f20dbd56cab9c0b3a18d2d432d5c3d5"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
 
 
