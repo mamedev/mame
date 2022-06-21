@@ -53,6 +53,7 @@ void HCR_set(dsp56156_core* cpustate, uint16_t value)
 	HCIE_bit_set(cpustate, (value & 0x0004) >> 2);
 	HTIE_bit_set(cpustate, (value & 0x0002) >> 1);
 	HRIE_bit_set(cpustate, (value & 0x0001) >> 0);
+	cpustate->device->machine().scheduler().synchronize();
 }
 //uint16_t HF3_bit(dsp56156_core* cpustate) { return ((HCR & 0x0010) != 0); }
 //uint16_t HF2_bit(dsp56156_core* cpustate) { return ((HCR & 0x0008) != 0); }

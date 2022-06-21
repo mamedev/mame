@@ -76,7 +76,13 @@
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "png.h"
+#include "emuopts.h"
+#include "fileio.h"
 
+#include "debug/debugcon.h"
+#include "debug/debugcmd.h"
+#include "debugger.h"
 
 #define LOG_DSP_AB0         (1U << 1)
 #define LOG_DSP_A6          (1U << 2)
@@ -87,18 +93,23 @@
 #define LOG_DSP_B6          (1U << 7)
 #define LOG_DSP_B7          (1U << 8)
 #define LOG_DSP_B8          (1U << 9)
-#define LOG_68K_SHARED      (1U << 10)
-#define LOG_DSP_HOST_INTF   (1U << 11)
-#define LOG_DSP_CTRL        (1U << 12)
-#define LOG_DSP_PORTC       (1U << 13)
+#define LOG_68K_SHARED_RD   (1U << 10)
+#define LOG_68K_SHARED_WR   (1U << 11)
+#define LOG_DSP_HOST_INTF   (1U << 12)
+#define LOG_DSP_CTRL        (1U << 13)
+#define LOG_DSP_PORTC       (1U << 14)
 
 #define LOG_ALL_DSP_A       (LOG_DSP_AB0 | LOG_DSP_A7 | LOG_DSP_A6 | LOG_DSP_A8 | LOG_DSP_AC | LOG_DSP_AE)
 #define LOG_ALL_DSP_B       (LOG_DSP_AB0 | LOG_DSP_B6 | LOG_DSP_B7 | LOG_DSP_B8)
 
-//#define VERBOSE (LOG_ALL_DSP_A | LOG_ALL_DSP_B | LOG_68K_SHARED | LOG_DSP_HOST_INTF | LOG_DSP_CTRL | LOG_DSP_PORTC)
+//#define VERBOSE (LOG_DSP_B6 | LOG_DSP_B7 | LOG_DSP_B8 | LOG_DSP_AE | LOG_DSP_HOST_INTF | LOG_DSP_CTRL | LOG_DSP_PORTC)
 #define VERBOSE (0)
 #include "logmacro.h"
 
+static bool frame_rendered = false;
+static bool single_command = false;
+static bool debug_buf = false;
+static u16 debug_span = 0;
 
 namespace {
 
@@ -110,11 +121,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
+		m_watchdog(*this, "watchdog"),
 		m_eeprom(*this, "eeprom"),
 		m_k053936(*this, "k053936"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_ttl_vram(*this, "ttl_vram"),
+		m_fix_regs(*this, "fix_regs"),
 		m_roz_vram(*this, "roz_vram"),
 		m_k054321(*this, "k054321"),
 		m_sound_bank(*this, "bank1"),
@@ -190,10 +203,12 @@ private:
 	void dsp_ram_a_e_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// Video handlers
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
 	void ttl_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t fix_regs_r(offs_t offset, uint32_t mem_mask = ~0);
+	void fix_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void roz_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(roz_get_tile_info);
@@ -201,14 +216,19 @@ private:
 	// Sound handlers
 	void sound_ctrl_w(uint8_t data);
 
+	void process_polys();
+	template <int PolyPage> bool draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const u16 span_ptr, const u16 raw_start, const u16 raw_end);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dsp56156_device> m_dsp;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<eeprom_serial_er5911_device> m_eeprom;
 	required_device<k053936_device> m_k053936;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_ttl_vram;
+	required_shared_ptr<uint32_t> m_fix_regs;
 	required_shared_ptr<uint32_t> m_roz_vram;
 	required_device<k054321_device> m_k054321;
 	required_memory_bank m_sound_bank;
@@ -246,6 +266,13 @@ private:
 	// Sound members
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_intck;
+
+	// Poly debug members
+	bitmap_rgb32 m_pla_bitmap;
+	bitmap_rgb32 m_plb_bitmap;
+	bitmap_rgb32 m_plc_bitmap;
+	bitmap_rgb32 m_pld_bitmap;
+	bitmap_rgb32 m_front_bitmap;
 };
 
 //-------------------------------------------------
@@ -254,6 +281,12 @@ private:
 
 void polygonet_state::machine_start()
 {
+	m_pla_bitmap.allocate(256, 256);
+	m_plb_bitmap.allocate(256, 256);
+	m_plc_bitmap.allocate(256, 256);
+	m_pld_bitmap.allocate(256, 256);
+	m_front_bitmap.allocate(256, 256);
+
 	m_sound_bank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
 	// Initialize DSP banking
@@ -393,6 +426,7 @@ void polygonet_state::sys_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
+			LOGMASKED(LOG_GENERAL, "Unknown sys_w write: %08x = %02x\n", offset, data);
 			break;
 	}
 }
@@ -459,13 +493,20 @@ void polygonet_state::dsp_host_interface_w(offs_t offset, uint32_t data, uint32_
 	LOGMASKED(LOG_DSP_HOST_INTF, "%s: 68k Writing to DSP Host Interface address %04x (68k addr %08x) = %08x & %08x\n", machine().describe_context(),
 		hi_addr, offset, data, mem_mask);
 
+	//if (hi_addr == 1)
+	//{
+		//printf("Function %02x (%02x)\n", hi_data & 0x1f, (hi_data & 0x1f) << 1);
+	//}
 	m_dsp->host_interface_write(hi_addr, hi_data);
 }
 
 uint32_t polygonet_state::shared_ram_read(offs_t offset, uint32_t mem_mask)
 {
 	const uint32_t data = (m_dsp_share[offset << 1] << 16) | m_dsp_share[(offset << 1) + 1];
-	LOGMASKED(LOG_68K_SHARED, "%s: 68k Reading from shared DSP RAM[%04x]: %08x & %08x \n", machine().describe_context(), 0xc000 + (offset << 1), data, mem_mask);
+	if (((offset << 1) + 1) >= 0x1ffb || (offset << 1) >= 0x1ffb)
+	{
+		LOGMASKED(LOG_68K_SHARED_RD, "%s: 68k Reading from shared DSP RAM[%04x]: %08x & %08x \n", machine().describe_context(), 0xc000 + (offset << 1), data, mem_mask);
+	}
 	return data;
 }
 
@@ -475,14 +516,20 @@ void polygonet_state::shared_ram_write(offs_t offset, uint32_t data, uint32_t me
 	if (ACCESSING_BITS_16_31)
 	{
 		m_dsp_share[offset << 1] = (uint16_t)(data >> 16);
-		LOGMASKED(LOG_68K_SHARED, "%s: 68k Writing to shared DSP RAM[%04x] = %04x\n", machine().describe_context(), 0xc000 + (offset << 1), (uint16_t)(data >> 16));
+		if ((offset << 1) >= 0x1ffb)
+		{
+			LOGMASKED(LOG_68K_SHARED_WR, "%s: 68k Writing to shared DSP RAM[%04x] = %04x\n", machine().describe_context(), 0xc000 + (offset << 1), (uint16_t)(data >> 16));
+		}
 	}
 
 	// Write to the next DSP word
 	if (ACCESSING_BITS_0_15)
 	{
 		m_dsp_share[(offset << 1) + 1] = (uint16_t)data;
-		LOGMASKED(LOG_68K_SHARED, "%s: 68k Writing to shared DSP RAM[%04x] = %04x\n", machine().describe_context(), 0xc000 + (offset << 1) + 1, (uint16_t)data);
+		if (((offset << 1) + 1) >= 0x1ffb)
+		{
+			LOGMASKED(LOG_68K_SHARED_WR, "%s: 68k Writing to shared DSP RAM[%04x] = %04x\n", machine().describe_context(), 0xc000 + (offset << 1) + 1, (uint16_t)data);
+		}
 	}
 }
 
@@ -525,6 +572,7 @@ uint16_t polygonet_state::dsp_bootload_r()
 void polygonet_state::dsp_portc_write(uint16_t data)
 {
 	LOGMASKED(LOG_DSP_PORTC, "%s: DSP Port C write: %04x\n", machine().describe_context(), data);
+	//printf("DSP Port C write: %04x\n", data);
 	m_dsp_portc = data;
 
 	const uint8_t bank_a_8_num = bitswap<3>(m_dsp_portc, 4, 3, 2);
@@ -568,7 +616,7 @@ uint16_t polygonet_state::dsp_ram_a_6_read(offs_t offset)
 
 void polygonet_state::dsp_ram_a_6_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_DSP_A6, "%s: DSP Writing to Mapping A, 6xxx RAM[%04x] = %04x (bank offset %05x)\n", machine().describe_context(), 0x6000 + offset, data);
+	LOGMASKED(LOG_DSP_A6, "%s: DSP Writing to Mapping A, 6xxx RAM[%04x] = %04x\n", machine().describe_context(), 0x6000 + offset, data);
 	COMBINE_DATA(&m_dsp_a_6[offset]);
 }
 
@@ -584,7 +632,10 @@ uint16_t polygonet_state::dsp_ram_b_6_read(offs_t offset)
 void polygonet_state::dsp_ram_b_6_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	const offs_t bank_b_6_offset = bitswap<2>(m_dsp_portc, 7, 8) * 0x1000;
-	LOGMASKED(LOG_DSP_B6, "%s: DSP Writing to Mapping B, 6xxx RAM[%04x] = %04x (bank offset %05x)\n", machine().describe_context(), 0x6000 + offset, data, bank_b_6_offset + offset);
+	if (data != 0)
+	{
+		LOGMASKED(LOG_DSP_B6, "%s: DSP Writing to Mapping B, 6xxx RAM[%04x] = %04x (bank offset %05x)\n", machine().describe_context(), 0x6000 + offset, data, bank_b_6_offset + offset);
+	}
 	COMBINE_DATA(((uint16_t *)m_dsp_bank_b_6->base()) + offset);
 }
 
@@ -646,7 +697,7 @@ uint16_t polygonet_state::dsp_ram_b_8_read(offs_t offset)
 
 void polygonet_state::dsp_ram_b_8_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	const offs_t bank_b_8_offset = bitswap<3>(m_dsp_portc, 4, 3, 2) * 0x4000;
+	const offs_t bank_b_8_offset = bitswap<3>(m_dsp_portc, 7, 8, 0) * 0x8000;
 	LOGMASKED(LOG_DSP_B8, "%s: DSP Writing to Mapping B, 8xxx RAM[%04x] = %04x (bank offset %05x)\n", machine().describe_context(), 0x8000 + offset, data, bank_b_8_offset + offset);
 	COMBINE_DATA(((uint16_t *)m_dsp_bank_b_8->base()) + offset);
 }
@@ -676,9 +727,166 @@ uint16_t polygonet_state::dsp_ram_a_e_read(offs_t offset)
 void polygonet_state::dsp_ram_a_e_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_DSP_AE, "%s: DSP Writing to Mapping A, Exxx RAM[%04x] = %04x\n", machine().describe_context(), 0xe000 + offset, data);
+	//printf("DSP Writing to Mapping A, Exxx RAM[%04x] = %04x\n", 0xe000 + offset, data);
+	//const uint16_t old = m_dsp_a_e[offset];
+	//if (offset == 0 && BIT(old, 0) != BIT(data, 0))
+	//{
+	//	process_polys();
+	//}
 	COMBINE_DATA(&m_dsp_a_e[offset]);
 }
 
+void polygonet_state::process_polys()
+{
+	m_watchdog->watchdog_reset();
+
+	uint16_t *b6_data = (uint16_t *)m_dsp_ram_b_6.target();
+	uint16_t *b7_data = (uint16_t *)m_dsp_ram_b_7.target();
+
+	offs_t b6_offset_0 = BIT(m_dsp_a_e[0], 0) ? 0x2000 : 0x0000;
+	offs_t b6_offset_1 = BIT(m_dsp_a_e[0], 0) ? 0x3000 : 0x1000;
+	offs_t b7_offset_0 = BIT(m_dsp_a_e[0], 0) ? 0x2000 : 0x0000;
+	offs_t b7_offset_1 = BIT(m_dsp_a_e[0], 0) ? 0x3000 : 0x1000;
+
+	frame_rendered = false;
+
+	if (b6_data[b6_offset_0] == 6 && b6_data[b6_offset_0 + 1] == 6)
+		return;
+
+	static int poly_frame = 0;
+
+	//printf("\nProcessing polys for group %d:\n", BIT(m_dsp_a_e[0], 0));
+
+	bitmap_rgb32 &bitmap_a = BIT(m_dsp_a_e[0], 0) ? m_pla_bitmap : m_plc_bitmap;
+	bitmap_rgb32 &bitmap_b = BIT(m_dsp_a_e[0], 0) ? m_plb_bitmap : m_pld_bitmap;
+	//char char_a = BIT(m_dsp_a_e[0], 0) ? 'A' : 'C';
+	//char char_b = BIT(m_dsp_a_e[0], 0) ? 'B' : 'D';
+
+	if (BIT(b7_data[b7_offset_0 + 1], 15))
+	{
+		bitmap_a.fill(0x00000000);
+	}
+	if (BIT(b7_data[b7_offset_1 + 1], 15))
+	{
+		bitmap_b.fill(0x00000000);
+	}
+	m_front_bitmap.fill(0x00000000);
+
+	u16 b6_idx_0 = 0;
+	u16 b7_idx_0 = 0;
+	while (BIT(b7_data[b7_offset_0 + b7_idx_0 + 1], 15) && (b6_idx_0 < 0x1000 && b7_idx_0 < 0x1000))
+	{
+		if (debug_buf) break;
+		const uint16_t raw_color = b7_data[b7_offset_0 + b7_idx_0];
+		const uint16_t span_ptr = b7_data[b7_offset_0 + b7_idx_0 + 1];
+		const uint16_t raw_start = b6_data[b6_offset_0 + b6_idx_0];
+		const uint16_t raw_end = b6_data[b6_offset_0 + b6_idx_0 + 1];
+		if (!single_command || (single_command && (debug_span << 1) == b7_idx_0))
+		{
+			/*if (machine().input().code_pressed(KEYCODE_H))*/ //printf("PLA entry %03x: %04x %04x / %04x %04x:\n", b7_idx_0, raw_color, span_ptr, raw_start, raw_end);
+			bitmap_rgb32 &bitmap = /*BIT(raw_color, 15) ? m_front_bitmap :*/ bitmap_a;
+			draw_poly<0>(bitmap, raw_color, span_ptr, raw_start, raw_end);
+		}
+
+		b6_idx_0 += 2;
+		b7_idx_0 += 2;
+	}
+
+	u16 b6_idx_1 = 0;
+	u16 b7_idx_1 = 0;
+	//printf("PLB initial %03x: %04x %04x / %04x %04x:\n", b7_data[b7_offset_1 + b7_idx_1], b7_data[b7_offset_1 + b7_idx_1 + 1], b6_data[b6_offset_1 + b6_idx_1], b6_data[b6_offset_1 + b6_idx_1 + 1]);
+	while (BIT(b7_data[b7_offset_1 + b7_idx_1 + 1], 15) && (b6_idx_1 < 0x1000 && b7_idx_1 < 0x1000))
+	{
+		//if (!debug_buf) break;
+		const uint16_t raw_color = b7_data[b7_offset_1 + b7_idx_1];
+		const uint16_t span_ptr = b7_data[b7_offset_1 + b7_idx_1 + 1];
+		const uint16_t raw_start = b6_data[b6_offset_1 + b6_idx_1];
+		const uint16_t raw_end = b6_data[b6_offset_1 + b6_idx_1 + 1];
+		if (!single_command || (single_command && (debug_span << 1) == b7_idx_1))
+		{
+			/*if (machine().input().code_pressed(KEYCODE_H))*/ //printf("PLB entry %03x: %04x %04x / %04x %04x:\n", b7_idx_1, raw_color, span_ptr, raw_start, raw_end);
+			bitmap_rgb32 &bitmap = /*BIT(raw_color, 15) ? m_front_bitmap :*/ bitmap_b;
+			draw_poly<1>(bitmap, raw_color, span_ptr, raw_start, raw_end);
+		}
+
+		b6_idx_1 += 2;
+		b7_idx_1 += 2;
+	}
+
+	/*if (any_a)
+	{
+		emu_file pla_file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		std::error_condition const pla_filerr = pla_file.open(util::string_format("plygonet-pla-%d.png", poly_frame));
+		if (!pla_filerr)
+		{
+			util::png_write_bitmap(pla_file, nullptr, bitmap_a, 0, nullptr);
+		}
+	}*/
+
+	//if (any_b)
+	/*{
+		emu_file plb_file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		std::error_condition const plb_filerr = plb_file.open(util::string_format("plygonet-plb-%d.png", poly_frame));
+		if (!plb_filerr)
+		{
+			util::png_write_bitmap(plb_file, nullptr, bitmap_b, 0, nullptr);
+		}
+	}*/
+
+	poly_frame++;
+	frame_rendered = true;
+}
+
+template <int PolyPage>
+bool polygonet_state::draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const u16 span_ptr, const u16 raw_start, const u16 raw_end)
+{
+	uint16_t *span_data = (uint16_t *)m_dsp_ram_b_8.target();
+	const offs_t page_offset = PolyPage ? 0x10000 : 0x0000;
+	const offs_t frame_offset = BIT(m_dsp_a_e[0], 0) ? 0x20000 : 0x00000;
+	offs_t start_offset = page_offset + frame_offset;
+	offs_t end_offset = page_offset + frame_offset + 0x8000U;
+
+	const uint8_t r = ((raw_color >> 7) & 0xf8) | ((raw_color >> 12) & 7);
+	const uint8_t g = ((raw_color >> 2) & 0xf8) | ((raw_color >> 7) & 7);
+	const uint8_t b = ((raw_color << 3) & 0xf8) | ((raw_color >> 2) & 7);
+	const uint32_t color888 = 0xff000000 | (r << 16) | (g << 8) | b;
+
+	int16_t y_start = (int16_t)raw_start >> 5;
+	int16_t y_end = (int16_t)raw_end >> 5;
+	if (y_start == y_end)
+	{
+		//printf("y_start matches y_end, skipping\n");
+		return false;
+	}
+	if (y_start > y_end)
+	{
+		std::swap(y_start, y_end);
+	}
+
+	offs_t start_addr = start_offset + (span_ptr & 0x7fff);
+	offs_t end_addr = end_offset + (span_ptr & 0x7fff);
+	//uint16_t span_addr = span_ptr & 0x7fff;
+
+	for (int16_t y = y_start; y < y_end; y++, start_addr++, end_addr++)
+	{
+		/*if (machine().input().code_pressed(KEYCODE_H))*/ //printf("    S,E %04x (%06x %04x), %04x - %04x\n", span_ptr & 0x7fff, start_offset, span_ptr, span_data[start_addr], span_data[end_addr]);
+		int16_t x_start = (int16_t)span_data[start_addr] >> 5;
+		int16_t x_end = (int16_t)span_data[end_addr] >> 5;
+		//printf("    XS,XE: %04x: %04x - %04x (%u, %u)\n", start_addr & 0x7fff, (uint16_t)x_start, (uint16_t)x_end, (uint32_t)((uint16_t)(x_start + 1024) - 896) & 0x0000ffff, (uint32_t)((uint16_t)(y_start + 1024) - 896) & 0x0000ffff);
+
+		uint16_t bitmap_y = (uint16_t)(y + 1024) - 896;
+		for (int16_t x = x_start; x < x_end; x++)
+		{
+			uint16_t bitmap_x = (uint16_t)(x + 1024) - 896;
+			if (bitmap_x < 256 && bitmap_y < 256)
+			{
+				bitmap.pix(bitmap_y, bitmap_x) = color888;
+			}
+		}
+	}
+
+	return true;
+}
 
 //-------------------------------------------------
 //  Video hardware
@@ -727,6 +935,19 @@ void polygonet_state::ttl_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	m_ttl_tilemap->mark_tile_dirty((offset << 1) + 1);
 }
 
+void polygonet_state::fix_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_fix_regs[offset]);
+	LOGMASKED(LOG_GENERAL, "fix_regs_w: %08x = %08x & %08x\n", offset, data, mem_mask);
+}
+
+uint32_t polygonet_state::fix_regs_r(offs_t offset, uint32_t mem_mask)
+{
+	const uint32_t data = m_fix_regs[offset];
+	LOGMASKED(LOG_GENERAL, "fix_regs_r: %08x: %08x & %08x\n", offset, data, mem_mask);
+	return data;
+}
+
 void polygonet_state::roz_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_roz_vram[offset]);
@@ -769,7 +990,7 @@ void polygonet_state::video_start()
 	save_item(NAME(m_ttl_gfx_index));
 }
 
-uint32_t polygonet_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t polygonet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0);
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -777,6 +998,73 @@ uint32_t polygonet_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, 0, 0, 0);
 
 	m_ttl_tilemap->draw(screen, bitmap, cliprect, 0, 1<<0);
+
+	if (machine().input().code_pressed_once(KEYCODE_G))
+	{
+		single_command = !single_command;
+		if (single_command)
+		{
+			m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+			m_dsp->suspend(SUSPEND_REASON_HALT, true);
+		}
+		else
+		{
+			m_maincpu->resume(SUSPEND_REASON_HALT);
+			m_dsp->resume(SUSPEND_REASON_HALT);
+		}
+	}
+
+	if (machine().input().code_pressed_once(KEYCODE_O))
+	{
+		debug_span++;
+	}
+
+	if (machine().input().code_pressed_once(KEYCODE_COLON))
+	{
+		debug_buf = !debug_buf;
+	}
+
+	if (machine().input().code_pressed_once(KEYCODE_L))
+	{
+		debug_span--;
+	}
+
+	process_polys();
+
+	if (frame_rendered)
+	{
+		int fb = BIT(m_dsp_a_e[0], 0);
+		bitmap_rgb32 &bitmap_a = fb ? m_pla_bitmap : m_plc_bitmap;
+		bitmap_rgb32 &bitmap_b = fb ? m_plb_bitmap : m_pld_bitmap;
+
+		for (int y = 0; y < 256; y++)
+		{
+			uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
+			uint32_t *src_b = &bitmap_b.pix(y);
+			uint32_t *src_a = &bitmap_a.pix(y);
+			//uint32_t *src_f = &m_front_bitmap.pix(y);
+			for (int x = 0; x < 256; x++)
+			{
+				//uint32_t f_pix = *src_f++ & 0x00ffffff;
+				uint32_t a_pix = *src_a++ & 0x00ffffff;
+				uint32_t b_pix = *src_b++ & 0x00ffffff;
+				/*if (f_pix)
+				{
+					*dst = f_pix | 0xff000000;
+				}
+				else*/ if (a_pix)
+				{
+					*dst = a_pix | 0xff000000;
+				}
+				else if (b_pix)
+				{
+					*dst = b_pix | 0xff000000;
+				}
+				dst++;
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -797,12 +1085,12 @@ void polygonet_state::main_map(address_map &map)
 	map(0x504000, 0x504003).w(FUNC(polygonet_state::dsp_w_lines));
 	map(0x506000, 0x50600f).rw(FUNC(polygonet_state::dsp_host_interface_r), FUNC(polygonet_state::dsp_host_interface_w));
 	map(0x540000, 0x540fff).ram().share(m_ttl_vram).w(FUNC(polygonet_state::ttl_vram_w));
-	map(0x541000, 0x54101f).ram();
+	map(0x541000, 0x54101f).ram().share(m_fix_regs).rw(FUNC(polygonet_state::fix_regs_r), FUNC(polygonet_state::fix_regs_w));
 	map(0x580000, 0x5807ff).ram();
 	map(0x580800, 0x580803).r(FUNC(polygonet_state::network_r)).nopw(); // Network RAM and registers?
 	map(0x600000, 0x60000f).m(m_k054321, FUNC(k054321_device::main_map));
 	map(0x640000, 0x640003).w(FUNC(polygonet_state::sound_irq_w));
-	map(0x680000, 0x680003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
+	map(0x680000, 0x680003).w(m_watchdog, FUNC(watchdog_timer_device::reset32_w));
 	map(0x700000, 0x73ffff).rom().region("gfx2", 0);
 	map(0x780000, 0x79ffff).rom().region("gfx1", 0);
 	map(0xff8000, 0xffffff).ram();
@@ -822,7 +1110,7 @@ void polygonet_state::dsp_program_map(address_map &map)
 
 void polygonet_state::dsp_data_map(address_map &map)
 {
-	map(0x0800, 0xffff).view(m_dsp_data_view);
+	map(0x0000, 0xffff).view(m_dsp_data_view);
 
 	m_dsp_data_view[0](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
 	m_dsp_data_view[0](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_a_6_read), FUNC(polygonet_state::dsp_ram_a_6_write)).share(m_dsp_a_6);
@@ -902,7 +1190,7 @@ void polygonet_state::plygonet(machine_config &config)
 
 	EEPROM_ER5911_8BIT(config, m_eeprom);
 
-	WATCHDOG_TIMER(config, "watchdog");
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_plygonet);
 
@@ -913,7 +1201,6 @@ void polygonet_state::plygonet(machine_config &config)
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(64, 64+368-1, 0, 32*8-1);
 	screen.set_screen_update(FUNC(polygonet_state::screen_update));
-	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
