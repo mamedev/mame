@@ -1179,7 +1179,7 @@ RAM: 640KB
 Bus: 6x ISA:    1) MDA/Hercules/CGA and parallel port
                 2) Floppy, RTC and serial port
                 3) (optional) MFM harddisk controller
-Video: MDA/Hercules, exchangable via ISA-slot
+Video: MDA/Hercules, exchangeable via ISA-slot
 Mass storage: 1x 5.25" 360K floppy and 1x 5.25" 360K floppy or MFM hard drive (10MB or 20MB)
 On board ports: parallel, serial, beeper
 Options: 8087 FPU
