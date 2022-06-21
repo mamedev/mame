@@ -3027,8 +3027,10 @@ void kiwame_state::kiwame_map(address_map &map)
 ***************************************************************************/
 
 /* Protection only present in thunderl set.
-   Implemented using a registered PALCE16V8H: TL-9. Main CPU performs several writtings to the address space 
-   mapped to the PAL to save a value into PAL registers. Eventually, CPU reads back that value and performs some checkings.
+   Implemented using a registered PALCE16V8H: TL-9. Main CPU performs
+   several writtings to the address space mapped to the PAL to save a value
+   into PAL registers. Eventually, CPU reads back that value and performs
+   some checkings.
    If the value is not the proper one, a soft reset is done.
    Address during writting operation is mapped in the following way:
 
@@ -3041,13 +3043,17 @@ void kiwame_state::kiwame_map(address_map &map)
    A15 -> I8
    A16 -> I9
 
-   Data sent by the CPU during these writting operations is not used to calculate the protection register value, only some
-   address lines are used to compute the value, as shown above.
-   Every write operation done to the PAL discards the previous stored value in the registers and stores a new computed value,
-   following the logic equations programmed in the PAL.
+   Data sent by the CPU during these writting operations is not used to
+   calculate the protection register value, only some address lines are used
+   to compute the value, as shown above.
+   Every write operation done to the PAL discards the previous stored value
+   in the registers and stores a new computed value, following the logic
+   equations programmed in the PAL.
 
-   (I1 = CLK : pulses when accessing to writting handler and acts as clock for internal latches in PAL)
-   (I11 = /OE : asserted when accessing to reading handler. Sub-address used for reading here is no used to compute the result value
+   (I1 = CLK : pulses when accessing to writting handler and acts as clock
+   for internal latches in PAL)
+   (I11 = /OE : asserted when accessing to reading handler. Sub-address
+   used for reading here is no used to compute the result value
 
    I19  -> D0
    I18  -> D1
@@ -3066,45 +3072,18 @@ u16 seta_state::thunderl_protection_r()
 }
 void seta_state::thunderl_protection_w(offs_t offset, u16 data)
 {
+	// data byte written here is not used to save the value into protection registers
 	const u32 addr = offset * 2;
-	// data byte written here is not used to save the value into the protection register
-	/*
-	const u8 init_prot_data =
-		((addr & 0x04) >> 2)                       // A2 (addr & 2^address_bit) >> (address_bit - current_data_bit)
-		| ((addr & 0x8) >> 2)                      // A3
-		| ((addr & 0x40) >> 4)                     // A6 
-		| ((addr & 0x100) >> 5)                    // A8
-		| ((addr & 0x800) >> 7)                    // A11
-		| ((addr & 0x2000) >> 8)                   // A13
-		| ((addr & 0x8000) >> 9)                   // A15
-		| ((addr & 0x10000) >> 9);                 // A16
-	*/
 
 	m_thunderl_protection_reg =
-		((addr & 0x04) >> 2)                       // D0 = A2
-		| (((addr & 0x04) >> 1)                    // D1 = A2 & /A3
-			& ((~addr & 0x8) >> 2))
-		| ((addr & 0x04)                           // D2 = A2 | /A6
-			| ((~addr & 0x40) >> 4))
-		| (((addr & 0x04) << 1)                    // D3 = A2 | /A6 | /A8
-			| ((~addr & 0x40) >> 3)
-			| ((~addr & 0x100) >> 5))
-		| (((addr & 0x8) << 1)                     // D4 = A3 & /A11 & A15
-			& ((~addr & 0x800) >> 7)
-			& ((addr & 0x8000) >> 11))
-		| (((addr & 0x40) >> 1)                    // D5 = A6 & A13
-			& ((addr & 0x2000) >> 8))
-		| (((addr & 0x40)                          // D6 = (A6 | /A16) & (A13 | /A16)
-				| ((~addr & 0x10000) >> 10))
-			& (((addr & 0x2000) >> 7)
-				| ((~addr & 0x10000) >> 10)))
-		| ((((addr & 0x40) << 1)                   // D7 = (A6 | /A16) & (A13 | /A16) & (A2 | /A6 | /A8)
-				| ((~addr & 0x10000) >> 9))
-			& (((addr & 0x2000) >> 6)
-				| ((~addr & 0x10000) >> 9))
-			& (((addr & 0x04) << 6)
-				| ((~addr & 0x40) << 1)
-				| ((~addr & 0x100) >> 1)));
+		(BIT(addr, 2) << 0)
+		| ((BIT(addr, 2) & BIT(~addr, 3)) << 1)
+		| ((BIT(addr, 2) | BIT(~addr, 6)) << 2)
+		| ((BIT(addr, 2) | BIT(~addr, 6) | BIT(~addr, 8)) << 3)
+		| ((BIT(addr, 3) & BIT(~addr, 11) & BIT(addr, 15)) << 4)
+		| ((BIT(addr, 6) & BIT(addr, 13)) << 5)
+		| (((BIT(addr, 6) & BIT(addr, 13)) | BIT(~addr, 16)) << 6)
+		| ((((BIT(addr, 6) & BIT(addr, 13)) | BIT(~addr, 16)) & (BIT(addr, 2) | BIT(~addr, 6) | BIT(~addr, 8))) << 7);
 
 	//  logerror("PC %06X - Protection Written: %04X <- %04X\n", m_maincpu->pc(), addr, data);
 }
