@@ -32,6 +32,7 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// palette implementation
 	virtual uint32_t palette_entries() const override;
@@ -50,12 +51,14 @@ private:
 
 	static void crtc_w(int16_t &param, uint32_t offset, uint32_t data);
 
+	required_ioport m_userosc;
 	emu_timer *m_timer;
 
 	std::vector<uint32_t> m_vram;
 	uint32_t m_mode, m_vbl_disable;
 	uint32_t m_colors[3], m_count, m_clutoffs;
 
+	uint8_t m_osc;
 	int16_t m_hsync, m_hstart, m_hend, m_htotal;
 	int16_t m_vsync, m_vstart, m_vend, m_vtotal;
 	bool m_interlace;

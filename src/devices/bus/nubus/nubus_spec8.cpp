@@ -4,14 +4,17 @@
 
   SuperMac Spectrum/8 Series III video card
 
-  There is no sign of acceleration or blitting in any mode, and the
-  acceleration code from the Spectrum PDQ ROM is absent on this one.
+  This is a high-resolution video card supporting 1-bit, 2-bit, 4-bit and
+  8-bit modes with 24-bit palette entires.  Virtual desktop panning and
+  two-times zoom are supported in hardware.  No accelerated drawing
+  features are present.
 
   On first boot or with clean PRAM, the firmware will cycle through video
   modes and prompt you to press space when the desired mode is active (on
   the monitors available at the time, only one mode would produce a stable
   image).  If you want to change video mode later, hold Option as soon as
-  the machine starts.
+  the machine starts.  The modes offered depend on the user-supplied
+  oscillator.
 
   The CRTC has 16-bit registers with the bytes written at separate
   addresses offset by 2.  The most significant byte is at the higher
@@ -25,13 +28,11 @@
   the start of the line/frame in the configuration registers.
 
   TODO:
-  * The card has some way of detecting whether a user-supplied oscillator
-    module is present.  This isn't implemented.
-  * The card has some way of selecting which of the five oscillators to
-    use as the video timing source.  This isn't implemented.
+  * The user-supplied oscillator measurement gets incorrect results.
   * Interlaced modes are not understood.
-  * There are lines of garbage at the bottom of the screen in 8bpp modes
-    (bottom of the virtual desktop if virtual desktop is enabled).
+  * There are lines of garbage at the bottom of the screen in some high-
+    resolution modes (bottom of the virtual desktop if virtual desktop is
+    enabled).
 
 ***************************************************************************/
 
@@ -51,6 +52,15 @@
 #define VRAM_SIZE   (0xc0000)   // 768k of VRAM for 1024x768 @ 8 bit
 
 
+static INPUT_PORTS_START( spec8s3 )
+	PORT_START("USEROSC")
+	PORT_CONFNAME(0x07, 0x01, "Oscillator Y1")
+	PORT_CONFSETTING(   0x00, "14.32 MHz (NTSC Underscan)")
+	PORT_CONFSETTING(   0x01, "15.67 MHz (Apple 12\")")
+	PORT_CONFSETTING(   0x02, "17.73 MHz (PAL Underscan)")
+	PORT_CONFSETTING(   0x03, "57.28 MHz (Apple 15\" Portrait, Apple 16\")")
+INPUT_PORTS_END
+
 ROM_START( spec8s3 )
 	ROM_DEFAULT_BIOS("ver13")
 	ROM_SYSTEM_BIOS( 0, "ver12", "Ver. 1.2 (1990)" )
@@ -60,6 +70,7 @@ ROM_START( spec8s3 )
 	ROMX_LOAD( "1003067-0001d.11b.bin", 0x000000, 0x008000, CRC(12188e2b) SHA1(6552d40364eae99b449842a79843d8c0114c4c70), ROM_BIOS(0) ) // "1003067-0001D Spec/8 Ser III // Ver. 1.2 (C)Copyright 1990 // SuperMac Technology // All Rights Reserved" 27c256 @11B
 	ROMX_LOAD( "1003067-0001e.11b.bin", 0x000000, 0x008000, CRC(39fab193) SHA1(124c9847bf07733d131c977c4395cfbbb6470973), ROM_BIOS(1) ) // "1003067-0001E Spec/8 Ser III // Ver. 1.3 (C)Copyright 1993 // SuperMac Technology // All Rights Reserved" NMC27C256Q @11B
 ROM_END
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -87,7 +98,7 @@ void nubus_spec8s3_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, SPEC8S3_SCREEN_NAME, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(nubus_spec8s3_device::screen_update));
-	screen.set_raw(64_MHz_XTAL, 332*4, 64*4, 320*4, 804, 33, 801);
+	screen.set_raw(80.000_MHz_XTAL, 332*4, 64*4, 320*4, 804, 33, 801);
 }
 
 //-------------------------------------------------
@@ -97,6 +108,15 @@ void nubus_spec8s3_device::device_add_mconfig(machine_config &config)
 const tiny_rom_entry *nubus_spec8s3_device::device_rom_region() const
 {
 	return ROM_NAME( spec8s3 );
+}
+
+//-------------------------------------------------
+//  input_ports - device-specific I/O ports
+//-------------------------------------------------
+
+ioport_constructor nubus_spec8s3_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( spec8s3 );
 }
 
 //-------------------------------------------------
@@ -127,6 +147,7 @@ nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device
 	device_nubus_card_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	device_palette_interface(mconfig, *this),
+	m_userosc(*this, "USEROSC"),
 	m_timer(nullptr),
 	m_mode(0), m_vbl_disable(0),
 	m_count(0), m_clutoffs(0),
@@ -159,6 +180,7 @@ void nubus_spec8s3_device::device_start()
 	save_item(NAME(m_colors));
 	save_item(NAME(m_count));
 	save_item(NAME(m_clutoffs));
+	save_item(NAME(m_osc));
 	save_item(NAME(m_hsync));
 	save_item(NAME(m_hstart));
 	save_item(NAME(m_hend));
@@ -189,6 +211,7 @@ void nubus_spec8s3_device::device_reset()
 	std::fill(std::begin(m_colors), std::end(m_colors), 0);
 	m_count = 0;
 	m_clutoffs = 0;
+	m_osc = 0;
 	m_hsync = -24;
 	m_hstart = -64;
 	m_hend = -320;
@@ -229,31 +252,46 @@ TIMER_CALLBACK_MEMBER(nubus_spec8s3_device::vbl_tick)
 
 void nubus_spec8s3_device::update_crtc()
 {
-	// FIXME: Blatant hack - I have no idea how the clock source is configured
-	// (there's space for five clock modules on the board)
-	// Interlace mode configuration is also complicated, so it's hacked here
-	// The user-supplied clock module should be a machine configuration option
-	uint32_t clock = 64'000'000; // supplied - 1024x768 60Hz
-	m_interlace = false;
-	switch (m_vtotal)
+	XTAL oscillator = 80.000_MHz_XTAL; // no default constructor
+	switch (m_osc)
 	{
-	case -803:
-		clock = 80'000'000; // supplied - 1024x768 75Hz
+	case 0: // Y5
+		oscillator = 80.000_MHz_XTAL;
 		break;
-	case -654:
-		clock = 55'000'000; // supplied with newer revisions - 832x625 75Hz
+	case 1: // Y1
+		switch (m_userosc->read())
+		{
+		case 0:
+			oscillator = 14.318'18_MHz_XTAL;
+			break;
+		case 1:
+			oscillator = 15.67_MHz_XTAL;
+			break;
+		case 2:
+			oscillator = 17.73_MHz_XTAL;
+			break;
+		case 3:
+			oscillator = 57.27_MHz_XTAL;
+			break;
+		default:
+			throw emu_fatalerror("%s: spec8s3: invalid user oscillator selection %d\n", tag(), m_userosc->read());
+		}
 		break;
-	case -525:
-		clock = 30'240'000; // supplied - 640x480 67Hz
+	case 2: // Y2
+		oscillator = 55.000_MHz_XTAL;
 		break;
-	case -411:
-		clock = 15'821'851; // user-supplied - 512x384 60.15Hz FIXME: what's the real recommended clock for this?
+	case 3: // Y3
+		oscillator = 30.240_MHz_XTAL;
 		break;
-	case -262:
-		clock = 14'318'180; // user-supplied - 640x480i NTSC
-		m_interlace = true;
+	case 4: // Y4
+		oscillator = 64.000_MHz_XTAL;
 		break;
+	default:
+		throw emu_fatalerror("%s: spec8s3: invalid oscillator selection %d\n", tag(), m_osc);
 	}
+
+	// FIXME: blatant hack - I don't know how interlace mode is configured
+	m_interlace = m_vtotal > -320;
 
 	// for some reason you temporarily get invalid screen parameters - ignore them
 	if ((m_hstart < m_hsync) && (m_hend < m_hstart) && (m_htotal < m_hend) && (m_vstart < m_vsync) && (m_vend < m_vstart) && (m_vtotal < m_vend))
@@ -266,7 +304,7 @@ void nubus_spec8s3_device::update_crtc()
 					(4 * (m_hsync - m_hend)) - 1,
 					(m_vsync - m_vstart) * (m_interlace ? 2 : 1),
 					((m_vsync - m_vend) * (m_interlace ? 2 : 1)) - 1),
-				attotime::from_ticks(-4 * m_htotal * -m_vtotal, clock).attoseconds());
+				attotime::from_ticks(-4 * m_htotal * -m_vtotal, oscillator).attoseconds());
 
 		m_timer->adjust(screen().time_until_pos((m_vsync - m_vend) * (m_interlace ? 2 : 1), 0));
 	}
@@ -382,7 +420,7 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 			break;
 
 		default:
-			fatalerror("spec8s3: unknown video mode %d\n", m_mode);
+			throw emu_fatalerror("%s: spec8s3: unknown video mode %d\n", tag(), m_mode);
 	}
 	return 0;
 }
@@ -540,6 +578,15 @@ void nubus_spec8s3_device::spec8s3_w(offs_t offset, uint32_t data, uint32_t mem_
 			}
 			break;
 
+		case 0x3e05:
+		case 0x3e06:
+		case 0x3e07:
+			m_osc = (m_osc & ~(1 << (offset - 0x3e05))) | (BIT(~data, 0) << (offset - 0x3e05));
+			// only update when the high bit is set to avoid bad intermediate values
+			if (offset == 0x3e07)
+				update_crtc();
+			break;
+
 		default:
 //          if (offset >= 0x3800) logerror("spec8s3_w: %08x @ %x (mask %08x  %s)\n", data, offset, mem_mask, machine().describe_context());
 			break;
@@ -550,12 +597,50 @@ uint32_t nubus_spec8s3_device::spec8s3_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
-		case 0x3826:
+		case 0x382c:
 		case 0x382e:
+			{
+				/*
+				 * FIXME: Something goes wrong with user-supplied oscillator measurement.
+				 * Set breakpoint at 0x2d1e on Mac II with card in slot 9 to catch
+				 * measurement.  See the measured value in D0.b when PC= 0x2d6c.
+				 *
+				 * Expected:
+				 *    2- 5    57.28 MHz
+				 *    6-19    bad
+				 *   20-22    14.32 MHz
+				 *   23-24    15.67 MHz
+				 *   25-27    17.73 MHz
+				 *   27-      bad
+				 *
+				 * Measured:
+				 *   14.32 MHz  15
+				 *   15.67 MHz  19
+				 *   17.73 MHz  25
+				 *   57.28 MHz   9
+				 */
+				int vpos;
+				if (m_interlace)
+				{
+					// hack for interlace modes because screen_device doesn't support them
+					vpos = screen().vpos() - (2 * m_vsync);
+					if (vpos >= (-2 * m_vtotal))
+						vpos += 2 * m_vtotal;
+					vpos = vpos % -m_vtotal;
+				}
+				else
+				{
+					vpos = screen().vpos() - m_vsync;
+					if (vpos >= -m_vtotal)
+						vpos += m_vtotal;
+				}
+				return ~((vpos >> (BIT(offset, 1) ? 8 : 0)) & 0xff);
+			}
+
+		case 0x3826:
 			return 0xff;
 
 		case 0x3824:
-		case 0x382c:
 			return (0xa^0xffffffff);
 
 		case 0x3846:
