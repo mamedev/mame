@@ -3023,7 +3023,7 @@ void kiwame_state::kiwame_map(address_map &map)
 
 
 /***************************************************************************
-                        Thunder & Lightning / Wit's
+                        Thunder & Lightning
 ***************************************************************************/
 
 /* Protection only present in thunderl set.
@@ -3064,13 +3064,13 @@ void kiwame_state::kiwame_map(address_map &map)
    I13  -> D6
    I12  -> D7
 */
-u16 seta_state::thunderl_protection_r()
+u16 thunderl_state::thunderl_protection_r()
 {
 //  logerror("PC %06X - Protection Read\n", m_maincpu->pc());
 
 	return m_thunderl_protection_reg;
 }
-void seta_state::thunderl_protection_w(offs_t offset, u16 data)
+void thunderl_state::thunderl_protection_w(offs_t offset, u16 data)
 {
 	// data byte written here is not used to save the value into protection registers
 	const u32 addr = offset * 2;
@@ -3088,57 +3088,76 @@ void seta_state::thunderl_protection_w(offs_t offset, u16 data)
 	//  logerror("PC %06X - Protection Written: %04X <- %04X\n", m_maincpu->pc(), addr, data);
 }
 
-
 /* Similar to downtown etc. */
 
-void seta_state::thunderl_map(address_map &map)
+void thunderl_state::thunderl_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).rom();                             // ROM
-	map(0xffc000, 0xffffff).ram();                             // RAM
+	map(0x000000, 0x00ffff).rom();                       // ROM
+	map(0xffc000, 0xffffff).ram();                       // RAM
 	map(0x100000, 0x103fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0x200000, 0x200001).rw(FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
-	map(0x300000, 0x300001).nopw();                        // ?
-	map(0x400000, 0x41ffff).w(FUNC(seta_state::thunderl_protection_w));    // Protection (not in wits)
-	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
-	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
+	map(0x200000, 0x200001).rw(FUNC(thunderl_state::ipl1_ack_r), FUNC(thunderl_state::ipl1_ack_w));
+	map(0x300000, 0x300001).nopw();                      // ?
+	map(0x400000, 0x41ffff).w(FUNC(thunderl_state::thunderl_protection_w)); // Protection
+	map(0x500001, 0x500001).w(FUNC(thunderl_state::seta_coin_lockout_w));   // Coin Lockout
+	map(0x600000, 0x600003).r(FUNC(thunderl_state::seta_dsw_r));            // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
 	map(0xb00000, 0xb00001).portr("P1");                 // P1
 	map(0xb00002, 0xb00003).portr("P2");                 // P2
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
-	map(0xb0000c, 0xb0000d).r(FUNC(seta_state::thunderl_protection_r));   // Protection (not in wits)
-	map(0xb00008, 0xb00009).portr("P3");                 // P3 (wits)
-	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
-	map(0xc00000, 0xc00001).ram();                             // ? 0x4000
+	map(0xb0000c, 0xb0000d).r(FUNC(thunderl_state::thunderl_protection_r)); // Protection
+	map(0xc00000, 0xc00001).ram();                       // ? 0x4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xe04000, 0xe07fff).ram();                             // (wits)
 }
 
 
-void seta_state::thunderlbl_map(address_map &map)
+void thunderl_state::thunderlbl_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).rom();                             // ROM
-	map(0xffc000, 0xffffff).ram();                             // RAM
+	map(0x000000, 0x00ffff).rom();                       // ROM
+	map(0xffc000, 0xffffff).ram();                       // RAM
 //  map(0x100000, 0x103fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));  // Sound
-	map(0x200000, 0x200001).rw(FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
-	map(0x300000, 0x300001).nopw();                        // ?
-//  map(0x400000, 0x40ffff).w(FUNC(seta_state::thunderl_protection_w));    // Protection (not in wits)
-	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
-	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
+	map(0x200000, 0x200001).rw(FUNC(thunderl_state::ipl1_ack_r), FUNC(thunderl_state::ipl1_ack_w));
+	map(0x300000, 0x300001).nopw();                      // ?
+	map(0x500001, 0x500001).w(FUNC(thunderl_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x600000, 0x600003).r(FUNC(thunderl_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
 	map(0xb00000, 0xb00001).portr("P1");                 // P1
 	map(0xb00002, 0xb00003).portr("P2");                 // P2
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
 	map(0xb0000c, 0xb0000d).w(m_seta001, FUNC(seta001_device::spritectrl_w8)).umask16(0xff00); // the bootleg is modified to write the first byte of spritectrl here, rather than the usual address
-	map(0xb00008, 0xb00009).portr("P3"); // P3 (wits)
 	map(0xb00008, 0xb00008).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
-	map(0xc00000, 0xc00001).ram();                             // ? 0x4000
+	map(0xc00000, 0xc00001).ram();                       // ? 0x4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xe04000, 0xe07fff).ram();                             // (wits)
+}
+
+/***************************************************************************
+					Wit's
+***************************************************************************/
+/* Similar to thunderl but without protection */
+
+void seta_state::wits_map(address_map& map)
+{
+	map(0x000000, 0x00ffff).rom();                       // ROM
+	map(0xffc000, 0xffffff).ram();                       // RAM
+	map(0x100000, 0x103fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0x200000, 0x200001).rw(FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
+	map(0x300000, 0x300001).nopw();                      // ?
+	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
+	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
+	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
+	map(0xb00000, 0xb00001).portr("P1");                 // P1
+	map(0xb00002, 0xb00003).portr("P2");                 // P2
+	map(0xb00004, 0xb00005).portr("COINS");              // Coins
+	map(0xb00008, 0xb00009).portr("P3");                 // P3 (wits)
+	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
+	map(0xc00000, 0xc00001).ram();                       // ? 0x4000
+	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
+	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
+	map(0xe04000, 0xe07fff).ram();
 }
 
 /***************************************************************************
@@ -3147,27 +3166,24 @@ void seta_state::thunderlbl_map(address_map &map)
 
 void seta_state::wiggie_map(address_map &map)
 {
-	map(0x000000, 0x01ffff).rom();                             // ROM
-	map(0xffc000, 0xffffff).ram();                             // RAM
-	map(0x100000, 0x103fff).noprw();                             // X1_010 is not used
+	map(0x000000, 0x01ffff).rom();                       // ROM
+	map(0xffc000, 0xffffff).ram();                       // RAM
+	map(0x100000, 0x103fff).noprw();                     // X1_010 is not used
 	map(0x200000, 0x200001).rw(FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
-	map(0x300000, 0x300001).nopw();                        // ?
-	map(0x400000, 0x40ffff).w(FUNC(seta_state::thunderl_protection_w));    // Protection (not in wits)
+	map(0x300000, 0x300001).nopw();                      // ?
+	map(0x400000, 0x41ffff).nopw();	                     // Protection (but not used, taken from thunderl code)
 	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
 	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
 	map(0xb00000, 0xb00001).portr("P1");                 // P1
 	map(0xb00002, 0xb00003).portr("P2");                 // P2
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
-	map(0xb0000c, 0xb0000d).r(FUNC(seta_state::thunderl_protection_r));     // Protection (not in wits)
-	map(0xb00008, 0xb00009).portr("P3");                 // P3 (wits)
+	map(0xb0000c, 0xb0000d).nopw();                      // Protection (but not used, taken from thunderl code)
 	map(0xb00008, 0xb00008).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
-	map(0xc00000, 0xc00001).ram();                             // ? 0x4000
+	map(0xc00000, 0xc00001).ram();                       // ? 0x4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xe04000, 0xe07fff).ram(); // (wits)
 }
 
 void seta_state::wiggie_sound_map(address_map &map)
@@ -9588,19 +9604,24 @@ void seta_state::rezon(machine_config &config)
 /***************************************************************************
                         Thunder & Lightning / Wit's
 ***************************************************************************/
-MACHINE_START_MEMBER(seta_state, thunderl) { save_item(NAME(m_thunderl_protection_reg)); }
+void thunderl_state::machine_start()
+{
+	seta_state::machine_start();
+
+	save_item(NAME(m_thunderl_protection_reg));
+}
 
 /*  thunderl lev 2 = lev 3 - other levels lead to an error */
 
-void seta_state::thunderl(machine_config &config)
+void thunderl_state::thunderl(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::thunderl_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &thunderl_state::thunderl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(thunderl_state::irq2_line_assert));
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
-	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
+	m_seta001->set_gfxbank_callback(FUNC(thunderl_state::setac_gfxbank_callback));
 	// position kludges
 	m_seta001->set_fg_xoffsets(0, 0); // unknown
 	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
@@ -9612,10 +9633,8 @@ void seta_state::thunderl(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_screen_update(FUNC(thunderl_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
-
-	MCFG_MACHINE_START_OVERRIDE(seta_state, thunderl)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
@@ -9627,7 +9646,7 @@ void seta_state::thunderl(machine_config &config)
 }
 
 
-void seta_state::thunderlbl_sound_map(address_map &map)
+void thunderl_state::thunderlbl_sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
@@ -9635,7 +9654,7 @@ void seta_state::thunderlbl_sound_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
-void seta_state::thunderlbl_sound_portmap(address_map &map)
+void thunderl_state::thunderlbl_sound_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -9643,17 +9662,17 @@ void seta_state::thunderlbl_sound_portmap(address_map &map)
 	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-void seta_state::thunderlbl(machine_config &config)
+void thunderl_state::thunderlbl(machine_config &config)
 {
 	thunderl(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::thunderlbl_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &thunderl_state::thunderlbl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(thunderl_state::irq2_line_assert));
 
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // XTAL verified, divider unknown, but Z8400A PS, so likely
-	m_audiocpu->set_addrmap(AS_PROGRAM, &seta_state::thunderlbl_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &seta_state::thunderlbl_sound_portmap);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &thunderl_state::thunderlbl_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &thunderl_state::thunderlbl_sound_portmap);
 
 	/* the sound hardware / program is ripped from Tetris (S16B) */
 	config.device_remove("x1snd");
@@ -9712,7 +9731,7 @@ void seta_state::wits(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::thunderl_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wits_map);
 	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_sprites);
@@ -10525,8 +10544,8 @@ ROM_START( thunderl )
 	ROM_LOAD( "r28", 0x000000, 0x080000, CRC(a043615d) SHA1(e483fa9fd8e922578a9d7b6ced0750643089ca78) )
 	ROM_LOAD( "r27", 0x080000, 0x080000, CRC(cb8425a3) SHA1(655afa295fbe99acc79c4004f03ed832560cff5b) )
 
-	ROM_REGION(0x200, "plds", 0)        /* Protection */
-	ROM_LOAD("tl-9", 0x000000, 0x117, CRC(3b62882d) SHA1(a590648cb013f20d837f18ddb2e839a89bac5fcb))
+	ROM_REGION(0x200, "plds", 0)        /* Protection, bruteforced and recreated for GAL16V8 */
+	ROM_LOAD("tl-9", 0x000000, 0x117, BAD_DUMP CRC(3b62882d) SHA1(a590648cb013f20d837f18ddb2e839a89bac5fcb))
 ROM_END
 
 ROM_START( thunderlbl )
@@ -12577,9 +12596,9 @@ GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_ini
 
 GAME( 1989, wits,      0,        wits,      wits,      seta_state,     empty_init,     ROT0,   "Athena (Visco license)",    "Wit's (Japan)" , 0) // Country/License: DSW
 
-GAME( 1990, thunderl,   0,       thunderl,  thunderl,  seta_state,     empty_init,     ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
-GAME( 1991, thunderlbl, thunderl,thunderlbl,thunderlbl,seta_state,     empty_init,     ROT270, "bootleg (Hyogo)",           "Thunder & Lightning (bootleg with Tetris sound, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
-GAME( 1990, thunderlbl2,thunderl,thunderlbl,thunderl,  seta_state,     empty_init,     ROT270, "bootleg",                   "Thunder & Lightning (bootleg with Tetris sound, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
+GAME( 1990, thunderl,   0,       thunderl,  thunderl,  thunderl_state, empty_init,     ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
+GAME( 1991, thunderlbl, thunderl,thunderlbl,thunderlbl,thunderl_state, empty_init,     ROT270, "bootleg (Hyogo)",           "Thunder & Lightning (bootleg with Tetris sound, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
+GAME( 1990, thunderlbl2,thunderl,thunderlbl,thunderl,  thunderl_state, empty_init,     ROT270, "bootleg",                   "Thunder & Lightning (bootleg with Tetris sound, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
 
 GAME( 1994, wiggie,    0,        wiggie,    thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Wiggie Waggie", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Super Bar", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning

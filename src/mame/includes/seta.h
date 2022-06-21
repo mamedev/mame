@@ -62,7 +62,7 @@ public:
 	void gundhara(machine_config &config);
 	void triplfun(machine_config &config);
 	void blandiap(machine_config &config);
-	void wits(machine_config &config);
+	void wits(machine_config& config);
 	void msgundam(machine_config &config);
 	void msgundamb(machine_config &config);
 	void extdwnhl(machine_config &config);
@@ -71,7 +71,6 @@ public:
 	void umanclub(machine_config &config);
 	void daioh(machine_config &config);
 	void atehate(machine_config &config);
-	void thunderlbl(machine_config &config);
 	void blockcarb(machine_config &config);
 	void wrofaero(machine_config &config);
 	void blockcar(machine_config &config);
@@ -87,7 +86,6 @@ public:
 	void superbar(machine_config &config);
 	void jjsquawk(machine_config &config);
 	void blandia(machine_config &config);
-	void thunderl(machine_config &config);
 	void utoukond(machine_config &config);
 	void rezon(machine_config &config);
 
@@ -127,8 +125,6 @@ protected:
 
 	u8 m_vregs;
 
-	u8 m_thunderl_protection_reg;
-
 	int m_tilemaps_flip;
 	int m_samples_bank;
 
@@ -141,9 +137,7 @@ protected:
 	u16 seta_dsw_r(offs_t offset);
 
 	u16 zingzipbl_unknown_r();
-	DECLARE_MACHINE_START(thunderl);
-	u16 thunderl_protection_r();
-	void thunderl_protection_w(offs_t offset, u16 data);
+
 	void utoukond_sound_control_w(u8 data);
 	u16 extra_r();
 
@@ -195,10 +189,6 @@ protected:
 	void msgundamb_map(address_map &map);
 	void oisipuzl_map(address_map &map);
 	void orbs_map(address_map &map);
-	void thunderl_map(address_map &map);
-	void thunderlbl_map(address_map &map);
-	void thunderlbl_sound_map(address_map &map);
-	void thunderlbl_sound_portmap(address_map &map);
 	void triplfun_map(address_map &map);
 	void umanclub_map(address_map &map);
 	void utoukond_map(address_map &map);
@@ -206,6 +196,7 @@ protected:
 	void utoukond_sound_map(address_map &map);
 	void wiggie_map(address_map &map);
 	void wiggie_sound_map(address_map &map);
+	void wits_map(address_map& map);
 	void wrofaero_map(address_map &map);
 	void zingzipbl_map(address_map &map);
 };
@@ -336,6 +327,31 @@ private:
 
 	u8 m_port_select;
 	u16 m_tiles_offset;
+};
+
+class thunderl_state : public seta_state
+{
+public:
+	thunderl_state(const machine_config& mconfig, device_type type, const char* tag) :
+		seta_state(mconfig, type, tag)
+	{ }
+
+	void thunderl(machine_config& config);
+	void thunderlbl(machine_config& config);
+
+protected:
+	u16 thunderl_protection_r();
+	void thunderl_protection_w(offs_t offset, u16 data);
+
+	virtual void machine_start() override;
+
+	void thunderl_map(address_map& map);
+	void thunderlbl_map(address_map& map);
+	void thunderlbl_sound_map(address_map& map);
+	void thunderlbl_sound_portmap(address_map& map);
+
+private:
+	u8 m_thunderl_protection_reg;
 };
 
 class kiwame_state : public seta_state
