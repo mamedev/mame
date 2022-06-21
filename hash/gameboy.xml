@@ -3708,7 +3708,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cattrap" cloneof="catrap">
+	<software name="catrapp" cloneof="catrap">
 		<description>Catrap (prototype)</description>
 		<year>1990</year>
 		<publisher>Asmik</publisher>
