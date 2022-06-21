@@ -21,6 +21,7 @@ MACHINE_RESET_MEMBER(scramble_state,scramble)
 
 	if (m_audiocpu != nullptr)
 		sh_init();
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 MACHINE_RESET_MEMBER(scramble_state,explorer)
