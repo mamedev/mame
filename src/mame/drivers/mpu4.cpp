@@ -738,7 +738,7 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 
 /* Dolbeck connect 4 complains if the strobe containing bulb 120 doesn't trigger overcurrent,
 but this is non-fatal. BWB games will definitely complain if overcurrent is triggered, though.
-
+*/
 #if 0
 	if ( lamp_overcurrent ) m_ic4_input_b |= 0x02;
 	if ( lamp_undercurrent ) m_ic4_input_b |= 0x01;
