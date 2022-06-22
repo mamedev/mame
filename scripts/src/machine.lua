@@ -4963,6 +4963,31 @@ if (MACHINES["BITMAP_PRINTER"]~=null) then
 	}
 end
 
+
+---------------------------------------------------
+--
+--@src/devices/machine/plotter.h,MACHINES["PLOTTER"] = true
+---------------------------------------------------
+if (MACHINES["PLOTTER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/plotter.cpp",
+		MAME_DIR .. "src/devices/machine/plotter.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/machine/alps_dpg1302.h,MACHINES["ALPS_DPG1302"] = true
+---------------------------------------------------
+if (MACHINES["ALPS_DPG1302"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/alps_dpg1302.cpp",
+		MAME_DIR .. "src/devices/machine/alps_dpg1302.h",
+	}
+end
+
+
 ---------------------------------------------------
 --
 --@src/devices/machine/ns32382.h,MACHINES["NS32382"] = true
