@@ -233,6 +233,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-LO-EUR" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -1844,6 +1845,7 @@ license:CC0
 		<info name="release" value="19950127" />
 		<info name="alt_title" value="バトルクラッシャー" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="battle crusher (japan).bin" size="262144" crc="ea4eb1a1" sha1="ae07172c69a7bdece4392016c6a6dd253623f5f8" />
@@ -2996,6 +2998,7 @@ license:CC0
 		<info name="release" value="19980731" />
 		<info name="alt_title" value="ブレインドレイン" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="brain drain (japan).bin" size="131072" crc="e558aacd" sha1="225c25d94854f509611b8c0b4b415daf48d51310" />
@@ -4090,6 +4093,7 @@ license:CC0
 		<publisher>Banpresto</publisher>
 		<info name="alt_title" value="超魔神英雄伝ワタル まぜっこモンスター" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="chou mashin eiyuuden wataru - mazekko monster (japan) (beta).bin" size="524288" crc="e6c3a473" sha1="ac2360d790c855fde91fca26ee88a4814a1f2e9f" />
@@ -4926,6 +4930,7 @@ license:CC0
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-ADSP-UKV, DMG-ADSP-ESP" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -7357,6 +7362,7 @@ license:CC0
 		<year>1997?</year>
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="game boy wars turbo - famitsu version (japan).bin" size="262144" crc="86d04bfb" sha1="a0106f20aaf857a7ba033537821e31c6ec074dd6" />
@@ -9537,6 +9543,7 @@ license:CC0
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-AGOP-NOE" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" /> <!-- Also found with DMG-BEAN-10 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -9921,6 +9928,7 @@ license:CC0
 		<info name="release" value="19980306" />
 		<info name="alt_title" value="頭文字D 外伝" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="initial d gaiden (japan).bin" size="262144" crc="6cc56612" sha1="1b3c4c1c4dfca46a009eb2e5cd45b343d7ee6681" />
@@ -9989,6 +9997,7 @@ license:CC0
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AXIE-USA, DMG-AXIP-EUR" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- EUR cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -10566,6 +10575,7 @@ license:CC0
 		<year>1993?</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="john madden football (prototype a).bin" size="131072" crc="4f03ee8c" sha1="c79ecb697723f98448423d311c3d7c76328a46a8" />
@@ -13230,6 +13240,7 @@ license:CC0
 		<publisher>Laguna</publisher>
 		<info name="serial" value="DMG-AJSD-NOE" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-GDAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC2A" />
@@ -13796,6 +13807,7 @@ license:CC0
 		<info name="serial" value="DMG-I5-USA, DMG-I5-NOE" />
 		<info name="alt_title" value="Mickey Mouse V - Zauberstäbe (German Box)" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B" />
@@ -16031,6 +16043,7 @@ license:CC0
 		<publisher>Malibu Games</publisher>
 		<info name="serial" value="DMG-ANHE-USA, DMG-ANHP-EUR" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="nhl hockey '95 (usa, europe).bin" size="524288" crc="bcabd2d2" sha1="baea6987f69b4c8792ff4e453ea88006803a3ef9" />
@@ -21646,6 +21659,7 @@ license:CC0
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="DMG-UF-FAH-1, DMG-UF-NOE-1, DMG-UF-USA)" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-10" /> <!-- Also found with DMG-BEAN-02 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1 [DMG MBC1-B]" />
@@ -22192,6 +22206,7 @@ license:CC0
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="spirou (europe) (en,fr,de,es) (beta).bin" size="262144" crc="35415a00" sha1="556641fc79700c5ccb4f8feaec1d7fafe99c31c4" />
@@ -24432,6 +24447,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AYLE-USA" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="tetris attack (usa).bin" size="524288" crc="b76c769b" sha1="3de8d7f30322bc50008ab0d917acd0a934b5b195" />
@@ -24445,6 +24461,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AYLE-USA, DMG-AYLP-EUR" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
@@ -24461,6 +24478,7 @@ license:CC0
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-ASBE-USA, DMG-ASBP-UKV" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="tetris blast (usa, europe).bin" size="131072" crc="7be5a73f" sha1="14de1e47820b8aef8475d1ba94ea3d49cc45d06c" />
@@ -24782,6 +24800,7 @@ license:CC0
 		<info name="release" value="19951222" />
 		<info name="alt_title" value="東京ディズニーランド ミッキーのシンデレラ城ミステリーツアー" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="tokyo disneyland - mickey no cinderella-jou mystery tour (japan).bin" size="524288" crc="77d69349" sha1="8e7ab2d9477f58254db3dfea749e12f535dc104c" />
@@ -25267,6 +25286,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>Mahou</publisher>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="tsume shougi - kamiki godan (japan) (beta).bin" size="131072" crc="9995ee1a" sha1="eae6cdb4425ddae51bee0e7d0aa956b72e897743" />
@@ -25622,6 +25642,7 @@ license:CC0
 		<info name="release" value="19940826" />
 		<info name="alt_title" value="ウルトラマン超闘士激伝" />
 		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="ultraman chou toushi gekiden (japan).bin" size="262144" crc="b904230d" sha1="1a55b76a4039fb6ff1ef0b1914dd9a7ccddde2b2" />
