@@ -1,0 +1,71 @@
+id: org.mamedev.MAME
+runtime: org.kde.Platform
+runtime-version: 5.15-21.08
+sdk: org.kde.Sdk
+command: mame
+separate-locales: false
+finish-args:
+  - --device=all
+  - --filesystem=home
+  - --filesystem=host:ro
+  - --share=network
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  - --socket=wayland
+  - --allow=bluetooth
+modules:
+  - name: mame
+    buildsystem: simple
+    build-options:
+      no-debuginfo: true
+      strip: true
+    build-commands:
+      - make -j ${FLATPAK_BUILDER_N_JOBS}
+      - install -Dm 0755 mame /app/bin/mame
+      - install -Dm 0644 ${FLATPAK_ID}.desktop /app/share/applications/${FLATPAK_ID}.desktop
+      - install -Dm 0644 ${FLATPAK_ID}.metainfo.xml /app/share/metainfo/${FLATPAK_ID}.metainfo.xml
+      - |
+        for i in 32 48 64 128 256; do
+          install -Dm 0644 mame${i}x${i}.png /app/share/icons/hicolor/${i}x${i}/apps/${FLATPAK_ID}.png
+        done
+    sources:
+    - type: archive
+      url: https://github.com/mamedev/mame/archive/refs/tags/mame0244.tar.gz
+      sha256: 843c917edc46008a27b439a1fc66fc12a27c84e55e08753b963789e5614cebf7
+    - type: file
+      path: mame32x32.png
+    - type: file
+      path: mame48x48.png
+    - type: file
+      path: mame64x64.png
+    - type: file
+      path: mame128x128.png
+    - type: file
+      path: mame256x256.png
+    - type: file
+      path: org.mamedev.MAME.desktop
+    - type: file
+      path: org.mamedev.MAME.metainfo.xml
+    - type: patch
+      path: 0.244-ptrdiff_t.patch
+    - type: patch
+      path: use-system-lib-flac.patch
+    - type: patch
+      path: ldopts.patch
+    post-install:
+      - cp COPYING /app/bin/
+      - cp uismall.bdf /app/bin/
+      - cp -r artwork/ /app/bin/
+      - cp -r bgfx/ /app/bin/
+      - cp -r ctrlr/ /app/bin/
+      - mkdir -p /app/bin/docs/
+      - cp -r docs/legal/ /app/bin/docs/
+      - cp -r docs/man/ /app/bin/docs/
+      - cp -r hash/ /app/bin/
+      - cp -r hlsl/ /app/bin/
+      - cp -r ini/ /app/bin/
+      - cp -r language/ /app/bin/
+      - cp -r plugins/ /app/bin/
+      - cp -r roms/ /app/bin/
+      - cp -r samples/ /app/bin/

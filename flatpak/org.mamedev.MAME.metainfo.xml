@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.mamedev.MAME</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <name>MAME</name>
+  <summary>
+    MAME is a multi-purpose emulation framework.
+  </summary>
+  <description>
+    <p>MAME&apos;s purpose is to preserve decades of software history. As electronic technology continues to rush forward, MAME prevents this important &quot;vintage&quot; software from being lost and forgotten. This is achieved by documenting the hardware and how it functions. The source code to MAME serves as this documentation. The fact that the software is usable serves primarily to validate the accuracy of the documentation (how else can you prove that you have recreated the hardware faithfully?). Over time, MAME (originally stood for Multiple Arcade Machine Emulator) absorbed the sister-project MESS (Multi Emulator Super System), so MAME now documents a wide variety of (mostly vintage) computers, video game consoles and calculators, in addition to the arcade video games that were its initial focus.</p>
+  </description>
+  <categories>
+    <category>Game</category>
+    <category>ArcadeGame</category>
+    <category>Emulator</category>
+  </categories>
+  <url type="homepage">https://www.mamedev.org</url>
+  <launchable type="desktop-id">org.mamedev.MAME.desktop</launchable>
+  <releases>
+    <release version="0.244" date="2022-05-25"/>
+  </releases>
+  <provides>
+    <binary>mame</binary>
+  </provides>
+</component>

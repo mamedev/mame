@@ -1,0 +1,12 @@
+diff --git a/src/lib/netlist/plib/ppmf.h b/src/lib/netlist/plib/ppmf.h
+index b188ca0c..e037fc28 100644
+--- a/src/lib/netlist/plib/ppmf.h
++++ b/src/lib/netlist/plib/ppmf.h
+@@ -82,6 +82,7 @@ namespace plib {
+ 
+ #include <algorithm>
+ #include <cstdint> // uintptr_t
++#include <cstddef>
+ #include <type_traits>
+ #include <utility>
+ 
