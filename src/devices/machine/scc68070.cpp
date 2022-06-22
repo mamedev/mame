@@ -13,11 +13,12 @@
 
 STATUS:
 
-- Skeleton.  Just enough for the CD-i to run.
+- Skeleton.  Just enough for the CD-i and Magicard to run.
 
 TODO:
 
 - Proper handling of the 68070's internal devices (UART, DMA, Timers, etc.)
+- I2C could do with re-visiting.
 
 *******************************************************************************/
 
@@ -40,6 +41,32 @@ TODO:
 #include "logmacro.h"
 
 #define ENABLE_UART_PRINTING (0)
+
+//**************************************************************************
+// Register defines
+//**************************************************************************
+#define ICR_SEL 0x40
+#define ICR_ESO 0x08
+#define ICR_ACK 0x04
+
+
+#define I2C_IDLE				0
+#define I2C_TX_IN_PROGRESS		1
+#define I2C_RX_IN_PROGRESS		2
+#define I2C_RX_COMPLETE			3
+#define I2C_GET_ACK				4
+#define I2C_SEND_ACK			5
+#define I2C_SEND_ACK_AND_RX		6
+#define I2C_SEND_ACK_AND_STOP	7
+#define I2C_SEND_STOP			8
+#define I2C_CHANGED_TO_RX		9
+#define I2C_SEND_RESTART		10
+
+#define I2C_SCL_IDLE			0
+#define I2C_SCL_SET_0			1
+#define I2C_SCL_SET_1			2
+#define I2C_SCL_WAIT_1			3
+
 
 // device type definition
 DEFINE_DEVICE_TYPE(SCC68070, scc68070_device, "scc68070", "Philips SCC68070")
@@ -86,6 +113,9 @@ scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag,
 	, m_iack7_callback(*this)
 	, m_uart_tx_callback(*this)
 	, m_uart_rtsn_callback(*this)
+	, m_i2c_scl_callback(*this)
+	, m_i2c_sdaw_callback(*this)
+	, m_i2c_sdar_callback(*this)
 	, m_ipl(0)
 	, m_in2_line(CLEAR_LINE)
 	, m_in4_line(CLEAR_LINE)
@@ -113,6 +143,9 @@ void scc68070_device::device_resolve_objects()
 	m_iack7_callback.resolve_safe(autovector(7));
 	m_uart_tx_callback.resolve_safe();
 	m_uart_rtsn_callback.resolve_safe();
+	m_i2c_scl_callback.resolve_safe();
+	m_i2c_sdaw_callback.resolve_safe();
+	m_i2c_sdar_callback.resolve_safe(0);
 }
 
 //-------------------------------------------------
@@ -146,6 +179,16 @@ void scc68070_device::device_start()
 	save_item(NAME(m_i2c.status_register));
 	save_item(NAME(m_i2c.control_register));
 	save_item(NAME(m_i2c.clock_control_register));
+	save_item(NAME(m_i2c.scl_out_state));
+	save_item(NAME(m_i2c.scl_in_state));
+	save_item(NAME(m_i2c.sda_out_state));
+	save_item(NAME(m_i2c.sda_in_state));
+	save_item(NAME(m_i2c.state));
+	save_item(NAME(m_i2c.counter));
+	save_item(NAME(m_i2c.clock_change_state));
+	save_item(NAME(m_i2c.clocks));
+	save_item(NAME(m_i2c.first_byte));
+	save_item(NAME(m_i2c.ack_or_nak_sent));
 
 	save_item(NAME(m_uart.mode_register));
 	save_item(NAME(m_uart.status_register));
@@ -191,6 +234,9 @@ void scc68070_device::device_start()
 
 	m_uart.tx_timer = timer_alloc(FUNC(scc68070_device::tx_callback), this);
 	m_uart.tx_timer->adjust(attotime::never);
+
+	m_i2c.timer = timer_alloc(FUNC(scc68070_device::i2c_callback), this);
+	m_i2c.timer->adjust(attotime::never);
 }
 
 //-------------------------------------------------
@@ -212,9 +258,15 @@ void scc68070_device::device_reset()
 
 	m_i2c.data_register = 0;
 	m_i2c.address_register = 0;
-	m_i2c.status_register = 0;
+	m_i2c.status_register = ISR_PIN;
 	m_i2c.control_register = 0;
 	m_i2c.clock_control_register = 0;
+	m_i2c.scl_out_state = true;
+	m_i2c.scl_in_state = true;
+	m_i2c.sda_out_state = true;
+	m_i2c.state = I2C_IDLE;
+	m_i2c.clock_change_state = I2C_SCL_IDLE;
+	m_i2c.clocks = 0;
 
 	m_uart.mode_register = 0;
 	m_uart.status_register = USR_TXRDY;
@@ -260,7 +312,7 @@ void scc68070_device::device_reset()
 
 	m_uart.rx_timer->adjust(attotime::never);
 	m_uart.tx_timer->adjust(attotime::never);
-	m_timers.timer0_timer->adjust(attotime::never);
+	set_timer_callback(0);
 }
 
 void scc68070_device::m68k_reset_peripherals()
@@ -274,9 +326,15 @@ void scc68070_device::m68k_reset_peripherals()
 	m_uart_rx_int = false;
 	m_uart_tx_int = false;
 
-	m_i2c.status_register = 0;
+	m_i2c.status_register = ISR_PIN;
 	m_i2c.control_register = 0;
 	m_i2c.clock_control_register = 0;
+	m_i2c.scl_out_state = true;
+	m_i2c.scl_in_state = true;
+	m_i2c.sda_out_state = true;
+	m_i2c.state = I2C_IDLE;
+	m_i2c.clock_change_state = I2C_SCL_IDLE;
+	m_i2c.clocks = 0;
 	m_uart.command_register = 0;
 	m_uart.receive_pointer = -1;
 	m_uart.transmit_pointer = -1;
@@ -291,6 +349,7 @@ void scc68070_device::m68k_reset_peripherals()
 	m_uart.rx_timer->adjust(attotime::never);
 	m_uart.tx_timer->adjust(attotime::never);
 	m_timers.timer0_timer->adjust(attotime::never);
+	m_i2c.timer->adjust(attotime::never);
 
 	update_ipl();
 }
@@ -370,7 +429,7 @@ WRITE_LINE_MEMBER(scc68070_device::int2_w)
 			update_ipl();
 		}
 
-		m_int1_line = state;
+		m_int2_line = state;
 	}
 }
 
@@ -558,13 +617,41 @@ TIMER_CALLBACK_MEMBER(scc68070_device::tx_callback)
 uint8_t scc68070_device::lir_r()
 {
 	// LIR priority level: 80001001
-	return m_lir;
+	return m_lir & 0x77;
 }
 
 void scc68070_device::lir_w(uint8_t data)
 {
 	LOGMASKED(LOG_IRQS, "%s: LIR Write: %02x\n", machine().describe_context(), data);
-	m_lir = data;
+	
+	switch (data & 0x88)
+	{
+	case 0x08:
+		if (m_lir & 0x08)
+		{
+			m_lir &= 0xf7;
+			update_ipl();
+		}
+		break;
+
+	case 0x80:
+		if (data & 0x80)
+		{
+			m_lir &= 0x7f;
+			update_ipl();
+		}
+		break;
+
+	case 0x88:
+		if (data & 0x88)
+		{
+			m_lir &= 0x77;
+			update_ipl();
+		}
+		break;
+	}
+
+	m_lir = (m_lir & 0x88) | (data & 0x77);
 }
 
 uint8_t scc68070_device::picr1_r()
@@ -654,6 +741,35 @@ uint8_t scc68070_device::idr_r()
 	// I2C data register: 80002001
 	if (!machine().side_effects_disabled())
 		LOGMASKED(LOG_I2C, "%s: I2C Data Register Read: %02x\n", machine().describe_context(), m_i2c.data_register);
+	
+	m_i2c.counter = 0;
+	m_i2c.status_register |= ISR_PIN;
+	m_i2c_int = false;
+	update_ipl();
+
+	if (m_i2c.state != I2C_RX_COMPLETE)
+	{
+	}
+	else
+	{
+		m_i2c.sda_out_state = (m_i2c.control_register&ICR_ACK) ? false : true;
+		m_i2c_sdaw_callback(m_i2c.sda_out_state);
+		
+		if (m_i2c.control_register & ICR_ACK)
+		{
+			m_i2c.state = I2C_SEND_ACK_AND_RX;
+			m_i2c.clocks = 9;
+		}
+		else
+		{
+			m_i2c.state = I2C_SEND_ACK;
+			m_i2c.clocks = 1;
+		}
+		m_i2c.ack_or_nak_sent = true;
+		m_i2c.clock_change_state = I2C_SCL_SET_1;
+		set_i2c_timer();
+
+	}
 	return m_i2c.data_register;
 }
 
@@ -661,6 +777,18 @@ void scc68070_device::idr_w(uint8_t data)
 {
 	LOGMASKED(LOG_I2C, "%s: I2C Data Register Write: %02x\n", machine().describe_context(), data);
 	m_i2c.data_register = data;
+	if (m_i2c.status_register & ISR_MST && m_i2c.status_register & ISR_TRX && m_i2c.status_register & ISR_BB)
+	{
+		m_i2c.status_register |= ISR_PIN;
+		m_i2c_int = false;
+		update_ipl();
+		m_i2c.counter = 0;
+		m_i2c.state = I2C_TX_IN_PROGRESS;
+		m_i2c.clocks = 9;
+		i2c_process_falling_scl();
+		m_i2c.clock_change_state = I2C_SCL_SET_1;
+		set_i2c_timer();
+	}
 }
 
 uint8_t scc68070_device::iar_r()
@@ -682,13 +810,154 @@ uint8_t scc68070_device::isr_r()
 	// I2C status register: 80002005
 	if (!machine().side_effects_disabled())
 		LOGMASKED(LOG_I2C, "%s: I2C Status Register Read: %02x\n", machine().describe_context(), m_i2c.status_register);
-	return m_i2c.status_register & 0xef; // hack for magicard
+	return m_i2c.status_register;
 }
 
 void scc68070_device::isr_w(uint8_t data)
 {
 	LOGMASKED(LOG_I2C, "%s: I2C Status Register Write: %02x\n", machine().describe_context(), data);
-	m_i2c.status_register = data;
+	if (data & ISR_MST)
+	{
+		if ((data & ISR_SSR_MASK) == ISR_START)
+		{
+			if ((m_i2c.status_register & ISR_SSR_MASK) == ISR_STOP || (m_i2c.status_register & ISR_SSR_MASK) == 0)
+			{
+				if (m_i2c_sdar_callback() && m_i2c.state == I2C_IDLE)
+				{
+					m_i2c.status_register = data;
+					if (data & ISR_PIN)
+					{
+						m_i2c_int = false;
+						update_ipl();
+					}
+					m_i2c.sda_out_state = false;
+					m_i2c_sdaw_callback(false);
+					m_i2c.clock_change_state = I2C_SCL_SET_0;
+					m_i2c.clocks = 10;
+					m_i2c.state = I2C_TX_IN_PROGRESS;
+					m_i2c.first_byte = true;
+					m_i2c.ack_or_nak_sent = false;
+					set_i2c_timer();
+					m_i2c.counter = 0;
+				}
+				else
+				{
+					m_i2c.status_register |= ISR_AL;
+					m_i2c.status_register &= ~ISR_PIN;
+					m_i2c_int = true;
+					update_ipl();
+				}
+			}
+			else if ((m_i2c.status_register & ISR_SSR_MASK) == ISR_MST)
+			{
+				m_i2c.status_register = data;
+				if (data & ISR_PIN)
+				{
+					m_i2c_int = false;
+					update_ipl();
+				}
+				m_i2c.sda_out_state = true;
+				m_i2c_sdaw_callback(true);
+				m_i2c.clock_change_state = I2C_SCL_SET_1;
+				m_i2c.clocks = 10;
+				m_i2c.state = I2C_SEND_RESTART;
+				m_i2c.first_byte = true;
+				m_i2c.ack_or_nak_sent = false;
+				set_i2c_timer();
+				m_i2c.counter = 0;
+			}
+		}
+		else if ((data & ISR_SSR_MASK) == ISR_STOP && m_i2c.status_register & ISR_BB)
+		{
+			// we should send STOP here, however, unkte06 in magicard appears to expect
+			// NAK followed by STOP when in read mode.
+			
+			if (data & ISR_PIN)
+			{
+				m_i2c_int = false;
+				update_ipl();
+			}
+
+			if (m_i2c.ack_or_nak_sent || (m_i2c.status_register & ISR_TRX))
+			{
+				m_i2c.state = I2C_SEND_STOP;
+				m_i2c.sda_out_state = false;
+				m_i2c_sdaw_callback(false);
+			}
+			else
+			{
+				m_i2c.ack_or_nak_sent = true;
+				m_i2c.sda_out_state = (m_i2c.control_register&ICR_ACK) ? false : true;
+				m_i2c_sdaw_callback(m_i2c.sda_out_state);
+				m_i2c.state = I2C_SEND_ACK_AND_STOP;
+				m_i2c.clocks = 2;
+			}
+			m_i2c.status_register = data | ISR_BB;
+			m_i2c.clock_change_state = I2C_SCL_SET_1;
+			set_i2c_timer();
+		}
+		else if ((data & ISR_SSR_MASK) == ISR_MST)
+		{
+			m_i2c.status_register = data;
+			if (data & ISR_PIN)
+			{
+				m_i2c_int = false;
+				update_ipl();
+			}
+		}
+		else
+		{
+			if (data & ISR_PIN && !(m_i2c.status_register&ISR_PIN))
+			{
+				if (m_i2c.state == I2C_CHANGED_TO_RX)
+				{
+					m_i2c.state = I2C_RX_IN_PROGRESS;
+					m_i2c.clock_change_state = I2C_SCL_SET_1;
+					m_i2c.status_register = data;
+					m_i2c_int = false;
+					update_ipl();
+					m_i2c.counter = 0;
+					m_i2c.clocks = 8;
+					set_i2c_timer();
+				}
+				else
+				{
+					m_i2c.ack_or_nak_sent = true;
+					m_i2c.sda_out_state = (m_i2c.control_register&ICR_ACK) ? false : true;
+					m_i2c_sdaw_callback(m_i2c.sda_out_state);
+					m_i2c.status_register = data;
+					m_i2c_int = false;
+					update_ipl();
+					m_i2c.state = I2C_SEND_ACK;
+					m_i2c.clock_change_state = I2C_SCL_SET_1;
+					m_i2c.clocks = 1;
+					set_i2c_timer();
+				}
+			}
+			else
+			{
+				m_i2c.status_register = data;
+				if (data & ISR_PIN)
+				{
+					m_i2c_int = false;
+					update_ipl();
+				}
+			}
+		}
+	}
+	else
+	{
+		m_i2c.status_register = data;
+		m_i2c_int = false;
+		update_ipl();
+		m_i2c.timer->adjust(attotime::never);
+		m_i2c_scl_callback(1);
+		m_i2c_sdaw_callback(1);
+		m_i2c.scl_out_state = true;
+		m_i2c.scl_in_state = true;
+		m_i2c.sda_out_state = true;
+		m_i2c.state = I2C_IDLE;
+	}
 }
 
 uint8_t scc68070_device::icr_r()
@@ -703,6 +972,17 @@ void scc68070_device::icr_w(uint8_t data)
 {
 	LOGMASKED(LOG_I2C, "%s: I2C Control Register Write: %02x\n", machine().describe_context(), data);
 	m_i2c.control_register = data;
+	
+	if (!(data & ICR_ESO))
+	{
+		m_i2c.timer->adjust(attotime::never);
+		m_i2c_scl_callback(1);
+		m_i2c_sdaw_callback(1);
+		m_i2c.scl_out_state = true;
+		m_i2c.scl_in_state = true;
+		m_i2c.sda_out_state = true;
+		m_i2c.state = I2C_IDLE;
+	}
 }
 
 uint8_t scc68070_device::iccr_r()
@@ -717,6 +997,200 @@ void scc68070_device::iccr_w(uint8_t data)
 {
 	LOGMASKED(LOG_I2C, "%s: I2C Clock Control Register Write: %02x\n", machine().describe_context(), data);
 	m_i2c.clock_control_register = data & 0x1f;
+}
+
+
+void scc68070_device::i2c_process_falling_scl()
+{
+	switch (m_i2c.state)
+	{
+		case I2C_TX_IN_PROGRESS:
+			if (m_i2c.counter<8)
+			{
+				m_i2c.sda_out_state = BIT(m_i2c.data_register, 7 - m_i2c.counter);
+				m_i2c_sdaw_callback(m_i2c.sda_out_state);
+				m_i2c.counter++;
+			}
+			else
+			{
+				m_i2c.sda_out_state = true;
+				m_i2c_sdaw_callback(true);
+				m_i2c.state = I2C_GET_ACK;
+			}
+			break;
+			
+		case I2C_GET_ACK:
+			m_i2c.status_register &= ~ISR_PIN;
+			m_i2c_int = true;
+			update_ipl();
+			m_i2c.state = I2C_IDLE;
+			if (m_i2c.first_byte)
+			{
+				m_i2c.first_byte = false;
+				if (BIT(m_i2c.data_register, 0))
+				{
+					m_i2c.status_register &= ~ISR_TRX;
+					if (!(m_i2c.status_register&ISR_LRB))
+					{
+						m_i2c.state = I2C_CHANGED_TO_RX;
+					}
+				}
+			}
+			break;
+
+		case I2C_RX_IN_PROGRESS:
+			if (m_i2c.counter >= 8)
+			{
+				m_i2c.status_register &= ~ISR_PIN;
+				m_i2c_int = true;
+				update_ipl();
+				m_i2c.state = I2C_RX_COMPLETE;
+			}
+			break;
+
+		case I2C_SEND_ACK_AND_RX:
+			m_i2c.sda_out_state = true;
+			m_i2c_sdaw_callback(true);
+			m_i2c.state = I2C_RX_IN_PROGRESS;
+			m_i2c.counter = 0;
+			break;
+
+		case I2C_SEND_ACK_AND_STOP:
+			m_i2c.sda_out_state = false;
+			m_i2c_sdaw_callback(false);
+			m_i2c.state = I2C_SEND_STOP;
+			break;
+
+		case I2C_SEND_ACK:
+			m_i2c.state = I2C_IDLE;
+			m_i2c.status_register &= ~ISR_PIN;
+			m_i2c_int = true;
+			update_ipl();
+			break;
+	}
+}
+
+void scc68070_device::i2c_process_rising_scl()
+{
+	switch (m_i2c.state)
+	{
+		case I2C_GET_ACK:
+			if (m_i2c_sdar_callback())
+			{
+				m_i2c.status_register |= ISR_LRB;
+			}
+			else
+			{
+				m_i2c.status_register &= ~ISR_LRB;
+			}
+			break;
+			
+		case I2C_SEND_STOP:
+		case I2C_SEND_RESTART:
+			m_i2c.timer->adjust(attotime::from_nsec(5000));
+			break;
+
+		case I2C_RX_IN_PROGRESS:
+			if (m_i2c.counter < 8)
+			{
+				m_i2c.data_register <<= 1;
+				m_i2c.data_register |= m_i2c_sdar_callback();
+				m_i2c.counter++;
+			}
+			break;
+	}
+}
+
+WRITE_LINE_MEMBER(scc68070_device::write_scl)
+{
+	if (m_i2c.status_register&ISR_MST)
+	{
+		if (m_i2c.scl_in_state != state && state)
+		{
+			i2c_process_rising_scl();
+			i2c_next_state();
+		}
+	}
+	m_i2c.scl_in_state = state;
+}
+
+TIMER_CALLBACK_MEMBER(scc68070_device::i2c_callback)
+{
+	i2c_next_state();
+}
+
+void scc68070_device::i2c_next_state()
+{
+	switch (m_i2c.clock_change_state)
+	{
+		case I2C_SCL_SET_0:
+			if (m_i2c.state == I2C_SEND_STOP)
+			{
+				if (!m_i2c.sda_out_state)
+				{
+					m_i2c.sda_out_state = true;
+					m_i2c_sdaw_callback(true);
+					set_i2c_timer();
+				}
+				else
+				{
+					m_i2c.state = I2C_IDLE;
+					m_i2c.status_register &= ~(ISR_PIN | ISR_BB);
+					m_i2c_int = true;
+					update_ipl();
+					m_i2c.clock_change_state = I2C_SCL_IDLE;
+				}
+			}
+			else if (m_i2c.state == I2C_SEND_RESTART)
+			{
+				m_i2c.sda_out_state = false;
+				m_i2c_sdaw_callback(false);
+				set_i2c_timer();
+				m_i2c.clock_change_state = I2C_SCL_SET_0;
+				m_i2c.state = I2C_TX_IN_PROGRESS;
+			}
+			else
+			{
+				m_i2c.scl_out_state = false;
+				m_i2c_scl_callback(false);
+				if (m_i2c.clocks)
+				{
+					m_i2c.clocks--;
+				}
+				if (m_i2c.clocks == 0)
+				{
+					m_i2c.clock_change_state = I2C_SCL_IDLE;
+				}
+				else
+				{
+					set_i2c_timer();
+					m_i2c.clock_change_state = I2C_SCL_SET_1;
+				}
+				i2c_process_falling_scl();
+			}
+			break;
+			
+		case I2C_SCL_SET_1:
+			m_i2c.clock_change_state = I2C_SCL_WAIT_1;
+			m_i2c.scl_out_state = true;
+			m_i2c_scl_callback(true);
+			break;
+			
+		case I2C_SCL_WAIT_1:
+			set_i2c_timer();
+			m_i2c.clock_change_state = I2C_SCL_SET_0;
+			break;
+	}
+}
+
+void scc68070_device::set_i2c_timer()
+{
+	// divider offset 0 entry is illegal
+	const int divider[]={    1,   78,   90,  102,  126,  150,  174,    198,
+						   246,  294,  342,  390,  486,  582,  678,    774,
+						   996, 1158, 1350, 1542, 1926, 2310, 2694,   3078,
+						  3846, 4614, 5382, 6150, 7686, 9222, 10758, 12294 } ;
+	m_i2c.timer->adjust(cycles_to_attotime(divider[m_i2c.clock_control_register]));
 }
 
 uint8_t scc68070_device::umr_r()
@@ -870,7 +1344,8 @@ uint16_t scc68070_device::timer_r(offs_t offset, uint16_t mem_mask)
 	case 0x4/2:
 		if (!machine().side_effects_disabled())
 			LOGMASKED(LOG_TIMERS, "%s: Timer 0 Read: %04x & %04x\n", machine().describe_context(), m_timers.timer0, mem_mask);
-		return m_timers.timer0;
+		return 0x10000 - (attotime_to_cycles(m_timers.timer0_timer->remaining()) / 96);
+
 	case 0x6/2:
 		if (!machine().side_effects_disabled())
 			LOGMASKED(LOG_TIMERS, "%s: Timer 1 Read: %04x & %04x\n", machine().describe_context(), m_timers.timer1, mem_mask);
@@ -908,6 +1383,7 @@ void scc68070_device::timer_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x2/2:
 		LOGMASKED(LOG_TIMERS, "%s: Timer Reload Register Write: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 		COMBINE_DATA(&m_timers.reload_register);
+		set_timer_callback(0);
 		break;
 	case 0x4/2:
 		LOGMASKED(LOG_TIMERS, "%s: Timer 0 Write: %04x & %04x\n", machine().describe_context(), data, mem_mask);

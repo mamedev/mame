@@ -29,14 +29,17 @@ TODO:
 #include "cpu/m68000/m68000.h"
 
 
-#define ISR_MST     0x80    // Master
-#define ISR_TRX     0x40    // Transmitter
-#define ISR_BB      0x20    // Busy
-#define ISR_PIN     0x10    // No Pending Interrupt
-#define ISR_AL      0x08    // Arbitration Lost
-#define ISR_AAS     0x04    // Addressed As Slave
-#define ISR_AD0     0x02    // Address Zero
-#define ISR_LRB     0x01    // Last Received Bit
+#define ISR_MST         0x80                        // Master
+#define ISR_TRX         0x40                        // Transmitter
+#define ISR_BB          0x20                        // Busy
+#define ISR_PIN         0x10                        // No Pending Interrupt
+#define ISR_AL          0x08                        // Arbitration Lost
+#define ISR_AAS         0x04                        // Addressed As Slave
+#define ISR_AD0         0x02                        // Address Zero
+#define ISR_LRB         0x01                        // Last Received Bit
+#define	ISR_SSR_MASK    (ISR_MST | ISR_TRX | ISR_BB)// Mask for detecting start/stop/restart
+#define	ISR_START       (ISR_MST | ISR_TRX | ISR_BB)// Start bit request
+#define	ISR_STOP        (ISR_MST | ISR_TRX)			// Stop bit request
 
 #define UMR_OM          0xc0
 #define UMR_OM_NORMAL   0x00
@@ -141,6 +144,9 @@ public:
 	auto iack7_callback() { return m_iack7_callback.bind(); }
 	auto uart_tx_callback() { return m_uart_tx_callback.bind(); }
 	auto uart_rtsn_callback() { return m_uart_rtsn_callback.bind(); }
+	auto i2c_scl_w() { return m_i2c_scl_callback.bind(); }
+	auto i2c_sda_w() { return m_i2c_sdaw_callback.bind(); }
+	auto i2c_sda_r() { return m_i2c_sdar_callback.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(in2_w);
 	DECLARE_WRITE_LINE_MEMBER(in4_w);
@@ -149,9 +155,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int1_w);
 	DECLARE_WRITE_LINE_MEMBER(int2_w);
 
+	DECLARE_WRITE_LINE_MEMBER(write_scl);
+
 	TIMER_CALLBACK_MEMBER(timer0_callback);
 	TIMER_CALLBACK_MEMBER(rx_callback);
 	TIMER_CALLBACK_MEMBER(tx_callback);
+	TIMER_CALLBACK_MEMBER(i2c_callback);
 
 	// external callbacks
 	void uart_rx(uint8_t data);
@@ -170,6 +179,17 @@ public:
 		uint8_t control_register;
 		uint8_t reserved;
 		uint8_t clock_control_register;
+		emu_timer* timer;
+		bool scl_out_state;
+		bool scl_in_state;
+		bool sda_out_state;
+		bool sda_in_state;
+		uint8_t clock_change_state;
+		uint8_t clocks;
+		uint8_t state;
+		uint8_t counter;
+		bool first_byte;
+		bool ack_or_nak_sent;
 	};
 
 	struct uart_regs_t
@@ -298,6 +318,10 @@ private:
 	void icr_w(uint8_t data);
 	uint8_t iccr_r();
 	void iccr_w(uint8_t data);
+	void set_i2c_timer();
+	void i2c_process_falling_scl();
+	void i2c_process_rising_scl();
+	void i2c_next_state();
 
 	// UART interface
 	uint8_t umr_r();
@@ -336,6 +360,9 @@ private:
 	devcb_read8 m_iack7_callback;
 	devcb_write8 m_uart_tx_callback;
 	devcb_write_line m_uart_rtsn_callback;
+	devcb_write_line m_i2c_scl_callback;
+	devcb_write_line m_i2c_sdaw_callback;
+	devcb_read8 m_i2c_sdar_callback;
 
 	// internal state
 	uint8_t m_ipl;
