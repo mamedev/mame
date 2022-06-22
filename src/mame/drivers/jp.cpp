@@ -3,7 +3,7 @@
 /******************************************************************************************************
 
 PINBALL
-Juegos Populares
+Juegos Populares / Automáticos Montecarlo
 
 All manuals are in Spanish.
 Schematic has a number of errors and omissions, so referring to PinMAME.
@@ -742,5 +742,11 @@ GAME(1986,  aqualand,  0,        jps, jp, jp_state, empty_init, ROT0, "Juegos Po
 GAME(1986,  aqualanda, aqualand, jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Aqualand (set 2)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1986,  america,   0,        jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "America 1492",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1986,  olympus,   0,        jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Olympus (Juegos Populares)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1987,  lortium,   0,        jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Lortium",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(19??,  pimbal,    0,        jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Pimbal (Pinball 3000)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+
+/* Juan Paredes, the founder of Juegos Populares (and Petaco before that), started another pinball company named Automáticos Montecarlo (with another
+   partner named Rosés) just before closing Juegos Populares because of economic issues, and trasferred some of the intelectual property from one company
+   to the other. Automáticos Montecarlo manufactured two pinballs just relabeling Juegos Populares machines (using the same ROMs), Lortium and Pimball
+   (Pimball was a reissue with improved hardware of Quijote, also from Juegos Populares), and started a completely new pinball design named Mediterráneo,
+   which couldn't be finished, as Juan Paredes died on a traffic accident when the proyect was on a very preliminary stage. */
+GAME(1987,  lortium,   0,        jp,  jp, jp_state, empty_init, ROT0, u8"Juegos Populares / Automáticos Montecarlo", "Lortium",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(19??,  pimbal,    0,        jp,  jp, jp_state, empty_init, ROT0, u8"Juegos Populares / Automáticos Montecarlo", "Pimbal (Pinball 3000)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
