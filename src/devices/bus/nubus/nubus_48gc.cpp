@@ -14,6 +14,9 @@
 
 #include <algorithm>
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 #define VRAM_SIZE  (0x200000)  // 2 megs, maxed out
 
@@ -67,6 +70,16 @@ const tiny_rom_entry *nubus_824gc_device::device_rom_region() const
 	return ROM_NAME( gc824 );
 }
 
+//-------------------------------------------------
+//  palette_entries - entries in color palette
+//-------------------------------------------------
+
+uint32_t jmfb_device::palette_entries() const
+{
+	return 256;
+}
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -77,9 +90,12 @@ const tiny_rom_entry *nubus_824gc_device::device_rom_region() const
 
 jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is824) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
-	m_screen(nullptr), m_timer(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_stride(0), m_base(0), m_count(0), m_clutoffs(0), m_xres(0), m_yres(0),
+	device_video_interface(mconfig, *this),
+	device_palette_interface(mconfig, *this),
+	m_timer(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_stride(0), m_base(0),
+	m_count(0), m_clutoffs(0),
+	m_xres(0), m_yres(0),
 	m_is824(is824)
 {
 	set_screen(*this, GC48_SCREEN_NAME);
@@ -115,7 +131,6 @@ void jmfb_device::device_start()
 	nubus().install_device(slotspace+0x200000, slotspace+0x2003ff, read32s_delegate(*this, FUNC(jmfb_device::mac_48gc_r)), write32s_delegate(*this, FUNC(jmfb_device::mac_48gc_w)));
 
 	m_timer = timer_alloc(FUNC(jmfb_device::vbl_tick), this);
-	m_screen = nullptr;    // can we look this up now?
 }
 
 //-------------------------------------------------
@@ -134,7 +149,8 @@ void jmfb_device::device_reset()
 	m_yres = 480;
 	m_mode = 0;
 	std::fill(m_vram.begin(), m_vram.end(), 0);
-	memset(m_palette, 0, sizeof(m_palette));
+
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 /***************************************************************************
@@ -150,19 +166,12 @@ TIMER_CALLBACK_MEMBER(jmfb_device::vbl_tick)
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + (m_base << 5);
-
-	// first time?  kick off the VBL timer
-	if (!m_screen)
-	{
-		m_screen = &screen;
-		m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
-	}
 
 	switch (m_mode)
 	{
@@ -174,14 +183,14 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					uint8_t const pixels = vram8[(y * m_stride * 4) + x];
 
-					*scanline++ = m_palette[BIT(pixels, 7)];
-					*scanline++ = m_palette[BIT(pixels, 6)];
-					*scanline++ = m_palette[BIT(pixels, 5)];
-					*scanline++ = m_palette[BIT(pixels, 4)];
-					*scanline++ = m_palette[BIT(pixels, 3)];
-					*scanline++ = m_palette[BIT(pixels, 2)];
-					*scanline++ = m_palette[BIT(pixels, 1)];
-					*scanline++ = m_palette[BIT(pixels, 0)];
+					*scanline++ = pen_color(BIT(pixels, 7));
+					*scanline++ = pen_color(BIT(pixels, 6));
+					*scanline++ = pen_color(BIT(pixels, 5));
+					*scanline++ = pen_color(BIT(pixels, 4));
+					*scanline++ = pen_color(BIT(pixels, 3));
+					*scanline++ = pen_color(BIT(pixels, 2));
+					*scanline++ = pen_color(BIT(pixels, 1));
+					*scanline++ = pen_color(BIT(pixels, 0));
 				}
 			}
 			break;
@@ -194,10 +203,10 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					uint8_t const pixels = vram8[(y * m_stride * 4) + x];
 
-					*scanline++ = m_palette[(pixels>>6)&0x3];
-					*scanline++ = m_palette[(pixels>>4)&0x3];
-					*scanline++ = m_palette[(pixels>>2)&0x3];
-					*scanline++ = m_palette[pixels&3];
+					*scanline++ = pen_color(BIT(pixels, 6, 2));
+					*scanline++ = pen_color(BIT(pixels, 4, 2));
+					*scanline++ = pen_color(BIT(pixels, 2, 2));
+					*scanline++ = pen_color(BIT(pixels, 0, 2));
 				}
 			}
 			break;
@@ -210,8 +219,8 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					uint8_t const pixels = vram8[(y * m_stride * 4) + x];
 
-					*scanline++ = m_palette[(pixels>>4)&0xf];
-					*scanline++ = m_palette[pixels&0xf];
+					*scanline++ = pen_color(BIT(pixels, 4, 4));
+					*scanline++ = pen_color(BIT(pixels, 0, 4));
 				}
 			}
 			break;
@@ -223,7 +232,7 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				for (int x = 0; x < m_xres; x++)
 				{
 					uint8_t const pixels = vram8[(y * m_stride * 4) + x];
-					*scanline++ = m_palette[pixels];
+					*scanline++ = pen_color(pixels);
 				}
 			}
 			break;
@@ -245,30 +254,30 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void jmfb_device::mac_48gc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_registers[offset&0xff]);
+	COMBINE_DATA(&m_registers[offset & 0xff]);
 
 	switch (offset)
 	{
-		case 0x8/4: // base
-//          printf("%x to base\n", data);
+		case 0x008/4: // base
+			LOG("%s: %x to base\n", machine().describe_context(), data);
 			m_base = data;
 			break;
 
 		case 0x00c/4: // stride
-//          printf("%x to stride\n", data);
+			LOG("%s: %x to stride\n", machine().describe_context(), data);
 			// this value is in DWORDs for 1-8 bpp and, uhh, strange for 24bpp
 			m_stride = data;
 			break;
 
 		case 0x200/4:   // DAC control
-//          printf("%08x to DAC control\n", data);
+			LOG("%s: %08x to DAC control\n", machine().describe_context(), data);
 			if (m_is824)
 			{
-				m_clutoffs = data&0xff;
+				m_clutoffs = data & 0xff;
 			}
 			else
 			{
-				m_clutoffs = data>>24;
+				m_clutoffs = data >> 24;
 			}
 			m_count = 0;
 			break;
@@ -276,17 +285,17 @@ void jmfb_device::mac_48gc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case 0x204/4:   // DAC data
 			if (m_is824)
 			{
-				m_colors[m_count++] = data&0xff;
+				m_colors[m_count++] = data & 0xff;
 			}
 			else
 			{
-				m_colors[m_count++] = data>>24;
+				m_colors[m_count++] = data >> 24;
 			}
 
 			if (m_count == 3)
 			{
-//              printf("RAMDAC: color %d = %02x %02x %02x\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2]);
-				m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
+				LOG("%s: RAMDAC: color %d = %02x %02x %02x\n", machine().describe_context(), m_clutoffs, m_colors[0], m_colors[1], m_colors[2]);
+				set_pen_color(m_clutoffs, rgb_t(m_colors[0], m_colors[1], m_colors[2]));
 				m_clutoffs++;
 				m_count = 0;
 			}

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "nubus.h"
+#include "supermac.h"
 
 
 //**************************************************************************
@@ -49,24 +50,21 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	static void crtc_w(int16_t &param, uint32_t offset, uint32_t data);
-
 	required_ioport m_userosc;
 	emu_timer *m_timer;
+
+	supermac_spec_crtc m_crtc;
+	supermac_spec_shift_reg m_shiftreg;
 
 	std::vector<uint32_t> m_vram;
 	uint32_t m_mode, m_vbl_disable;
 	uint32_t m_colors[3], m_count, m_clutoffs;
 
 	uint8_t m_osc;
-	int16_t m_hsync, m_hstart, m_hend, m_htotal;
-	int16_t m_vsync, m_vstart, m_vend, m_vtotal;
 	bool m_interlace;
 
 	uint16_t m_hpan, m_vpan;
 	uint8_t m_zoom;
-
-	uint8_t m_param_bit, m_param_sel, m_param_val;
 
 	bool m_vbl_pending;
 };

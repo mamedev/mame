@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, Vas Crabb
 #ifndef MAME_BUS_NUBUS_NUBUS_SPECPDQ_H
 #define MAME_BUS_NUBUS_NUBUS_SPECPDQ_H
 
 #pragma once
 
 #include "nubus.h"
+#include "supermac.h"
 
 
 //**************************************************************************
@@ -32,6 +33,7 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// palette implementation
 	virtual uint32_t palette_entries() const override;
@@ -44,18 +46,29 @@ private:
 	uint32_t vram_r(offs_t offset, uint32_t mem_mask = ~0);
 	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
+	void update_crtc();
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	required_ioport m_userosc;
 	emu_timer *m_timer;
+
+	supermac_spec_crtc m_crtc;
+	supermac_spec_shift_reg m_shiftreg;
 
 	std::vector<uint32_t> m_vram;
 	uint32_t m_mode, m_vbl_disable;
 	uint32_t m_colors[3], m_count, m_clutoffs;
 
+	uint16_t m_stride;
+	uint16_t m_vint;
+	uint8_t m_hdelay;
+	uint8_t m_osc;
+
 	uint32_t m_7xxxxx_regs[0x100000/4];
 	uint32_t m_width, m_height, m_patofsx, m_patofsy;
 	uint32_t m_vram_addr, m_vram_src;
-	uint8_t m_fillbytes[256];
+	uint32_t m_pattern[64];
 };
 
 

@@ -15,8 +15,9 @@
 
 class jmfb_device :
 		public device_t,
+		public device_nubus_card_interface,
 		public device_video_interface,
-		public device_nubus_card_interface
+		public device_palette_interface
 {
 protected:
 	// construction/destruction
@@ -30,6 +31,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	// palette implementation
+	uint32_t palette_entries() const override;
+
 	TIMER_CALLBACK_MEMBER(vbl_tick);
 
 private:
@@ -38,12 +42,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	screen_device *m_screen;
 	emu_timer *m_timer;
 
 	std::vector<uint32_t> m_vram;
 	uint32_t m_mode, m_vbl_disable, m_toggle, m_stride, m_base;
-	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
+	uint32_t m_colors[3], m_count, m_clutoffs;
 	uint32_t m_registers[0x100];
 	int m_xres, m_yres;
 	const bool m_is824;
