@@ -51,6 +51,8 @@
 	*  hap (12-Feb-2017) Ver 1.16                                              *
 	*   - Added basic support for the old GI PIC1650 and PIC1655.              *
 	*   - Made RTCC(aka T0CKI) pin an inputline handler.                       *
+	*  pa (12-Jun-2022) Ver 1.17                                               *
+	*   - Port callback functions pass tristate value in mem_mask.             *
 	*                                                                          *
 	*                                                                          *
 	*  **** Notes: ****                                                        *
@@ -449,7 +451,7 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 					}
 					else if (m_picmodel != 0x1655) { /* A is input-only on 1655 */
 						data &= 0x0f; /* 4-bit port (only lower 4 bits used) */
-						m_write_a(PIC16C5x_PORTA, data & (uint8_t)(~m_TRISA), 0xff);
+						m_write_a(PIC16C5x_PORTA, data & (uint8_t)(~m_TRISA) & 0x0f, (uint8_t)(~m_TRISA) & 0x0f);
 					}
 					PORTA = data;
 					break;
@@ -458,7 +460,7 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 						m_write_b(PIC16C5x_PORTB, data, 0xff);
 					}
 					else {
-						m_write_b(PIC16C5x_PORTB, data & (uint8_t)(~m_TRISB), 0xff);
+						m_write_b(PIC16C5x_PORTB, data & (uint8_t)(~m_TRISB), (uint8_t)(~m_TRISB));
 					}
 					PORTB = data;
 					break;
@@ -467,7 +469,7 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data)    /* Write to in
 						m_write_c(PIC16C5x_PORTC, data, 0xff);
 					}
 					else if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
-						m_write_c(PIC16C5x_PORTC, data & (uint8_t)(~m_TRISC), 0xff);
+						m_write_c(PIC16C5x_PORTC, data & (uint8_t)(~m_TRISC), (uint8_t)(~m_TRISC));
 					}
 					PORTC = data; /* also writes to RAM */
 					break;
@@ -756,12 +758,12 @@ void pic16c5x_device::tris()
 	switch(m_opcode.b.l & 0x7)
 	{
 		case 5:     if   (m_TRISA == m_W) break;
-					else { m_TRISA = m_W | 0xf0; m_write_a(PIC16C5x_PORTA, PORTA & (uint8_t)(~m_TRISA) & 0x0f, 0xff); break; }
+					else { m_TRISA = m_W | 0xf0; m_write_a(PIC16C5x_PORTA, PORTA & (uint8_t)(~m_TRISA) & 0x0f, (uint8_t)(~m_TRISA) & 0x0f); break; }
 		case 6:     if   (m_TRISB == m_W) break;
-					else { m_TRISB = m_W; m_write_b(PIC16C5x_PORTB, PORTB & (uint8_t)(~m_TRISB), 0xff); break; }
+					else { m_TRISB = m_W; m_write_b(PIC16C5x_PORTB, PORTB & (uint8_t)(~m_TRISB), (uint8_t)(~m_TRISB)); break; }
 		case 7:     if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
 						if   (m_TRISC == m_W) break;
-						else { m_TRISC = m_W; m_write_c(PIC16C5x_PORTC, PORTC & (uint8_t)(~m_TRISC), 0xff); break; }
+						else { m_TRISC = m_W; m_write_c(PIC16C5x_PORTC, PORTC & (uint8_t)(~m_TRISC), (uint8_t)(~m_TRISC)); break; }
 					}
 					else {
 						illegal(); break;
