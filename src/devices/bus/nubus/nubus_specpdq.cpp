@@ -4,24 +4,22 @@
 
   SuperMac Spectrum PDQ video card
 
-  Accelerated only in 256 color mode.  Accleration is not yet emulated
-  properly (pattern fill works but has glitches).  Use in B&W or 16 colors
-  for full functionality right now.
+  Accelerated only in 256 color mode.
 
   blitter info:
 
-  ctrl 1 = ?
-  ctrl 2 = low 3 bits of Y position in bits 3-5, low 3 bits of X position in bits 0-2
-  ctrl 3 = width
-  ctrl 4 = height
-  ctrl 5 = ?
-  ctrl 6 = VRAM offset * 4
-  ctrl 7 = command/execute (00000002 for pattern fill, 00000100 for copy)
+  06 = ?
+  07 = command - 002 = pattern fill, 100/101 = copy forward/backward
+  08 = pattern offset - X in bits 0-2, Y in bits 3-6
+  09 = VRAM destination * 4
+  0a = VRAM source * 4
+  0b = height (inclusive)
+  0e = width (exclusive)
 
   Busy flag at Fs800000 (bit 8)
 
-  There is 256 bytes of pattern RAM arranged as 32 pixels horizontally by 8
-  vertically.
+  There is 256 bytes of pattern RAM arranged as 32 pixels horizontally by
+  8 vertically.
 
 ***************************************************************************/
 
@@ -500,95 +498,99 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 
 		// blitter control
 		case 0x182006:
-			LOG("%08x (%d) to blitter ctrl 1 %s rectangle\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
-			break;
-
-		case 0x182008:
-			LOG("%08x (%d) to blitter ctrl 2 %s rectangle\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
-			m_patofsx = (data ^ 0xffffffff) & 7;
-			m_patofsy = ((data ^ 0xffffffff)>>3) & 7;
-			break;
-
-		case 0x18200e:
-			LOG("%08x (%d) to blitter ctrl 3 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
-			m_width = data ^ 0xffffffff;
-			break;
-
-		case 0x18200b:
-			LOG("%08x (%d) to blitter ctrl 4 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
-			m_height = (data ^ 0xffffffff) & 0xffff;
-			break;
-
-		case 0x18200a:
-			data ^= 0xffffffff;
-			LOG("%08x to blitter ctrl 5 %s\n", data, machine().describe_context());
-			m_vram_src = data>>2;
-			break;
-
-		case 0x182009:
-			data ^= 0xffffffff;
-			LOG("%08x to blitter ctrl 6 %s\n", data, machine().describe_context());
-			m_vram_addr = data>>2;
+			data = ~data;
+			LOG("%08x (%d) to blitter ctrl 1 %s rectangle\n", data, data, machine().describe_context());
 			break;
 
 		case 0x182007:
-			data ^= 0xffffffff;
-			LOG("%08x to blitter ctrl 7 %s\n", data, machine().describe_context());
+			data = ~data;
+			LOG("%s: %08x to blitter command\n", machine().describe_context(), data);
 
-			// fill rectangle
 			if (data == 2)
 			{
-				auto const vram8 = util::big_endian_cast<uint8_t>(&m_vram[0]) + m_vram_addr;
-				auto const fillbytes = util::big_endian_cast<uint8_t const>(m_pattern);
-
-				LOG("Fill rectangle with %02x %02x %02x %02x, adr %x (%d, %d) width %d height %d delta %d %d\n", fillbytes[0], fillbytes[1], fillbytes[2], fillbytes[3], m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_width, m_height, m_patofsx, m_patofsy);
-
+				// fill rectangle
+				auto const source = util::big_endian_cast<uint8_t const>(m_pattern);
+				auto dest = util::big_endian_cast<uint8_t>(&m_vram[0]) + m_vram_addr;
+				uint32_t const patofsx = (m_vram_addr & 0x3) + m_patofsx;
+				LOG("Fill rectangle with %02x %02x %02x %02x, adr %x (%d, %d) width %d height %d delta %d %d\n", source[0], source[1], source[2], source[3], m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_width, m_height, m_patofsx, m_patofsy);
 				for (int y = 0; y <= m_height; y++)
 				{
-					for (int x = 0; x <= m_width; x++)
+					for (int x = 0; x < m_width; x++)
 					{
-						vram8[(y * 1152)+x] = fillbytes[((m_patofsx + x) & 0x1f)+(((m_patofsy + y) & 0x7) << 5)];
+						dest[x] = source[(((m_patofsy + y) & 0x7) << 5) + ((patofsx + x) & 0x1f)];
 					}
+					dest += m_stride * 4;
 				}
 			}
 			else if (data == 0x100)
 			{
-				auto const vram8 = util::big_endian_cast<uint8_t>(&m_vram[0]) + m_vram_addr;
-				auto const vramsrc8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + m_vram_src;
-
 				LOG("Copy rectangle forwards, width %d height %d dst %x (%d, %d) src %x (%d, %d)\n", m_width, m_height, m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_vram_src, m_vram_src % 1152, m_vram_src / 1152);
-
+				auto source = util::big_endian_cast<uint8_t const>(&m_vram[0]) + m_vram_src;
+				auto dest = util::big_endian_cast<uint8_t>(&m_vram[0]) + m_vram_addr;
 				for (int y = 0; y <= m_height; y++)
 				{
-					for (int x = 0; x <= m_width; x++)
+					for (int x = 0; x < m_width; x++)
 					{
-						vram8[(y * 1152)+x] = vramsrc8[(y * 1152)+x];
+						dest[x] = source[x];
 					}
+					source += m_stride * 4;
+					dest += m_stride * 4;
 				}
 			}
 			else if (data == 0x101)
 			{
-				auto const vram8 = util::big_endian_cast<uint8_t>(&m_vram[0]) + m_vram_addr;
-				auto const vramsrc8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + m_vram_src;
-
 				LOG("Copy rectangle backwards, width %d height %d dst %x (%d, %d) src %x (%d, %d)\n", m_width, m_height, m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_vram_src, m_vram_src % 1152, m_vram_src / 1152);
-
-				for (int y = 0; y < m_height; y++)
+				auto source = util::big_endian_cast<uint8_t const>(&m_vram[0]) + m_vram_src;
+				auto dest = util::big_endian_cast<uint8_t>(&m_vram[0]) + m_vram_addr;
+				for (int y = 0; y <= m_height; y++)
 				{
 					for (int x = 0; x < m_width; x++)
 					{
-						vram8[(-y * 1152)-x] = vramsrc8[(-y * 1152)-x];
+						dest[-x] = source[-x];
 					}
+					source -= m_stride * 4;
+					dest -= m_stride * 4;
 				}
 			}
 			else
 			{
-				LOG("Unknown blitter command %08x\n", data);
+				logerror("Unknown blitter command %08x\n", data);
 			}
 			break;
 
+		case 0x182008:
+			data = ~data;
+			LOG("%s: %08x (%d) to blitter ctrl 2 rectangle\n", machine().describe_context(), data, data);
+			m_patofsx = BIT(data, 0, 3);
+			m_patofsy = BIT(data, 3, 3);
+			break;
+
+		case 0x182009:
+			data = ~data;
+			LOG("%s: %08x to blitter destination\n", machine().describe_context(), data);
+			m_vram_addr = data >> 2;
+			break;
+
+		case 0x18200a:
+			data = ~data;
+			LOG("%s: %08x to blitter source\n", machine().describe_context(), data);
+			m_vram_src = data >> 2;
+			break;
+
+		case 0x18200b:
+			data = ~data;
+			LOG("%s: %08x (%d) to blitter height\n", machine().describe_context(), data, data);
+			m_height = data & 0xffff;
+			break;
+
+		case 0x18200e:
+			data = ~data;
+			LOG("%s: %08x (%d) to blitter width\n", machine().describe_context(), data, data);
+			m_width = data;
+			break;
+
 		default:
-			LOG("specpdq_w: %08x @ %x (mask %08x  %s)\n", data^0xffffffff, offset, mem_mask, machine().describe_context());
+			LOG("%s: specpdq_w: %08x @ %x (mask %08x)\n", machine().describe_context(), data^0xffffffff, offset, mem_mask);
 			break;
 	}
 }
@@ -610,7 +612,7 @@ uint32_t nubus_specpdq_device::specpdq_r(offs_t offset, uint32_t mem_mask)
 			 * Measured:
 			 *   55.00 MHz  64    detected as 55.00 MHz
 			 *   57.28 MHz   1    detected as 55.00 MHz
-			 *   64.00 MHz   9    detected as 52.28 MHz
+			 *   64.00 MHz   9    detected as 57.28 MHz
 			 */
 			return ~((u32(m_crtc.v_pos(screen())) << (BIT(offset, 1) ? 16 : 24)) & 0xff000000);
 	}
