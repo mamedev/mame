@@ -46,6 +46,10 @@ private:
 	uint32_t vram_r(offs_t offset, uint32_t mem_mask = ~0);
 	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
+	void blitter_pattern_fill();
+	void blitter_copy_forward();
+	void blitter_copy_backward();
+
 	void update_crtc();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -65,10 +69,13 @@ private:
 	uint8_t m_hdelay;
 	uint8_t m_osc;
 
-	uint32_t m_7xxxxx_regs[0x100000/4];
-	uint32_t m_width, m_height, m_patofsx, m_patofsy;
-	uint32_t m_vram_addr, m_vram_src;
-	uint32_t m_pattern[64];
+	uint16_t m_blit_stride;
+	uint32_t m_blit_src, m_blit_dst;
+	uint32_t m_blit_width, m_blit_height;
+	uint8_t m_blit_patoffs;
+	uint32_t m_blit_pat[64];
+
+	uint32_t m_7xxxxx_regs[0x100000 / 4];
 };
 
 

@@ -21,10 +21,18 @@
   There is 256 bytes of pattern RAM arranged as 32 pixels horizontally by
   8 vertically.
 
+  TODO:
+  * Having no alternate oscillator installed is not emulated.
+  * Work out how active line length is configured.
+  * Alternate oscillator calibration is currently failing.  Fixing this
+    probably requires a complete cycle-accurate Mac II.
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "nubus_specpdq.h"
+
+#include "layout/generic.h"
 #include "screen.h"
 
 #include <algorithm>
@@ -33,10 +41,10 @@
 #include "logmacro.h"
 
 
-#define SPECPDQ_SCREEN_NAME "specpdq_screen"
+#define SPECPDQ_SCREEN_NAME "screen"
 #define SPECPDQ_ROM_REGION  "specpdq_rom"
 
-#define VRAM_SIZE   (0x400000)
+#define VRAM_SIZE   (0x40'0000)
 
 
 static INPUT_PORTS_START( specpdq )
@@ -65,9 +73,12 @@ DEFINE_DEVICE_TYPE(NUBUS_SPECPDQ, nubus_specpdq_device, "nb_spdq", "SuperMac Spe
 
 void nubus_specpdq_device::device_add_mconfig(machine_config &config)
 {
+	config.set_default_layout(layout_monitors);
+
 	screen_device &screen(SCREEN(config, SPECPDQ_SCREEN_NAME, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(nubus_specpdq_device::screen_update));
 	screen.set_raw(100.000_MHz_XTAL, 1'456, 108, 1'260, 915, 39, 909);
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 }
 
 //-------------------------------------------------
@@ -118,9 +129,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device
 	device_palette_interface(mconfig, *this),
 	m_userosc(*this, "USEROSC"),
 	m_timer(nullptr),
-	m_mode(0), m_vbl_disable(0),
-	m_count(0), m_clutoffs(0),
-	m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0)
+	m_mode(0)
 {
 	set_screen(*this, SPECPDQ_SCREEN_NAME);
 }
@@ -155,14 +164,14 @@ void nubus_specpdq_device::device_start()
 	save_item(NAME(m_vint));
 	save_item(NAME(m_hdelay));
 	save_item(NAME(m_osc));
+	save_item(NAME(m_blit_stride));
+	save_item(NAME(m_blit_src));
+	save_item(NAME(m_blit_dst));
+	save_item(NAME(m_blit_width));
+	save_item(NAME(m_blit_height));
+	save_item(NAME(m_blit_patoffs));
+	save_item(NAME(m_blit_pat));
 	save_item(NAME(m_7xxxxx_regs));
-	save_item(NAME(m_width));
-	save_item(NAME(m_height));
-	save_item(NAME(m_patofsx));
-	save_item(NAME(m_patofsy));
-	save_item(NAME(m_vram_addr));
-	save_item(NAME(m_vram_src));
-	save_item(NAME(m_pattern));
 }
 
 //-------------------------------------------------
@@ -180,18 +189,21 @@ void nubus_specpdq_device::device_reset()
 	std::fill(std::begin(m_colors), std::end(m_colors), 0);
 	m_count = 0;
 	m_clutoffs = 0;
-	m_stride = 512 / 4;
+
+	m_stride = 0;
 	m_vint = 0;
 	m_hdelay = 0;
 	m_osc = 0;
 
+	m_blit_stride = 0;
+	m_blit_src = 0;
+	m_blit_dst = 0;
+	m_blit_width = 0;
+	m_blit_height = 0;
+	m_blit_patoffs = 0;
+	std::fill(std::begin(m_blit_pat), std::end(m_blit_pat), 0);
+
 	std::fill(std::begin(m_7xxxxx_regs), std::end(m_7xxxxx_regs), 0);
-	m_width = 0;
-	m_height = 0;
-	m_patofsx = 0;
-	m_patofsy = 0;
-	m_vram_addr = 0;
-	m_vram_src = 0;
 }
 
 
@@ -202,10 +214,7 @@ TIMER_CALLBACK_MEMBER(nubus_specpdq_device::vbl_tick)
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(
-			screen().time_until_pos(
-				m_vint + m_crtc.v_start() - 1,
-				m_crtc.h_total(16) - m_crtc.h_sync(16)));
+	m_timer->adjust(screen().time_until_pos(m_vint));
 }
 
 /***************************************************************************
@@ -272,10 +281,7 @@ void nubus_specpdq_device::update_crtc()
 				active,
 				m_crtc.frame_time(16, oscillator));
 
-		m_timer->adjust(
-				screen().time_until_pos(
-					m_vint + m_crtc.v_start() - 1,
-					m_crtc.h_total(16) - m_crtc.h_sync(16)));
+		m_timer->adjust(screen().time_until_pos(m_vint + m_crtc.v_start() - 1));
 	}
 }
 
@@ -410,7 +416,7 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 	else if ((offset >= 0x181000) && (offset <= 0x18103f))
 	{
 		// 256 pixels worth at 8 bpp
-		m_pattern[offset & 0x3f] = ~data;
+		m_blit_pat[offset & 0x3f] = ~data;
 	}
 	else switch (offset)
 	{
@@ -424,7 +430,6 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 
 		case 0xc0054:
 		case 0xc0056:
-			// same value written here and to c007a:c0078
 			m_stride &= BIT(offset, 1) ? 0x00ff : 0xff00;
 			m_stride |= (~data & 0xff000000) >> (BIT(offset, 1) ? 16 : 24);
 			LOG("%s: %u to stride\n", machine().describe_context(), m_stride);
@@ -449,6 +454,13 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 			LOG("%s: %u to hdelay\n", machine().describe_context(), ~data & 0xff);
 			m_hdelay = ~data & 0xff;
 			update_crtc();
+			break;
+
+		case 0xc0078:
+		case 0xc007a:
+			m_blit_stride &= BIT(offset, 1) ? 0x00ff : 0xff00;
+			m_blit_stride |= (~data & 0xff000000) >> (BIT(offset, 1) ? 16 : 24);
+			LOG("%s: %u to blitter stride\n", machine().describe_context(), m_blit_stride);
 			break;
 
 		case 0x120000:  // DAC address
@@ -496,7 +508,6 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 			m_shiftreg.write_control(*this, data);
 			break;
 
-		// blitter control
 		case 0x182006:
 			data = ~data;
 			LOG("%08x (%d) to blitter ctrl 1 %s rectangle\n", data, data, machine().describe_context());
@@ -505,55 +516,18 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 		case 0x182007:
 			data = ~data;
 			LOG("%s: %08x to blitter command\n", machine().describe_context(), data);
-
-			if (data == 2)
+			switch (data)
 			{
-				// fill rectangle
-				auto const source = util::big_endian_cast<uint8_t const>(m_pattern);
-				auto dest = util::big_endian_cast<uint8_t>(&m_vram[0]) + m_vram_addr;
-				uint32_t const patofsx = (m_vram_addr & 0x3) + m_patofsx;
-				LOG("Fill rectangle with %02x %02x %02x %02x, adr %x (%d, %d) width %d height %d delta %d %d\n", source[0], source[1], source[2], source[3], m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_width, m_height, m_patofsx, m_patofsy);
-				for (int y = 0; y <= m_height; y++)
-				{
-					for (int x = 0; x < m_width; x++)
-					{
-						dest[x] = source[(((m_patofsy + y) & 0x7) << 5) + ((patofsx + x) & 0x1f)];
-					}
-					dest += m_stride * 4;
-				}
-			}
-			else if (data == 0x100)
-			{
-				LOG("Copy rectangle forwards, width %d height %d dst %x (%d, %d) src %x (%d, %d)\n", m_width, m_height, m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_vram_src, m_vram_src % 1152, m_vram_src / 1152);
-				auto source = util::big_endian_cast<uint8_t const>(&m_vram[0]) + m_vram_src;
-				auto dest = util::big_endian_cast<uint8_t>(&m_vram[0]) + m_vram_addr;
-				for (int y = 0; y <= m_height; y++)
-				{
-					for (int x = 0; x < m_width; x++)
-					{
-						dest[x] = source[x];
-					}
-					source += m_stride * 4;
-					dest += m_stride * 4;
-				}
-			}
-			else if (data == 0x101)
-			{
-				LOG("Copy rectangle backwards, width %d height %d dst %x (%d, %d) src %x (%d, %d)\n", m_width, m_height, m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_vram_src, m_vram_src % 1152, m_vram_src / 1152);
-				auto source = util::big_endian_cast<uint8_t const>(&m_vram[0]) + m_vram_src;
-				auto dest = util::big_endian_cast<uint8_t>(&m_vram[0]) + m_vram_addr;
-				for (int y = 0; y <= m_height; y++)
-				{
-					for (int x = 0; x < m_width; x++)
-					{
-						dest[-x] = source[-x];
-					}
-					source -= m_stride * 4;
-					dest -= m_stride * 4;
-				}
-			}
-			else
-			{
+			case 0x002:
+				blitter_pattern_fill();
+				break;
+			case 0x100:
+				blitter_copy_forward();
+				break;
+			case 0x101:
+				blitter_copy_backward();
+				break;
+			default:
 				logerror("Unknown blitter command %08x\n", data);
 			}
 			break;
@@ -561,32 +535,31 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 		case 0x182008:
 			data = ~data;
 			LOG("%s: %08x (%d) to blitter ctrl 2 rectangle\n", machine().describe_context(), data, data);
-			m_patofsx = BIT(data, 0, 3);
-			m_patofsy = BIT(data, 3, 3);
+			m_blit_patoffs = (data >> 3) & 0x1fff;
 			break;
 
 		case 0x182009:
 			data = ~data;
 			LOG("%s: %08x to blitter destination\n", machine().describe_context(), data);
-			m_vram_addr = data >> 2;
+			m_blit_dst = (data >> 2) & 0x3fffff;
 			break;
 
 		case 0x18200a:
 			data = ~data;
 			LOG("%s: %08x to blitter source\n", machine().describe_context(), data);
-			m_vram_src = data >> 2;
+			m_blit_src = (data >> 2) & 0x3fffff;
 			break;
 
 		case 0x18200b:
 			data = ~data;
 			LOG("%s: %08x (%d) to blitter height\n", machine().describe_context(), data, data);
-			m_height = data & 0xffff;
+			m_blit_height = data;
 			break;
 
 		case 0x18200e:
 			data = ~data;
 			LOG("%s: %08x (%d) to blitter width\n", machine().describe_context(), data, data);
-			m_width = data;
+			m_blit_width = data;
 			break;
 
 		default:
@@ -614,7 +587,7 @@ uint32_t nubus_specpdq_device::specpdq_r(offs_t offset, uint32_t mem_mask)
 			 *   57.28 MHz   1    detected as 55.00 MHz
 			 *   64.00 MHz   9    detected as 57.28 MHz
 			 */
-			return ~((u32(m_crtc.v_pos(screen())) << (BIT(offset, 1) ? 16 : 24)) & 0xff000000);
+			return ~((u32(screen().vpos()) << (BIT(offset, 1) ? 16 : 24)) & 0xff000000);
 	}
 
 	if (offset >= 0xc0000 && offset < 0x100000)
@@ -634,4 +607,59 @@ void nubus_specpdq_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mas
 uint32_t nubus_specpdq_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
 	return ~m_vram[offset];
+}
+
+void nubus_specpdq_device::blitter_pattern_fill()
+{
+	auto const source = util::big_endian_cast<uint8_t const>(m_blit_pat);
+	auto const dest = util::big_endian_cast<uint8_t>(&m_vram[0]);
+	uint32_t const patofsx = m_blit_dst & 0x3;
+	uint32_t const stride = m_blit_stride * 4;
+	LOG("Fill rectangle with %02x %02x %02x %02x, adr %x (%d, %d) width %d height %d delta %d\n",
+			source[0], source[1], source[2], source[3],
+			m_blit_dst, m_blit_dst % (m_blit_stride * 4), m_blit_dst / (m_blit_stride * 4),
+			m_blit_width, m_blit_height, m_blit_patoffs);
+	for (int y = 0; y <= m_blit_height; y++)
+	{
+		for (int x = 0; x < m_blit_width; x++)
+		{
+			dest[(m_blit_dst + (y * stride) + x) & (VRAM_SIZE - 1)] = source[(((m_blit_patoffs + y) & 0x7) << 5) | ((patofsx + x) & 0x1f)];
+		}
+	}
+}
+
+void nubus_specpdq_device::blitter_copy_forward()
+{
+	LOG("Copy rectangle forwards, width %d height %d dst %x (%d, %d) src %x (%d, %d)\n",
+			m_blit_width, m_blit_height,
+			m_blit_dst, m_blit_dst % (m_blit_stride * 4), m_blit_dst / (m_blit_stride * 4),
+			m_blit_src, m_blit_src % (m_blit_stride * 4), m_blit_src / (m_blit_stride * 4));
+	auto const source = util::big_endian_cast<uint8_t const>(&m_vram[0]);
+	auto const dest = util::big_endian_cast<uint8_t>(&m_vram[0]);
+	uint32_t const stride = m_blit_stride * 4;
+	for (int y = 0; y <= m_blit_height; y++)
+	{
+		for (int x = 0; x < m_blit_width; x++)
+		{
+			dest[(m_blit_dst + (y * stride) + x) & (VRAM_SIZE - 1)] = source[(m_blit_src + (y * stride) + x) & (VRAM_SIZE - 1)];
+		}
+	}
+}
+
+void nubus_specpdq_device::blitter_copy_backward()
+{
+	LOG("Copy rectangle backwards, width %d height %d dst %x (%d, %d) src %x (%d, %d)\n",
+			m_blit_width, m_blit_height,
+			m_blit_dst, m_blit_dst % (m_blit_stride * 4), m_blit_dst / (m_blit_stride * 4),
+			m_blit_src, m_blit_src % (m_blit_stride * 4), m_blit_src / (m_blit_stride * 4));
+	auto const source = util::big_endian_cast<uint8_t const>(&m_vram[0]);
+	auto const dest = util::big_endian_cast<uint8_t>(&m_vram[0]);
+	uint32_t const stride = m_blit_stride * 4;
+	for (int y = 0; y <= m_blit_height; y++)
+	{
+		for (int x = 0; x < m_blit_width; x++)
+		{
+			dest[(m_blit_dst - (y * stride) - x) & (VRAM_SIZE - 1)] = source[(m_blit_src - (y * stride) - x) & (VRAM_SIZE - 1)];
+		}
+	}
 }

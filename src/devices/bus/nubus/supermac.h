@@ -24,9 +24,9 @@ public:
 	uint32_t h_active(uint32_t scale) const noexcept
 	{ return (m_hend - m_hstart) * scale; }
 	uint32_t h_start(uint32_t scale) const noexcept
-	{ return (m_hstart - m_hsync) * scale; }
+	{ return (m_hstart + 1) * scale; }
 	uint32_t h_end(uint32_t scale) const noexcept
-	{ return (m_hend - m_hsync) * scale; }
+	{ return (m_hend + 1) * scale; }
 
 	uint16_t v_sync() const noexcept
 	{ return m_vsync + 1; }
@@ -35,14 +35,12 @@ public:
 	uint32_t v_active() const noexcept
 	{ return (m_vend - m_vstart); }
 	uint16_t v_start() const noexcept
-	{ return m_vstart - m_vsync; }
+	{ return m_vstart + 1; }
 	uint16_t v_end() const noexcept
-	{ return m_vend - m_vsync; }
+	{ return m_vend + 1; }
 
 	attoseconds_t frame_time(uint32_t scale, XTAL const &osc) const noexcept
 	{ return attotime::from_ticks((m_htotal + 1) * (m_vtotal + 1) * scale, osc).attoseconds(); }
-
-	int v_pos(screen_device const &screen) const;
 
 private:
 	uint16_t m_hsync, m_hstart, m_hend, m_htotal;

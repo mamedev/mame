@@ -59,6 +59,9 @@
 // screenless layouts
 #include "noscreens.lh"
 
+// single screen layouts
+#include "monitors.lh"
+
 // dual screen layouts
 #include "dualhsxs.lh"
 #include "dualhovu.lh"

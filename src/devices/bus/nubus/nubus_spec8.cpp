@@ -21,17 +21,34 @@
   Configuration settings, you need to zap the PRAM before it will be
   recognised properly.
 
+  Set breakpoint at 0x2d1e on Mac II with Ver. 1.3 card in slot 9 to catch
+  user oscillator measurement.  See the measured value in D0.b when
+  PC = 0x2d6c.
+
+  Expected:
+     2- 5    57.28 MHz
+     6-19    bad
+    20-22    14.32 MHz
+    23-24    15.67 MHz
+    25-27    17.73 MHz
+    27-      bad
+
+  Measured:
+    14.32 MHz  20
+    15.67 MHz  23
+    17.73 MHz  26
+    57.28 MHz   5
+
   TODO:
   * Having no oscillator installed at Y1 is not emulated.
   * Interlaced modes are not understood.
-  * There are lines of garbage at the bottom of the screen in some high-
-    resolution modes (bottom of the virtual desktop if virtual desktop is
-    enabled).
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "nubus_spec8.h"
+
+#include "layout/generic.h"
 #include "screen.h"
 
 #include <algorithm>
@@ -40,10 +57,10 @@
 #include "logmacro.h"
 
 
-#define SPEC8S3_SCREEN_NAME "spec8s3_screen"
+#define SPEC8S3_SCREEN_NAME "screen"
 #define SPEC8S3_ROM_REGION  "spec8s3_rom"
 
-#define VRAM_SIZE   (0xc0000)   // 768k of VRAM for 1024x768 @ 8 bit
+#define VRAM_SIZE   (0x10'0000) // 1M of VRAM for 1024x768 @ 8 bit
 
 
 static INPUT_PORTS_START( spec8s3 )
@@ -79,9 +96,12 @@ DEFINE_DEVICE_TYPE(NUBUS_SPEC8S3, nubus_spec8s3_device, "nb_sp8s3", "SuperMac Sp
 
 void nubus_spec8s3_device::device_add_mconfig(machine_config &config)
 {
+	config.set_default_layout(layout_monitors);
+
 	screen_device &screen(SCREEN(config, SPEC8S3_SCREEN_NAME, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(nubus_spec8s3_device::screen_update));
 	screen.set_raw(80.000_MHz_XTAL, 332*4, 64*4, 320*4, 804, 33, 801);
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 }
 
 //-------------------------------------------------
@@ -496,38 +516,10 @@ uint32_t nubus_spec8s3_device::spec8s3_r(offs_t offset, uint32_t mem_mask)
 		case 0x382c:
 		case 0x382e:
 			{
-				/*
-				 * Set breakpoint at 0x2d1e on Mac II with Ver. 1.3 card in
-				 * slot 9 to catch user oscillator measurement.  See the
-				 * measured value in D0.b when PC = 0x2d6c.
-				 *
-				 * Expected:
-				 *    2- 5    57.28 MHz
-				 *    6-19    bad
-				 *   20-22    14.32 MHz
-				 *   23-24    15.67 MHz
-				 *   25-27    17.73 MHz
-				 *   27-      bad
-				 *
-				 * Measured:
-				 *   14.32 MHz  20
-				 *   15.67 MHz  23
-				 *   17.73 MHz  26
-				 *   57.28 MHz   5
-				 */
-				int vpos;
+				// hack for interlace modes because screen_device doesn't support them
+				int vpos = screen().vpos();
 				if (m_interlace)
-				{
-					// hack for interlace modes because screen_device doesn't support them
-					vpos = screen().vpos() - (m_crtc.v_sync() * 2);
-					if (vpos >= (m_crtc.v_total() * 2))
-						vpos -= m_crtc.v_total() * 2;
 					vpos /= 2;
-				}
-				else
-				{
-					vpos = m_crtc.v_pos(screen());
-				}
 				return ~((vpos >> (BIT(offset, 1) ? 8 : 0)) & 0xff);
 			}
 

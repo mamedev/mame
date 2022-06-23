@@ -14,14 +14,15 @@
 #include "emu.h"
 #include "includes/mac.h"
 
+#include "machine/macadb.h"
+
+#include "bus/nscsi/devices.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
-#include "formats/ap_dsk35.h"
 #include "machine/applepic.h"
 #include "machine/iwm.h"
 #include "machine/swim1.h"
 #include "machine/swim2.h"
-#include "bus/nscsi/devices.h"
 
 // NuBus and 030/040 PDS cards
 #include "bus/nubus/nubus_48gc.h"
@@ -44,10 +45,12 @@
 #include "bus/nubus/pds30_30hr.h"
 #include "bus/nubus/pds30_mc30.h"
 
-#include "machine/macadb.h"
+#include "layout/generic.h"
 #include "softlist_dev.h"
 #include "speaker.h"
-#include "mac.lh"
+
+#include "formats/ap_dsk35.h"
+
 
 #define C32M    (31.3344_MHz_XTAL)
 #define C15M    (C32M/2)
@@ -928,7 +931,7 @@ void mac_state::maclc(machine_config &config, bool cpu, bool egret, asc_device::
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macv8));
 	m_screen->screen_vblank().set(FUNC(mac_state::mac_rbv_vbl));
-	config.set_default_layout(layout_mac);
+	config.set_default_layout(layout_monitors);
 
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("4M,6M,8M,10M");
@@ -1134,7 +1137,7 @@ void mac_state::maciici(machine_config &config)
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbv));
 	m_screen->screen_vblank().set(FUNC(mac_state::mac_rbv_vbl));
-	config.set_default_layout(layout_mac);
+	config.set_default_layout(layout_monitors);
 
 	/* internal ram */
 	m_ram->set_default_size("2M");
@@ -1158,7 +1161,7 @@ void mac_state::maciisi(machine_config &config)
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macrbv));
 	m_screen->screen_vblank().set(FUNC(mac_state::mac_rbv_vbl));
-	config.set_default_layout(layout_mac);
+	config.set_default_layout(layout_monitors);
 
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("4M,8M,16M,32M,48M,64M,128M");

@@ -131,13 +131,6 @@ bool supermac_spec_crtc::valid(device_t &device) const
 }
 
 
-int supermac_spec_crtc::v_pos(screen_device const &screen) const
-{
-	int const vpos = screen.vpos() + m_vsync + 1;
-	return (vpos <= m_vtotal) ? vpos : (vpos - m_vtotal - 1);
-}
-
-
 void supermac_spec_shift_reg::register_save(device_t &device)
 {
 	device.save_item(NAME(m_shift_data));

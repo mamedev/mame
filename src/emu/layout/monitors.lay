@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<view name="4:3 Standard">
+		<screen tag="screen">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+	</view>
+	<view name="3:4 Portrait">
+		<screen tag="screen">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</screen>
+	</view>
+	<view name="5:4 Two-Page">
+		<screen tag="screen">
+			<bounds left="0" top="0" right="5" bottom="4" />
+		</screen>
+	</view>
+	<view name="16:9 Widescreen">
+		<screen tag="screen">
+			<bounds left="0" top="0" right="16" bottom="9" />
+		</screen>
+	</view>
+	<view name="21:9 UltraWide">
+		<screen tag="screen">
+			<bounds left="0" top="0" right="21" bottom="9" />
+		</screen>
+	</view>
+	<view name="32:9 Super UltraWide">
+		<screen tag="screen">
+			<bounds left="0" top="0" right="32" bottom="9" />
+		</screen>
+	</view>
+	<view name="1:1 Air Traffic Control">
+		<screen tag="screen">
+			<bounds left="0" top="0" right="32" bottom="9" />
+		</screen>
+	</view>
+</mamelayout>
