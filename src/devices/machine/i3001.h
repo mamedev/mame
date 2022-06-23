@@ -54,7 +54,7 @@ public:
 	void fc_w(uint8_t fc);
 
 	// Write Flag Input
-	DECLARE_WRITE_LINE_MEMBER(fi_w) { m_fi = state; }
+	void fi_w(bool state) { m_fi = state; }
 
 	// Read Flag Output
 	DECLARE_READ_LINE_MEMBER(fo_r) { return m_fo; }
@@ -64,11 +64,11 @@ public:
 	DECLARE_READ_LINE_MEMBER(zero_r) { return m_zero; }
 
 	// Output callbacks
-	auto fo_w() { return m_fo_handler.bind(); }
+	template <typename... T> void set_fo_w_cb(T &&... args) { m_fo_handler.set(std::forward<T>(args)...); }
 
 	// Input callbacks
-	auto px_r() { return m_px_handler.bind(); }
-	auto sx_r() { return m_sx_handler.bind(); }
+	template <typename... T> void set_px_r_cb(T &&... args) { m_px_handler.set(std::forward<T>(args)...); }
+	template <typename... T> void set_sx_r_cb(T &&... args) { m_sx_handler.set(std::forward<T>(args)...); }
 
 	// Load address (in real hw address is loaded through PX/SX buses)
 	void addr_w(uint16_t addr) { m_addr = addr & ADDR_MASK; }
@@ -80,9 +80,9 @@ protected:
 	virtual void device_start() override;
 
 private:
-	devcb_write_line m_fo_handler;
-	devcb_read8 m_px_handler;
-	devcb_read8 m_sx_handler;
+	device_delegate<void (bool)> m_fo_handler;
+	device_delegate<uint8_t (void)> m_px_handler;
+	device_delegate<uint8_t (void)> m_sx_handler;
 
 	uint16_t m_addr;
 	uint8_t m_pr;

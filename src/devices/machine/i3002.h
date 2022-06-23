@@ -68,10 +68,10 @@ public:
 	void fc_kbus_w(uint8_t fc , uint8_t k);
 
 	// Write Carry Input
-	DECLARE_WRITE_LINE_MEMBER(ci_w) { m_ci = state != 0; }
+	void ci_w(bool state) { m_ci = state; }
 
 	// Write Left Input
-	DECLARE_WRITE_LINE_MEMBER(li_w) { m_li = state != 0; }
+	void li_w(bool state) { m_li = state; }
 
 	// Read Carry Output
 	DECLARE_READ_LINE_MEMBER(co_r) const { return m_co; }
@@ -80,12 +80,12 @@ public:
 	DECLARE_READ_LINE_MEMBER(ro_r) const { return m_ro; }
 
 	// Output callbacks
-	auto co_w() { return m_co_handler.bind(); }
-	auto ro_w() { return m_ro_handler.bind(); }
+	template <typename... T> void set_co_w_cb(T &&... args) { m_co_handler.set(std::forward<T>(args)...); }
+	template <typename... T> void set_ro_w_cb(T &&... args) { m_ro_handler.set(std::forward<T>(args)...); }
 
 	// Input bus callbacks
-	auto ibus_r() { return m_ibus_handler.bind(); }
-	auto mbus_r() { return m_mbus_handler.bind(); }
+	template <typename... T> void set_ibus_r_cb(T &&... args) { m_ibus_handler.set(std::forward<T>(args)...); }
+	template <typename... T> void set_mbus_r_cb(T &&... args) { m_mbus_handler.set(std::forward<T>(args)...); }
 
 	// Read output buses
 	uint8_t abus_r() const { return m_reg[ REG_MAR ]; }
@@ -106,10 +106,10 @@ protected:
 	virtual void device_start() override;
 
 private:
-	devcb_write_line m_co_handler;
-	devcb_write_line m_ro_handler;
-	devcb_read8 m_ibus_handler;
-	devcb_read8 m_mbus_handler;
+	device_delegate<void (bool)> m_co_handler;
+	device_delegate<void (bool)> m_ro_handler;
+	device_delegate<uint8_t (void)> m_ibus_handler;
+	device_delegate<uint8_t (void)> m_mbus_handler;
 
 	uint8_t m_reg[ REG_COUNT ];
 	uint8_t m_fc;
