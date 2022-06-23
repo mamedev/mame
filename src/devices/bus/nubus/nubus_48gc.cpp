@@ -7,8 +7,6 @@
       w/different ROMs and RAMDACs, apparently)
 
   TODO:
-  * Proper clock generation to calculate frame rate - it's pretty easy to
-    find where it's writing PLL parameters.
   * Work out why some monitors need magic multiply or divide by two to
     get the right RAMDAC clock - inferring it from the reference clock
     modulus is definitely wrong.
@@ -92,11 +90,9 @@ void jmfb_device::device_add_mconfig(machine_config &config)
 
 	screen_device &screen(SCREEN(config, GC48_SCREEN_NAME, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(jmfb_device::screen_update));
-	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
-//  screen.set_size(1152, 870);
-//  screen.set_visarea(0, 1152-1, 0, 870-1);
-//  screen.set_refresh_hz(75);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(1260));
+	screen.set_raw(20_MHz_XTAL / 21 * 127 / 4, 864, 0, 640, 525, 0, 480);
+	//screen.set_raw(20_MHz_XTAL / 19 * 190 / 2, 1'456, 0, 1'152, 915, 0, 870);
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 }
 
 //-------------------------------------------------
@@ -214,6 +210,7 @@ void jmfb_device::device_start()
 	save_item(NAME(m_vbporch));
 	save_item(NAME(m_vsync));
 	save_item(NAME(m_vfporch));
+	save_item(NAME(m_multiplier));
 	save_item(NAME(m_modulus));
 	save_item(NAME(m_pdiv));
 }
@@ -266,6 +263,7 @@ void jmfb_device::device_reset()
 	m_vbporch = 78;
 	m_vsync = 6;
 	m_vfporch = 6;
+	m_multiplier = 190;
 	m_modulus = 19;
 	m_pdiv = 1;
 }
@@ -283,7 +281,8 @@ TIMER_CALLBACK_MEMBER(jmfb_device::vbl_tick)
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(screen().time_until_pos(479, 0), 0);
+	// TODO: determine correct timing for vertical blanking interrupt
+	m_timer->adjust(screen().time_until_pos(screen().visible_area().bottom()));
 }
 
 uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -379,10 +378,12 @@ void jmfb_device::update_crtc()
 {
 	int const vtotal = (m_vactive + m_vbporch + m_vsync + m_vfporch) / 2;
 	int const height = m_vactive / 2;
-	if (vtotal && height)
+	if (vtotal && height && m_multiplier)
 	{
+		// FIXME: where does this multiply/divide by 2 come from?
+		// This is obviously not correct by any definition.
 		int scale = 0;
-		switch (m_modulus) // FIXME: hacky - I'm missing something
+		switch (m_modulus)
 		{
 		case 15:
 			scale = -1;
@@ -421,14 +422,14 @@ void jmfb_device::update_crtc()
 				width >>= 2;
 				break;
 		}
-		rectangle const active(0, width - 1, 0, height - 1);
+		XTAL const pixclock = 20_MHz_XTAL / m_modulus * m_multiplier / (1 << m_pdiv);
 		screen().configure(
 				htotal, vtotal,
-				active,
-				HZ_TO_ATTOSECONDS(75)); // FIXME: not correct in any sense
+				rectangle(0, width - 1, 0, height - 1),
+				attotime::from_ticks(htotal * vtotal, pixclock).attoseconds());
 
-		// TODO: work out how this is configured
-		m_timer->adjust(screen().time_until_pos(height - 1, 0), 0);
+		// TODO: determine correct timing for vertical blanking interrupt
+		m_timer->adjust(screen().time_until_pos(height - 1, 0));
 	}
 }
 
@@ -539,6 +540,16 @@ void jmfb_device::jmfb_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 
+		case 0x300/4:
+		case 0x304/4:
+		case 0x308/4:
+		case 0x30c/4:
+			m_multiplier &= ~(0x0f << ((offset & 3) * 4));
+			m_multiplier |= (data & 0x0f) << ((offset & 3) * 4);
+			LOG("%s: %d to multiplier\n", machine().describe_context(), m_multiplier);
+			update_crtc();
+			break;
+
 		case 0x310/4:
 		case 0x314/4:
 		case 0x318/4:
@@ -551,7 +562,7 @@ void jmfb_device::jmfb_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 		case 0x324/4:
 			LOG("%s: 1<<%d to pixel cell divider\n", machine().describe_context(), data);
-			m_pdiv = data;
+			m_pdiv = data & 0x0f;
 			update_crtc();
 			break;
 

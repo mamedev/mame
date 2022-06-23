@@ -62,6 +62,7 @@ private:
 
 	uint16_t m_hactive, m_hbporch, m_hsync, m_hfporch;
 	uint16_t m_vactive, m_vbporch, m_vsync, m_vfporch;
+	uint16_t m_multiplier;
 	uint16_t m_modulus;
 	uint8_t m_pdiv;
 };
