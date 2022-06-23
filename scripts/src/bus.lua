@@ -2002,6 +2002,8 @@ if (BUSES["PC_KBD"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc_kbd/pc_kbdc.h",
 		MAME_DIR .. "src/devices/bus/pc_kbd/keyboards.cpp",
 		MAME_DIR .. "src/devices/bus/pc_kbd/keyboards.h",
+		MAME_DIR .. "src/devices/bus/pc_kbd/cherry_mx1500.cpp",
+		MAME_DIR .. "src/devices/bus/pc_kbd/cherry_mx1500.h",
 		MAME_DIR .. "src/devices/bus/pc_kbd/ec1841.cpp",
 		MAME_DIR .. "src/devices/bus/pc_kbd/ec1841.h",
 		MAME_DIR .. "src/devices/bus/pc_kbd/iskr1030.cpp",

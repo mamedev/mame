@@ -28,6 +28,7 @@ void pc_xt_keyboards(device_slot_interface &device);
 #define STR_KBD_IBM_PC_AT_84        "pcat"
 #define STR_KBD_IBM_3270PC_122      "3270pc"
 #define STR_KBD_IBM_PC_AT_101       "pcat101"
+#define STR_KBD_CHERRY_G80_1500     "g80_1500"
 
 void pc_at_keyboards(device_slot_interface &device);
 
