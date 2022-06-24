@@ -75,8 +75,10 @@ public:
 		{}
 
 		const fs::manager_t *manager() const { return m_manager; }
+		const floppy_image_format_t *type() { return m_type; }
 		const char *name() const { return m_name; }
 		const char *description() const { return m_description; }
+		u32 image_size() const { return m_image_size; }
 	};
 
 	// construction/destruction

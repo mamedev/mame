@@ -564,56 +564,6 @@ void lua_engine::attach_notifiers()
 }
 
 //-------------------------------------------------
-
-namespace
-{
-	class my_floppy_enumerator : public fs::manager_t::floppy_enumerator
-	{
-	public:
-		my_floppy_enumerator(const floppy_image &image)
-			: m_image(image)
-			, m_sector_image_format(nullptr)
-		{
-		}
-
-		virtual void add(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override
-		{
-			// did we already figure it out?  if so bail
-			if (m_fsblk)
-				return;
-
-			// is this a new format type?  if so, load it
-			if (m_sector_image_format != &type)
-			{
-				m_sector_image_format = &type;
-				m_sector_image.clear();
-				util::random_read_write_fill_wrapper<util::vector_read_write_adapter<u8>, 0xff> io(m_sector_image);
-				m_sector_image_format->save(io, std::vector<uint32_t>(), (floppy_image *) & m_image);
-			}
-
-			// if we found the right size, use it
-			if (m_sector_image.size() == image_size)
-			{
-				m_fsblk = std::make_unique<fs::fsblk_vec_owned_t>(std::move(m_sector_image));
-				m_sector_image_format = nullptr;
-			}
-		}
-
-		virtual void add_raw(const char *name, u32 key, const char *description) override
-		{
-			// do nothing
-		}
-
-		std::unique_ptr<fs::fsblk_t> m_fsblk;
-
-	private:
-		const floppy_image				m_image;
-		std::vector<u8>					m_sector_image;
-		const floppy_image_format_t *	m_sector_image_format;
-	};
-};
-
-//-------------------------------------------------
 //  initialize - initialize lua hookup to emu engine
 //-------------------------------------------------
 
@@ -1690,12 +1640,6 @@ void lua_engine::initialize()
 			uint32_t form_factor = image.get_form_factor();
 			return s_floppy_form_factor_parser(form_factor);
 		};
-	floppy_image_type["save_to_fsblk"] = [](const floppy_image &image, fs::manager_t const &fs)
-		{
-			my_floppy_enumerator fenum(image);
-			fs.enumerate_f(fenum, image.get_form_factor(), std::vector<u32>());
-			return std::move(fenum.m_fsblk);
-		};
 
 	auto floppy_image_format_type = sol().registry().new_usertype<floppy_image_format_t>("floppy_image_format", sol::no_constructor);
 	floppy_image_format_type["name"] = sol::property(&floppy_image_format_t::name);
@@ -1715,6 +1659,16 @@ void lua_engine::initialize()
 			if (!format.load(*io, form_factor, std::vector<uint32_t>(), img.get()))
 				img.reset();
 			return img;
+		};
+	floppy_image_format_type["save"] = [](floppy_image_format_t &format, floppy_image &image)
+		{
+			std::vector<u8> sector_image;
+			util::random_read_write_fill_wrapper<util::vector_read_write_adapter<u8>, 0xff> io(sector_image);
+
+			bool success = format.save(io, std::vector<uint32_t>(), &image);
+			return success
+				? std::string((const char *)&sector_image[0], sector_image.size())
+				: std::optional<std::string>();
 		};
 
 	/*  FS meta_data
@@ -1777,6 +1731,15 @@ void lua_engine::initialize()
 	fs_manager_type["directory_meta_description"] = sol::property(&fs::manager_t::directory_meta_description);
 	fs_manager_type["mount"] = &fs::manager_t::mount;
 
+	// HACK - putting this on emu
+	emu["fsblk_from_bytes"] = [](std::string_view sector_bytes)
+		{
+			std::vector<u8> vec;
+			vec.insert(vec.begin(), (const u8 *)&sector_bytes[0], (const u8 *)&sector_bytes[0] + sector_bytes.size());
+			std::shared_ptr<fs::fsblk_t> result = std::make_shared<fs::fsblk_vec_owned_t>(std::move(vec));
+			return result;
+		};
+
 	auto fs_filesystem_type = sol().registry().new_usertype<fs::filesystem_t>("filesystem_t", sol::no_constructor);
 	fs_filesystem_type["root"] = sol::property(&fs::filesystem_t::root);
 
@@ -1796,8 +1759,10 @@ void lua_engine::initialize()
 
 	auto floppy_fs_type = sol().registry().new_usertype<floppy_image_device::fs_info>("floppy_fs_info", sol::no_constructor);
 	floppy_fs_type["manager"] = sol::property(&floppy_image_device::fs_info::manager);
+	floppy_fs_type["type"] = sol::property(&floppy_image_device::fs_info::type);
 	floppy_fs_type["name"] = sol::property(&floppy_image_device::fs_info::name);
 	floppy_fs_type["description"] = sol::property(&floppy_image_device::fs_info::description);
+	floppy_fs_type["image_size"] = sol::property(&floppy_image_device::fs_info::image_size);
 
 	auto floppy_type = sol().registry().new_usertype<floppy_image_device>(
 		"floppy",
