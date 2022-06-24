@@ -104,7 +104,7 @@ namespace plib {
 	class fp_signal_enabler
 	{
 	public:
-		explicit fp_signal_enabler(unsigned fpexceptions);
+		explicit fp_signal_enabler(unsigned fp_exceptions);
 
 		PCOPYASSIGNMOVE(fp_signal_enabler, delete)
 

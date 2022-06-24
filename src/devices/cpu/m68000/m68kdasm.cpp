@@ -718,30 +718,40 @@ std::string m68k_disassembler::d68020_bfclr()
 
 std::string m68k_disassembler::d68020_bfexts()
 {
-	auto limit = limit_cpu_types(M68020_PLUS);
+	auto const limit = limit_cpu_types(M68020_PLUS);
 	if(limit.first)
 		return limit.second;
 
-	u16 extension = read_imm_16();
+	u16 const extension = read_imm_16();
 
-	std::string offset = BIT(extension, 11) ? util::string_format("D%d", (extension>>6)&7) : util::string_format("%d", (extension>>6)&31);
+	std::string const offset = BIT(extension, 11)
+			? util::string_format("D%d", (extension >> 6) & 7)
+			: util::string_format("%d", (extension >> 6) & 31);
 
-	std::string width = BIT(extension, 5) ? util::string_format("D%d", extension&7) : util::string_format("%d", m_5bit_data_table[extension&31]);
-	return util::string_format("bfexts  D%d, %s {%s:%s}; (2+)", (extension>>12)&7, get_ea_mode_str_8(m_cpu_ir), offset, width);
+	std::string const width = BIT(extension, 5)
+			? util::string_format("D%d", extension & 7)
+			: util::string_format("%d", m_5bit_data_table[extension & 31]);
+
+	return util::string_format("bfexts  %s {%s:%s}, D%d; (2+)", get_ea_mode_str_8(m_cpu_ir), offset, width, (extension >> 12) & 7);
 }
 
 std::string m68k_disassembler::d68020_bfextu()
 {
-	auto limit = limit_cpu_types(M68020_PLUS);
+	auto const limit = limit_cpu_types(M68020_PLUS);
 	if(limit.first)
 		return limit.second;
 
-	u16 extension = read_imm_16();
+	u16 const extension = read_imm_16();
 
-	std::string offset = BIT(extension, 11) ? util::string_format("D%d", (extension>>6)&7) : util::string_format("%d", (extension>>6)&31);
+	std::string const offset = BIT(extension, 11)
+			? util::string_format("D%d", (extension >> 6) & 7)
+			: util::string_format("%d", (extension >> 6) & 31);
 
-	std::string width = BIT(extension, 5) ? util::string_format("D%d", extension&7) : util::string_format("%d", m_5bit_data_table[extension&31]);
-	return util::string_format("bfextu  D%d, %s {%s:%s}; (2+)", (extension>>12)&7, get_ea_mode_str_8(m_cpu_ir), offset, width);
+	std::string const width = BIT(extension, 5)
+			? util::string_format("D%d", extension & 7)
+			: util::string_format("%d", m_5bit_data_table[extension & 31]);
+
+	return util::string_format("bfextu  %s {%s:%s}, D%d; (2+)", get_ea_mode_str_8(m_cpu_ir), offset, width, (extension >> 12) & 7);
 }
 
 std::string m68k_disassembler::d68020_bfffo()
@@ -3133,7 +3143,7 @@ std::string m68k_disassembler::d68040_fbcc_32()
 
 const m68k_disassembler::opcode_struct m68k_disassembler::m_opcode_info[] =
 {
-/*  opcode handler             mask    match   ea mask */
+/*  opcode handler                             mask    match   ea mask */
 	{&m68k_disassembler::d68000_1010         , 0xf000, 0xa000, 0x000},
 	{&m68k_disassembler::d68000_1111         , 0xf000, 0xf000, 0x000},
 	{&m68k_disassembler::d68000_abcd_rr      , 0xf1f8, 0xc100, 0x000},

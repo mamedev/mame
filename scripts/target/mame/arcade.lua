@@ -2281,8 +2281,6 @@ files {
 	MAME_DIR .. "src/mame/includes/bigstrkb.h",
 	MAME_DIR .. "src/mame/video/bigstrkb.cpp",
 	MAME_DIR .. "src/mame/drivers/blueprnt.cpp",
-	MAME_DIR .. "src/mame/includes/blueprnt.h",
-	MAME_DIR .. "src/mame/video/blueprnt.cpp",
 	MAME_DIR .. "src/mame/drivers/bnstars.cpp",
 	MAME_DIR .. "src/mame/drivers/cischeat.cpp",
 	MAME_DIR .. "src/mame/includes/cischeat.h",
@@ -4448,8 +4446,6 @@ files {
 	MAME_DIR .. "src/mame/machine/bagman.cpp",
 	MAME_DIR .. "src/mame/video/bagman.cpp",
 	MAME_DIR .. "src/mame/drivers/tankbust.cpp",
-	MAME_DIR .. "src/mame/includes/tankbust.h",
-	MAME_DIR .. "src/mame/video/tankbust.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "venture")

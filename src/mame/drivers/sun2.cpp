@@ -534,13 +534,12 @@ WRITE_LINE_MEMBER(sun2_state::ethernet_int_w)
 
 uint16_t sun2_state::edlc_mmu_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t result = tl_mmu_r(M68K_FC_SUPERVISOR_DATA, offset, (mem_mask >> 8) | (mem_mask << 8));
-	return (result >> 8) | (result << 8);
+	return swapendian_int16(tl_mmu_r(M68K_FC_SUPERVISOR_DATA, offset, swapendian_int16(mem_mask)));
 }
 
 void sun2_state::edlc_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	tl_mmu_w(M68K_FC_SUPERVISOR_DATA, offset, (data >> 8) | (data << 8), (mem_mask >> 8) | (mem_mask << 8));
+	tl_mmu_w(M68K_FC_SUPERVISOR_DATA, offset, swapendian_int16(data), swapendian_int16(mem_mask));
 }
 
 void sun2_state::sun2_mem(address_map &map)

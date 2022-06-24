@@ -53,6 +53,9 @@
 #define C15M (C7M*2)
 #define C32M (C15M*2)
 
+
+namespace {
+
 class macquadra_state : public driver_device
 {
 public:
@@ -142,9 +145,9 @@ private:
 	int m_adb_irq_pending = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_539x_2_w);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_539x_2_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_539x_2_w);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(drq_539x_2_w);
 
 	floppy_image_device *m_cur_floppy = nullptr;
 	int m_hdsel = 0;
@@ -1052,5 +1055,7 @@ ROM_START( macqd700 )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
 ROM_END
+
+} // anonymous namespace
 
 COMP( 1991, macqd700, 0, 0, macqd700, macadb, macquadra_state, init_macqd700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)

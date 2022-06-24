@@ -30,25 +30,23 @@ namespace netlist::devices
 	NETLIB_OBJECT(mainclock)
 	{
 		NETLIB_CONSTRUCTOR(mainclock)
-		, m_Q(*this, "Q")
-		, m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5))
+		, m_Q(*this, "Q"), m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5))
 		{
-			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
+			m_inc = netlist_time::from_fp(
+				plib::reciprocal(m_freq() * nlconst::two()));
 		}
 
-		NETLIB_RESETI()
-		{
-			m_Q.net().set_next_scheduled_time(exec().time());
-		}
+		NETLIB_RESETI() { m_Q.net().set_next_scheduled_time(exec().time()); }
 
 		NETLIB_UPDATE_PARAMI()
 		{
-			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
+			m_inc = netlist_time::from_fp(
+				plib::reciprocal(m_freq() * nlconst::two()));
 		}
 
 	public:
-		logic_output_t m_Q; // NOLINT: needed in core
-		netlist_time m_inc; // NOLINT: needed in core
+		logic_output_t m_Q;   // NOLINT: needed in core
+		netlist_time   m_inc; // NOLINT: needed in core
 	private:
 		param_fp_t m_freq;
 	};
@@ -65,7 +63,7 @@ namespace netlist::devices
 	class nld_power_pins
 	{
 	public:
-		using this_type = nld_power_pins;
+		using constructor_type = nld_power_pins;
 
 		explicit nld_power_pins(device_t &owner)
 		: m_VCC(owner, owner.logic_family()->vcc_pin(), NETLIB_DELEGATE(noop))
@@ -80,33 +78,26 @@ namespace netlist::devices
 		}
 
 		// Some devices like the 74LS629 have two pairs of supply pins.
-		explicit nld_power_pins(device_t &owner,
-			const pstring &vcc, const pstring &gnd)
+		explicit nld_power_pins(device_t &owner, const pstring &vcc,
+			const pstring &gnd)
 		: m_VCC(owner, vcc, NETLIB_DELEGATE(noop))
 		, m_GND(owner, gnd, NETLIB_DELEGATE(noop))
 		{
 		}
 
 		// Some devices like the 74LS629 have two pairs of supply pins.
-		explicit nld_power_pins(device_t &owner,
-			const pstring &vcc, const pstring &gnd,
-			nl_delegate delegate)
+		explicit nld_power_pins(device_t &owner, const pstring &vcc,
+			const pstring &gnd, nl_delegate delegate)
 		: m_VCC(owner, vcc, delegate)
 		, m_GND(owner, gnd, delegate)
 		{
 		}
 
-		const analog_input_t &VCC() const noexcept
-		{
-			return m_VCC;
-		}
-		const analog_input_t &GND() const noexcept
-		{
-			return m_GND;
-		}
+		const analog_input_t &VCC() const noexcept { return m_VCC; }
+		const analog_input_t &GND() const noexcept { return m_GND; }
 
 	private:
-		void noop() { }
+		void           noop() {}
 		analog_input_t m_VCC;
 		analog_input_t m_GND;
 	};
@@ -124,14 +115,14 @@ namespace netlist::devices
 		, m_max_link_loops(*this, "MAX_LINK_RESOLVE_LOOPS", 100)
 		{
 		}
-		//NETLIB_RESETI() {}
-		//NETLIB_UPDATE_PARAMI() { }
+		// NETLIB_RESETI() {}
+		// NETLIB_UPDATE_PARAMI() { }
 	public:
-		param_logic_t m_use_deactivate;
-		param_num_t<unsigned>   m_startup_strategy;
-		param_num_t<unsigned>   m_mos_cap_model;
+		param_logic_t         m_use_deactivate;
+		param_num_t<unsigned> m_startup_strategy;
+		param_num_t<unsigned> m_mos_cap_model;
 		//! How many times do we try to resolve links (connections)
-		param_num_t<unsigned>   m_max_link_loops;
+		param_num_t<unsigned> m_max_link_loops;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -145,16 +136,13 @@ namespace netlist::devices
 	{
 	public:
 		NETLIB_CONSTRUCTOR(nc_pin)
-		, m_I(*this, "I", NETLIB_DELEGATE_NOOP())
-		{
-		}
+		, m_I(*this, "I", NETLIB_DELEGATE_NOOP()) {}
 
 	protected:
-		//NETLIB_RESETI() {}
+		// NETLIB_RESETI() {}
 
 	private:
 		analog_input_t m_I;
-
 	};
 
 	// -----------------------------------------------------------------------------
@@ -164,16 +152,11 @@ namespace netlist::devices
 	NETLIB_OBJECT(gnd)
 	{
 		NETLIB_CONSTRUCTOR(gnd)
-		, m_Q(*this, "Q")
-		{
-		}
+		, m_Q(*this, "Q") {}
 
-		NETLIB_UPDATE_PARAMI()
-		{
-			m_Q.push(nlconst::zero());
-		}
+		NETLIB_UPDATE_PARAMI() { m_Q.push(nlconst::zero()); }
 
-		//NETLIB_RESETI() {}
+		// NETLIB_RESETI() {}
 	protected:
 		analog_output_t m_Q;
 	};

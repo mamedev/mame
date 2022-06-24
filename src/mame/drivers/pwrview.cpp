@@ -27,6 +27,7 @@ public:
 		m_pit(*this, "pit"),
 		m_uart(*this, "uart"),
 		m_sio(*this, "sio"),
+		m_fdc(*this, "fdc"),
 		m_bios(*this, "bios"),
 		m_ram(*this, "ram"),
 		m_biosbank(*this, "bios_bank"),
@@ -76,6 +77,7 @@ private:
 	required_device<pit8253_device> m_pit;
 	required_device<i8251_device> m_uart;
 	required_device<z80sio_device> m_sio;
+	required_device<upd765a_device> m_fdc;
 	required_memory_region m_bios;
 	required_shared_ptr<u16> m_ram;
 	required_device<address_map_bank_device> m_biosbank;
@@ -90,6 +92,7 @@ private:
 	u16 m_vramwin[2];
 	bool m_dtr, m_rtsa, m_rtsb;
 	bool m_rts;
+	bool m_enable_fdc;
 	emu_timer *m_tmr0ext;
 	emu_timer *m_tmrkbd;
 };
@@ -115,6 +118,8 @@ void pwrview_state::machine_reset()
 	m_biosbank->set_bank(0);
 	m_uart->write_cts(0);
 	m_tmrkbd->adjust(attotime::from_hz(9600*16), 0, attotime::from_hz(9600*16)); // kbd baud is guess
+	m_enable_fdc = false;
+	m_fdc->set_floppy(m_fdc->subdevice<floppy_connector>("0")->get_device());
 }
 
 TIMER_CALLBACK_MEMBER(pwrview_state::update_tmr0)
@@ -331,6 +336,15 @@ void pwrview_state::unk3_w(offs_t offset, u8 data)
 					m_pit->set_clockin(2, 0);
 			}
 			break;
+		case 1:
+			if(BIT(data, 4))
+			{
+				m_enable_fdc = true;
+				m_fdc->soft_reset();
+			}
+			else
+				m_enable_fdc = false;
+			break;
 	}
 }
 
@@ -468,9 +482,9 @@ void pwrview_state::pwrview_io(address_map &map)
 	map(0xc08a, 0xc08a).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0xc280, 0xc287).rw(FUNC(pwrview_state::unk3_r), FUNC(pwrview_state::unk3_w)).umask16(0x00ff);
 	map(0xc288, 0xc28f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0xc2a0, 0xc2a7).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
+	map(0xc2a0, 0xc2a7).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
 	map(0xc2c0, 0xc2c3).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
-	map(0xc2e0, 0xc2e3).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0xc2e0, 0xc2e3).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0xc2e4, 0xc2e5).ram();
 	map(0xc2e6, 0xc2e6).r(FUNC(pwrview_state::pitclock_r));
 }
@@ -502,9 +516,9 @@ void pwrview_state::pwrview(machine_config &config)
 	m_pit->out_handler<1>().append([this](int state){ if (!m_rtsb) m_sio->txcb_w(state); });
 
 	// floppy disk controller
-	UPD765A(config, "fdc", 8'000'000, true, true); // Rockwell R7675P
-	//fdc.intrq_wr_callback().set("pic1", FUNC(pic8259_device::ir6_w));
-	//fdc.drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
+	UPD765A(config, m_fdc, 8'000'000, false, false); // Rockwell R6765P
+	m_fdc->intrq_wr_callback().set([this](int state){ if(m_enable_fdc) m_maincpu->int3_w(state); });
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
@@ -513,6 +527,7 @@ void pwrview_state::pwrview(machine_config &config)
 	m_uart->txd_handler().set([this](bool state){ if(BIT(m_c280, 4) && m_dtr) m_uart->write_rxd(state); }); // m_dtr here appears unlikely but the post seems to expect it
 	m_uart->dtr_handler().set([this](bool state){ m_dtr = state; });
 	m_uart->rts_handler().set([this](bool state){ m_rts = state; });
+
 
 	Z80SIO(config, m_sio, 4000000); // Z8442BPS (SIO/2)
 	m_sio->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int2_w));

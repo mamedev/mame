@@ -18,22 +18,22 @@
 ///
 /// \brief Version - Major.
 ///
-#define NL_VERSION_MAJOR           0
+#define NL_VERSION_MAJOR 0
 ///
 /// \brief Version - Minor.
 ///
-#define NL_VERSION_MINOR           14
+#define NL_VERSION_MINOR 14
 /// \brief Version - Patch level.
 ///
-#define NL_VERSION_PATCHLEVEL      0
+#define NL_VERSION_PATCHLEVEL 0
 
 ///
 /// \addtogroup compiledefine
 /// \{
 
-//============================================================
-//  GENERAL
-//============================================================
+// -----------------------------------------------------------------------------
+// General
+// -----------------------------------------------------------------------------
 
 /// \brief  Compile in academic solvers
 ///
@@ -48,20 +48,19 @@
 /// time significantly.
 ///
 #ifndef NL_USE_ACADEMIC_SOLVERS
-#define NL_USE_ACADEMIC_SOLVERS (1)
+	#define NL_USE_ACADEMIC_SOLVERS (1)
 #endif
 
 /// \brief Use backward Euler integration
 ///
 /// This will use backward Euler instead of trapezoidal integration.
 ///
-/// FIXME: Long term this will become a runtime setting. Only the capacitor model
-/// currently has a trapezoidal version and there is no support currently for
-/// variable capacitors.
-/// The change will have impact on timings since trapezoidal improves timing
-/// accuracy.
+/// FIXME: Long term this will become a runtime setting. Only the capacitor
+/// model currently has a trapezoidal version and there is no support currently
+/// for variable capacitors. The change will have impact on timings since
+/// trapezoidal improves timing accuracy.
 #ifndef NL_USE_BACKWARD_EULER
-#define NL_USE_BACKWARD_EULER (1) // FIXME: Move to config struct later
+	#define NL_USE_BACKWARD_EULER (1) // FIXME: Move to config struct later
 #endif
 
 /// \brief  Compile with core terminals owned by net_t
@@ -78,7 +77,7 @@
 /// By default the setting is currently disabled.
 ///
 #ifndef NL_USE_INPLACE_CORE_TERMS
-#define NL_USE_INPLACE_CORE_TERMS (0)
+	#define NL_USE_INPLACE_CORE_TERMS (0)
 #endif
 
 /// \brief Use alternative truth table execution approach
@@ -90,26 +89,25 @@
 /// Unfortunately this has to be macro since it needs another member variable.
 ///
 #ifndef NL_USE_TT_ALTERNATIVE
-#define NL_USE_TT_ALTERNATIVE (0)
+	#define NL_USE_TT_ALTERNATIVE (0)
 #endif
 
 /// \brief  Compile matrix solvers using the __float128 type.
 ///
 /// Defaults to \ref PUSE_FLOAT128
 #ifndef NL_USE_FLOAT128
-#define NL_USE_FLOAT128 PUSE_FLOAT128
+	#define NL_USE_FLOAT128 PUSE_FLOAT128
 #endif
 
-
-//============================================================
+// -----------------------------------------------------------------------------
 //  DEBUGGING
-//============================================================
+// -----------------------------------------------------------------------------
 
 /// \brief Enable compile time debugging code
 ///
 
 #ifndef NL_DEBUG
-#define NL_DEBUG                    (false)
+	#define NL_DEBUG (false)
 #endif
 
 ///
@@ -118,9 +116,9 @@
 
 namespace netlist
 {
-	//============================================================
-	//  GENERAL
-	//============================================================
+	// -------------------------------------------------------------------------
+	// GENERAL
+	// -------------------------------------------------------------------------
 
 	struct config_default
 	{
@@ -136,10 +134,11 @@ namespace netlist
 		/// brief default minimum alignment of mempool_arena
 		///
 		/// 256 is the best compromise between logic applications like MAME
-		/// TTL games (e.g. pong) and analog applications like e.g. kidnikik sound.
+		/// TTL games (e.g. pong) and analog applications like e.g. kidnikik
+		/// sound.
 		///
-		/// Best performance for pong is achieved with a value of 16, but this degrades
-		/// kidniki performance by ~10%.
+		/// Best performance for pong is achieved with a value of 16, but this
+		/// degrades kidniki performance by ~10%.
 		///
 		/// More work is needed here.
 		using mempool_align = std::integral_constant<std::size_t, 16>;
@@ -159,9 +158,9 @@ namespace netlist
 		///
 		using use_queue_stats = std::integral_constant<bool, false>;
 
-		//============================================================
+		// ---------------------------------------------------------------------
 		// Time resolution
-		//============================================================
+		// ---------------------------------------------------------------------
 
 		/// \brief Resolution as clocks per second for timing
 		///
@@ -178,15 +177,17 @@ namespace netlist
 		///  |  63  |   100,000,000,000 |    92,233,720 |   1,068|   2.9 |
 		///  |  63  | 1,000,000,000,000 |     9,223,372 |     107|   0.3 |
 		///
-		using INTERNAL_RES = std::integral_constant<long long int, 10'000'000'000LL>; // NOLINT
+		using INTERNAL_RES = std::integral_constant<long long int,
+			10'000'000'000LL>; // NOLINT
 
 		/// \brief Recommended clock to be used
 		///
-		/// This is the recommended clock to be used in fixed clock applications limited
-		/// to 32 bit clock resolution. The MAME code (netlist.cpp) contains code
-		/// illustrating how to deal with remainders if \ref INTERNAL_RES is bigger than
-		/// NETLIST_CLOCK.
-		using DEFAULT_CLOCK = std::integral_constant<int, 1'000'000'000>; // NOLINT
+		/// This is the recommended clock to be used in fixed clock applications
+		/// limited to 32 bit clock resolution. The MAME code (netlist.cpp)
+		/// contains code illustrating how to deal with remainders if \ref
+		/// INTERNAL_RES is bigger than NETLIST_CLOCK.
+		using DEFAULT_CLOCK = std::integral_constant<int,
+			1'000'000'000>; // NOLINT
 
 		/// \brief Default logic family
 		///
@@ -194,23 +195,28 @@ namespace netlist
 
 		/// \brief Maximum queue size
 		///
-		using max_queue_size = std::integral_constant<std::size_t, 1024>; // NOLINT
+		using max_queue_size = std::integral_constant<std::size_t,
+			1024>; // NOLINT
 
 		/// \brief Maximum queue size for solvers
 		///
-		using max_solver_queue_size = std::integral_constant<std::size_t, 512>; // NOLINT
+		using max_solver_queue_size = std::integral_constant<std::size_t,
+			512>; // NOLINT
 
 		/// \brief Support float type for matrix calculations.
 		///
 		/// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
-		using use_float_matrix = std::integral_constant<bool, NL_USE_ACADEMIC_SOLVERS>;
+		using use_float_matrix = std::integral_constant<bool,
+			NL_USE_ACADEMIC_SOLVERS>;
 
 		/// \brief Support long double type for matrix calculations.
 		///
 		/// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
-		using use_long_double_matrix = std::integral_constant<bool, NL_USE_ACADEMIC_SOLVERS>;
+		using use_long_double_matrix = std::integral_constant<bool,
+			NL_USE_ACADEMIC_SOLVERS>;
 
-		using use_float128_matrix = std::integral_constant<bool, NL_USE_FLOAT128>;
+		using use_float128_matrix = std::integral_constant<bool,
+			NL_USE_FLOAT128>;
 
 		/// \brief  Floating point types used
 		///
@@ -235,7 +241,8 @@ namespace netlist
 		/// By default it is disabled since it is not as fast as
 		/// the default approach. It is ~20% slower.
 		///
-		using use_copy_instead_of_reference = std::integral_constant<bool, false>;
+		using use_copy_instead_of_reference = std::integral_constant<bool,
+			false>;
 
 		/// \brief Avoid unnecessary queue pushes
 		///
@@ -268,9 +275,10 @@ namespace netlist
 	///
 	struct config : public config_default
 	{
-		//using mempool_align = std::integral_constant<std::size_t, 32>;
-		//using avoid_noop_queue_pushes = std::integral_constant<bool, true>;
-		//using use_copy_instead_of_reference = std::integral_constant<bool, true>;
+		// using mempool_align = std::integral_constant<std::size_t, 32>;
+		// using avoid_noop_queue_pushes = std::integral_constant<bool, true>;
+		// using use_copy_instead_of_reference = std::integral_constant<bool,
+		// true>;
 	};
 
 	using nl_fptype = config::fptype;
@@ -281,21 +289,34 @@ namespace netlist
 	///
 	template <typename FT>
 	struct fp_constants
-	{ };
+	{
+	};
 
 	/// \brief  Specific constants for long double floating point type
 	///
 	template <>
 	struct fp_constants<long double>
 	{
-		static constexpr long double DIODE_MAXDIFF() noexcept { return  1e100L; } // NOLINT
-		static constexpr long double DIODE_MAXVOLT() noexcept { return  300.0L; } // NOLINT
+		static constexpr long double DIODE_MAXDIFF() noexcept
+		{
+			return 1e100L;
+		} // NOLINT
+		static constexpr long double DIODE_MAXVOLT() noexcept
+		{
+			return 300.0L;
+		} // NOLINT
 
-		static constexpr long double TIMESTEP_MAXDIFF() noexcept { return  1e100L; } // NOLINT
-		static constexpr long double TIMESTEP_MINDIV() noexcept { return  1e-60L; } // NOLINT
+		static constexpr long double TIMESTEP_MAXDIFF() noexcept
+		{
+			return 1e100L;
+		} // NOLINT
+		static constexpr long double TIMESTEP_MINDIV() noexcept
+		{
+			return 1e-60L;
+		} // NOLINT
 
-		static constexpr const char * name() noexcept { return "long double"; }
-		static constexpr const char * suffix() noexcept { return "L"; }
+		static constexpr const char *name() noexcept { return "long double"; }
+		static constexpr const char *suffix() noexcept { return "L"; }
 	};
 
 	/// \brief  Specific constants for double floating point type
@@ -303,14 +324,26 @@ namespace netlist
 	template <>
 	struct fp_constants<double>
 	{
-		static constexpr double DIODE_MAXDIFF() noexcept { return  1e100; } // NOLINT
-		static constexpr double DIODE_MAXVOLT() noexcept { return  300.0; } // NOLINT
+		static constexpr double DIODE_MAXDIFF() noexcept
+		{
+			return 1e100;
+		} // NOLINT
+		static constexpr double DIODE_MAXVOLT() noexcept
+		{
+			return 300.0;
+		} // NOLINT
 
-		static constexpr double TIMESTEP_MAXDIFF() noexcept { return  1e100; } // NOLINT
-		static constexpr double TIMESTEP_MINDIV() noexcept { return  1e-60; } // NOLINT
+		static constexpr double TIMESTEP_MAXDIFF() noexcept
+		{
+			return 1e100;
+		} // NOLINT
+		static constexpr double TIMESTEP_MINDIV() noexcept
+		{
+			return 1e-60;
+		} // NOLINT
 
-		static constexpr const char * name() noexcept { return "double"; }
-		static constexpr const char * suffix() noexcept { return ""; }
+		static constexpr const char *name() noexcept { return "double"; }
+		static constexpr const char *suffix() noexcept { return ""; }
 	};
 
 	/// \brief  Specific constants for float floating point type
@@ -318,14 +351,26 @@ namespace netlist
 	template <>
 	struct fp_constants<float>
 	{
-		static constexpr float DIODE_MAXDIFF() noexcept { return  1e20F; } // NOLINT
-		static constexpr float DIODE_MAXVOLT() noexcept { return  90.0F; } // NOLINT
+		static constexpr float DIODE_MAXDIFF() noexcept
+		{
+			return 1e20F;
+		} // NOLINT
+		static constexpr float DIODE_MAXVOLT() noexcept
+		{
+			return 90.0F;
+		} // NOLINT
 
-		static constexpr float TIMESTEP_MAXDIFF() noexcept { return  1e30F; } // NOLINT
-		static constexpr float TIMESTEP_MINDIV() noexcept { return  1e-8F; } // NOLINT
+		static constexpr float TIMESTEP_MAXDIFF() noexcept
+		{
+			return 1e30F;
+		} // NOLINT
+		static constexpr float TIMESTEP_MINDIV() noexcept
+		{
+			return 1e-8F;
+		} // NOLINT
 
-		static constexpr const char * name() noexcept { return "float"; }
-		static constexpr const char * suffix() noexcept { return "f"; }
+		static constexpr const char *name() noexcept { return "float"; }
+		static constexpr const char *suffix() noexcept { return "f"; }
 	};
 
 #if (NL_USE_FLOAT128)
@@ -334,7 +379,7 @@ namespace netlist
 	template <>
 	struct fp_constants<FLOAT128>
 	{
-#if 0
+	#if 0
 		// MAME compile doesn't support Q
 		static constexpr FLOAT128 DIODE_MAXDIFF() noexcept { return  1e100Q; }
 		static constexpr FLOAT128 DIODE_MAXVOLT() noexcept { return  300.0Q; }
@@ -344,17 +389,29 @@ namespace netlist
 
 		static constexpr const char * name() noexcept { return "FLOAT128"; }
 		static constexpr const char * suffix() noexcept { return "Q"; }
-#else
-	static constexpr FLOAT128 DIODE_MAXDIFF() noexcept { return static_cast<FLOAT128>(1e100L); }
-	static constexpr FLOAT128 DIODE_MAXVOLT() noexcept { return static_cast<FLOAT128>(300.0L); }
+	#else
+		static constexpr FLOAT128 DIODE_MAXDIFF() noexcept
+		{
+			return static_cast<FLOAT128>(1e100L);
+		}
+		static constexpr FLOAT128 DIODE_MAXVOLT() noexcept
+		{
+			return static_cast<FLOAT128>(300.0L);
+		}
 
-	static constexpr FLOAT128 TIMESTEP_MAXDIFF() noexcept { return static_cast<FLOAT128>(1e100L); }
-	static constexpr FLOAT128 TIMESTEP_MINDIV() noexcept { return static_cast<FLOAT128>(1e-60L); }
+		static constexpr FLOAT128 TIMESTEP_MAXDIFF() noexcept
+		{
+			return static_cast<FLOAT128>(1e100L);
+		}
+		static constexpr FLOAT128 TIMESTEP_MINDIV() noexcept
+		{
+			return static_cast<FLOAT128>(1e-60L);
+		}
 
-	static constexpr const char * name() noexcept { return "__float128"; }
-	static constexpr const char * suffix() noexcept { return "Q"; }
+		static constexpr const char *name() noexcept { return "__float128"; }
+		static constexpr const char *suffix() noexcept { return "Q"; }
 
-#endif
+	#endif
 	};
 #endif
 } // namespace netlist
@@ -363,7 +420,12 @@ namespace netlist
 //  Asserts
 //============================================================
 
-#define nl_assert(x)    do { if (NL_DEBUG) passert_always(x); } while (0)
+#define nl_assert(x)                                                           \
+	do                                                                         \
+	{                                                                          \
+		if (NL_DEBUG)                                                          \
+			passert_always(x);                                                 \
+	} while (0)
 #define nl_assert_always(x, msg) passert_always_msg(x, msg)
 
 #endif // NLCONFIG_H_

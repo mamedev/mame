@@ -94,6 +94,7 @@ INPUT_PORTS_EXTERN( mpu4jackpot8per );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p90pc );
+INPUT_PORTS_EXTERN( mpu4_70pc );
 
 // currently in mpu4.cpp this may get moved into the driver, or renamed to something more generic based on the setup
 INPUT_PORTS_EXTERN( grtecp );
@@ -140,76 +141,78 @@ public:
 	void init_m4default();
 	void init_m4default_big();
 	void init_m4default_big_low();
-
-
 	void init_m4default_big_aux2inv();
 	void init_m4default_806prot();
-
 	void init_m4tst2();
-
-	void init_m4default_banks();
-	void init_m4default_reels();
-	void init_m4_low_volt_alt();
-
-
-	void init_m4_five_reel_std();
-	void init_m4_five_reel_rev();
-	void init_m4_five_reel_alt();
-	void init_m4_six_reel_std();
-	void init_m4_six_reel_alt();
-	void init_m4_seven_reel();
-	void init_m4_small_extender();
-	void init_m4_large_extender_b();
-	void init_m4_large_extender_c();
-	void init_m4_hopper_tubes();
-	void init_m4_hopper_duart_a();
-	void init_m4_hopper_duart_b();
-	void init_m4_hopper_duart_c();
-	void init_m4_hopper_nonduart_a();
-	void init_m4_hopper_nonduart_b();
-	void init_m4_led_a();
-	void init_m4_led_b();
-	void init_m4_led_c();
-	void init_m4_led_simple();
-
-
 	void init_m4_andycp10c();
-	void init_m_blsbys();
-	void init_m_oldtmr();
+	void init_m4default_big_five_std();
+	void init_m4default_big_five_rev();
+
+	void init_m4default_big_six();
+	void init_m4default_big_six_alt();
+
 	void init_m4tst();
 	void init_big_extenda();
-
-	void init_m4altreels();//legacy, will be removed once things are sorted out
+	void init_m4altreels();
 	void init_m4altreels_big();
-
-	void bwboki(machine_config &config);
-	void bwboki_chr(machine_config &config);
-
-	template<const uint32_t* Key> void bwboki_chr_cheat(machine_config &config)
-	{
-		bwboki(config);
-		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser_bwb);
-		MPU4_CHARACTERISER_PAL_BWB(config, m_characteriser_bwb, 0);
-		m_characteriser_bwb->set_common_key(Key[0] & 0xff);
-		m_characteriser_bwb->set_other_key(Key[1]);
-	}
-
-
-
+	void init_m4default_five_std();
+	void init_m4default_five_rev();
+	void init_m4default_five_alt();
+	void init_m4default_six();
+	void init_m4default_six_alt();
+	void init_m4default_seven();
 
 	void mod2(machine_config &config);
+	void mod2_7reel(machine_config &config);
+
 	void mod2_cheatchr(machine_config &config);
 	void mod2_chr(machine_config &config);
 
 	template<const uint8_t ReelNo, uint8_t Type>
-	void mpu4_add_reel(machine_config& config);
+	void mpu4_add_reel(machine_config &config)
+	{
+		switch (Type)
+		{
+		default:
+		case 0x00: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 1, 3, 0x00, 2); break;
+		case 0x01: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 4, 12, 0x00, 2); break;
+		case 0x02: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 92, 3, 0x00, 2); break;
+		case 0x03: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 93, 2, 0x00, 2); break;
+		case 0x04: REEL(config, m_reel[ReelNo], BARCREST_48STEP_REEL, 96, 3, 0x00, 2); break; // BWB
+		}
+
+		if (m_reel[ReelNo])
+			m_reel[ReelNo]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<ReelNo>));
+	}
 
 	template<uint8_t Type, uint8_t NumberOfReels>
-	void mpu4_reels(machine_config &config);
+	void mpu4_reels(machine_config &config)
+	{
+		if (NumberOfReels>0) mpu4_add_reel<0, Type>(config);
+		if (NumberOfReels>1) mpu4_add_reel<1, Type>(config);
+		if (NumberOfReels>2) mpu4_add_reel<2, Type>(config);
+		if (NumberOfReels>3) mpu4_add_reel<3, Type>(config);
+		if (NumberOfReels>4) mpu4_add_reel<4, Type>(config);
+		if (NumberOfReels>5) mpu4_add_reel<5, Type>(config);
+		if (NumberOfReels>6) mpu4_add_reel<6, Type>(config);
+		if (NumberOfReels>7) mpu4_add_reel<7, Type>(config);
+	}
 
 	template<const uint8_t* Table> void mod2_cheatchr_pal(machine_config &config)
 	{
 		mod2(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod2_7reel_cheatchr_pal(machine_config &config)
+	{
+		mod2_7reel(config);
 
 		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
 
@@ -243,6 +246,18 @@ public:
 		m_characteriser->set_lamp_table(Table);
 	}
 
+	template<const uint8_t* Table> void mod4oki_7reel_cheatchr_pal(machine_config &config)
+	{
+		mod4oki_7reel(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
 	template<const uint8_t* Table> void mod4oki_alt_cheatchr_pal(machine_config &config)
 	{
 		mod4oki_alt(config);
@@ -258,6 +273,18 @@ public:
 	template<const uint8_t* Table> void mod4yam_cheatchr_pal(machine_config &config)
 	{
 		mod4yam(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
+
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod4yam_alt_cheatchr_pal(machine_config &config)
+	{
+		mod4yam_alt(config);
 
 		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
 
@@ -295,6 +322,16 @@ public:
 	template<uint8_t Fixed> void mod2_bootleg_fixedret(machine_config &config)
 	{
 		mod2(config);
+
+		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
+
+		MPU4_CHARACTERISER_BL(config, m_characteriser_bl, 0);
+		m_characteriser_bl->set_bl_fixed_return(Fixed);
+	}
+
+	template<uint8_t Fixed> void mod2_alt_bootleg_fixedret(machine_config &config)
+	{
+		mod2_alt(config);
 
 		m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_bootleg_characteriser);
 
@@ -350,6 +387,7 @@ public:
 	void mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table);
 
 	void mod4oki(machine_config &config);
+	void mod4oki_7reel(machine_config &config);
 	void mod4oki_cheatchr(machine_config &config);
 	void mod4oki_cheatchr_table(machine_config &config, const uint8_t* table);
 	void mod4oki_chr(machine_config &config);
@@ -359,19 +397,46 @@ public:
 	void mod4yam_cheatchr_table(machine_config& config, const uint8_t* table);
 	void mod4yam_chr(machine_config &config);
 
+	void mod4yam_alt(machine_config &config);
+
+
+
 	void mpu4_common(machine_config &config);
 	void mpu4_common2(machine_config &config);
-	void mpu4crys(machine_config &config);
 	void mpu4base(machine_config &config);
 
 protected:
+
+	void use_m4_standard_reels();
+	void use_m4_low_volt_alt();
+	void use_m4_five_reel_std();
+	void use_m4_five_reel_rev();
+	void use_m4_five_reel_alt();
+	void use_m4_six_reel_std();
+	void use_m4_six_reel_alt();
+	void use_m4_seven_reel();
+	void use_m4_small_extender();
+	void use_m4_large_extender_b();
+	void use_m4_large_extender_c();
+	void use_m4_hopper_tubes();
+	void use_m4_hopper_duart_a();
+	void use_m4_hopper_duart_b();
+	void use_m4_hopper_duart_c();
+	void use_m4_hopper_nonduart_a();
+	void use_m4_hopper_nonduart_b();
+	void use_m4_led_a();
+	void use_m4_led_b();
+	void use_m4_led_c();
+	void use_m4_led_simple();
+
+	void setup_rom_banks();
+
 	TIMER_CALLBACK_MEMBER(update_ic24);
 
 	void mpu4_memmap(address_map &map);
 	void mpu4_memmap_characteriser(address_map &map);
 	void mpu4_memmap_bootleg_characteriser(address_map &map);
 	void mpu4_memmap_bl_characteriser_blastbank(address_map &map);
-	void mpu4_memmap_characteriser_bwb(address_map &map);
 
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
@@ -383,15 +448,12 @@ protected:
 	void update_ay(device_t *device);
 	void mpu4_install_mod4yam_space(address_space &space);
 	void mpu4_install_mod4oki_space(address_space &space);
-	void mpu4_install_mod4bwb_space(address_space &space);
 	void mpu4_config_common();
 
 	DECLARE_MACHINE_START(mod2);
 	DECLARE_MACHINE_RESET(mpu4);
 	DECLARE_MACHINE_START(mpu4yam);
 	DECLARE_MACHINE_START(mpu4oki);
-	DECLARE_MACHINE_START(mpu4bwb);
-	DECLARE_MACHINE_START(mpu4cry);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
 

@@ -13,7 +13,13 @@
 
 #pragma once
 
+// standard sdl header
+#include <SDL2/SDL.h>
+
 #include <algorithm>
+#include <memory>
+#include <mutex>
+#include <string>
 #include <unordered_map>
 
 #define MAX_DEVMAP_ENTRIES  16
@@ -28,6 +34,8 @@ struct device_map_t
 	} map[MAX_DEVMAP_ENTRIES];
 	int     logical[MAX_DEVMAP_ENTRIES];
 	int     initialized;
+
+	void init(running_machine &machine, const char *opt, int max_devices, const char *label);
 };
 
 //============================================================
@@ -129,50 +137,6 @@ static inline std::string remove_spaces(const char *s)
 	output.erase(std::remove_if(output.begin(), output.end(), isspace), output.end());
 
 	return output;
-}
-
-//============================================================
-//  devmap_init - initializes a device_map based on
-//   an input option prefix and max number of devices
-//============================================================
-
-static inline void devmap_init(running_machine &machine, device_map_t *devmap, const char *opt, int max_devices, const char *label)
-{
-	int dev;
-	char defname[20];
-
-	// The max devices the user specified, better not be bigger than the max the arrays can old
-	assert(max_devices <= MAX_DEVMAP_ENTRIES);
-
-	// Initialize the map to default uninitialized values
-	for (dev = 0; dev < MAX_DEVMAP_ENTRIES; dev++)
-	{
-		devmap->map[dev].name.clear();
-		devmap->map[dev].physical = -1;
-		devmap->logical[dev] = -1;
-	}
-	devmap->initialized = 0;
-
-	// populate the device map up to the max number of devices
-	for (dev = 0; dev < max_devices; dev++)
-	{
-		const char *dev_name;
-
-		// derive the parameter name from the option name and index. For instance: lightgun_index1 to lightgun_index8
-		sprintf(defname, "%s%d", opt, dev + 1);
-
-		// Get the user-specified name that matches the parameter
-		dev_name = machine.options().value(defname);
-
-		// If they've specified a name and it's not "auto", treat it as a custom mapping
-		if (dev_name && *dev_name && strcmp(dev_name, OSDOPTVAL_AUTO))
-		{
-			// remove the spaces from the name store it in the index
-			devmap->map[dev].name = remove_spaces(dev_name);
-			osd_printf_verbose("%s: Logical id %d: %s\n", label, dev + 1, devmap->map[dev].name);
-			devmap->initialized = 1;
-		}
-	}
 }
 
 #endif // MAME_OSD_INPUT_INPUT_SDLCOMMON_H

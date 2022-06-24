@@ -7,10 +7,10 @@
 /// tests for `plib::pmfp`
 ///
 
-#include "plib/pconfig.h"
-#include "plib/ppmf.h"
 #include "netlist/nl_config.h"
 
+#include "plib/pconfig.h"
+#include "plib/ppmf.h"
 #include "plib/ptests.h"
 
 PTEST(test_precommit, precommit)
