@@ -2739,8 +2739,8 @@ GAME( 1996, maniacsqs,   maniacsq,  maniacsqs,        snowboar, gaelco2_state, e
 GAME( 1996, snowboar,    0,         snowboar,         snowboar, gaelco2_state, init_snowboar,  ROT0, "Gaelco", "Snow Board Championship (version 2.1, checksum B0E)", 0 )
 GAME( 1996, snowboara,   snowboar,  snowboar,         snowboar, gaelco2_state, init_snowboara, ROT0, "Gaelco", "Snow Board Championship (version 2.0, checksum F0E)", 0 )
 
-GAME( 1998, bang,        0,         bang,             bang,     bang_state,    init_bang,      ROT0, "Gaelco", "Bang!", 0 )
-GAME( 1998, bangj,       bang,      bang,             bang,     bang_state,    init_bang,      ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
+GAME( 1998, bang,        0,         bang,             bang,     bang_state,    init_bang,      ROT0, "Gaelco", "Bang! (checksum B61D)", 0 )
+GAME( 1998, bangj,       bang,      bang,             bang,     bang_state,    init_bang,      ROT0, "Gaelco", "Gun Gabacho (Japan, checksum C6BB)", 0 )
 
 // 2-in-1 gambling game, appears to be cloned Gaelco hardware complete with DS5002FP, or possibly manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
 // these are Italian versions, English versions also exist
