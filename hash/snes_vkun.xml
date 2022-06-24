@@ -19,16 +19,60 @@ Undumped
 <softwarelist name="snes_vkun" description="Voicer-kun audio compact discs">
 
 	<software name="angelvf">
-		<!-- original image (from King Mike)
-		<rom name="ANGELVOICE.BIN" size="558644688" crc="ee1af152" sha1="5900295c8fce37c497d766b545b7bac4b9c657e3" status="baddump"/>
-		<rom name="ANGELVOICE.CUE" size="5767"      crc="860a72dc" sha1="4224c47111ffde20c7287066122d45ba733c6e93" status="baddump"/>
-		-->
 		<description>Angelique - Voice Fantasy (Jpn)</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<part name="cdrom" interface="ir_controlled_cd_player">
 			<diskarea name="cdrom">
-				<disk name="angelvf" sha1="97aa958bc0ae6cbb9ede9b00dd54e1e1750077aa" status="baddump" />
+				<disk name="angelique voice fantasy (japan)" sha1="731b207b1fa9c635a8335ea4fa4d8e498d1396e1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="emit1">
+		<description>Emit Vol. 1 - Toki no Maigo (Jpn)</description>
+		<year>1995</year>
+		<publisher>Koei</publisher>
+		<part name="cdrom" interface="ir_controlled_cd_player">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 1 - toki no maigo - script of lost in time (japan) (disc 1)" sha1="d755e21f68ff86eb2b143a0b546f93108813de9f" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="ir_controlled_cd_player">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 1 - toki no maigo - script of lost in time (japan) (disc 2)" sha1="91046a20aa739e5d597cbd9f1237df8a99fc96e9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="emit2">
+		<description>Emit Vol. 2 - Inochigake no Tabi (Jpn)</description>
+		<year>1995</year>
+		<publisher>Koei</publisher>
+		<part name="cdrom" interface="ir_controlled_cd_player">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 2 - inochigake no tabi - script of a life-and-death trip (japan) (disc 1)" sha1="f452cfaa9dc2691ec8c8f14db2f6bc1fac43055f" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="ir_controlled_cd_player">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 2 - inochigake no tabi - script of a life-and-death trip (japan) (disc 2)" sha1="43def738fe0a1dfd545d14a469defa8d2cfe70ee" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="emit3">
+		<description>Emit Vol. 3 - Watashi ni Sayonara o (Jpn)</description>
+		<year>1995</year>
+		<publisher>Koei</publisher>
+		<part name="cdrom" interface="ir_controlled_cd_player">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 3 - watashi ni sayonara o - script of bid myself farewell (japan) (disc 1)" sha1="be9ac5b6db147f56059fcbf03ebefd58aef1829a" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="ir_controlled_cd_player">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 3 - watashi ni sayonara o - script of bid myself farewell (japan) (disc 2)" sha1="79c3c4766145bcca157bbb3b1f8bce8c1ca8968c" />
 			</diskarea>
 		</part>
 	</software>
