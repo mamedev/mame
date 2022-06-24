@@ -561,25 +561,6 @@ void mpu4_state::pia_ic3_portb_w(uint8_t data)
 			}
 			m_lamp_strobe2 = m_input_strobe;
 		}
-
-		if (m_led_lamp)
-		{
-			/* Some games (like Connect 4) use 'programmable' LED displays, built from light display lines in section 2. */
-			/* These are mostly low-tech machines, where such wiring proved cheaper than an extender card */
-			uint8_t pled_segs[2] = {0,0};
-
-			static const int lamps1[8] = { 106, 107, 108, 109, 104, 105, 110, 111 };
-			static const int lamps2[8] = { 114, 115, 116, 117, 112, 113, 118, 119 };
-
-			for (i = 0; i < 8; i++)
-			{
-				if (m_lamps[lamps1[i]]) pled_segs[0] |= (1 << i);
-				if (m_lamps[lamps2[i]]) pled_segs[1] |= (1 << i);
-			}
-
-			m_digits[8] = pled_segs[0];
-			m_digits[9] = pled_segs[1];
-		}
 	}
 }
 
