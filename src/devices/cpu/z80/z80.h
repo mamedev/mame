@@ -7,8 +7,6 @@
 
 #include "machine/z80daisy.h"
 
-//typedef std::vector<std::function<void()>> opt_m;
-
 enum
 {
 	NSC800_RSTA = INPUT_LINE_IRQ0 + 1,
@@ -244,7 +242,7 @@ protected:
 	void ei();
 
 	ops_type ops_flat(std::vector<ops_type> op_map);
-	ops_type z80_device::* do_exec();
+	ops_type * do_exec();
 	ops_type next_op();
 	void calculate_icount();
 	virtual void check_interrupts();

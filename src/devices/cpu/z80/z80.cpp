@@ -346,7 +346,7 @@ static const uint8_t cc_ex[0x100] = {
 	m_icount_executing -= icount; \
 } while (0)
 
-#define CP(prefix, opcode) case 0x##opcode: return &z80_device::prefix##_##opcode;break;
+#define CP(prefix, opcode) case 0x##opcode: return &prefix##_##opcode;break;
 
 // T Memory Address
 #define MTM ((m_cc_op == nullptr ? 4 : m_cc_op[0])-1)
@@ -1456,7 +1456,6 @@ inline void z80_device::illegal_2()
 }
 
 void z80_device::init_instructions() {
-	//m_tmp = {{[&](){B = rlc(B);}}};
 
 /**********************************************************
  * opcodes with CB prefix
@@ -1753,7 +1752,7 @@ OP(cb,ff) { A = set(7, A);          } EOP /* SET  7,A         */
 
 /**********************************************************
 * opcodes with DD/FD CB prefix
-* rotate, shift and bit EOPrations with (IX+o)
+* rotate, shift and bit operations with (IX+o)
 **********************************************************/
 OP(xycb,00) { B = rlc(rm_reg(m_ea)); wm(m_ea, B);    } EOP /* RLC  B=(XY+o)    */
 OP(xycb,01) { C = rlc(rm_reg(m_ea)); wm(m_ea, C);    } EOP /* RLC  C=(XY+o)    */
@@ -3628,7 +3627,7 @@ z80_device::ops_type z80_device::ops_flat(std::vector<ops_type> op_map)
 	return ops;
 }
 
-z80_device::ops_type z80_device::* z80_device::do_exec()
+z80_device::ops_type * z80_device::do_exec()
 {
 	switch (m_prefix)
 	{
@@ -3640,7 +3639,7 @@ z80_device::ops_type z80_device::* z80_device::do_exec()
 	case XY_CB: EXEC(xycb, m_opcode); break;
 	}
 	// error
-	return &z80_device::op_00;
+	return &op_00;
 }
 
 void z80_device::calculate_icount()
@@ -3670,11 +3669,11 @@ void z80_device::execute_run()
 			return;
 		}
 
-		ops_type v = this->*do_exec();
-		while (m_cycle < v.size() && m_icount > 0)
-			v[m_cycle++]();
+		ops_type *v = do_exec();
+		while (m_cycle < v->size() && m_icount > 0)
+			(*v)[m_cycle++]();
 
-		if(m_cycle >= v.size())
+		if(m_cycle >= v->size())
 			m_cycle = 0;
 	}
 
