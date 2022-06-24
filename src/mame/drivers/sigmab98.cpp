@@ -1496,7 +1496,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &lufykzku_state::lufykzku_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(lufykzku_state::lufykzku_irq), "screen", 0, 1);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM (TC55257DFL-70L)
 	// No EEPROM
 
 	MB3773(config, m_watchdog, 0);

@@ -50,7 +50,8 @@ namespace netlist::solver
 	matrix_solver_t::matrix_solver_t(devices::nld_solver &main_solver, const pstring &name,
 		const net_list_t &nets,
 		const solver::solver_parameters_t *params)
-		: device_t(static_cast<device_t &>(main_solver), name)
+		//: device_t(static_cast<device_t &>(main_solver), name)
+		: device_t(device_data_t{main_solver.state(), main_solver.name() + "." + name})
 		, m_params(*params)
 		, m_gonn(m_arena)
 		, m_gtn(m_arena)
@@ -126,9 +127,9 @@ namespace netlist::solver
 							if (!plib::container::contains(dynamic_devices, &p->device()))
 								dynamic_devices.push_back(&p->device());
 						{
-							auto *pterm = dynamic_cast<terminal_t *>(p);
-							nl_assert(pterm != nullptr);
-							add_term(k, pterm);
+							auto pterm = plib::dynamic_downcast<terminal_t *>(p);
+							nl_assert_always(bool(pterm), "cast to terminal_t * failed");
+							add_term(k, *pterm);
 						}
 						log().debug("Added terminal {1}\n", p->name());
 						break;
@@ -145,8 +146,9 @@ namespace netlist::solver
 							if (net_proxy_output == nullptr)
 							{
 								pstring new_name(this->name() + "." + pstring(plib::pfmt("m{1}")(m_inputs.size())));
-								nl_assert_always(net.is_analog(), "Net is not an analog net");
-								auto net_proxy_output_u = state().make_pool_object<proxied_analog_output_t>(*this, new_name, &dynamic_cast<analog_net_t &>(p->net()));
+								auto proxied_net = plib::dynamic_downcast<analog_net_t *>(p->net());
+								nl_assert_always(proxied_net, "Net is not an analog net");
+								auto net_proxy_output_u = state().make_pool_object<proxied_analog_output_t>(*this, new_name, *proxied_net);
 								net_proxy_output = net_proxy_output_u.get();
 								m_inputs.emplace_back(std::move(net_proxy_output_u));
 							}
@@ -366,6 +368,8 @@ namespace netlist::solver
 		}
 		log().verbose("Number of multiplications/additions for {1}: {2}", name(), m_ops);
 
+		// Dumps non zero elements right of diagonal -> to much output, disabled
+		// NOLINTNEXTLINE(readability-simplify-boolean-expr)
 		if ((false))
 			for (std::size_t k = 0; k < iN; k++)
 			{

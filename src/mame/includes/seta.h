@@ -50,8 +50,8 @@ public:
 		m_extra_port(*this, "EXTRA"),
 		m_paletteram(*this, "paletteram%u", 1U),
 		m_x1_bank(*this, "x1_bank"),
-		m_leds(*this, "led%u", 0U),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_tilemaps_flip(0)
 	{ }
 
 	void madshark(machine_config &config);
@@ -66,7 +66,6 @@ public:
 	void msgundam(machine_config &config);
 	void msgundamb(machine_config &config);
 	void extdwnhl(machine_config &config);
-	void pairlove(machine_config &config);
 	void zingzip(machine_config &config);
 	void wiggie(machine_config &config);
 	void umanclub(machine_config &config);
@@ -77,13 +76,11 @@ public:
 	void wrofaero(machine_config &config);
 	void blockcar(machine_config &config);
 	void crazyfgt(machine_config &config);
-	void keroppi(machine_config &config);
 	void drgnunit(machine_config &config);
 	void stg(machine_config &config);
 	void qzkklogy(machine_config &config);
 	void orbs(machine_config &config);
 	void daiohp(machine_config &config);
-	void magspeed(machine_config &config);
 	void krzybowl(machine_config &config);
 	void qzkklgy2(machine_config &config);
 	void kamenrid(machine_config &config);
@@ -99,7 +96,6 @@ public:
 	void init_wiggie();
 	void init_bankx1();
 	void init_eightfrc();
-	void init_pairlove();
 
 	void palette_init_RRRRRGGGGGBBBBB_proms(palette_device &palette) const;
 
@@ -108,6 +104,8 @@ public:
 	u32 screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
+	void set_tilemaps_flip(int val) { m_tilemaps_flip = val; }
+
 	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
@@ -125,8 +123,6 @@ protected:
 
 	optional_memory_bank m_x1_bank;
 
-	output_finder<48> m_leds;
-
 	required_device<palette_device> m_palette;
 
 	u8 m_vregs;
@@ -136,15 +132,6 @@ protected:
 
 	uPD71054_state m_uPD71054;
 
-	int m_keroppi_prize_hop;
-	int m_keroppi_protection_count;
-	emu_timer *m_keroppi_prize_hop_timer;
-
-	u16 m_magspeed_lights[3];
-
-	std::unique_ptr<u16[]> m_pairslove_protram;
-	std::unique_ptr<u16[]> m_pairslove_protram_old;
-
 	void seta_coin_counter_w(u8 data);
 	void seta_coin_lockout_w(u8 data);
 	void seta_vregs_w(u8 data);
@@ -152,16 +139,9 @@ protected:
 	u16 seta_dsw_r(offs_t offset);
 
 	u16 zingzipbl_unknown_r();
-	u16 keroppi_protection_r();
-	u16 keroppi_protection_init_r();
-	u16 keroppi_coin_r();
-	void keroppi_prize_w(u16 data);
 	u16 thunderl_protection_r();
 	void thunderl_protection_w(u16 data);
 	void utoukond_sound_control_w(u8 data);
-	u16 pairlove_prot_r(offs_t offset);
-	void pairlove_prot_w(offs_t offset, u16 data);
-	void magspeed_lights_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 extra_r();
 
 	void blandia_palette(palette_device &palette) const;
@@ -169,9 +149,6 @@ protected:
 	DECLARE_MACHINE_START(wrofaero);
 	void gundhara_palette(palette_device &palette) const;
 	void jjsquawk_palette(palette_device &palette) const;
-	DECLARE_MACHINE_START(keroppi);
-	DECLARE_MACHINE_START(magspeed);
-	DECLARE_VIDEO_START(oisipuzl);
 	u32 screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -185,7 +162,6 @@ protected:
 	void uPD71054_update_timer(device_t *cpu, int no);
 	INTERRUPT_GEN_MEMBER(wrofaero_interrupt);
 	TIMER_CALLBACK_MEMBER(uPD71054_timer_callback);
-	TIMER_CALLBACK_MEMBER(keroppi_prize_hop_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_1_and_2);
 	TIMER_DEVICE_CALLBACK_MEMBER(seta_interrupt_2_and_4);
 	TIMER_DEVICE_CALLBACK_MEMBER(crazyfgt_interrupt);
@@ -210,15 +186,12 @@ protected:
 	void extdwnhl_map(address_map &map);
 	void jjsquawb_map(address_map &map);
 	void kamenrid_map(address_map &map);
-	void keroppi_map(address_map &map);
 	void krzybowl_map(address_map &map);
 	void madshark_map(address_map &map);
-	void magspeed_map(address_map &map);
 	void msgundam_map(address_map &map);
 	void msgundamb_map(address_map &map);
 	void oisipuzl_map(address_map &map);
 	void orbs_map(address_map &map);
-	void pairlove_map(address_map &map);
 	void thunderl_map(address_map &map);
 	void thunderlbl_map(address_map &map);
 	void thunderlbl_sound_map(address_map &map);
@@ -386,6 +359,58 @@ private:
 	u16 m_kiwame_row_select = 0;
 };
 
+class magspeed_state : public seta_state
+{
+public:
+	magspeed_state(const machine_config &mconfig, device_type type, const char *tag) :
+		seta_state(mconfig, type, tag),
+		m_leds(*this, "led%u", 0U)
+	{
+	}
+
+	void magspeed(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void lights_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	void magspeed_map(address_map &map);
+
+	output_finder<48> m_leds;
+
+	u16 m_lights[3];
+};
+
+class keroppi_state : public seta_state
+{
+public:
+	keroppi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		seta_state(mconfig, type, tag)
+	{
+	}
+
+	void keroppi(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	u16 protection_r();
+	u16 protection_init_r();
+	u16 coin_r();
+	void prize_w(u16 data);
+	TIMER_CALLBACK_MEMBER(prize_hop_callback);
+
+	void keroppi_map(address_map &map);
+
+	emu_timer *m_prize_hop_timer;
+
+	int m_prize_hop;
+	int m_protection_count;
+};
+
 class zombraid_state : public seta_state
 {
 public:
@@ -400,7 +425,7 @@ public:
 	void init_zombraid();
 
 protected:
-	DECLARE_MACHINE_START(zombraid);
+	virtual void machine_start() override;
 
 private:
 	double adc_cb(u8 input);
@@ -423,6 +448,7 @@ public:
 		m_rtc(*this, "rtc"),
 		m_hopper(*this, "hopper"),
 		m_bet(*this, "BET.%02X", 0),
+		m_leds(*this, "led%u", 0U),
 		m_mux(0),
 		m_pay(0),
 		m_led(0),
@@ -469,6 +495,8 @@ private:
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<26> m_bet;
 
+	output_finder<2> m_leds;
+
 	u8 m_mux;
 
 	u8 m_pay;
@@ -477,6 +505,29 @@ private:
 	uint64_t m_coin_start_cycles;
 
 	void show_outputs();
+};
+
+class pairlove_state : public seta_state
+{
+public:
+	pairlove_state(const machine_config &mconfig, device_type type, const char *tag) :
+		seta_state(mconfig, type, tag)
+	{
+	}
+
+	void pairlove(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+protected:
+	u16 prot_r(offs_t offset);
+	void prot_w(offs_t offset, u16 data);
+
+	void pairlove_map(address_map &map);
+
+	std::unique_ptr<u16 []> m_protram;
+	std::unique_ptr<u16 []> m_protram_old;
 };
 
 class jockeyc_state : public seta_state

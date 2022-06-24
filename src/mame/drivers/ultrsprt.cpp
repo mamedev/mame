@@ -69,7 +69,7 @@ private:
 	void sound_map(address_map &map);
 	void main_map(address_map &map);
 
-	std::unique_ptr<u8[]> m_vram;
+	std::unique_ptr<u32[]> m_vram;
 	u32 m_cpu_vram_page;
 };
 
@@ -78,7 +78,7 @@ private:
 
 u32 ultrsprt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 const *const vram = m_vram.get() + (m_cpu_vram_page ^ 1) * VRAM_PAGE_BYTES;
+	auto const vram = util::big_endian_cast<u8 const>(m_vram.get()) + (m_cpu_vram_page ^ 1) * VRAM_PAGE_BYTES;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
@@ -87,10 +87,10 @@ u32 ultrsprt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
 		{
-			u8 const p1 = vram[BYTE4_XOR_BE(fb_index + x + 512)];
+			u8 const p1 = vram[fb_index + x + 512];
 
 			if (p1 == 0)
-				*dest++ = vram[BYTE4_XOR_BE(fb_index + x)];
+				*dest++ = vram[fb_index + x];
 			else
 				*dest++ = 0x100 + p1;
 		}
@@ -224,11 +224,11 @@ void ultrsprt_state::machine_start()
 	// configure fast RAM regions for DRC
 	m_maincpu->ppcdrc_add_fastram(0xff000000, 0xff01ffff, false, m_workram);
 
-	m_vram = std::make_unique<u8[]>(VRAM_PAGE_BYTES * VRAM_PAGES);
+	m_vram = std::make_unique<u32[]>(VRAM_PAGE_BYTES / sizeof(u32) * VRAM_PAGES);
 
 	m_vrambank->configure_entries(0, VRAM_PAGES, m_vram.get(), VRAM_PAGE_BYTES);
 
-	save_pointer(NAME(m_vram), VRAM_PAGE_BYTES * VRAM_PAGES);
+	save_pointer(NAME(m_vram), VRAM_PAGE_BYTES / sizeof(u32) * VRAM_PAGES);
 	save_item(NAME(m_cpu_vram_page));
 }
 

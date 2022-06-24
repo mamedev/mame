@@ -769,7 +769,7 @@ void sun3_state::vmetype0space_map(address_map &map)
 {
 	map(0x00000000, 0x08ffffff).rw(FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
 	map(0xfe400000, 0xfe41ffff).ram(); // not sure what's going on here (3/110)
-	map(0xff000000, 0xff03ffff).ram().share("bw2_vram");
+	map(0xff000000, 0xff03ffff).ram().share(m_bw2_vram);
 }
 
 // type 0 without VRAM (3/50)
@@ -905,14 +905,14 @@ template <unsigned W, unsigned H>
 uint32_t sun3_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t const *const m_vram = (uint8_t *)m_bw2_vram.target();
+	auto const vram = util::big_endian_cast<uint8_t const>(m_bw2_vram.target());
 
 	for (int y = 0; y < H; y++)
 	{
 		uint32_t *scanline = &bitmap.pix(y);
 		for (int x = 0; x < W/8; x++)
 		{
-			uint8_t const pixels = m_vram[(y * (W/8)) + (BYTE4_XOR_BE(x))];
+			uint8_t const pixels = vram[(y * (W / 8)) + x];
 
 			*scanline++ = palette[BIT(pixels, 7)];
 			*scanline++ = palette[BIT(pixels, 6)];
@@ -930,14 +930,14 @@ uint32_t sun3_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 uint32_t sun3_state::bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t const *const m_vram = (uint8_t *)&m_ram_ptr[(0x100000>>2)];
+	auto const vram = util::big_endian_cast<uint8_t const>(m_ram_ptr + (0x100000 >> 2));
 
 	for (int y = 0; y < 900; y++)
 	{
 		uint32_t *scanline = &bitmap.pix(y);
 		for (int x = 0; x < 1152/8; x++)
 		{
-			uint8_t const pixels = m_vram[(y * (1152/8)) + (BYTE4_XOR_BE(x))];
+			uint8_t const pixels = vram[(y * (1152 / 8)) + x];
 
 			*scanline++ = palette[BIT(pixels, 7)];
 			*scanline++ = palette[BIT(pixels, 6)];

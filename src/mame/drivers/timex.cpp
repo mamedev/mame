@@ -147,8 +147,6 @@ http://www.z88forever.org.uk/zxplus3e/
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/spectrum.h"
-#include "includes/spec128.h"
 #include "includes/timex.h"
 
 #include "cpu/z80/z80.h"

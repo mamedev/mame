@@ -21,6 +21,7 @@
 //-         +---+---++---+
 //-
 static NETLIST_START(TTL_7400_DIP)
+{
 	TTL_7400_NAND(A)
 	TTL_7400_NAND(B)
 	TTL_7400_NAND(C)
@@ -39,6 +40,7 @@ static NETLIST_START(TTL_7400_DIP)
 		A.GND, /*   GND |7            8| Y3   */ C.Q
 			   /*       +--------------+      */
 	)
+}
 NETLIST_END()
 
 //- Identifier: TTL_7402_DIP
@@ -2091,20 +2093,15 @@ NETLIST_END()
 //-
 static NETLIST_START(TTL_74174_DIP)
 	TTL_74174(A)
-	TTL_74174(B)
-	TTL_74174(C)
-	TTL_74174(D)
-	TTL_74174(E)
-	TTL_74174(F)
 
 	DIPPINS(    /*      +--------------+      */
-		A.CLRQ, /* CLRQ |1     ++    16| VCC  */ A.VCC,
-		   A.Q, /*   Q1 |2           15| Q6   */ F.Q,
-		   A.D, /*   D1 |3           14| D6   */ F.D,
-		   B.D, /*   D2 |4   74174   13| D5   */ E.D,
-		   B.Q, /*   Q2 |5           12| Q5   */ E.Q,
-		   C.D, /*   D3 |6           11| D4   */ D.D,
-		   C.Q, /*   Q3 |7           10| Q4   */ D.Q,
+		A.CLRQ, /* CLRQ |1     ++    16| VCC  */ A.VCC
+		  A.Q1, /*   Q1 |2           15| Q6   */ A.Q6,
+		  A.D1, /*   D1 |3           14| D6   */ A.D6,
+		  A.D2, /*   D2 |4   74174   13| D5   */ A.D5,
+		  A.Q2, /*   Q2 |5           12| Q5   */ A.Q5,
+		  A.D3, /*   D3 |6           11| D4   */ A.D4,
+		  A.Q3, /*   Q3 |7           10| Q4   */ A.Q4,
 		 A.GND, /*  GND |8            9| CLK  */ A.CLK
 				/*      +--------------+      */
 	)
@@ -3147,6 +3144,7 @@ static TRUTHTABLE_START(TTL_74279B, 4, 1, "")
 TRUTHTABLE_END()
 
 static TRUTHTABLE_START(TTL_9312, 12, 2, "+A,+B,+C,+G,+D0,+D1,+D2,+D3,+D4,+D5,+D6,+D7,@VCC,@GND")
+{
 	TT_HEAD(" C, B, A, G,D0,D1,D2,D3,D4,D5,D6,D7| Y,YQ")
 	TT_LINE(" X, X, X, 1, X, X, X, X, X, X, X, X| 0, 1|33,19")
 	TT_LINE(" 0, 0, 0, 0, 0, X, X, X, X, X, X, X| 0, 1|33,28")
@@ -3166,6 +3164,7 @@ static TRUTHTABLE_START(TTL_9312, 12, 2, "+A,+B,+C,+G,+D0,+D1,+D2,+D3,+D4,+D5,+D
 	TT_LINE(" 1, 1, 1, 0, X, X, X, X, X, X, X, 0| 0, 1|33,28")
 	TT_LINE(" 1, 1, 1, 0, X, X, X, X, X, X, X, 1| 1, 0|33,28")
 	TT_FAMILY("74XX")
+}
 TRUTHTABLE_END()
 
 NETLIST_START(ttl74xx_lib)

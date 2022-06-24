@@ -704,18 +704,18 @@ GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
 {
-	const uint16_t *ttl_vram = (uint16_t *)&m_ttl_vram[0];
-	const int code = ttl_vram[BYTE_XOR_BE(tile_index)] & 0xfff;
-	const int attr = ttl_vram[BYTE_XOR_BE(tile_index)] >> 12;  // Is the palette in all 4 bits?
+	const auto ttl_vram = util::big_endian_cast<const uint16_t>(m_ttl_vram.target());
+	const int code = ttl_vram[tile_index] & 0xfff;
+	const int attr = ttl_vram[tile_index] >> 12;  // Is the palette in all 4 bits?
 
 	tileinfo.set(m_ttl_gfx_index, code, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 {
-	const uint16_t *roz_vram = (uint16_t *)&m_roz_vram[0];
-	const int code = roz_vram[BYTE_XOR_BE(tile_index)] & 0x3ff;
-	const int attr = (roz_vram[BYTE_XOR_BE(tile_index)] >> 12) + 16; // ROZ base palette is palette index 16 onward
+	const auto roz_vram = util::big_endian_cast<const uint16_t>(m_roz_vram.target());
+	const int code = roz_vram[tile_index] & 0x3ff;
+	const int attr = (roz_vram[tile_index] >> 12) + 16; // ROZ base palette is palette index 16 onward
 
 	tileinfo.set(0, code, attr, 0);
 }

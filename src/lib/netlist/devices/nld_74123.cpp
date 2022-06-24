@@ -128,8 +128,8 @@ namespace netlist::devices {
 			connect("RN.1", "RP.2");
 			connect("_CV", "RN.1");
 
-			m_RP.m_RON.set(D::RI());
-			m_RN.m_RON.set(D::RI());
+			m_RP().m_RON.set(D::RI());
+			m_RN().m_RON.set(D::RI());
 		}
 
 		NETLIB_HANDLERI(ab_clear)
@@ -169,7 +169,7 @@ namespace netlist::devices {
 		{
 			if (m_state == 1)
 			{
-				const nl_fptype vLow = m_KP * m_RP.P()();
+				const nl_fptype vLow = m_KP * m_RP().P()();
 				if (m_CV() < vLow)
 				{
 					m_RN_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
@@ -178,7 +178,7 @@ namespace netlist::devices {
 			}
 			if (m_state == 2)
 			{
-				const nl_fptype vHigh = (nlconst::one() - m_KP) * m_RP.P()();
+				const nl_fptype vHigh = (nlconst::one() - m_KP) * m_RP().P()();
 				if (m_CV() > vHigh)
 				{
 					m_RP_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
@@ -192,8 +192,8 @@ namespace netlist::devices {
 
 		NETLIB_RESETI()
 		{
-			m_RP.reset();
-			m_RN.reset();
+			m_RP().reset();
+			m_RN().reset();
 
 			//m_RP.set_R(R_OFF);
 			//m_RN.set_R(R_OFF);

@@ -223,6 +223,8 @@ public:
 
 	void map(address_map &map);
 
+	uint8_t pc_ppi_portb_r();
+
 protected:
 	pc_noppi_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -231,7 +233,6 @@ protected:
 
 private:
 	uint8_t pc_ppi_porta_r();
-	uint8_t pc_ppi_portb_r();
 };
 
 DECLARE_DEVICE_TYPE(PCNOPPI_MOTHERBOARD, pc_noppi_mb_device)

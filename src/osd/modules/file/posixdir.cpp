@@ -193,7 +193,7 @@ bool posix_directory::open_impl(std::string const &dirname)
 {
 	assert(!m_fd);
 
-	osd_subst_env(m_path, dirname);
+	m_path = osd_subst_env(dirname);
 	m_fd.reset(::opendir(m_path.c_str()));
 	return bool(m_fd);
 }
@@ -224,7 +224,7 @@ directory::ptr directory::open(std::string const &dirname)
 //  osd_subst_env
 //============================================================
 
-void osd_subst_env(std::string &dst, std::string const &src)
+std::string osd_subst_env(std::string_view src)
 {
 	std::string result, var;
 	auto start = src.begin();
@@ -292,5 +292,5 @@ void osd_subst_env(std::string &dst, std::string const &src)
 		}
 	}
 
-	dst = std::move(result);
+	return result;
 }

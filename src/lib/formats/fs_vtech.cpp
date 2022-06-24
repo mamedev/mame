@@ -137,7 +137,7 @@ std::vector<dir_entry> vtech_image::impl::root_dir::contents()
 			if(bdir.r8(off+1) != ':')
 				continue;
 			std::string fname = trim_end_spaces(bdir.rstr(off+2, 8));
-			res.emplace_back(dir_entry(fname, dir_entry_type::file, id));
+			res.emplace_back(dir_entry(std::move(fname), dir_entry_type::file, id));
 			id++;
 		}
 	}

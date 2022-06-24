@@ -14,6 +14,8 @@
 #include "emu.h"
 #include "input_common.h"
 
+#include "inputdev.h" // FIXME: still using concrete input device class in input_module_base::poll
+
 // winnt.h defines this
 #ifdef DELETE
 #undef DELETE
@@ -276,4 +278,47 @@ int input_module_base::init(const osd_options &options)
 	m_input_enabled = true;
 
 	return 0;
+}
+
+void input_module_base::poll(running_machine &machine)
+{
+	// ignore if not enabled
+	if (m_input_enabled)
+	{
+		// grab the current time
+		m_last_poll = m_clock.now();
+
+		before_poll(machine);
+
+		// track if mouse/lightgun is enabled, for mouse hiding purposes
+		m_mouse_enabled = machine.input().device_class(DEVICE_CLASS_MOUSE).enabled();
+		m_lightgun_enabled = machine.input().device_class(DEVICE_CLASS_LIGHTGUN).enabled();
+	}
+
+	// poll all of the devices
+	if (should_poll_devices(machine))
+	{
+		m_devicelist.poll_devices();
+	}
+	else
+	{
+		m_devicelist.reset_devices();
+	}
+}
+
+void input_module_base::pause()
+{
+	// keep track of the paused state
+	m_input_paused = true;
+}
+
+void input_module_base::resume()
+{
+	// keep track of the paused state
+	m_input_paused = false;
+}
+
+void input_module_base::exit()
+{
+	devicelist().free_all_devices();
 }

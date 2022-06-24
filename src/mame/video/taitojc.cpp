@@ -122,42 +122,36 @@ void taitojc_state::taitojc_char_w(offs_t offset, uint32_t data, uint32_t mem_ma
 
 void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t w1, uint32_t w2, uint8_t bank_type)
 {
-	int x, y, width, height, palette;
-	int x1, x2, y1, y2;
-	int ix, iy;
-	uint32_t address;
-	uint8_t *v;
-	uint8_t color_depth;
-	uint8_t mask_screen;
+	uint8_t const color_depth = (w2 & 0x10000) >> 16;
+	uint8_t const mask_screen = (w2 & 0x20000) >> 17;
 
-	color_depth = (w2 & 0x10000) >> 16;
-	mask_screen = (w2 & 0x20000) >> 17;
-
-	address     = (w2 & 0x7fff) * 0x20;
-	if (w2 & 0x4000)
+	uint32_t address = (w2 & 0x7fff) * 0x20;
+	if(w2 & 0x4000)
 		address |= 0x40000;
 
-	x           = ((w1 >>  0) & 0x3ff);
-	if (x & 0x200)
+	int x = ((w1 >>  0) & 0x3ff);
+	if(x & 0x200)
 		x |= ~0x1ff;        // sign-extend
 
-	y           = ((w1 >> 16) & 0x3ff);
-	if (y & 0x200)
+	int y = ((w1 >> 16) & 0x3ff);
+	if(y & 0x200)
 		y |= ~0x1ff;        // sign-extend
 
-	width       = ((w1 >> 10) & 0x3f) * 16;
-	height      = ((w1 >> 26) & 0x3f) * 16;
-	palette     = ((w2 >> 22) & 0x7f) << 8;
+	int width       = ((w1 >> 10) & 0x3f) * 16;
+	int height      = ((w1 >> 26) & 0x3f) * 16;
+	int palette     = ((w2 >> 22) & 0x7f) << 8;
 
 	/* TODO: untangle this! */
+	uint32_t const *v;
 	if(address >= 0xff000)
-		v = (uint8_t*)&m_objlist[(address-0xff000)/4];
+		v = &m_objlist[(address-0xff000)/4];
 	if(address >= 0xfc000)
-		v = (uint8_t*)&m_char_ram[(address-0xfc000)/4];
+		v = &m_char_ram[(address-0xfc000)/4];
 	else if(address >= 0xf8000)
-		v = (uint8_t*)&m_tile_ram[(address-0xf8000)/4];
+		v = &m_tile_ram[(address-0xf8000)/4];
 	else
-		v = (uint8_t*)&m_vram[address/4];
+		v = &m_vram[address/4];
+	auto const v8 = util::big_endian_cast<u8>(v);
 
 	/* guess, but it's probably doable via a vreg ... */
 	if ((width == 0 || height == 0) && bank_type == 2)
@@ -166,10 +160,10 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	if(width == 0 || height == 0)
 		return;
 
-	x1 = x;
-	x2 = x + width;
-	y1 = y;
-	y2 = y + height;
+	int x1 = x;
+	int x2 = x + width;
+	int y1 = y;
+	int y2 = y + height;
 
 	// trivial rejection
 	if (x1 > cliprect.max_x || x2 < cliprect.min_x || y1 > cliprect.max_y || y2 < cliprect.min_y)
@@ -179,8 +173,8 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 //  osd_printf_debug("draw_object: %08X %08X, X: %d, Y: %d, W: %d, H: %d\n", w1, w2, x, y, width, height);
 
-	ix = 0;
-	iy = 0;
+	int ix = 0;
+	int iy = 0;
 
 	// clip
 	if (x1 < cliprect.min_x)
@@ -234,11 +228,11 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 			for (int i=x1; i < x2; i+=2)
 			{
-				uint8_t pen = (v[BYTE4_XOR_BE(index)] & 0xf0) >> 4;
+				uint8_t pen = (v8[index] & 0xf0) >> 4;
 				if (pen != 0)
 					d[i] = palette + pen;
 
-				pen = (v[BYTE4_XOR_BE(index)] & 0x0f);
+				pen = v8[index] & 0x0f;
 				if (pen != 0)
 					d[i+1] = palette + pen;
 
@@ -258,7 +252,7 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 				for (int i=x1; i < x2; i++)
 				{
-					uint8_t pen = v[BYTE4_XOR_BE(index)];
+					uint8_t pen = v8[index];
 					if (pen != 0)
 					{
 						d[i] = palette + pen;

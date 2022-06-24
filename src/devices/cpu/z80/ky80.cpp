@@ -4,7 +4,7 @@
 
     Taxan KY-80
 
-    This 160-pin QFP device seems to be a custom derivative of the
+    This 100-pin QFP device seems to be a custom derivative of the
     Kawasaki KC82 CPU core (fast Z80-like with built-in MMU). It seems
     possible that it was built entirely out of Kawasaki LSI macrocells,
     but the on-chip peripherals are at least mapped differently than in
@@ -12,8 +12,8 @@
     rather the bottom quarter).
 
     On-chip features appear to include 1024 bytes of RAM, an interrupt
-    controller (not quite the same as KP69), 5 parallel ports and 2 8251-
-    like serial ports.
+    controller (not quite the same as KP69), a KP63-like timer/counter
+    block, 5 parallel ports and 2 8251-like serial ports.
 
 ***************************************************************************/
 

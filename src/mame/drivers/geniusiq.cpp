@@ -2,10 +2,11 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 Video Technology Genius computers:
+    PreComputer Unlimited (USA and Canada)
     VTech Genius PC (France)
     VTech Genius IQ 512 (Germany)
     The French packaging mentions distributions in Switzerland, the Netherlands,
-    USA, Canada, and UK as well. Looking for more information and ROM dumps.
+    and UK as well. Looking for more information and ROM dumps.
 
 System driver:
 
@@ -26,7 +27,6 @@ TODO:
     - Check with different countries ROMs
 
 Not very much is known about this computer released in 1997.
-
 
 
 PCB - German Version:
@@ -446,7 +446,7 @@ void geniusiq_state::geniusiq_mem(address_map &map)
 	// 0x600000 : some memory mapped hardware
 }
 
-/* Input ports */
+// Input ports
 static INPUT_PORTS_START( geniusiq )
 	PORT_START( "IN0" )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )      //  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x00 )
@@ -700,15 +700,15 @@ DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state::cart_unload)
 
 void geniusiq_state::iq128(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	M68000(config, m_maincpu, XTAL(32'000'000)/2); // The main crystal is at 32MHz, not sure whats the CPU freq
 	m_maincpu->set_addrmap(AS_PROGRAM, &geniusiq_state::geniusiq_mem);
 	m_maincpu->set_periodic_int(FUNC(geniusiq_state::irq6_line_hold), attotime::from_hz(125));  // the internal clock is increased by 1 sec every 125 interrupts
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(512, 256);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(geniusiq_state::screen_update));
@@ -716,26 +716,31 @@ void geniusiq_state::iq128(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(geniusiq_state::geniusiq_palette), 16);
 
-	/* internal flash */
+	// Internal flash
 	AMD_29F010(config, "flash");
 
-	/* cartridge */
+	// Cartridge
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "iq128_cart"));
 	cartslot.set_device_load(FUNC(geniusiq_state::cart_load));
 	cartslot.set_device_unload(FUNC(geniusiq_state::cart_unload));
 
-	/* Software lists */
+	// Software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("iq128");
 }
 
 void geniusiq_state::iqtv512(machine_config &config)
 {
 	iq128(config);
-	/* internal flash */
+	// Internal flash
 	AMD_29F040(config.replace(), "flash");
 }
 
-/* ROM definition */
+// ROM definitions
+
+ROM_START( pcunlim )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "27-5792-03.u3", 0x0000, 0x200000, CRC(944aa3be) SHA1(6005627035d99cfb6c479064808424adf0430df3) )
+ROM_END
 
 ROM_START( iq128 )
 	ROM_REGION(0x200000, "maincpu", 0)
@@ -757,10 +762,11 @@ ROM_START( itunlim )
 	ROM_LOAD( "27-06124-002.u3", 0x000000, 0x200000, CRC(0c0753ce) SHA1(d22504d583ca8d6a9d2f56fbaa3e1d52c442a1e9) )
 ROM_END
 
-/* Driver */
+// Drivers
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT        CLASS           INIT        COMPANY             FULLNAME                      FLAGS
-COMP( 1997, iq128,    0,      0,      iq128,   geniusiq_de, geniusiq_state, empty_init, "Video Technology", "Genius IQ 128 (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1997, iq128_fr, iq128,  0,      iq128,   geniusiq,    geniusiq_state, empty_init, "Video Technology", "Genius IQ 128 (France)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, iqtv512,  0,      0,      iqtv512, geniusiq_de, geniusiq_state, empty_init, "Video Technology", "Genius IQ TV 512 (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, itunlim,  0,      0,      iq128,   geniusiq_de, geniusiq_state, empty_init, "Video Technology", "VTech IT Unlimited (UK)",    MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT        CLASS           INIT        COMPANY             FULLNAME                              FLAGS
+COMP( 1997, pcunlim,  0,       0,      iq128,   geniusiq_de, geniusiq_state, empty_init, "Video Technology", "PreComputer Unlimited (USA/Canada)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1997, iq128,    pcunlim, 0,      iq128,   geniusiq_de, geniusiq_state, empty_init, "Video Technology", "Genius IQ 128 (Germany)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1997, iq128_fr, pcunlim, 0,      iq128,   geniusiq,    geniusiq_state, empty_init, "Video Technology", "Genius IQ 128 (France)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, iqtv512,  pcunlim, 0,      iqtv512, geniusiq_de, geniusiq_state, empty_init, "Video Technology", "Genius IQ TV 512 (Germany)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, itunlim,  pcunlim, 0,      iq128,   geniusiq_de, geniusiq_state, empty_init, "Video Technology", "VTech IT Unlimited (UK)",            MACHINE_NO_SOUND)

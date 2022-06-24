@@ -327,7 +327,7 @@ namespace netlist::solver
 		t.imbue(std::locale::classic());
 		plib::putf8_fmt_writer w(&t);
 		generate_code(w);
-		//std::hash<typename std::remove_const<std::remove_reference<decltype(t.str())>::type>::type> h;
+		//#std::hash<typename std::remove_const<std::remove_reference<decltype(t.str())>::type>::type> h;
 		return plib::pfmt("nl_gcr_{1}_{2}_{3}_{4:x}")(mat.nz_num)(str_fptype)(str_floattype)(plib::hash<uint64_t>( t.str().c_str(), t.str().size() ));
 	}
 

@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "ui/viewgfx.h"
 
-
 #include "emupal.h"
 #include "render.h"
 #include "rendfont.h"
@@ -19,6 +18,8 @@
 #include "screen.h"
 #include "tilemap.h"
 #include "uiinput.h"
+
+#include "util/unicode.h"
 
 #include <cmath>
 #include <vector>
@@ -549,6 +550,25 @@ private:
 
 	void gfxset_draw_item(gfx_element &gfx, int index, int dstx, int dsty, gfxset::setinfo const &info);
 
+	void draw_text(mame_ui_manager &mui, render_container &container, std::string_view str, float x, float y)
+	{
+		render_font *const font = mui.get_font();
+		float const height = mui.get_line_height();
+		float const aspect = m_machine.render().ui_aspect(&container);
+		rgb_t const color = mui.colors().text_color();
+
+		int n;
+		char32_t ch;
+		while ((n = uchar_from_utf8(&ch, str)) != 0)
+		{
+			if (0 > n)
+				ch = 0xfffd;
+			str.remove_prefix((0 > n) ? 1 : n);
+			container.add_char(x, y, height, aspect, color, *font, ch);
+			x += font->char_width(height, aspect, ch);
+		}
+	}
+
 	void resize_bitmap(int32_t width, int32_t height)
 	{
 		if (!m_bitmap.valid() || !m_texture || (m_bitmap.width() != width) || (m_bitmap.height() != height))
@@ -766,17 +786,17 @@ bool gfx_viewer::tilemap::handle_keys(running_machine &machine, float pixelscale
 	if (input.pressed(IPT_UI_ZOOM_OUT) && info.zoom_out(pixelscale))
 	{
 		result = true;
-		machine.popmessage(info.m_zoom_frac ? _("Zoom = 1/%1$d") : _("Zoom = %1$d"), info.m_zoom);
+		machine.popmessage(info.m_zoom_frac ? _("gfxview", "Zoom = 1/%1$d") : _("gfxview", "Zoom = %1$d"), info.m_zoom);
 	}
 	if (input.pressed(IPT_UI_ZOOM_IN) && info.zoom_in(pixelscale))
 	{
 		result = true;
-		machine.popmessage(info.m_zoom_frac ? _("Zoom = 1/%1$d") : _("Zoom = %1$d"), info.m_zoom);
+		machine.popmessage(info.m_zoom_frac ? _("gfxview", "Zoom = 1/%1$d") : _("gfxview", "Zoom = %1$d"), info.m_zoom);
 	}
 	if (input.pressed(IPT_UI_ZOOM_DEFAULT) && !info.m_auto_zoom)
 	{
 		info.m_auto_zoom = true;
-		machine.popmessage(_("Expand to fit"));
+		machine.popmessage(_("gfxview", "Expand to fit"));
 	}
 
 	// handle rotation (R)
@@ -799,14 +819,14 @@ bool gfx_viewer::tilemap::handle_keys(running_machine &machine, float pixelscale
 	{
 		result = true;
 		if (TILEMAP_DRAW_ALL_CATEGORIES == info.m_flags)
-			machine.popmessage("Category All");
+			machine.popmessage(_("gfxview", "All categories"));
 		else
-			machine.popmessage("Category = %d", info.m_flags);
+			machine.popmessage(_("gfxview", "Category %1$d"), info.m_flags);
 	}
 	if (input.pressed(IPT_UI_PAGE_DOWN) && info.next_category())
 	{
 		result = true;
-		machine.popmessage("Category = %d", info.m_flags);
+		machine.popmessage(_("gfxview", "Category %1$d"), info.m_flags);
 	}
 
 	// handle navigation (up,down,left,right), taking orientation into account
@@ -902,9 +922,9 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 
 	// figure out the title
 	std::ostringstream title_buf;
-	util::stream_format(title_buf, "'%s'", palette.device().tag());
-	if (palette.indirect_entries() > 0)
-		title_buf << (indirect ? _(" COLORS") : _(" PENS"));
+	util::stream_format(title_buf,
+			!palette.indirect_entries() ? _("gfxview", "[root%1$s]") : indirect ? _("gfxview", "[root%1$s] colors") : _("gfxview", "[root%1$s] pens"),
+			palette.device().tag());
 
 	// if the mouse pointer is over one of our cells, add some info about the corresponding palette entry
 	float mouse_x, mouse_y;
@@ -913,14 +933,28 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 		int const index = m_palette.index(int((mouse_x - cellboxbounds.x0) / cellwidth), int((mouse_y - cellboxbounds.y0) / cellheight));
 		if (index < total)
 		{
-			util::stream_format(title_buf, " #%X", index);
-			if (palette.indirect_entries() && indirect)
-				util::stream_format(title_buf, " => %X", palette.pen_indirect(index));
-			else if (paldev && paldev->basemem().base())
-				util::stream_format(title_buf, " = %X", paldev->read_entry(index));
-
 			rgb_t const col = indirect ? palette.indirect_color(index) : raw_color[index];
-			util::stream_format(title_buf, " (A:%X R:%X G:%X B:%X)", col.a(), col.r(), col.g(), col.b());
+			if (palette.indirect_entries() && indirect)
+			{
+				util::stream_format(title_buf,
+						_("gfxview", u8" #%1$X \u2192 %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"),
+						index, palette.pen_indirect(index),
+						col.a(), col.r(), col.g(), col.b());
+			}
+			else if (paldev && paldev->basemem().base())
+			{
+				util::stream_format(title_buf,
+						_("gfxview", " #%1$X = %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"),
+						index, paldev->read_entry(index),
+						col.a(), col.r(), col.g(), col.b());
+			}
+			else
+			{
+				util::stream_format(title_buf,
+						_("gfxview", " #%1$X (A:%2$02X R:%3$02X G:%4$02X B:%5$02X)"),
+						index,
+						col.a(), col.r(), col.g(), col.b());
+			}
 		}
 	}
 
@@ -937,13 +971,7 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 	mui.draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, mui.colors().gfxviewer_bg_color());
 
 	// draw the title
-	x0 = 0.5f - 0.5f * titlewidth;
-	y0 = boxbounds.y0 + 0.5f * chheight;
-	for (auto ch : title)
-	{
-		container.add_char(x0, y0, chheight, aspect, rgb_t::white(), *ui_font, ch);
-		x0 += ui_font->char_width(chheight, aspect, ch);
-	}
+	draw_text(mui, container, title, 0.5f - 0.5f * titlewidth, boxbounds.y0 + 0.5f * chheight);
 
 	// draw the top column headers
 	int const rowskip = int(chwidth / cellwidth);
@@ -1102,7 +1130,10 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 
 	// figure out the title
 	std::ostringstream title_buf;
-	util::stream_format(title_buf, "'%s' %d/%d", interface.device().tag(), m_gfxset.m_set, info.setcount() - 1);
+	util::stream_format(title_buf,
+			_("gfxview", "[root%1$s] %2$d/%3$d"),
+			interface.device().tag(),
+			m_gfxset.m_set, info.setcount() - 1);
 
 	// if the mouse pointer is over a pixel in a tile, add some info about the tile and pixel
 	bool found_pixel = false;
@@ -1122,14 +1153,18 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 			if (set.m_rotate & ORIENTATION_SWAP_XY)
 				std::swap(xpixel, ypixel);
 			uint8_t const pixdata = gfx.get_data(code)[xpixel + ypixel * gfx.rowbytes()];
-			util::stream_format(title_buf, " #%X:%X @ %d,%d = %X",
+			util::stream_format(title_buf,
+					_("gfxview", " #%1$X:%2$X (%3$d %4$d) = %5$X"),
 					code, set.m_color,
 					xpixel, ypixel,
 					gfx.colorbase() + (set.m_color * gfx.granularity()) + pixdata);
 		}
 	}
 	if (!found_pixel)
-		util::stream_format(title_buf, " %dx%d COLOR %X/%X", gfx.width(), gfx.height(), set.m_color, set.m_color_count);
+		util::stream_format(title_buf,
+				_("gfxview", u8" %1$d\u00d7%2$d color %3$X/%4$X"),
+				gfx.width(), gfx.height(),
+				set.m_color, set.m_color_count);
 
 	float x0, y0;
 
@@ -1144,13 +1179,7 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 	mui.draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, mui.colors().gfxviewer_bg_color());
 
 	// draw the title
-	x0 = 0.5f - 0.5f * titlewidth;
-	y0 = boxbounds.y0 + 0.5f * chheight;
-	for (auto ch : title)
-	{
-		container.add_char(x0, y0, chheight, aspect, rgb_t::white(), *ui_font, ch);
-		x0 += ui_font->char_width(chheight, aspect, ch);
-	}
+	draw_text(mui, container, title, 0.5f - 0.5f * titlewidth, boxbounds.y0 + 0.5f * chheight);
 
 	// draw the top column headers
 	int const colskip = int(chwidth / cellwidth);
@@ -1272,7 +1301,10 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 
 	// figure out the title
 	std::ostringstream title_buf;
-	util::stream_format(title_buf, "TILEMAP %d/%d", m_tilemap.index() + 1, m_machine.tilemap().count());
+	util::stream_format(title_buf,
+			(m_tilemap.flags() != TILEMAP_DRAW_ALL_CATEGORIES) ? _("gfxview", "Tilemap %1$d/%2$d category %3$u") : _("gfxview", "Tilemap %1$d/%2$d "),
+			m_tilemap.index() + 1, m_machine.tilemap().count(),
+			m_tilemap.flags());
 
 	// if the mouse pointer is over a tile, add some info about its coordinates and color
 	float mouse_x, mouse_y;
@@ -1291,17 +1323,18 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 		uint8_t gfxnum;
 		uint32_t code, color;
 		tilemap.get_info_debug(col, row, gfxnum, code, color);
-		util::stream_format(title_buf, " @ %u,%u = GFX%u #%X:%X",
+		util::stream_format(title_buf,
+				_("gfxview", " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"),
 				col * tilemap.tilewidth(), row * tilemap.tileheight(),
 				gfxnum, code, color);
 	}
 	else
 	{
-		util::stream_format(title_buf, " %dx%d OFFS %d,%d", tilemap.width(), tilemap.height(), m_tilemap.xoffs(), m_tilemap.yoffs());
+		util::stream_format(title_buf,
+				_("gfxview", u8" %1$d\u00d7%2$d origin (%3$d %4$d)"),
+				tilemap.width(), tilemap.height(),
+				m_tilemap.xoffs(), m_tilemap.yoffs());
 	}
-
-	if (m_tilemap.flags() != TILEMAP_DRAW_ALL_CATEGORIES)
-		util::stream_format(title_buf, " CAT %u", m_tilemap.flags());
 
 	// expand the outer box to fit the title
 	std::string const title = std::move(title_buf).str();
@@ -1316,13 +1349,7 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 	mui.draw_outlined_box(container, boxbounds.x0, boxbounds.y0, boxbounds.x1, boxbounds.y1, mui.colors().gfxviewer_bg_color());
 
 	// draw the title
-	float x0 = 0.5f - 0.5f * titlewidth;
-	float y0 = boxbounds.y0 + 0.5f * chheight;
-	for (auto ch : title)
-	{
-		container.add_char(x0, y0, chheight, aspect, rgb_t::white(), *ui_font, ch);
-		x0 += ui_font->char_width(chheight, aspect, ch);
-	}
+	draw_text(mui, container, title, 0.5f - 0.5f * titlewidth, boxbounds.y0 + 0.5f * chheight);
 
 	// update the bitmap
 	update_tilemap_bitmap(std::lround(mapboxwidth / pixelscale), std::lround(mapboxheight / pixelscale));
