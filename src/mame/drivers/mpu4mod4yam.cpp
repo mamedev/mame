@@ -44,8 +44,8 @@ void mpu4mod4yam_machines_state::init_m4addr()
 {
 	//Derived from Adders_&_Ladders_(Barcrest)_[C03_800_6jp].gam
 	init_m4default();
-	init_m4_hopper_tubes();
-	init_m4default_reels();
+	use_m4_hopper_tubes();
+	use_m4_standard_reels();
 
 	//PCKEY =0
 	//STKEY =0
@@ -122,64 +122,64 @@ GAME_CUSTOM( 1991, m4addr6ly,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser
 GAME_CUSTOM( 1991, m4addr6lyd,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::addr_characteriser_prot>, m4addr, init_m4addr, "a6ldy.p1",                 0x0000, 0x010000, CRC(82f060a5) SHA1(2e8474e6c17def07e35448b5bf8d453cce0f292c), "Barcrest","Classic Adders & Ladders (Barcrest) (MPU4) (A6L 0.1 YD)", 0 )
 GAME_CUSTOM( 1991, m4addr6lybd,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::addr_characteriser_prot>, m4addr, init_m4addr, "a6lbdy.p1",                0x0000, 0x010000, CRC(28064099) SHA1(c916f73911974440d4c79ecb51b343aad78f115b), "Barcrest","Classic Adders & Ladders (Barcrest) (MPU4) (A6L 0.1 YBD)", 0 )
 // "(C)1993  B.W.B." and "ADD 1.0"
-GAME_CUSTOM( 199?, m4addrc__l,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "al10",                     0x0000, 0x010000, CRC(3c3c82b6) SHA1(cc5ffdd0837c9af31d5737a70430a01d1989cdcc), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, 1993)", GAME_FLAGS )
+GAME_CUSTOM( 199?, m4addrc__l,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "al10",                     0x0000, 0x010000, CRC(3c3c82b6) SHA1(cc5ffdd0837c9af31d5737a70430a01d1989cdcc), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0, 1993)", GAME_FLAGS )
 // "(C)1994  B.W.B." and "ADD 1.0" (actually version 10?)
-GAME_CUSTOM( 1994, m4addr10,     m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05___.1o3",             0x0000, 0x010000, CRC(8d9e0f5d) SHA1(fecc844908876e161d0134ce3cc098e79e74e0b1), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr10d,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_d_.1o3",             0x0000, 0x010000, CRC(2d29040f) SHA1(ee2bdd5da1a7e4146419ffd8bad521a9c1b49aa2), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 D, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr10c,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi05___.1o3",             0x0000, 0x010000, CRC(050764b1) SHA1(364c50e4887c9fdd7ff62e63a6be4513336b4814), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr10yd,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_b_.1o3",             0x0000, 0x010000, CRC(b10b194a) SHA1(4dc3f14ff3b903c49829f4a91136f9b03a5cb1ae), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 YD, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr10_a,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_10___.1o3",             0x0000, 0x010000, CRC(d587cb00) SHA1(6574c42402f13e5f9cb8f951e0f59b499b2d025d), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr10d_a,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_10_d_.1o3",             0x0000, 0x010000, CRC(d7670d32) SHA1(09dfe2a7fe267f485efed234411efc92d9cce414), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 D, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr10c_a,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi10___.1o3",             0x0000, 0x010000, CRC(005caaa1) SHA1(b4b421c045012b5fbeaca95fa09d087a9c5e6b5b), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr10yd_a, m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_10_b_.1o3",             0x0000, 0x010000, CRC(e2b5c0db) SHA1(9e1716186bb049c61dddaef2465fb1e55d2d93fd), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 YD, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr10,     m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05___.1o3",             0x0000, 0x010000, CRC(8d9e0f5d) SHA1(fecc844908876e161d0134ce3cc098e79e74e0b1), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr10d,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_d_.1o3",             0x0000, 0x010000, CRC(2d29040f) SHA1(ee2bdd5da1a7e4146419ffd8bad521a9c1b49aa2), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 D, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr10c,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi05___.1o3",             0x0000, 0x010000, CRC(050764b1) SHA1(364c50e4887c9fdd7ff62e63a6be4513336b4814), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 C, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr10yd,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_b_.1o3",             0x0000, 0x010000, CRC(b10b194a) SHA1(4dc3f14ff3b903c49829f4a91136f9b03a5cb1ae), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 YD, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr10_a,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_10___.1o3",             0x0000, 0x010000, CRC(d587cb00) SHA1(6574c42402f13e5f9cb8f951e0f59b499b2d025d), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr10d_a,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_10_d_.1o3",             0x0000, 0x010000, CRC(d7670d32) SHA1(09dfe2a7fe267f485efed234411efc92d9cce414), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 D, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr10c_a,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi10___.1o3",             0x0000, 0x010000, CRC(005caaa1) SHA1(b4b421c045012b5fbeaca95fa09d087a9c5e6b5b), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 C, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr10yd_a, m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_10_b_.1o3",             0x0000, 0x010000, CRC(e2b5c0db) SHA1(9e1716186bb049c61dddaef2465fb1e55d2d93fd), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 YD, set 2)", GAME_FLAGS )
 // "(C)1993  B.W.B."  and "ADD 3.0"
-GAME_CUSTOM( 1993, m4addr3,      m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05___.3q3",             0x0000, 0x010000, CRC(ec6ed7ce) SHA1(dfad04b5f6c4ff0fd784ad20471f1cf84586f2cd), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr3d,     m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_d_.3q3",             0x0000, 0x010000, CRC(8d05fba9) SHA1(9c69d7eec7ce0d647d4f8b8b0a6b7e54daa7a79f), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 D, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr3yd,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_b_.3q3",             0x0000, 0x010000, CRC(d4c06db1) SHA1(dacb66b98f9d1d51eddc48b6946d517c277e588e), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 YD, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr3_a,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20___.3a3",             0x0000, 0x010000, CRC(c2431657) SHA1(b2b7541207eb3c898f9cf3df520bff396213b78a), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr3d_a,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20_d_.3a3",             0x0000, 0x010000, CRC(62304025) SHA1(59b7815bf1b5337f46083cef186fedd078a4ad37), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 D, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr3yd_a,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20_b_.3a3",             0x0000, 0x010000, CRC(19990a19) SHA1(ab1031513fb1e499da4a3001b5b26ff1e86cc628), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 YD, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr3_b,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20___.3n3",             0x0000, 0x010000, CRC(883ff001) SHA1(50540270dba31820ad99a4a4034c69d4a58d87c5), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0, set 3)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr3d_b,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20_d_.3n3",             0x0000, 0x010000, CRC(cf254a00) SHA1(1e430b652e4023e28b5648b8bea63e778c6dafc9), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 D, set 3)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr3yd_b,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20_b_.3n3",             0x0000, 0x010000, CRC(65f9946f) SHA1(6bf6f315ed2dc6f603381d36dd408e951ace76bc), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 YD, set 3)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr3_c,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20___.3s3",             0x0000, 0x010000, CRC(b1d54cb6) SHA1(35205975ccdaccd5bf3c1b7bf9a26c5ef30050b3), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0, set 4)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr3d_c,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20_d_.3s3",             0x0000, 0x010000, CRC(89d2301b) SHA1(62ad1a9e008063eb16442b50af806f061669dba7), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 D, set 4)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr3yd_c,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20_b_.3s3",             0x0000, 0x010000, CRC(86982248) SHA1(a6d876333777a29eb0504fa3636727ebcc104f0a), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 YD, set 4)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr3_d,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adl5pv2",                  0x0000, 0x010000, CRC(09c39527) SHA1(16af3e552a7d6c6b802d2b1923523e9aa9de766a), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0, set 5)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3,      m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05___.3q3",             0x0000, 0x010000, CRC(ec6ed7ce) SHA1(dfad04b5f6c4ff0fd784ad20471f1cf84586f2cd), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3d,     m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_d_.3q3",             0x0000, 0x010000, CRC(8d05fba9) SHA1(9c69d7eec7ce0d647d4f8b8b0a6b7e54daa7a79f), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0 D, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3yd,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_b_.3q3",             0x0000, 0x010000, CRC(d4c06db1) SHA1(dacb66b98f9d1d51eddc48b6946d517c277e588e), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0 YD, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3_a,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20___.3a3",             0x0000, 0x010000, CRC(c2431657) SHA1(b2b7541207eb3c898f9cf3df520bff396213b78a), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3d_a,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20_d_.3a3",             0x0000, 0x010000, CRC(62304025) SHA1(59b7815bf1b5337f46083cef186fedd078a4ad37), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0 D, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3yd_a,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20_b_.3a3",             0x0000, 0x010000, CRC(19990a19) SHA1(ab1031513fb1e499da4a3001b5b26ff1e86cc628), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0 YD, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3_b,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20___.3n3",             0x0000, 0x010000, CRC(883ff001) SHA1(50540270dba31820ad99a4a4034c69d4a58d87c5), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0, set 3)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3d_b,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20_d_.3n3",             0x0000, 0x010000, CRC(cf254a00) SHA1(1e430b652e4023e28b5648b8bea63e778c6dafc9), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0 D, set 3)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3yd_b,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20_b_.3n3",             0x0000, 0x010000, CRC(65f9946f) SHA1(6bf6f315ed2dc6f603381d36dd408e951ace76bc), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0 YD, set 3)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3_c,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20___.3s3",             0x0000, 0x010000, CRC(b1d54cb6) SHA1(35205975ccdaccd5bf3c1b7bf9a26c5ef30050b3), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0, set 4)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3d_c,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20_d_.3s3",             0x0000, 0x010000, CRC(89d2301b) SHA1(62ad1a9e008063eb16442b50af806f061669dba7), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0 D, set 4)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3yd_c,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_20_b_.3s3",             0x0000, 0x010000, CRC(86982248) SHA1(a6d876333777a29eb0504fa3636727ebcc104f0a), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0 YD, set 4)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr3_d,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adl5pv2",                  0x0000, 0x010000, CRC(09c39527) SHA1(16af3e552a7d6c6b802d2b1923523e9aa9de766a), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 3.0, set 5)", GAME_FLAGS )
 // "(C)1994  B.W.B."  and "ADD 5.0"
-GAME_CUSTOM( 1994, m4addr5,      m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05___.5a3",             0x0000, 0x010000, CRC(9821a988) SHA1(2be85a0b68e5e31401a5c753b40f3cf803589444), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr5d,     m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_d_.5a3",             0x0000, 0x010000, CRC(b5be8114) SHA1(28dfe1d1cc1d9fc2bcc13fd6437602a6e8c90de2), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0 D, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr5c,     m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi05___.5a3",             0x0000, 0x010000, CRC(03777f8c) SHA1(9e3fddc2130600f343df0531bf3e636b82c2f108), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0 C, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr5yd,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_b_.5a3",             0x0000, 0x010000, CRC(592cb1ae) SHA1(5696ecb3e9e6419f73087120b6a832fde606bacc), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0 YD, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr5_a,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05___.5n3",             0x0000, 0x010000, CRC(86ac3564) SHA1(1dd9cf39d2aee11a3e1bbc68460c12f10e62aeaf), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr5d_a,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_d_.5n3",             0x0000, 0x010000, CRC(ca2653d5) SHA1(30cd35627be8fb4fff2f0d61a6ab43cf3e4c1742), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0 D, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr5c_a,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi05___.5n3",             0x0000, 0x010000, CRC(13003560) SHA1(aabad24748f9b1b09f1820bf1af932160e64fe3e), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0 C, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr5yd_a,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_b_.5n3",             0x0000, 0x010000, CRC(cdc8ca39) SHA1(33fdeef8ab8908f6908120aedf501ec3e9d7d23e), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0 YD, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr5,      m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05___.5a3",             0x0000, 0x010000, CRC(9821a988) SHA1(2be85a0b68e5e31401a5c753b40f3cf803589444), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 5.0, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr5d,     m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_d_.5a3",             0x0000, 0x010000, CRC(b5be8114) SHA1(28dfe1d1cc1d9fc2bcc13fd6437602a6e8c90de2), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 5.0 D, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr5c,     m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi05___.5a3",             0x0000, 0x010000, CRC(03777f8c) SHA1(9e3fddc2130600f343df0531bf3e636b82c2f108), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 5.0 C, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr5yd,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_b_.5a3",             0x0000, 0x010000, CRC(592cb1ae) SHA1(5696ecb3e9e6419f73087120b6a832fde606bacc), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 5.0 YD, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr5_a,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05___.5n3",             0x0000, 0x010000, CRC(86ac3564) SHA1(1dd9cf39d2aee11a3e1bbc68460c12f10e62aeaf), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 5.0, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr5d_a,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_d_.5n3",             0x0000, 0x010000, CRC(ca2653d5) SHA1(30cd35627be8fb4fff2f0d61a6ab43cf3e4c1742), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 5.0 D, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr5c_a,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi05___.5n3",             0x0000, 0x010000, CRC(13003560) SHA1(aabad24748f9b1b09f1820bf1af932160e64fe3e), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 5.0 C, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr5yd_a,  m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_b_.5n3",             0x0000, 0x010000, CRC(cdc8ca39) SHA1(33fdeef8ab8908f6908120aedf501ec3e9d7d23e), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 5.0 YD, set 2)", GAME_FLAGS )
 // "(C)1993  B.W.B."  and "ADD 4.0"
-GAME_CUSTOM( 1993, m4addr4,      m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05___.4s3",             0x0000, 0x010000, CRC(6d1a3c51) SHA1(0e4b985173c7c3bd5804573d99913d66a05d54fb), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr4c,     m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi05___.4s3",             0x0000, 0x010000, CRC(a4343a89) SHA1(cef67bbe03e6f535b530fc099f1b9a8bc7a2f864), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0 C, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr4d,     m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_d_.4s3",             0x0000, 0x010000, CRC(e672baf0) SHA1(bae2e2fe9f51b3b8da20fcefb145f6d35fa2d604), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0 D, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 1993, m4addr4yd,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_b_.4s3",             0x0000, 0x010000, CRC(6bd6fdb6) SHA1(7ee1e80da5833b3eaf4b23035690a09379781584), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0 YD, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr4,      m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05___.4s3",             0x0000, 0x010000, CRC(6d1a3c51) SHA1(0e4b985173c7c3bd5804573d99913d66a05d54fb), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 4.0, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr4c,     m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi05___.4s3",             0x0000, 0x010000, CRC(a4343a89) SHA1(cef67bbe03e6f535b530fc099f1b9a8bc7a2f864), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 4.0 C, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr4d,     m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_d_.4s3",             0x0000, 0x010000, CRC(e672baf0) SHA1(bae2e2fe9f51b3b8da20fcefb145f6d35fa2d604), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 4.0 D, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 1993, m4addr4yd,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_b_.4s3",             0x0000, 0x010000, CRC(6bd6fdb6) SHA1(7ee1e80da5833b3eaf4b23035690a09379781584), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 4.0 YD, set 1)", GAME_FLAGS )
 // "(C)1994  B.W.B."  and "ADD 4.0"
-GAME_CUSTOM( 1994, m4addr4_a,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_10___.4a3",             0x0000, 0x010000, CRC(9151dac3) SHA1(bf1c065a62e84a8073f8f9854981bedad60805be), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr4c_a,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi10___.4a3",             0x0000, 0x010000, CRC(2d2aa3cc) SHA1(21a7690c3fb7d158f4b4e6da63663778246ac902), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0 C, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr4c_b,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi10___.4n3",             0x0000, 0x010000, CRC(af9aad00) SHA1(09729e73f27d9ac5d6ac7171191ed76aeaac3e3d), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0 C, set 3)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr4_a,    m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_10___.4a3",             0x0000, 0x010000, CRC(9151dac3) SHA1(bf1c065a62e84a8073f8f9854981bedad60805be), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 4.0, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr4c_a,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi10___.4a3",             0x0000, 0x010000, CRC(2d2aa3cc) SHA1(21a7690c3fb7d158f4b4e6da63663778246ac902), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 4.0 C, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr4c_b,   m4addr, mod4yam_cheatchr_pal<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi10___.4n3",             0x0000, 0x010000, CRC(af9aad00) SHA1(09729e73f27d9ac5d6ac7171191ed76aeaac3e3d), "BWB","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 4.0 C, set 3)", GAME_FLAGS )
 
 // These have different protection
 // "(C)1991 BARCREST" and "A6L 0.1" (but hack?)
 GAME_CUSTOM( 199?, m4addrc__b,   m4addr, mod4yam_bootleg_fixedret<0x43>, m4addr, init_m4addr, "add20_101",                0x0000, 0x010000, CRC(361b7173) SHA1(dea2b1b0f5910e2fd3f45d220554f0e712dedada), "hack","Classic Adders & Ladders (Barcrest) (MPU4) (A6L 0.1, hack, set 1)", GAME_FLAGS )
 GAME_CUSTOM( 199?, m4addrc__k,   m4addr, mod4yam_bootleg_fixedret<0x63>, m4addr, init_m4addr, "addl_20_.8",               0x0000, 0x010000, CRC(43c98f46) SHA1(0ca4a093b38fc04639e3f4bb742a8923b90d2ed1), "hack","Classic Adders & Ladders (Barcrest) (MPU4) (A6L 0.1, hack, set 2)", GAME_FLAGS )
 // "BIG DIPPER"  and ADD 1.0
-GAME_CUSTOM( 199?, m4addrc__h,   m4addr, mod4yam_bootleg_fixedret<0x1d>, m4addr, init_m4addr, "adders classic.bin",       0x0000, 0x010000, CRC(6bc1d2aa) SHA1(cf17e697ff0cfba999f6511f24051dbc3d0384ef), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, hack)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr_h1,    m4addr, mod4yam_bootleg_fixedret<0x1d>, m4addr, init_m4addr, "5p4addersladders.bin",     0x0000, 0x010000, CRC(03fc43da) SHA1(cf2fdb0d1ad702331ba004fd39072484b05e2b97), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 199?, m4addrc__m,   m4addr, mod4yam_bootleg_fixedret<0x1d>, m4addr, init_m4addr, "alad58c",                  0x0000, 0x010000, CRC(df9c46b8) SHA1(439ea1ce17aa89e19cedb78465b4388b72c8c5ed), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 5)", GAME_FLAGS )
-GAME_CUSTOM( 1994, m4addr_h2,    m4addr, mod4yam_bootleg_fixedret<0x61>, m4addr, init_m4addr, "ad05.6c",                  0x0000, 0x010000, CRC(0940e4aa) SHA1(e8e7f7249a18386af990999a4c06f001db7003c5), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 199?, m4addrc,      m4addr, mod4yam_bootleg_fixedret<0x2d>, m4addr, init_m4addr, "add05_101",                0x0000, 0x010000, CRC(4b3fb104) SHA1(9dba619019a476ce317122a3553965b279c684ba), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 3)", GAME_FLAGS )
-GAME_CUSTOM( 199?, m4addrc__c,   m4addr, mod4yam_bootleg_fixedret<0x25>, m4addr, init_m4addr, "add55",                    0x0000, 0x010000, CRC(48c5bc73) SHA1(18c9f70bad6141cca95b6bbcb4fc621e71f87700), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 4)", GAME_FLAGS )
+GAME_CUSTOM( 199?, m4addrc__h,   m4addr, mod4yam_bootleg_fixedret<0x1d>, m4addr, init_m4addr, "adders classic.bin",       0x0000, 0x010000, CRC(6bc1d2aa) SHA1(cf17e697ff0cfba999f6511f24051dbc3d0384ef), "hack","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0, hack)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr_h1,    m4addr, mod4yam_bootleg_fixedret<0x1d>, m4addr, init_m4addr, "5p4addersladders.bin",     0x0000, 0x010000, CRC(03fc43da) SHA1(cf2fdb0d1ad702331ba004fd39072484b05e2b97), "hack","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 C, hack, set 1)", GAME_FLAGS )
+GAME_CUSTOM( 199?, m4addrc__m,   m4addr, mod4yam_bootleg_fixedret<0x1d>, m4addr, init_m4addr, "alad58c",                  0x0000, 0x010000, CRC(df9c46b8) SHA1(439ea1ce17aa89e19cedb78465b4388b72c8c5ed), "hack","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 C, hack, set 5)", GAME_FLAGS )
+GAME_CUSTOM( 1994, m4addr_h2,    m4addr, mod4yam_bootleg_fixedret<0x61>, m4addr, init_m4addr, "ad05.6c",                  0x0000, 0x010000, CRC(0940e4aa) SHA1(e8e7f7249a18386af990999a4c06f001db7003c5), "hack","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 C, hack, set 2)", GAME_FLAGS )
+GAME_CUSTOM( 199?, m4addrc,      m4addr, mod4yam_bootleg_fixedret<0x2d>, m4addr, init_m4addr, "add05_101",                0x0000, 0x010000, CRC(4b3fb104) SHA1(9dba619019a476ce317122a3553965b279c684ba), "hack","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 C, hack, set 3)", GAME_FLAGS )
+GAME_CUSTOM( 199?, m4addrc__c,   m4addr, mod4yam_bootleg_fixedret<0x25>, m4addr, init_m4addr, "add55",                    0x0000, 0x010000, CRC(48c5bc73) SHA1(18c9f70bad6141cca95b6bbcb4fc621e71f87700), "hack","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 C, hack, set 4)", GAME_FLAGS )
 // "DADS  ARMY" and "ADD 1.0"
-GAME_CUSTOM( 199?, m4addrc__a,   m4addr, mod4yam_bootleg_fixedret<0x2b>, m4addr, init_m4addr, "add10_101",                0x0000, 0x010000, CRC(af8f8b4e) SHA1(712c33ed0f425dc10b79780b0cfce0ac5768e2d5), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 6)", GAME_FLAGS )
-GAME_CUSTOM( 199?, m4addrc__i,   m4addr, mod4yam_bootleg_fixedret<0x5f>, m4addr, init_m4addr, "addl_10_.4",               0x0000, 0x010000, CRC(c2d11126) SHA1(0eafe9dc30013ed5817ac303a4eea5ea82d62715), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 7)", GAME_FLAGS )
-GAME_CUSTOM( 199?, m4addrc__j,   m4addr, mod4yam_bootleg_fixedret<0x5f>, m4addr, init_m4addr, "addl_10_.8",               0x0000, 0x010000, CRC(9fc82c47) SHA1(0f56afc33f09fe22afc5ec74aeb496c32f9e623c), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 8)", GAME_FLAGS )
+GAME_CUSTOM( 199?, m4addrc__a,   m4addr, mod4yam_bootleg_fixedret<0x2b>, m4addr, init_m4addr, "add10_101",                0x0000, 0x010000, CRC(af8f8b4e) SHA1(712c33ed0f425dc10b79780b0cfce0ac5768e2d5), "hack","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 C, hack, set 6)", GAME_FLAGS )
+GAME_CUSTOM( 199?, m4addrc__i,   m4addr, mod4yam_bootleg_fixedret<0x5f>, m4addr, init_m4addr, "addl_10_.4",               0x0000, 0x010000, CRC(c2d11126) SHA1(0eafe9dc30013ed5817ac303a4eea5ea82d62715), "hack","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 C, hack, set 7)", GAME_FLAGS )
+GAME_CUSTOM( 199?, m4addrc__j,   m4addr, mod4yam_bootleg_fixedret<0x5f>, m4addr, init_m4addr, "addl_10_.8",               0x0000, 0x010000, CRC(9fc82c47) SHA1(0f56afc33f09fe22afc5ec74aeb496c32f9e623c), "hack","Classic Adders & Ladders (BWB / Barcrest) (MPU4) (ADD 1.0 C, hack, set 8)", GAME_FLAGS )
 
 
 /*****************************************************************************************************************************************************************************
@@ -194,9 +194,7 @@ GAME_CUSTOM( 199?, m4addrc__j,   m4addr, mod4yam_bootleg_fixedret<0x5f>, m4addr,
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m578_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
-
-// REEL A SETUP ALM
+	GAME(year, setname, parent, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m578_characteriser_prot>, mpu420p, mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1991 BARCREST" and "ADC 1.1"
 GAME_CUSTOM( 199?, m4addrcc,       0,          "adcs.p1", 0x0000, 0x010000, CRC(7247de78) SHA1(e390b4e912d7bc8c1ca5e42bf2e2753d4c2b4d17), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (ADC 1.1)" )
@@ -557,10 +555,10 @@ GAME_CUSTOM( 199?, m4monte__m,  m4monte,    "nmns.p1",  0x0000, 0x010000, CRC(48
 	GAME(year, setname, parent, mod4yam_cheatchr_pal<mpu4_characteriser_pal::toplot_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 // Bwb sets
-GAME_CUSTOM( 1995, m4monteza,   m4monte,    "mx_05a__.2_1", 0x0000, 0x010000, CRC(a1a03e03) SHA1(bf49b516e6824a47cd9bf1408bf676f9f1e43d62), "Bwb","Monte Carlo (MX052.0 K) (Bwb) (MPU4)" )
-GAME_CUSTOM( 1995, m4montezi,   m4monte,    "mxi05___.2_1", 0x0000, 0x010000, CRC(de425b55) SHA1(2aa63bbd32c766e7e2d888345115c3185dc03bff), "Bwb","Monte Carlo (MX052.0 C) (Bwb) (MPU4)" )
-GAME_CUSTOM( 1995, m4montezb,   m4monte,    "mx_10a__.2_1", 0x0000, 0x010000, CRC(bbf21e9f) SHA1(901b14b96cdb0945f491c39707ab9d2b9a2d25dd), "Bwb","Monte Carlo (MX102.0 K) (Bwb) (MPU4)" )
-GAME_CUSTOM( 1995, m4montezj,   m4monte,    "mxi10___.2_1", 0x0000, 0x010000, CRC(19077425) SHA1(e31da38a903345c65b083cac192555f1f4ba2e5a), "Bwb","Monte Carlo (MX102.0 C) (Bwb) (MPU4)" )
+GAME_CUSTOM( 1995, m4monteza,   m4monte,    "mx_05a__.2_1", 0x0000, 0x010000, CRC(a1a03e03) SHA1(bf49b516e6824a47cd9bf1408bf676f9f1e43d62), "BWB","Monte Carlo (MX052.0 K) (BWB) (MPU4)" )
+GAME_CUSTOM( 1995, m4montezi,   m4monte,    "mxi05___.2_1", 0x0000, 0x010000, CRC(de425b55) SHA1(2aa63bbd32c766e7e2d888345115c3185dc03bff), "BWB","Monte Carlo (MX052.0 C) (BWB) (MPU4)" )
+GAME_CUSTOM( 1995, m4montezb,   m4monte,    "mx_10a__.2_1", 0x0000, 0x010000, CRC(bbf21e9f) SHA1(901b14b96cdb0945f491c39707ab9d2b9a2d25dd), "BWB","Monte Carlo (MX102.0 K) (BWB) (MPU4)" )
+GAME_CUSTOM( 1995, m4montezj,   m4monte,    "mxi10___.2_1", 0x0000, 0x010000, CRC(19077425) SHA1(e31da38a903345c65b083cac192555f1f4ba2e5a), "BWB","Monte Carlo (MX102.0 C) (BWB) (MPU4)" )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -570,12 +568,12 @@ GAME_CUSTOM( 1995, m4montezj,   m4monte,    "mxi10___.2_1", 0x0000, 0x010000, CR
 	ROM_END \
 	GAME(year, setname, parent, mod4yam_cheatchr_pal<mpu4_characteriser_pal::montealt_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
-GAME_CUSTOM( 1996, m4montezc,   m4monte,    "mx_20__c.1_1", 0x0000, 0x010000, CRC(a753798d) SHA1(ae1f5f14a37dead66f6b2d075a5bfc019d59f806), "Bwb","Monte Carlo (MC  2.0 C) (Bwb) (MPU4)" )
-GAME_CUSTOM( 1996, m4montezd,   m4monte,    "mx_20a_c.1_1", 0x0000, 0x010000, CRC(9ec6f5fb) SHA1(ee181a64557053349cc8bff86bba937b191cab01), "Bwb","Monte Carlo (MC  2.0 K) (Bwb) (MPU4)" )
-GAME_CUSTOM( 1996, m4monteze,   m4monte,    "mx_20dkc.1_1", 0x0000, 0x010000, CRC(d580f742) SHA1(3c1d6aba4068d60ab53eceecf65bc920f8b5604e), "Bwb","Monte Carlo (MC  2.0 YD) (Bwb) (MPU4)" )
-GAME_CUSTOM( 1996, m4montezf,   m4monte,    "mx_25__c.3_1", 0x0000, 0x010000, CRC(11ae121d) SHA1(11e61db1c645410ac18ef429cde167a7774be5f5), "Bwb","Monte Carlo (MC_ 3.0 C) (Bwb) (MPU4)" )
-GAME_CUSTOM( 1996, m4montezh,   m4monte,    "mx_25a_c.3_1", 0x0000, 0x010000, CRC(283b9e6b) SHA1(937da8bda49a7a0fa1f728770f96d10a65bfe7bc), "Bwb","Monte Carlo (MC_ 3.0 K) (Bwb) (MPU4)" )
-GAME_CUSTOM( 1996, m4montezg,   m4monte,    "mx_25_bc.3_1", 0x0000, 0x010000, CRC(4228139c) SHA1(a448ddc034923cba58ee298fd2a4c2cdd4f84f04), "Bwb","Monte Carlo (MC_ 3.0 YD) (Bwb) (MPU4)" )
+GAME_CUSTOM( 1996, m4montezc,   m4monte,    "mx_20__c.1_1", 0x0000, 0x010000, CRC(a753798d) SHA1(ae1f5f14a37dead66f6b2d075a5bfc019d59f806), "BWB","Monte Carlo (MC  2.0 C) (BWB) (MPU4)" )
+GAME_CUSTOM( 1996, m4montezd,   m4monte,    "mx_20a_c.1_1", 0x0000, 0x010000, CRC(9ec6f5fb) SHA1(ee181a64557053349cc8bff86bba937b191cab01), "BWB","Monte Carlo (MC  2.0 K) (BWB) (MPU4)" )
+GAME_CUSTOM( 1996, m4monteze,   m4monte,    "mx_20dkc.1_1", 0x0000, 0x010000, CRC(d580f742) SHA1(3c1d6aba4068d60ab53eceecf65bc920f8b5604e), "BWB","Monte Carlo (MC  2.0 YD) (BWB) (MPU4)" )
+GAME_CUSTOM( 1996, m4montezf,   m4monte,    "mx_25__c.3_1", 0x0000, 0x010000, CRC(11ae121d) SHA1(11e61db1c645410ac18ef429cde167a7774be5f5), "BWB","Monte Carlo (MC_ 3.0 C) (BWB) (MPU4)" )
+GAME_CUSTOM( 1996, m4montezh,   m4monte,    "mx_25a_c.3_1", 0x0000, 0x010000, CRC(283b9e6b) SHA1(937da8bda49a7a0fa1f728770f96d10a65bfe7bc), "BWB","Monte Carlo (MC_ 3.0 K) (BWB) (MPU4)" )
+GAME_CUSTOM( 1996, m4montezg,   m4monte,    "mx_25_bc.3_1", 0x0000, 0x010000, CRC(4228139c) SHA1(a448ddc034923cba58ee298fd2a4c2cdd4f84f04), "BWB","Monte Carlo (MC_ 3.0 YD) (BWB) (MPU4)" )
 
 /*****************************************************************************************************************************************************************************
 *
@@ -602,15 +600,15 @@ GAME_CUSTOM( 1991, m4przmc__g,  m4przmc,    "montvnd",  0x0000, 0x010000, CRC(98
 
 // sets below were in Prize Money sets, but boot to show 'Monte Carlo with Prizes'
 // "(C)1995  B.W.B." and "MC 53.0"
-GAME_CUSTOM( 199?, m4przmc__h,    m4przmc,   "mt_05a__.3o3", 0x0000, 0x010000, CRC(4175f4a9) SHA1(b0e172e4862aa3b7be7accefc90e98d07d449b65), "Bwb","Prize Monte Carlo (MC 53.0 K) (Barcrest) (MPU4)" )
-GAME_CUSTOM( 199?, m4przmc__i,    m4przmc,   "mt_05s__.3o3", 0x0000, 0x010000, CRC(92d674b7) SHA1(a828a9b0d870122bc09d865de90b8efa428f3fd0), "Bwb","Prize Monte Carlo (MC 53.0) (Barcrest) (MPU4)" )
-GAME_CUSTOM( 199?, m4przmc__j,    m4przmc,   "mt_05sb_.3o3", 0x0000, 0x010000, CRC(1158e506) SHA1(8c91bfe29545bbbc0d136a8c9abef785cadc3c64), "Bwb","Prize Monte Carlo (MC 53.0 YD) (Barcrest) (MPU4)" )
-GAME_CUSTOM( 199?, m4przmc__k,    m4przmc,   "mt_05sd_.3o3", 0x0000, 0x010000, CRC(5ed3d947) SHA1(4b9bc9be6e79014ad6ca95293eb464af39e40dc1), "Bwb","Prize Monte Carlo (MC 53.0 D) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__h,    m4przmc,   "mt_05a__.3o3", 0x0000, 0x010000, CRC(4175f4a9) SHA1(b0e172e4862aa3b7be7accefc90e98d07d449b65), "BWB","Prize Monte Carlo (MC 53.0 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__i,    m4przmc,   "mt_05s__.3o3", 0x0000, 0x010000, CRC(92d674b7) SHA1(a828a9b0d870122bc09d865de90b8efa428f3fd0), "BWB","Prize Monte Carlo (MC 53.0) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__j,    m4przmc,   "mt_05sb_.3o3", 0x0000, 0x010000, CRC(1158e506) SHA1(8c91bfe29545bbbc0d136a8c9abef785cadc3c64), "BWB","Prize Monte Carlo (MC 53.0 YD) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__k,    m4przmc,   "mt_05sd_.3o3", 0x0000, 0x010000, CRC(5ed3d947) SHA1(4b9bc9be6e79014ad6ca95293eb464af39e40dc1), "BWB","Prize Monte Carlo (MC 53.0 D) (Barcrest) (MPU4)" )
 // "(C)1995  B.W.B." and "MC103.0"
-GAME_CUSTOM( 199?, m4przmc__l,    m4przmc,   "mt_10a__.3o3", 0x0000, 0x010000, CRC(6a8172a4) SHA1(92c081535258677e90d9f9748a168926c7a0cbed), "Bwb","Prize Monte Carlo (MC103.0 K) (Barcrest) (MPU4)" )
-GAME_CUSTOM( 199?, m4przmc__m,    m4przmc,   "mt_10s__.3o3", 0x0000, 0x010000, CRC(1b66f0f8) SHA1(308227b0144f0568df8190810e0de627b413a742), "Bwb","Prize Monte Carlo (MC103.0) (Barcrest) (MPU4)" )
-GAME_CUSTOM( 199?, m4przmc__n,    m4przmc,   "mt_10sb_.3o3", 0x0000, 0x010000, CRC(06a33d34) SHA1(5fa1269a7cf42ef14e2a19143a07bf28b38ad920), "Bwb","Prize Monte Carlo (MC103.0 YD) (Barcrest) (MPU4)" )
-GAME_CUSTOM( 199?, m4przmc__o,    m4przmc,   "mt_10sd_.3o3", 0x0000, 0x010000, CRC(42629cb1) SHA1(12f695e1f70bf93100c1af8052dcee9131711510), "Bwb","Prize Monte Carlo (MC103.0 D) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__l,    m4przmc,   "mt_10a__.3o3", 0x0000, 0x010000, CRC(6a8172a4) SHA1(92c081535258677e90d9f9748a168926c7a0cbed), "BWB","Prize Monte Carlo (MC103.0 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__m,    m4przmc,   "mt_10s__.3o3", 0x0000, 0x010000, CRC(1b66f0f8) SHA1(308227b0144f0568df8190810e0de627b413a742), "BWB","Prize Monte Carlo (MC103.0) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__n,    m4przmc,   "mt_10sb_.3o3", 0x0000, 0x010000, CRC(06a33d34) SHA1(5fa1269a7cf42ef14e2a19143a07bf28b38ad920), "BWB","Prize Monte Carlo (MC103.0 YD) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__o,    m4przmc,   "mt_10sd_.3o3", 0x0000, 0x010000, CRC(42629cb1) SHA1(12f695e1f70bf93100c1af8052dcee9131711510), "BWB","Prize Monte Carlo (MC103.0 D) (Barcrest) (MPU4)" )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -621,11 +619,11 @@ GAME_CUSTOM( 199?, m4przmc__o,    m4przmc,   "mt_10sd_.3o3", 0x0000, 0x010000, C
 	GAME(year, setname, parent, mod4yam_cheatchr_pal<mpu4_characteriser_pal::przmontealt_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1995  B.W.B." and "MT054.0"
-GAME_CUSTOM( 199?, m4przmc__p,    m4przmc,   "mt_05a__.4o1", 0x0000, 0x010000, CRC(637fecee) SHA1(8c970bdf703177c71dde5c774c75929ac42b6eb0), "Bwb","Prize Monte Carlo (MT054.0 K) (Barcrest) (MPU4)" )
-GAME_CUSTOM( 199?, m4przmc__q,    m4przmc,   "mti05___.4o1", 0x0000, 0x010000, CRC(0e82c258) SHA1(c4aa7d32bcd9418e2919be8be8a2f9e60d46f316), "Bwb","Prize Monte Carlo (MT054.0 C) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__p,    m4przmc,   "mt_05a__.4o1", 0x0000, 0x010000, CRC(637fecee) SHA1(8c970bdf703177c71dde5c774c75929ac42b6eb0), "BWB","Prize Monte Carlo (MT054.0 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__q,    m4przmc,   "mti05___.4o1", 0x0000, 0x010000, CRC(0e82c258) SHA1(c4aa7d32bcd9418e2919be8be8a2f9e60d46f316), "BWB","Prize Monte Carlo (MT054.0 C) (Barcrest) (MPU4)" )
 // "(C)1995  B.W.B." and "MT104.0"
-GAME_CUSTOM( 199?, m4przmc__r,    m4przmc,   "mt_10a__.4o1", 0x0000, 0x010000, CRC(36eeac30) SHA1(daa662392874806d18d4a161d39caed7e0abca73), "Bwb","Prize Monte Carlo (MT104.0 K) (Barcrest) (MPU4)" )
-GAME_CUSTOM( 199?, m4przmc__s,    m4przmc,   "mti10___.4o1", 0x0000, 0x010000, CRC(a35e0571) SHA1(9a22946047e76392f0c4534f892ee9ae9e700503), "Bwb","Prize Monte Carlo (MT104.0 C) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__r,    m4przmc,   "mt_10a__.4o1", 0x0000, 0x010000, CRC(36eeac30) SHA1(daa662392874806d18d4a161d39caed7e0abca73), "BWB","Prize Monte Carlo (MT104.0 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__s,    m4przmc,   "mti10___.4o1", 0x0000, 0x010000, CRC(a35e0571) SHA1(9a22946047e76392f0c4534f892ee9ae9e700503), "BWB","Prize Monte Carlo (MT104.0 C) (Barcrest) (MPU4)" )
 
 
 
@@ -668,21 +666,21 @@ GAME_CUSTOM( 199?, m4nudbnk__d,    m4nudbnk,   "sbnx.p1",  0x0000, 0x010000, CRC
 	GAME(year, setname, parent, machine, inputs, mpu4mod4yam_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // (C)1995  B.W.B. and SP5 1.0
-GAME_CUSTOM( 199?, m4sss,     0,     mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_05a__.1o3",     0x0000, 0x010000, CRC(044a0133) SHA1(7cf85cf19f5c3f588daf5c0d7efe4204d67161a2), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 1)" )
-GAME_CUSTOM( 199?, m4sss__b,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_05s__.1o3",     0x0000, 0x010000, CRC(2e000a62) SHA1(e60390a383388e385bbde79ca14c63e5d69a8869), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 2)" )
-GAME_CUSTOM( 199?, m4sss__c,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_05sb_.1o3",     0x0000, 0x010000, CRC(c6380ef5) SHA1(673044aae9998dfe52205a5e4a3d26361f01c518), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 3)" )
-GAME_CUSTOM( 199?, m4sss__d,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_05sd_.1o3",     0x0000, 0x010000, CRC(31f818e1) SHA1(bbfa45ef63a73aa726a8223be234fb8ffba45e24), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 4)" )
+GAME_CUSTOM( 199?, m4sss,     0,     mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_05a__.1o3",     0x0000, 0x010000, CRC(044a0133) SHA1(7cf85cf19f5c3f588daf5c0d7efe4204d67161a2), "BWB","Spend Spend Spend (BWB) (MPU4) (SP5 1.0, set 1)" )
+GAME_CUSTOM( 199?, m4sss__b,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_05s__.1o3",     0x0000, 0x010000, CRC(2e000a62) SHA1(e60390a383388e385bbde79ca14c63e5d69a8869), "BWB","Spend Spend Spend (BWB) (MPU4) (SP5 1.0, set 2)" )
+GAME_CUSTOM( 199?, m4sss__c,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_05sb_.1o3",     0x0000, 0x010000, CRC(c6380ef5) SHA1(673044aae9998dfe52205a5e4a3d26361f01c518), "BWB","Spend Spend Spend (BWB) (MPU4) (SP5 1.0, set 3)" )
+GAME_CUSTOM( 199?, m4sss__d,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_05sd_.1o3",     0x0000, 0x010000, CRC(31f818e1) SHA1(bbfa45ef63a73aa726a8223be234fb8ffba45e24), "BWB","Spend Spend Spend (BWB) (MPU4) (SP5 1.0, set 4)" )
 // (C)1995  B.W.B. and SP101.0
-GAME_CUSTOM( 199?, m4sss__e,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_10a__.1o3",     0x0000, 0x010000, CRC(918c038c) SHA1(608062dc4e39c15967e16d95945b65ef7feabea2), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 1)" )
-GAME_CUSTOM( 199?, m4sss__f,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_10s__.1o3",     0x0000, 0x010000, CRC(1bc5780a) SHA1(df1b5d0d6f4751a480aef77be40fb2cfd153bf18), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 2)" )
-GAME_CUSTOM( 199?, m4sss__g,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_10sb_.1o3",     0x0000, 0x010000, CRC(2dfc3926) SHA1(b6b201c65c182f9b18a590910183ce88b245af2b), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 3)" )
-GAME_CUSTOM( 199?, m4sss__h,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_10sd_.1o3",     0x0000, 0x010000, CRC(fe5c7e3e) SHA1(f5066f1f0c2220da874cbac0ce510cbac6fff8e7), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 4)" )
+GAME_CUSTOM( 199?, m4sss__e,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_10a__.1o3",     0x0000, 0x010000, CRC(918c038c) SHA1(608062dc4e39c15967e16d95945b65ef7feabea2), "BWB","Spend Spend Spend (BWB) (MPU4) (SP101.0, set 1)" )
+GAME_CUSTOM( 199?, m4sss__f,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_10s__.1o3",     0x0000, 0x010000, CRC(1bc5780a) SHA1(df1b5d0d6f4751a480aef77be40fb2cfd153bf18), "BWB","Spend Spend Spend (BWB) (MPU4) (SP101.0, set 2)" )
+GAME_CUSTOM( 199?, m4sss__g,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_10sb_.1o3",     0x0000, 0x010000, CRC(2dfc3926) SHA1(b6b201c65c182f9b18a590910183ce88b245af2b), "BWB","Spend Spend Spend (BWB) (MPU4) (SP101.0, set 3)" )
+GAME_CUSTOM( 199?, m4sss__h,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4default, "sp_10sd_.1o3",     0x0000, 0x010000, CRC(fe5c7e3e) SHA1(f5066f1f0c2220da874cbac0ce510cbac6fff8e7), "BWB","Spend Spend Spend (BWB) (MPU4) (SP101.0, set 4)" )
 // (C)1995  B.W.B. and SX5 2.0
-GAME_CUSTOM( 199?, m4sss__i,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,init_m4default, "sx_05a__.2_1",     0x0000, 0x010000, CRC(ceb830a1) SHA1(c9bef44d64a64872460ae3c450533fd14c92ca43), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX5 2.0, set 1)" )
-GAME_CUSTOM( 199?, m4sss__k,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,init_m4default, "sxi05___.2_1",     0x0000, 0x010000, CRC(a804a20b) SHA1(477d2a750c0c252ffa215c3cf89916cb3a296b92), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX5 2.0, set 2)" )
+GAME_CUSTOM( 199?, m4sss__i,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,init_m4default, "sx_05a__.2_1",     0x0000, 0x010000, CRC(ceb830a1) SHA1(c9bef44d64a64872460ae3c450533fd14c92ca43), "BWB","Spend Spend Spend (BWB) (MPU4) (SX5 2.0, set 1)" )
+GAME_CUSTOM( 199?, m4sss__k,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,init_m4default, "sxi05___.2_1",     0x0000, 0x010000, CRC(a804a20b) SHA1(477d2a750c0c252ffa215c3cf89916cb3a296b92), "BWB","Spend Spend Spend (BWB) (MPU4) (SX5 2.0, set 2)" )
 // (C)1995  B.W.B. and SX102.0
-GAME_CUSTOM( 199?, m4sss__j,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,init_m4default, "sx_10a__.2_1",     0x0000, 0x010000, CRC(73e3bc13) SHA1(004097cc9cd62b8fa4c584fcb9874cf998c7b89d), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX102.0, set 1)" )
-GAME_CUSTOM( 199?, m4sss__l,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,init_m4default, "sxi10___.2_1",     0x0000, 0x010000, CRC(bbb23438) SHA1(2cc4376f6393c69c1e18ad06be18933592b6bdae), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX102.0, set 2)" )
+GAME_CUSTOM( 199?, m4sss__j,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,init_m4default, "sx_10a__.2_1",     0x0000, 0x010000, CRC(73e3bc13) SHA1(004097cc9cd62b8fa4c584fcb9874cf998c7b89d), "BWB","Spend Spend Spend (BWB) (MPU4) (SX102.0, set 1)" )
+GAME_CUSTOM( 199?, m4sss__l,  m4sss, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,init_m4default, "sxi10___.2_1",     0x0000, 0x010000, CRC(bbb23438) SHA1(2cc4376f6393c69c1e18ad06be18933592b6bdae), "BWB","Spend Spend Spend (BWB) (MPU4) (SX102.0, set 2)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -843,21 +841,21 @@ GAME_CUSTOM( 199?, m4sayno__c,  m4sayno,    "snm 6.bin",            0x0000, 0x01
 	GAME(year, setname, parent, mod4yam_cheatchr_pal<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 // (C)1995  B.W.B. and AE5 3.0
-GAME_CUSTOM( 199?, m4acechs__a,    m4acechs,   "ae_05a__.3_1", 0x0000, 0x010000, CRC(900e1789) SHA1(dbb13f1728d8527a7de5d257c866732adb0a95b5), "Bwb","Ace Chase (Bwb) (MPU4) (AE5 3.0, set 1)" )
-GAME_CUSTOM( 199?, m4acechs__r,    m4acechs,   "aei05___.3_1", 0x0000, 0x010000, CRC(bb84d01f) SHA1(f1653590e8cd642faf09a16c5c1b0a4b267d42e7), "Bwb","Ace Chase (Bwb) (MPU4) (AE5 3.0, set 2)" )
+GAME_CUSTOM( 199?, m4acechs__a,    m4acechs,   "ae_05a__.3_1", 0x0000, 0x010000, CRC(900e1789) SHA1(dbb13f1728d8527a7de5d257c866732adb0a95b5), "BWB","Ace Chase (BWB) (MPU4) (AE5 3.0, set 1)" )
+GAME_CUSTOM( 199?, m4acechs__r,    m4acechs,   "aei05___.3_1", 0x0000, 0x010000, CRC(bb84d01f) SHA1(f1653590e8cd642faf09a16c5c1b0a4b267d42e7), "BWB","Ace Chase (BWB) (MPU4) (AE5 3.0, set 2)" )
 // (C)1995  B.W.B. and AE10 3.0
-GAME_CUSTOM( 199?, m4acechs__f,    m4acechs,   "ae_10a__.3_1", 0x0000, 0x010000, CRC(e20c2513) SHA1(857ed8a6b155863c769ee9c3aca5e4702c1372b6), "Bwb","Ace Chase (Bwb) (MPU4) (AE10 3.0, set 1)" )
-GAME_CUSTOM( 199?, m4acechs__t,    m4acechs,   "aei10___.3_1", 0x0000, 0x010000, CRC(db99a965) SHA1(1fb200b30e10d502af39bcd2e58d3e36e13f3695), "Bwb","Ace Chase (Bwb) (MPU4) (AE10 3.0, set 2)" )
+GAME_CUSTOM( 199?, m4acechs__f,    m4acechs,   "ae_10a__.3_1", 0x0000, 0x010000, CRC(e20c2513) SHA1(857ed8a6b155863c769ee9c3aca5e4702c1372b6), "BWB","Ace Chase (BWB) (MPU4) (AE10 3.0, set 1)" )
+GAME_CUSTOM( 199?, m4acechs__t,    m4acechs,   "aei10___.3_1", 0x0000, 0x010000, CRC(db99a965) SHA1(1fb200b30e10d502af39bcd2e58d3e36e13f3695), "BWB","Ace Chase (BWB) (MPU4) (AE10 3.0, set 2)" )
 // (C)1994  B.W.B. and AE  1.0
-GAME_CUSTOM( 199?, m4acechs__g,    m4acechs,   "ae_10bg_.2_3", 0x0000, 0x010000, CRC(7ed7fcee) SHA1(7b2b0c47dc8a75d11f49f09441a4320815d838ac), "Bwb","Ace Chase (Bwb) (MPU4) (AE  1.0)" )
+GAME_CUSTOM( 199?, m4acechs__g,    m4acechs,   "ae_10bg_.2_3", 0x0000, 0x010000, CRC(7ed7fcee) SHA1(7b2b0c47dc8a75d11f49f09441a4320815d838ac), "BWB","Ace Chase (BWB) (MPU4) (AE  1.0)" )
 // (C)1995  B.W.B. and AE20 3.0
-GAME_CUSTOM( 199?, m4acechs__k,    m4acechs,   "ae_20a__.3_1", 0x0000, 0x010000, CRC(43f6cc19) SHA1(3eda49477b141c649a4ba7a4ecc021694d9830db), "Bwb","Ace Chase (Bwb) (MPU4) (AE20 3.0, set 1)" )
-GAME_CUSTOM( 199?, m4acechs__l,    m4acechs,   "ae_20b__.3_1", 0x0000, 0x010000, CRC(30060ac4) SHA1(488263a1d3cfe067d43de29c57e58fe55024437c), "Bwb","Ace Chase (Bwb) (MPU4) (AE20 3.0, set 2)" )
-GAME_CUSTOM( 199?, m4acechs__m,    m4acechs,   "ae_20bd_.3_1", 0x0000, 0x010000, CRC(f9b922c2) SHA1(fc0deb79fc6c33732872da8925a6729f3d11bcaf), "Bwb","Ace Chase (Bwb) (MPU4) (AE20 3.0, set 3)" )
-GAME_CUSTOM( 199?, m4acechs__n,    m4acechs,   "ae_20bg_.3_1", 0x0000, 0x010000, CRC(02706741) SHA1(8388d91091945d1f73aa5e68a86f930f5d9dafa2), "Bwb","Ace Chase (Bwb) (MPU4) (AE20 3.0, set 4)" )
-GAME_CUSTOM( 199?, m4acechs__o,    m4acechs,   "ae_20bt_.3_1", 0x0000, 0x010000, CRC(3b313958) SHA1(9fe4cb99dc30d1305816f9a27079d97c4d07cb15), "Bwb","Ace Chase (Bwb) (MPU4) (AE20 3.0, set 5)" )
-GAME_CUSTOM( 199?, m4acechs__p,    m4acechs,   "ae_20sb_.3_1", 0x0000, 0x010000, CRC(471f2ba4) SHA1(baaf8339d8ee15365886cea2ecb36ad298975633), "Bwb","Ace Chase (Bwb) (MPU4) (AE20 3.0, set 6)" )
-GAME_CUSTOM( 199?, m4acechs__u,    m4acechs,   "aei20___.3_1", 0x0000, 0x010000, CRC(1744e7f4) SHA1(bf2f1b720a1a2610aff46a1de5c789a17828eae0), "Bwb","Ace Chase (Bwb) (MPU4) (AE20 3.0, set 7)" )
+GAME_CUSTOM( 199?, m4acechs__k,    m4acechs,   "ae_20a__.3_1", 0x0000, 0x010000, CRC(43f6cc19) SHA1(3eda49477b141c649a4ba7a4ecc021694d9830db), "BWB","Ace Chase (BWB) (MPU4) (AE20 3.0, set 1)" )
+GAME_CUSTOM( 199?, m4acechs__l,    m4acechs,   "ae_20b__.3_1", 0x0000, 0x010000, CRC(30060ac4) SHA1(488263a1d3cfe067d43de29c57e58fe55024437c), "BWB","Ace Chase (BWB) (MPU4) (AE20 3.0, set 2)" )
+GAME_CUSTOM( 199?, m4acechs__m,    m4acechs,   "ae_20bd_.3_1", 0x0000, 0x010000, CRC(f9b922c2) SHA1(fc0deb79fc6c33732872da8925a6729f3d11bcaf), "BWB","Ace Chase (BWB) (MPU4) (AE20 3.0, set 3)" )
+GAME_CUSTOM( 199?, m4acechs__n,    m4acechs,   "ae_20bg_.3_1", 0x0000, 0x010000, CRC(02706741) SHA1(8388d91091945d1f73aa5e68a86f930f5d9dafa2), "BWB","Ace Chase (BWB) (MPU4) (AE20 3.0, set 4)" )
+GAME_CUSTOM( 199?, m4acechs__o,    m4acechs,   "ae_20bt_.3_1", 0x0000, 0x010000, CRC(3b313958) SHA1(9fe4cb99dc30d1305816f9a27079d97c4d07cb15), "BWB","Ace Chase (BWB) (MPU4) (AE20 3.0, set 5)" )
+GAME_CUSTOM( 199?, m4acechs__p,    m4acechs,   "ae_20sb_.3_1", 0x0000, 0x010000, CRC(471f2ba4) SHA1(baaf8339d8ee15365886cea2ecb36ad298975633), "BWB","Ace Chase (BWB) (MPU4) (AE20 3.0, set 6)" )
+GAME_CUSTOM( 199?, m4acechs__u,    m4acechs,   "aei20___.3_1", 0x0000, 0x010000, CRC(1744e7f4) SHA1(bf2f1b720a1a2610aff46a1de5c789a17828eae0), "BWB","Ace Chase (BWB) (MPU4) (AE20 3.0, set 7)" )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -868,17 +866,17 @@ GAME_CUSTOM( 199?, m4acechs__u,    m4acechs,   "aei20___.3_1", 0x0000, 0x010000,
 	GAME(year, setname, parent, mod4yam_cheatchr_pal<mpu4_characteriser_pal::acechasealt_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default, ROT0, company, title, GAME_FLAGS )
 
 // (C)1994  B.W.B. and AE5 2.0
-GAME_CUSTOM( 199?, m4acechs,       0,          "ae_05a__.2_3", 0x0000, 0x010000, CRC(c9a03623) SHA1(8daf7e71057528c481915eb8506e03ce9cf372c8), "Bwb","Ace Chase (Bwb) (MPU4) (AE5 2.0, set 1)" )
-GAME_CUSTOM( 199?, m4acechs__b,    m4acechs,   "ae_05s__.2_3", 0x0000, 0x010000, CRC(eb64ab0a) SHA1(4d4c6908c8ca8b1d3c39c8973c8386da079cbd39), "Bwb","Ace Chase (Bwb) (MPU4) (AE5 2.0, set 2)" )
-GAME_CUSTOM( 199?, m4acechs__c,    m4acechs,   "ae_05sb_.2_3", 0x0000, 0x010000, CRC(5d67c6f6) SHA1(213225405defb3be7f564459d71aeca6f5856f8f), "Bwb","Ace Chase (Bwb) (MPU4) (AE5 2.0, set 3)" )
-GAME_CUSTOM( 199?, m4acechs__d,    m4acechs,   "ae_05sd_.2_3", 0x0000, 0x010000, CRC(2bdbe356) SHA1(a328a8f50847cbb199b31672ca50e1e95a474e4b), "Bwb","Ace Chase (Bwb) (MPU4) (AE5 2.0, set 4)" )
-GAME_CUSTOM( 199?, m4acechs__q,    m4acechs,   "aei05___.2_3", 0x0000, 0x010000, CRC(f035ba55) SHA1(d13bebec00650018a9236cc18df73b06c970cfd0), "Bwb","Ace Chase (Bwb) (MPU4) (AE5 2.0, set 5)" )
+GAME_CUSTOM( 199?, m4acechs,       0,          "ae_05a__.2_3", 0x0000, 0x010000, CRC(c9a03623) SHA1(8daf7e71057528c481915eb8506e03ce9cf372c8), "BWB","Ace Chase (BWB) (MPU4) (AE5 2.0, set 1)" )
+GAME_CUSTOM( 199?, m4acechs__b,    m4acechs,   "ae_05s__.2_3", 0x0000, 0x010000, CRC(eb64ab0a) SHA1(4d4c6908c8ca8b1d3c39c8973c8386da079cbd39), "BWB","Ace Chase (BWB) (MPU4) (AE5 2.0, set 2)" )
+GAME_CUSTOM( 199?, m4acechs__c,    m4acechs,   "ae_05sb_.2_3", 0x0000, 0x010000, CRC(5d67c6f6) SHA1(213225405defb3be7f564459d71aeca6f5856f8f), "BWB","Ace Chase (BWB) (MPU4) (AE5 2.0, set 3)" )
+GAME_CUSTOM( 199?, m4acechs__d,    m4acechs,   "ae_05sd_.2_3", 0x0000, 0x010000, CRC(2bdbe356) SHA1(a328a8f50847cbb199b31672ca50e1e95a474e4b), "BWB","Ace Chase (BWB) (MPU4) (AE5 2.0, set 4)" )
+GAME_CUSTOM( 199?, m4acechs__q,    m4acechs,   "aei05___.2_3", 0x0000, 0x010000, CRC(f035ba55) SHA1(d13bebec00650018a9236cc18df73b06c970cfd0), "BWB","Ace Chase (BWB) (MPU4) (AE5 2.0, set 5)" )
 // (C)1994  B.W.B. and AE10 2.0
-GAME_CUSTOM( 199?, m4acechs__e,    m4acechs,   "ae_10a__.2_3", 0x0000, 0x010000, CRC(d718d498) SHA1(d13970b0ca86b988bcc91cd3c2dbee4c637944ca), "Bwb","Ace Chase (Bwb) (MPU4) (AE10 2.0, set 1)" )
-GAME_CUSTOM( 199?, m4acechs__h,    m4acechs,   "ae_10s__.2_3", 0x0000, 0x010000, CRC(31932d3f) SHA1(a1809c7baaea22d24491829a8638f232e2d75849), "Bwb","Ace Chase (Bwb) (MPU4) (AE10 2.0, set 2)" )
-GAME_CUSTOM( 199?, m4acechs__i,    m4acechs,   "ae_10sb_.2_3", 0x0000, 0x010000, CRC(d6bcd1fd) SHA1(664ec7e7821c09bddfd1996892ae3f9fbdbc6809), "Bwb","Ace Chase (Bwb) (MPU4) (AE10 2.0, set 3)" )
-GAME_CUSTOM( 199?, m4acechs__j,    m4acechs,   "ae_10sd_.2_3", 0x0000, 0x010000, CRC(5920b9ad) SHA1(fb8de53e7877505fe53ff874b396707ee8e01e5e), "Bwb","Ace Chase (Bwb) (MPU4) (AE10 2.0, set 4)" )
-GAME_CUSTOM( 199?, m4acechs__s,    m4acechs,   "aei10___.2_3", 0x0000, 0x010000, CRC(96edf44f) SHA1(8abcb5d4018e0a4c879eb1a1550af09f55f75135), "Bwb","Ace Chase (Bwb) (MPU4) (AE10 2.0, set 5)" )
+GAME_CUSTOM( 199?, m4acechs__e,    m4acechs,   "ae_10a__.2_3", 0x0000, 0x010000, CRC(d718d498) SHA1(d13970b0ca86b988bcc91cd3c2dbee4c637944ca), "BWB","Ace Chase (BWB) (MPU4) (AE10 2.0, set 1)" )
+GAME_CUSTOM( 199?, m4acechs__h,    m4acechs,   "ae_10s__.2_3", 0x0000, 0x010000, CRC(31932d3f) SHA1(a1809c7baaea22d24491829a8638f232e2d75849), "BWB","Ace Chase (BWB) (MPU4) (AE10 2.0, set 2)" )
+GAME_CUSTOM( 199?, m4acechs__i,    m4acechs,   "ae_10sb_.2_3", 0x0000, 0x010000, CRC(d6bcd1fd) SHA1(664ec7e7821c09bddfd1996892ae3f9fbdbc6809), "BWB","Ace Chase (BWB) (MPU4) (AE10 2.0, set 3)" )
+GAME_CUSTOM( 199?, m4acechs__j,    m4acechs,   "ae_10sd_.2_3", 0x0000, 0x010000, CRC(5920b9ad) SHA1(fb8de53e7877505fe53ff874b396707ee8e01e5e), "BWB","Ace Chase (BWB) (MPU4) (AE10 2.0, set 4)" )
+GAME_CUSTOM( 199?, m4acechs__s,    m4acechs,   "aei10___.2_3", 0x0000, 0x010000, CRC(96edf44f) SHA1(8abcb5d4018e0a4c879eb1a1550af09f55f75135), "BWB","Ace Chase (BWB) (MPU4) (AE10 2.0, set 5)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -1107,18 +1105,18 @@ GAME_CUSTOM( 199?, m4vivalv__g,    m4vivalv, mod4yam_cheatchr_pal<mpu4_character
 // "(C)1991 BARCREST" and "VLV 1.0"
 GAME_CUSTOM( 199?, m4vivalv__h,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4, init_m4default,  "viva206",                      0x0000, 0x010000, CRC(76ab9a5d) SHA1(455699cbc05f744eafe58881a8fb120b24cfe5c8), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0)" )
 // (C)1993  B.W.B. and "VL_ 2.0" - boots with cheatchr
-GAME_CUSTOM( 199?, m4vivalv__i,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "v.las vegas 6 10p 10m.bin",    0x0000, 0x010000, CRC(f09d5a2c) SHA1(6f9df58767e88a1ca7fc7dd17c618d30ab97067d), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 1)" )
-GAME_CUSTOM( 199?, m4vivalv__j,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_05___.3_3",                 0x0000, 0x010000, CRC(bb8361f6) SHA1(d5f651a66be1cab3662798751a290a65c29bba64), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 2)" )
-GAME_CUSTOM( 199?, m4vivalv__k,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_05_b_.3_3",                 0x0000, 0x010000, CRC(12079321) SHA1(5b5dd55080c04393a45d3ef9c63b6fef5de9b7cd), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 3)" )
-GAME_CUSTOM( 199?, m4vivalv__l,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_05_d_.3_3",                 0x0000, 0x010000, CRC(b758df52) SHA1(f4d47a93fa1b1deb84654bb2272767093f3463c2), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 4)" )
-GAME_CUSTOM( 199?, m4vivalv__m,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_05_k_.3_3",                 0x0000, 0x010000, CRC(9875c59c) SHA1(c31a7fc5df8af9d931353bc095a59befe808434b), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 5)" )
-GAME_CUSTOM( 199?, m4vivalv__n,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_05a__.3_3",                 0x0000, 0x010000, CRC(0f416e47) SHA1(54338fbef5f227c440c04448b51e8f0ec04a4cc7), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 6)" )
-GAME_CUSTOM( 199?, m4vivalv__o,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_10___.3_3",                 0x0000, 0x010000, CRC(dc8db002) SHA1(305547b4f0b1e1bde9354e5ed9f18f99c6829cab), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 7)" )
-GAME_CUSTOM( 199?, m4vivalv__p,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_10_b_.3_3",                 0x0000, 0x010000, CRC(e1c4b292) SHA1(4516c7d918935862824e206626a5a24f936ec514), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 8)" )
-GAME_CUSTOM( 199?, m4vivalv__q,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_10_d_.3_3",                 0x0000, 0x010000, CRC(e9dda1ee) SHA1(6363b5b26be22cb1f5aac71e98c5e5a5064839f4), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 9)" )
-GAME_CUSTOM( 199?, m4vivalv__r,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_10_k_.3_3",                 0x0000, 0x010000, CRC(70fc4c56) SHA1(02cbaadd3575ef0d9dc192aabbe39a735893a662), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 10)" )
-GAME_CUSTOM( 199?, m4vivalv__s,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_10a__.3_3",                 0x0000, 0x010000, CRC(c908d65a) SHA1(5af180e697c22c27380e275d76708103e298cf41), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 11)" )
-GAME_CUSTOM( 199?, m4vivalv__t,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vvi05___.3_3",                 0x0000, 0x010000, CRC(a5829d5c) SHA1(4cd1a2185579898db7be75f8c3f565043f0691b6), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 12)" )
+GAME_CUSTOM( 199?, m4vivalv__i,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "v.las vegas 6 10p 10m.bin",    0x0000, 0x010000, CRC(f09d5a2c) SHA1(6f9df58767e88a1ca7fc7dd17c618d30ab97067d), "BWB","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, set 1)" )
+GAME_CUSTOM( 199?, m4vivalv__j,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_05___.3_3",                 0x0000, 0x010000, CRC(bb8361f6) SHA1(d5f651a66be1cab3662798751a290a65c29bba64), "BWB","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, set 2)" )
+GAME_CUSTOM( 199?, m4vivalv__k,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_05_b_.3_3",                 0x0000, 0x010000, CRC(12079321) SHA1(5b5dd55080c04393a45d3ef9c63b6fef5de9b7cd), "BWB","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, set 3)" )
+GAME_CUSTOM( 199?, m4vivalv__l,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_05_d_.3_3",                 0x0000, 0x010000, CRC(b758df52) SHA1(f4d47a93fa1b1deb84654bb2272767093f3463c2), "BWB","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, set 4)" )
+GAME_CUSTOM( 199?, m4vivalv__m,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_05_k_.3_3",                 0x0000, 0x010000, CRC(9875c59c) SHA1(c31a7fc5df8af9d931353bc095a59befe808434b), "BWB","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, set 5)" )
+GAME_CUSTOM( 199?, m4vivalv__n,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_05a__.3_3",                 0x0000, 0x010000, CRC(0f416e47) SHA1(54338fbef5f227c440c04448b51e8f0ec04a4cc7), "BWB","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, set 6)" )
+GAME_CUSTOM( 199?, m4vivalv__o,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_10___.3_3",                 0x0000, 0x010000, CRC(dc8db002) SHA1(305547b4f0b1e1bde9354e5ed9f18f99c6829cab), "BWB","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, set 7)" )
+GAME_CUSTOM( 199?, m4vivalv__p,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_10_b_.3_3",                 0x0000, 0x010000, CRC(e1c4b292) SHA1(4516c7d918935862824e206626a5a24f936ec514), "BWB","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, set 8)" )
+GAME_CUSTOM( 199?, m4vivalv__q,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_10_d_.3_3",                 0x0000, 0x010000, CRC(e9dda1ee) SHA1(6363b5b26be22cb1f5aac71e98c5e5a5064839f4), "BWB","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, set 9)" )
+GAME_CUSTOM( 199?, m4vivalv__r,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_10_k_.3_3",                 0x0000, 0x010000, CRC(70fc4c56) SHA1(02cbaadd3575ef0d9dc192aabbe39a735893a662), "BWB","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, set 10)" )
+GAME_CUSTOM( 199?, m4vivalv__s,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vv_10a__.3_3",                 0x0000, 0x010000, CRC(c908d65a) SHA1(5af180e697c22c27380e275d76708103e298cf41), "BWB","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, set 11)" )
+GAME_CUSTOM( 199?, m4vivalv__t,    m4vivalv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4default,  "vvi05___.3_3",                 0x0000, 0x010000, CRC(a5829d5c) SHA1(4cd1a2185579898db7be75f8c3f565043f0691b6), "BWB","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, set 12)" )
 
 // "(C)1991 BARCREST" and "VLV 1.0" but different protection, hacks / bootlegs
 // this one is unusual, the 2nd and 3rd checks expect different values, or you get scrambled lamps, usually they want the same
@@ -1130,14 +1128,14 @@ GAME_CUSTOM( 199?, m4vivalv__y,    m4vivalv, mod4yam_bootleg_fixedret<0x6a>, mpu
 GAME_CUSTOM( 199?, m4vivalv__v,    m4vivalv, mod4yam_bootleg_fixedret<0x5a>, mpu4, init_m4default,  "viva20_11",                    0x0000, 0x010000, CRC(51b93018) SHA1(fc13179e3e1939839c3b90d7600a7eb301ea03da), "hack?","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0, hack?, set 2)" )
 
 // no copyright string, "VL_ 2.0", hack
-GAME_CUSTOM( 199?, m4vivalv__z,    m4vivalv, mod4yam_bootleg_fixedret<0x38>, mpu4, init_m4default,  "5p5vivalasvegas6.bin",         0x0000, 0x010000, CRC(4d365b57) SHA1(69ff75ccc91f1f7b867a0914d350d1649834a48e), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 1)" )
-GAME_CUSTOM( 199?, m4vivalv__0,    m4vivalv, mod4yam_bootleg_fixedret<0x5c>, mpu4, init_m4default,  "viva05_11",                    0x0000, 0x010000, CRC(1e6ea483) SHA1(e6a53eb1bf3b8e661287c0d57fc6ab5ed41755a3), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 2)" )
-GAME_CUSTOM( 199?, m4vivalv__1,    m4vivalv, mod4yam_bootleg_fixedret<0x12>, mpu4, init_m4default,  "viva10_11",                    0x0000, 0x010000, CRC(246a39b7) SHA1(c0f5c21374e43b42df5df0ada0967a34ecefbdb4), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 3)" )
-GAME_CUSTOM( 199?, m4vivalv__2,    m4vivalv, mod4yam_bootleg_fixedret<0x28>, mpu4, init_m4default,  "viva58c",                      0x0000, 0x010000, CRC(719d0802) SHA1(ba6bd5fbf49f0ada383cb2e8faa037b78f6af587), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 4)" )
-GAME_CUSTOM( 199?, m4vivalv__3,    m4vivalv, mod4yam_bootleg_fixedret<0x28>, mpu4, init_m4default,  "viva_05_.4",                   0x0000, 0x010000, CRC(b094914f) SHA1(8217b4bb7a8d55fb8e86018ffc520a63f41a79b8), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 5)" )
-GAME_CUSTOM( 199?, m4vivalv__4,    m4vivalv, mod4yam_bootleg_fixedret<0x28>, mpu4, init_m4default,  "viva_05_.8",                   0x0000, 0x010000, CRC(c5c09c10) SHA1(47890d0ba1c2ca53231ac148a02f046452dce1b4), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 6)" )
-GAME_CUSTOM( 199?, m4vivalv__5,    m4vivalv, mod4yam_bootleg_fixedret<0x66>, mpu4, init_m4default,  "viva_10_.4",                   0x0000, 0x010000, CRC(b1d5e820) SHA1(68012216d7e82168c7468d1e54c527c15d268917), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 7)" )
-GAME_CUSTOM( 199?, m4vivalv__6,    m4vivalv, mod4yam_bootleg_fixedret<0x66>, mpu4, init_m4default,  "viva_10_.8",                   0x0000, 0x010000, CRC(f392c81c) SHA1(cb3320b688b315dbc226f45b78490fed439ee9a2), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack ? , set 8)" )
+GAME_CUSTOM( 199?, m4vivalv__z,    m4vivalv, mod4yam_bootleg_fixedret<0x38>, mpu4, init_m4default,  "5p5vivalasvegas6.bin",         0x0000, 0x010000, CRC(4d365b57) SHA1(69ff75ccc91f1f7b867a0914d350d1649834a48e), "hack?","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, hack?, set 1)" )
+GAME_CUSTOM( 199?, m4vivalv__0,    m4vivalv, mod4yam_bootleg_fixedret<0x5c>, mpu4, init_m4default,  "viva05_11",                    0x0000, 0x010000, CRC(1e6ea483) SHA1(e6a53eb1bf3b8e661287c0d57fc6ab5ed41755a3), "hack?","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, hack?, set 2)" )
+GAME_CUSTOM( 199?, m4vivalv__1,    m4vivalv, mod4yam_bootleg_fixedret<0x12>, mpu4, init_m4default,  "viva10_11",                    0x0000, 0x010000, CRC(246a39b7) SHA1(c0f5c21374e43b42df5df0ada0967a34ecefbdb4), "hack?","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, hack?, set 3)" )
+GAME_CUSTOM( 199?, m4vivalv__2,    m4vivalv, mod4yam_bootleg_fixedret<0x28>, mpu4, init_m4default,  "viva58c",                      0x0000, 0x010000, CRC(719d0802) SHA1(ba6bd5fbf49f0ada383cb2e8faa037b78f6af587), "hack?","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, hack?, set 4)" )
+GAME_CUSTOM( 199?, m4vivalv__3,    m4vivalv, mod4yam_bootleg_fixedret<0x28>, mpu4, init_m4default,  "viva_05_.4",                   0x0000, 0x010000, CRC(b094914f) SHA1(8217b4bb7a8d55fb8e86018ffc520a63f41a79b8), "hack?","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, hack?, set 5)" )
+GAME_CUSTOM( 199?, m4vivalv__4,    m4vivalv, mod4yam_bootleg_fixedret<0x28>, mpu4, init_m4default,  "viva_05_.8",                   0x0000, 0x010000, CRC(c5c09c10) SHA1(47890d0ba1c2ca53231ac148a02f046452dce1b4), "hack?","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, hack?, set 6)" )
+GAME_CUSTOM( 199?, m4vivalv__5,    m4vivalv, mod4yam_bootleg_fixedret<0x66>, mpu4, init_m4default,  "viva_10_.4",                   0x0000, 0x010000, CRC(b1d5e820) SHA1(68012216d7e82168c7468d1e54c527c15d268917), "hack?","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, hack?, set 7)" )
+GAME_CUSTOM( 199?, m4vivalv__6,    m4vivalv, mod4yam_bootleg_fixedret<0x66>, mpu4, init_m4default,  "viva_10_.8",                   0x0000, 0x010000, CRC(f392c81c) SHA1(cb3320b688b315dbc226f45b78490fed439ee9a2), "hack?","Viva Las Vegas (BWB) (MPU4) (VL_ 2.0, hack ? , set 8)" )
 
 
 
@@ -1159,27 +1157,27 @@ GAME_CUSTOM( 199?, m4vivalv__6,    m4vivalv, mod4yam_bootleg_fixedret<0x66>, mpu
 	GAME(year, setname, parent, machine, inputs, mpu4mod4yam_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1993  B.W.B." and "HVP 3.0"
-GAME_CUSTOM( 199?, m4shv__h,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hvyp10p",              0x0000, 0x010000, CRC(b4af635a) SHA1(420cdf3a6899e432d74e3b10a57414cbedc0913e), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 1)" )
-GAME_CUSTOM( 199?, m4shv__i,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_05___.3h3",         0x0000, 0x010000, CRC(13bfa891) SHA1(ffddd14a019d52029bf8d4f680d8d05413a9f0b7), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 2)" )
-GAME_CUSTOM( 199?, m4shv__j,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_05_d_.3h3",         0x0000, 0x010000, CRC(50c66ce8) SHA1(ef12525fc3ac82caf80326edaac81bb9fbc3245c), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 3)" )
-GAME_CUSTOM( 199?, m4shv__k,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_10___.3h3",         0x0000, 0x010000, CRC(627caac7) SHA1(4851ce2441850743ea68ecbf89bde3f4cd6c2b4c), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 4)" )
-GAME_CUSTOM( 199?, m4shv__l,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_10_d_.3h3",         0x0000, 0x010000, CRC(15cfa26e) SHA1(6bc3feaba65d1797b9945f23a89e983f56b13f79), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 5)" )
-GAME_CUSTOM( 199?, m4shv__m,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_10_d_.3n3",         0x0000, 0x010000, CRC(b81f1d0a) SHA1(5fd293be2b75393069c9f5e099b4700ff930f081), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 6)" )
-GAME_CUSTOM( 199?, m4shv__n,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hvi05___.3h3",         0x0000, 0x010000, CRC(6959332e) SHA1(edaa5f86ad4389b0a3bc2e6679fe8f62520be3ae), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 7)" )
-GAME_CUSTOM( 199?, m4shv__o,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hvi10___.3h3",         0x0000, 0x010000, CRC(6c1b4b89) SHA1(e8eb4e689d43c5b9e8354aa7375ca3ba12ed1160), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 8)" )
-GAME_CUSTOM( 199?, m4shv__p,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hvi10___.3n3",         0x0000, 0x010000, CRC(9d95cf8c) SHA1(26daf3975e1e3a605bc4392700c5470b52450d6e), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 9)" )
+GAME_CUSTOM( 199?, m4shv__h,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hvyp10p",              0x0000, 0x010000, CRC(b4af635a) SHA1(420cdf3a6899e432d74e3b10a57414cbedc0913e), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 1)" )
+GAME_CUSTOM( 199?, m4shv__i,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_05___.3h3",         0x0000, 0x010000, CRC(13bfa891) SHA1(ffddd14a019d52029bf8d4f680d8d05413a9f0b7), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 2)" )
+GAME_CUSTOM( 199?, m4shv__j,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_05_d_.3h3",         0x0000, 0x010000, CRC(50c66ce8) SHA1(ef12525fc3ac82caf80326edaac81bb9fbc3245c), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 3)" )
+GAME_CUSTOM( 199?, m4shv__k,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_10___.3h3",         0x0000, 0x010000, CRC(627caac7) SHA1(4851ce2441850743ea68ecbf89bde3f4cd6c2b4c), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 4)" )
+GAME_CUSTOM( 199?, m4shv__l,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_10_d_.3h3",         0x0000, 0x010000, CRC(15cfa26e) SHA1(6bc3feaba65d1797b9945f23a89e983f56b13f79), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 5)" )
+GAME_CUSTOM( 199?, m4shv__m,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_10_d_.3n3",         0x0000, 0x010000, CRC(b81f1d0a) SHA1(5fd293be2b75393069c9f5e099b4700ff930f081), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 6)" )
+GAME_CUSTOM( 199?, m4shv__n,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hvi05___.3h3",         0x0000, 0x010000, CRC(6959332e) SHA1(edaa5f86ad4389b0a3bc2e6679fe8f62520be3ae), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 7)" )
+GAME_CUSTOM( 199?, m4shv__o,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hvi10___.3h3",         0x0000, 0x010000, CRC(6c1b4b89) SHA1(e8eb4e689d43c5b9e8354aa7375ca3ba12ed1160), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 8)" )
+GAME_CUSTOM( 199?, m4shv__p,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hvi10___.3n3",         0x0000, 0x010000, CRC(9d95cf8c) SHA1(26daf3975e1e3a605bc4392700c5470b52450d6e), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 9)" )
 // "(C)1994  B.W.B." and "HVP 3.0"
-GAME_CUSTOM( 199?, m4shv__q,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "h.viper10p610m.bin",   0x0000, 0x010000, CRC(104b0c48) SHA1(ab4cdb596a0cfb877ed1b6bf801e4a759b53971f), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, C)" )
-GAME_CUSTOM( 199?, m4shv__r,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hvyp56c",              0x0000, 0x010000, CRC(297d3cf8) SHA1(78f4de2ed69fb38b944a54d4d5927ff791e7876c), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, C, bad?)" ) // bad rom? checksum alarm
-GAME_CUSTOM( 199?, m4shv__s,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_05___.3o3",         0x0000, 0x010000, CRC(9ae86366) SHA1(614ae0ab184645c9f568796783f29a177eda3208), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 1)" )
-GAME_CUSTOM( 199?, m4shv__t,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_05_d_.3o3",         0x0000, 0x010000, CRC(87dfca0e) SHA1(3ab4105680acc46d3633a722f40ff1af0a520a7f), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 2)" )
-GAME_CUSTOM( 199?, m4shv__u,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_10___.3o3",         0x0000, 0x010000, CRC(02e4d86a) SHA1(47aa83e8bcd85e8ba7fb972cdd1ead7fe21e0418), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 3)" )
-GAME_CUSTOM( 199?, m4shv__v,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_10_d_.3o3",         0x0000, 0x010000, CRC(85f176b9) SHA1(30380d58bf2834829764cbdbdc7d950632e61e6d), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 4)" )
-GAME_CUSTOM( 199?, m4shv__w,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hvi05___.3o3",         0x0000, 0x010000, CRC(cdba80a5) SHA1(6c9fac7e5ee324b18922cc7a053495f1977bcb6d), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 5)" )
+GAME_CUSTOM( 199?, m4shv__q,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "h.viper10p610m.bin",   0x0000, 0x010000, CRC(104b0c48) SHA1(ab4cdb596a0cfb877ed1b6bf801e4a759b53971f), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, C)" )
+GAME_CUSTOM( 199?, m4shv__r,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hvyp56c",              0x0000, 0x010000, CRC(297d3cf8) SHA1(78f4de2ed69fb38b944a54d4d5927ff791e7876c), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, C, bad?)" ) // bad rom? checksum alarm
+GAME_CUSTOM( 199?, m4shv__s,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_05___.3o3",         0x0000, 0x010000, CRC(9ae86366) SHA1(614ae0ab184645c9f568796783f29a177eda3208), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 1)" )
+GAME_CUSTOM( 199?, m4shv__t,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_05_d_.3o3",         0x0000, 0x010000, CRC(87dfca0e) SHA1(3ab4105680acc46d3633a722f40ff1af0a520a7f), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 2)" )
+GAME_CUSTOM( 199?, m4shv__u,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_10___.3o3",         0x0000, 0x010000, CRC(02e4d86a) SHA1(47aa83e8bcd85e8ba7fb972cdd1ead7fe21e0418), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 3)" )
+GAME_CUSTOM( 199?, m4shv__v,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hv_10_d_.3o3",         0x0000, 0x010000, CRC(85f176b9) SHA1(30380d58bf2834829764cbdbdc7d950632e61e6d), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 4)" )
+GAME_CUSTOM( 199?, m4shv__w,    m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,  "hvi05___.3o3",         0x0000, 0x010000, CRC(cdba80a5) SHA1(6c9fac7e5ee324b18922cc7a053495f1977bcb6d), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 5)" )
 // "(C)1993  B.W.B." and "HVP 4.0"
-GAME_CUSTOM( 199?, m4shv__x, m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,     "hv_05___.4n3",         0x0000, 0x010000, CRC(f607f351) SHA1(d7b779b80fa964a27b106bd9d5ca3be16a11d5e9), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 1)" )
-GAME_CUSTOM( 199?, m4shv__y, m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,     "hv_05_d_.4n3",         0x0000, 0x010000, CRC(f4d702d7) SHA1(268c7f6443c7ae587caf5b227fcd438530a06bcc), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 2)" )
-GAME_CUSTOM( 199?, m4shv__z, m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,     "hvi05___.4n3",         0x0000, 0x010000, CRC(38a33c2b) SHA1(21004092b81e08146291fd3a025652f0edbe47dc), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 3)" )
+GAME_CUSTOM( 199?, m4shv__x, m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,     "hv_05___.4n3",         0x0000, 0x010000, CRC(f607f351) SHA1(d7b779b80fa964a27b106bd9d5ca3be16a11d5e9), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 1)" )
+GAME_CUSTOM( 199?, m4shv__y, m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,     "hv_05_d_.4n3",         0x0000, 0x010000, CRC(f4d702d7) SHA1(268c7f6443c7ae587caf5b227fcd438530a06bcc), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 2)" )
+GAME_CUSTOM( 199?, m4shv__z, m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4default,     "hvi05___.4n3",         0x0000, 0x010000, CRC(38a33c2b) SHA1(21004092b81e08146291fd3a025652f0edbe47dc), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 3)" )
 // "(C)1991 BARCREST" and "H6Y 0.3"
 GAME_CUSTOM( 199?, m4shv,    0,     mod4yam_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4default,     "h6ys.p1",              0x0000, 0x010000, CRC(4af914ff) SHA1(3d9b7c65ec1129ee64e3f4e14e43e4c39c76166b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 1)" )
 GAME_CUSTOM( 199?, m4shv__a, m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4default,     "h6yc.p1",              0x0000, 0x010000, CRC(8faca3bc) SHA1(9d666371f1118ccb1a94bfc4e6c79b540a84842b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 C)" )
@@ -1190,7 +1188,7 @@ GAME_CUSTOM( 199?, m4shv__e, m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal:
 // "(C)1991 BARCREST" and "H6Y 0.2"
 GAME_CUSTOM( 199?, m4shv__f, m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4default,     "hvypr206",             0x0000, 0x010000, CRC(e1d96b8c) SHA1(e21b1bdbca1bae41f0e7274e3521f99eb984759e), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.2 Y)" )
  // "(C)1995  B.W.B." and "HVC 1.0"
-GAME_CUSTOM( 199?, m4shv__g, m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::hypvipalt_characteriser_prot>, mpu4,  init_m4default,"5p4hypervyper.bin",    0x0000, 0x010000, CRC(51ac9288) SHA1(1580079b6e710506ab03e1d8a89af65cd06cedd2), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVC 1.0 C)" )
+GAME_CUSTOM( 199?, m4shv__g, m4shv, mod4yam_cheatchr_pal<mpu4_characteriser_pal::hypvipalt_characteriser_prot>, mpu4,  init_m4default,"5p4hypervyper.bin",    0x0000, 0x010000, CRC(51ac9288) SHA1(1580079b6e710506ab03e1d8a89af65cd06cedd2), "BWB","Super Hyper Viper (Barcrest) (MPU4) (HVC 1.0 C)" )
 
 // different protection
 // no copyright string and "HVP 3.0"
@@ -1251,35 +1249,234 @@ GAME_CUSTOM( 199?, m4hypclb__b,    m4hypclb,   "hpcfd.p1", 0x0000, 0x010000, CRC
 // some of these ROMs (the non-D ones?) contain a 'Barcrest Video' string, why? there's no footage to support it being a video game
 
 // "(C)1994  B.W.B." and "GB  5.0"
-GAME_CUSTOM( 199?, m4gbust,     0,          "gb_05___.4s3",         0x0000, 0x010000, CRC(e2227701) SHA1(271682c7bf6e0f6f49f6d6b138aa19b6ef6bc626), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 5.0)" )
+GAME_CUSTOM( 199?, m4gbust,     0,          "gb_05___.4s3",         0x0000, 0x010000, CRC(e2227701) SHA1(271682c7bf6e0f6f49f6d6b138aa19b6ef6bc626), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 5.0)" )
 // "(C)1994  B.W.B." and "GB  4.0"
-GAME_CUSTOM( 199?, m4gbust__d,  m4gbust,    "gb_05___.4a3",         0x0000, 0x010000, CRC(8be6949e) SHA1(9731a1cb0d17c3cec2bec263cd6348f05662d917), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 4.0, set 1)" )
-GAME_CUSTOM( 199?, m4gbust__e,  m4gbust,    "gb_05___.4n3",         0x0000, 0x010000, CRC(621b25f0) SHA1(bf699068284def8bad9143c5841f667f2cb6f20f), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 4.0, set 2)" )
-GAME_CUSTOM( 199?, m4gbust__g,  m4gbust,    "gb_05_d_.4a3",         0x0000, 0x010000, CRC(a1b2b32f) SHA1(c1504b3768920f90dbd441b9d50db9676528ca97), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 4.0 D)" )
+GAME_CUSTOM( 199?, m4gbust__d,  m4gbust,    "gb_05___.4a3",         0x0000, 0x010000, CRC(8be6949e) SHA1(9731a1cb0d17c3cec2bec263cd6348f05662d917), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 4.0, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__e,  m4gbust,    "gb_05___.4n3",         0x0000, 0x010000, CRC(621b25f0) SHA1(bf699068284def8bad9143c5841f667f2cb6f20f), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 4.0, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__g,  m4gbust,    "gb_05_d_.4a3",         0x0000, 0x010000, CRC(a1b2b32f) SHA1(c1504b3768920f90dbd441b9d50db9676528ca97), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 4.0 D)" )
 // "(C)1994  B.W.B." and "GB  3.0"
-GAME_CUSTOM( 199?, m4gbust__b,  m4gbust,    "gb_02___.3n3",         0x0000, 0x010000, CRC(99514ddd) SHA1(432d484525867c6ad68cd93a4bfded4dba36cf56), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0, 1994, set 1)" )
-GAME_CUSTOM( 199?, m4gbust__a,  m4gbust,    "gb_02___.3a3",         0x0000, 0x010000, CRC(2b9d94b6) SHA1(ca433240f9e926cdf5240209589951e6018a496a), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0, 1994, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__b,  m4gbust,    "gb_02___.3n3",         0x0000, 0x010000, CRC(99514ddd) SHA1(432d484525867c6ad68cd93a4bfded4dba36cf56), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 3.0, 1994, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__a,  m4gbust,    "gb_02___.3a3",         0x0000, 0x010000, CRC(2b9d94b6) SHA1(ca433240f9e926cdf5240209589951e6018a496a), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 3.0, 1994, set 2)" )
 // "(C)1994  B.W.B." and "GB  2.0"
-GAME_CUSTOM( 199?, m4gbust__c,  m4gbust,    "gb_02___.3s3",         0x0000, 0x010000, CRC(2634aa5f) SHA1(58ab973940138bdfd2690867e2ac3eb52bffb633), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0, 1994)" )
+GAME_CUSTOM( 199?, m4gbust__c,  m4gbust,    "gb_02___.3s3",         0x0000, 0x010000, CRC(2634aa5f) SHA1(58ab973940138bdfd2690867e2ac3eb52bffb633), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 2.0, 1994)" )
 // "(C)1993  B.W.B." and "GB  3.0"
-GAME_CUSTOM( 199?, m4gbust__j,  m4gbust,    "gb_10___.3s3",         0x0000, 0x010000, CRC(427e043b) SHA1(2f64c11a04306692ac5eb9919892f7226156dce0), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0, set 1)" )
-GAME_CUSTOM( 199?, m4gbust__p,  m4gbust,    "gb_20___.3s3",         0x0000, 0x010000, CRC(4a86d879) SHA1(72e92b6482fdeb4dca36d9426a712ac24d60f7f7), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0, set 2)" )
-GAME_CUSTOM( 199?, m4gbust__n,  m4gbust,    "gb_10_d_.3s3",         0x0000, 0x010000, CRC(776736de) SHA1(4f80d9ffdf4468801cf830e9774b6028f7684864), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0 D, set 1)" )
-GAME_CUSTOM( 199?, m4gbust__v,  m4gbust,    "gb_20_d_.3s3",         0x0000, 0x010000, CRC(4fc69155) SHA1(09a0f2122893d9fd90204a74c8862e01386503a4), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0 D, set 2)" )
-GAME_CUSTOM( 199?, m4gbust__k,  m4gbust,    "gb_10_b_.3s3",         0x0000, 0x010000, CRC(091afb66) SHA1(ac32d7be1e1f4f1453e37017966990a481506024), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0 YD, set 1)" )
-GAME_CUSTOM( 199?, m4gbust__s,  m4gbust,    "gb_20_b_.3s3",         0x0000, 0x010000, CRC(1a7cc3cf) SHA1(0d5764d35489bde284965c197b217a06f26a3e3b), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 3.0 YD, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__j,  m4gbust,    "gb_10___.3s3",         0x0000, 0x010000, CRC(427e043b) SHA1(2f64c11a04306692ac5eb9919892f7226156dce0), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 3.0, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__p,  m4gbust,    "gb_20___.3s3",         0x0000, 0x010000, CRC(4a86d879) SHA1(72e92b6482fdeb4dca36d9426a712ac24d60f7f7), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 3.0, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__n,  m4gbust,    "gb_10_d_.3s3",         0x0000, 0x010000, CRC(776736de) SHA1(4f80d9ffdf4468801cf830e9774b6028f7684864), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 3.0 D, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__v,  m4gbust,    "gb_20_d_.3s3",         0x0000, 0x010000, CRC(4fc69155) SHA1(09a0f2122893d9fd90204a74c8862e01386503a4), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 3.0 D, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__k,  m4gbust,    "gb_10_b_.3s3",         0x0000, 0x010000, CRC(091afb66) SHA1(ac32d7be1e1f4f1453e37017966990a481506024), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 3.0 YD, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__s,  m4gbust,    "gb_20_b_.3s3",         0x0000, 0x010000, CRC(1a7cc3cf) SHA1(0d5764d35489bde284965c197b217a06f26a3e3b), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 3.0 YD, set 2)" )
 // "(C)1993  B.W.B." and "GB  2.0"
-GAME_CUSTOM( 199?, m4gbust__f,  m4gbust,    "gb_02___.2n3",         0x0000, 0x010000, CRC(973b3538) SHA1(31df04d9f35cbde4d5e395256927f146d1613178), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 1)" )
-GAME_CUSTOM( 199?, m4gbust__i,  m4gbust,    "gb_10___.2n3",         0x0000, 0x010000, CRC(de18c441) SHA1(5a7055fcd755c1ac58e1b94af243801f169f29f5), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 2)" )
-GAME_CUSTOM( 199?, m4gbust__o,  m4gbust,    "gb_20___.2n3",         0x0000, 0x010000, CRC(27fc2ee1) SHA1(2e6a042f7117b4594b2601ae166ee0db72c70ed5), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 3)" )
-GAME_CUSTOM( 199?, m4gbust__h,  m4gbust,    "gb_10___.2a3",         0x0000, 0x010000, CRC(a5c692f3) SHA1(8305c88ab8b80b407f4723df25135c25a4c0794f), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 4)" )
-GAME_CUSTOM( 199?, m4gbust__w,  m4gbust,    "ghostbusters 2p.bin",  0x0000, 0x010000, CRC(abb288c4) SHA1(2012e027711996a552ab59674ae3bce1bf14f44b), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 5)" )
-GAME_CUSTOM( 199?, m4gbust__m,  m4gbust,    "gb_10_d_.2n3",         0x0000, 0x010000, CRC(cac5057d) SHA1(afcc21dbd07515ed134675b7dbfb53c048a465b0), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0 D, set 1)" )
-GAME_CUSTOM( 199?, m4gbust__u,  m4gbust,    "gb_20_d_.2n3",         0x0000, 0x010000, CRC(431c2965) SHA1(eb24e560d5c4bf419465fc760621a4fa853fff95), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0 D, set 2)" )
-GAME_CUSTOM( 199?, m4gbust__l,  m4gbust,    "gb_10_d_.2a3",         0x0000, 0x010000, CRC(f1446bf5) SHA1(4011d60e13045476741c5a02c64dabbe6a1ae2d6), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0 D, set 3)" )
-GAME_CUSTOM( 199?, m4gbust__t,  m4gbust,    "gb_20_d_.2a3",         0x0000, 0x010000, CRC(70f40688) SHA1(ed14f8f460825ffa087394ef5984ae064e02f7b6), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0 D, set 4)" )
-GAME_CUSTOM( 199?, m4gbust__r,  m4gbust,    "gb_20_b_.2n3",         0x0000, 0x010000, CRC(28cbb217) SHA1(a74978ff5e1511a33f543006b3f8ad30a77ea462), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0 YD, set 1)" )
-GAME_CUSTOM( 199?, m4gbust__q,  m4gbust,    "gb_20_b_.2a3",         0x0000, 0x010000, CRC(4dd7d38f) SHA1(8a71c27189ec3089c016a8292db68f7cdc91b083), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 2.0 YD, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__f,  m4gbust,    "gb_02___.2n3",         0x0000, 0x010000, CRC(973b3538) SHA1(31df04d9f35cbde4d5e395256927f146d1613178), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__i,  m4gbust,    "gb_10___.2n3",         0x0000, 0x010000, CRC(de18c441) SHA1(5a7055fcd755c1ac58e1b94af243801f169f29f5), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__o,  m4gbust,    "gb_20___.2n3",         0x0000, 0x010000, CRC(27fc2ee1) SHA1(2e6a042f7117b4594b2601ae166ee0db72c70ed5), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 3)" )
+GAME_CUSTOM( 199?, m4gbust__h,  m4gbust,    "gb_10___.2a3",         0x0000, 0x010000, CRC(a5c692f3) SHA1(8305c88ab8b80b407f4723df25135c25a4c0794f), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 4)" )
+GAME_CUSTOM( 199?, m4gbust__w,  m4gbust,    "ghostbusters 2p.bin",  0x0000, 0x010000, CRC(abb288c4) SHA1(2012e027711996a552ab59674ae3bce1bf14f44b), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 2.0, set 5)" )
+GAME_CUSTOM( 199?, m4gbust__m,  m4gbust,    "gb_10_d_.2n3",         0x0000, 0x010000, CRC(cac5057d) SHA1(afcc21dbd07515ed134675b7dbfb53c048a465b0), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 2.0 D, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__u,  m4gbust,    "gb_20_d_.2n3",         0x0000, 0x010000, CRC(431c2965) SHA1(eb24e560d5c4bf419465fc760621a4fa853fff95), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 2.0 D, set 2)" )
+GAME_CUSTOM( 199?, m4gbust__l,  m4gbust,    "gb_10_d_.2a3",         0x0000, 0x010000, CRC(f1446bf5) SHA1(4011d60e13045476741c5a02c64dabbe6a1ae2d6), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 2.0 D, set 3)" )
+GAME_CUSTOM( 199?, m4gbust__t,  m4gbust,    "gb_20_d_.2a3",         0x0000, 0x010000, CRC(70f40688) SHA1(ed14f8f460825ffa087394ef5984ae064e02f7b6), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 2.0 D, set 4)" )
+GAME_CUSTOM( 199?, m4gbust__r,  m4gbust,    "gb_20_b_.2n3",         0x0000, 0x010000, CRC(28cbb217) SHA1(a74978ff5e1511a33f543006b3f8ad30a77ea462), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 2.0 YD, set 1)" )
+GAME_CUSTOM( 199?, m4gbust__q,  m4gbust,    "gb_20_b_.2a3",         0x0000, 0x010000, CRC(4dd7d38f) SHA1(8a71c27189ec3089c016a8292db68f7cdc91b083), "BWB","Ghost Buster (Barcrest) (MPU4) (GB 2.0 YD, set 2)" )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Bucks Fizz Club / Super Bucks Fizz Club
+*
+*****************************************************************************************************************************************************************************/
+
+
+ROM_START( m4bucks )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bufs.p1", 0x0000, 0x010000, CRC(e394ae40) SHA1(911077053c47cebba1bed9d359cd38bd676a46f1) )
+ROM_END
+
+ROM_START( m4bucksa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bufd.p1", 0x0000, 0x010000, CRC(02c575d3) SHA1(92dc7a0c298e4d2d19bf754a5c82cc15e4e6456c) )
+ROM_END
+
+ROM_START( m4supbf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sbff.p1", 0x0000, 0x010000, CRC(f27feba0) SHA1(157bf28e2d5fc2fa58bed11b3285cf56ae18abb8) )
+ROM_END
+
+ROM_START( m4supbfa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sbfs.p1", 0x0000, 0x010000, CRC(c8c52d5e) SHA1(d53513b9faabc307623a7c2f5be0225fb812beeb) )
+ROM_END
+
+
+GAME(199?, m4bucks,   0,          mod4yam_cheatchr_pal<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4) (BUF 1.2, set 1)",GAME_FLAGS )
+GAME(199?, m4bucksa,  m4bucks,    mod4yam_cheatchr_pal<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4) (BUF 1.2, set 2)",GAME_FLAGS )
+GAME(199?, m4supbf,   0,          mod4yam_cheatchr_pal<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (SBF 2.0, set 1)",GAME_FLAGS )
+GAME(199?, m4supbfa,  m4supbf,    mod4yam_cheatchr_pal<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (SBF 2.0, set 2)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* California Club
+*  - can't see credit display, needs extender?
+*
+*****************************************************************************************************************************************************************************/
+
+
+ROM_START( m4calicl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ca2s.p1", 0x0000, 0x010000, CRC(fad153fd) SHA1(bd1f1a5c73624df45d01cb4853d87e998e434d7a) )
+ROM_END
+
+ROM_START( m4calicla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ca2d.p1", 0x0000, 0x010000, CRC(75eb8c6f) SHA1(1bb923d06dcfa24eaf9533c083f68f4bd840834f) )
+ROM_END
+
+ROM_START( m4caliclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ca2f.p1", 0x0000, 0x010000, CRC(6c53cf29) SHA1(2e58453891ab4faa17ef58a81c5f3c0618d046a5) )
+ROM_END
+
+ROM_START( m4caliclc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cald.p1", 0x0000, 0x010000, CRC(296fdeeb) SHA1(7782c0c7d8f44e2c0d48cc24c13015241e47b9ec) )
+ROM_END
+
+ROM_START( m4calicld )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cals.p1", 0x0000, 0x010000, CRC(28a1c5fe) SHA1(e8474df609ea7f3517780b54d6f493987aad3650) )
+ROM_END
+
+
+GAME(199?, m4calicl,  0,          mod4yam_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (CA2 1.0, set 1)",GAME_FLAGS )
+GAME(199?, m4calicla, m4calicl,   mod4yam_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (CA2 1.0, set 2)",GAME_FLAGS )
+GAME(199?, m4caliclb, m4calicl,   mod4yam_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (CA2 1.0, set 3)",GAME_FLAGS )
+GAME(199?, m4caliclc, m4calicl,   mod4yam_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (CAL 2.0, set 1)",GAME_FLAGS )
+GAME(199?, m4calicld, m4calicl,   mod4yam_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (CAL 2.0, set 2)",GAME_FLAGS )
+
+/*****************************************************************************************************************************************************************************
+*
+* Sunset Club
+*  - can't see credit display, needs extender?
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4sunscl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sc_xe___.3_3", 0x0000, 0x010000, CRC(e3732cc6) SHA1(77f0368bb29ad00030f83af794a52df92fe97e5d) )
+ROM_END
+
+ROM_START( m4sunscla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sc_xe_d_.3_3", 0x0000, 0x010000, CRC(b8627c4a) SHA1(ad616d38773cbd82376b518aa15dc3d7027237c5) )
+ROM_END
+
+ROM_START( m4sunsclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sc_xef__.3_3", 0x0000, 0x010000, CRC(8e7e1100) SHA1(7648ea860a546081388a213845e27312730f46d9) )
+ROM_END
+
+GAME(199?, m4sunscl,  0,          mod4yam_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "BWB", "Sunset Club (BWB) (MPU4) (SSC 3.0, set 1)", GAME_FLAGS )
+GAME(199?, m4sunscla, m4sunscl,   mod4yam_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "BWB", "Sunset Club (BWB) (MPU4) (SSC 3.0, set 2)", GAME_FLAGS )
+GAME(199?, m4sunsclb, m4sunscl,   mod4yam_cheatchr_pal<mpu4_characteriser_pal::sunsetclub_characteriser_prot>,       mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "BWB", "Sunset Club (BWB) (MPU4) (SSC 3.0, set 3)", GAME_FLAGS )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Tropicana Club
+*  - can't see credit display, needs extender?
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4tropcl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tros.p1", 0x0000, 0x010000, CRC(5e86c3fc) SHA1(ce2419991559839a8875060c1afe0f030190010a) )
+ROM_END
+
+ROM_START( m4tropcla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tr2d.p1", 0x0000, 0x010000, CRC(0cc23f89) SHA1(a66c8c28073f53381c43e3e597f15f81c5c61479) )
+ROM_END
+
+ROM_START( m4tropclb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tr2f.p1", 0x0000, 0x010000, CRC(fbdcd06f) SHA1(27ccdc83e60a62227d33d8cf3d516fc43908ab99) )
+ROM_END
+
+ROM_START( m4tropclc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tr2s.p1", 0x0000, 0x010000, CRC(6d43375c) SHA1(5be1dc85374c6a1235e0b137b46ebd7a2d7d922a) )
+ROM_END
+
+ROM_START( m4tropcld )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "trod.p1", 0x0000, 0x010000, CRC(60c84612) SHA1(84dc8b34e41436331832c1a32ddac0fce269488a) )
+ROM_END
+
+GAME(199?, m4tropcl,  0,          mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TRO 2.0, set 1)",GAME_FLAGS )
+GAME(199?, m4tropcld, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TRO 2.0, set 2)",GAME_FLAGS )
+GAME(199?, m4tropcla, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 1)",GAME_FLAGS )
+GAME(199?, m4tropclb, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 2)",GAME_FLAGS )
+GAME(199?, m4tropclc, m4tropcl,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (TR2 1.1, set 3)",GAME_FLAGS )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Nudge Shuffle
+*
+*****************************************************************************************************************************************************************************/
+
+ROM_START( m4nudshf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nusx.p1", 0x0000, 0x010000, CRC(87caab84) SHA1(e2492ad0d25ded4d760c4cbe05e9b51ca1a10544) )
+ROM_END
+
+ROM_START( m4nudshfa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nus6", 0x0000, 0x010000, CRC(017c5354) SHA1(07491e4b03ab62ad923f8479300c1af4633e3e8c) )
+ROM_END
+
+ROM_START( m4nudshfb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nuss.bin", 0x0000, 0x010000, CRC(d3b860ee) SHA1(d5d1262c715e4684748b0cae708eeed31b1dc50f) )
+ROM_END
+
+ROM_START( m4nudshfc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nusxc.p1", 0x0000, 0x010000, CRC(e2557b45) SHA1(a9d1514d4fe3897f6fcef22a5039d6bdff8126ff) )
+ROM_END
+
+
+GAME(199?, m4nudshf,  0,          mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 1)",GAME_FLAGS )
+GAME(199?, m4nudshfb, m4nudshf,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 2)",GAME_FLAGS )
+GAME(199?, m4nudshfc, m4nudshf,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 3)",GAME_FLAGS )
+GAME(199?, m4nudshfa, m4nudshf,   mod4yam_alt_cheatchr_pal<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.0)",GAME_FLAGS )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Night Spot
+*
+*****************************************************************************************************************************************************************************/
+
+
+ROM_START( m4nspot )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ns2s.p1", 0x0000, 0x010000, CRC(ba0f5a81) SHA1(7015176d4528636cb8a753249c824c37941e8eae) )
+ROM_END
+
+ROM_START( m4nspota )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ns2d.p1", 0x0000, 0x010000, CRC(5e66b7e0) SHA1(e82044e3c1e5cf3a2baf1fde7b7ab8b6e221d360) )
+ROM_END
+
+ROM_START( m4nspotb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nits.p1", 0x0000, 0x010000, CRC(47c965e6) SHA1(41a337a9a367c4e704a60e32d56b262d03f97b59) )
+ROM_END
+
+GAME(199?, m4nspot,   0,          mod4yam_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (NS2 2.2, set 1)",GAME_FLAGS )
+GAME(199?, m4nspota,  m4nspot,    mod4yam_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (NS2 2.2, set 2)",GAME_FLAGS )
+GAME(199?, m4nspotb,  m4nspot,    mod4yam_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>,   mpu420p,    mpu4mod4yam_machines_state, init_m4default_five_rev, ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (NIT 1.1)",GAME_FLAGS )
 
 
 /*****************************************************************************************************************************************************************************
@@ -1303,10 +1500,6 @@ ROM_START( m4clbshf )
 	ROM_LOAD( "csss.p1", 0x0000, 0x010000, CRC(32dd9b96) SHA1(93831858b2f0ada8e4a0aa2fae59d12c53287df1) )
 ROM_END
 
-ROM_START( m4graffd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "grafittirom.bin", 0x0000, 0x010000, CRC(36135d6e) SHA1(e71eedabae36971739f8a6fd56a4a954de29944b) )
-ROM_END
 
 ROM_START( m4voodoo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1317,11 +1510,11 @@ GAME(198?, m4tst, 0, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4default, 
 
 GAME(199?, m4joljokd, 0,       mod4yam_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) (Dutch) (MPU4) (DJJ 1.5)",GAME_FLAGS) // Geen Tubes
 
-GAME(199?, m4clbshf,  0,        mod4yam_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4) (CSS 1.0)",GAME_FLAGS) // set stake (runs if you do)
+GAME(199?, m4clbshf,  0,        mod4yam_cheatchr_pal<mpu4_characteriser_pal::shuffle_characteriser_prot>, mpu420p, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4) (CSS 1.0)",GAME_FLAGS) // set stake (runs if you do)
 
+// GEEN TUBES
 GAME(199?, m4voodoo,  0,        mod4yam_cheatchr_pal<mpu4_characteriser_pal::m435_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (Dutch) (MPU4) (DDO 3.2)",GAME_FLAGS ) // ROL F SETUP ALM
 
-GAME(199?, m4graffd,  0,  mod4yam_cheatchr_pal<mpu4_characteriser_pal::turboplay_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Grafitti (Barcrest) (Dutch) (MPU4) (DGR 1.3)",GAME_FLAGS ) // ROL D SETUP ALM
 
 ROM_START( m4hslo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1329,4 +1522,4 @@ ROM_START( m4hslo )
 ROM_END
 
 // non-standard protection
-GAME(199?, m4hslo,    0,          mod4yam_bootleg_fixedret<0x56>,       mpu4,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "(bootleg)","Hot Slot (bootleg) (MPU4) (HOT 3.0)",GAME_FLAGS )
+GAME(199?, m4hslo,    0,          mod4yam_bootleg_fixedret<0x56>,       mpu4_70pc,    mpu4mod4yam_machines_state, init_m4default, ROT0,   "(bootleg)","Hot Slot (bootleg) (MPU4) (HOT 3.0)",GAME_FLAGS )

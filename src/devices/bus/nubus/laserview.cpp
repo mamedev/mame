@@ -14,6 +14,9 @@
 #include "laserview.h"
 #include "screen.h"
 
+#include <algorithm>
+
+
 #define LASERVIEW_SCREEN_NAME   "laserview_screen"
 #define LASERVIEW_ROM_REGION    "laserview_rom"
 
@@ -81,13 +84,13 @@ void nubus_laserview_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(this, LASERVIEW_ROM_REGION, true);
+	install_declaration_rom(LASERVIEW_ROM_REGION, true);
 
 	slotspace = get_slotspace();
 
 //  printf("[laserview %p] slotspace = %x\n", this, slotspace);
 
-	m_vram.resize(VRAM_SIZE);
+	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, &m_vram[0]);
 	install_bank(slotspace+0x900000, slotspace+0x900000+VRAM_SIZE-1, &m_vram[0]);
 
@@ -103,7 +106,7 @@ void nubus_laserview_device::device_reset()
 	m_vbl_disable = 1;
 	m_prot_state = 0;
 	m_toggle = 0;
-	memset(&m_vram[0], 0, VRAM_SIZE);
+	std::fill(m_vram.begin(), m_vram.end(), 0);
 
 	m_palette[0] = rgb_t(255, 255, 255);
 	m_palette[1] = rgb_t(0, 0, 0);
@@ -122,12 +125,13 @@ uint32_t nubus_laserview_device::screen_update(screen_device &screen, bitmap_rgb
 		raise_slot_irq();
 	}
 
+	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]);
 	for (int y = 0; y < 600; y++)
 	{
 		uint32_t *scanline = &bitmap.pix(y);
 		for (int x = 0; x < 832/8; x++)
 		{
-			uint8_t const pixels = m_vram[(y * 104) + (BYTE4_XOR_BE(x)) + 0x20];
+			uint8_t const pixels = vram8[(y * 104) + x + 0x20];
 
 			*scanline++ = m_palette[BIT(pixels, 7)];
 			*scanline++ = m_palette[BIT(pixels, 6)];

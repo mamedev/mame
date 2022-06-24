@@ -314,6 +314,7 @@ public:
 	// spend spend spend - This is unusual because the 2nd value DOES need to be different, bit 0x20 can't be set
 	// or the 2nd reel will be in the wrong place.  Does this indicate the lamp reading is more complex than
 	// we believe, or are there 2 parts with the same sequence and one value different?
+	// clubx also needs this version instead
 	static constexpr uint8_t viva_sss_characteriser_prot[8] = { 0x00, 0x40, 0x20, 0x40, 0x40, 0x20, 0x20, 0x40 };
 
 	// games with sequence starting
@@ -784,6 +785,7 @@ public:
 	//                    "JC8 4.4"
 	//                    "JC8 4.2"
 	// Pot Black Casino   "PO  1.2"
+    //                    "PO  1.1"
 	// Fortune Club       "CFO 1.2"
 	static constexpr uint8_t fortune_characteriser_prot[8] = { 0x00, 0x70, 0x10, 0x60, 0x20, 0x50, 0x10, 0x00 }; // guessed based on lamp positions in Pot Black Casino and Jewel in the Crown
 
@@ -1127,8 +1129,6 @@ public:
 	// Pot Black                  "PBG 1.4"
 	//                            "PBG 1.5"
 	//                            "PBS 0.4"
-	//                            "PO  1.2"
-	//                            "PO  1.1"
 	// Action Club                "A2C 1.1"
 	// Nile Jewels (German)       "GJN 0.8"
 	// Oriental Diamonds (German) "RAB 0.1"
@@ -1227,6 +1227,26 @@ public:
 	static constexpr uint8_t bankrollerclub_characteriser_prot[8] = { 0x00, 0x08, 0x08, 0x10, 0x00, 0x48, 0x08, 0x00 }; // good?
 
 
+	// games with sequence starting 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48
+	// High Rise  "HII 0.3"
+	//            "HIR 3.1" 
+	//            "HIR 3.0"
+	//static constexpr uint8_t hirise_characteriser_prot[8] = { 0x00, 0x68, 0x08, 0x60, 0x40, 0x28, 0x68, 0x60 };
+	static constexpr uint8_t hirise_characteriser_prot[8] = { 0x00, 0x68, 0x08, 0x60, 0x20, 0x48, 0x08, 0x00 }; // matches bootleg
+
+
+	// games with sequence starting   00 48 a0 54 2c 88 94 14 2c a4 50 24 48 a4 78 c0 70
+	// Bucks Fizz Club        "BUF 1.2"
+	// Super Bucks Fizz Club  "SBF 2.0"
+	static constexpr uint8_t bucksfizz_characteriser_prot[8] = { 0x00, 0x68, 0x48, 0x60, 0x40, 0x68, 0x48, 0x40 };
+
+
+	// games with sequence starting 00 24 24 2c b0 e0 4c 30 a8 d8 9c 9c bc 1c bc 94
+	// Nudge Shuffle   "NUS 3.1"
+	//                 "NUS 3.0"
+	static constexpr uint8_t nudshf_characteriser_prot[8] = { 0x00, 0x28, 0x20, 0x08, 0x08, 0x20, 0x20, 0x00 };
+
+
 	/***************************************************************
 
 	 Unusual sequences (but correct?)
@@ -1264,12 +1284,6 @@ public:
 	// Dutch Turbo Play   "DTP 1.3"
 	// Dutch Grafitti     "DGR 1.3"
 	static constexpr uint8_t turboplay_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-
-	// games with sequence starting 00 24 24 2c b0 e0 4c 30 a8 d8 9c 9c bc 1c bc 94
-	// Nudge Shuffle   "NUS 3.1"
-	//                 "NUS 3.0"
-	static constexpr uint8_t nudshf_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 
 	// games with sequence starting
@@ -1357,16 +1371,6 @@ public:
 	// Dutch Techno Reel  "DTE 1.3" (doesn't boot) (REEL F)
 	static constexpr uint8_t techno_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-	// games with sequence starting   00 48 a0 54 2c 88 94 14 2c a4 50 24 48 a4 78 c0 70
-	// Bucks Fizz Club        "BUF 1.2" (doesn't boot) (REEL E)
-	// Super Bucks Fizz Club  "SBF 2.0" (doesn't boot)
-	static constexpr uint8_t bucksfizz_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-
-	// games with sequence starting 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48
-	// High Rise  "HII 0.3" (doesn't boot) (REEL E)
-	//            "HIR 3.1" (doesn't boot)
-	//            "HIR 3.0" (doesn't boot)
-	static constexpr uint8_t hirise_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	/***************************************************************
 

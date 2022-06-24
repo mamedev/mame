@@ -27,8 +27,6 @@ public:
 	// construction/destruction
 	bbc_sdcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static constexpr feature_type unemulated_features() { return feature::MEDIA; }
-
 protected:
 	bbc_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

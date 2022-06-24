@@ -346,7 +346,8 @@ GFXDECODE_END
 
 rectangle spectrum_128_state::get_screen_area()
 {
-	return rectangle{48, 48 + 255, 63, 63 + 191};
+	return { SPEC_LEFT_BORDER, SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE - 1,
+			SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER, SPEC128_UNSEEN_LINES + SPEC_TOP_BORDER + SPEC_DISPLAY_YSIZE - 1 };
 }
 
 void spectrum_128_state::spectrum_128(machine_config &config)
@@ -363,7 +364,9 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	m_screen->set_raw(X1_128_SINCLAIR / 5, 456, 311, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 56});
+	rectangle visarea = { get_screen_area().left() - SPEC_LEFT_BORDER, get_screen_area().right() + SPEC_RIGHT_BORDER,
+		get_screen_area().top() - SPEC_TOP_BORDER, get_screen_area().bottom() + SPEC_BOTTOM_BORDER };
+	m_screen->set_raw(X1_128_SINCLAIR / 5, SPEC128_CYCLES_PER_LINE * 2, SPEC128_UNSEEN_LINES + SPEC_SCREEN_HEIGHT, visarea);
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
 

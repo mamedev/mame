@@ -15,14 +15,15 @@ Video   :   2 x I.G.1BB 48844758V
 Year + Game             Main CPU  Sound CPU  Sound                         Video
 ------------------------------------------------------------------------------------------------------------------------
 >=1987  Born To Fight   V20       8088       4x MSM5205                    2x I.G.1BB 48844758V
->=1987  Fantasy Land    8086?     8086?      YM2151 + DAC                  ?
+>=1987  Fantasy Land    V30       8088       YM2151 + DAC                  ?
 1988    Wheels Runner   V20       Z80        2x SN76489 + YM3526 + YM3014  2x PLCC84 FPGA (labeled "INGA 1" and "INGA 2")
 1989    Galaxy Gunners  8088      V20        YM2151                        2x I.G.1BB 48844758V (labeled "INGA 1" and "INGA 2")
 ------------------------------------------------------------------------------------------------------------------------
 
-[fantland, galaxygn]
+[fantland]
 
-- Clocks are unknown and the cpu might be an 8088 or a later x86.
+- The board has only 1 16 MHz XTAL, but dividers aren't verified.
+  Reportedly gameplay and music are both significantly too fast.
 
 [fantland, borntofi]
 
@@ -806,10 +807,10 @@ INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
 void fantland_state::fantland(machine_config &config)
 {
 	// Basic machine hardware
-	I8086(config, m_maincpu, 8000000);        // ?
+	V30(config, m_maincpu, 16_MHz_XTAL / 2);        // NEC 9002N8 V30, D70116C-8 - divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &fantland_state::fantland_map);
 
-	I8088(config, m_audiocpu, 8000000);        // ?
+	I8088(config, m_audiocpu, 16_MHz_XTAL / 2);        // AMD P8088-2 - divider not verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fantland_state::fantland_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &fantland_state::fantland_sound_iomap);
 	m_audiocpu->set_periodic_int(FUNC(fantland_state::fantland_sound_irq), attotime::from_hz(8000));
@@ -835,7 +836,7 @@ void fantland_state::fantland(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "ymsnd", 3000000).add_route(0, "speaker", 0.35).add_route(1, "speaker", 0.35);
+	YM2151(config, "ymsnd", 16_MHz_XTAL / 4).add_route(0, "speaker", 0.35).add_route(1, "speaker", 0.35); // divider not verified
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }

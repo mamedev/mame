@@ -149,44 +149,17 @@ namespace analog
 		param_model_t::value_base_t<int> m_CAPMOD; //!< Capacitance model (0=no model 2=Meyer)
 	};
 
-	// Have a common start for mosfets
+	// -----------------------------------------------------------------------------
+	// nld_MOSFET
+	// -----------------------------------------------------------------------------
 
-	NETLIB_BASE_OBJECT(FET)
+	class nld_MOSFET : public base_device_t
 	{
 	public:
-		enum q_type {
-			FET_NMOS,
-			FET_PMOS
-		};
-
-		NETLIB_CONSTRUCTOR(FET)
+	public:                                                                        \
+		nld_MOSFET(constructor_param_t data)
+		: base_device_t(data)
 		, m_model(*this, "MODEL", "NMOS")
-		, m_qtype(FET_NMOS)
-		{
-		}
-
-		NETLIB_IS_DYNAMIC(true)
-
-		//NETLIB_RESETI();
-
-		q_type qtype() const noexcept { return m_qtype; }
-		bool is_qtype(q_type atype) const noexcept { return m_qtype == atype; }
-		void set_qtype(q_type atype) noexcept { m_qtype = atype; }
-	protected:
-
-		param_model_t m_model;
-	private:
-		q_type m_qtype;
-	};
-
-	// -----------------------------------------------------------------------------
-	// nld_QBJT_EB
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT_DERIVED(MOSFET, FET)
-	{
-	public:
-		NETLIB_CONSTRUCTOR(MOSFET)
 		, m_DG(*this, "m_DG", NETLIB_DELEGATE(terminal_handler))
 		, m_SG(*this, "m_SG", NETLIB_DELEGATE(terminal_handler))
 		, m_SD(*this, "m_SD", NETLIB_DELEGATE(terminal_handler))
@@ -204,7 +177,7 @@ namespace analog
 		, m_lambda(nlconst::zero())
 		, m_Leff(nlconst::zero())
 		, m_CoxWL(nlconst::zero())
-		, m_polarity(qtype() == FET_NMOS ? nlconst::one() : -nlconst::one())
+		//S, m_polarity(qtype() == FET_NMOS ? nlconst::one() : -nlconst::one())
 		, m_Cgb(nlconst::zero())
 		, m_Cgs(nlconst::zero())
 		, m_Cgd(nlconst::zero())
@@ -222,8 +195,7 @@ namespace analog
 			connect(m_SG.N(), m_DG.N());
 			connect(m_DG.P(), m_SD.N());
 
-			set_qtype((m_model.type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
-			m_polarity = (qtype() == FET_NMOS ? nlconst::one() : -nlconst::one());
+			m_polarity = (m_model.type() == "NMOS_DEFAULT" ? nlconst::one() : -nlconst::one());
 
 			m_capacitor_model = m_model_acc.m_CAPMOD;
 			//# printf("capmod %d %g %g\n", m_capacitor_model, (nl_fptype)m_model_acc.m_VTO, m_polarity);
@@ -296,6 +268,7 @@ namespace analog
 			//#printf("Cox: %g\n", m_Cox);
 		}
 
+		NETLIB_IS_DYNAMIC(true)
 		NETLIB_IS_TIMESTEP(true || m_capacitor_model != 0)
 
 		NETLIB_TIMESTEPI()
@@ -328,7 +301,6 @@ namespace analog
 
 		NETLIB_RESETI()
 		{
-			NETLIB_NAME(FET)::reset();
 			// Bulk diodes
 
 			m_D_BD.set_param(m_model_acc.m_ISD, m_model_acc.m_N, exec().gmin(), constants::T0());
@@ -351,9 +323,11 @@ namespace analog
 
 	private:
 
-		nld_two_terminal m_DG;
-		nld_two_terminal m_SG;
-		nld_two_terminal m_SD;
+		param_model_t m_model;
+
+		NETLIB_NAME(two_terminal) m_DG;
+		NETLIB_NAME(two_terminal) m_SG;
+		NETLIB_NAME(two_terminal) m_SD;
 
 		generic_diode<diode_e::MOS> m_D_BD;
 #if (!BODY_CONNECTED_TO_SOURCE)
@@ -594,14 +568,14 @@ namespace analog
 		const nl_fptype gSSBB = gSS + gBB + gBS + gSB;
 		const auto zero(nlconst::zero());
 		//                 S          G
-		m_SG.set_mat(    gSSBB,   gSG + gBG, +(IS + IB),       // S
-					   gGS + gGB,    gGG,      IG       );     // G
+		m_SG.set_mat(  gSSBB,   gSG + gBG, +(IS + IB),       // S
+					   gGS + gGB,    gGG,        IG     );     // G
 		//                 D          G
-		m_DG.set_mat(     gDD,       gDG,    +ID,              // D
-						  gGD,      zero,   zero        );     // G
+		m_DG.set_mat(   gDD,       gDG,        +ID,          // D
+						  gGD,      zero,       zero    );     // G
 		//                 S          D
-		m_SD.set_mat(    zero,    gSD + gBD, zero,             // S
-					   gDS + gDB,   zero,    zero);            // D
+		m_SD.set_mat(  zero,    gSD + gBD,    zero,          // S
+					   gDS + gDB,   zero,       zero    );     // D
 	}
 
 	NETLIB_UPDATE_PARAM(MOSFET)

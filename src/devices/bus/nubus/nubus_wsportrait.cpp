@@ -17,6 +17,8 @@
 #include "nubus_wsportrait.h"
 #include "screen.h"
 
+#include <algorithm>
+
 #define WSPORTRAIT_SCREEN_NAME  "wsport_screen"
 #define WSPORTRAIT_ROM_REGION  "wsport_rom"
 
@@ -46,6 +48,7 @@ void nubus_wsportrait_device::device_add_mconfig(machine_config &config)
 	screen.set_size(1024, 960);
 	screen.set_refresh_hz(75.0);
 	screen.set_visarea(0, 640-1, 0, 870-1);
+	screen.set_physical_aspect(3, 4);
 }
 
 //-------------------------------------------------
@@ -74,7 +77,7 @@ nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, 
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
-	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+	m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
 {
 	set_screen(*this, WSPORTRAIT_SCREEN_NAME);
 }
@@ -87,14 +90,13 @@ void nubus_wsportrait_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(this, WSPORTRAIT_ROM_REGION, true);
+	install_declaration_rom(WSPORTRAIT_ROM_REGION, true);
 
 	slotspace = get_slotspace();
 
-	printf("[wsportrait %p] slotspace = %x\n", (void *)this, slotspace);
+//  printf("[wsportrait %p] slotspace = %x\n", (void *)this, slotspace);
 
-	m_vram.resize(VRAM_SIZE);
-	m_vram32 = (uint32_t *)&m_vram[0];
+	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
 
 	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_wsportrait_device::vram_r)), write32s_delegate(*this, FUNC(nubus_wsportrait_device::vram_w)));
 	nubus().install_device(slotspace+0x900000, slotspace+0x900000+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_wsportrait_device::vram_r)), write32s_delegate(*this, FUNC(nubus_wsportrait_device::vram_w)));
@@ -114,7 +116,7 @@ void nubus_wsportrait_device::device_reset()
 	m_clutoffs = 0;
 	m_vbl_disable = 1;
 	m_mode = 0;
-	memset(&m_vram[0], 0, VRAM_SIZE);
+	std::fill(m_vram.begin(), m_vram.end(), 0);
 	memset(m_palette, 0, sizeof(m_palette));
 }
 
@@ -138,7 +140,7 @@ TIMER_CALLBACK_MEMBER(nubus_wsportrait_device::vbl_tick)
 uint32_t nubus_wsportrait_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// first time?  kick off the VBL timer
-	uint8_t const *const vram = &m_vram[0x80];
+	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + 0x80;
 
 	switch (m_mode)
 	{
@@ -148,7 +150,7 @@ uint32_t nubus_wsportrait_device::screen_update(screen_device &screen, bitmap_rg
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/8; x++)
 				{
-					uint8_t const pixels = vram[(y * 128) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 128) + x];
 
 					*scanline++ = m_palette[BIT(pixels, 7)];
 					*scanline++ = m_palette[BIT(pixels, 6)];
@@ -168,7 +170,7 @@ uint32_t nubus_wsportrait_device::screen_update(screen_device &screen, bitmap_rg
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/4; x++)
 				{
-					uint8_t const pixels = vram[(y * 256) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 256) + x];
 
 					*scanline++ = m_palette[((pixels>>6)&3)];
 					*scanline++ = m_palette[((pixels>>4)&3)];
@@ -184,7 +186,7 @@ uint32_t nubus_wsportrait_device::screen_update(screen_device &screen, bitmap_rg
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/2; x++)
 				{
-					uint8_t const pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 512) + x];
 
 					*scanline++ = m_palette[((pixels&0xf0)>>4)];
 					*scanline++ = m_palette[(pixels&0xf)];
@@ -287,10 +289,10 @@ uint32_t nubus_wsportrait_device::wsportrait_r(offs_t offset, uint32_t mem_mask)
 void nubus_wsportrait_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
-	COMBINE_DATA(&m_vram32[offset]);
+	COMBINE_DATA(&m_vram[offset]);
 }
 
 uint32_t nubus_wsportrait_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
-	return m_vram32[offset] ^ 0xffffffff;
+	return m_vram[offset] ^ 0xffffffff;
 }
