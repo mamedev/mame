@@ -7,6 +7,8 @@
 
 #include "machine/z80daisy.h"
 
+//typedef std::vector<std::function<void()>> opt_m;
+
 enum
 {
 	NSC800_RSTA = INPUT_LINE_IRQ0 + 1,
@@ -42,6 +44,7 @@ public:
 	auto halt_cb() { return m_halt_cb.bind(); }
 
 protected:
+	using ops_type = std::vector<std::function<void()>>;
 	enum op_prefix : u8
 	{
 		NONE, CB, DD, ED, FD, XY_CB
@@ -52,6 +55,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	void init_instructions();
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
@@ -75,72 +79,73 @@ protected:
 
 #undef PROTOTYPES
 #define PROTOTYPES(prefix) \
-	void prefix##_00(); void prefix##_01(); void prefix##_02(); void prefix##_03(); \
-	void prefix##_04(); void prefix##_05(); void prefix##_06(); void prefix##_07(); \
-	void prefix##_08(); void prefix##_09(); void prefix##_0a(); void prefix##_0b(); \
-	void prefix##_0c(); void prefix##_0d(); void prefix##_0e(); void prefix##_0f(); \
-	void prefix##_10(); void prefix##_11(); void prefix##_12(); void prefix##_13(); \
-	void prefix##_14(); void prefix##_15(); void prefix##_16(); void prefix##_17(); \
-	void prefix##_18(); void prefix##_19(); void prefix##_1a(); void prefix##_1b(); \
-	void prefix##_1c(); void prefix##_1d(); void prefix##_1e(); void prefix##_1f(); \
-	void prefix##_20(); void prefix##_21(); void prefix##_22(); void prefix##_23(); \
-	void prefix##_24(); void prefix##_25(); void prefix##_26(); void prefix##_27(); \
-	void prefix##_28(); void prefix##_29(); void prefix##_2a(); void prefix##_2b(); \
-	void prefix##_2c(); void prefix##_2d(); void prefix##_2e(); void prefix##_2f(); \
-	void prefix##_30(); void prefix##_31(); void prefix##_32(); void prefix##_33(); \
-	void prefix##_34(); void prefix##_35(); void prefix##_36(); void prefix##_37(); \
-	void prefix##_38(); void prefix##_39(); void prefix##_3a(); void prefix##_3b(); \
-	void prefix##_3c(); void prefix##_3d(); void prefix##_3e(); void prefix##_3f(); \
-	void prefix##_40(); void prefix##_41(); void prefix##_42(); void prefix##_43(); \
-	void prefix##_44(); void prefix##_45(); void prefix##_46(); void prefix##_47(); \
-	void prefix##_48(); void prefix##_49(); void prefix##_4a(); void prefix##_4b(); \
-	void prefix##_4c(); void prefix##_4d(); void prefix##_4e(); void prefix##_4f(); \
-	void prefix##_50(); void prefix##_51(); void prefix##_52(); void prefix##_53(); \
-	void prefix##_54(); void prefix##_55(); void prefix##_56(); void prefix##_57(); \
-	void prefix##_58(); void prefix##_59(); void prefix##_5a(); void prefix##_5b(); \
-	void prefix##_5c(); void prefix##_5d(); void prefix##_5e(); void prefix##_5f(); \
-	void prefix##_60(); void prefix##_61(); void prefix##_62(); void prefix##_63(); \
-	void prefix##_64(); void prefix##_65(); void prefix##_66(); void prefix##_67(); \
-	void prefix##_68(); void prefix##_69(); void prefix##_6a(); void prefix##_6b(); \
-	void prefix##_6c(); void prefix##_6d(); void prefix##_6e(); void prefix##_6f(); \
-	void prefix##_70(); void prefix##_71(); void prefix##_72(); void prefix##_73(); \
-	void prefix##_74(); void prefix##_75(); void prefix##_76(); void prefix##_77(); \
-	void prefix##_78(); void prefix##_79(); void prefix##_7a(); void prefix##_7b(); \
-	void prefix##_7c(); void prefix##_7d(); void prefix##_7e(); void prefix##_7f(); \
-	void prefix##_80(); void prefix##_81(); void prefix##_82(); void prefix##_83(); \
-	void prefix##_84(); void prefix##_85(); void prefix##_86(); void prefix##_87(); \
-	void prefix##_88(); void prefix##_89(); void prefix##_8a(); void prefix##_8b(); \
-	void prefix##_8c(); void prefix##_8d(); void prefix##_8e(); void prefix##_8f(); \
-	void prefix##_90(); void prefix##_91(); void prefix##_92(); void prefix##_93(); \
-	void prefix##_94(); void prefix##_95(); void prefix##_96(); void prefix##_97(); \
-	void prefix##_98(); void prefix##_99(); void prefix##_9a(); void prefix##_9b(); \
-	void prefix##_9c(); void prefix##_9d(); void prefix##_9e(); void prefix##_9f(); \
-	void prefix##_a0(); void prefix##_a1(); void prefix##_a2(); void prefix##_a3(); \
-	void prefix##_a4(); void prefix##_a5(); void prefix##_a6(); void prefix##_a7(); \
-	void prefix##_a8(); void prefix##_a9(); void prefix##_aa(); void prefix##_ab(); \
-	void prefix##_ac(); void prefix##_ad(); void prefix##_ae(); void prefix##_af(); \
-	void prefix##_b0(); void prefix##_b1(); void prefix##_b2(); void prefix##_b3(); \
-	void prefix##_b4(); void prefix##_b5(); void prefix##_b6(); void prefix##_b7(); \
-	void prefix##_b8(); void prefix##_b9(); void prefix##_ba(); void prefix##_bb(); \
-	void prefix##_bc(); void prefix##_bd(); void prefix##_be(); void prefix##_bf(); \
-	void prefix##_c0(); void prefix##_c1(); void prefix##_c2(); void prefix##_c3(); \
-	void prefix##_c4(); void prefix##_c5(); void prefix##_c6(); void prefix##_c7(); \
-	void prefix##_c8(); void prefix##_c9(); void prefix##_ca(); void prefix##_cb(); \
-	void prefix##_cc(); void prefix##_cd(); void prefix##_ce(); void prefix##_cf(); \
-	void prefix##_d0(); void prefix##_d1(); void prefix##_d2(); void prefix##_d3(); \
-	void prefix##_d4(); void prefix##_d5(); void prefix##_d6(); void prefix##_d7(); \
-	void prefix##_d8(); void prefix##_d9(); void prefix##_da(); void prefix##_db(); \
-	void prefix##_dc(); void prefix##_dd(); void prefix##_de(); void prefix##_df(); \
-	void prefix##_e0(); void prefix##_e1(); void prefix##_e2(); void prefix##_e3(); \
-	void prefix##_e4(); void prefix##_e5(); void prefix##_e6(); void prefix##_e7(); \
-	void prefix##_e8(); void prefix##_e9(); void prefix##_ea(); void prefix##_eb(); \
-	void prefix##_ec(); void prefix##_ed(); void prefix##_ee(); void prefix##_ef(); \
-	void prefix##_f0(); void prefix##_f1(); void prefix##_f2(); void prefix##_f3(); \
-	void prefix##_f4(); void prefix##_f5(); void prefix##_f6(); void prefix##_f7(); \
-	void prefix##_f8(); void prefix##_f9(); void prefix##_fa(); void prefix##_fb(); \
-	void prefix##_fc(); void prefix##_fd(); void prefix##_fe(); void prefix##_ff();
+	ops_type prefix##_00; ops_type prefix##_01; ops_type prefix##_02; ops_type prefix##_03; \
+	ops_type prefix##_04; ops_type prefix##_05; ops_type prefix##_06; ops_type prefix##_07; \
+	ops_type prefix##_08; ops_type prefix##_09; ops_type prefix##_0a; ops_type prefix##_0b; \
+	ops_type prefix##_0c; ops_type prefix##_0d; ops_type prefix##_0e; ops_type prefix##_0f; \
+	ops_type prefix##_10; ops_type prefix##_11; ops_type prefix##_12; ops_type prefix##_13; \
+	ops_type prefix##_14; ops_type prefix##_15; ops_type prefix##_16; ops_type prefix##_17; \
+	ops_type prefix##_18; ops_type prefix##_19; ops_type prefix##_1a; ops_type prefix##_1b; \
+	ops_type prefix##_1c; ops_type prefix##_1d; ops_type prefix##_1e; ops_type prefix##_1f; \
+	ops_type prefix##_20; ops_type prefix##_21; ops_type prefix##_22; ops_type prefix##_23; \
+	ops_type prefix##_24; ops_type prefix##_25; ops_type prefix##_26; ops_type prefix##_27; \
+	ops_type prefix##_28; ops_type prefix##_29; ops_type prefix##_2a; ops_type prefix##_2b; \
+	ops_type prefix##_2c; ops_type prefix##_2d; ops_type prefix##_2e; ops_type prefix##_2f; \
+	ops_type prefix##_30; ops_type prefix##_31; ops_type prefix##_32; ops_type prefix##_33; \
+	ops_type prefix##_34; ops_type prefix##_35; ops_type prefix##_36; ops_type prefix##_37; \
+	ops_type prefix##_38; ops_type prefix##_39; ops_type prefix##_3a; ops_type prefix##_3b; \
+	ops_type prefix##_3c; ops_type prefix##_3d; ops_type prefix##_3e; ops_type prefix##_3f; \
+	ops_type prefix##_40; ops_type prefix##_41; ops_type prefix##_42; ops_type prefix##_43; \
+	ops_type prefix##_44; ops_type prefix##_45; ops_type prefix##_46; ops_type prefix##_47; \
+	ops_type prefix##_48; ops_type prefix##_49; ops_type prefix##_4a; ops_type prefix##_4b; \
+	ops_type prefix##_4c; ops_type prefix##_4d; ops_type prefix##_4e; ops_type prefix##_4f; \
+	ops_type prefix##_50; ops_type prefix##_51; ops_type prefix##_52; ops_type prefix##_53; \
+	ops_type prefix##_54; ops_type prefix##_55; ops_type prefix##_56; ops_type prefix##_57; \
+	ops_type prefix##_58; ops_type prefix##_59; ops_type prefix##_5a; ops_type prefix##_5b; \
+	ops_type prefix##_5c; ops_type prefix##_5d; ops_type prefix##_5e; ops_type prefix##_5f; \
+	ops_type prefix##_60; ops_type prefix##_61; ops_type prefix##_62; ops_type prefix##_63; \
+	ops_type prefix##_64; ops_type prefix##_65; ops_type prefix##_66; ops_type prefix##_67; \
+	ops_type prefix##_68; ops_type prefix##_69; ops_type prefix##_6a; ops_type prefix##_6b; \
+	ops_type prefix##_6c; ops_type prefix##_6d; ops_type prefix##_6e; ops_type prefix##_6f; \
+	ops_type prefix##_70; ops_type prefix##_71; ops_type prefix##_72; ops_type prefix##_73; \
+	ops_type prefix##_74; ops_type prefix##_75; ops_type prefix##_76; ops_type prefix##_77; \
+	ops_type prefix##_78; ops_type prefix##_79; ops_type prefix##_7a; ops_type prefix##_7b; \
+	ops_type prefix##_7c; ops_type prefix##_7d; ops_type prefix##_7e; ops_type prefix##_7f; \
+	ops_type prefix##_80; ops_type prefix##_81; ops_type prefix##_82; ops_type prefix##_83; \
+	ops_type prefix##_84; ops_type prefix##_85; ops_type prefix##_86; ops_type prefix##_87; \
+	ops_type prefix##_88; ops_type prefix##_89; ops_type prefix##_8a; ops_type prefix##_8b; \
+	ops_type prefix##_8c; ops_type prefix##_8d; ops_type prefix##_8e; ops_type prefix##_8f; \
+	ops_type prefix##_90; ops_type prefix##_91; ops_type prefix##_92; ops_type prefix##_93; \
+	ops_type prefix##_94; ops_type prefix##_95; ops_type prefix##_96; ops_type prefix##_97; \
+	ops_type prefix##_98; ops_type prefix##_99; ops_type prefix##_9a; ops_type prefix##_9b; \
+	ops_type prefix##_9c; ops_type prefix##_9d; ops_type prefix##_9e; ops_type prefix##_9f; \
+	ops_type prefix##_a0; ops_type prefix##_a1; ops_type prefix##_a2; ops_type prefix##_a3; \
+	ops_type prefix##_a4; ops_type prefix##_a5; ops_type prefix##_a6; ops_type prefix##_a7; \
+	ops_type prefix##_a8; ops_type prefix##_a9; ops_type prefix##_aa; ops_type prefix##_ab; \
+	ops_type prefix##_ac; ops_type prefix##_ad; ops_type prefix##_ae; ops_type prefix##_af; \
+	ops_type prefix##_b0; ops_type prefix##_b1; ops_type prefix##_b2; ops_type prefix##_b3; \
+	ops_type prefix##_b4; ops_type prefix##_b5; ops_type prefix##_b6; ops_type prefix##_b7; \
+	ops_type prefix##_b8; ops_type prefix##_b9; ops_type prefix##_ba; ops_type prefix##_bb; \
+	ops_type prefix##_bc; ops_type prefix##_bd; ops_type prefix##_be; ops_type prefix##_bf; \
+	ops_type prefix##_c0; ops_type prefix##_c1; ops_type prefix##_c2; ops_type prefix##_c3; \
+	ops_type prefix##_c4; ops_type prefix##_c5; ops_type prefix##_c6; ops_type prefix##_c7; \
+	ops_type prefix##_c8; ops_type prefix##_c9; ops_type prefix##_ca; ops_type prefix##_cb; \
+	ops_type prefix##_cc; ops_type prefix##_cd; ops_type prefix##_ce; ops_type prefix##_cf; \
+	ops_type prefix##_d0; ops_type prefix##_d1; ops_type prefix##_d2; ops_type prefix##_d3; \
+	ops_type prefix##_d4; ops_type prefix##_d5; ops_type prefix##_d6; ops_type prefix##_d7; \
+	ops_type prefix##_d8; ops_type prefix##_d9; ops_type prefix##_da; ops_type prefix##_db; \
+	ops_type prefix##_dc; ops_type prefix##_dd; ops_type prefix##_de; ops_type prefix##_df; \
+	ops_type prefix##_e0; ops_type prefix##_e1; ops_type prefix##_e2; ops_type prefix##_e3; \
+	ops_type prefix##_e4; ops_type prefix##_e5; ops_type prefix##_e6; ops_type prefix##_e7; \
+	ops_type prefix##_e8; ops_type prefix##_e9; ops_type prefix##_ea; ops_type prefix##_eb; \
+	ops_type prefix##_ec; ops_type prefix##_ed; ops_type prefix##_ee; ops_type prefix##_ef; \
+	ops_type prefix##_f0; ops_type prefix##_f1; ops_type prefix##_f2; ops_type prefix##_f3; \
+	ops_type prefix##_f4; ops_type prefix##_f5; ops_type prefix##_f6; ops_type prefix##_f7; \
+	ops_type prefix##_f8; ops_type prefix##_f9; ops_type prefix##_fa; ops_type prefix##_fb; \
+	ops_type prefix##_fc; ops_type prefix##_fd; ops_type prefix##_fe; ops_type prefix##_ff;
 
 	void illegal_1();
+	ops_type illegal_1(ops_type ref); // TODO rm
 	void illegal_2();
 
 	PROTOTYPES(op)
@@ -163,6 +168,7 @@ protected:
 	virtual uint8_t rop();
 	virtual uint8_t arg();
 	virtual uint16_t arg16();
+	ops_type arg16_n();
 	void eax();
 	void eay();
 	void pop(PAIR &r);
@@ -237,7 +243,10 @@ protected:
 	void otdr();
 	void ei();
 
-	void exec(op_prefix prefix, u8 opcode);
+	ops_type ops_flat(std::vector<ops_type> op_map);
+	ops_type z80_device::* do_exec();
+	ops_type next_op();
+	void calculate_icount();
 	virtual void check_interrupts();
 	void take_interrupt();
 	void take_nmi();
@@ -288,11 +297,14 @@ protected:
 	uint8_t           m_after_ldair;        /* same, but for LD A,I or LD A,R */
 	uint32_t          m_ea;
 
-	int               m_cycle;
+int	tmp_max_overlap = 0; // TODO tmp
+	u8                m_cycle;
 	op_prefix         m_prefix;
+	op_prefix         m_prefix_next;
 	u8                m_opcode;
 	int               m_icount;
 	int               m_icount_executing;
+	PAIR              m_m_shared;
 	uint8_t           m_rtemp;
 	const uint8_t *   m_cc_op;
 	const uint8_t *   m_cc_cb;
