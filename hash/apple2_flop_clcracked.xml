@@ -48646,4 +48646,37 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="plyrdmus">
+		<description>Playing and Reading Music (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-06-23"/>
+		<!--"Playing and Reading Music" is a 1987 educational program developed by Vincent Oddo and Henry Levy, and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playing and reading music (4am crack) disk 1.dsk" size="143360" crc="eaeb5ac1" sha1="ba313892322d045160cfe623330c8fdaf6f591d7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playing and reading music (4am crack) disk 2.dsk" size="143360" crc="673ffe87" sha1="ce7529d7e0f890d65a914b3a2a485ac7db095610"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playing and reading music (4am crack) disk 3.dsk" size="143360" crc="85172747" sha1="f0ac3b037273682f668486733108554e169e06d6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playing and reading music (4am crack) disk 4.dsk" size="143360" crc="1ac3aab4" sha1="4864efcbdf539e896e2f8961e3c10fd3d37cf0af"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
