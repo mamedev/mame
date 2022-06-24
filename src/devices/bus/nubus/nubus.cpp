@@ -193,6 +193,12 @@ void nubus_device::install_bank(offs_t start, offs_t end, void *data)
 	m_space->install_ram(start, end, data);
 }
 
+void nubus_device::install_view(offs_t start, offs_t end, memory_view &view)
+{
+//  printf("install_view: %s @ %x->%x\n", tag, start, end);
+	m_space->install_view(start, end, view);
+}
+
 void nubus_device::set_irq_line(int slot, int state)
 {
 	switch (slot)
@@ -282,6 +288,11 @@ void device_nubus_card_interface::interface_pre_start()
 void device_nubus_card_interface::install_bank(offs_t start, offs_t end, void *data)
 {
 	nubus().install_bank(start, end, data);
+}
+
+void device_nubus_card_interface::install_view(offs_t start, offs_t end, memory_view &view)
+{
+	nubus().install_view(start, end, view);
 }
 
 void device_nubus_card_interface::install_declaration_rom(const char *romregion, bool mirror_all_mb, bool reverse_rom)

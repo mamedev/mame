@@ -149,6 +149,7 @@ public:
 		  m_b0_0800bank(*this, A2GS_B00800_TAG),
 		  m_b0_2000bank(*this, A2GS_B02000_TAG),
 		  m_b0_4000bank(*this, A2GS_B04000_TAG),
+		  m_e0_0400bank(*this, "e0_0400_bank"),
 		  m_lcbank(*this, A2GS_LCBANK_TAG),
 		  m_lcaux(*this, A2GS_LCAUX_TAG),
 		  m_lc00(*this, A2GS_LC00_TAG),
@@ -202,7 +203,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	memory_view m_upperbank, m_upperaux, m_upper00, m_upper01;
 	required_device<address_map_bank_device> m_c300bank;
-	memory_view m_b0_0000bank, m_b0_0200bank, m_b0_0400bank, m_b0_0800bank, m_b0_2000bank, m_b0_4000bank;
+	memory_view m_b0_0000bank, m_b0_0200bank, m_b0_0400bank, m_b0_0800bank, m_b0_2000bank, m_b0_4000bank, m_e0_0400bank;
 	memory_view m_lcbank, m_lcaux, m_lc00, m_lc01, m_bank0_atc, m_bank1_atc;
 	required_device<z80scc_device> m_scc;
 	required_device<es5503_device> m_doc;
@@ -341,6 +342,8 @@ private:
 
 	u8 ram0000_r(offs_t offset);
 	void ram0000_w(offs_t offset, u8 data);
+	u8 ram0800_r(offs_t offset);
+	void ram0800_w(offs_t offset, u8 data);
 	u8 auxram0000_r(offs_t offset);
 	void auxram0000_w(offs_t offset, u8 data);
 	u8 b0ram0000_r(offs_t offset);
@@ -367,6 +370,10 @@ private:
 	void b1ram2000_w(offs_t offset, u8 data);
 	u8 b1ram4000_r(offs_t offset);
 	void b1ram4000_w(offs_t offset, u8 data);
+	u8 e0ram0400_r(offs_t offset);
+	void e0ram0400_w(offs_t offset, u8 data);
+	u8 e1ram0400_r(offs_t offset);
+	void e1ram0400_w(offs_t offset, u8 data);
 	u8 c000_r(offs_t offset);
 	void c000_w(offs_t offset, u8 data);
 	u8 c080_r(offs_t offset);
@@ -1327,6 +1334,7 @@ void apple2gs_state::machine_start()
 	m_b0_0000bank.select(0);
 	m_b0_0200bank.select(0);
 	m_b0_0400bank.select(0);
+	m_e0_0400bank.select(0);
 	m_b0_0800bank.select(0);
 	m_b0_2000bank.select(0);
 	m_b0_4000bank.select(0);
@@ -1588,6 +1596,7 @@ void apple2gs_state::machine_reset()
 	m_b0_0000bank.select(0);
 	m_b0_0200bank.select(0);
 	m_b0_0400bank.select(0);
+	m_e0_0400bank.select(0);
 	m_b0_0800bank.select(0);
 	m_b0_2000bank.select(0);
 	m_b0_4000bank.select(0);
@@ -1887,15 +1896,18 @@ void apple2gs_state::auxbank_update()
 		if (m_page2)
 		{
 			m_b0_0400bank.select(3);
+			m_e0_0400bank.select(3);
 		}
 		else
 		{
 			m_b0_0400bank.select(0);
+			m_e0_0400bank.select(0);
 		}
 	}
 	else
 	{
 		m_b0_0400bank.select(ramwr);
+		m_e0_0400bank.select(ramwr);
 	}
 
 	m_b0_0800bank.select(ramwr);
@@ -3743,8 +3755,15 @@ u8 apple2gs_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
+u8 apple2gs_state::e0ram0400_r(offs_t offset) { slow_cycle(); return m_megaii_ram[offset + 0x0400]; }
+void apple2gs_state::e0ram0400_w(offs_t offset, u8 data) { slow_cycle(); m_megaii_ram[offset + 0x0400] = data; }
+u8 apple2gs_state::e1ram0400_r(offs_t offset) { slow_cycle(); return m_megaii_ram[offset + 0x10400]; }
+void apple2gs_state::e1ram0400_w(offs_t offset, u8 data) { slow_cycle(); m_megaii_ram[offset + 0x10400] = data; }
+
 u8 apple2gs_state::ram0000_r(offs_t offset)  { slow_cycle(); return m_megaii_ram[offset]; }
 void apple2gs_state::ram0000_w(offs_t offset, u8 data) { slow_cycle(); m_megaii_ram[offset] = data; }
+u8 apple2gs_state::ram0800_r(offs_t offset)  { slow_cycle(); return m_megaii_ram[offset + 0x800]; }
+void apple2gs_state::ram0800_w(offs_t offset, u8 data) { slow_cycle(); m_megaii_ram[offset + 0x800] = data; }
 u8 apple2gs_state::auxram0000_r(offs_t offset)
 {
 	slow_cycle();
@@ -4070,7 +4089,15 @@ void apple2gs_state::apple2gs_map(address_map &map)
 
 	/* "Mega II side" - this is basically a 128K IIe on a chip that runs merrily at 1 MHz */
 	/* Unfortunately all I/O happens here, including new IIgs-specific stuff */
-	map(0xe00000, 0xe0bfff).rw(FUNC(apple2gs_state::ram0000_r), FUNC(apple2gs_state::ram0000_w));
+	map(0xe00000, 0xe003ff).rw(FUNC(apple2gs_state::ram0000_r), FUNC(apple2gs_state::ram0000_w));
+	map(0xe00400, 0xe007ff).view(m_e0_0400bank);
+	m_e0_0400bank[0](0x0400, 0x07ff).rw(FUNC(apple2gs_state::e0ram0400_r), FUNC(apple2gs_state::e0ram0400_w)); // wr 0 rd 0
+	m_e0_0400bank[1](0x0400, 0x07ff).rw(FUNC(apple2gs_state::e1ram0400_r), FUNC(apple2gs_state::e0ram0400_w)); // wr 0 rd 1
+	m_e0_0400bank[2](0x0400, 0x07ff).rw(FUNC(apple2gs_state::e0ram0400_r), FUNC(apple2gs_state::e1ram0400_w)); // wr 1 rd 0
+	m_e0_0400bank[3](0x0400, 0x07ff).rw(FUNC(apple2gs_state::e1ram0400_r), FUNC(apple2gs_state::e1ram0400_w)); // wr 1 rd 1
+
+	map(0xe00800, 0xe0bfff).rw(FUNC(apple2gs_state::ram0800_r), FUNC(apple2gs_state::ram0800_w));
+
 	map(0xe0c000, 0xe0c07f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
 	map(0xe0c080, 0xe0c0ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
 	map(0xe0c100, 0xe0c2ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));

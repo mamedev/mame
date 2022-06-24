@@ -1132,7 +1132,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
-		<software name="asteroide06" cloneof="asteroid">
+	<software name="asteroide06" cloneof="asteroid">
 		<description>Asteroids (PAL, rev. 06)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>

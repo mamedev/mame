@@ -9558,6 +9558,7 @@ blueprnt                        // (c) 1982 Bally Midway (Zilec in ROM 3U, and t
 blueprntj                       // (c) 1982 Jaleco (Zilec in ROM 3U, and the programmer names)
 grasspin                        // (c) 1983 Jaleco (Zilec / Ashby programmer names in sound rom)
 saturnzi                        // (c) 1983 Jaleco (Zilec in ROM R6, and the programmer names)
+unkzilec                        // (c) 198? Exodis / Zilec
 
 @source:blw700i.cpp
 blw700i                         // (c) 1995 Brother

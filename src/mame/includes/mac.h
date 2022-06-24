@@ -234,7 +234,7 @@ private:
 	bool m_main_buffer = false;
 	int m_adb_irq_pending = 0;
 	int m_screen_buffer = 0;
-	int irq_count, ca1_data, ca2_data;
+	int irq_count = 0, ca1_data = 0, ca2_data = 0;
 
 	// 60.15 Hz timer for RBV/V8/Sonora/Eagle/VASP/etc.
 	emu_timer *m_6015_timer = nullptr;
