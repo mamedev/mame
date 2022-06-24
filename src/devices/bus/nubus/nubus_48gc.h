@@ -53,10 +53,14 @@ private:
 	memory_view m_vram_view;
 	emu_timer *m_timer;
 
+	uint8_t m_monitor_type;
+
 	std::vector<uint32_t> m_vram;
-	uint32_t m_vbl_disable, m_toggle, m_stride, m_base;
+	uint32_t m_vbl_disable, m_toggle;
 	uint32_t m_registers[0x100];
-	uint8_t m_preload;
+	uint8_t m_sense;
+	uint16_t m_preload;
+	uint32_t m_base, m_stride;
 
 	uint8_t m_colors[3], m_count, m_clutoffs, m_mode;
 

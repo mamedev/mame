@@ -10,7 +10,7 @@
 
   06 = ?
   07 = command - 002 = pattern fill, 100/101 = copy forward/backward
-  08 = pattern offset - X in bits 0-2, Y in bits 3-6
+  08 = pattern Y offset * 8
   09 = VRAM destination * 4
   0a = VRAM source * 4
   0b = height (inclusive)

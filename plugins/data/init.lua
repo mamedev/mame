@@ -4,12 +4,12 @@
 -- heading if it supports the set otherwise nil and get which returns the data
 -- the script should be named data_<name>.lua
 -- this is set default on in the plugin.json
-local exports = {}
-exports.name = "data"
-exports.version = "0.0.1"
-exports.description = "Data plugin"
-exports.license = "BSD-3-Clause"
-exports.author = { name = "Carl" }
+local exports = {
+	name = 'data',
+	version = '0.0.2',
+	description = 'Data plugin',
+	license = 'BSD-3-Clause',
+	author = { name = 'Carl' } }
 
 local data = exports
 
@@ -26,7 +26,7 @@ function data.startplugin()
 	local cur_list
 
 	emu.register_start(
-			function()
+			function ()
 				data_scr = {}
 				for file in lfs.dir(plugindir) do
 					local name = string.match(file, '^(data_.*).lua$')
@@ -40,7 +40,7 @@ function data.startplugin()
 			end)
 
 	emu.register_callback(
-			function(set)
+			function (set)
 				local ret = {}
 				if set == '' then
 					set = emu.romname()
@@ -70,13 +70,13 @@ function data.startplugin()
 			'data_list')
 
 	emu.register_callback(
-			function(num)
+			function (num)
 				return valid_lst[num + 1].get()
 			end,
 			'data')
 
 	emu.register_callback(
-			function(num)
+			function (num)
 				local ver
 				if valid_lst[num + 1].ver then
 					ver = valid_lst[num + 1].ver()

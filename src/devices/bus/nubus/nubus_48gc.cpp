@@ -8,10 +8,8 @@
 
   TODO:
   * Work out why some monitors need magic multiply or divide by two to
-    get the right RAMDAC clock - inferring it from the reference clock
-    modulus is definitely wrong.
-  * When a monochrome monitor is connected, it sends the intensity to the
-    blue channel - maybe detect this and map blue channel to white?
+    get the right RAMDAC/CRTC clocks - inferring it from the reference
+    clock modulus is definitely wrong.
   * The 8•24 card uses a strange off-white palette with some monitors,
     including the 21" and 16" RGB displays.
   * Interlaced modes.
@@ -38,7 +36,7 @@
 
 static INPUT_PORTS_START( 48gc )
 	PORT_START("MONITOR")
-	PORT_CONFNAME(0x07, 0x06, u8"Attached monitor")
+	PORT_CONFNAME(0x0f, 0x06, u8"Attached monitor")
 	PORT_CONFSETTING(   0x00, u8"Macintosh Two-Page Monitor (1152\u00d7870)")
 	PORT_CONFSETTING(   0x01, u8"Macintosh Portrait Display (B&W 15\" 640\u00d7870)")
 	PORT_CONFSETTING(   0x02, u8"Macintosh RGB Display (12\" 512\u00d7384)")
@@ -51,14 +49,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( 824gc )
 	PORT_START("MONITOR")
-	PORT_CONFNAME(0x07, 0x06, u8"Attached monitor")
+	PORT_CONFNAME(0x0f, 0x06, u8"Attached monitor")
 	PORT_CONFSETTING(   0x00, u8"Mac 21\" Color Display (1152\u00d7870)")
 	PORT_CONFSETTING(   0x01, u8"Mac Portrait Display (B&W 15\" 640\u00d7870)")
 	PORT_CONFSETTING(   0x02, u8"Mac RGB Display (12\" 512\u00d7384)")
 	PORT_CONFSETTING(   0x03, u8"Mac Two-Page Display (B&W 21\" 1152\u00d7870)")
 	//PORT_CONFSETTING(   0x04, u8"NTSC Monitor") requires implementing interlace modes
-	PORT_CONFSETTING(   0x05, u8"Mac 16\" Color Display (832\u00d7624)")
 	PORT_CONFSETTING(   0x06, u8"Mac Hi-Res Display (12-14\" 640\u00d7480)")
+	PORT_CONFSETTING(   0x0d, u8"Mac 16\" Color Display (832\u00d7624)")
 INPUT_PORTS_END
 
 
@@ -78,6 +76,27 @@ ROM_END
 
 DEFINE_DEVICE_TYPE(NUBUS_48GC,  nubus_48gc_device,  "nb_48gc",  "Apple Macintosh Display Card 4*8")
 DEFINE_DEVICE_TYPE(NUBUS_824GC, nubus_824gc_device, "nb_824gc", "Apple Macintosh Display Card 8*24")
+
+
+// TODO: find a better place for this table to live
+struct mac_monitor_info { bool mono; unsigned sense[4]; };
+static mac_monitor_info const f_monitors[] = {
+	{ false, { 0, 0, 0, 0 } },      //  0: RGB 21"
+	{ true,  { 1, 1, 1, 0 } },      //  1: Full-Page (B&W 15")
+	{ false, { 2, 2, 0, 2 } },      //  2: RGB 12"
+	{ true,  { 3, 3, 1, 2 } },      //  3: Two-Page (B&W 21")
+	{ false, { 4, 0, 4, 4 } },      //  4: NTSC Monitor
+	{ false, { 5, 1, 5, 4 } },      //  5: RGB 15"
+	{ false, { 6, 2, 4, 6 } },      //  6: Hi-Res (12-14")
+	{ false, { 6, 0, 0, 6 } },      //  7: Multiple Scan 14"
+	{ false, { 6, 0, 4, 6 } },      //  8: Multiple Scan 16"
+	{ false, { 6, 2, 0, 6 } },      //  9: Multiple Scan 21"
+	{ false, { 7, 0, 0, 0 } },      // 10: PAL Encoder
+	{ false, { 7, 1, 1, 0 } },      // 11: NTSC Encoder
+	{ false, { 7, 1, 1, 6 } },      // 12: VGA/Super VGA
+	{ false, { 7, 2, 5, 2 } },      // 13: RGB 16"
+	{ false, { 7, 3, 0, 0 } },      // 14: PAL Monitor
+	{ false, { 7, 3, 4, 4 } } };    // 15: RGB 19"
 
 
 //-------------------------------------------------
@@ -149,7 +168,7 @@ jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const 
 	m_monitor(*this, "MONITOR"),
 	m_vram_view(*this, "vram"),
 	m_timer(nullptr),
-	m_vbl_disable(0), m_toggle(0), m_stride(0), m_base(0),
+	m_vbl_disable(0), m_toggle(0),
 	m_count(0), m_clutoffs(0), m_mode(0)
 {
 	set_screen(*this, GC48_SCREEN_NAME);
@@ -191,13 +210,18 @@ void jmfb_device::device_start()
 
 	m_timer = timer_alloc(FUNC(jmfb_device::vbl_tick), this);
 
+	m_monitor_type = 0;
+	m_mode = 0;
+
+	save_item(NAME(m_monitor_type));
 	save_item(NAME(m_vram));
 	save_item(NAME(m_vbl_disable));
 	save_item(NAME(m_toggle));
-	save_item(NAME(m_stride));
-	save_item(NAME(m_base));
 	save_item(NAME(m_registers));
+	save_item(NAME(m_sense));
 	save_item(NAME(m_preload));
+	save_item(NAME(m_base));
+	save_item(NAME(m_stride));
 	save_item(NAME(m_colors));
 	save_item(NAME(m_count));
 	save_item(NAME(m_clutoffs));
@@ -243,12 +267,19 @@ void jmfb_device::device_reset()
 {
 	m_vram_view.select(0);
 
+	m_monitor_type = m_monitor->read();
+	if (m_monitor_type > std::size(f_monitors))
+	{
+		throw emu_fatalerror("%s: Invalid monitor selection %x\n", m_monitor_type);
+	}
+
 	std::fill(m_vram.begin(), m_vram.end(), 0);
 	m_vbl_disable = 1;
 	m_toggle = 0;
-	m_stride = 80 / 4;
-	m_base = 0;
+	m_sense = 0;
 	m_preload = 256 - 8;
+	m_base = 0;
+	m_stride = 80 / 4;
 
 	m_clutoffs = 0;
 	m_count = 0;
@@ -287,6 +318,11 @@ TIMER_CALLBACK_MEMBER(jmfb_device::vbl_tick)
 
 uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	auto const trans =
+		[mono = f_monitors[m_monitor_type].mono] (rgb_t color)
+		{
+			return !mono ? color : rgb_t(color.b(), color.b(), color.b());
+		};
 	auto const screenbase = util::big_endian_cast<uint8_t const>(&m_vram[0]) + (m_base << 5);
 	int const xres = screen.visible_area().right();
 
@@ -301,14 +337,14 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					uint8_t const pixels = rowbase[x];
 
-					*scanline++ = pen_color(BIT(pixels, 7));
-					*scanline++ = pen_color(BIT(pixels, 6));
-					*scanline++ = pen_color(BIT(pixels, 5));
-					*scanline++ = pen_color(BIT(pixels, 4));
-					*scanline++ = pen_color(BIT(pixels, 3));
-					*scanline++ = pen_color(BIT(pixels, 2));
-					*scanline++ = pen_color(BIT(pixels, 1));
-					*scanline++ = pen_color(BIT(pixels, 0));
+					*scanline++ = trans(pen_color(BIT(pixels, 7)));
+					*scanline++ = trans(pen_color(BIT(pixels, 6)));
+					*scanline++ = trans(pen_color(BIT(pixels, 5)));
+					*scanline++ = trans(pen_color(BIT(pixels, 4)));
+					*scanline++ = trans(pen_color(BIT(pixels, 3)));
+					*scanline++ = trans(pen_color(BIT(pixels, 2)));
+					*scanline++ = trans(pen_color(BIT(pixels, 1)));
+					*scanline++ = trans(pen_color(BIT(pixels, 0)));
 				}
 			}
 			break;
@@ -322,10 +358,10 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					uint8_t const pixels = rowbase[x];
 
-					*scanline++ = pen_color(BIT(pixels, 6, 2));
-					*scanline++ = pen_color(BIT(pixels, 4, 2));
-					*scanline++ = pen_color(BIT(pixels, 2, 2));
-					*scanline++ = pen_color(BIT(pixels, 0, 2));
+					*scanline++ = trans(pen_color(BIT(pixels, 6, 2)));
+					*scanline++ = trans(pen_color(BIT(pixels, 4, 2)));
+					*scanline++ = trans(pen_color(BIT(pixels, 2, 2)));
+					*scanline++ = trans(pen_color(BIT(pixels, 0, 2)));
 				}
 			}
 			break;
@@ -339,8 +375,8 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					uint8_t const pixels = rowbase[x];
 
-					*scanline++ = pen_color(BIT(pixels, 4, 4));
-					*scanline++ = pen_color(BIT(pixels, 0, 4));
+					*scanline++ = trans(pen_color(BIT(pixels, 4, 4)));
+					*scanline++ = trans(pen_color(BIT(pixels, 0, 4)));
 				}
 			}
 			break;
@@ -352,7 +388,7 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x <= xres; x++)
 				{
-					*scanline++ = pen_color(rowbase[x]);
+					*scanline++ = trans(pen_color(rowbase[x]));
 				}
 			}
 			break;
@@ -364,7 +400,10 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x <= xres; x++)
 				{
-					*scanline++ = rgb_t(source[0], source[1], source[2]);
+					if (!f_monitors[m_monitor_type].mono)
+						*scanline++ = rgb_t(source[0], source[1], source[2]);
+					else
+						*scanline++ = rgb_t(source[2], source[2], source[2]);
 					source += 3;
 				}
 			}
@@ -378,8 +417,20 @@ void jmfb_device::update_crtc()
 {
 	int const vtotal = (m_vactive + m_vbporch + m_vsync + m_vfporch) / 2;
 	int const height = m_vactive / 2;
-	if (vtotal && height && m_multiplier)
+	if (vtotal && height && m_multiplier && m_modulus)
 	{
+		int const divider = 256 - m_preload;
+		XTAL const refclk = 20_MHz_XTAL / m_modulus;
+		XTAL const vcoout = refclk * m_multiplier;
+		XTAL const pixclk = vcoout / (1 << m_pdiv);
+		XTAL const dacclk = pixclk / divider;
+		LOG("reference clock %d VCO output %d pixel clock %d RAMDAC clock %d\n",
+				refclk.value(), vcoout.value(), pixclk.value(), dacclk.value());
+
+		int htotal = m_hactive + m_hbporch + m_hsync + m_hfporch + 8;
+		int width = m_hactive + 2;
+		LOG("horizontal total %d active %d\n", htotal, width);
+
 		// FIXME: where does this multiply/divide by 2 come from?
 		// This is obviously not correct by any definition.
 		int scale = 0;
@@ -398,9 +449,8 @@ void jmfb_device::update_crtc()
 		default:
 			throw emu_fatalerror("%s: Unknown clock modulus %d\n", tag(), m_modulus);
 		}
-		int const divider = 256 - unsigned(m_preload);
-		int htotal = ((m_hactive + m_hbporch + m_hsync + m_hfporch + 8) << (m_pdiv + scale)) / divider;
-		int width = ((m_hactive + 2) << (m_pdiv + scale)) / divider;
+		htotal = ((m_hactive + m_hbporch + m_hsync + m_hfporch + 8) << (m_pdiv + scale)) / divider;
+		width = ((m_hactive + 2) << (m_pdiv + scale)) / divider;
 		switch (m_mode)
 		{
 			case 0: // 1bpp:
@@ -440,7 +490,16 @@ uint32_t jmfb_device::jmfb_r(offs_t offset, uint32_t mem_mask)
 	switch (offset)
 	{
 		case 0x000/4:
-			return m_monitor->read() << 9;
+			{
+				uint32_t result = f_monitors[m_monitor_type].sense[0];
+				if (BIT(m_sense, 2))
+					result &= f_monitors[m_monitor_type].sense[1];
+				if (BIT(m_sense, 1))
+					result &= f_monitors[m_monitor_type].sense[2];
+				if (BIT(m_sense, 0))
+					result &= f_monitors[m_monitor_type].sense[3];
+				return result << 9;
+			}
 
 		case 0x1c0/4:
 			m_toggle ^= 0xffffffff;
@@ -462,23 +521,24 @@ void jmfb_device::jmfb_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			{
 				m_vram_view.select(BIT(data, 2)); // packed RGB mode
 			}
+			m_sense = (data >> 9) & 0x07;
 			break;
 
 		case 0x004/4:
 			LOG("%s: %02x to preload\n", machine().describe_context(), data);
-			m_preload = data;
+			m_preload = data & 0xff;
 			update_crtc();
 			break;
 
 		case 0x008/4: // base
 			LOG("%s: %x to base\n", machine().describe_context(), data);
-			m_base = data;
+			m_base = data & 0xffff;
 			break;
 
 		case 0x00c/4: // stride
 			LOG("%s: %x to stride\n", machine().describe_context(), data);
 			// this value is in DWORDs for 1-8 bpp and, uhh, strange for 24bpp
-			m_stride = data;
+			m_stride = data & 0xffff;
 			break;
 
 		case 0x10c/4: // active pixel cells - 2
