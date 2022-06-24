@@ -7894,7 +7894,7 @@ license:CC0
 	</software>
 
 	<software name="discover">
-		<description>Discover (cleanly cracked)</description>
+		<description>Discover: A Science Experiment (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Sunburst Communications</publisher>
 		<info name="release" value="2015-06-02"/>
@@ -35376,7 +35376,7 @@ license:CC0
 	</software>
 
 	<software name="wlywrdwk">
-		<description>Wally's Word Works (cleanly cracked)</description>
+		<description>Wally's Word Works: The Parts of Speech Game (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Sunburst Communications</publisher>
 		<info name="release" value="2019-07-27"/>
@@ -35757,7 +35757,7 @@ license:CC0
 	</software>
 
 	<software name="bignlitl">
-		<description>BIG and little (cleanly cracked)</description>
+		<description>BIG and little: Books, Posters, and Cards for Muppet Slate (cleanly cracked)</description>
 		<year>1990</year>
 		<publisher>Sunburst Communications</publisher>
 		<info name="release" value="2019-08-17"/>
@@ -48015,6 +48015,666 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="drugs- their effects on you (4am crack).dsk" size="143360" crc="6540b35f" sha1="b8965f31c71c09e5b72f465ba2783377a7b9ec93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bublgumm">
+		<description>The Bubble Gum Machine (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Heartsoft</publisher>
+		<info name="release" value="2022-04-26"/>
+		<!--"The Bubble Gum Machine" is a 1987 educational program developed and distributed by Heartsoft. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the bubble gum machine (4am crack).dsk" size="143360" crc="4e3c82e9" sha1="376c861070627da3b097aa4975fa45c55cb8ab06"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="verbusg10189">
+		<description>Verb Usage 1 (Version 01.31.89) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-04-26"/>
+		<!--"Verb Usage 1" is a 1986 educational program developed and distributed by Hartley Courseware. This version is dated 01.31.89. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verb usage 1 v01.31.89 (4am crack).dsk" size="143360" crc="a097ef98" sha1="fa0ab229d3fe9703a0ccbbc0932e5ec46d38d7a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antsyn10889">
+		<description>Antonyms/Synonyms (Version 08.02.89) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-04-29"/>
+		<!--"Antonyms/Synonyms" is a 1989 educational program with content authoring by Carolyn Micklatcher and distributed by Hartley Courseware. This version is dated 08.02.89. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="antonyms-synonyms v08.02.89 (4am crack) disk 1.dsk" size="143360" crc="19a04510" sha1="cea7ce48b004271173b66f53456740ee18078643"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="antonyms-synonyms v08.02.89 (4am crack) disk 2.dsk" size="143360" crc="ea1cd3e8" sha1="304582fb5fbddfee75d1254eca2a37a81bec9880"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homonyms0189">
+		<description>Homonyms (Version 01.19.89) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-04-29"/>
+		<!--"Homonyms" is a 1989 educational program with content authoring by Jane Hartley and distributed by Hartley Courseware. This version is dated 01.19.89. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="homonyms v01.19.89 (4am crack) disk 1.dsk" size="143360" crc="5b3bd83f" sha1="fcd92a3374ac2e22a2433a612ae7521adf9295d4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="homonyms v01.19.89 (4am crack) disk 2.dsk" size="143360" crc="05423e27" sha1="56bbd84231363aacf8c109e0a8f068c99436b5a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="verbusg20189">
+		<description>Verb Usage 2 (Version 01.31.89) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-04-29"/>
+		<!--"Verb Usage 2" is a 1989 educational program developed and distributed by Hartley Courseware. This version is dated 01.31.89. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verb usage 2 v01.31.89 (4am crack).dsk" size="143360" crc="471e875a" sha1="798e29181d421eb7e8b735bbb0697224678e2c8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="medapres0985">
+		<description>Medalist Series: Presidents (Version 09.27.85) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-04-29"/>
+		<!--"Medalist Series: Presidents" is a 1985 educational program developed and distributed by Hartley Courseware. This version is dated 09.27.85. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="medalist series- presidents (4am crack).dsk" size="143360" crc="49991a47" sha1="57bbf36d45e0dc4d6cdd704a6a016ae520e909b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="botgardn">
+		<description>Botanical Gardens (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-05"/>
+		<!--"Botanical Gardens" is a 1986 educational program developed by Robert Kimball, David J. Donoghue, and Patrick Kehoe, and distributed by Sunburst Communications. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="botanical gardens (4am crack).dsk" size="143360" crc="45282d06" sha1="bebb4d99261cf2caa58144cc0561cca21e8c5455"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="usconnaf">
+		<description>The U.S. Constitution: Nationalism and Federalism (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2022-05-06"/>
+		<!--"The U.S. Constitution: Nationalism and Federalism" is a 1987 educational program developed and distributed by Focus Media. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Development of the Constitution"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the u.s. constitution - nationalism and federalism (4am crack) disk 1 - development of the constitution.dsk" size="143360" crc="e50f8f9c" sha1="657339a9f4d9614d1b535b6c098a49608e29420c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - The creation of the Constution"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the u.s. constitution - nationalism and federalism (4am crack) disk 2 - the creation of the constitution.dsk" size="143360" crc="2e178e4c" sha1="bfc9fb735410da42870b7e4f2b256d8eee8aea67"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Testing your knowledge of the Constitution"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the u.s. constitution - nationalism and federalism (4am crack) disk 3 - testing your knowledge of the constitution.dsk" size="143360" crc="911e86c8" sha1="6247e47f014a6b43d78e9cce2cb4416c531e012a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="verbusg40189">
+		<description>Verb Usage 4 (Version 01.31.89) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-05-09"/>
+		<!--"Verb Usage 4" is a 1989 educational program developed and distributed by Hartley Courseware. This version is dated 01.31.89. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verb usage 4 v01.31.89 (4am crack).dsk" size="143360" crc="47ebdd05" sha1="4bfc911e1be292aa18ce61c2fe4be5659e2af9bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ezgraph2">
+		<description>Easy Graph II (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Grolier Publishing</publisher>
+		<info name="release" value="2022-05-09"/>
+		<!--"Easy Graph II" is a 1987 educational program developed by James Austin, Yen-ching Chu, Michael Lease, Kate McCormick, Joan Nordberg, Matt Osber, Jay Roberts, Elaine Lewis, Susan Christie Thomas, Bob Stickgold, and George Sullivan, and distributed by Grolier publishing. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Tutorial disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="easy graph ii (4am crack) disk 1 - tutorial.dsk" size="143360" crc="35556a34" sha1="77e726881244e5d343634aff9f75632ee76b410c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Tool disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="easy graph ii (4am crack) disk 2 - tool.dsk" size="143360" crc="dd4a193b" sha1="5552fcf0fcfccc5aade53f28a1af4465766524e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grphcalc16">
+		<description>Graphics Calculator (Version 1.6) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Conduit Educational Software</publisher>
+		<info name="release" value="2022-05-09"/>
+		<!--"Graphics Calculator" is a 1988 educational program developed by Michael Konemann, Dennis Mick, Gerald Isaacs, and Richard O'Farrell, and distributed by Conduit Educational Software. This is version 1.6. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="graphics calculator (4am crack) disk 1 - program disk.dsk" size="143360" crc="7f9e2522" sha1="f09e468d67aab85e066779bf77635810a29d07d2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Demonstration disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="graphics calculator (4am crack) disk 2 - demonstration disk.dsk" size="143360" crc="b5fb6ffc" sha1="2cf05d3ae3c88282c2e459cbb47c197afe6923d4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Auxiliary disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="graphics calculator (4am crack) disk 3 - auxiliary disk.dsk" size="143360" crc="f0c1b21e" sha1="5ba76831964d0d749b5d9ba150db9e1920098d23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultima2">
+		<description>Ultima II (Revision 3) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2022-06-07"/>
+		<!--"Ultima II" is a 1982 role-playing game developed by Kenneth W. Arnold, Richard Garriott, and Keith Zabalaoui; designed by Helen Walker, Owen Garriott, Howard Makler, and Mary Taylor Rollo; and distributed by On-Line Systems. This is revision 3, which adds a feature to make a copy of the player master disk before you create a character. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 3 (4am crack) - disk 1 - program master.dsk" size="143360" crc="29b8c634" sha1="a8408eec3a37f99a1c1e91603c3f9676032a3cce"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Player master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 3 (4am crack) - disk 2 - player master.dsk" size="143360" crc="ed3b8497" sha1="d7f9ad3f50c4e26f5644c42df79324c61be9efdf"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Galactic disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 3 (4am crack) - disk 3 - galactic disk.dsk" size="143360" crc="ae5dcd69" sha1="5f20aab52719a98fa0eeab03bf427dd36f014284"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultima2r2">
+		<description>Ultima II (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2022-06-07"/>
+		<!--"Ultima II" is a 1982 role-playing game developed by Kenneth W. Arnold, Richard Garriott, and Keith Zabalaoui; designed by Helen Walker, Owen Garriott, Howard Makler, and Mary Taylor Rollo; and distributed by On-Line Systems. This is revision 2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 2 (4am crack) disk 1 - program master.dsk" size="143360" crc="3fa83c21" sha1="af3b5b1300cf972d501946edc205f261b0690adb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Player master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 2 (4am crack) disk 2 - player master.dsk" size="143360" crc="ed3b8497" sha1="d7f9ad3f50c4e26f5644c42df79324c61be9efdf"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Galactic disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 2 (4am crack) disk 3 - galactic disk.dsk" size="143360" crc="ae5dcd69" sha1="5f20aab52719a98fa0eeab03bf427dd36f014284"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultima2r1">
+		<description>Ultima II (Revision 1) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2022-06-07"/>
+		<!--"Ultima II" is a 1982 role-playing game developed by Kenneth W. Arnold, Richard Garriott, and Keith Zabalaoui; designed by Helen Walker, Owen Garriott, Howard Makler, and Mary Taylor Rollo; and distributed by On-Line Systems. This is revision 1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 1 (4am crack) disk 1 - program master.dsk" size="143360" crc="3d83a419" sha1="ad0f3e7515bb439c61d98e45b980ca786f44cc10"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Player master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 1 (4am crack) disk 2 - player master.dsk" size="143360" crc="ed3b8497" sha1="d7f9ad3f50c4e26f5644c42df79324c61be9efdf"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Galactic disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ultima ii rev. 1 (4am crack) disk 3 - galactic disk.dsk" size="143360" crc="ae5dcd69" sha1="5f20aab52719a98fa0eeab03bf427dd36f014284"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprearc">
+		<description>Super Ear Challenger (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-06-09"/>
+		<!--"Super Ear Challenger" is a 1985 educational program developed by Stephen Walker and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2 and will crash spectacularly without one. It is preserved here for the first time.-->
+        <!-- It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2 and will crash spectacularly without one. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="super ear challenger- a music game (4am crack).dsk" size="143360" crc="461f0401" sha1="5002c1a3c9de2dc015fb46746f105dbec1c0a145"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cyborgss">
+		<description>Cyborg (Softsmith) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Softsmith</publisher>
+		<info name="release" value="2022-06-09"/>
+		<!--"Cyborg" is a 1982 adventure game developed by Sentient Software. This 1983 re-release is distributed by Softsmith. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cyborg (softsmith) (4am crack).dsk" size="143360" crc="56e9da76" sha1="97356be1d74d7ebf525b57e671537b2ea496c4d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kittenkf0386">
+		<description>Kittens, Kids, and a Frog (Version 03.12.86) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Kittens, Kids, and a Frog" is a 1986 educational program with content by Janet Goldman and distributed by Hartley Courseware. This version is dated 03.12.86. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kittens, kids, and a frog 03.12.86 (4am crack) disk 1.dsk" size="143360" crc="5f3b43f7" sha1="bb9975903497d879125f1b33328eb044855c67eb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kittens, kids, and a frog 03.12.86 (4am crack) disk 2.dsk" size="143360" crc="b55f6ff0" sha1="2d39b36503c096bfed5dc5e3b32730aeed771ee0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pythdrgn">
+		<description>Pythagoras and The Dragon (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Krell Software</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Pythagoras and The Dragon" is a 1983 educational game developed and distributed by Krell Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pythagoras and the dragon (4am crack).dsk" size="143360" crc="c21b3d07" sha1="759a6f56911f2e0e4f8b09b120bc50e8f3bf994f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcrescu">
+		<description>Space Rescue (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Level-10</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Space Rescue" is a 1982 action game developed by Rod Nelsen and distributed by Level-10.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="space rescue (4am crack).dsk" size="143360" crc="35c570ee" sha1="0da6e145b183a07916fd13b0933fe207903a6551"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcksmth50g">
+		<description>Locksmith (Version 5.0 Revision G) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Alpha Logic Business Systems</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Locksmith" is a 1984 disk utility developed and distributed by Alpha Logic Business Systems. This is version 5.0G.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="locksmith v5.0g (4am crack).dsk" size="143360" crc="4be27a62" sha1="3e19e176a314c6c888e6c3d53fe361d4767d3285"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vt100emu">
+		<description>VT-100 Emulator (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"VT-100 Emulator" is a 1980 communications program developed and distributed by Apple Computer. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="vt-100 emulator (4am and san inc crack).dsk" size="143360" crc="6c9aefb6" sha1="1145f21c0904556f1dd897d93f80f22fa17c6954"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ortrk13a">
+		<description>Order Tracking System (Version 1.3a) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Order Tracking System" is a 1981 productivity program developed by Loggins and distributed by Apple Computer. This is version 1.3a. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="order tracking system v1.3a (4am and san inc crack) disk 1 - master disk.dsk" size="143360" crc="c38a08b6" sha1="17a537b514dd1df22b60abb25246dfb2079d2064"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Data disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="order tracking system v1.3a (4am and san inc crack) disk 2 - data disk.dsk" size="143360" crc="c05b5270" sha1="2df14e5463e291da1c25e3a7f1fd8c82f6c98075"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tnsbsbasic">
+		<description>The New Step by Step: A Computer Course in BASIC (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Program Design</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"The New Step by Step: A Computer Course in BASIC" is a 1981 educational program developed and distributed by Program Design. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the new step by step (4am crack) disk 1.dsk" size="143360" crc="04cee7af" sha1="89ace8ba63e1b076748e3980b90df5a8c5b6259a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the new step by step (4am crack) disk 2.dsk" size="143360" crc="2afc9d0e" sha1="2f04f279a07fbfcf1b1160591cc245611079eeed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrhlpr15">
+		<description>Writer's Helper (Version 1.5) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>CONDUIT Educational Software</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Writer's Helper" is a 1985 educational program developed by William Wresch and distributed by CONDUIT Educational Software. This is version 1.5. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="writer's helper v1.5 (4am crack) disk 1 - program disk.dsk" size="143360" crc="b417f300" sha1="f60ee9583aa39821bb55d6a37b9ce76554a56c11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muptvller2">
+		<description>Muppetville (Revision 2) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Muppetville" is a 1986 educational program developed and distributed by Sunburst Communications. This is revision 2, with a filename fix and other unspecified changes. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="muppetville rev. 2 (4am crack).dsk" size="143360" crc="99891244" sha1="43449499e6b21b6d49d0002f9db9f9fca6443e57"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="faymathw">
+		<description>Fay: That Math Woman! (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Didatech Software</publisher>
+		<info name="release" value="2022-06-11"/>
+		<!--"Fay: That Math Woman!" is a 1983 educational program developed by David Vincent and Paul Melhus, and distributed by Didatech Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fay- that math woman (4am crack).dsk" size="143360" crc="708f4de6" sha1="8c25121dbef45710183576b0145c7d23c7614004"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rebuswr">
+		<description>Rebus Writer (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Rebus Writer" is a 1987 educational program developed by TJ and distributed by Mindscape. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rebus writer (4am crack) side a - program.dsk" size="143360" crc="9fdb3d8f" sha1="a8c94406aa0eb42faa3fcf2cc44a2908dcb4682a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Pictionary disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="rebus writer (4am crack) side b - pictionary.dsk" size="143360" crc="d42ae5a3" sha1="ed2f9d42a9e023de2156ee05aa1d4b3f534aef67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desktzoo">
+		<description>Desktop Zoo (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Micrograms</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Desktop Zoo" is a 1989 educational program developed and distributed by Micrograms.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="desktop zoo (4am crack).dsk" size="143360" crc="369c223c" sha1="a3373b95967dbdc59be845cf3f965f52148e1a89"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gothmogl">
+		<description>Gothmog's Lair (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Progressive Peripherals and Software</publisher>
+		<info name="release" value="2022-06-10"/>
+		<!--"Gothmog's Lair" is a 1984 adventure game developed by Sean A. Moore and distributed by Progressive Peripherals and Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gothmog's lair (4am crack).dsk" size="143360" crc="b543c4c7" sha1="1c792662f3690849c60e284fd8d8be9f43569c37"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geoocaow">
+		<description>Geography: Our Country and Our World (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Scott, Foresman and Company</publisher>
+		<info name="release" value="2022-06-13"/>
+		<!--"Geography: Our Country and Our World" is a 1988 educational program developed and distributed by Scott, Foresman and Company. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Question Writer (Bootable)"/>
+			<dataarea name="flop" size="143360">
+				<rom name="scott, foresman test generator (4am crack) disk 1 - question writer.dsk" size="143360" crc="41006aed" sha1="e043d455a536aa553d5be61c7034e9569cdda7a5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Test Storage"/>
+			<dataarea name="flop" size="143360">
+				<rom name="scott, foresman test generator (4am crack) disk 2 - test storage.dsk" size="143360" crc="e35d7194" sha1="a78065734e80b426077b999b0ee53465db8b2927"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Databases 1-3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geography- our country and our world - databases units 1-3.dsk" size="143360" crc="2ab73b9c" sha1="0af16e844c3cc3140e13a9f483bd18b8534435d6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Databases 4-6"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geography- our country and our world - databases units 4-6.dsk" size="143360" crc="a601eb13" sha1="537a26529c8ee900596ac2304543c7ecf65f55e5"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Test questions intro-chapter 9"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geography- our country and our world - test questions intro-chapter 9.dsk" size="143360" crc="eb95e972" sha1="07a1770e470e4550ccb26f15273d8395fc9b4634"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Test questions chapters 10-18"/>
+			<dataarea name="flop" size="143360">
+				<rom name="geography- our country and our world - test questions chapters 10-18.dsk" size="143360" crc="9547cc56" sha1="24f541406c8097426ee7f20769cfeb7b5292cd7e"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Filer Disk - Side A (Bootable)"/>
+			<dataarea name="flop" size="143360">
+				<rom name="scott, foresman filer (4am crack) side a.dsk" size="143360" crc="6801bcd4" sha1="45c0657b2f09b6b0556a565bc27fad3fde47ae67"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Filer Disk - Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="scott, foresman filer (4am crack) side b.dsk" size="143360" crc="b1c0b0a3" sha1="4ea5be1354e67f121c04030cadf0bbf2b9df09e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ginnread">
+		<description>Ginn Reading Program (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Ginn and Company</publisher>
+		<info name="release" value="2022-06-14"/>
+		<!--"Ginn Reading Program" is a 1984 educational program developed and distributed by Ginn and Company. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ginn reading program (4am crack) disk 1 - program.dsk" size="143360" crc="b3fb08a2" sha1="298781ac2ed9540b5ee2aec551bd380a7f23c143"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Test scoring and reports"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ginn reading program (4am crack) disk 2 - test scoring and reports.dsk" size="143360" crc="c582494a" sha1="804a8de7ad507d305bdaf11acfc1d889ad2dc104"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Data disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ginn reading program (4am crack) disk 3 - data.dsk" size="143360" crc="fef483a9" sha1="e0f16bf0a3478a55d63e02092b2a216852f672aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthb0884">
+		<description>Math Blaster (Version 08.05.84) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2022-06-18"/>
+		<!--"Math Blaster" is a 1983 educational program developed by Richard Eckert and Janice Davidson, Ph.D., and distributed by Davidson and Associates. This version is dated August 5, 1984 according to the printed disk label.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math blaster v080584 (4am crack) side a - program.dsk" size="143360" crc="1f40f3e7" sha1="59e80536bfe46e46bd458ac11aacc30d9da56886"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Data disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="math blaster v080584 (4am crack) side b - data.dsk" size="143360" crc="fe5f63a4" sha1="1eac6e9205030b23f43c0fcc2cb5055659126407"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plyrdmus">
+		<description>Playing and Reading Music (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-06-23"/>
+		<!--"Playing and Reading Music" is a 1987 educational program developed by Vincent Oddo and Henry Levy, and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playing and reading music (4am crack) disk 1.dsk" size="143360" crc="eaeb5ac1" sha1="ba313892322d045160cfe623330c8fdaf6f591d7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playing and reading music (4am crack) disk 2.dsk" size="143360" crc="673ffe87" sha1="ce7529d7e0f890d65a914b3a2a485ac7db095610"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playing and reading music (4am crack) disk 3.dsk" size="143360" crc="85172747" sha1="f0ac3b037273682f668486733108554e169e06d6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playing and reading music (4am crack) disk 4.dsk" size="143360" crc="1ac3aab4" sha1="4864efcbdf539e896e2f8961e3c10fd3d37cf0af"/>
 			</dataarea>
 		</part>
 	</software>
