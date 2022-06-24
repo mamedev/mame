@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#include <bitset>
+
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/mc68681.h"
@@ -620,6 +622,12 @@ protected:
 	int m_t3h = 0;
 	uint8_t m_numbanks = 0;
 
+	bool m_overcurrent = false;
+	bool m_undercurrent = false;
+	
+	std::bitset<16> m_overcurrent_strobes;
+	std::bitset<16> m_undercurrent_strobes;
+	
 	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 };

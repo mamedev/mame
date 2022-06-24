@@ -520,6 +520,14 @@ void mpu4_state::pia_ic3_porta_w(uint8_t data)
 			// As a consequence, the lamp column data can change before the input strobe without
 			// causing the relevant lamps to black out.
 
+			if (m_overcurrent_strobes.test(m_input_strobe)) {
+				m_overcurrent = true;
+			}
+
+			if (m_undercurrent_strobes.test(m_input_strobe)) {
+				m_undercurrent = true;
+			}
+			
 			for (i = 0; i < 8; i++)
 			{
 				m_lamps[(8*m_input_strobe)+i] = BIT(data, i);
@@ -538,6 +546,15 @@ void mpu4_state::pia_ic3_portb_w(uint8_t data)
 	{
 		if (m_lamp_strobe2 != m_input_strobe)
 		{
+
+			if (m_overcurrent_strobes.test(m_input_strobe+8)) {
+				m_overcurrent = true;
+			}
+
+			if (m_undercurrent_strobes.test(m_input_strobe+8)) {
+				m_undercurrent = true;
+			}
+
 			for (i = 0; i < 8; i++)
 			{
 				m_lamps[(8*m_input_strobe)+i+64] = BIT(data, i);
@@ -612,6 +629,10 @@ void mpu4_state::ic23_update()
 	{
 		m_input_strobe = 0x00;
 	}
+//	if (m_input_strobe == 0x00) {
+//		m_overcurrent = false;
+//		m_undercurrent = false;
+//	}
 }
 
 
@@ -698,6 +719,8 @@ void mpu4_state::pia_ic4_portb_w(uint8_t data)
 
 uint8_t mpu4_state::pia_ic4_portb_r()
 {
+	m_ic4_input_b = 0x00;
+
 	if ( m_serial_data )
 	{
 		m_ic4_input_b |=  0x80;
@@ -736,14 +759,14 @@ uint8_t mpu4_state::pia_ic4_portb_r()
 	if ( m_signal_50hz )            m_ic4_input_b |=  0x04; /* 50 Hz */
 	else                            m_ic4_input_b &= ~0x04;
 
-/* Dolbeck connect 4 complains if the strobe containing bulb 120 doesn't trigger overcurrent,
-but this is non-fatal. BWB games will definitely complain if overcurrent is triggered, though.
-*/
-#if 0
-	if ( lamp_overcurrent ) m_ic4_input_b |= 0x02;
-	if ( lamp_undercurrent ) m_ic4_input_b |= 0x01;
-#endif
-
+	if ( m_overcurrent )
+	{
+		m_ic4_input_b |= 0x02;
+	}
+	if ( m_undercurrent )
+	{
+		m_ic4_input_b |= 0x01;
+	}
 	LOG_IC3(("%s: IC4 PIA Read of Port B %x\n",machine().describe_context(),m_ic4_input_b));
 	return m_ic4_input_b;
 }
@@ -770,11 +793,11 @@ uint8_t mpu4_state::pia_ic5_porta_r()
 	{
 		if (m_lamp_sense && m_ic23_active)
 		{
-			m_aux1_input |= 0x40;
-		}
-		else
-		{
-			m_aux1_input &= ~0x40; //Pulse the overcurrent line with every read to show the CPU each lamp has lit
+			if (m_overcurrent) 
+			{
+				m_aux1_input |= 0x40;
+				m_overcurrent = false;
+			}
 		}
 	}
 	if (m_hopper == HOPPER_NONDUART_A)
