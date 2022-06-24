@@ -17,7 +17,7 @@
 
  On the second set, boards A and B have different part numbers (97091X and 97092X) and two less roms.
  These boards were made later then the first set.
- These boards seem to be interchangable, the only difference seems to be the rom size, which only 2 of the roms
+ These boards seem to be interchangeable, the only difference seems to be the rom size, which only 2 of the roms
    utilize the full 1024 bytes (second set).
 
  ROM SET A        <type 7461, 24 pin>      ROM SET B     <type MB7132E, 24 pin>

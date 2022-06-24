@@ -106,7 +106,7 @@ struct res_net_channel_info {
 	// - Least significant bit first
 	double  R[8];
 	// Minimum output voltage
-	// - Applicable if output is routed through a complimentary
+	// - Applicable if output is routed through a complementary
 	// - darlington circuit
 	// - typical value ~ 0.9V
 	double  minout;
