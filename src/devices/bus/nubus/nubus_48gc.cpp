@@ -2,16 +2,21 @@
 // copyright-holders:R. Belmont, Vas Crabb
 /***************************************************************************
 
-  Apple 4*8 Graphics Card (model 630-0400) emulation
-  Apple 8*24 Graphics Card emulation (cards have the same framebuffer chip
-      w/different ROMs and RAMDACs, apparently)
+  Apple Macitosh Display Card 4•8 (model 630-0400)
+  Apple Macitosh Display Card 8•24
+
+  Cards have the same framebuffer, CRTC and clock synthesizers, but use
+  different RAMDACs and ROMs.
+
+  Monitor type changes take effect on had reset.  The 8•24 defaults to the
+  “Page-White Gamma” profile for the 21" and 16" color monitors, which
+  affects white balance.  Use the Monitors control panel to switch to the
+  “Uncorrected Gamma” profile if you don’t like it.
 
   TODO:
   * Work out why some monitors need magic multiply or divide by two to
     get the right RAMDAC/CRTC clocks - inferring it from the reference
     clock modulus is definitely wrong.
-  * The 8•24 card uses a strange off-white palette with some monitors,
-    including the 21" and 16" RGB displays.
   * Interlaced modes.
 
 ***************************************************************************/
@@ -472,11 +477,10 @@ void jmfb_device::update_crtc()
 				width >>= 2;
 				break;
 		}
-		XTAL const pixclock = 20_MHz_XTAL / m_modulus * m_multiplier / (1 << m_pdiv);
 		screen().configure(
 				htotal, vtotal,
 				rectangle(0, width - 1, 0, height - 1),
-				attotime::from_ticks(htotal * vtotal, pixclock).attoseconds());
+				attotime::from_ticks(htotal * vtotal, pixclk).attoseconds());
 
 		// TODO: determine correct timing for vertical blanking interrupt
 		m_timer->adjust(screen().time_until_pos(height - 1, 0));
