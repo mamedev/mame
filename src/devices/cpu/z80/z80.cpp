@@ -3632,12 +3632,12 @@ z80_device::ops_type z80_device::* z80_device::do_exec()
 {
 	switch (m_prefix)
 	{
-	case NONE:  EXEC(op,   m_opcode);
-	case CB:    EXEC(cb,   m_opcode);
-	case DD:    EXEC(dd,   m_opcode);
-	case ED:    EXEC(ed,   m_opcode);
-	case FD:    EXEC(fd,   m_opcode);
-	case XY_CB: EXEC(xycb, m_opcode);
+	case NONE:  EXEC(op,   m_opcode); break;
+	case CB:    EXEC(cb,   m_opcode); break;
+	case DD:    EXEC(dd,   m_opcode); break;
+	case ED:    EXEC(ed,   m_opcode); break;
+	case FD:    EXEC(fd,   m_opcode); break;
+	case XY_CB: EXEC(xycb, m_opcode); break;
 	}
 	// error
 	return &z80_device::op_00;
