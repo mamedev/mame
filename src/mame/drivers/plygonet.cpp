@@ -203,6 +203,7 @@ private:
 
 	// Sound handlers
 	void sound_ctrl_w(u8 data);
+	void update_sound_nmi();
 
 	template <int PolyPage> void process_polys();
 	template <int PolyPage> void draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const u16 span_ptr, const u16 raw_start, const u16 raw_end);
@@ -797,7 +798,7 @@ void polygonet_state::draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const
 static const gfx_layout bglayout =
 {
 	16,16,
-	1024,
+	RGN_FRAC(1,1),
 	4,
 	{ 0, 1, 2, 3 },
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
@@ -824,7 +825,7 @@ TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
 TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 {
 	const auto roz_vram = util::big_endian_cast<const u16>(m_roz_vram.target());
-	const int code = roz_vram[tile_index] & 0x3ff;
+	const int code = roz_vram[tile_index] & 0x7ff;
 	const int attr = (roz_vram[tile_index] >> 12) + 16; // ROZ base palette is palette index 16 onward
 
 	tileinfo.set(0, code, attr, 0);
@@ -1005,27 +1006,28 @@ void polygonet_state::sound_map(address_map &map)
 void polygonet_state::sound_ctrl_w(u8 data)
 {
 	// .... .xxx - Sound bank
-	// ...x .... - NMI clear (clocked?)
+	// ...x .... - NMI clear (clocked?) (or NMI enable mask?) (or maybe just something else)
 
 	if ((m_sound_ctrl & 7) != (data & 7))
 		m_sound_bank->set_entry(data & 7);
 
-	// This behaves differently to the other games of this era
-	if (!(m_sound_ctrl & 0x10) && (data & 0x10))
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-
 	m_sound_ctrl = data;
+	update_sound_nmi();
+}
+
+void polygonet_state::update_sound_nmi()
+{
+	if (m_sound_intck) // checking m_sound_ctrl & 0x10 seems logical based on other Konami games, but polynetw doesn't like it?
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
 {
-	// Trigger interrupt on rising clock edge
-	if (!m_sound_intck && state)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-
 	m_sound_intck = state;
+	update_sound_nmi();
 }
-
 
 //-------------------------------------------------
 //  Machine configuration
@@ -1097,7 +1099,7 @@ ROM_START( plygonet )
 	ROMX_LOAD( "305b06.18g", 0x000000, 0x20000, CRC(decd6e42) SHA1(4c23dcb1d68132d3381007096e014ee4b6007086), ROM_GROUPDWORD | ROM_REVERSE )
 
 	ROM_REGION32_BE( 0x40000, "gfx2", 0 ) // '936 tiles
-	ROMX_LOAD( "305b07.20d", 0x000000, 0x40000, CRC(e4320bc3) SHA1(b0bb2dac40d42f97da94516d4ebe29b1c3d77c37), ROM_GROUPDWORD | ROM_REVERSE )
+	ROMX_LOAD( "305b07.20d", 0x000000, 0x40000, CRC(e4320bc3) SHA1(b0bb2dac40d42f97da94516d4ebe29b1c3d77c37), ROM_GROUPDWORD )
 
 	ROM_REGION( 0x200000, "k054539", 0 ) // Sound data
 	ROM_LOAD( "305b08.2e", 0x000000, 0x200000, CRC(874607df) SHA1(763b44a80abfbc355bcb9be8bf44373254976019) )
@@ -1120,7 +1122,7 @@ ROM_START( polynetw )
 	ROMX_LOAD( "305a06.18g", 0x000000, 0x020000, CRC(4b9b7e9c) SHA1(8c3c0f1ec7e26fd9552f6da1e6bdd7ff4453ba57), ROM_GROUPDWORD | ROM_REVERSE )
 
 	ROM_REGION32_BE( 0x40000, "gfx2", 0 ) // '936 tiles
-	ROMX_LOAD( "305a07.20d", 0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203), ROM_GROUPDWORD | ROM_REVERSE )
+	ROMX_LOAD( "305a07.20d", 0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203), ROM_GROUPDWORD )
 
 	ROM_REGION( 0x400000, "k054539", 0 ) // Sound data
 	ROM_LOAD( "305a08.2e", 0x000000, 0x200000, CRC(7ddb8a52) SHA1(3199b347fc433ffe0de8521001df77672d40771e) )
