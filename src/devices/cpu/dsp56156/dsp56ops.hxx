@@ -19,9 +19,15 @@
 
 /*
 TODO:
-    - 0x01ee: should this move sign extend?  otherwise the test-against-minus means nothing.
-    - Restore only the proper bits upon loop termination!
+    - Restore only the proper SR/MR bits upon loop termination!
 */
+
+#define LOG_OUTPUT_FUNC cpustate->device->logerror
+#define LOG_UNIMPLEMENTED   (1 << 1U)
+#define LOG_CHECKS          (1 << 2U)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 /************************/
 /* Datatypes and macros */
@@ -41,7 +47,7 @@ struct typed_pointer
 	char  data_type;
 };
 
-#define BITS(CUR,MASK) (Dsp56156OpMask(CUR,MASK))
+#define BITS(CUR,MASK) (dsp56156_op_mask(CUR,MASK))
 
 static const bool dsp56156_add_ovf_table[8] = { false, true, false, false, false, false, true, false };
 static const bool dsp56156_sub_ovf_table[8] = { false, false, false, true, true, false, false, false };
@@ -221,13 +227,15 @@ static void dsp56156_process_rep(dsp56156_core* cpustate, size_t repSize);
 /********************/
 /* Helper Functions */
 /********************/
-static uint16_t Dsp56156OpMask(uint16_t op, uint16_t mask);
+static uint16_t dsp56156_op_mask(uint16_t op, uint16_t mask);
+
+static uint64_t dsp56156_limit_long_to_long(dsp56156_core* cpustate, uint64_t val);
 
 /* These arguments are written source->destination to fall in line with the processor's paradigm. */
-static void SetDestinationValue(dsp56156_core* cpustate, typed_pointer source, typed_pointer dest);
+static void dsp56156_set_destination_value(dsp56156_core* cpustate, typed_pointer source, typed_pointer dest);
 
-static void SetDataMemoryValue(dsp56156_core* cpustate, typed_pointer source, uint32_t destinationAddr);
-static void SetProgramMemoryValue(dsp56156_core* cpustate, typed_pointer source, uint32_t destinationAddr);
+static void dsp56156_set_data_memory_value(dsp56156_core* cpustate, typed_pointer source, uint32_t destinationAddr);
+static void dsp56156_set_program_memory_value(dsp56156_core* cpustate, typed_pointer source, uint32_t destinationAddr);
 
 
 
@@ -1074,7 +1082,7 @@ static void execute_one(dsp56156_core* cpustate)
 
 		/* Now evaluate the parallel data move */
 		/* TODO // decode_x_memory_data_write_and_register_data_move(op, parallel_move_str, parallel_move_str2); */
-		cpustate->device->logerror("DSP56156: Unemulated Dual X Memory Data And Register Data Move @ 0x%x\n", PC);
+		LOGMASKED(LOG_UNIMPLEMENTED, "DSP56156: Unemulated Dual X Memory Data And Register Data Move @ 0x%x\n", PC);
 		cpustate->device->machine().debug_break();
 	}
 
@@ -1840,8 +1848,8 @@ static void execute_one(dsp56156_core* cpustate)
 	/* Not recognized?  Nudge debugger onto the next word */
 	if (size == 0x1337)
 	{
-		cpustate->device->logerror("DSP56156: Unimplemented opcode at 0x%04x : %04x\n", PC, op);
-		size = 1 ;                      /* Just to get the debugger past the bad opcode */
+		LOGMASKED(LOG_UNIMPLEMENTED, "DSP56156: Unimplemented opcode at 0x%04x : %04x\n", PC, op);
+		size = 1;                      /* Just to get the debugger past the bad opcode */
 	}
 
 	/* Must have been a good opcode */
@@ -1975,7 +1983,7 @@ static size_t dsp56156_op_macr_1(dsp56156_core* cpustate, const uint16_t op_byte
 {
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
-	printf("dsp56156_op_macr_1\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_macr_1\n");
 	return 0;
 }
 
@@ -1984,7 +1992,7 @@ static size_t dsp56156_op_move_1(dsp56156_core* cpustate, const uint16_t op_byte
 {
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
-	printf("dsp56156_op_move_1\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_move_1\n");
 	return 0;
 }
 
@@ -2031,7 +2039,7 @@ static size_t dsp56156_op_mpyr_1(dsp56156_core* cpustate, const uint16_t op_byte
 {
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
-	printf("dsp56156_op_mpyr_1\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_mpyr_1\n");
 	return 0;
 }
 
@@ -2040,7 +2048,7 @@ static size_t dsp56156_op_tfr_2(dsp56156_core* cpustate, const uint16_t op_byte,
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_tfr_2\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_tfr_2\n");
 	return 0;
 }
 
@@ -2049,7 +2057,7 @@ static size_t dsp56156_op_mpy_2(dsp56156_core* cpustate, const uint16_t op_byte,
 {
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
-	printf("dsp56156_op_mpy_2\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_mpy_2\n");
 	return 0;
 }
 
@@ -2058,7 +2066,7 @@ static size_t dsp56156_op_mac_2(dsp56156_core* cpustate, const uint16_t op_byte,
 {
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
-	printf("dsp56156_op_mac_2\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_mac_2\n");
 	return 0;
 }
 
@@ -2075,7 +2083,7 @@ static size_t dsp56156_op_clr(dsp56156_core* cpustate, const uint16_t op_byte, t
 
 	clear.addr = &clear_val;
 	clear.data_type = DT_LONG_WORD;
-	SetDestinationValue(cpustate, clear, D);
+	dsp56156_set_destination_value(cpustate, clear, D);
 
 	d_register->addr = D.addr;
 	d_register->data_type = D.data_type;
@@ -2108,10 +2116,7 @@ static size_t dsp56156_op_add(dsp56156_core* cpustate, const uint16_t op_byte, t
 	{
 		case DT_WORD:        addVal = (uint64_t)*((uint16_t*)S.addr) << 16; break;
 		case DT_DOUBLE_WORD: addVal = (uint64_t)*((uint32_t*)S.addr);       break;
-		case DT_LONG_WORD:
-			addVal = (uint64_t)*((uint64_t*)S.addr);
-			if (D.data_type == DT_WORD) printf("%04x: Bad add?\n", cpustate->PCU.pc);
-			break;
+		case DT_LONG_WORD:   addVal = (uint64_t)*((uint64_t*)S.addr);       break;
 	}
 
 	/* Sign-extend word for proper add/sub op */
@@ -2168,7 +2173,7 @@ static size_t dsp56156_op_tfr(dsp56156_core* cpustate, const uint16_t op_byte, t
 
 	*p_accum = *((uint64_t*)D.addr);
 
-	SetDestinationValue(cpustate, S, D);
+	dsp56156_set_destination_value(cpustate, S, D);
 
 	d_register->addr = D.addr;
 	d_register->data_type = D.data_type;
@@ -2265,7 +2270,7 @@ static size_t dsp56156_op_inc(dsp56156_core* cpustate, const uint16_t op_byte, t
 	/* * * * * * * * * */
 	/* TODO: S, L, E, U */
 	if ( *((uint64_t*)D.addr) & 0x0000008000000000ULL)       DSP56156_N_SET(); else DSP56156_N_CLEAR();
-	if ((*((uint64_t*)D.addr) & 0x000000ffffff0000ULL) == 0) DSP56156_Z_SET(); else DSP56156_Z_CLEAR();
+	if ((*((uint64_t*)D.addr) & 0x000000ffffffffffULL) == 0) DSP56156_Z_SET(); else DSP56156_Z_CLEAR();
 	if ((*((uint64_t*)D.addr) & 0xffffff0000000000ULL) != 0) DSP56156_V_SET(); else DSP56156_V_CLEAR();
 	if ((*((uint64_t*)D.addr) & 0xffffff0000000000ULL) != 0) DSP56156_C_SET(); else DSP56156_C_CLEAR();
 
@@ -2435,7 +2440,7 @@ static size_t dsp56156_op_lsl(dsp56156_core* cpustate, const uint16_t op_byte, t
 	/* N - Set if bit 31 of the result is set. Cleared otherwise. */
 	/* Z - Set if bits 16-31 of the result are zero. Cleared otherwise. */
 	/* C - Set if bit 31 of the source operand is set. Cleared otherwise. */
-	printf("dsp56156_op_lsl\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_lsl\n");
 	return 0;
 }
 
@@ -2476,7 +2481,7 @@ static size_t dsp56156_op_subl(dsp56156_core* cpustate, const uint16_t op_byte, 
 	/* * * * * * * ? * */
 	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if the most significant
 	       bit of the destination operand is changed as a result of the left shift. Cleared otherwise. */
-	printf("dsp56156_op_subl\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_subl\n");
 	return 0;
 }
 
@@ -2533,7 +2538,7 @@ static size_t dsp56156_op_clr24(dsp56156_core* cpustate, const uint16_t op_byte,
 	/* S L E U N Z V C */
 	/* * * * * * ? 0 - */
 	/* Z - Set if the 24 most significant bits of the destination result are all zeroes. */
-	printf("dsp56156_op_clr24\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_clr24\n");
 	return 0;
 }
 
@@ -2542,7 +2547,7 @@ static size_t dsp56156_op_sbc(dsp56156_core* cpustate, const uint16_t op_byte, t
 {
 	/* S L E U N Z V C */
 	/* * * * * * * * * */
-	printf("dsp56156_op_sbc\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_sbc\n");
 	return 0;
 }
 
@@ -2606,29 +2611,26 @@ static size_t dsp56156_op_neg(dsp56156_core* cpustate, const uint16_t op_byte, t
 
 	uint64_t sVal = *p_accum = *((uint64_t*)D.addr);
 	uint64_t dVal = 0 - sVal;
+	uint64_t dMasked = dVal & 0x000000ffffffffffULL;
 
-	neg.addr = &dVal;
+	neg.addr = &dMasked;
 	neg.data_type = DT_LONG_WORD;
-	SetDestinationValue(cpustate, neg, D);
+	dsp56156_set_destination_value(cpustate, neg, D);
 
 	d_register->addr = D.addr;
 	d_register->data_type = D.data_type;
 
-	bool sNeg = (sVal & 0x0000008000000000ULL);
-	bool dNeg = (dVal & 0x0000008000000000ULL);
-
-	uint64_t dUpper = dNeg & 0xffffff0000000000ULL;
-	bool ovf = (dUpper != 0ULL && dUpper != 0xffffff0000000000ULL);
+	uint8_t ovf_index = (BIT(sVal, 39) << 1) | BIT(dVal, 39);
 
 	/* S L E U N Z V C */
 	/* * * * * * * * * */
 	/* TODO - S, L */
 	if (dsp56156_value_is_unnormalized(cpustate, dVal)) DSP56156_U_SET(); else DSP56156_U_CLEAR();
 	if (dsp56156_value_is_extended(cpustate, dVal))     DSP56156_E_SET(); else DSP56156_E_CLEAR();
-	if (dVal & 0x0000008000000000ULL) DSP56156_N_SET(); else DSP56156_N_CLEAR();
-	if (dVal == 0)                    DSP56156_Z_SET(); else DSP56156_Z_CLEAR();
-	if (ovf)                          DSP56156_V_SET(); else DSP56156_V_CLEAR();
-	if (!sNeg)                        DSP56156_C_SET(); else DSP56156_C_CLEAR(); /* TODO: Check if this is correct */
+	if (dVal & 0x0000008000000000ULL)          DSP56156_N_SET(); else DSP56156_N_CLEAR();
+	if (dVal == 0)                             DSP56156_Z_SET(); else DSP56156_Z_CLEAR();
+	if (dsp56156_sub_ovf_table[ovf_index])     DSP56156_V_SET(); else DSP56156_V_CLEAR();
+	if ((dVal & 0xffffff0000000000ULL) != 0)   DSP56156_C_SET(); else DSP56156_C_CLEAR();
 
 	cycles += 2;    /* TODO: + mv oscillator clock cycles */
 	return 1;
@@ -2664,7 +2666,7 @@ static size_t dsp56156_op_dec(dsp56156_core* cpustate, const uint16_t op_byte, t
 {
 	/* S L E U N Z V C */
 	/* * * * * * * * * */
-	printf("dsp56156_op_dec\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_dec\n");
 	return 0;
 }
 
@@ -2782,7 +2784,7 @@ static size_t dsp56156_op_ror(dsp56156_core* cpustate, const uint16_t op_byte, t
 	/* N - Set if bit 31 of the result is set. Cleared otherwise. */
 	/* Z - Set if bits 16-31 of the result are zero. Cleared otherwise. */
 	/* C - Set if bit 16 of the source operand is set. Cleared otherwise. */
-	printf("dsp56156_op_ror\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_ror\n");
 	return 0;
 }
 
@@ -2862,8 +2864,8 @@ static size_t dsp56156_op_cmpm(dsp56156_core* cpustate, const uint16_t op_byte, 
 	else
 	{
 		absD = (*((uint16_t*)D.addr)) << 16;
-		if (absS &  0x0000000080000000ULL)
-			absS |= 0xffffffff80000000ULL;
+		if (absD &  0x0000000080000000ULL)
+			absD |= 0xffffffff80000000ULL;
 	}
 	absD = (absD & 0x8000000000000000ULL) ? (0 - absD) : absD;
 
@@ -2942,7 +2944,7 @@ static size_t dsp56156_op_mpyr(dsp56156_core* cpustate, const uint16_t op_byte, 
 {
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
-	printf("dsp56156_op_mpyr\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_mpyr\n");
 	return 0;
 }
 
@@ -3090,7 +3092,7 @@ static size_t dsp56156_op_adc(dsp56156_core* cpustate, const uint16_t op, uint8_
 {
 	/* S L E U N Z V C */
 	/* - * * * * * * * */
-	printf("dsp56156_op_adc\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_adc\n");
 	return 0;
 }
 
@@ -3115,7 +3117,7 @@ static size_t dsp56156_op_andi(dsp56156_core* cpustate, const uint16_t op, uint8
 			break;
 
 		default:
-			fatalerror("DSP56156 - BAD EE value in andi operation\n") ;
+			fatalerror("DSP56156 - BAD EE value in andi operation\n");
 	}
 
 	/* S L E U N Z V C */
@@ -3253,7 +3255,7 @@ static size_t dsp56156_op_bfop(dsp56156_core* cpustate, const uint16_t op, const
 
 	tempTP.addr = &workingWord;
 	tempTP.data_type = DT_WORD;
-	SetDataMemoryValue(cpustate, tempTP, workAddr);
+	dsp56156_set_data_memory_value(cpustate, tempTP, workAddr);
 
 	/* S L E U N Z V C */
 	/* - * - - - - - ? */
@@ -3319,7 +3321,7 @@ static size_t dsp56156_op_bfop_1(dsp56156_core* cpustate, const uint16_t op, con
 
 	tempTP.addr = &workingWord;
 	tempTP.data_type = DT_WORD;
-	SetDataMemoryValue(cpustate, tempTP, workAddr);
+	dsp56156_set_data_memory_value(cpustate, tempTP, workAddr);
 
 	/* S L E U N Z V C */
 	/* - * - - - - - ? */
@@ -3349,8 +3351,9 @@ static size_t dsp56156_op_bfop_1(dsp56156_core* cpustate, const uint16_t op, con
 /* BFTSTL : 0001 0100 000D DDDD BBB0 0000 iiii iiii : A-46 */
 static size_t dsp56156_op_bfop_2(dsp56156_core* cpustate, const uint16_t op, const uint16_t op2, uint8_t* cycles)
 {
-	uint16_t workingWord = 0x0000;
-	uint16_t previousValue = 0x0000;
+	uint16_t workingWord = 0;
+	uint16_t previousWord = 0;
+	uint64_t previousAccum = 0;
 
 	uint16_t iVal = op2 & 0x00ff;
 	typed_pointer S = { nullptr, DT_BYTE };
@@ -3360,11 +3363,16 @@ static size_t dsp56156_op_bfop_2(dsp56156_core* cpustate, const uint16_t op, con
 
 	/* A & B are special */
 	if (S.data_type == DT_LONG_WORD)
-		previousValue = ((PAIR64*)S.addr)->w.h;
+	{
+		previousAccum = dsp56156_limit_long_to_long(cpustate, ((PAIR64*)S.addr)->q);
+		previousWord = (uint16_t)(previousAccum >> 16);
+	}
 	else
-		previousValue = *((uint16_t*)S.addr);
+	{
+		previousWord = *((uint16_t*)S.addr);
+	}
 
-	workingWord = previousValue;
+	workingWord = previousWord;
 
 	switch(BITS(op2, 0x1f00))
 	{
@@ -3387,9 +3395,13 @@ static size_t dsp56156_op_bfop_2(dsp56156_core* cpustate, const uint16_t op, con
 
 	/* Put the data back where it belongs (A & B are special) */
 	if (S.data_type == DT_LONG_WORD)
-		((PAIR64*)S.addr)->w.h = workingWord;
+	{
+		((PAIR64*)S.addr)->q = (previousAccum & 0x000000ff00000000ULL) | ((uint64_t)workingWord << 16);
+	}
 	else
-		*((uint16_t*)S.addr) = workingWord;
+	{
+		*(uint16_t*)S.addr = workingWord;
+	}
 
 	/* S L E U N Z V C */
 	/* - * - - - - - ? */
@@ -3397,15 +3409,15 @@ static size_t dsp56156_op_bfop_2(dsp56156_core* cpustate, const uint16_t op, con
 	switch(BITS(op2, 0x1f00))
 	{
 		case 0x12:  /* BFCHG */
-			if ((iVal & previousValue) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
+			if ((iVal & previousWord) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x04:  /* BFCLR */
-			if ((iVal & previousValue) == 0x0000) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
+			if ((iVal & previousWord) == 0x0000) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x18:  /* BFSET */
-			if ((iVal & previousValue) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
+			if ((iVal & previousWord) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x10:  /* BFTSTH */
-			if ((iVal & previousValue) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
+			if ((iVal & previousWord) == iVal) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 		case 0x00:  /* BFTSTL */
-			if ((iVal & previousValue) == 0x0000) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
+			if ((iVal & previousWord) == 0x0000) DSP56156_C_SET(); else DSP56156_C_CLEAR(); break;
 	}
 
 	cycles += 4;    /* TODO: + mvb oscillator clock cycles */
@@ -3467,7 +3479,7 @@ static size_t dsp56156_op_bcc_2(dsp56156_core* cpustate, const uint16_t op, uint
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_bcc_2\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_bcc_2\n");
 	return 0;
 }
 
@@ -3476,7 +3488,7 @@ static size_t dsp56156_op_bra(dsp56156_core* cpustate, const uint16_t op, const 
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_bra\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_bra\n");
 	return 0;
 }
 
@@ -3503,7 +3515,7 @@ static size_t dsp56156_op_bra_2(dsp56156_core* cpustate, const uint16_t op, uint
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_bra_2\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_bra_2\n");
 	return 0;
 }
 
@@ -3514,7 +3526,19 @@ static size_t dsp56156_op_brkcc(dsp56156_core* cpustate, const uint16_t op, uint
 
 	if (shouldBreak)
 	{
-		return dsp56156_op_enddo(cpustate, op, cycles);
+		/* TODO: I think this PC = LA thing is off-by-1, but it's working this way because its consistently so */
+		PC = LA;
+
+		SR &= 0x3fff;
+		SR |= SSL & 0xc000;
+		SP--;
+
+		LA = SSH;
+		LC = SSL;
+		SP--;
+
+		cycles += 2;
+		return 0;
 	}
 
 	/* S L E U N Z V C */
@@ -3558,7 +3582,7 @@ static size_t dsp56156_op_bscc_1(dsp56156_core* cpustate, const uint16_t op, uin
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_bscc_1\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_bscc_1\n");
 	return 0;
 }
 
@@ -3587,7 +3611,7 @@ static size_t dsp56156_op_bsr_1(dsp56156_core* cpustate, const uint16_t op, uint
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_bsr_1\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_bsr_1\n");
 	return 0;
 }
 
@@ -3602,7 +3626,7 @@ static size_t dsp56156_op_chkaau(dsp56156_core* cpustate, const uint16_t op, uin
 	       address ALU is positive. */
 	/* N - Set if the result of the last address ALU update is negative. Cleared if the result of the
 	       last address ALU is positive. */
-	printf("dsp56156_op_chkaau\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_chkaau\n");
 	return 0;
 }
 
@@ -3611,7 +3635,7 @@ static size_t dsp56156_op_debug(dsp56156_core* cpustate, const uint16_t op, uint
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_debug\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_debug\n");
 	return 0;
 }
 
@@ -3620,7 +3644,7 @@ static size_t dsp56156_op_debugcc(dsp56156_core* cpustate, const uint16_t op, ui
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_debugcc\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_debugcc\n");
 	return 0;
 }
 
@@ -3724,7 +3748,7 @@ static size_t dsp56156_op_do(dsp56156_core* cpustate, const uint16_t op, const u
 {
 	/* S L E U N Z V C */
 	/* - * - - - - - - */
-	printf("dsp56156_op_do\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_do\n");
 	return 0;
 }
 
@@ -3791,21 +3815,13 @@ static size_t dsp56156_op_do_2(dsp56156_core* cpustate, const uint16_t op, const
 	else if (S.addr == &B) lValue = *((uint16_t*)(&B1));
 	else                   lValue = *((uint16_t*)S.addr);
 
-	/* HACK */
-	if (lValue >= 0xfff0)
-	{
-		cpustate->device->logerror("Dsp56156 : DO_2 operation changed %04x to 0000, pc:%04x ppc:%04x.\n", lValue, cpustate->PCU.pc, cpustate->ppc);
-		cpustate->device->machine().debug_break();
-		lValue = 0x0000;
-	}
-
 	/* TODO: Fix for special cased SP S */
 	if (S.addr == &SP)
-		cpustate->device->logerror("DSP56156: do with SP as the source not properly implemented yet.\n");
+		LOGMASKED(LOG_UNIMPLEMENTED, "DSP56156: do with SP as the source not properly implemented yet.\n");
 
 	/* TODO: Fix for special cased SSSL S */
 	if (S.addr == &SSL)
-		cpustate->device->logerror("DSP56156: do with SP as the source not properly implemented yet.\n");
+		LOGMASKED(LOG_UNIMPLEMENTED, "DSP56156: do with SP as the source not properly implemented yet.\n");
 
 	/* Don't execute if the loop counter == 0 */
 	if (lValue != 0x00)
@@ -3876,9 +3892,6 @@ static size_t dsp56156_op_doforever(dsp56156_core* cpustate, const uint16_t op, 
 /* ENDDO : 0000 0000 0000 1001 : A-92 */
 static size_t dsp56156_op_enddo(dsp56156_core* cpustate, const uint16_t op, uint8_t* cycles)
 {
-	/* TODO: I think this PC = LA thing is off-by-1, but it's working this way because its consistently so */
-	PC = LA;
-
 	SR &= 0x3fff;
 	SR |= SSL & 0xc000;
 	SP--;
@@ -3890,7 +3903,7 @@ static size_t dsp56156_op_enddo(dsp56156_core* cpustate, const uint16_t op, uint
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
 	cycles += 8;
-	return 0;
+	return 1;
 }
 
 /* EXT : 0001 0101 0101 F010 : A-96 */
@@ -3898,7 +3911,7 @@ static size_t dsp56156_op_ext(dsp56156_core* cpustate, const uint16_t op, uint8_
 {
 	/* S L E U N Z V C */
 	/* - * * * * * * - */
-	printf("dsp56156_op_ext\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_ext\n");
 	return 0;
 }
 
@@ -3907,7 +3920,7 @@ static size_t dsp56156_op_illegal(dsp56156_core* cpustate, const uint16_t op, ui
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_illegal\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_illegal\n");
 	return 0;
 }
 
@@ -3971,7 +3984,7 @@ static size_t dsp56156_op_impy(dsp56156_core* cpustate, const uint16_t op, uint8
 	/* Z - Set if the 24 most significant bits of the destination result are all zeroes. */
 	/* U,E - Will not be set correctly by this instruction*/
 	/* V - Set to zero regardless of the overflow */
-	printf("dsp56156_op_impy\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_impy\n");
 	return 0;
 }
 
@@ -3980,7 +3993,7 @@ static size_t dsp56156_op_jcc(dsp56156_core* cpustate, const uint16_t op, const 
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_jcc\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_jcc\n");
 	return 0;
 }
 
@@ -3989,7 +4002,7 @@ static size_t dsp56156_op_jcc_1(dsp56156_core* cpustate, const uint16_t op, uint
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_jcc_1\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_jcc_1\n");
 	return 0;
 }
 
@@ -4059,7 +4072,7 @@ static size_t dsp56156_op_jscc_1(dsp56156_core* cpustate, const uint16_t op, uin
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_jscc_1\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_jscc_1\n");
 	return 0;
 }
 
@@ -4088,7 +4101,7 @@ static size_t dsp56156_op_jsr_1(dsp56156_core* cpustate, const uint16_t op, uint
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_jsr_1\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_jsr_1\n");
 	return 0;
 }
 
@@ -4097,7 +4110,7 @@ static size_t dsp56156_op_jsr_2(dsp56156_core* cpustate, const uint16_t op, uint
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_jsr_2\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_jsr_2\n");
 	return 0;
 }
 
@@ -4142,7 +4155,7 @@ static size_t dsp56156_op_lea_1(dsp56156_core* cpustate, const uint16_t op, uint
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_lea_1\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_lea_1\n");
 	return 0;
 }
 
@@ -4196,7 +4209,7 @@ static size_t dsp56156_op_move_2(dsp56156_core* cpustate, const uint16_t op, con
 {
 	/* S L E U N Z V C */
 	/* * * - - - - - - */
-	printf("dsp56156_op_move_2\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_move_2\n");
 	return 0;
 }
 
@@ -4214,15 +4227,15 @@ static size_t dsp56156_op_movec(dsp56156_core* cpustate, const uint16_t op, uint
 	if (W)
 	{
 		/* Write D */
-		uint16_t value = cpustate->data.read_word(*((uint16_t*)R.addr)) ;
+		uint16_t value = cpustate->data.read_word(*((uint16_t*)R.addr));
 		typed_pointer temp_src = { &value, DT_WORD };
-		SetDestinationValue(cpustate, temp_src, SD);
+		dsp56156_set_destination_value(cpustate, temp_src, SD);
 	}
 	else
 	{
 		/* Read S */
 		uint16_t dataMemOffset = *((uint16_t*)R.addr);
-		SetDataMemoryValue(cpustate, SD, dataMemOffset);
+		dsp56156_set_data_memory_value(cpustate, SD, dataMemOffset);
 	}
 
 	execute_MM_table(cpustate, BITS(op,0x0003), BITS(op,0x000c));
@@ -4266,7 +4279,7 @@ static size_t dsp56156_op_movec_1(dsp56156_core* cpustate, const uint16_t op, ui
 			SD.addr = &((PAIR64*)SD.addr)->w.h;
 		}
 
-		SetDestinationValue(cpustate, temp_src, SD);
+		dsp56156_set_destination_value(cpustate, temp_src, SD);
 	}
 	else
 	{
@@ -4280,7 +4293,7 @@ static size_t dsp56156_op_movec_1(dsp56156_core* cpustate, const uint16_t op, ui
 		}
 
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
-		SetDataMemoryValue(cpustate, temp_src, memOffset);
+		dsp56156_set_data_memory_value(cpustate, temp_src, memOffset);
 	}
 
 	/* S L E U N Z V C */
@@ -4317,14 +4330,14 @@ static size_t dsp56156_op_movec_2(dsp56156_core* cpustate, const uint16_t op, ui
 		/* Write D */
 		uint16_t tempData = cpustate->data.read_word(memOffset);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
-		SetDestinationValue(cpustate, temp_src, SD);
+		dsp56156_set_destination_value(cpustate, temp_src, SD);
 	}
 	else
 	{
 		/* Read S */
 		uint16_t tempData = *((uint16_t*)SD.addr);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
-		SetDataMemoryValue(cpustate, temp_src, memOffset);
+		dsp56156_set_data_memory_value(cpustate, temp_src, memOffset);
 	}
 
 
@@ -4354,29 +4367,10 @@ static size_t dsp56156_op_movec_3(dsp56156_core* cpustate, const uint16_t op, co
 	t = BITS(op,0x0008);
 	decode_DDDDD_table(cpustate, BITS(op,0x03e0), &SD);
 
-	if (PC == 0x255)
-	{
-		//uint16_t model_data = cpustate->ALU.a.w.h;
-		/*if (model_data != 0x0102)
-		{
-			printf("Drawing model %02x (%04x) (Ignored)\n", model_data & 0x00ff, model_data);
-			PC = 0x628;
-			cycles += 2;
-			return 0;
-		}
-		else*/
-		{
-			//printf("Drawing model %02x (%04x) into %04x\n", model_data & 0x00ff, model_data, cpustate->data.read_word(0x2f6));
-		}
-	}
-	if (PC == 0x61F)
-	{
-		//printf("Storing span-store pointer: %04x\n", R1);
-	}
-	if (PC == 0x554)
-	{
-		//printf("Loading span-store pointer: %04x\n", cpustate->data.read_word(0x2f6));
-	}
+	// Useful Polygonet addresses:
+	// 0x255: cpustate->ALU.a.w.h contains model to draw, go to 0x628 to skip. Data RAM 0x2F6 contains address into which model spans are drawn
+	// 0x61F: R1 contains span-store pointer which is being stored
+	// 0x554: 0x2F6 contains span-store pointer which is being loaded
 
 	if (W)
 	{
@@ -4385,14 +4379,14 @@ static size_t dsp56156_op_movec_3(dsp56156_core* cpustate, const uint16_t op, co
 		{
 			/* 16-bit long data */
 			typed_pointer temp_src = { (void*)&op2, DT_WORD };
-			SetDestinationValue(cpustate, temp_src, SD);
+			dsp56156_set_destination_value(cpustate, temp_src, SD);
 		}
 		else
 		{
 			/* 16-bit long address */
 			uint16_t tempD = cpustate->data.read_word(op2);
 			typed_pointer tempTP = {&tempD, DT_WORD};
-			SetDestinationValue(cpustate, tempTP, SD);
+			dsp56156_set_destination_value(cpustate, tempTP, SD);
 		}
 	}
 	else
@@ -4401,12 +4395,12 @@ static size_t dsp56156_op_movec_3(dsp56156_core* cpustate, const uint16_t op, co
 		if (t)
 		{
 			/* 16-bit long data */
-			cpustate->device->logerror("DSP56156: Movec - I don't think this exists?");
+			LOGMASKED(LOG_UNIMPLEMENTED, "DSP56156: Potentially nonexistent movec_3 at %04x", PC);
 		}
 		else
 		{
 			/* 16-bit long address */
-			SetDataMemoryValue(cpustate, SD, op2);
+			dsp56156_set_data_memory_value(cpustate, SD, op2);
 		}
 	}
 
@@ -4434,22 +4428,28 @@ static size_t dsp56156_op_movec_4(dsp56156_core* cpustate, const uint16_t op, ui
 	decode_DDDDD_table(cpustate, BITS(op,0x03e0), &S);
 	decode_DDDDD_table(cpustate, BITS(op,0x001f), &D);
 
-	if (S.data_type == DT_LONG_WORD && D.data_type == DT_LONG_WORD && S.addr == D.addr)
+	const bool both_accum = (S.data_type == DT_LONG_WORD && D.data_type == DT_LONG_WORD);
+
+	if (S.data_type == DT_LONG_WORD && D.data_type == DT_WORD)
 	{
-		*(uint64_t*)D.addr &= 0x00000000ffff0000;
+		S.data_type = DT_WORD;
+		if (S.addr == &A)
+			S.addr = &A1;
+		else if (S.addr == &B)
+			S.addr = &B1;
+		dsp56156_set_destination_value(cpustate, S, D);
+	}
+	else if (both_accum)
+	{
+		typed_pointer tempTP;
+		uint64_t temp_val = dsp56156_limit_long_to_long(cpustate, *(uint64_t*)S.addr);
+		tempTP.addr = &temp_val;
+		tempTP.data_type = DT_LONG_WORD;
+		dsp56156_set_destination_value(cpustate, tempTP, D);
 	}
 	else
 	{
-		if (S.data_type == DT_LONG_WORD && D.data_type == DT_WORD)
-		{
-			S.data_type = DT_WORD;
-			if (S.addr == &A)
-				S.addr = &A1;
-			else if (S.addr == &B)
-				S.addr = &B1;
-		}
-
-		SetDestinationValue(cpustate, S, D);
+		dsp56156_set_destination_value(cpustate, S, D);
 	}
 
 	/* S L E U N Z V C */
@@ -4486,14 +4486,14 @@ static size_t dsp56156_op_movec_5(dsp56156_core* cpustate, const uint16_t op, co
 		/* Write D */
 		uint16_t tempData = cpustate->data.read_word(memOffset);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
-		SetDestinationValue(cpustate, temp_src, SD);
+		dsp56156_set_destination_value(cpustate, temp_src, SD);
 	}
 	else
 	{
 		/* Read S */
 		uint16_t tempData = *((uint16_t*)SD.addr);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
-		SetDataMemoryValue(cpustate, temp_src, memOffset);
+		dsp56156_set_data_memory_value(cpustate, temp_src, memOffset);
 	}
 
 	/* S L E U N Z V C */
@@ -4524,7 +4524,7 @@ static size_t dsp56156_op_movei(dsp56156_core* cpustate, const uint16_t op, uint
 
 	decode_DD_table(cpustate, BITS(op,0x0300), &D);
 
-	SetDestinationValue(cpustate, immTP, D);
+	dsp56156_set_destination_value(cpustate, immTP, D);
 
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
@@ -4551,12 +4551,12 @@ static size_t dsp56156_op_movem(dsp56156_core* cpustate, const uint16_t op, uint
 
 		data.addr = &ldata;
 		data.data_type = DT_WORD;
-		SetDestinationValue(cpustate, data, SD) ;
+		dsp56156_set_destination_value(cpustate, data, SD);
 	}
 	else
 	{
 		/* Write to Program Memory */
-		SetProgramMemoryValue(cpustate, SD, *((uint16_t*)R.addr)) ;
+		dsp56156_set_program_memory_value(cpustate, SD, *((uint16_t*)R.addr));
 	}
 
 	execute_MM_table(cpustate, BITS(op,0x00c0), BITS(op,0x0018));
@@ -4573,7 +4573,7 @@ static size_t dsp56156_op_movem_1(dsp56156_core* cpustate, const uint16_t op, ui
 {
 	/* S L E U N Z V C */
 	/* * * - - - - - - */
-	printf("dsp56156_op_movem_1\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_movem_1\n");
 	return 0;
 }
 
@@ -4582,7 +4582,7 @@ static size_t dsp56156_op_movem_2(dsp56156_core* cpustate, const uint16_t op, co
 {
 	/* S L E U N Z V C */
 	/* * * - - - - - - */
-	printf("dsp56156_op_movem_2\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_movem_2\n");
 	return 0;
 }
 
@@ -4609,11 +4609,11 @@ static size_t dsp56156_op_movep(dsp56156_core* cpustate, const uint16_t op, uint
 		tempTP.addr = &data;
 		tempTP.data_type = DT_WORD;
 
-		SetDestinationValue(cpustate, tempTP, SD);
+		dsp56156_set_destination_value(cpustate, tempTP, SD);
 	}
 	else
 	{
-		SetDataMemoryValue(cpustate, SD, pp);
+		dsp56156_set_data_memory_value(cpustate, SD, pp);
 	}
 
 	/* S L E U N Z V C */
@@ -4648,12 +4648,12 @@ static size_t dsp56156_op_movep_1(dsp56156_core* cpustate, const uint16_t op, ui
 		tempTP.addr = &data;
 		tempTP.data_type = DT_WORD;
 
-		SetDataMemoryValue(cpustate, tempTP, pp);
+		dsp56156_set_data_memory_value(cpustate, tempTP, pp);
 	}
 	else
 	{
 		/* TODO */
-		fatalerror("dsp56156 : move(p) NOTHING HERE (yet)\n") ;
+		fatalerror("dsp56156 : move(p) NOTHING HERE (yet)\n");
 	}
 
 	/* Postincrement */
@@ -4671,7 +4671,7 @@ static size_t dsp56156_op_moves(dsp56156_core* cpustate, const uint16_t op, uint
 {
 	/* S L E U N Z V C */
 	/* * * - - - - - - */
-	printf("dsp56156_op_moves\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_moves\n");
 	return 0;
 }
 
@@ -4725,7 +4725,7 @@ static size_t dsp56156_op_negc(dsp56156_core* cpustate, const uint16_t op, uint8
 {
 	/* S L E U N Z V C */
 	/* - * * * * * * * */
-	printf("dsp56156_op_negc\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_negc\n");
 	return 0;
 }
 
@@ -4744,7 +4744,7 @@ static size_t dsp56156_op_norm(dsp56156_core* cpustate, const uint16_t op, uint8
 	/* - * * * * * ? - */
 	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if the most significantst
 	       bit of the destination operand is changed as a result of the left shift. Cleared otherwise. */
-	printf("dsp56156_op_norm\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_norm\n");
 	return 0;
 }
 
@@ -4755,7 +4755,7 @@ static size_t dsp56156_op_ori(dsp56156_core* cpustate, const uint16_t op, uint8_
 	/* - ? ? ? ? ? ? ? */
 	/* All ? bits - Set if the corresponding bit in the immediate data is set and if the operand is the
 	   CCR. Not affected otherwise. */
-	printf("dsp56156_op_ori\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_ori\n");
 	return 0;
 }
 
@@ -4764,7 +4764,7 @@ static size_t dsp56156_op_rep(dsp56156_core* cpustate, const uint16_t op, uint8_
 {
 	/* S L E U N Z V C */
 	/* - * - - - - - - */
-	printf("dsp56156_op_rep\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_rep\n");
 	return 0;
 }
 
@@ -4809,7 +4809,7 @@ static size_t dsp56156_op_rep_2(dsp56156_core* cpustate, const uint16_t op, uint
 
 	/* TODO: handle special A&B source cases */
 	if (D.addr == &A || D.addr == &B)
-		cpustate->device->logerror("DSP56156 ERROR : Rep with A or B instruction not implemented yet!\n");
+		LOGMASKED(LOG_UNIMPLEMENTED, "DSP56156 ERROR: rep_2 with A or B instruction not implemented yet at %04x\n", PC);
 
 	repValue = *((uint16_t*)D.addr);
 
@@ -4842,7 +4842,7 @@ static size_t dsp56156_op_repcc(dsp56156_core* cpustate, const uint16_t op, uint
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_repcc\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_repcc\n");
 	return 0;
 }
 
@@ -4851,7 +4851,7 @@ static size_t dsp56156_op_reset(dsp56156_core* cpustate, const uint16_t op, uint
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_reset\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_reset\n");
 	return 0;
 }
 
@@ -4898,7 +4898,7 @@ static size_t dsp56156_op_stop(dsp56156_core* cpustate, const uint16_t op, uint8
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_stop\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_stop\n");
 	return 0;
 }
 
@@ -4907,7 +4907,7 @@ static size_t dsp56156_op_swap(dsp56156_core* cpustate, const uint16_t op, uint8
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_swap\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_swap\n");
 	return 0;
 }
 
@@ -4916,7 +4916,7 @@ static size_t dsp56156_op_swi(dsp56156_core* cpustate, const uint16_t op, uint8_
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_swi\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_swi\n");
 	return 0;
 }
 
@@ -4933,11 +4933,11 @@ static size_t dsp56156_op_tcc(dsp56156_core* cpustate, const uint16_t op, uint8_
 		typed_pointer D2 = {nullptr, DT_BYTE};
 
 		decode_h0hF_table(cpustate, BITS(op,0x0007),BITS(op,0x0008), &S, &D);
-		SetDestinationValue(cpustate, S, D);
+		dsp56156_set_destination_value(cpustate, S, D);
 
 		/* TODO: What's up with that A,A* thing in the docs?  Can you only ignore the R0->RX transfer if you do an A,A? */
 		decode_RR_table(cpustate, BITS(op,0x0030), &D2); /* TT is the same as RR */
-		SetDestinationValue(cpustate, S2, D2);
+		dsp56156_set_destination_value(cpustate, S2, D2);
 	}
 
 	/* S L E U N Z V C */
@@ -4954,7 +4954,7 @@ static size_t dsp56156_op_tfr2(dsp56156_core* cpustate, const uint16_t op, uint8
 
 	decode_JF_table(cpustate, BITS(op,0x0001), BITS(op,0x0008), &S, &D);
 
-	SetDestinationValue(cpustate, S, D);
+	dsp56156_set_destination_value(cpustate, S, D);
 
 	/* S L E U N Z V C */
 	/* - * - - - - - - */
@@ -4968,7 +4968,7 @@ static size_t dsp56156_op_tfr3(dsp56156_core* cpustate, const uint16_t op, uint8
 {
 	/* S L E U N Z V C */
 	/* * * - - - - - - */
-	printf("dsp56156_op_tfr3\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_tfr3\n");
 	return 0;
 }
 
@@ -4998,7 +4998,7 @@ static size_t dsp56156_op_wait(dsp56156_core* cpustate, const uint16_t op, uint8
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	printf("dsp56156_op_wait\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_wait\n");
 	return 0;
 }
 
@@ -5007,7 +5007,7 @@ static size_t dsp56156_op_zero(dsp56156_core* cpustate, const uint16_t op, uint8
 {
 	/* S L E U N Z V C */
 	/* - * * * * * * - */
-	printf("dsp56156_op_zero\n");
+	LOGMASKED(LOG_UNIMPLEMENTED, "dsp56156_op_zero\n");
 	return 0;
 }
 
@@ -5067,8 +5067,8 @@ static void decode_DDDDD_table(dsp56156_core* cpustate, uint16_t DDDDD, typed_po
 		case 0x01: ret->addr = &Y0;  ret->data_type = DT_WORD;       break;
 		case 0x02: ret->addr = &X1;  ret->data_type = DT_WORD;       break;
 		case 0x03: ret->addr = &Y1;  ret->data_type = DT_WORD;       break;
-		case 0x04: ret->addr = &A ;  ret->data_type = DT_LONG_WORD;  break;
-		case 0x05: ret->addr = &B ;  ret->data_type = DT_LONG_WORD;  break;
+		case 0x04: ret->addr = &A;   ret->data_type = DT_LONG_WORD;  break;
+		case 0x05: ret->addr = &B;   ret->data_type = DT_LONG_WORD;  break;
 		case 0x06: ret->addr = &A0;  ret->data_type = DT_WORD;       break;
 		case 0x07: ret->addr = &B0;  ret->data_type = DT_WORD;       break;
 		case 0x08: ret->addr = &LC;  ret->data_type = DT_WORD;       break;
@@ -5138,7 +5138,7 @@ static void decode_F_table(dsp56156_core* cpustate, uint16_t F, typed_pointer* r
 
 static void decode_h0hF_table(dsp56156_core* cpustate, uint16_t h0h, uint16_t F, typed_pointer* src_ret, typed_pointer* dst_ret)
 {
-	uint16_t switchVal = (h0h << 1) | F ;
+	uint16_t switchVal = (h0h << 1) | F;
 
 	switch (switchVal)
 	{
@@ -5181,10 +5181,10 @@ static void decode_HHH_table(dsp56156_core* cpustate, uint16_t HHH, typed_pointe
 
 static void decode_IIII_table(dsp56156_core* cpustate, uint16_t IIII, typed_pointer* src_ret, typed_pointer* dst_ret, void *working)
 {
-	void *opposite = nullptr ;
+	void *opposite = nullptr;
 
-	if (working == &A) opposite = &B ;
-	else               opposite = &A ;
+	if (working == &A) opposite = &B;
+	else               opposite = &A;
 
 	switch(IIII)
 	{
@@ -5196,8 +5196,10 @@ static void decode_IIII_table(dsp56156_core* cpustate, uint16_t IIII, typed_poin
 		case 0x5: src_ret->addr = &B1;      src_ret->data_type = DT_WORD;       dst_ret->addr = &Y0;       dst_ret->data_type = DT_WORD;       break;
 		case 0x6: src_ret->addr = &A0;      src_ret->data_type = DT_WORD;       dst_ret->addr = &X0;       dst_ret->data_type = DT_WORD;       break;
 		case 0x7: src_ret->addr = &B0;      src_ret->data_type = DT_WORD;       dst_ret->addr = &Y0;       dst_ret->data_type = DT_WORD;       break;
-		case 0x8: src_ret->addr = working;  src_ret->data_type = DT_LONG_WORD;  dst_ret->addr = opposite;  dst_ret->data_type = DT_LONG_WORD;  break;
+		case 0x8:
 		case 0x9: src_ret->addr = working;  src_ret->data_type = DT_LONG_WORD;  dst_ret->addr = opposite;  dst_ret->data_type = DT_LONG_WORD;  break;
+		//case 0x8:
+		//case 0x9: src_ret->addr = &((PAIR64*)working)->w.h;  src_ret->data_type = DT_WORD;        dst_ret->addr = opposite;  dst_ret->data_type = DT_LONG_WORD;       break;
 		case 0xc: src_ret->addr = &A1;      src_ret->data_type = DT_WORD;       dst_ret->addr = &X1;       dst_ret->data_type = DT_WORD;       break;
 		case 0xd: src_ret->addr = &B1;      src_ret->data_type = DT_WORD;       dst_ret->addr = &Y1;       dst_ret->data_type = DT_WORD;       break;
 		case 0xe: src_ret->addr = &A0;      src_ret->data_type = DT_WORD;       dst_ret->addr = &X1;       dst_ret->data_type = DT_WORD;       break;
@@ -5207,7 +5209,7 @@ static void decode_IIII_table(dsp56156_core* cpustate, uint16_t IIII, typed_poin
 
 static void decode_JJJF_table(dsp56156_core* cpustate, uint16_t JJJ, uint16_t F, typed_pointer* src_ret, typed_pointer* dst_ret)
 {
-	uint16_t switchVal = (JJJ << 1) | F ;
+	uint16_t switchVal = (JJJ << 1) | F;
 
 	switch(switchVal)
 	{
@@ -5230,7 +5232,7 @@ static void decode_JJJF_table(dsp56156_core* cpustate, uint16_t JJJ, uint16_t F,
 
 static void decode_JJF_table(dsp56156_core* cpustate, uint16_t JJ, uint16_t F, typed_pointer* src_ret, typed_pointer* dst_ret)
 {
-	uint16_t switchVal = (JJ << 1) | F ;
+	uint16_t switchVal = (JJ << 1) | F;
 
 	switch (switchVal)
 	{
@@ -5247,7 +5249,7 @@ static void decode_JJF_table(dsp56156_core* cpustate, uint16_t JJ, uint16_t F, t
 
 static void decode_JF_table(dsp56156_core* cpustate, uint16_t J, uint16_t F, typed_pointer* src_ret, typed_pointer* dst_ret)
 {
-	uint16_t switchVal = (J << 1) | F ;
+	uint16_t switchVal = (J << 1) | F;
 
 	switch (switchVal)
 	{
@@ -5260,10 +5262,10 @@ static void decode_JF_table(dsp56156_core* cpustate, uint16_t J, uint16_t F, typ
 
 static void decode_KKK_table(dsp56156_core* cpustate, uint16_t KKK, typed_pointer* dst_ret1, typed_pointer* dst_ret2, void* working)
 {
-	void *opposite = nullptr ;
+	void *opposite = nullptr;
 
-	if (working == &A) opposite = &B ;
-	else               opposite = &A ;
+	if (working == &A) opposite = &B;
+	else               opposite = &A;
 
 	switch(KKK)
 	{
@@ -5280,7 +5282,7 @@ static void decode_KKK_table(dsp56156_core* cpustate, uint16_t KKK, typed_pointe
 
 static void decode_QQF_table(dsp56156_core* cpustate, uint16_t QQ, uint16_t F, void **S1, void **S2, void **D)
 {
-	uint16_t switchVal = (QQ << 1) | F ;
+	uint16_t switchVal = (QQ << 1) | F;
 
 	switch(switchVal)
 	{
@@ -5297,7 +5299,7 @@ static void decode_QQF_table(dsp56156_core* cpustate, uint16_t QQ, uint16_t F, v
 
 static void decode_QQF_special_table(dsp56156_core* cpustate, uint16_t QQ, uint16_t F, void **S1, void **S2, void **D)
 {
-	uint16_t switchVal = (QQ << 1) | F ;
+	uint16_t switchVal = (QQ << 1) | F;
 
 	switch(switchVal)
 	{
@@ -5446,8 +5448,8 @@ static void decode_Z_table(dsp56156_core* cpustate, uint16_t Z, typed_pointer* r
 
 static void execute_m_table(dsp56156_core* cpustate, int x, uint16_t m)
 {
-	uint16_t *rX = nullptr ;
-	uint16_t *nX = nullptr ;
+	uint16_t *rX = nullptr;
+	uint16_t *nX = nullptr;
 
 	switch(x)
 	{
@@ -5488,8 +5490,8 @@ static void execute_mm_table(dsp56156_core* cpustate, uint16_t rnum, uint16_t mm
 
 static void execute_MM_table(dsp56156_core* cpustate, uint16_t rnum, uint16_t MM)
 {
-	uint16_t *rX = nullptr ;
-	uint16_t *nX = nullptr ;
+	uint16_t *rX = nullptr;
+	uint16_t *nX = nullptr;
 
 	switch(rnum)
 	{
@@ -5502,9 +5504,9 @@ static void execute_MM_table(dsp56156_core* cpustate, uint16_t rnum, uint16_t MM
 	switch(MM)
 	{
 		case 0x0: /* do nothing */      break;
-		case 0x1: (*rX)++ ;             break;
-		case 0x2: (*rX)-- ;             break;
-		case 0x3: (*rX) = (*rX)+(*nX) ; break;
+		case 0x1: (*rX)++;              break;
+		case 0x2: (*rX)--;              break;
+		case 0x3: (*rX) = (*rX)+(*nX);  break;
 	}
 }
 
@@ -5524,8 +5526,8 @@ static uint16_t execute_q_table(dsp56156_core* cpustate, int RR, uint16_t q)
 
 	switch(q)
 	{
-		case 0x0: /* No permanent changes */ ; return (*rX)+(*nX);
-		case 0x1: (*rX)--;                     return (*rX);    /* This one is special - it's a *PRE-decrement*! */
+		case 0x0: /* No permanent changes */; return (*rX)+(*nX);
+		case 0x1: (*rX)--;                    return (*rX);    /* This one is special - it's a *PRE-decrement*! */
 	}
 
 	/* Should not get here */
@@ -5555,7 +5557,7 @@ static void execute_z_table(dsp56156_core* cpustate, int RR, uint16_t z)
 
 static uint16_t assemble_address_from_Pppppp_table(dsp56156_core* cpustate, uint16_t P, uint16_t ppppp)
 {
-	uint16_t destAddr = 0x00 ;
+	uint16_t destAddr = 0x00;
 
 	switch (P)
 	{
@@ -5563,7 +5565,7 @@ static uint16_t assemble_address_from_Pppppp_table(dsp56156_core* cpustate, uint
 		case 0x1: destAddr = assemble_address_from_IO_short_address(cpustate, ppppp);  break;
 	}
 
-	return destAddr ;
+	return destAddr;
 }
 
 static uint16_t assemble_address_from_IO_short_address(dsp56156_core* cpustate, uint16_t pp)
@@ -5575,11 +5577,11 @@ static uint16_t assemble_address_from_IO_short_address(dsp56156_core* cpustate, 
 
 static uint16_t assemble_address_from_6bit_signed_relative_short_address(dsp56156_core* cpustate, uint16_t srs)
 {
-	uint16_t fullAddy = srs ;
+	uint16_t fullAddy = srs;
 	if (fullAddy & 0x0020)
-		fullAddy |= 0xffc0 ;
+		fullAddy |= 0xffc0;
 
-	return fullAddy ;
+	return fullAddy;
 }
 
 static void dsp56156_process_loop(dsp56156_core* cpustate)
@@ -5681,32 +5683,40 @@ static void execute_register_to_register_data_move(dsp56156_core* cpustate, cons
 
 	decode_IIII_table(cpustate, BITS(op,0x0f00), &S, &D, d_register->addr);
 
-	bool d_is_a = d_register->addr == &A0 || d_register->addr == &A1;
-	bool d_is_b = d_register->addr == &B0 || d_register->addr == &B1;
-	bool s_is_a = S.addr == &A0 || S.addr == &A1;
-	bool s_is_b = S.addr == &B0 || S.addr == &B1;
+	const bool opdest_is_a = d_register->addr == &A0 || d_register->addr == &A1;
+	const bool opdest_is_b = d_register->addr == &B0 || d_register->addr == &B1;
+	const bool s_is_a = S.addr == &A0 || S.addr == &A1;
+	const bool s_is_b = S.addr == &B0 || S.addr == &B1;
 
 	/* If the source is the same as the ALU destination, use the previous accumulator value */
-	if ((d_is_a && s_is_a) || (d_is_b && s_is_b))
+	if ((opdest_is_a && s_is_a) || (opdest_is_b && s_is_b))
 	{
 		typed_pointer tempTP;
-		uint16_t temp_val = 0;
+		uint64_t temp_long = 0ULL;
+		uint16_t temp_word = 0U;
 		if (S.addr == &A1 || S.addr == &B1)
 		{
-			temp_val = (uint16_t)(*prev_accum_value >> 16);
-			tempTP.addr = &temp_val;
+			temp_word = (uint16_t)(*prev_accum_value >> 16);
+			tempTP.addr = &temp_word;
 			tempTP.data_type = DT_WORD;
+		}
+		else if (S.data_type == DT_LONG_WORD)
+		{
+			temp_long = dsp56156_limit_long_to_long(cpustate, *prev_accum_value);
+			tempTP.addr = &temp_long;
+			tempTP.data_type = DT_LONG_WORD;
 		}
 		else
 		{
-			tempTP.addr = prev_accum_value;
-			tempTP.data_type = DT_LONG_WORD;
+			temp_word = (uint16_t)*prev_accum_value;
+			tempTP.addr = &temp_word;
+			tempTP.data_type = DT_WORD;
 		}
-		SetDestinationValue(cpustate, tempTP, D);
+		dsp56156_set_destination_value(cpustate, tempTP, D);
 	}
 	else
 	{
-		SetDestinationValue(cpustate, S, D);
+		dsp56156_set_destination_value(cpustate, S, D);
 	}
 }
 
@@ -5736,7 +5746,7 @@ static void execute_x_memory_data_move(dsp56156_core* cpustate, const uint16_t o
 		tempTP.addr = &data;
 		tempTP.data_type = DT_WORD;
 
-		SetDestinationValue(cpustate, tempTP, SD);
+		dsp56156_set_destination_value(cpustate, tempTP, SD);
 	}
 	else
 	{
@@ -5748,11 +5758,11 @@ static void execute_x_memory_data_move(dsp56156_core* cpustate, const uint16_t o
 			tempTP.addr = prev_accum_value;
 			tempTP.data_type = DT_LONG_WORD;
 
-			SetDataMemoryValue(cpustate, tempTP, *((uint16_t*)R.addr)) ;
+			dsp56156_set_data_memory_value(cpustate, tempTP, *((uint16_t*)R.addr));
 		}
 		else
 		{
-			SetDataMemoryValue(cpustate, SD, *((uint16_t*)R.addr)) ;
+			dsp56156_set_data_memory_value(cpustate, SD, *((uint16_t*)R.addr));
 		}
 	}
 
@@ -5780,12 +5790,12 @@ static void execute_x_memory_data_move2(dsp56156_core* cpustate, const uint16_t 
 		/* Write D */
 		uint16_t value = cpustate->data.read_word(*mem_offset);
 		typed_pointer tempV = {&value, DT_WORD};
-		SetDestinationValue(cpustate, tempV, SD);
+		dsp56156_set_destination_value(cpustate, tempV, SD);
 	}
 	else
 	{
 		/* Read S */
-		SetDataMemoryValue(cpustate, SD, *mem_offset);
+		dsp56156_set_data_memory_value(cpustate, SD, *mem_offset);
 	}
 }
 
@@ -5808,14 +5818,14 @@ static void execute_x_memory_data_move_with_short_displacement(dsp56156_core* cp
 		/* Write D */
 		uint16_t tempData = cpustate->data.read_word(memOffset);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
-		SetDestinationValue(cpustate, temp_src, SD);
+		dsp56156_set_destination_value(cpustate, temp_src, SD);
 	}
 	else
 	{
 		/* Read S */
 		uint16_t tempData = *((uint16_t*)SD.addr);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
-		SetDataMemoryValue(cpustate, temp_src, memOffset);
+		dsp56156_set_data_memory_value(cpustate, temp_src, memOffset);
 	}
 }
 
@@ -5841,20 +5851,20 @@ static void execute_dual_x_memory_data_read(dsp56156_core* cpustate, const uint1
 	if (*((uint16_t*)R.addr) >= 0xffc0 || R3 >= 0xffc0)
 	{
 		cpustate->device->machine().debug_break();
-		printf("Dsp56156: Unimplemented access to external X Data Memory >= 0xffc0 in Dual X Memory Data Read at %04x.\n", cpustate->PCU.pc);
+		LOGMASKED(LOG_UNIMPLEMENTED, "Dsp56156: Unimplemented access to external X Data Memory >= 0xffc0 in Dual X Memory Data Read at %04x.\n", cpustate->PCU.pc);
 	}
 
 	/* First memmove */
 	srcVal1 = cpustate->data.read_word(*((uint16_t*)R.addr));
 	tempV.addr = &srcVal1;
 	tempV.data_type = DT_WORD;
-	SetDestinationValue(cpustate, tempV, D1);
+	dsp56156_set_destination_value(cpustate, tempV, D1);
 
 	/* Second memmove */
 	srcVal2 = cpustate->data.read_word(R3);
 	tempV.addr = &srcVal2;
 	tempV.data_type = DT_WORD;
-	SetDestinationValue(cpustate, tempV, D2);
+	dsp56156_set_destination_value(cpustate, tempV, D2);
 
 	/* Touch up the R regs after all the moves */
 	execute_mm_table(cpustate, BITS(op,0x0060), BITS(op,0x1800));
@@ -5863,40 +5873,38 @@ static void execute_dual_x_memory_data_read(dsp56156_core* cpustate, const uint1
 /***************************************************************************
     Helper Functions
 ***************************************************************************/
-static uint16_t Dsp56156OpMask(uint16_t cur, uint16_t mask)
+static uint16_t dsp56156_op_mask(uint16_t cur, uint16_t mask)
 {
-	int i ;
-
-	uint16_t retVal = (cur & mask) ;
-	uint16_t temp = 0x0000 ;
-	int offsetCount = 0 ;
+	uint16_t retVal = (cur & mask);
+	uint16_t temp = 0x0000;
+	int offsetCount = 0;
 
 	/* Shift everything right, eliminating 'whitespace' */
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		if (mask & (0x1<<i))        /* If mask bit is non-zero */
+		if (BIT(mask, i))        /* If mask bit is non-zero */
 		{
-			temp |= (((retVal >> i) & 0x1) << offsetCount) ;
-			offsetCount++ ;
+			temp |= (BIT(retVal, i) << offsetCount);
+			offsetCount++;
 		}
 	}
 
-	return temp ;
+	return temp;
 }
 
-static void SetDestinationValue(dsp56156_core* cpustate, typed_pointer source, typed_pointer dest)
+static uint64_t dsp56156_limit_long_to_long(dsp56156_core* /*cpustate*/, uint64_t val)
 {
-	uint64_t destinationValue = 0 ;
-	if (dest.addr == nullptr)
-	{
-		printf("nullptr dest at %04x\n", cpustate->PCU.pc);
-		fflush(stdout);
-	}
-	if (source.addr == nullptr)
-	{
-		printf("nullptr source at %04x\n", cpustate->PCU.pc);
-		fflush(stdout);
-	}
+	int32_t signed_upper = (int32_t)(val >> 8) >> 8;
+	if (signed_upper < -32768)
+		return 0x000000ff80000000ULL;
+	else if (signed_upper > 32767)
+		return 0x000000007fff0000ULL;
+	return val & 0x000000ffffff0000ULL;
+}
+
+static void dsp56156_set_destination_value(dsp56156_core* cpustate, typed_pointer source, typed_pointer dest)
+{
+	uint64_t destinationValue = 0;
 
 	switch(dest.data_type)
 	{
@@ -5923,7 +5931,7 @@ static void SetDestinationValue(dsp56156_core* cpustate, typed_pointer source, t
 					/* TODO: Shift limiter action! A-147 */
 					if (dest.addr == &A || dest.addr == &B)
 					{
-						printf("%04x: Double-check SetDestinationValue, writing A/B to a word.\n", cpustate->PCU.pc);
+						LOGMASKED(LOG_CHECKS, "%04x: Double-check dsp56156_set_destination_value, writing A/B to a word.\n", cpustate->PCU.pc);
 					}
 					break;
 			}
@@ -5959,13 +5967,13 @@ static void SetDestinationValue(dsp56156_core* cpustate, typed_pointer source, t
 }
 
 /* TODO: Wait-state timings! */
-static void SetDataMemoryValue(dsp56156_core* cpustate, typed_pointer source, uint32_t destinationAddr)
+static void dsp56156_set_data_memory_value(dsp56156_core* cpustate, typed_pointer source, uint32_t destinationAddr)
 {
 	switch(source.data_type)
 	{
-		case DT_BYTE:        cpustate->data.write_word(destinationAddr, (uint16_t)( (*((uint8_t*) source.addr) & 0xff)));		break;
-		case DT_WORD:        cpustate->data.write_word(destinationAddr, (uint16_t)( (*((uint16_t*)source.addr) & 0xffff)));		break;
-		case DT_DOUBLE_WORD: cpustate->data.write_word(destinationAddr, (uint16_t)( (*((uint32_t*)source.addr) & 0x0000ffff)));	break;
+		case DT_BYTE:        cpustate->data.write_word(destinationAddr, (uint16_t)( (*((uint8_t*) source.addr) & 0xff)));       break;
+		case DT_WORD:        cpustate->data.write_word(destinationAddr, (uint16_t)( (*((uint16_t*)source.addr) & 0xffff)));     break;
+		case DT_DOUBLE_WORD: cpustate->data.write_word(destinationAddr, (uint16_t)( (*((uint32_t*)source.addr) & 0x0000ffff))); break;
 
 		/* !!! Is this universal ??? */
 		/* !!! Forget not, yon shift-limiter !!! */
@@ -5974,13 +5982,13 @@ static void SetDataMemoryValue(dsp56156_core* cpustate, typed_pointer source, ui
 }
 
 /* TODO: Wait-state timings! */
-static void SetProgramMemoryValue(dsp56156_core* cpustate, typed_pointer source, uint32_t destinationAddr)
+static void dsp56156_set_program_memory_value(dsp56156_core* cpustate, typed_pointer source, uint32_t destinationAddr)
 {
 	switch(source.data_type)
 	{
-		case DT_BYTE:        cpustate->program.write_word(destinationAddr, (uint16_t)( (*((uint8_t*) source.addr) & 0xff)));		break;
-		case DT_WORD:        cpustate->program.write_word(destinationAddr, (uint16_t)( (*((uint16_t*)source.addr) & 0xffff)));		break;
-		case DT_DOUBLE_WORD: cpustate->program.write_word(destinationAddr, (uint16_t)( (*((uint32_t*)source.addr) & 0x0000ffff)));	break;
+		case DT_BYTE:        cpustate->program.write_word(destinationAddr, (uint16_t)( (*((uint8_t*) source.addr) & 0xff)));        break;
+		case DT_WORD:        cpustate->program.write_word(destinationAddr, (uint16_t)( (*((uint16_t*)source.addr) & 0xffff)));      break;
+		case DT_DOUBLE_WORD: cpustate->program.write_word(destinationAddr, (uint16_t)( (*((uint32_t*)source.addr) & 0x0000ffff)));  break;
 
 		/* !!! Is this universal ??? */
 		/* !!! Forget not, yon shift-limiter !!! */
