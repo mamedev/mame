@@ -12,7 +12,7 @@
 #ifndef MAME_BUS_A2BUS_CARDS_H
 #define MAME_BUS_A2BUS_CARDS_H
 
-#include "bus/a2bus/a2bus.h"
+#pragma once
 
 void apple2_slot0_cards(device_slot_interface &device) ATTR_COLD;
 void apple2_cards(device_slot_interface &device) ATTR_COLD;
