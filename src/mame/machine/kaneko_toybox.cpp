@@ -417,9 +417,8 @@ void kaneko_toybox_device::decrypt_rom()
 
 void kaneko_toybox_device::handle_04_subcommand(uint8_t mcu_subcmd, uint16_t *mcu_ram)
 {
-	uint8_t* src = (uint8_t *)&m_mcudata[0x10000];
-	uint8_t* dst = (uint8_t *)mcu_ram;
-	int offs = (mcu_subcmd & 0x3f) * 8;
+	uint8_t const *const src = &m_mcudata[0x10000];
+	int const offs = (mcu_subcmd & 0x3f) * 8;
 
 	//uint16_t unused = src[offs + 0] | (src[offs + 1] << 8);
 	uint16_t romstart = src[offs + 2] | (src[offs + 3] << 8);
@@ -429,9 +428,10 @@ void kaneko_toybox_device::handle_04_subcommand(uint8_t mcu_subcmd, uint16_t *mc
 
 	//printf("romstart %04x length %04x\n", romstart, romlength);
 
+	auto const dst = util::little_endian_cast<uint8_t>(mcu_ram);
 	for (int x = 0; x < romlength; x++)
 	{
-		dst[BYTE_XOR_LE(ramdest + x)] = src[(romstart + x)];
+		dst[ramdest + x] = src[romstart + x];
 	}
 }
 

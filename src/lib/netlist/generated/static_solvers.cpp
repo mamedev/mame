@@ -43299,7 +43299,7 @@ static void nl_gcr_62_double_double_afce66fb47d3c5f3(double * __restrict V, cons
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
-// pongf
+// pong
 static void nl_gcr_10_double_double_13e7b5ac1a260dbf(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
 {
@@ -43375,7 +43375,7 @@ static void nl_gcr_10_double_double_13e7b5ac1a260dbf(double * __restrict V, cons
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
-// pongf
+// pong
 static void nl_gcr_35_double_double_dbafc5ddaf7a08f8(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
 {
@@ -43621,7 +43621,7 @@ static void nl_gcr_35_double_double_dbafc5ddaf7a08f8(double * __restrict V, cons
 	V[0] = (RHS0 - tmp0) / m_A0;
 }
 
-// pongf
+// pong
 static void nl_gcr_7_double_double_e51b463cd890ef6d(double * __restrict V, const double * __restrict go, const double * __restrict gt, const double * __restrict Idr, const double * const * __restrict cnV)
 
 {
@@ -80369,11 +80369,11 @@ const plib::static_library::symbol nl_static_solver_syms[] = {
 	{"nl_gcr_29_double_double_80b4b1e5cc58d303", reinterpret_cast<void *>(&nl_gcr_29_double_double_80b4b1e5cc58d303)}, // NOLINT
 // mario
 	{"nl_gcr_62_double_double_afce66fb47d3c5f3", reinterpret_cast<void *>(&nl_gcr_62_double_double_afce66fb47d3c5f3)}, // NOLINT
-// pongf
+// pong
 	{"nl_gcr_10_double_double_13e7b5ac1a260dbf", reinterpret_cast<void *>(&nl_gcr_10_double_double_13e7b5ac1a260dbf)}, // NOLINT
-// pongf
+// pong
 	{"nl_gcr_35_double_double_dbafc5ddaf7a08f8", reinterpret_cast<void *>(&nl_gcr_35_double_double_dbafc5ddaf7a08f8)}, // NOLINT
-// pongf
+// pong
 	{"nl_gcr_7_double_double_e51b463cd890ef6d", reinterpret_cast<void *>(&nl_gcr_7_double_double_e51b463cd890ef6d)}, // NOLINT
 // popeye
 	{"nl_gcr_50_double_double_c6f25bb06e161d1c", reinterpret_cast<void *>(&nl_gcr_50_double_double_c6f25bb06e161d1c)}, // NOLINT

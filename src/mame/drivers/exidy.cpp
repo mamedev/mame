@@ -15,6 +15,9 @@
         * Hard Hat
         * Fax and Fax 2
 
+    TODO:
+        * check whether games besides Venture have coin counter outputs
+
     Known bugs:
         * none at this time
 
@@ -206,6 +209,7 @@ public:
 	void pepper2(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(intsource_coins_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_count_w);
 
 protected:
 	virtual void machine_start() override;
@@ -438,10 +442,21 @@ CUSTOM_INPUT_MEMBER(teetert_state::teetert_input_r)
 }
 
 
+/*************************************
+ *
+ *  Special inputs
+ *
+ *************************************/
+
+INPUT_CHANGED_MEMBER(exidy_state::coin_count_w)
+{
+	machine().bookkeeping().coin_counter_w(param, newval);
+}
+
 
 /*************************************
  *
- *  Bankswitcher
+ *  Bank switching
  *
  *************************************/
 
@@ -461,6 +476,7 @@ void exidy_state::mtrap_ocl_w(uint8_t data) // Mouse Trap (possibly others) set 
 	output().set_value("led0", !BIT(data, 2));
 	output().set_value("led1", !BIT(data, 4));
 }
+
 
 /*************************************
  *
@@ -819,7 +835,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( venture )
 	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exidy_state, coin_count_w, 1)
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x00, "20000" )
 	PORT_DIPSETTING(    0x02, "30000" )
@@ -847,7 +863,7 @@ static INPUT_PORTS_START( venture )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exidy_state, coin_count_w, 0)
 
 	PORT_START("INTSOURCE")
 /*

@@ -50,7 +50,6 @@ public:
 	void dotrikun(machine_config &config);
 
 protected:
-
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_vram;
@@ -227,20 +226,21 @@ void dotrikun_state::dotrikun(machine_config &config)
 
 ROM_START( dotrikun )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "14479a.mpr", 0x0000, 0x4000, CRC(b77a50db) SHA1(2a5d812d39f0f58f5c3e1b46f80aca75aa225115) )
+	ROM_LOAD( "mpr-14479a.ic2", 0x0000, 0x4000, CRC(b77a50db) SHA1(2a5d812d39f0f58f5c3e1b46f80aca75aa225115) )
 ROM_END
 
 ROM_START( dotrikun2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-13141.ic2",  0x0000, 0x4000, CRC(a6aa7fa5) SHA1(4dbea33fb3541fdacf2195355751078a33bb30d5) )
+	ROM_LOAD( "mpr-14479.ic2",  0x0000, 0x4000, CRC(a6aa7fa5) SHA1(4dbea33fb3541fdacf2195355751078a33bb30d5) ) // also seen with EPR-13141 (same ROM contents)
 ROM_END
 
 ROM_START( dotriman )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "14479a.mpr", 0x0000, 0x4000, CRC(4ba6d2f5) SHA1(db805e9121ecbd41fac4593b58d7f071e7dbc720) )
+	ROM_LOAD( "dotriman.bin", 0x0000, 0x4000, CRC(4ba6d2f5) SHA1(db805e9121ecbd41fac4593b58d7f071e7dbc720) )
 ROM_END
 
 
 GAME( 1990, dotrikun,  0,        dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "Sega", "Dottori Kun (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 GAME( 1990, dotrikun2, dotrikun, dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "Sega", "Dottori Kun (old version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
 GAME( 2016, dotriman,  dotrikun, dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "hack (Chris Covell)", "Dottori-Man Jr.", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

@@ -2493,7 +2493,7 @@ ROM 11B |  A-5343-09908   3005-11  |  A-5343-09955   3005-23
 ROM 12B |  A-5343-09909   3005-12  |  A-5343-09956   3005-24
 
 Robotron 2084 Manual No. 16P-3005-101 May 1982:
-  - Current Robotron games use blue-label ROMs.  Earlier games have either yellow or red-labels ROMs, which are interchangable
+  - Current Robotron games use blue-label ROMs.  Earlier games have either yellow or red-labels ROMs, which are interchangeable
       and may be mixed in the same game. DO NOT attempt to mix blue-label ROMs with red or yellow-label ROMs.
 
 D-9144-3005 ROM Board Assembly:
@@ -2740,7 +2740,7 @@ A-5343-09971-A   ROM 11A  3006-11  |  A-5343-09971-B   ROM 11B  3006-23
 A-5343-09972-A   ROM 12A  3006-12  |  A-5343-09972-B   ROM 12B  3006-24
 
 Joust Manual Amendment No. 16P-3006-101-AMD-1 October 1982:
-  - Current JOUST games use green-label ROMs.  Earlier games have either yellow or red-labels ROMs, which are interchangable
+  - Current JOUST games use green-label ROMs.  Earlier games have either yellow or red-labels ROMs, which are interchangeable
       and may be mixed in the same game. DO NOT attempt to mix green-label ROMs with red or yellow label ROMs.
   - Boards with green-label ROMs should include jumper W1 and W3 only. Boards with red or yellow label ROMs subsitute jumpers W2 and W4
 

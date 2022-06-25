@@ -22,6 +22,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/tms34010/tms34010.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
@@ -29,81 +30,120 @@
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "video/tlc34076.h"
+
 #include "screen.h"
 #include "speaker.h"
 
 
+namespace {
+
 class tickee_state : public driver_device
 {
 public:
-	tickee_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki"),
-		m_screen(*this, "screen"),
-		m_tlc34076(*this, "tlc34076"),
-		m_ticket(*this, "ticket%u", 1),
+	tickee_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
-		m_control(*this, "control") { }
+		m_control(*this, "control"),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_oki(*this, "oki"),
+		m_tlc34076(*this, "tlc34076"),
+		m_ticket(*this, "ticket%u", 1)
+	{
+	}
 
-	void rapidfir(machine_config &config);
-	void ghoshunt(machine_config &config);
-	void tickee(machine_config &config);
+	// Machine drivers
 	void mouseatk(machine_config &config);
 
-private:
-	enum
-	{
-		TIMER_TRIGGER_GUN_INTERRUPT,
-		TIMER_CLEAR_GUN_INTERRUPT,
-		TIMER_SETUP_GUN_INTERRUPTS
-	};
-
-	required_device<tms34010_device> m_maincpu;
-	optional_device<okim6295_device> m_oki;
-	required_device<screen_device> m_screen;
-	required_device<tlc34076_device> m_tlc34076;
-	optional_device_array<ticket_dispenser_device, 2> m_ticket;
-
+protected:
 	required_shared_ptr<uint16_t> m_vram;
 	optional_shared_ptr<uint16_t> m_control;
 
-	emu_timer *m_setup_gun_timer = nullptr;
-	emu_timer *m_set_gun_int_timer[2]{};
-	emu_timer *m_clear_gun_int_timer[2]{};
+	required_device<tms34010_device> m_maincpu;
+	required_device<screen_device> m_screen;
+
+	optional_device<okim6295_device> m_oki;
+	required_device<tlc34076_device> m_tlc34076;
+	optional_device_array<ticket_dispenser_device, 2> m_ticket;
+
+	// Video update
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
+
+	// Miscellaneous control bits
+	void tickee_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+private:
+	// Memory maps
+	void mouseatk_map(address_map &map);
+};
+
+
+class tickee_gun_state : public tickee_state
+{
+public:
+	tickee_gun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tickee_state(mconfig, type, tag),
+		m_gun_axis_x(*this, "GUNX%u", 1U),
+		m_gun_axis_y(*this, "GUNY%u", 1U)
+	{
+	}
+
+	// Machine drivers
+	void tickee(machine_config &config);
+	void ghoshunt(machine_config &config);
+	void rapidfir(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_ioport_array<2> m_gun_axis_x;
+	required_ioport_array<2> m_gun_axis_y;
+
+	emu_timer *m_setup_gun_timer;
+	emu_timer *m_set_gun_int_timer[2];
+	emu_timer *m_clear_gun_int_timer[2];
+
 	int m_beamxadd = 0;
 	int m_beamyadd = 0;
-	int m_palette_bank = 0;
-	uint8_t m_gunx[2]{};
+	int m_palette_bank;
+	uint8_t m_gunx[2];
+
+	void set_beamadd(int x, int y) { m_beamxadd = x; m_beamyadd = y; }
+
+	// Compute X/Y coordinates
 	void get_crosshair_xy(int player, int &x, int &y);
 
+	// Light gun interrupts
+	TIMER_CALLBACK_MEMBER(trigger_gun_interrupt);
+	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
+	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
+
+	// Video update
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(rapidfir_scanline_update);
+
+	// Video related
 	void rapidfir_transparent_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t rapidfir_transparent_r(offs_t offset);
-	void tickee_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	TMS340X0_TO_SHIFTREG_CB_MEMBER(rapidfir_to_shiftreg);
+	TMS340X0_FROM_SHIFTREG_CB_MEMBER(rapidfir_from_shiftreg);
+
+	// Unknowns
 	uint16_t ffff_r();
 	uint16_t rapidfir_gun1_r();
 	uint16_t rapidfir_gun2_r();
 	uint16_t ff7f_r();
 	void ff7f_w(uint16_t data);
 	void rapidfir_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	// Sound
 	void sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_MACHINE_RESET(tickee);
-	DECLARE_VIDEO_START(tickee);
-	DECLARE_VIDEO_RESET(tickee);
-	DECLARE_MACHINE_RESET(rapidfir);
-	TIMER_CALLBACK_MEMBER(trigger_gun_interrupt);
-	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
-	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
 
-	TMS340X0_TO_SHIFTREG_CB_MEMBER(rapidfir_to_shiftreg);
-	TMS340X0_FROM_SHIFTREG_CB_MEMBER(rapidfir_from_shiftreg);
-	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-	TMS340X0_SCANLINE_RGB32_CB_MEMBER(rapidfir_scanline_update);
-
-	void ghoshunt_map(address_map &map);
-	void mouseatk_map(address_map &map);
-	void rapidfir_map(address_map &map);
+	// Memory maps
 	void tickee_map(address_map &map);
+	void ghoshunt_map(address_map &map);
+	void rapidfir_map(address_map &map);
 };
 
 
@@ -118,12 +158,12 @@ private:
  *
  *************************************/
 
-inline void tickee_state::get_crosshair_xy(int player, int &x, int &y)
+inline void tickee_gun_state::get_crosshair_xy(int player, int &x, int &y)
 {
 	const rectangle &visarea = m_screen->visible_area();
 
-	x = (((ioport(player ? "GUNX2" : "GUNX1")->read() & 0xff) * visarea.width()) >> 8) + visarea.min_x;
-	y = (((ioport(player ? "GUNY2" : "GUNY1")->read() & 0xff) * visarea.height()) >> 8) + visarea.min_y;
+	x = (((m_gun_axis_x[player]->read() & 0xff) * visarea.width()) >> 8) + visarea.min_x;
+	y = (((m_gun_axis_y[player]->read() & 0xff) * visarea.height()) >> 8) + visarea.min_y;
 }
 
 
@@ -134,10 +174,10 @@ inline void tickee_state::get_crosshair_xy(int player, int &x, int &y)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(tickee_state::trigger_gun_interrupt)
+TIMER_CALLBACK_MEMBER(tickee_gun_state::trigger_gun_interrupt)
 {
-	int which = param & 1;
-	int beamx = (m_screen->hpos()/2)-58;
+	int const which = param & 1;
+	int const beamx = (m_screen->hpos() / 2) - 58;
 
 	/* once we're ready to fire, set the X coordinate and assert the line */
 	m_gunx[which] = beamx;
@@ -147,34 +187,33 @@ TIMER_CALLBACK_MEMBER(tickee_state::trigger_gun_interrupt)
 }
 
 
-TIMER_CALLBACK_MEMBER(tickee_state::clear_gun_interrupt)
+TIMER_CALLBACK_MEMBER(tickee_gun_state::clear_gun_interrupt)
 {
 	/* clear the IRQ on the next scanline? */
 	m_maincpu->set_input_line(param, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
+TIMER_CALLBACK_MEMBER(tickee_gun_state::setup_gun_interrupts)
 {
-	int beamx, beamy;
-
 	/* set a timer to do this again next frame */
 	m_setup_gun_timer->adjust(m_screen->time_until_pos(0));
 
 	/* only do work if the palette is flashed */
-	if (m_control)
-		if (!m_control[2])
-			return;
+	if (!m_control || m_control[2])
+	{
+		int beamx, beamy;
 
-	/* generate interrupts for player 1's gun */
-	get_crosshair_xy(0, beamx, beamy);
-	m_set_gun_int_timer[0]->adjust(m_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), 0);
-	m_clear_gun_int_timer[0]->adjust(m_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), 0);
+		/* generate interrupts for player 1's gun */
+		get_crosshair_xy(0, beamx, beamy);
+		m_set_gun_int_timer[0]->adjust(m_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), 0);
+		m_clear_gun_int_timer[0]->adjust(m_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), 0);
 
-	/* generate interrupts for player 2's gun */
-	get_crosshair_xy(1, beamx, beamy);
-	m_set_gun_int_timer[1]->adjust(m_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), 1);
-	m_clear_gun_int_timer[1]->adjust(m_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), 1);
+		/* generate interrupts for player 2's gun */
+		get_crosshair_xy(1, beamx, beamy);
+		m_set_gun_int_timer[1]->adjust(m_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), 1);
+		m_clear_gun_int_timer[1]->adjust(m_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), 1);
+	}
 }
 
 
@@ -185,20 +224,30 @@ TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
  *
  *************************************/
 
-VIDEO_START_MEMBER(tickee_state,tickee)
+void tickee_gun_state::machine_start()
 {
+	tickee_state::machine_start();
+
 	/* start a timer going on the first scanline of every frame */
-	m_setup_gun_timer = timer_alloc(FUNC(tickee_state::setup_gun_interrupts), this);
+	m_setup_gun_timer = timer_alloc(FUNC(tickee_gun_state::setup_gun_interrupts), this);
 
 	/* initialize gun set/clear interrupts for both players */
-	m_set_gun_int_timer[0] = timer_alloc(FUNC(tickee_state::trigger_gun_interrupt), this);
-	m_set_gun_int_timer[1] = timer_alloc(FUNC(tickee_state::trigger_gun_interrupt), this);
-	m_clear_gun_int_timer[0] = timer_alloc(FUNC(tickee_state::clear_gun_interrupt), this);
-	m_clear_gun_int_timer[1] = timer_alloc(FUNC(tickee_state::clear_gun_interrupt), this);
+	m_set_gun_int_timer[0] = timer_alloc(FUNC(tickee_gun_state::trigger_gun_interrupt), this);
+	m_set_gun_int_timer[1] = timer_alloc(FUNC(tickee_gun_state::trigger_gun_interrupt), this);
+	m_clear_gun_int_timer[0] = timer_alloc(FUNC(tickee_gun_state::clear_gun_interrupt), this);
+	m_clear_gun_int_timer[1] = timer_alloc(FUNC(tickee_gun_state::clear_gun_interrupt), this);
+
+	m_palette_bank = 0;
+	std::fill(std::begin(m_gunx), std::end(m_gunx), 0);
+
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_gunx));
 }
 
-VIDEO_RESET_MEMBER(tickee_state,tickee)
+void tickee_gun_state::machine_reset()
 {
+	tickee_state::machine_reset();
+
 	m_setup_gun_timer->adjust(m_screen->time_until_pos(0));
 
 	m_set_gun_int_timer[0]->adjust(attotime::never);
@@ -228,6 +277,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 			dest[x] = pens[0xff];
 	}
 	else
+	{
 		/* copy the non-blanked portions of this scanline */
 		for (int x = params->heblnk; x < params->hsblnk; x += 2)
 		{
@@ -235,10 +285,11 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 			dest[x + 0] = pens[pixels & 0xff];
 			dest[x + 1] = pens[pixels >> 8];
 		}
+	}
 }
 
 
-TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_gun_state::rapidfir_scanline_update)
 {
 	uint16_t const *const src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
 	uint32_t *const dest = &bitmap.pix(scanline);
@@ -269,30 +320,11 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
 
 /*************************************
  *
- *  Machine init
- *
- *************************************/
-
-MACHINE_RESET_MEMBER(tickee_state,tickee)
-{
-	m_beamxadd = 50;
-	m_beamyadd = 0;
-}
-
-MACHINE_RESET_MEMBER(tickee_state,rapidfir)
-{
-	m_beamxadd = 0;
-	m_beamyadd = -5;
-}
-
-
-/*************************************
- *
  *  Video related
  *
  *************************************/
 
-void tickee_state::rapidfir_transparent_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void tickee_gun_state::rapidfir_transparent_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!(data & 0xff00)) mem_mask &= 0x00ff;
 	if (!(data & 0x00ff)) mem_mask &= 0xff00;
@@ -300,20 +332,20 @@ void tickee_state::rapidfir_transparent_w(offs_t offset, uint16_t data, uint16_t
 }
 
 
-uint16_t tickee_state::rapidfir_transparent_r(offs_t offset)
+uint16_t tickee_gun_state::rapidfir_transparent_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
 
-TMS340X0_TO_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_to_shiftreg)
+TMS340X0_TO_SHIFTREG_CB_MEMBER(tickee_gun_state::rapidfir_to_shiftreg)
 {
 	if (address < 0x800000)
 		memcpy(shiftreg, &m_vram[address >> 4], 0x400);
 }
 
 
-TMS340X0_FROM_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_from_shiftreg)
+TMS340X0_FROM_SHIFTREG_CB_MEMBER(tickee_gun_state::rapidfir_from_shiftreg)
 {
 	if (address < 0x800000)
 		memcpy(&m_vram[address >> 4], shiftreg, 0x400);
@@ -358,36 +390,36 @@ void tickee_state::tickee_control_w(offs_t offset, uint16_t data, uint16_t mem_m
  *
  *************************************/
 
-uint16_t tickee_state::ffff_r()
+uint16_t tickee_gun_state::ffff_r()
 {
 	return 0xffff;
 }
 
 
-uint16_t tickee_state::rapidfir_gun1_r()
+uint16_t tickee_gun_state::rapidfir_gun1_r()
 {
 	return m_gunx[0];
 }
 
 
-uint16_t tickee_state::rapidfir_gun2_r()
+uint16_t tickee_gun_state::rapidfir_gun2_r()
 {
 	return m_gunx[1];
 }
 
 
-uint16_t tickee_state::ff7f_r()
+uint16_t tickee_gun_state::ff7f_r()
 {
 	/* Ticket dispenser status? */
 	return 0xff7f;
 }
 
-void tickee_state::ff7f_w(uint16_t data)
+void tickee_gun_state::ff7f_w(uint16_t data)
 {
 	/* Ticket dispenser output? */
 }
 
-void tickee_state::rapidfir_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void tickee_gun_state::rapidfir_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* other bits like control on tickee? */
 	if (ACCESSING_BITS_0_7)
@@ -402,7 +434,7 @@ void tickee_state::rapidfir_control_w(offs_t offset, uint16_t data, uint16_t mem
  *
  *************************************/
 
-void tickee_state::sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void tickee_gun_state::sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (data & 0xff)
 	{
@@ -436,7 +468,7 @@ void tickee_state::sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
  *
  *************************************/
 
-void tickee_state::tickee_map(address_map &map)
+void tickee_gun_state::tickee_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("vram");
 	map(0x02000000, 0x02ffffff).rom().region("user1", 0);
@@ -446,7 +478,7 @@ void tickee_state::tickee_map(address_map &map)
 	map(0x04200000, 0x0420001f).w("ym1", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04200100, 0x0420010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04200100, 0x0420011f).w("ym2", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
-	map(0x04400000, 0x0440007f).w(FUNC(tickee_state::tickee_control_w)).share("control");
+	map(0x04400000, 0x0440007f).w(FUNC(tickee_gun_state::tickee_control_w)).share(m_control);
 	map(0x04400040, 0x0440004f).portr("IN2");
 	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
 	map(0xff000000, 0xffffffff).rom().region("user1", 0);
@@ -454,7 +486,7 @@ void tickee_state::tickee_map(address_map &map)
 
 
 /* addreses in the 04x range shifted slightly...*/
-void tickee_state::ghoshunt_map(address_map &map)
+void tickee_gun_state::ghoshunt_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("vram");
 	map(0x02000000, 0x02ffffff).rom().region("user1", 0);
@@ -464,7 +496,7 @@ void tickee_state::ghoshunt_map(address_map &map)
 	map(0x04300000, 0x0430001f).w("ym1", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04300100, 0x0430010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04300100, 0x0430011f).w("ym2", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
-	map(0x04500000, 0x0450007f).w(FUNC(tickee_state::tickee_control_w)).share("control");
+	map(0x04500000, 0x0450007f).w(FUNC(tickee_gun_state::tickee_control_w)).share(m_control);
 	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
 	map(0xff000000, 0xffffffff).rom().region("user1", 0);
 }
@@ -479,7 +511,7 @@ void tickee_state::mouseatk_map(address_map &map)
 	map(0x04200000, 0x0420000f).r("ym", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04200000, 0x0420000f).w("ym", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04200100, 0x0420010f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x04400000, 0x0440007f).w(FUNC(tickee_state::tickee_control_w)).share("control");
+	map(0x04400000, 0x0440007f).w(FUNC(tickee_state::tickee_control_w)).share(m_control);
 	map(0x04400040, 0x0440004f).portr("IN2"); // ?
 	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
 	map(0xff000000, 0xffffffff).rom().region("user1", 0);
@@ -487,16 +519,16 @@ void tickee_state::mouseatk_map(address_map &map)
 
 
 /* newer hardware */
-void tickee_state::rapidfir_map(address_map &map)
+void tickee_gun_state::rapidfir_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).ram().share("vram");
-	map(0x02000000, 0x027fffff).rw(FUNC(tickee_state::rapidfir_transparent_r), FUNC(tickee_state::rapidfir_transparent_w));
-	map(0xfc000000, 0xfc00000f).r(FUNC(tickee_state::rapidfir_gun1_r));
-	map(0xfc000100, 0xfc00010f).r(FUNC(tickee_state::rapidfir_gun2_r));
-	map(0xfc000400, 0xfc00040f).r(FUNC(tickee_state::ffff_r));
+	map(0x02000000, 0x027fffff).rw(FUNC(tickee_gun_state::rapidfir_transparent_r), FUNC(tickee_gun_state::rapidfir_transparent_w));
+	map(0xfc000000, 0xfc00000f).r(FUNC(tickee_gun_state::rapidfir_gun1_r));
+	map(0xfc000100, 0xfc00010f).r(FUNC(tickee_gun_state::rapidfir_gun2_r));
+	map(0xfc000400, 0xfc00040f).r(FUNC(tickee_gun_state::ffff_r));
 	map(0xfc000500, 0xfc00050f).noprw();
-	map(0xfc000600, 0xfc00060f).w(FUNC(tickee_state::rapidfir_control_w));
-	map(0xfc000700, 0xfc00070f).w(FUNC(tickee_state::sound_bank_w));
+	map(0xfc000600, 0xfc00060f).w(FUNC(tickee_gun_state::rapidfir_control_w));
+	map(0xfc000700, 0xfc00070f).w(FUNC(tickee_gun_state::sound_bank_w));
 	map(0xfc000800, 0xfc00080f).portr("IN0");
 	map(0xfc000900, 0xfc00090f).portr("IN1");
 	map(0xfc000a00, 0xfc000a0f).portr("IN2");
@@ -506,7 +538,7 @@ void tickee_state::rapidfir_map(address_map &map)
 	map(0xfc100000, 0xfc1000ff).mirror(0x80000).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 	map(0xfc200000, 0xfc207fff).ram().share("nvram");
 	map(0xfc300000, 0xfc30000f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0xfc400010, 0xfc40001f).rw(FUNC(tickee_state::ff7f_r), FUNC(tickee_state::ff7f_w));
+	map(0xfc400010, 0xfc40001f).rw(FUNC(tickee_gun_state::ff7f_r), FUNC(tickee_gun_state::ff7f_w));
 	map(0xfe000000, 0xffffffff).rom().region("user1", 0);
 }
 
@@ -742,23 +774,24 @@ static INPUT_PORTS_START( rapidfir )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  Machine drivers
  *
  *************************************/
 
-void tickee_state::tickee(machine_config &config)
+void tickee_gun_state::tickee(machine_config &config)
 {
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, XTAL(40'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::tickee_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_gun_state::tickee_map);
 	m_maincpu->set_halt_on_reset(false);
 	m_maincpu->set_pixel_clock(VIDEO_CLOCK/2);
 	m_maincpu->set_pixels_per_clock(1);
-	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_state::scanline_update));
+	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_gun_state::scanline_update));
 
-	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)
+	set_beamadd(50, 0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
@@ -766,9 +799,6 @@ void tickee_state::tickee(machine_config &config)
 
 	/* video hardware */
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
-
-	MCFG_VIDEO_START_OVERRIDE(tickee_state,tickee)
-	MCFG_VIDEO_RESET_OVERRIDE(tickee_state,tickee)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200);
@@ -789,36 +819,34 @@ void tickee_state::tickee(machine_config &config)
 }
 
 
-void tickee_state::ghoshunt(machine_config &config)
+void tickee_gun_state::ghoshunt(machine_config &config)
 {
 	tickee(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::ghoshunt_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_gun_state::ghoshunt_map);
 }
 
 
-void tickee_state::rapidfir(machine_config &config)
+void tickee_gun_state::rapidfir(machine_config &config)
 {
 	/* basic machine hardware */
 	TMS34010(config, m_maincpu, XTAL(50'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::rapidfir_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_gun_state::rapidfir_map);
 	m_maincpu->set_halt_on_reset(false);
 	m_maincpu->set_pixel_clock(VIDEO_CLOCK/2);
 	m_maincpu->set_pixels_per_clock(1);
-	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_state::rapidfir_scanline_update));
-	m_maincpu->set_shiftreg_in_callback(FUNC(tickee_state::rapidfir_to_shiftreg));
-	m_maincpu->set_shiftreg_out_callback(FUNC(tickee_state::rapidfir_from_shiftreg));
+	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_gun_state::rapidfir_scanline_update));
+	m_maincpu->set_shiftreg_in_callback(FUNC(tickee_gun_state::rapidfir_to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(tickee_gun_state::rapidfir_from_shiftreg));
 
-	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,rapidfir)
+	set_beamadd(0, -5);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
-
-	MCFG_VIDEO_START_OVERRIDE(tickee_state,tickee)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200);
@@ -841,7 +869,6 @@ void tickee_state::mouseatk(machine_config &config)
 	m_maincpu->set_pixels_per_clock(1);
 	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_state::scanline_update));
 
-	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	TICKET_DISPENSER(config, m_ticket[0], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
@@ -1150,6 +1177,8 @@ ROM_START( maletmad ) /* Version 2.1 */
 	/* U510 not populated */
 ROM_END
 
+} // anonymous namespace
+
 
 /*************************************
  *
@@ -1157,11 +1186,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_state, empty_init, ROT0, "Raster Elite",  "Tickee Tickats",              0 )
-GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_state, empty_init, ROT0, "Hanaho Games",  "Ghost Hunter",                0 )
-GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_state, empty_init, ROT0, "Island Design", "Tut's Tomb",                  0 )
-GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state, empty_init, ROT0, "ICE",           "Mouse Attack",                0 )
-GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_state, empty_init, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 239)", 0 )
-GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_state, empty_init, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 238)", 0 )
-GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_state, empty_init, ROT0, "Hanaho Games",  "Rapid Fire v1.0 (Build 236)", 0 )
-GAME( 1999, maletmad,  0,        rapidfir, rapidfir, tickee_state, empty_init, ROT0, "Hanaho Games",  "Mallet Madness v2.1",         0 )
+GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_gun_state, empty_init, ROT0, "Raster Elite",  "Tickee Tickats",              0 )
+GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Hanaho Games",  "Ghost Hunter",                0 )
+GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_gun_state, empty_init, ROT0, "Island Design", "Tut's Tomb",                  0 )
+GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state,     empty_init, ROT0, "ICE",           "Mouse Attack",                0 )
+GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 239)", 0 )
+GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 238)", 0 )
+GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",  "Rapid Fire v1.0 (Build 236)", 0 )
+GAME( 1999, maletmad,  0,        rapidfir, rapidfir, tickee_gun_state, empty_init, ROT0, "Hanaho Games",  "Mallet Madness v2.1",         0 )

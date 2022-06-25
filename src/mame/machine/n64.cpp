@@ -1113,8 +1113,6 @@ uint32_t n64_periphs::vi_reg_r(offs_t offset, uint32_t mem_mask)
 
 void n64_periphs::vi_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	//n64_state *state = machine().driver_data<n64_state>();
-
 	switch (offset)
 	{
 		case 0x00/4:        // VI_CONTROL_REG

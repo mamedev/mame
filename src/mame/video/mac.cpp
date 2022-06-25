@@ -369,14 +369,14 @@ uint32_t mac_state::screen_update_macrbvvram(screen_device &screen, bitmap_rgb32
 	{
 		case 0: // 1bpp
 		{
-			uint8_t const *const vram8 = (uint8_t *)m_vram.target();
+			auto const vram8 = util::big_endian_cast<uint8_t const>(m_vram.target());
 
 			for (int y = 0; y < vres; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < hres; x+=8)
 				{
-					uint8_t const pixels = vram8[(y * 0x400) + ((x/8)^3)];
+					uint8_t const pixels = vram8[(y * 2048) + (x / 8)];
 
 					*scanline++ = m_rbv_palette[0x7f|(pixels&0x80)];
 					*scanline++ = m_rbv_palette[0x7f|((pixels<<1)&0x80)];
@@ -393,19 +393,19 @@ uint32_t mac_state::screen_update_macrbvvram(screen_device &screen, bitmap_rgb32
 
 		case 1: // 2bpp
 		{
-			uint8_t const *const vram8 = (uint8_t *)m_vram.target();
+			auto const vram8 = util::big_endian_cast<uint8_t const>(m_vram.target());
 
 			for (int y = 0; y < vres; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < hres/4; x++)
 				{
-					uint8_t const pixels = vram8[(y * (hres/4)) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 2048) + x];
 
-					*scanline++ = m_rbv_palette[0xfc|((pixels>>6)&3)];
-					*scanline++ = m_rbv_palette[0xfc|((pixels>>4)&3)];
-					*scanline++ = m_rbv_palette[0xfc|((pixels>>2)&3)];
-					*scanline++ = m_rbv_palette[0xfc|(pixels&3)];
+					*scanline++ = m_rbv_palette[0x3f|(pixels&0xc0)];
+					*scanline++ = m_rbv_palette[0x3f|((pixels<<2)&0xc0)];
+					*scanline++ = m_rbv_palette[0x3f|((pixels<<4)&0xc0)];
+					*scanline++ = m_rbv_palette[0x3f|((pixels<<6)&0xc0)];
 				}
 			}
 		}
@@ -413,7 +413,7 @@ uint32_t mac_state::screen_update_macrbvvram(screen_device &screen, bitmap_rgb32
 
 		case 2: // 4bpp
 		{
-			uint8_t const *const vram8 = (uint8_t *)m_vram.target();
+			auto const vram8 = util::big_endian_cast<uint8_t const>(m_vram.target());
 
 			for (int y = 0; y < vres; y++)
 			{
@@ -421,10 +421,10 @@ uint32_t mac_state::screen_update_macrbvvram(screen_device &screen, bitmap_rgb32
 
 				for (int x = 0; x < hres/2; x++)
 				{
-					uint8_t const pixels = vram8[(y * (hres/2)) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 2048) + x];
 
-					*scanline++ = m_rbv_palette[0xf0|(pixels>>4)];
-					*scanline++ = m_rbv_palette[0xf0|(pixels&0xf)];
+					*scanline++ = m_rbv_palette[0x0f|(pixels&0xf0)];
+					*scanline++ = m_rbv_palette[0x0f|((pixels<<4)&0xf0)];
 				}
 			}
 		}
@@ -432,7 +432,7 @@ uint32_t mac_state::screen_update_macrbvvram(screen_device &screen, bitmap_rgb32
 
 		case 3: // 8bpp
 		{
-			uint8_t const *const vram8 = (uint8_t *)m_vram.target();
+			auto const vram8 = util::big_endian_cast<uint8_t const>(m_vram.target());
 
 			for (int y = 0; y < vres; y++)
 			{
@@ -440,11 +440,28 @@ uint32_t mac_state::screen_update_macrbvvram(screen_device &screen, bitmap_rgb32
 
 				for (int x = 0; x < hres; x++)
 				{
-					uint8_t const pixels = vram8[(y * 2048) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 2048) + x];
 					*scanline++ = m_rbv_palette[pixels];
 				}
 			}
 		}
+		break;
+
+		case 4: // 16bpp
+		{
+			auto const vram16 = util::big_endian_cast<uint16_t const>(m_vram.target());
+
+			for (int y = 0; y < vres; y++)
+			{
+				uint32_t *scanline = &bitmap.pix(y);
+				for (int x = 0; x < hres; x++)
+				{
+					uint16_t const pixels = vram16[(y * 1024) + x];
+					*scanline++ = rgb_t(((pixels >> 10) & 0x1f) << 3, ((pixels >> 5) & 0x1f) << 3, (pixels & 0x1f) << 3);
+				}
+			}
+		}
+		break;
 	}
 
 	return 0;

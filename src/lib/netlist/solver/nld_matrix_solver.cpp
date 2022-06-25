@@ -50,7 +50,8 @@ namespace netlist::solver
 	matrix_solver_t::matrix_solver_t(devices::nld_solver &main_solver, const pstring &name,
 		const net_list_t &nets,
 		const solver::solver_parameters_t *params)
-		: device_t(static_cast<device_t &>(main_solver), name)
+		//: device_t(static_cast<device_t &>(main_solver), name)
+		: device_t(device_data_t{main_solver.state(), main_solver.name() + "." + name})
 		, m_params(*params)
 		, m_gonn(m_arena)
 		, m_gtn(m_arena)
@@ -86,7 +87,7 @@ namespace netlist::solver
 		m_main_solver.reschedule(this, ts);
 	}
 
-	void matrix_solver_t::setup_base(setup_t &setup, const net_list_t &nets)
+	void matrix_solver_t::setup_base([[maybe_unused]] setup_t &setup, const net_list_t &nets)
 	{
 		log().debug("New solver setup\n");
 		std::vector<core_device_t *> step_devices;
@@ -102,14 +103,19 @@ namespace netlist::solver
 
 		for (std::size_t k = 0; k < nets.size(); k++)
 		{
+			std::vector<detail::core_terminal_t *> temp;
+
 			analog_net_t &net = *nets[k];
 
-			log().debug("adding net with {1} populated connections\n", setup.nlstate().core_terms(net).size());
+			// FIXME: add size() to list
+			// log().debug("adding net with {1} populated connections\n", net.core_terms().size());
 
 			net.set_solver(this);
 
-			for (auto &p : setup.nlstate().core_terms(net))
+			for (detail::core_terminal_t * p : net.core_terms_copy())
 			{
+				nl_assert_always(&p->net() == &net, "Net integrity violated");
+
 				log().debug("{1} {2} {3}\n", p->name(), net.name(), net.is_rail_net());
 				switch (p->type())
 				{
@@ -121,8 +127,9 @@ namespace netlist::solver
 							if (!plib::container::contains(dynamic_devices, &p->device()))
 								dynamic_devices.push_back(&p->device());
 						{
-							auto *pterm = dynamic_cast<terminal_t *>(p);
-							add_term(k, pterm);
+							auto pterm = plib::dynamic_downcast<terminal_t *>(p);
+							nl_assert_always(bool(pterm), "cast to terminal_t * failed");
+							add_term(k, *pterm);
 						}
 						log().debug("Added terminal {1}\n", p->name());
 						break;
@@ -139,12 +146,14 @@ namespace netlist::solver
 							if (net_proxy_output == nullptr)
 							{
 								pstring new_name(this->name() + "." + pstring(plib::pfmt("m{1}")(m_inputs.size())));
-								nl_assert(p->net().is_analog());
-								auto net_proxy_output_u = state().make_pool_object<proxied_analog_output_t>(*this, new_name, &dynamic_cast<analog_net_t &>(p->net()));
+								auto proxied_net = plib::dynamic_downcast<analog_net_t *>(p->net());
+								nl_assert_always(proxied_net, "Net is not an analog net");
+								auto net_proxy_output_u = state().make_pool_object<proxied_analog_output_t>(*this, new_name, *proxied_net);
 								net_proxy_output = net_proxy_output_u.get();
 								m_inputs.emplace_back(std::move(net_proxy_output_u));
 							}
-							setup.add_terminal(net_proxy_output->net(), *p);
+							net.remove_terminal(*p);
+							net_proxy_output->net().add_terminal(*p);
 							// FIXME: repeated calling - kind of brute force
 							net_proxy_output->net().rebuild_list();
 							log().debug("Added input {1}", net_proxy_output->name());
@@ -155,6 +164,7 @@ namespace netlist::solver
 						throw nl_exception(MF_UNHANDLED_ELEMENT_1_FOUND(p->name()));
 				}
 			}
+			net.rebuild_list();
 		}
 		for (auto &d : step_devices)
 			m_step_funcs.emplace_back(nl_delegate_ts(&core_device_t::time_step, d));
@@ -167,7 +177,7 @@ namespace netlist::solver
 	/// @param sort Sort algorithm to use.
 	///
 	/// Sort in descending order by number of connected matrix voltages.
-	///The idea is, that for Gauss-Seidel algorithm the first voltage computed
+	/// The idea is, that for Gauss-Seidel algorithm the first voltage computed
 	/// depends on the greatest number of previous voltages thus taking into
 	/// account the maximum amount of information.
 	///
@@ -358,6 +368,8 @@ namespace netlist::solver
 		}
 		log().verbose("Number of multiplications/additions for {1}: {2}", name(), m_ops);
 
+		// Dumps non zero elements right of diagonal -> to much output, disabled
+		// NOLINTNEXTLINE(readability-simplify-boolean-expr)
 		if ((false))
 			for (std::size_t k = 0; k < iN; k++)
 			{
@@ -425,20 +437,6 @@ namespace netlist::solver
 		// avoid recursive calls. Inputs are updated outside this call
 		for (auto &inp : m_inputs)
 			inp->push(inp->proxied_net()->Q_Analog());
-	}
-
-	bool matrix_solver_t::updates_net(const analog_net_t *net) const noexcept
-	{
-		if (net != nullptr)
-		{
-			for (const auto &t : m_terms )
-				if (t.is_net(net))
-					return true;
-			for (const auto &inp : m_inputs)
-				if (&inp->net() == net)
-					return true;
-		}
-		return false;
 	}
 
 	void matrix_solver_t::update_dynamic() noexcept

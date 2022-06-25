@@ -31,7 +31,7 @@ Barb Wire                                748  Hit 1, press GO                   
 Brooks & Dunn                            749  (unfinished prototype)
 Super Mario Brothers Mushroom World     N105  (not working)
 Strikes n Spares                        N111  (not working, press F3 to see the screen)
-Machina Zois                                  Hit 1, press LM                      M
+machinaZOIS Virtual Training Center           Hit 1, press LM                      M
 
 Status:
 - Some machines are playable
@@ -432,7 +432,7 @@ void gts3a_state::p0(machine_config &config)
 	M65C02(config, m_dmdcpu, XTAL(3'579'545) / 2);
 	m_dmdcpu->set_addrmap(AS_PROGRAM, &gts3a_state::dmd_map);
 
-	/* Video */
+	// Video
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -469,7 +469,7 @@ void gts3a_state::p0(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", m65c02_device::IRQ_LINE);
 
-	/* Sound */
+	// Sound
 	genpin_audio(config);
 	SPEAKER(config, "mono").front_center();
 }
@@ -506,7 +506,7 @@ ROM_END
 /*-------------------------------------------------------------------
 / Brooks & Dunn (#749T1)
 /-------------------------------------------------------------------*/
-ROM_START(brooks)
+ROM_START(brooks) // Rev. T1
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(26cebf07) SHA1(14741e2d216528f176dc35ade856baffab0f99a0))
 
@@ -553,7 +553,7 @@ ROM_START(cueball)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c22f5cc5) SHA1(a5bfbc1824bc483eecc961851bd411cb0dbcdc4a))
 ROM_END
 
-ROM_START(cueball2)
+ROM_START(cueballa)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.r2", 0x0000, 0x10000, CRC(171c0a0e) SHA1(e53d32e7cddf47feacf3f5c00651c2216da39b7a))
 
@@ -574,7 +574,7 @@ ROM_START(cueball2)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c22f5cc5) SHA1(a5bfbc1824bc483eecc961851bd411cb0dbcdc4a))
 ROM_END
 
-ROM_START(cueball3)
+ROM_START(cueballb)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.r3", 0x0000, 0x10000, CRC(f2d6e9d8) SHA1(bac7d498876454092607116fd7d46034438c9bfa))
 
@@ -620,7 +620,26 @@ ROM_END
 /*-------------------------------------------------------------------
 / Freddy: A Nightmare on Elm Street (#744)
 /-------------------------------------------------------------------*/
-ROM_START(freddy)
+ROM_START(freddy) // Rev. 4
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom4.bin", 0x0000, 0x10000, CRC(cd8b46ea) SHA1(3151a9f7b514314dc4989232e1eda444555242c0))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(d78d0fa3) SHA1(132c05e71cf5ad53184f044873fb3dd71f6da15f))
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(d472210c) SHA1(4607e6f928cb9a5f41175210ba0427b6cd50fb83))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(6bec0567) SHA1(510c0e5a5af7573761a69bad5ab36f0019767c48))
+	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(f0e9284d) SHA1(6ffe8286e27b0eecab9620ca613e3d72bb7f77ce))
+	ROM_RELOAD(0xc0000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(4a748665) SHA1(9f08b6d0731390c306194808226d2e99fbe9122d))
+ROM_END
+
+ROM_START(freddy3) // Rev. 3
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(f0a6f3e6) SHA1(ad9af12260b8adc639fa00de49366b1016df49ed))
 
@@ -639,24 +658,6 @@ ROM_START(freddy)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(4a748665) SHA1(9f08b6d0731390c306194808226d2e99fbe9122d))
 ROM_END
 
-ROM_START(freddy4)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gprom4.bin", 0x0000, 0x10000, CRC(cd8b46ea) SHA1(3151a9f7b514314dc4989232e1eda444555242c0))
-
-	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(d78d0fa3) SHA1(132c05e71cf5ad53184f044873fb3dd71f6da15f))
-
-	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(d472210c) SHA1(4607e6f928cb9a5f41175210ba0427b6cd50fb83))
-
-	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
-	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(6bec0567) SHA1(510c0e5a5af7573761a69bad5ab36f0019767c48))
-	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(f0e9284d) SHA1(6ffe8286e27b0eecab9620ca613e3d72bb7f77ce))
-	ROM_RELOAD(0xc0000, 0x40000)
-
-	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(4a748665) SHA1(9f08b6d0731390c306194808226d2e99fbe9122d))
-ROM_END
 /*-------------------------------------------------------------------
 / Gladiators (#737)
 /-------------------------------------------------------------------*/
@@ -683,7 +684,26 @@ ROM_END
 /*-------------------------------------------------------------------
 / Mario Andretti (#747)
 /-------------------------------------------------------------------*/
-ROM_START(andretti)
+ROM_START(andretti) // Rev. T4
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gpromt4.bin", 0x0000, 0x10000, CRC(c6f6a23b) SHA1(01ea23a830be1e86f5ecd27d6d56c1c6d5ff3176))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(1f70baae) SHA1(cf07bb057093b2bd18e6ee45009245ea62094e53))
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(d472210c) SHA1(4607e6f928cb9a5f41175210ba0427b6cd50fb83))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(918c3270) SHA1(aa57d3bfba01e701b02ca7e4f0946144cfb7d4b1))
+	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(3c61a2f7) SHA1(65cfb5d1261a1b0c219e1786b6635d7b0a188040))
+	ROM_RELOAD(0xc0000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(4ffb15b0) SHA1(de4e9b2ccca865deb2595320015a149246795260))
+ROM_END
+
+ROM_START(andretti0) // No rev.
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(cffa788d) SHA1(84646880b09dce73a42a6d87666897f6bd74a8f9))
 
@@ -702,24 +722,6 @@ ROM_START(andretti)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(4ffb15b0) SHA1(de4e9b2ccca865deb2595320015a149246795260))
 ROM_END
 
-ROM_START(andretti4)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gpromt4.bin", 0x0000, 0x10000, CRC(c6f6a23b) SHA1(01ea23a830be1e86f5ecd27d6d56c1c6d5ff3176))
-
-	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(1f70baae) SHA1(cf07bb057093b2bd18e6ee45009245ea62094e53))
-
-	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(d472210c) SHA1(4607e6f928cb9a5f41175210ba0427b6cd50fb83))
-
-	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
-	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(918c3270) SHA1(aa57d3bfba01e701b02ca7e4f0946144cfb7d4b1))
-	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(3c61a2f7) SHA1(65cfb5d1261a1b0c219e1786b6635d7b0a188040))
-	ROM_RELOAD(0xc0000, 0x40000)
-
-	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(4ffb15b0) SHA1(de4e9b2ccca865deb2595320015a149246795260))
-ROM_END
 
 /*-------------------------------------------------------------------
 / Rescue 911 (#740)
@@ -746,7 +748,7 @@ ROM_END
 /*-------------------------------------------------------------------
 / Shaq Attaq (#743)
 /-------------------------------------------------------------------*/
-ROM_START(shaqattq)
+ROM_START(shaqattq) // Rev. 5
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(7a967fd1) SHA1(c06e2aad9452150d92cfd3ba37b8e4a932cf4324))
 
@@ -765,7 +767,7 @@ ROM_START(shaqattq)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(e81e2928) SHA1(4bfe57efa99bb762e4de6c7e88e79b8c5ff57626))
 ROM_END
 
-ROM_START(shaqattq2)
+ROM_START(shaqattq2) // Rev. 2
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom2.bin", 0x0000, 0x10000, CRC(494b5cec) SHA1(91511eb9f8b0182ffeff5301fb5bcf4ee9056b3f))
 
@@ -785,7 +787,7 @@ ROM_START(shaqattq2)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Machina Zois (hack of Shaq Attack)
+/ machinaZOIS Virtual Training Center (hack of Shaq Attack)
 /-------------------------------------------------------------------*/
 ROM_START(mac_zois)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -809,97 +811,7 @@ ROM_END
 /*-------------------------------------------------------------------
 / Stargate (#742)
 /-------------------------------------------------------------------*/
-ROM_START(stargatp)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(837e4354) SHA1(b7d1e270309b3d7965dafeec7b81d2dd41e5700c))
-
-	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(17b89750) SHA1(927702f88013945cb9f2ea8389800b925182c347))
-
-	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(781b2b27) SHA1(06decd22b9064ee4859618a043055e0b3e3b9e04))
-
-	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
-	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(a0f62605) SHA1(8c39452367150f66271371ab02be2f5a812cb954))
-	ROM_RELOAD(0x80000, 0x80000)
-
-	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
-ROM_END
-
-ROM_START(stargatp1)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gprom1.bin", 0x0000, 0x10000, CRC(567ecd88) SHA1(2dc4bfbc971cc873af6ec32e5ddbbed001d2e1d2))
-
-	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("dsprom1.bin", 0x00000, 0x80000, CRC(91c1b01a) SHA1(96eec2e9e52c8278c102f433a554327d420fe131))
-
-	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(781b2b27) SHA1(06decd22b9064ee4859618a043055e0b3e3b9e04))
-
-	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
-	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(a0f62605) SHA1(8c39452367150f66271371ab02be2f5a812cb954))
-	ROM_RELOAD(0x80000, 0x80000)
-
-	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
-ROM_END
-
-ROM_START(stargatp2)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gprom2.bin", 0x0000, 0x10000, CRC(862920f8) SHA1(cde77e7937782f2f9fe4b7fe27b56206d6f26f63))
-
-	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("dsprom2.bin", 0x00000, 0x80000, CRC(d0205e03) SHA1(d8dea47f0fa0e46e2bd107a1f57121372fdef0d8))
-
-	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(781b2b27) SHA1(06decd22b9064ee4859618a043055e0b3e3b9e04))
-
-	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
-	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(a0f62605) SHA1(8c39452367150f66271371ab02be2f5a812cb954))
-	ROM_RELOAD(0x80000, 0x80000)
-
-	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
-ROM_END
-
-ROM_START(stargatp3)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gprom3.bin", 0x0000, 0x10000, CRC(83f0a2e7) SHA1(5d247a3329a946449e4b333b18c13e351caa230b))
-
-	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("dsprom3.bin", 0x00000, 0x80000, CRC(db483524) SHA1(ea14e8b04c32fc403ce2ff060caed5562104a862))
-
-	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(781b2b27) SHA1(06decd22b9064ee4859618a043055e0b3e3b9e04))
-
-	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
-	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(a0f62605) SHA1(8c39452367150f66271371ab02be2f5a812cb954))
-	ROM_RELOAD(0x80000, 0x80000)
-
-	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
-ROM_END
-
-ROM_START(stargatp4)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gprom4.bin", 0x0000, 0x10000, CRC(7b8f6920) SHA1(f354593e13c30e15c25580387ef2eb9b23622c89))
-
-	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("dsprom3.bin", 0x00000, 0x80000, CRC(db483524) SHA1(ea14e8b04c32fc403ce2ff060caed5562104a862))
-
-	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(781b2b27) SHA1(06decd22b9064ee4859618a043055e0b3e3b9e04))
-
-	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
-	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(a0f62605) SHA1(8c39452367150f66271371ab02be2f5a812cb954))
-	ROM_RELOAD(0x80000, 0x80000)
-
-	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
-ROM_END
-
-ROM_START(stargatp5)
+ROM_START(stargatp) // Rev. 5
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("stgtcpu5.512", 0x0000, 0x10000, CRC(c0579d86) SHA1(ba7ea85ccf407ec72d19e15b34b96a7ca95bf893))
 
@@ -917,10 +829,100 @@ ROM_START(stargatp5)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
 ROM_END
 
+ROM_START(stargatp4) // Rev. 4
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom4.bin", 0x0000, 0x10000, CRC(7b8f6920) SHA1(f354593e13c30e15c25580387ef2eb9b23622c89))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom3.bin", 0x00000, 0x80000, CRC(db483524) SHA1(ea14e8b04c32fc403ce2ff060caed5562104a862))
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(781b2b27) SHA1(06decd22b9064ee4859618a043055e0b3e3b9e04))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(a0f62605) SHA1(8c39452367150f66271371ab02be2f5a812cb954))
+	ROM_RELOAD(0x80000, 0x80000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
+ROM_END
+
+ROM_START(stargatp3) // Rev. 3
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom3.bin", 0x0000, 0x10000, CRC(83f0a2e7) SHA1(5d247a3329a946449e4b333b18c13e351caa230b))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom3.bin", 0x00000, 0x80000, CRC(db483524) SHA1(ea14e8b04c32fc403ce2ff060caed5562104a862))
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(781b2b27) SHA1(06decd22b9064ee4859618a043055e0b3e3b9e04))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(a0f62605) SHA1(8c39452367150f66271371ab02be2f5a812cb954))
+	ROM_RELOAD(0x80000, 0x80000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
+ROM_END
+
+ROM_START(stargatp2) // Rev. 2
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom2.bin", 0x0000, 0x10000, CRC(862920f8) SHA1(cde77e7937782f2f9fe4b7fe27b56206d6f26f63))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom2.bin", 0x00000, 0x80000, CRC(d0205e03) SHA1(d8dea47f0fa0e46e2bd107a1f57121372fdef0d8))
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(781b2b27) SHA1(06decd22b9064ee4859618a043055e0b3e3b9e04))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(a0f62605) SHA1(8c39452367150f66271371ab02be2f5a812cb954))
+	ROM_RELOAD(0x80000, 0x80000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
+ROM_END
+
+ROM_START(stargatp1) // Rev. 1
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom1.bin", 0x0000, 0x10000, CRC(567ecd88) SHA1(2dc4bfbc971cc873af6ec32e5ddbbed001d2e1d2))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom1.bin", 0x00000, 0x80000, CRC(91c1b01a) SHA1(96eec2e9e52c8278c102f433a554327d420fe131))
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(781b2b27) SHA1(06decd22b9064ee4859618a043055e0b3e3b9e04))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(a0f62605) SHA1(8c39452367150f66271371ab02be2f5a812cb954))
+	ROM_RELOAD(0x80000, 0x80000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
+ROM_END
+
+ROM_START(stargatp0) // No rev.
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(837e4354) SHA1(b7d1e270309b3d7965dafeec7b81d2dd41e5700c))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(17b89750) SHA1(927702f88013945cb9f2ea8389800b925182c347))
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(781b2b27) SHA1(06decd22b9064ee4859618a043055e0b3e3b9e04))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(a0f62605) SHA1(8c39452367150f66271371ab02be2f5a812cb954))
+	ROM_RELOAD(0x80000, 0x80000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Street Fighter II (#735)
 /-------------------------------------------------------------------*/
-ROM_START(sfight2)
+ROM_START(sfightii)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(299ad173) SHA1(95cca8c22cfabc55175a49b0439fc7858bdec1bd))
 
@@ -940,7 +942,7 @@ ROM_START(sfight2)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(9009f461) SHA1(589d94a9ae2269175be9f71b1946107bb85620ee))
 ROM_END
 
-ROM_START(sfight2a)
+ROM_START(sfightiia)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom1.bin", 0x0000, 0x10000, CRC(5b42c332) SHA1(958e9fe09e587038dc282fc2f276608ef3744b1d))
 
@@ -960,7 +962,7 @@ ROM_START(sfight2a)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(9009f461) SHA1(589d94a9ae2269175be9f71b1946107bb85620ee))
 ROM_END
 
-ROM_START(sfight2b)
+ROM_START(sfightiib)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom2.bin", 0x0000, 0x10000, CRC(26d24c06) SHA1(c706bd6b2bd5b9ad6a6fb69178169977a54107b5))
 
@@ -983,7 +985,7 @@ ROM_END
 /*-------------------------------------------------------------------
 / Strikes n' Spares (#N111)
 /-------------------------------------------------------------------*/
-ROM_START(snspares)
+ROM_START(snspares) // Rev. 6
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(9e018496) SHA1(a4995f153ba2179198cfc56b7011707328e4ec89))
 
@@ -1001,25 +1003,7 @@ ROM_START(snspares)
 	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(e248574a) SHA1(d2bdc2b9a330bb81556d25d464f617e0934995eb))
 ROM_END
 
-ROM_START(snspares1)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gprom1.bin", 0x0000, 0x10000, CRC(590393f4) SHA1(f52400c620e510253abd1c0719050b9bb09be942))
-
-	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(5c901899) SHA1(d106561b2e382afdb16e938072c9c8f1d1ccdae6))
-	ROM_RELOAD( 0x40000, 0x40000)
-
-	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
-
-	ROM_REGION(0x80000, "dmdcpu2", ROMREGION_ERASEFF)
-	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(5c901899) SHA1(d106561b2e382afdb16e938072c9c8f1d1ccdae6))
-	ROM_RELOAD(0x40000, 0x40000)
-
-	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
-	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(e248574a) SHA1(d2bdc2b9a330bb81556d25d464f617e0934995eb))
-ROM_END
-
-ROM_START(snspares2)
+ROM_START(snspares2) // Rev. 2
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom2.bin", 0x0000, 0x10000, CRC(79906dfc) SHA1(1efb68dd391f79e6f8ad5a588145d6ad7b36743c))
 
@@ -1031,7 +1015,25 @@ ROM_START(snspares2)
 
 	ROM_REGION(0x80000, "dmdcpu2", ROMREGION_ERASEFF)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(5c901899) SHA1(d106561b2e382afdb16e938072c9c8f1d1ccdae6))
-	ROM_RELOAD( 0x40000, 0x40000)
+	ROM_RELOAD(0x40000, 0x40000)
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(e248574a) SHA1(d2bdc2b9a330bb81556d25d464f617e0934995eb))
+ROM_END
+
+ROM_START(snspares1) // Rev. 1
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom1.bin", 0x0000, 0x10000, CRC(590393f4) SHA1(f52400c620e510253abd1c0719050b9bb09be942))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(5c901899) SHA1(d106561b2e382afdb16e938072c9c8f1d1ccdae6))
+	ROM_RELOAD(0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "dmdcpu2", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(5c901899) SHA1(d106561b2e382afdb16e938072c9c8f1d1ccdae6))
+	ROM_RELOAD(0x40000, 0x40000)
 
 	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
 	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(e248574a) SHA1(d2bdc2b9a330bb81556d25d464f617e0934995eb))
@@ -1040,7 +1042,7 @@ ROM_END
 /*-------------------------------------------------------------------
 / Super Mario Brothers (#733) - Only one dsprom dump seems to work?
 /-------------------------------------------------------------------*/
-ROM_START(smb)
+ROM_START(smbp)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(fa1f6e52) SHA1(d7ade0e129cb399494967e025d25614bf1650db7))
 
@@ -1061,7 +1063,7 @@ ROM_START(smb)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(e1379106) SHA1(10c46bad7cbae528716c5ba0709bb1fd3574a0a8))
 ROM_END
 
-ROM_START(smb1)
+ROM_START(smbpa)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom1.bin", 0x0000, 0x10000, CRC(1d8c4df8) SHA1(e301bf3b2a8ed6ef902fe15b890b4c06c4606aa9))
 
@@ -1082,7 +1084,7 @@ ROM_START(smb1)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(e1379106) SHA1(10c46bad7cbae528716c5ba0709bb1fd3574a0a8))
 ROM_END
 
-ROM_START(smb2)
+ROM_START(smbpb)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom2.bin", 0x0000, 0x10000, CRC(5b0f44c4) SHA1(ca9b0cd82c75612c85c956497c8f9c12992f6ad5))
 
@@ -1103,7 +1105,7 @@ ROM_START(smb2)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(e1379106) SHA1(10c46bad7cbae528716c5ba0709bb1fd3574a0a8))
 ROM_END
 
-ROM_START(smb3)
+ROM_START(smbpc)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom3.bin", 0x0000, 0x10000, CRC(5a40822c) SHA1(a87ec6307f848483c76141e47fd67e4549f9c9d3))
 
@@ -1151,47 +1153,7 @@ ROM_END
 /*-------------------------------------------------------------------
 / Tee'd Off (#736)
 /-------------------------------------------------------------------*/
-ROM_START(teedoffp)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(0620365b) SHA1(18887c49a5d3806b725fa6289e50db82974c0f40))
-
-	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(340b8a49) SHA1(3ac76faf920b00b77c77023c42595307840ed3a7))
-
-	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(3868e77a) SHA1(2db91c527803a369ca659eaae6022667a126d2ef))
-
-	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
-	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(9e442b71) SHA1(889023af42a2527a51343ccee7f66b089b6e6d01))
-	ROM_RELOAD(0x40000, 0x40000)
-	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(3dad9508) SHA1(70ed49fa82dbe7586bfca72c5020834f9173d563))
-	ROM_RELOAD(0xc0000, 0x40000)
-
-	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c51d98d8) SHA1(9387a39a03ca90bc8eaddc0c2df8874067a22dea))
-ROM_END
-
-ROM_START(teedoffp1)
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gprom1.bin", 0x0000, 0x10000, CRC(95760ab1) SHA1(9342128e2de4e81c4b0cfc482bb0650434a04bee))
-
-	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("dsprom1.bin", 0x00000, 0x80000, CRC(24f10ad2) SHA1(15f44f69d39ca9782410a75070edf348f64dba62))
-
-	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(3868e77a) SHA1(2db91c527803a369ca659eaae6022667a126d2ef))
-
-	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
-	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(9e442b71) SHA1(889023af42a2527a51343ccee7f66b089b6e6d01))
-	ROM_RELOAD(0x40000, 0x40000)
-	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(3dad9508) SHA1(70ed49fa82dbe7586bfca72c5020834f9173d563))
-	ROM_RELOAD(0xc0000, 0x40000)
-
-	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c51d98d8) SHA1(9387a39a03ca90bc8eaddc0c2df8874067a22dea))
-ROM_END
-
-ROM_START(teedoffp3)
+ROM_START(teedoffp) // Rev. 3
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom3.bin", 0x0000, 0x10000, CRC(d7008579) SHA1(b7bc9f54340ffb2d684b5df80624e8c01e7fa18b))
 
@@ -1211,10 +1173,50 @@ ROM_START(teedoffp3)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c51d98d8) SHA1(9387a39a03ca90bc8eaddc0c2df8874067a22dea))
 ROM_END
 
+ROM_START(teedoffp1) // Rev. 1
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom1.bin", 0x0000, 0x10000, CRC(95760ab1) SHA1(9342128e2de4e81c4b0cfc482bb0650434a04bee))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom1.bin", 0x00000, 0x80000, CRC(24f10ad2) SHA1(15f44f69d39ca9782410a75070edf348f64dba62))
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(3868e77a) SHA1(2db91c527803a369ca659eaae6022667a126d2ef))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(9e442b71) SHA1(889023af42a2527a51343ccee7f66b089b6e6d01))
+	ROM_RELOAD(0x40000, 0x40000)
+	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(3dad9508) SHA1(70ed49fa82dbe7586bfca72c5020834f9173d563))
+	ROM_RELOAD(0xc0000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c51d98d8) SHA1(9387a39a03ca90bc8eaddc0c2df8874067a22dea))
+ROM_END
+
+ROM_START(teedoffp0) // No rev.
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(0620365b) SHA1(18887c49a5d3806b725fa6289e50db82974c0f40))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom.bin", 0x00000, 0x80000, CRC(340b8a49) SHA1(3ac76faf920b00b77c77023c42595307840ed3a7))
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(3868e77a) SHA1(2db91c527803a369ca659eaae6022667a126d2ef))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(9e442b71) SHA1(889023af42a2527a51343ccee7f66b089b6e6d01))
+	ROM_RELOAD(0x40000, 0x40000)
+	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(3dad9508) SHA1(70ed49fa82dbe7586bfca72c5020834f9173d563))
+	ROM_RELOAD(0xc0000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c51d98d8) SHA1(9387a39a03ca90bc8eaddc0c2df8874067a22dea))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Waterworld (#746)
 /-------------------------------------------------------------------*/
-ROM_START(waterwld)
+ROM_START(waterwld) // Rev. 3
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(db1fd197) SHA1(caa22f7e3f52be85da496375115933722a414ee0))
 
@@ -1232,7 +1234,7 @@ ROM_START(waterwld)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(6dddce0a) SHA1(6ad9b023ba8632dda0a4e04a4f66aac52ddd3b09))
 ROM_END
 
-ROM_START(waterwld2)
+ROM_START(waterwld2) // Rev. 2
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom2.bin", 0x0000, 0x10000, CRC(c3d64cd7) SHA1(63bfd26fdc7082c2bb60c978508820442ac90f14))
 
@@ -1253,7 +1255,7 @@ ROM_END
 /*-------------------------------------------------------------------
 / Wipeout (#738)
 /-------------------------------------------------------------------*/
-ROM_START(wipeout)
+ROM_START(wipeout) // Rev. 2 (GPROM checksum 1F9B)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(1161cdb7) SHA1(fdf4c0abb70a41149c69bd55c613849a662944d3))
 
@@ -1271,6 +1273,26 @@ ROM_START(wipeout)
 
 	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(f08e6d7f) SHA1(284214ac80735ddd36933ecd60debc7aea18403c))
+ROM_END
+
+ROM_START(wipeout2a) // Rev. 2 (GPROM checksum 35FA)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("wipe_out_738_gprom.bin", 0x0000, 0x10000, CRC(968da1ac) SHA1(7400b7a36926d6bb39349a7654e3c33c5eda1052))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("wipe_out_738_dsprom.bin", 0x00000, 0x80000, CRC(cbdec3ab) SHA1(2d70d436783830bf074a7a0590d5c48432136595))
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("wipe_out_738_drom1.bin", 0x8000, 0x8000, CRC(98ae6da4) SHA1(3842c2c4e708a5deae6b5d9407694d337b62384f))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("wipe_out_738_arom1.u4", 0x00000, 0x40000, CRC(cccdf23a) SHA1(1b1e31f04cd60d64f0b9b8ab2c6169dacd0bce69))
+	ROM_RELOAD(0x40000, 0x40000)
+	ROM_LOAD("wipe_out_738_arom2.u5", 0x80000, 0x40000, CRC(d4cc44a1) SHA1(c68264f00efa9f219fc257061ed39cd789e94126))
+	ROM_RELOAD(0xc0000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("wipe_out_738_yrom1.bin", 0x8000, 0x8000, CRC(f08e6d7f) SHA1(284214ac80735ddd36933ecd60debc7aea18403c))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1296,7 +1318,7 @@ ROM_START(wcsoccer)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(8b2795b0) SHA1(b838d4e410c815421099c65b0d3b22227dae17c6))
 ROM_END
 
-ROM_START(wcsoccerd2)
+ROM_START(wcsoccer1a)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(6382c32e) SHA1(e212f4a9a77d1cf089acb226a8079ac4cae8a96d))
 
@@ -1318,43 +1340,44 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1992,  smb,        0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  smb1,       smb,      p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (rev.1)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  smb2,       smb,      p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (rev.2)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  smb3,       smb,      p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (rev.3)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  smbmush,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers Mushroom World",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  cueball,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  cueball2,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (rev.2)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  cueball3,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (rev.3)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  sfight2,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  sfight2a,   sfight2,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (rev.1)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  sfight2b,   sfight2,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (rev.2)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  teedoffp,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Tee'd Off",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  teedoffp1,  teedoffp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Tee'd Off (rev.1)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  teedoffp3,  teedoffp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Tee'd Off (rev.3)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  gladiatp,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Gladiators",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  wipeout,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Wipeout (rev.2)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rescu911,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Rescue 911 (rev.1)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcsoccer,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "World Challenge Soccer (rev.1)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcsoccerd2, wcsoccer, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "World Challenge Soccer (disp.rev.2)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  stargatp,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (Pinball)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  stargatp1,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (rev.1)",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  stargatp2,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (rev.2)",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  stargatp3,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (rev.3)",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  stargatp4,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (rev.4)",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  stargatp5,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (rev.5)",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  shaqattq,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Shaq Attaq (rev.5)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  shaqattq2,  shaqattq, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Shaq Attaq (rev.2)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  freddy,     0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.3)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  freddy4,    freddy,   p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.4)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  bighurt,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Frank Thomas' Big Hurt (rev.3)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  waterwld,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Waterworld (rev.3)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  waterwld2,  waterwld, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Waterworld (rev.2)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  snspares,   0,        p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Strikes n' Spares (rev.6)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  snspares2,  snspares, p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Strikes n' Spares (rev.2)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  snspares1,  snspares, p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Strikes n' Spares (rev.1)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  andretti,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Mario Andretti",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  andretti4,  andretti, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Mario Andretti (rev.T4)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1996,  barbwire,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Barb Wire",                                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1996,  brooks,     0,        p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Brooks & Dunn (rev.T1)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
-GAME(2003,  mac_zois,   shaqattq, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Aksioma",  "Machina Zois Virtual Training Centre",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  smbp,       0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 1)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  smbpa,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 2)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  smbpb,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 3)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  smbpc,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 4)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  smbmush,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers Mushroom World",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  cueball,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (set 1)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  cueballa,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (set 2)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  cueballb,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (set 3)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  sfightii,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (pinball, set 1)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  sfightiia,  sfightii, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (pinball, set 2)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  sfightiib,  sfightii, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (pinball, set 3)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  teedoffp,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Tee'd Off (pinball, rev.3)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  teedoffp1,  teedoffp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Tee'd Off (pinball, rev.1)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  teedoffp0,  teedoffp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Tee'd Off (pinball)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  gladiatp,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Gladiators (pinball)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  wipeout,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Wipeout (rev.2, set 1)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  wipeout2a,  wipeout,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Wipeout (rev.2, set 2)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rescu911,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Rescue 911 (rev.1)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcsoccer,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "World Challenge Soccer (rev.1, set 1)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcsoccer1a, wcsoccer, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "World Challenge Soccer (rev.1, set 2)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  stargatp,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.5)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  stargatp4,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.4)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  stargatp3,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.3)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  stargatp2,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.2)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  stargatp1,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball, rev.1)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  stargatp0,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  shaqattq,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Shaq Attaq (rev.5)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  shaqattq2,  shaqattq, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Shaq Attaq (rev.2)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(2003,  mac_zois,   shaqattq, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Aksioma",  "machinaZOIS Virtual Training Center",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  freddy,     0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.4)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  freddy3,    freddy,   p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.3)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  bighurt,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Frank Thomas' Big Hurt (rev.3)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  waterwld,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Waterworld (rev.3)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  waterwld2,  waterwld, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Waterworld (rev.2)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  snspares,   0,        p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Strikes n' Spares (rev.6)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  snspares2,  snspares, p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Strikes n' Spares (rev.2)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  snspares1,  snspares, p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Strikes n' Spares (rev.1)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  andretti,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Mario Andretti (rev.T4)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  andretti0,  andretti, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Mario Andretti",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1996,  barbwire,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Barb Wire",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1996,  brooks,     0,        p0, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Brooks & Dunn (rev.T1)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

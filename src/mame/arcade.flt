@@ -377,6 +377,7 @@ ecoinf2.cpp
 ecoinf3.cpp
 ecoinfr.cpp
 efdt.cpp
+efg8080.cpp
 egghunt.cpp
 electra.cpp
 embargo.cpp
@@ -435,6 +436,7 @@ forte2.cpp
 fortecar.cpp
 freekick.cpp
 freeway.cpp
+frenzyxprss.cpp
 fresh.cpp
 fromanc2.cpp
 fromance.cpp
@@ -545,7 +547,6 @@ hapyfish.cpp
 harddriv.cpp
 hazelgr.cpp
 hcastle.cpp
-headonb.cpp
 heromem.cpp
 hexion.cpp
 hideseek.cpp
@@ -841,7 +842,6 @@ mouser.cpp
 mpu12wbk.cpp
 mpu2.cpp
 mpu3.cpp
-mpu4.cpp
 mpu4avan.cpp
 mpu4bwb.cpp
 mpu4concept.cpp
@@ -851,10 +851,11 @@ mpu4empire.cpp
 mpu4mdm.cpp
 mpu4misc.cpp
 mpu4mod2sw.cpp
+mpu4mod4oki.cpp
 mpu4mod4yam.cpp
 mpu4plasma.cpp
-mpu4sw.cpp
 mpu4union.cpp
+mpu4unsorted.cpp
 mpu4vid.cpp
 mpu5sw.cpp
 mquake.cpp
@@ -1140,19 +1141,21 @@ segaatom.cpp
 segac2.cpp
 segacoin.cpp
 segae.cpp
+segafruit.cpp
 segag80r.cpp
 segag80v.cpp
 segahang.cpp
 segajw.cpp
 segald.cpp
-segam1.cpp
 segaorun.cpp
 segas16a.cpp
 segas16b.cpp
+segas16b_isgsm.cpp
 segas18.cpp
 segas18_astormbl.cpp
 segas24.cpp
 segas32.cpp
+segasm1.cpp
 segasp.cpp
 segattl.cpp
 segaufo.cpp

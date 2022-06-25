@@ -126,7 +126,8 @@ A memory share can be created if it doesn’t exist in a memory map
 through that creator class.  If it already exists it is just
 retrieved.  That class behaves like a pointer but also has the
 ``target()``, ``length()``, ``bytes()``, ``endianness()``,
-``bitwidth()`` and ``bytewidth()`` methods for share information.
+``bitwidth()`` and ``bytewidth()`` methods for share information.  The
+desired size is specified in bytes.
 
 .. code-block:: C++
 
@@ -154,12 +155,17 @@ A memory bank is a named memory zone indirection that can be mapped in
 address spaces.  It points to ``nullptr`` when created.
 ``configure_entry`` associates an entry number and a base pointer.
 ``configure_entries`` does the same for multiple consecutive entries
-spanning a memory zone.  Alternatively ``set_base`` sets the base for
-entry 0 and selects it.
+spanning a memory zone.
 
-``set_entry`` allows to dynamically and efficiently select the current
-active entry, ``entry()`` gets that selection back, and ``base()`` gets
-the associated base pointer.
+``set_base`` sets the base address for the active entry.  If there are
+no entries, entry 0 (zero) is automatically created and selected.  Use
+of ``set_base`` should be avoided in favour of pre-configured entries
+unless there are an impractically large number of possible base
+addresses.
+
+``set_entry`` dynamically and efficiently selects the active entry,
+``entry()`` returns the active entry number, and ``base()`` gets the
+associated base pointer.
 
 .. code-block:: C++
 

@@ -55,7 +55,7 @@
 		setup.register_param(NET_STR(name), NET_STR(val));
 
 #define DEFPARAM(name, val)                                                    \
-		setup.register_defparam(NET_STR(name), NET_STR(val));
+		setup.register_default_param(NET_STR(name), NET_STR(val));
 
 #define HINT(name, val)                                                        \
 		setup.register_hint(# name , ".HINT_" # val);
@@ -107,15 +107,26 @@ void NETLIST_NAME(name)([[maybe_unused]] netlist::nlparse_t &setup)            \
 // truth table defines
 // -----------------------------------------------------------------------------
 
+#if 0
 #define TRUTHTABLE_START(cname, in, out, pdef_params)                          \
-	NETLIST_START(cname) \
-		netlist::tt_desc desc;                                                 \
-		desc.name = #cname ;                                                   \
-		desc.ni = in;                                                          \
-		desc.no = out;                                                         \
-		desc.family = "";                                                      \
+	void NETLIST_NAME(cname ## _impl)(netlist::tt_desc &desc);                 \
+	static NETLIST_START(cname)                                                \
+		netlist::tt_desc xdesc{ #cname, in, out, "" };                         \
 		auto sloc = PSOURCELOC();                                              \
-		const pstring def_params = pdef_params;
+		const pstring def_params = pdef_params;                                \
+		NETLIST_NAME(cname ## _impl)(xdesc);                                   \
+		setup.truth_table_create(xdesc, def_params, std::move(sloc));          \
+	NETLIST_END()                                                              \
+	static void NETLIST_NAME(cname ## _impl)(netlist::tt_desc &desc)           \
+	{
+#else
+#define TRUTHTABLE_START(cname, in, out, pdef_params)                          \
+	NETLIST_START(cname)                                                       \
+		netlist::tt_desc desc{ #cname, in, out, "", {} };                      \
+		auto sloc = PSOURCELOC();                                              \
+		const pstring def_params = pdef_params;                                \
+		plib::functor_guard lg([&](){ setup.truth_table_create(desc, def_params, std::move(sloc)); });
+#endif
 
 #define TT_HEAD(x) \
 		desc.desc.emplace_back(x);
@@ -127,7 +138,6 @@ void NETLIST_NAME(name)([[maybe_unused]] netlist::nlparse_t &setup)            \
 		desc.family = x;
 
 #define TRUTHTABLE_END() \
-		setup.truth_table_create(desc, def_params, std::move(sloc)); \
 	NETLIST_END()
 
 #define TRUTHTABLE_ENTRY(name)                                                 \
@@ -143,12 +153,11 @@ namespace netlist
 
 	struct tt_desc
 	{
-		tt_desc() : ni(0), no(0) { }
 		pstring name;
 		unsigned long ni;
 		unsigned long no;
-		std::vector<pstring> desc;
 		pstring family;
+		std::vector<pstring> desc;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -168,20 +177,20 @@ namespace netlist
 
 		void register_model(const pstring &model_in);
 		void register_alias(const pstring &alias, const pstring &out);
-		void register_alias_nofqn(const pstring &alias, const pstring &out);
+		void register_alias_no_fqn(const pstring &alias, const pstring &out);
 		void register_dip_alias_arr(const pstring &terms);
 
 		// last argument only needed by nltool
 		void register_dev(const pstring &classname, const pstring &name,
 			const std::vector<pstring> &params_and_connections,
-			factory::element_t **felem = nullptr);
+			factory::element_t **factory_element = nullptr);
 		void register_dev(const pstring &classname, std::initializer_list<const char *> more_parameters);
 		void register_dev(const pstring &classname, const pstring &name)
 		{
 			register_dev(classname, name, std::vector<pstring>());
 		}
 
-		void register_hint(const pstring &objname, const pstring &hint_name);
+		void register_hint(const pstring &object_name, const pstring &hint_name);
 
 		void register_link(const pstring &sin, const pstring &sout);
 		void register_link_arr(const pstring &terms);
@@ -191,7 +200,7 @@ namespace netlist
 		void register_param(const pstring &param, const pstring &value);
 
 		// DEFPARAM support
-		void register_defparam(const pstring &name, const pstring &def);
+		void register_default_param(const pstring &name, const pstring &def);
 
 		template <typename T>
 		std::enable_if_t<plib::is_arithmetic<T>::value>

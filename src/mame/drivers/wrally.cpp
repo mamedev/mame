@@ -155,13 +155,13 @@ void wrally_state::machine_start()
 void wrally_state::shareram_w(offs_t offset, uint8_t data)
 {
 	// why isn't there address map functionality for this?
-	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+	util::big_endian_cast<u8>(m_shareram.target())[offset] = data;
 }
 
 uint8_t wrally_state::shareram_r(offs_t offset)
 {
 	// why isn't there address map functionality for this?
-	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+	return util::big_endian_cast<u8 const>(m_shareram.target())[offset];
 }
 
 void wrally_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)

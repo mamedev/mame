@@ -58,6 +58,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override { m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); }
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -108,7 +109,6 @@ private:
 	void vblank_irq(int state);
 	void bagmanf_vblank_irq(int state);
 
-	[[maybe_unused]] DECLARE_MACHINE_RESET(cclimber);
 	DECLARE_VIDEO_START(cclimber);
 	void cclimber_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(swimmer);

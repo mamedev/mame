@@ -28,9 +28,14 @@
 #include <utility>
 
 // standard windows headers
-#include <dsound.h>
-#include <mmsystem.h>
+
 #include <windows.h>
+
+#include <mmreg.h>
+#include <mmsystem.h>
+
+#include <dsound.h>
+
 #include <wrl/client.h>
 
 

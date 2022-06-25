@@ -14,6 +14,7 @@
 #include "formats/imd_dsk.h"
 #include "formats/tim011_dsk.h"
 #include "machine/upd765.h"
+#include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -136,6 +137,14 @@ static void tim011_floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_TIM011_FORMAT);
 }
 
+static DEVICE_INPUT_DEFAULTS_START( keyboard )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 void tim011_state::tim011_palette(palette_device &palette) const
 {
 	static constexpr rgb_t tim011_pens[4] = {
@@ -155,6 +164,7 @@ void tim011_state::tim011(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tim011_state::tim011_mem);
 	m_maincpu->set_addrmap(AS_IO, &tim011_state::tim011_io);
 	m_maincpu->tend1_wr_callback().set(m_fdc, FUNC(upd765a_device::tc_line_w));
+	m_maincpu->txa1_wr_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 
 //  CDP1802(config, "keyboard", XTAL(1'750'000)); // CDP1802, unknown clock
 
@@ -179,6 +189,10 @@ void tim011_state::tim011(machine_config &config)
 	screen.set_visarea(0, 512-1, 0, 256-1);
 	screen.set_screen_update(FUNC(tim011_state::screen_update_tim011));
 	screen.set_palette(m_palette);
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
+	rs232.rxd_handler().set(m_maincpu, FUNC(z180_device::rxa1_w));
 }
 
 /* ROM definition */

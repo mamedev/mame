@@ -22512,17 +22512,18 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
 		<!--"Wizardry: Proving Grounds of the Mad Overload" is a 1981 roleplaying game developed by Andrew Greenberg and Robert Woodhead, and distributed by Sir-Tech. This version is dated 05-SEP-81, the earliest known version. It runs on any Apple ][ with 48K.-->
+        <!-- This set was updated on May 10th, 2022 to fix critical data corruption in the saved characters roster that entirely prevented playing. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A - Scenario disk"/>
 			<dataarea name="flop" size="234881">
-				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side a - scenario.woz" size="234881" crc="01d521fe" sha1="2cd4d7f52a98e1a51787c89b82fa9f64dfa0fc3e"/>
+				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side a - scenario.woz" size="234881" crc="0e955f2e" sha1="47dd791b826c1d952ca78fe209fafd5f6fc30ed8" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B - Boot disk"/>
 			<dataarea name="flop" size="234846">
-				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side b - boot.woz" size="234846" crc="a7d80c8c" sha1="1f1ad5cb198a29e1934a744901ae71cccc82e300"/>
+				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side b - boot.woz" size="234846" crc="a7d80c8c" sha1="1f1ad5cb198a29e1934a744901ae71cccc82e300" />
 			</dataarea>
 		</part>
 	</software>
@@ -22564,6 +22565,864 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241629">
 				<rom name="drugs- their effects on you - disk 1, side a.woz" size="241629" crc="fd63a817" sha1="4f30cd771a60b6fed20973a86df5355d491ead8f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="runforit">
+		<description>Run For It</description>
+		<year>1984</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2022-04-29"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Run For It" is a 1984 action game developed by Richard Hefter and Steve Worthington, and distributed by Optimum Resource. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234841">
+				<rom name="run for it.woz" size="234841" crc="5ac6ea0d" sha1="b7d99b23bd97a6ca0d54cd387ab60d361844af46"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starmines">
+		<description>Starmines</description>
+		<year>1981</year>
+		<publisher>Softape</publisher>
+		<info name="release" value="2022-04-29"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Starmines" is a 1981 action game developed by Steve A. Baker and distributed by Softape. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234772">
+				<rom name="starmines.woz" size="234772" crc="406a60dd" sha1="fe97774a21c7ad6ac89f89bc67057a74345de2d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bwoodsafe">
+		<description>Basic Woodshop Safety</description>
+		<year>1983</year>
+		<publisher>Abraxas</publisher>
+		<info name="release" value="2022-04-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Basic Woodshop Safety" is a 1983 educational program developed and distributed by Abraxas. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228121">
+				<rom name="basic woodshop safety.woz" size="228121" crc="7036cc5d" sha1="62db58a0f6c45896720f1ff34f10d76c89d4d106"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sundfl20">
+		<description>SunDog: Frozen Legacy (Version 2.0)</description>
+		<year>1984</year>
+		<publisher>FTL Games</publisher>
+		<info name="release" value="2022-05-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"SunDog: Frozen Legacy" is a 1984 simulation game developed and distributed by FTL Games. This is version 2.0. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Play side"/>
+			<dataarea name="flop" size="241451">
+				<rom name="sundog frozen legacy v2.0 - play side.woz" size="241451" crc="fb257a8e" sha1="09401070910a3570344e295b1b7d3ff7fd5c5110"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot/Utility side"/>
+			<dataarea name="flop" size="234805">
+				<rom name="sundog frozen legacy v2.0 - utility side (boot).woz" size="234805" crc="867fb84c" sha1="7d87f5b73f42c84d9f674309f1086cea659ead66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumpman">
+		<description>Jumpman</description>
+		<year>1983</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2022-05-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Jumpman" is a 1983 action game developed and distributed by Epyx. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Beginner levels"/>
+			<dataarea name="flop" size="234776">
+				<rom name="jumpman - beginner levels.woz" size="234776" crc="5a113793" sha1="fbe71d6b9e2fc9c10015ed2ec01b94a0d70024a9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Advanced levels"/>
+			<dataarea name="flop" size="234776">
+				<rom name="jumpman - advanced levels.woz" size="234776" crc="51c438bc" sha1="b4cb7b54f461688bb513feae050036aa1b0ec7ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emp2is10">
+		<description>Empire II: Interstellar Sharks (Version 1.0)</description>
+		<year>1982</year>
+		<publisher>Edu-Ware</publisher>
+		<info name="release" value="2022-05-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Empire II: Interstellar Sharks" is a 1982 simulation game developed by David Mullich, Ken Delgado, Mike St. Jean, Jim Wootton, Wendy Peterson, and Pam Pollack, and distributed by Edu-Ware Services. This is version 1.0. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234881">
+				<rom name="empire ii- interstellar sharks.woz" size="234881" crc="9a6a5b21" sha1="1d4cd53272930c29ccd48aef40c8fdb590e5c311"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surmth20">
+		<description>Survival Math (Version 2.0)</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Survival Math" is a 1985 educational game designed by Walter Koetke and distributed by Sunburst Communications. This is version 2.0. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234814">
+				<rom name="survival math.woz" size="234814" crc="6d646e06" sha1="1d1ec8b1f67e8835f36c44fe8bacb0cfa2d3a1df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tbtpaps13">
+		<description>Teasers by Tobbs: Puzzles and Problem Solving (Version 1.3)</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Teasers by Tobbs: Puzzles and Problem Solving" is a 1982 educational game authored by Tom O'Brien and distributed by Sunburst Communications. This is version 1.3. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234852">
+				<rom name="teasers by tobbs- puzzles and problem solving.woz" size="234852" crc="ec73b80b" sha1="b8213f89a886d23f12b9d94190f82f4eae1b73ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgsquad">
+		<description>The Geometric Supposer: Quadrilaterals</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"The Geometric Supposer: Quadrilaterals" is a 1986 educational program by Judah L. Schwartz and Michal Yerushalmy, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234849">
+				<rom name="the geometric supposer- quadrilaterals.woz" size="234849" crc="457b9a05" sha1="f9ef50533975b4474051a6a42141e93a1a5b0c26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgtang">
+		<description>Targets: A Numbers Game</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Targets: A Numbers Game" is a 1985 educational game designed by T.C. O'Brien II, programmed by Andrew Lorenz, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234836">
+				<rom name="targets- a numbers game.woz" size="234836" crc="343980eb" sha1="7d45fbc51a115319dedb3c560e470ecfe3da1c02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgstri">
+		<description>The Geometric Supposer: Triangles</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"The Geometric Supposer: Triangles" is a 1985 educational program by Judah L. Schwartz and Michal Yerushalmy, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234833">
+				<rom name="the geometric supposer- triangles.woz" size="234833" crc="251da185" sha1="7095b073ea38d41aca74c9957b44bc8922fc0494"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tkrmad">
+		<description>The King's Rule: Mathematics and Discovery</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The King's Rule: Mathematics and Discovery" is a 1984 educational program designed by Tom O'Brien, programmed by Tom Raich and Mike Fish, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234846">
+				<rom name="the king's rule- mathematics and discovery.woz" size="234846" crc="bfefe27a" sha1="cf0beacfe1cece58a390c0c9903025470e385ba1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wqstbss">
+		<description>Word Quest: Binary Search Strategies</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Word Quest: Binary Search Strategies" is a 1985 educational game by Judah L. Schwartz and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234826">
+				<rom name="word quest- binary search strategies.woz" size="234826" crc="a559b0c3" sha1="fcfa01b5a2ae6fec3f348f8059730b3834267e93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpuzlr">
+		<description>The Puzzler: A Program for Developing Reading Strategies</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The Puzzler: A Program for Developing Reading Strategies" is a 1984 educational program developed by Janet Gollan, Audrey Shillington, Douglas Denby, Douglas Inkpen, Arthur Willer, Dale Burnett, and Larry Miller, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234929">
+				<rom name="the puzzler.woz" size="234929" crc="c46c6136" sha1="b97472d741f8d879e5ac6bebdf88bf078f12c385"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memcastl">
+		<description>Memory Castle</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-20"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Memory Castle" is a 1985 educational game designed by Donna Stanger, programmed by Lon Koenig, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234802">
+				<rom name="memory castle.woz" size="234802" crc="4392bcc7" sha1="76e4a3aac956c7acc5ed9383bf7e80b86b32241e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blkfndrs">
+		<description>Blockers and Finders</description>
+		<year>1987</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-20"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Blockers and Finders" is a 1987 educational game designed by Tom O'Brien, programmed by Jim Thomas, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234807">
+				<rom name="blockers and finders.woz" size="234807" crc="10a1d4fd" sha1="7242b9035e77e14ff47597682f32968b119e72cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fornext">
+		<description>FOR Your NEXT Adventure: FOR-NEXT Loops</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-20"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"FOR Your NEXT Adventure: FOR-NEXT Loops" is a 1985 educational game designed by John Stimson, Robert C. Rosen, and Ardyth Stimson, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234855">
+				<rom name="for your next adventure.woz" size="234855" crc="67cfa17d" sha1="342c28e36a8d735b09d6be7e6e9e407254ba7283"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wlywrdwk">
+		<description>Wally's Word Works: The Parts of Speech Game</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-20"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Wally's Word Works: The Parts of Speech Game" is a 1985 educational game designed by John D. Perron and Martha Nicols, programmed by Andrew Armstrong, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Teacher disk"/>
+			<dataarea name="flop" size="234886">
+				<rom name="wally's word works disk 1 - teacher disk.woz" size="234886" crc="2436eb0c" sha1="0bfb8694332b4a2bd38e4bd0bc0734c84ea8494f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Student disk"/>
+			<dataarea name="flop" size="234886">
+				<rom name="wally's word works disk 2 - student disk.woz" size="234886" crc="bd913887" sha1="49d7fb5a1e1b1b1da778692f9009c1d37bf6ff92"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tlapuzps">
+		<description>Tobbs Learns Algebra: Puzzles and Problem Solving</description>
+		<year>1983</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-20"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Tobbs Learns Algebra: Puzzles and Problem Solving" is a 1983 educational game by Tom O'Brien and distributed by Sunburst Communications. This is version 1.1. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234843">
+				<rom name="tobbs learns algebra.woz" size="234843" crc="55811802" sha1="fcda0a78d518c42f6c18f17d4468f18351380e36"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="botgardn">
+		<description>Botanical Gardens</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-20"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Botanical Gardens" is a 1986 educational game programmed by Robert Kimball, David J. Donoghue, and Patrick Kehoe, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234828">
+				<rom name="botanical gardens.woz" size="234828" crc="1edefb2b" sha1="58f1b1e715d0ff9f7bb866dcb6af16832d8fa0c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmath">
+		<description>Muppet Math</description>
+		<year>1991</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Muppet Math" is a 1991 educational program developed by Donna Stanger, Mary Anne Hermann, Chris Cerf, Barbara Wood Scott Clough, Eric Grubbs, Greg Johnson, Lon Koenig, and Tad Wood, and distributed by Sunburst Communications. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234884">
+				<rom name="muppet math.woz" size="234884" crc="ca1d1e02" sha1="3d1e4870c7d8b0428f4c5249e8a5e0b670d77f62"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslat10">
+		<description>Muppet Slate v1.0</description>
+		<year>1988</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Muppet Slate" is a 1988 productivity program designed by Donna Stanger, programmed by Tad Wood and Scott Clough, and distributed by Sunburst Communications. This is version 1.0. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Teacher disk"/>
+			<dataarea name="flop" size="234848">
+				<rom name="muppet slate v1.0 - disk 1 - teacher disk.woz" size="234848" crc="f014b4de" sha1="6a33813654a34c27face508ba10bf8fd03d8b44f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Master student disk"/>
+			<dataarea name="flop" size="234855">
+				<rom name="muppet slate v1.0 - disk 2 - master student disk.woz" size="234855" crc="491b07bd" sha1="5cc20b04d5846139fbeed50189c77ef036745c75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslat101">
+		<description>Muppet Slate (Version 1.0.1)</description>
+		<year>1988</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Muppet Slate" is a 1988 productivity program designed by Donna Stanger, programmed by Tad Wood and Scott Clough, and distributed by Sunburst Communications. This is version 1.0.1. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Teacher disk"/>
+			<dataarea name="flop" size="234850">
+				<rom name="muppet slate v1.0.1 - disk 1 - teacher disk.woz" size="234850" crc="649fc542" sha1="d6531dc70909efdfeb8243d296deb2868e0b359b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Master student disk"/>
+			<dataarea name="flop" size="234857">
+				<rom name="muppet slate v1.0.1 - disk 2 - master student disk.woz" size="234857" crc="4c31631b" sha1="d953d4f3c8616d75bdfa6867ae5a8b9a9d481b5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwawit">
+		<description>Newbery Winners: A Wrinkle in Time</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Newbery Winners: A Wrinkle in Time" is a 1982 educational program developed and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="newbery winners- a wrinkle in time.woz" size="234788" crc="2b02ea5d" sha1="d9a451f381ad47dfcd97a3a2f77689167af3b3d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwsndr">
+		<description>Newbery Winners: Sounder</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Newbery Winners: Sounder" is a 1982 educational program developed and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234778">
+				<rom name="newbery winners- sounder.woz" size="234778" crc="61387c82" sha1="0f5a6b49fba711e1777e62564ff205b6cdb1c117"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nwbtt">
+		<description>Newbery Winners: Bridge to Terabithia</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Newbery Winners: Bridge to Terabithia" is a 1982 educational program developed and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234791">
+				<rom name="newbery winners- bridge to terabithia.woz" size="234791" crc="de9bfb72" sha1="e41a7638650d3a839e0d1e02f093fcdd53d9b2d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="humnpump">
+		<description>The Human Pump</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The Human Pump" is a 1986 educational program developed by Jim Kulzer, Donna Stanger, and Tad Martin Wood, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234819">
+				<rom name="the human pump.woz" size="234819" crc="22ae15ca" sha1="a993c93c0cf0bc0a54825fb2a14c627b4b8c0795"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mptstg">
+		<description>Muppets on Stage</description>
+		<year>1987</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Muppets on Stage" is a 1987 educational game developed and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234770">
+				<rom name="muppets on stage.woz" size="234770" crc="0273fc7c" sha1="f5ea49e8c616e756649e5dc9619abb5b15ba286a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pickpart">
+		<description>Pick the Part</description>
+		<year>1983</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Pick the Part" is a 1983 educational game developed and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234767">
+				<rom name="pick the part.woz" size="234767" crc="8be956f4" sha1="9971235515c6fd27990ba2411632d625121ce3b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memmachn">
+		<description>The Memory Machine</description>
+		<year>1989</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"The Memory Machine" is a 1989 educational game designed by Donna Stanger, programmed by David Owen, with graphic art by Barb Wood, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234817">
+				<rom name="the memory machine.woz" size="234817" crc="605835b6" sha1="68420ba94b61c9013c36a748ab060ee6b25abae5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwstemp">
+		<description>Playing with Science: Temperature</description>
+		<year>1988</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Playing with Science: Temperature" is a 1988 educational game designed by Leslie Eiser and Dominique Allard, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234827">
+				<rom name="playing with science- temperature.woz" size="234827" crc="c65b1457" sha1="e03a830b4aca0425f6e247aa1d90f754c15d29d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puncpon">
+		<description>Punctuation Put-On: Punctuation Processor</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Punctuation Put-On: Punctuation Processor" is a 1985 educational program by John D. Perron, programmed by Victoria Hanson, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Teacher disk"/>
+			<dataarea name="flop" size="234844">
+				<rom name="punctuation put-on - disk 1 - teacher disk.woz" size="234844" crc="8eeb0c5a" sha1="4a7aec974400d16ee91f42593dc31f3e2e5b14b2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Student disk"/>
+			<dataarea name="flop" size="234844">
+				<rom name="punctuation put-on - disk 2 - student disk.woz" size="234844" crc="70563734" sha1="66b1215f797aa75f9c8e96b35b01bc201b9d19f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sspsai">
+		<description>Safari Search: Problem Solving and Inference</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Safari Search: Problem Solving and Inference" is a 1985 educational game designed by Thomas C. O'Brien, with graphics and programming by Jim Thomas, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234845">
+				<rom name="safari search- problem solving and inference.woz" size="234845" crc="c5ecc2ca" sha1="5b66690ce52cea46d1c8b8e3d88fc0dd6ee86b90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simonsays">
+		<description>Simon Says</description>
+		<year>1989</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Simon Says" is a 1989 educational game designed by Donna Stanger, programmed by Jim McDonagh, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234801">
+				<rom name="simon says.woz" size="234801" crc="cf2a10ca" sha1="3790e710b5a9497b12f98d9908aaf0c3959b45de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="regroup89">
+		<description>Regrouping</description>
+		<year>1989</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Regrouping" is a 1989 educational game designed by Donna Stanger, programmed by David Pearson and Andrew Lorenz, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234816">
+				<rom name="regrouping.woz" size="234816" crc="f8bcd559" sha1="c11f6802a33366488ec2d26238c4c40132b7ed5a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcwrace">
+		<description>Space Waste Race: Storybooks of the Future</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Space Waste Race: Storybooks of the Future" is a 1984 educational program designed by John D. Perron, programmed by Andrew Armstrong, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234846">
+				<rom name="space waste race- storybooks of the future.woz" size="234846" crc="c4956fa2" sha1="f4f35ce23a0639b98e73d62dc44f34b6dce01780"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seaiv2">
+		<description>Solving Equations and Inequalities (Version 2)</description>
+		<year>1983</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Solving Equations and Inequalities" is a 1983 educational program developed by Charles Lund and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234823">
+				<rom name="solving equations and inequalities.woz" size="234823" crc="a5b589a2" sha1="b2b318c75fa8321b0da93c3169e63a510b6fe506"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tenclues">
+		<description>Ten Clues</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Ten Clues" is a 1986 educational game designed by Donna Stanger, programmed by Tad Wood, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234796">
+				<rom name="ten clues.woz" size="234796" crc="8b32d377" sha1="a370910a23961dd66844ac3e7b1bb48f3bf9b3fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tchances">
+		<description>Taking Chances</description>
+		<year>1991</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Taking Chances" is a 1991 educational game designed by Gail Marshall, programmed by David Findley, with graphics by Steve Bunton, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234819">
+				<rom name="taking chances.woz" size="234819" crc="7dec429e" sha1="8af69831c269caed6133bcf2fa6d3a6f533d87d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tradpost">
+		<description>Trading Post</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Trading Post" is a 1985 educational game developed by Janet Brawner and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="trading post.woz" size="234790" crc="37adfc35" sha1="0e3f0fe0520741ae4ac6d3a41bed9de8659db8c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="semacalc">
+		<description>The Semantic Calculator</description>
+		<year>1983</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The Semantic Calculator" is a 1983 educational program developed and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234777">
+				<rom name="the semantic calculator.woz" size="234777" crc="7ae38ce6" sha1="bc59969b3bf3cf4b256549baffb984b14407bce1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thepond">
+		<description>The Pond</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The Pond" is a 1984 educational game developed by Marge Kosel and Mike Fish, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234794">
+				<rom name="the pond.woz" size="234794" crc="2d73628e" sha1="6eb3f3172d7676424d9ec5b585890bb5a4a9f6b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foosball">
+		<description>Computer Foosball</description>
+		<year>1981</year>
+		<publisher>Sirius Software</publisher>
+		<info name="release" value="2022-05-26"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E"/>
+		<!-- It requires a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later models. -->
+		<!--"Computer Foosball" is a 1981 sports game developed by Keithen Hayenga and distributed by Sirius Software. It requires a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later models.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234713">
+				<rom name="computer foosball.woz" size="234713" crc="e4f271df" sha1="1b8d48506b8b5a742ab13f9a7001c57cb6e13a24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="123seqme">
+		<description>1-2-3 Sequence Me</description>
+		<year>1991</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"1-2-3 Sequence Me" is a 1991 educational game developed by the Infotech Manitoba Educational Technology Program and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234830">
+				<rom name="1-2-3 sequence me.woz" size="234830" crc="ff77d4fa" sha1="138190d4510bfa06f0d622e08183f731c216438f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bignlitl">
+		<description>BIG and little: Books, Posters, and Cards for Muppet Slate</description>
+		<year>1990</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"BIG and little: Books, Posters and Cards for Muppet Slate" is a 1990 graphics program designed by Donna Stanger, programmed by Tad Wood, and distributed by Sunburst Communications. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234857">
+				<rom name="big and little.woz" size="234857" crc="8f793182" sha1="d2081eed06d87a7587a44500286ebfe3d0631d91"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chalmath">
+		<description>Challenge Math</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Challenge Math" is a 1982 educational program developed by C. McMahon and J. Sweedler, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="challenge math.woz" size="234813" crc="18ec6871" sha1="15b4fe2e391ad74d6f143cdd03c4eb8c3b7a15ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discover">
+		<description>Discover: A Science Experiment</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Discover: A Science Experiment" is a 1985 educational program by Ed Herstein and Andry Christian, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241485">
+				<rom name="discover- a science experiment.woz" size="241485" crc="790df2ad" sha1="f69e58d9530884b1ef07e1deae48ff79b89acc56"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expsctmp">
+		<description>Exploring Science: Temperature</description>
+		<year>1988</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Exploring Science: Temperature" is a 1988 educational program developed by Leslie Eiser and Dominique Allard, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241480">
+				<rom name="exploring science- temperature.woz" size="241480" crc="662e8445" sha1="315bc00ae0266f91d73f34a0c7aab6155a9d3878"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hwirelgc">
+		<description>High Wire Logic</description>
+		<year>1990</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"High Wire Logic" is a 1990 educational program designed by Donna Stanger, programmed by Scott Clough, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234806">
+				<rom name="high wire logic.woz" size="234806" crc="eb1b630b" sha1="bfef94db777d96e970d3dce8bfd37daf14b5bcd9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hop2it">
+		<description>Hop To It!</description>
+		<year>1990</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Hop To It!" is a 1990 educational program developed by Ed Annunziata and Stephen Birkelbach, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234838">
+				<rom name="hop to it.woz" size="234838" crc="140ea2d3" sha1="e4b9e96856323dfee670c78e5b2a4b354496d2dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="igdisatr">
+		<description>Iggy's Gnees: Discrimination, Attributes and Rules</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Iggy's Gnees: Discrimination, Attributes and Rules" is a 1984 educational program designed by Donna Stanger, programmed by Jim McDonagh, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234847">
+				<rom name="iggy's gnees.woz" size="234847" crc="85027476" sha1="f67ef9e3430ca8287d95a9f0512dd3e4bb730d90"/>
 			</dataarea>
 		</part>
 	</software>

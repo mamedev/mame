@@ -88,6 +88,7 @@ private:
 	u8 m_tc;
 	u8 m_td;
 	u8 m_rc;
+	u8 m_rd;
 
 	u8 m_lasttc;
 };

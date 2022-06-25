@@ -119,11 +119,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="agentusa">
-		<description>Agent USA</description>
+		<description>Agent USA (cracked)</description>
 		<year>1985</year>
 		<publisher>Scholastic Corporation</publisher>
 		<info name="developer" value="Tom Snyder Productions" />
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="agent usa.img" size="184320" crc="480ab416" sha1="dc0008d4218787969f5a7856d49b1558a70e0fa9"/>
@@ -132,12 +133,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="alleycat">
-		<description>Alley Cat [cr]</description>
+		<description>Alley Cat (cracked)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="developer" value="Synapse Software" />
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="alley cat.img" size="184320" crc="23228e10" sha1="c4e1b163b14fbffe3bef97816d5b7db142c593f1"/>
@@ -158,11 +159,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="aplepanc">
-		<description>Apple Panic [cr]</description>
+		<description>Apple Panic (cracked)</description>
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="apple panic.img" size="163840" crc="5594040e" sha1="d865096cfdc42c964bf375725cfd2c5058a97217"/>
@@ -290,11 +291,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="bigtop" supported="no">
-		<description>Big Top [cr]</description>
+		<description>Big Top (cracked)</description>
 		<year>1983</year>
 		<publisher>Funtastic</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="big top.img" size="184320" crc="b5ed200c" sha1="3e9f581acb9022d97049124fa9e416d31d2efa68"/>
@@ -398,7 +399,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="bdash12a" cloneof="bdash12">
-		<description>Boulder Dash I &amp; II (alt) [cr]</description>
+		<description>Boulder Dash I &amp; II (alt) (cracked)</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="First Star Software" />
@@ -436,7 +437,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="bugrangr">
-		<description>Buggy Ranger [cr]</description>
+		<description>Buggy Ranger (cracked)</description>
 		<year>1989</year>
 		<publisher>Iron Byte</publisher>
 		<info name="usage" value="PC Booter" />
@@ -750,12 +751,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="dunzhina" cloneof="dunzhin">
-		<description>Dunzhin: Warrior of Ras Volume I [cr]</description>
+		<description>Dunzhin: Warrior of Ras Volume I (cracked)</description>
 		<year>1982</year>
 		<publisher>Computer Applications Unlimited</publisher>
 		<info name="developer" value="Intelligent Statement" />
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="dunzhin - warrior of ras volume i.img" size="163840" crc="b9262dc3" sha1="7e76c35d082debca67b06c9326a49b47db46463c"/>
@@ -886,7 +887,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="4thprot">
-		<description>Frederick Forsyth's The Fourth Protocol [cr]</description>
+		<description>Frederick Forsyth's The Fourth Protocol (cracked)</description>
 		<year>1987</year>
 		<publisher>Ariolasoft UK</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1073,10 +1074,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<software name="hhmack" supported="no">
 	<!-- Might be Bad -->
-		<description>Hard Hat Mack</description>
+		<description>Hard Hat Mack (cracked)</description>
 		<year>1984</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
 				<rom name="hard hat mack.img" size="204800" crc="919b3aff" sha1="037aad77c610282aca5c77dffc4548c7c4ef8394"/>
@@ -1195,11 +1197,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="jbird">
-		<description>J-Bird [cr]</description>
+		<description>J-Bird (cracked)</description>
 		<year>1983</year>
 		<publisher>Greg Kuperberg</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="j-bird.img" size="163840" crc="d5b17630" sha1="485b19cf53898edba077c33dfaa68ef218ee9137"/>
@@ -1262,11 +1264,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="kingqst" supported="no">
-		<description>King's Quest</description>
+		<description>King's Quest (cracked)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="developer" value="Sierra On-Line" />
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="king's quest.img" size="368640" crc="a331a88b" sha1="51b7db761c2d9d8bb25fe053e0a5a0f97e2f2914"/>
@@ -1275,11 +1278,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="kingqst2">
-		<description>King's Quest II: Romancing the Throne (v1.1h) [cr]</description>
+		<description>King's Quest II: Romancing the Throne (v1.1h) (cracked)</description>
 		<year>1985</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="king's quest ii - romancing the throne v1.1h (disk 1 of 2).img" size="368640" crc="4107b044" sha1="874bc6ccffbd9a0e5faee8972b2eeedfb82aeb62"/>
@@ -1389,11 +1392,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="marble">
-		<description>Marble Madness [cr]</description>
+		<description>Marble Madness (cracked)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="marble madness (disk 1 of 2).img" size="409600" crc="256bcd8c" sha1="e68e7c0e2c7d55a5fdcf96fa41d52a6de7ee73a8"/>
@@ -1438,12 +1441,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="msadventcr" cloneof="msadvent">
-		<description>Microsoft Adventure [cr]</description>
+		<description>Microsoft Adventure (cracked)</description>
 		<year>1981</year>
 		<publisher>IBM</publisher>
 		<info name="developer" value="Microsoft" />
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="microsoft adventure [cr].img" size="184320" crc="7148422b" sha1="4d0704af33186890a7579a60f88e1576b718886d"/>
@@ -1452,11 +1455,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="decathln">
-		<description>Microsoft Decathlon [cr]</description>
+		<description>Microsoft Decathlon (cracked)</description>
 		<year>1982</year>
 		<publisher>Microsoft</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="microsoft decathlon.img" size="184320" crc="34435a3c" sha1="55bb5aa1b085c167e1f07ceb7cca845d6b18173e"/>
@@ -1570,10 +1573,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="montezum">
-		<description>Montezuma's Revenge</description>
+		<description>Montezuma's Revenge (cracked)</description>
 		<year>1984</year>
 		<publisher>BCI Software</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="montezuma's revenge.img" size="184320" crc="a6847754" sha1="411728a69cf1fc92510565be03e38193700f287f"/>
@@ -1582,11 +1586,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="mpatrol">
-		<description>Moon Patrol [cr]</description>
+		<description>Moon Patrol (cracked)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="moon patrol.img" size="368640" crc="abba0f4a" sha1="ec9304efec24d91e4ce584f977dd899bf22353d3"/>
@@ -1667,7 +1671,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="musicset">
-		<description>Will Harvey's Music Construction Set [cr]</description>
+		<description>Will Harvey's Music Construction Set (cracked)</description>
 		<year>1984</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
@@ -1769,11 +1773,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="poolchal">
-		<description>PC Pool challenges</description>
+		<description>PC Pool Challenges (cracked)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="developer" value="Hesware" />
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="pc pool challenges.img" size="184320" crc="3a3b51d5" sha1="a86b3e1ea24a745bac757508ad33d7f1289c31cf"/>
@@ -1782,11 +1787,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="pinball">
-		<description>Pinball Construction Set [cr]</description>
+		<description>Pinball Construction Set (cracked)</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="pinball construction set.img" size="409600" crc="6460e995" sha1="4e20da455dcd482371fa55510ea5f4c440580cce"/>
@@ -1806,11 +1811,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="pirates">
-		<description>Sid Meier's Pirates! [cr]</description>
+		<description>Sid Meier's Pirates! (cracked)</description>
 		<year>1987</year>
 		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="pirates (disk 1 of 2).img" size="368640" crc="db732151" sha1="5e9c1d4866aa928fc8ac1d61779bd2971761c52b"/>
@@ -1958,11 +1963,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="serptine">
-		<description>Serpentine [cr]</description>
+		<description>Serpentine (cracked)</description>
 		<year>1984</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="usage" value="PC Booter" />
-		<info name="cracked" value="demonlord" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="serpentine.img" size="163840" crc="bcf96e44" sha1="e9fb3bf2e0d689ed7793e1b1426f20d76796c686"/>
@@ -1971,10 +1976,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="7citygld">
-		<description>Seven Cities of Gold</description>
+		<description>Seven Cities of Gold (cracked)</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="152123">
 				<rom name="seven cities of gold (disk 1).td0" size="152123" crc="ab769135" sha1="8e226deb89b32eee926ee02510566e2d75c56916"/>
@@ -2024,7 +2030,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="silentsra" cloneof="silentsr">
-		<description>Silent Service - The Submarine Simulation [cr]</description>
+		<description>Silent Service - The Submarine Simulation (cracked)</description>
 		<year>1985</year>
 		<publisher>MicroProse</publisher>
 		<info name="usage" value="PC Booter" />
@@ -2084,10 +2090,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="spacestr">
-		<description>Space Strike</description>
+		<description>Space Strike (cracked)</description>
 		<year>1982</year>
 		<publisher>Funtastic</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="space strike.img" size="163840" crc="89af96f6" sha1="cd59d75dd76abf2023f72f9515c5366f6132d842"/>
@@ -2157,10 +2164,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="sumgame2">
-		<description>Summer Games II</description>
+		<description>Summer Games II (cracked)</description>
 		<year>1986</year>
 		<publisher>Epyx</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Niclas (The Carebears)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="summer games 2.img" size="368640" crc="a9ebb8f5" sha1="78f5300488c37f858681b856ff53e6eeadf01d53"/>
@@ -2325,10 +2333,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="troltale">
-		<description>Troll's Tale</description>
+		<description>Troll's Tale (cracked)</description>
 		<year>1984</year>
 		<publisher>Sierra</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="troll's tale.img" size="184320" crc="8879486a" sha1="c11bb9280a5f10d1a15a2bb0a40ae4c24381e84c"/>
@@ -2337,10 +2346,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="tv101">
-		<description>TV and Cinema 101: Trivia from Talkies to Trekkies</description>
+		<description>TV and Cinema 101: Trivia from Talkies to Trekkies (cracked)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="tv and cinema 101 - trivia from talkies to trekkies.img" size="327680" crc="de4e13e8" sha1="39d54c50efe78e6ab4e3821f7038cea8b830239a"/>
@@ -2349,10 +2359,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="ulysses">
-		<description>Ulysses and the Golden Fleece</description>
+		<description>Ulysses and the Golden Fleece (cracked)</description>
 		<year>1981</year>
 		<publisher>Sierra</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="ulysses and the golden fleece (disk 1 of 2).img" size="163840" crc="9bae2a6a" sha1="a81403b5ee77f974817b2efa9752e8a25d6ac32b"/>
@@ -2470,10 +2481,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="wizardr4">
-		<description>Wizardry IV: The Return of Werdna</description>
+		<description>Wizardry IV: The Return of Werdna (cracked)</description>
 		<year>1987</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
 				<rom name="wizardry 4 - the return of werdna.img" size="737280" crc="e33b0ade" sha1="fa524474b8c05047baf8474ea2efdf6cb9052a06"/>
@@ -2482,10 +2494,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="wizardr5">
-		<description>Wizardry V: Heart of the Maelstrom</description>
+		<description>Wizardry V: Heart of the Maelstrom (cracked)</description>
 		<year>1987</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
 				<rom name="wizardry 5 - heart of the maelstrom.img" size="737280" crc="a85a5459" sha1="c5a8dd0db15b0bf940b266775d3df19b385f146c"/>
@@ -11876,7 +11889,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="kult">
-		<description>Kult [cr]</description>
+		<description>Kult (cracked)</description>
 		<year>1989</year>
 		<publisher>Infogrames Multimedia SA</publisher>
 		<info name="developer" value="Exxos/ERE Informatique" />

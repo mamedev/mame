@@ -5,22 +5,29 @@
     Data East 'Rohga' era hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ROHGA_H
+#define MAME_INCLUDES_ROHGA_H
 
-#include "sound/okim6295.h"
-#include "cpu/h6280/h6280.h"
+#pragma once
+
+#include "machine/deco104.h"
+#include "machine/deco146.h"
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
-#include "video/bufsprite.h"
 #include "video/decospr.h"
-#include "machine/deco146.h"
-#include "machine/deco104.h"
+
+#include "cpu/h6280/h6280.h"
+#include "sound/okim6295.h"
+#include "video/bufsprite.h"
+
 #include "emupal.h"
+
 
 class rohga_state : public driver_device
 {
 public:
-	rohga_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	rohga_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ioprot(*this, "ioprot"),
@@ -80,11 +87,17 @@ private:
 
 	u16 ioprot_r(offs_t offset);
 	void ioprot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void hangzo_map(address_map &map);
-	void hotb_base_map(address_map &map);
-	void nitrobal_map(address_map &map);
+
+	void rohga_base(machine_config &config);
+
 	void rohga_map(address_map &map);
-	void sound_map(address_map &map);
-	void schmeisr_map(address_map &map);
 	void wizdfire_map(address_map &map);
+	void nitrobal_map(address_map &map);
+	void hotb_base_map(address_map &map);
+	void schmeisr_map(address_map &map);
+	void hangzo_map(address_map &map);
+
+	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ROHGA_H

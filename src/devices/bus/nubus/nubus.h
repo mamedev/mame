@@ -36,8 +36,9 @@ public:
 	void set_nubus_device();
 
 	// helper functions for card devices
-	void install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb = false, bool reverse_rom = false);
-	void install_bank(offs_t start, offs_t end, uint8_t *data);
+	void install_declaration_rom(const char *romregion, bool mirror_all_mb = false, bool reverse_rom = false);
+	void install_bank(offs_t start, offs_t end, void *data);
+	void install_view(offs_t start, offs_t end, memory_view &view);
 
 	uint32_t get_slotspace() { return 0xf0000000 | (m_slot<<24); }
 	uint32_t get_super_slotspace() { return m_slot<<28; }
@@ -122,10 +123,11 @@ public:
 	auto out_irqe_callback() { return m_out_irqe_cb.bind(); }
 
 	void add_nubus_card(device_nubus_card_interface *card);
-	template<typename R, typename W> void install_device(offs_t start, offs_t end, R rhandler, W whandler, uint32_t mask=0xffffffff);
-	void install_readonly_device(offs_t start, offs_t end, read32_delegate rhandler, uint32_t mask=0xffffffff);
-	void install_writeonly_device(offs_t start, offs_t end, write32_delegate whandler, uint32_t mask=0xffffffff);
-	void install_bank(offs_t start, offs_t end, uint8_t *data);
+	template <typename R, typename W> void install_device(offs_t start, offs_t end, R rhandler, W whandler, uint32_t mask=0xffffffff);
+	template <typename R> void install_readonly_device(offs_t start, offs_t end, R rhandler, uint32_t mask=0xffffffff);
+	template <typename W> void install_writeonly_device(offs_t start, offs_t end, W whandler, uint32_t mask=0xffffffff);
+	void install_bank(offs_t start, offs_t end, void *data);
+	void install_view(offs_t start, offs_t end, memory_view &view);
 	void set_irq_line(int slot, int state);
 
 	DECLARE_WRITE_LINE_MEMBER( irq9_w );

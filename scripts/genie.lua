@@ -557,7 +557,7 @@ if (_OPTIONS["PROJECT"] ~= nil) then
 	end
 	dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
 end
-if (_OPTIONS["SOURCES"] == nil and _OPTIONS["PROJECT"] == nil) then
+if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["PROJECT"] == nil) then
 	if (not os.isfile(path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
@@ -1085,9 +1085,9 @@ end
 				"-Wno-array-bounds",
 				"-Wno-error=attributes", -- GCC fails to recognize some uses of [[maybe_unused]]
 			}
-			if version < 100000 then
+			if version < 100300 then
 				buildoptions_cpp {
-					"-flifetime-dse=1", -- GCC 9 takes issue with Sol's get<std::optional<T> >() otherwise
+					"-flifetime-dse=1", -- GCC 10.2 and earlier take issue with Sol's get<std::optional<T> >() otherwise - possibly an issue with libstdc++ itself
 				}
 			end
 			if version >= 80000 then
@@ -1241,6 +1241,9 @@ configuration { "linux-*" }
 		links {
 			"dl",
 			"rt",
+		}
+		flags {
+			"LinkSupportCircularDependencies",
 		}
 		if _OPTIONS["distro"]=="debian-stable" then
 			defines
@@ -1416,14 +1419,14 @@ if (_OPTIONS["SOURCES"] ~= nil) then
 	local sourceargs = ""
 	for word in string.gmatch(str, '([^,]+)') do
 		if (not os.isfile(path.join(MAME_DIR, word))) then
-			print("File " .. word.. " does not exist")
+			print("File " .. word .. " does not exist")
 			os.exit()
 		end
 		sourceargs = sourceargs .. " " .. word
 	end
 	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesproject -r " .. MAME_DIR .. " -t " .. _OPTIONS["subtarget"] .. sourceargs )
 	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesfilter" .. sourceargs .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"] .. ".flt" )
+	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesfilter -l " .. MAME_DIR .. "src/" .. _OPTIONS["target"] .. "/" .. _OPTIONS["target"] .. ".lst" .. sourceargs .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"] .. ".flt" )
 end
 
 group "libs"

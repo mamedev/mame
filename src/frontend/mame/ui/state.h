@@ -67,7 +67,6 @@ private:
 	switch_code_poller                              m_switch_poller;
 	std::unordered_map<std::string, file_entry>     m_file_entries;
 	std::unordered_map<std::string, std::string>    m_filename_to_code_map;
-	std::string_view const                          m_header;
 	std::string_view const                          m_footer;
 	std::string                                     m_delete_prompt;
 	std::string                                     m_confirm_prompt;

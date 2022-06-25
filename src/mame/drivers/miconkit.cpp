@@ -25,7 +25,7 @@ Hardware notes:
 - beeper
 
 TODO:
-- correct video timing
+- correct video timing, maybe 10MHz / 2 / (262*320)
 - there's a 2-player start button on the cocktail cabinet, but where is it
   hooked up, if at all? (when inserting 2 coins, the game automatically starts)
 

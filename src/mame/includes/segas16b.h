@@ -27,6 +27,7 @@
 #include "video/sega16sp.h"
 #include "screen.h"
 
+INPUT_PORTS_EXTERN( system16b_generic );
 
 // ======================> segas16b_state
 
@@ -329,82 +330,6 @@ public:
 private:
 	required_ioport     m_accel;
 	required_ioport     m_steer;
-};
-
-
-// ======================> isgsm_state
-
-class isgsm_state : public segas16b_state
-{
-public:
-	// construction/destruction
-	isgsm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: segas16b_state(mconfig, type, tag)
-		, m_read_xor(0)
-		, m_cart_addrlatch(0)
-		, m_cart_addr(0)
-		, m_data_type(0)
-		, m_data_addr(0)
-		, m_data_mode(0)
-		, m_addr_latch(0)
-		, m_security_value(0)
-		, m_security_latch(0)
-		, m_rle_control_position(8)
-		, m_rle_control_byte(0)
-		, m_rle_latched(false)
-		, m_rle_byte(0)
-	{ }
-
-	void isgsm(machine_config &config);
-
-	// driver init
-	void init_isgsm();
-	void init_shinfz();
-	void init_tetrbx();
-
-private:
-	// read/write handlers
-	void cart_addr_high_w(uint16_t data);
-	void cart_addr_low_w(uint16_t data);
-	uint16_t cart_data_r();
-	void data_w(uint16_t data);
-	void datatype_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void addr_high_w(uint16_t data);
-	void addr_low_w(uint16_t data);
-	void cart_security_high_w(uint16_t data);
-	void cart_security_low_w(uint16_t data);
-	uint16_t cart_security_low_r();
-	uint16_t cart_security_high_r();
-	void sound_reset_w(uint16_t data);
-	void main_bank_change_w(uint16_t data);
-
-	// security callbacks
-	uint32_t shinfz_security(uint32_t input);
-	uint32_t tetrbx_security(uint32_t input);
-
-	// driver overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	// configuration
-	uint8_t           m_read_xor;
-	typedef delegate<uint32_t (uint32_t)> security_callback_delegate;
-	security_callback_delegate m_security_callback;
-
-	// internal state
-	uint16_t          m_cart_addrlatch;
-	uint32_t          m_cart_addr;
-	uint8_t           m_data_type;
-	uint32_t          m_data_addr;
-	uint8_t           m_data_mode;
-	uint16_t          m_addr_latch;
-	uint32_t          m_security_value;
-	uint16_t          m_security_latch;
-	uint8_t           m_rle_control_position;
-	uint8_t           m_rle_control_byte;
-	bool              m_rle_latched;
-	uint8_t           m_rle_byte;
-	void isgsm_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_SEGAS16B_H

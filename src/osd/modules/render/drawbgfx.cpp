@@ -605,7 +605,7 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	uint32_t texture_flags = 0U;
 	if (!PRIMFLAG_GET_TEXWRAP(prim->flags))
 		texture_flags |= BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
-	if (video_config.filter == 0)
+	if (!PRIMFLAG_GET_ANTIALIAS(prim->flags))
 		texture_flags |= BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
 
 	const bool is_screen = PRIMFLAG_GET_SCREENTEX(prim->flags);

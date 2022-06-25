@@ -546,6 +546,21 @@ Examples:
 Back to :ref:`debugger-general-list`
 
 
+.. _debugger-command-time:
+
+time
+----
+
+Prints the total elapsed emulated time to the debugger console.
+
+Examples:
+
+``time``
+    Prints the elapsed emulated time.
+
+Back to :ref:`debugger-general-list`
+
+
 .. _debugger-command-quit:
 
 quit

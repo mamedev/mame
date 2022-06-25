@@ -16,6 +16,8 @@
 #include "machine/z80dma.h"
 #include "machine/z80sio.h"
 
+#include "machine/input_merger.h"
+
 #include "imagedev/floppy.h"
 
 class labtam_z80sbc_device
@@ -48,6 +50,9 @@ private:
 	template <unsigned M> u8 map_r(offs_t offset) { return map_r(M, offset); }
 	template <unsigned M> void map_w(offs_t offset, u8 data) { map_w(M, offset, data); }
 
+	void intswt_w(u8 data);
+	void mapnum_w(u8 data);
+	void fdcint_w(int state);
 	void drive_w(offs_t offset, u8 data);
 	void fdcclr_w(u8 data);
 	void netclr_w(u8 data);
@@ -62,6 +67,7 @@ private:
 	required_device<wd2793_device> m_fdc;
 	required_device_array<z80dma_device, 2> m_dma;
 	required_device<z80sio_device> m_sio;
+	required_device<input_merger_any_high_device> m_int;
 
 	required_device_array<floppy_connector, 4> m_fdd;
 
@@ -77,9 +83,11 @@ private:
 	std::unique_ptr<u8[]> m_map_lo;
 	std::unique_ptr<u8[]> m_map_hi;
 
-	bool m_map_enabled;
+	u8 m_map_mux;
 	u8 m_map_num;
+	u8 m_map_cnt;
 
+	u8 m_fdcstatus;
 	std::optional<u8> m_drive;
 
 	bool m_installed;

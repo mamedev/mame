@@ -115,6 +115,7 @@ public:
 
 	/* simulates the LO->HI clocking of the light pen pin (pin 3) */
 	void assert_light_pen_input();
+	void assert_light_pen_input(u16);
 
 	/* set number of pixels per video memory address */
 	void set_hpixels_per_column(int hpixels_per_column);

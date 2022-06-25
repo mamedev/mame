@@ -2,7 +2,6 @@
 // copyright-holders:Miodrag Milanovic
 
 #include "emu.h"
-#include "includes/spectrum.h"
 #include "includes/spec128.h"
 
 #include "machine/beta.h"
@@ -31,6 +30,7 @@ public:
 	void quorum(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -46,6 +46,8 @@ private:
 	void scorpion_mem(address_map &map);
 	void scorpion_switch(address_map &map);
 
+	void scorpion_update_memory();
+
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
@@ -55,8 +57,7 @@ private:
 	uint8_t *m_ram_0000;
 	address_space *m_program;
 	uint8_t *m_p_ram;
-	void scorpion_update_memory();
-
+	uint16_t m_rom_selection;
 };
 
 /****************************************************************************************************/
@@ -104,11 +105,11 @@ void scorpion_state::scorpion_update_memory()
 	else
 	{
 		if ((m_port_1ffd_data & 0x02)==0x02)
-			m_ROMSelection = 2;
+			m_rom_selection = 2;
 		else
-			m_ROMSelection = BIT(m_port_7ffd_data, 4);
+			m_rom_selection = BIT(m_port_7ffd_data, 4);
 
-		m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+		m_bank1->set_base(&m_p_ram[0x10000 + (m_rom_selection<<14)]);
 	}
 }
 
@@ -160,11 +161,11 @@ uint8_t scorpion_state::beta_neutral_r(offs_t offset)
 
 uint8_t scorpion_state::beta_enable_r(offs_t offset)
 {
-	if(m_ROMSelection == 1) {
-		m_ROMSelection = 3;
+	if (m_rom_selection == 1) {
+		m_rom_selection = 3;
 		if (m_beta->started()) {
 			m_beta->enable();
-			m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+			m_bank1->set_base(&m_p_ram[0x10000 + (m_rom_selection<<14)]);
 			m_ram_disabled_by_beta = 1;
 		}
 	}
@@ -174,9 +175,9 @@ uint8_t scorpion_state::beta_enable_r(offs_t offset)
 uint8_t scorpion_state::beta_disable_r(offs_t offset)
 {
 	if (m_beta->started() && m_beta->is_active()) {
-		m_ROMSelection = BIT(m_port_7ffd_data, 4);
+		m_rom_selection = BIT(m_port_7ffd_data, 4);
 		m_beta->disable();
-		m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+		m_bank1->set_base(&m_p_ram[0x10000 + (m_rom_selection<<14)]);
 		m_ram_disabled_by_beta = 1;
 	} else
 		m_ram_disabled_by_beta = 0;
@@ -211,6 +212,16 @@ void scorpion_state::scorpion_switch(address_map &map)
 	map(0x0000, 0x3fff).r(FUNC(scorpion_state::beta_neutral_r)); // Overlap with previous because we want real addresses on the 3e00-3fff range
 	map(0x3d00, 0x3dff).r(FUNC(scorpion_state::beta_enable_r));
 	map(0x4000, 0xffff).r(FUNC(scorpion_state::beta_disable_r));
+}
+
+
+void scorpion_state::machine_start()
+{
+	spectrum_128_state::machine_start();
+
+	m_rom_selection = 0;
+
+	save_item(NAME(m_rom_selection));
 }
 
 void scorpion_state::machine_reset()

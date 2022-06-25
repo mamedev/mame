@@ -17,14 +17,17 @@
 #include <sstream>
 #include <vector>
 
-#define PSTRINGIFY_HELP(y) # y
+#define PSTRINGIFY_HELP(y) #y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
 
-// Discussion and background of this MSVC bug: https://github.com/mamedev/mame/issues/6106
+// Discussion and background of this MSVC bug:
+// https://github.com/mamedev/mame/issues/6106
 ///
 /// \brief Macro to work around a bug in MSVC treatment of __VA_ARGS__
 ///
 #define PMSVC_VARARG_BUG(MACRO, ARGS) MACRO ARGS
+
+// clang-format off
 
 /// \brief Determine number of arguments in __VA_ARGS__
 ///
@@ -70,13 +73,16 @@
 #define PSTRINGIFY_16(x, x2, x3, x4, x5, x6, x7, x8, x9, xa, xb, xc, xd, xe, xf, x10) \
 	#x, #x2, #x3, #x4, #x5, #x6, #x7, #x8, #x9, #xa, #xb, #xc, #xd, #xe, #xf, #x10
 
+// clang-format on
+
 /// \brief Individually stringify up to 16 arguments
 ///
 /// PSTRINGIFY_VA(a, b, c) will be expanded to "a", "b", "c"
 ///
 /// \returns List of stringified individual arguments
 ///
-#define PSTRINGIFY_VA(...) PMSVC_VARARG_BUG(PCONCAT, (PSTRINGIFY_, PNARGS(__VA_ARGS__)))(__VA_ARGS__)
+#define PSTRINGIFY_VA(...)                                                     \
+	PMSVC_VARARG_BUG(PCONCAT, (PSTRINGIFY_, PNARGS(__VA_ARGS__)))(__VA_ARGS__)
 
 /// \brief Dispatch VARARG macro to specialized macros
 ///
@@ -93,7 +99,8 @@
 ///
 /// \returns result of specialized macro
 ///
-#define PCALLVARARG(MAC, ...) PMSVC_VARARG_BUG(PCONCAT, (MAC, PNARGS(__VA_ARGS__)))(__VA_ARGS__)
+#define PCALLVARARG(MAC, ...)                                                  \
+	PMSVC_VARARG_BUG(PCONCAT, (MAC, PNARGS(__VA_ARGS__)))(__VA_ARGS__)
 
 // FIXME:: __FUNCTION__ may be not be supported by all compilers.
 
@@ -107,7 +114,7 @@ namespace plib
 		pstring basename(const pstring &filename, const pstring &suffix = "");
 		pstring path(const pstring &filename);
 		bool    exists(const pstring &filename);
-		pstring build_path(std::initializer_list<pstring> list );
+		pstring build_path(std::initializer_list<pstring> list);
 		pstring environment(const pstring &var, const pstring &default_val);
 	} // namespace util
 
@@ -121,7 +128,7 @@ namespace plib
 
 		static constexpr const std::size_t npos = static_cast<std::size_t>(-1);
 		template <class C>
-		std::size_t indexof(C &con, const typename C::value_type &elem)
+		std::size_t index_of(C &con, const typename C::value_type &elem)
 		{
 			auto it = std::find(con.begin(), con.end(), elem);
 			if (it != con.end())
@@ -130,7 +137,8 @@ namespace plib
 		}
 
 		template <class C>
-		void insert_at(C &con, const std::size_t index, const typename C::value_type &elem)
+		void insert_at(C &con, const std::size_t index,
+			const typename C::value_type &elem)
 		{
 			con.insert(con.begin() + narrow_cast<std::ptrdiff_t>(index), elem);
 		}
@@ -142,18 +150,71 @@ namespace plib
 		}
 	} // namespace container
 
-	// ----------------------------------------------------------------------------------------
-	// simple hash
-	// ----------------------------------------------------------------------------------------
-
+	/// \brief Consistent hash implementation
+	///
+	/// Hash implementations in c++ standard libraries may differ and deliver
+	/// different results. This hash can be used as a replacement hash in e.g.
+	/// std::map to deliver consistent results.
+	///
+	/// \tparam V result type
+	/// \tparam T buffer element type
+	/// \param buf pointer to buffer for which hash should be calculated
+	/// \param size number of buffer elements
+	/// \return the hash of the buffer
+	///
 	template <typename V, typename T>
 	constexpr V hash(const T *buf, std::size_t size) noexcept
 	{
 		V result = 5381; // NOLINT
-		for (const T* p = buf; p != buf + size; p++)
-			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ narrow_cast<std::size_t>(*p); // NOLINT
+		for (const T *p = buf; p != buf + size; p++)
+			result = ((result << 5) + result) ^ (result >> (32 - 5))
+					 ^ narrow_cast<std::size_t>(*p); // NOLINT
 		return result;
 	}
+
+	/// \brief Execute code at end of block
+	///
+	/// The class can be used to execute code at the end of a block. It follows
+	/// the same design as std::lock_guard.
+	///
+	/// Since the functor is executed in the destructor of the class the
+	/// execution is protected by a try catch block. If an exception is raised,
+	/// \ref plib::terminate is called.
+	///
+	/// \tparam F type of functor - will be derived by template deduction guide
+	///
+	template <typename F>
+	struct functor_guard
+	{
+		/// \brief constructor
+		///
+		/// \param f functor to execute
+		functor_guard(F &&f)
+		: m_f(std::move(f))
+		{
+		}
+		/// \brief destructor
+		///
+		~functor_guard()
+		{
+			try
+			{
+				m_f();
+			}
+			catch (...)
+			{
+				plib::terminate("exception raised in lambda_guard");
+			}
+		}
+
+	private:
+		F m_f;
+	};
+
+	/// \brief template deduction guide
+	///
+	template <class F>
+	functor_guard(F f) -> functor_guard<F>;
 
 } // namespace plib
 

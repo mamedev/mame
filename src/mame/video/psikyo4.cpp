@@ -54,23 +54,23 @@ void psikyo4_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	**- End Sprite Format -*/
 
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint32_t *source = m_spriteram;
-	uint16_t *list = (uint16_t *)m_spriteram.target() + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
-	uint16_t listlen = (0xc00/2 - 0x04/2), listcntr = 0;
+	gfx_element *const gfx = m_gfxdecode->gfx(0);
+	uint32_t const *const source = m_spriteram;
+	auto const list = util::big_endian_cast<uint16_t const>(m_spriteram.target() + 0x2c00/4 + 0x04/4); /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
+	uint16_t const listlen = 0xc00/2 - 0x04/2;
+	uint16_t listcntr = 0;
 	bool const flipscreen = BIT(m_vidregs[1], (scr == 0 ? 31 : 23));
 	uint16_t const screen_height = screen.visible_area().max_y + 1;
 
 	while (listcntr < listlen)
 	{
-		uint16_t const listdat = list[BYTE_XOR_BE(listcntr)];
+		uint16_t const listdat = list[listcntr];
 		uint16_t const sprnum = (listdat & 0x03ff) * 2;
 
 		/* start drawing */
 		if ((listdat & 0x8000) == 0 && (listdat & 0x2000) == scr) /* draw only selected screen */
 		{
 			int loopnum = 0;
-			int xstart, ystart, xend, yend, xinc, yinc;
 
 			int16_t ypos        = (source[sprnum + 0] & 0x03ff0000) >> 16;
 			int16_t xpos        = (source[sprnum + 0] & 0x000003ff) >> 00;
@@ -97,9 +97,11 @@ void psikyo4_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 				flipy = !flipy;
 			}
 
+			int xstart, xend, xinc;
 			if (flipx)  { xstart = wide - 1;  xend = -1;    xinc = -1; }
 			else        { xstart = 0;         xend = wide;  xinc = +1; }
 
+			int ystart, yend, yinc;
 			if (flipy)  { ystart = high - 1;  yend = -1;     yinc = -1; }
 			else        { ystart = 0;         yend = high;   yinc = +1; }
 

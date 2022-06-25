@@ -39,6 +39,7 @@ menu_tape_control::menu_tape_control(mame_ui_manager &mui, render_container &con
 	: menu_device_control<cassette_image_device>(mui, container, device)
 {
 	set_process_flags(PROCESS_LR_REPEAT);
+	set_heading(_("Tape Control"));
 }
 
 
