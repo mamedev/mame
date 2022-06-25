@@ -925,7 +925,16 @@ uint8_t mpu4_state::pia_ic5_portb_r()
 WRITE_LINE_MEMBER(mpu4_state::pia_ic5_ca2_w)
 {
 	LOG(("%s: IC5 PIA Write CA2 (Serial Tx) %2x\n",machine().describe_context(),state));
-	m_dataport->write_txd(state);
+	
+	if (m_dataport_loopback)
+	{
+		m_serial_data = state;
+		m_pia4->cb1_w(state);
+	}
+	else
+	{
+		m_dataport->write_txd(state);		
+	}
 }
 
 

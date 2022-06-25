@@ -585,7 +585,6 @@ protected:
 
 	int m_reel_flag = 0;
 	int m_ic23_active = 0;
-	int m_led_lamp = 0;
 	int m_link7a_connected = 0;
 	int m_low_volt_detect_disable = 0;
 	emu_timer *m_ic24_timer = nullptr;
@@ -624,6 +623,8 @@ protected:
 
 	bool m_overcurrent = false;
 	bool m_undercurrent = false;
+
+	bool m_dataport_loopback = false;
 	
 	std::bitset<16> m_overcurrent_strobes;
 	std::bitset<16> m_undercurrent_strobes;

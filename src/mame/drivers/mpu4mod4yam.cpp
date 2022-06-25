@@ -17,6 +17,7 @@ public:
 	}
 
 	void init_m4addr();
+	void init_m4test4();
 
 	void mod4yam_cheatchr_gambal(machine_config &config);
 
@@ -74,6 +75,13 @@ void mpu4mod4yam_machines_state::init_m4addr()
 	//Front door code 0 Cash door code 0
 }
 
+
+void mpu4mod4yam_machines_state::init_m4test4()
+{
+	init_m4default();
+	m_dataport_loopback = true;	
+	m_overcurrent_strobes.set(); // Sense on every strobe
+}
 
 
 INPUT_PORTS_START( m4addr )
@@ -1506,7 +1514,7 @@ ROM_START( m4voodoo )
 	ROM_LOAD( "ddo32", 0x0000, 0x010000, CRC(260dfef1) SHA1(2b4918e40808963a86d289cd251740a9b0bed70a) )
 ROM_END
 
-GAME(198?, m4tst, 0, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4default, ROT0,"Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
+GAME(198?, m4tst, 0, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4test4, ROT0,"Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
 
 GAME(199?, m4joljokd, 0,       mod4yam_cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) (Dutch) (MPU4) (DJJ 1.5)",GAME_FLAGS) // Geen Tubes
 

@@ -30,8 +30,15 @@ public:
 	}
 
 	void init_m4aao();
+	void init_m4test();
 };
 
+void mpu4unsorted_state::init_m4test()
+{
+	init_m4default();
+	m_dataport_loopback = true;	
+	m_overcurrent_strobes.set(); // Sense on every strobe
+}
 
 
 #include "m4aao.lh"
@@ -1501,9 +1508,9 @@ ROM_END
 
 
 /* Barcrest */
-GAME( 198?, m4tst2,   0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","MPU4 Unit Test (Program 2)",MACHINE_MECHANICAL )
-GAME( 198?, m4clr,    0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","MPU4 Meter Clear ROM",MACHINE_MECHANICAL )
-GAME( 198?, m4rltst,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","MPU4 Reel Test (3.0)",MACHINE_MECHANICAL )
+GAME( 198?, m4tst2,   0,          mod2,       mpu4,    mpu4unsorted_state, init_m4test,  ROT0,   "Barcrest","MPU4 Unit Test (Program 2)",MACHINE_MECHANICAL )
+GAME( 198?, m4clr,    0,          mod2,       mpu4,    mpu4unsorted_state, init_m4test,  ROT0,   "Barcrest","MPU4 Meter Clear ROM",MACHINE_MECHANICAL )
+GAME( 198?, m4rltst,  0,          mod2,       mpu4,    mpu4unsorted_state, init_m4test,  ROT0,   "Barcrest","MPU4 Reel Test (3.0)",MACHINE_MECHANICAL )
 
 // barcrest, to split
 

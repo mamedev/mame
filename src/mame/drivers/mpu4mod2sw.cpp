@@ -49,7 +49,6 @@ public:
 void mpu4mod2_machines_state::init_connect4()
 {
 	m_reels = 0; //reel-free game
-	m_led_lamp = 1;
 	m_overcurrent_strobes.set(15); // Bulb 120
 	setup_rom_banks();
 }
