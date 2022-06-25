@@ -2297,8 +2297,8 @@ GAME_CUSTOM( 199?, m4redunk,    0,   "redx_20_.8",   0x0000, 0x010000, CRC(b5e8d
 /*********************************************************************************************************
 
     Super Play
-	 - set was originally called "Black Bull" and as 'Czech' region
-	 - dipswitches probably all different (has coinage dip?)
+     - set was originally called "Black Bull" and as 'Czech' region
+     - dipswitches probably all different (has coinage dip?)
 
 *********************************************************************************************************/
 
@@ -2343,7 +2343,7 @@ GAME(199?, m4blkbul,  0,          mod2_alt_cheatchr_pal<mpu4_characteriser_pal::
 /*********************************************************************************************************
 
     Top Run
-	 - currently runs with door open, probably not by Barcrest?
+     - currently runs with door open, probably not by Barcrest?
 
 *********************************************************************************************************/
 
@@ -2399,14 +2399,14 @@ GAME(199?, m4copcsh,  0,          mod2_chr_copcash, mpu4,            mpu4mod2_ma
 /* Pcp */
 
 // runs and plays, but no lamps or other display..
-GAME(199?, m4cshino,  0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Cashino Deluxe (Pcp) (MPU4)",GAME_FLAGS ) 
+GAME(199?, m4cshino,  0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Cashino Deluxe (Pcp) (MPU4)",GAME_FLAGS )
 
 // runs and plays, but no lamps or other display..
 GAME(199?, m4jjc,     0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Jumping Jack Cash (Pcp) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4jjca,    m4jjc,      mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Jumping Jack Cash (Pcp) (MPU4) (set 2)",GAME_FLAGS )
 
 // runs and plays, but no lamps or other display..
-GAME(199?, m4spton,   0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Spot On (Pcp) (MPU4)",GAME_FLAGS ) 
+GAME(199?, m4spton,   0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Spot On (Pcp) (MPU4)",GAME_FLAGS )
 
 GAME(199?, m4exlin,   0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Extra Lines (Pcp) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4exlina,  m4exlin,    mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Pcp","Extra Lines (Pcp) (MPU4) (set 2)",GAME_FLAGS )

@@ -22512,7 +22512,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It runs on any Apple II with 48K. -->
 		<!--"Wizardry: Proving Grounds of the Mad Overload" is a 1981 roleplaying game developed by Andrew Greenberg and Robert Woodhead, and distributed by Sir-Tech. This version is dated 05-SEP-81, the earliest known version. It runs on any Apple ][ with 48K.-->
-        <!-- This set was updated on May 10th, 2022 to fix critical data corruption in the saved characters roster that entirely prevented playing. -->
+		<!-- This set was updated on May 10th, 2022 to fix critical data corruption in the saved characters roster that entirely prevented playing. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A - Scenario disk"/>

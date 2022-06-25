@@ -164,7 +164,7 @@ TIMER_CALLBACK_MEMBER(simpsons_state::dma_end)
 void simpsons_state::z80_arm_nmi_w(uint8_t data)
 {
 	// LD $(FA00), A takes 13 cycles. 4*M1 + 3*read + 3*read + 3*write.
-	// 
+	//
 	// The Z80 checks if NMI has gone from high to low during the instruction, on the rising edge of CLK, at the start of the last cycle (in this case cycle 3 of the write).
 	// The circuit raises NMI when MREQ/WR goes high, on the falling edge of CLK, half way through cycle 3 of the write.
 	// NMI is then lowered when the sound chips timer output subsequently goes from low to high.

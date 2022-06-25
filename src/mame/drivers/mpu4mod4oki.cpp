@@ -28,7 +28,7 @@
     Cloud Nine
     Copy Cat
     Cosmic Casinos
-	Crown Jewels Club (has only 3 main reels, so not a club machine?)
+    Crown Jewels Club (has only 3 main reels, so not a club machine?)
     Dennis The Menace
     Duty Free
     Duty Free (Prize version)
@@ -47,7 +47,7 @@
     Jolly Gems
     Kings & Queens
     Kings & Queens (Classic)
-	Lazy Bones
+    Lazy Bones
     Let The Good Times Roll
     Lucky Las Vegas
     Lucky Las Vegas (Classic)
@@ -7881,7 +7881,7 @@ GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::t
 * Bronze Voyage
 * - this is structured like a Barcrest game, but no copyright is shown, nor is there any protection, bootleg? some sources claim the original is BWB
 * - sample ROM missing, but confirmed as OKI (will attempt to play sounds with ROM from other game)
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4BRNZE_EXTRAS \

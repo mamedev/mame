@@ -3134,7 +3134,7 @@ void thunderl_state::thunderlbl_map(address_map &map)
 }
 
 /***************************************************************************
-					Wit's
+                    Wit's
 ***************************************************************************/
 /* Similar to thunderl but without protection */
 
@@ -3171,7 +3171,7 @@ void seta_state::wiggie_map(address_map &map)
 	map(0x100000, 0x103fff).noprw();                     // X1_010 is not used
 	map(0x200000, 0x200001).rw(FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
 	map(0x300000, 0x300001).nopw();                      // ?
-	map(0x400000, 0x41ffff).nopw();	                     // Protection (but not used, taken from thunderl code)
+	map(0x400000, 0x41ffff).nopw();                      // Protection (but not used, taken from thunderl code)
 	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
 	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette

@@ -30,7 +30,7 @@ license:CC0
 		</led16segsc>
 	</element>
 
-	
+
 	<element name="text0"><text string="0"><color red="0.03" green="0.03" blue="0.03" /></text></element>
 	<element name="text1"><text string="1"><color red="0.03" green="0.03" blue="0.03" /></text></element>
 	<element name="text2"><text string="2"><color red="0.03" green="0.03" blue="0.03" /></text></element>
@@ -287,7 +287,7 @@ license:CC0
 	<element name="text253"><text string="253"><color red="0.03" green="0.03" blue="0.03" /></text></element>
 	<element name="text254"><text string="254"><color red="0.03" green="0.03" blue="0.03" /></text></element>
 	<element name="text255"><text string="255"><color red="0.03" green="0.03" blue="0.03" /></text></element>
-	
+
 	<group name="vfd">
 		<repeat count="16">
 			<param name="n" start="15" increment="-1" />
@@ -318,7 +318,7 @@ license:CC0
 		<element name="reel7" ref="Steppers" state="0">
 			<bounds x="340" y="300" width="50" height="50"/>
 		</element>
-		
+
 		<!-- standard lamps -->
 		<repeat count="16">
 			<param name="s" start="0" increment="8" />

@@ -584,11 +584,7 @@ void jmfb_device::update_crtc()
 		LOGCRTC("horizontal total %d active %d (mode %x %d/%d)\n",
 				htotal, hactive, m_ramdac_mode, width, hpixels);
 
-		int frametotal = (htotal * vtotal);
-		if (convolution)
-			frametotal <<= 1;
-		else
-			frametotal >>= 1;
+		int const frametotal = hpixels * vtotal >> (interlace ? 0 : 1);
 
 		screen().configure(
 				hpixels, vtotal >> (interlace ? 0 : 1),

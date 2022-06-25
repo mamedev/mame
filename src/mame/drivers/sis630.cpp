@@ -25,7 +25,7 @@
     - windows xp sp3: BSoD during install with a STOP #0a IRQL_NOT_LESS_OR_EQUAL;
 
     - windows neptune: BSoD during ethernet check (after time clock setup)
-	  with a STOP #a0 INTERNAL_POWER_ERROR with param1 0x5 ("reserved"!?)
+      with a STOP #a0 INTERNAL_POWER_ERROR with param1 0x5 ("reserved"!?)
 
     - gamecstl Kontron BIOS:
     \- hangs at PC=0xf3cf2, again wanting a SMI# from devtrap_en_w;
@@ -40,8 +40,8 @@
     \- GUI is never recognized no matter what, punts with DirectX not installed;
 
     - xubuntu 6.10: throws several SCSIDEV unhandled $46 & $51 commands
-	  (get configuration/read disc information),
-	  eventually punts to prompt with a "can't access tty: job control turned off" (on live CD) or
+      (get configuration/read disc information),
+      eventually punts to prompt with a "can't access tty: job control turned off" (on live CD) or
       hangs at "Configuring network interfaces" (on actual install);
 
     - xubuntu 10.10: stalls after '900 ethernet check;

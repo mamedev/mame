@@ -49,9 +49,9 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG_VIA		(1U << 1)
-#define LOG_SCP		(1U << 2)
-#define LOG_BITS	(1U << 3)
+#define LOG_VIA     (1U << 1)
+#define LOG_SCP     (1U << 2)
+#define LOG_BITS    (1U << 3)
 
 #ifdef USE_SCP
 #define VERBOSE (LOG_SCP)

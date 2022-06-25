@@ -218,7 +218,7 @@ void nubus_specpdq_device::device_start()
 	nubus().install_device(slotspace+0x400000, slotspace+0xfbffff, read32s_delegate(*this, FUNC(nubus_specpdq_device::specpdq_r)), write32s_delegate(*this, FUNC(nubus_specpdq_device::specpdq_w)));
 
 	m_timer = timer_alloc(FUNC(nubus_specpdq_device::vbl_tick), this);
-	
+
 	m_crtc.register_save(*this);
 	m_shiftreg.register_save(*this);
 

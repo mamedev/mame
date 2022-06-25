@@ -391,7 +391,7 @@ ROM_END
 
 
 /** Compumatic Minidart.
- Microdar V6 PCB. 24MHz xtal. Atmel AT89S51 intead of the usual REF34VA and a custom chip labeled "Toronto 2707" 
+ Microdar V6 PCB. 24MHz xtal. Atmel AT89S51 intead of the usual REF34VA and a custom chip labeled "Toronto 2707"
  (but referred as REF0097 on the manual) instead of the REF0096.
 */
 ROM_START(minidart)
@@ -468,7 +468,7 @@ ROM_END
  |     PALCE16V8H-25->| |  |_|  |_|  ________  ________   ________ ________  |   |
  |                    | | 24LC04B   |ULN2803A |ULN2803A  HEF4094BP TD62783AP |   |
 74HC273N    74HC273N  |_|     _____  __  __  __           ________ ________  |   |
- | __  __  __  __  ____      |    | | | | | | |          HEF4094BP TD62783AP |   | 
+ | __  __  __  __  ____      |    | | | | | | |          HEF4094BP TD62783AP |   |
  || | | | | | | | |   | _____80C31| | | | | | |           ________ ________  |   |
  || | | | | | | | EPROM|    ||    | |_| |_| |_|          HEF4094BP TD62783AP |   |
  ||_| |_| |_| |_| |   ||    ||    | 3 x 74HC273N          ________ ________  |   |

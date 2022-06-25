@@ -44,7 +44,7 @@ license:CC0
 		<text string="Cherry">      <bounds x="0" y="160" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="Bell*">       <bounds x="0" y="180" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="Pear">        <bounds x="0" y="200" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="Orange"> 	    <bounds x="0" y="220" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange">      <bounds x="0" y="220" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="Bell*">       <bounds x="0" y="240" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="Grapes">      <bounds x="0" y="260" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="Cherry">      <bounds x="0" y="280" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>

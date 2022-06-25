@@ -8,10 +8,10 @@
 #include "dsp56pcu.h"
 
 #define LOG_OUTPUT_FUNC cpustate->device->logerror
-#define LOG_INVALID				(1 << 1U)
-#define LOG_PERIPHERAL_READS	(1 << 2U)
-#define LOG_PERIPHERAL_WRITES	(1 << 3U)
-#define LOG_HOST_READS			(1 << 4U)
+#define LOG_INVALID             (1 << 1U)
+#define LOG_PERIPHERAL_READS    (1 << 2U)
+#define LOG_PERIPHERAL_WRITES   (1 << 3U)
+#define LOG_HOST_READS          (1 << 4U)
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -808,7 +808,7 @@ void dsp56156_device::host_interface_write(uint8_t offset, uint8_t data)
 	/*
 	if (!host_interface_active())
 	{
-		LOGMASKED(LOG_INVALID, "%s: Host interface write called without HI being set active by the PBC.\n", cpustate->device->machine().describe_context());
+	    LOGMASKED(LOG_INVALID, "%s: Host interface write called without HI being set active by the PBC.\n", cpustate->device->machine().describe_context());
 	}
 	*/
 
@@ -908,7 +908,7 @@ uint8_t dsp56156_device::host_interface_read(uint8_t offset)
 	/*
 	if (!host_interface_active())
 	{
-		LOGMASKED(LOG_INVALID, "%s: Host interface write called without HI being set active by the PBC.\n", cpustate->device->machine().describe_context());
+	    LOGMASKED(LOG_INVALID, "%s: Host interface write called without HI being set active by the PBC.\n", cpustate->device->machine().describe_context());
 	}
 	*/
 

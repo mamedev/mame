@@ -192,7 +192,7 @@ void igs_string_device::dump(const char *filename, u32 string_addr, u32 xor_addr
 		fclose(f);
 		return;
 	}
-	
+
 	printf("igs_string addr = %x, %x (%d bits)\n", string_addr, xor_addr, is_16bits ? 16 : 8);
 
 	const u8 * const string_base    =   (const u8 *)memregion(":maincpu")->base() + string_addr;

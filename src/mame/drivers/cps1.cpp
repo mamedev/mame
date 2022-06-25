@@ -1527,7 +1527,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ffight )
 	PORT_INCLUDE( cps1_3b )
-	
+
 /* The button below is not officially documented, pressing it will allow you to escape from grabs and choke
    holds instantly. */
 

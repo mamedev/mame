@@ -8,11 +8,11 @@
 
 #include "pci.h"
 
-class sis7001_usb_device : public pci_device 
+class sis7001_usb_device : public pci_device
 {
 public:
 	sis7001_usb_device(
-		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, 
+		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 		int num_ports
 	) : sis7001_usb_device(mconfig, tag, owner, clock)
 	{
@@ -31,7 +31,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-//	virtual void reset_all_mappings() override;
+//  virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
@@ -39,7 +39,7 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 	void io_map(address_map &map);
-	
+
 private:
 	u8 m_downstream_ports;
 	u32 m_HcFmInterval = 0;

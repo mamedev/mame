@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 
 /*
-    
+
     Luxor X37 prototype
 
     (Luxor DS90-10 + ABC 1600 video)

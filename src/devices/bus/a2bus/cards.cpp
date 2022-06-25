@@ -143,7 +143,7 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("q68", A2BUS_Q68);                       // Stellation Q68 68000 card
 	device.option_add("q68plus", A2BUS_Q68PLUS);               // Stellation Q68 Plus 68000 card
 	device.option_add("grafex", A2BUS_GRAFEX);                 // Grafex card (uPD7220 graphics)
-	device.option_add("excel9", A2BUS_EXCEL9);				   // Excel-9 (6809 coprocessor)
+	device.option_add("excel9", A2BUS_EXCEL9);                 // Excel-9 (6809 coprocessor)
 }
 
 void apple2e_cards(device_slot_interface &device)

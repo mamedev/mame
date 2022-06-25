@@ -785,7 +785,7 @@ public:
 	//                    "JC8 4.4"
 	//                    "JC8 4.2"
 	// Pot Black Casino   "PO  1.2"
-    //                    "PO  1.1"
+	//                    "PO  1.1"
 	// Fortune Club       "CFO 1.2"
 	static constexpr uint8_t fortune_characteriser_prot[8] = { 0x00, 0x70, 0x10, 0x60, 0x20, 0x50, 0x10, 0x00 }; // guessed based on lamp positions in Pot Black Casino and Jewel in the Crown
 
@@ -1229,7 +1229,7 @@ public:
 
 	// games with sequence starting 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48
 	// High Rise  "HII 0.3"
-	//            "HIR 3.1" 
+	//            "HIR 3.1"
 	//            "HIR 3.0"
 	//static constexpr uint8_t hirise_characteriser_prot[8] = { 0x00, 0x68, 0x08, 0x60, 0x40, 0x28, 0x68, 0x60 };
 	static constexpr uint8_t hirise_characteriser_prot[8] = { 0x00, 0x68, 0x08, 0x60, 0x20, 0x48, 0x08, 0x00 }; // matches bootleg

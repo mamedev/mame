@@ -496,7 +496,7 @@ void jpmsru_state::out_logicext_w(offs_t offset, uint8_t data)
 	switch(offset)
 	{
 		case 0: out_lamp_ext_w(m_logicext_addr, m_logicext_data); break; /* j_lc has solely lamps as outputs and is the only dumped
-																			game to use this, so keep things simple for now */
+		                                                                    game to use this, so keep things simple for now */
 		case 1: m_logicext_data = data; break;
 		case 2:
 		case 3:
@@ -930,7 +930,7 @@ static INPUT_PORTS_START( j_ewsbl )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) /* No stake jumper, 50p coin pulses meter 1 160 times if this is on and prizes
-													are doubled as well, which doesn't make sense with 10p coins */
+	                                                are doubled as well, which doesn't make sense with 10p coins */
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // No coin tube switch
