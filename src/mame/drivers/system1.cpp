@@ -4432,6 +4432,42 @@ ROM_START( wboy3 )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
+ // this bootleg by Tecfri has a small daughterboard with standard Z80, PAL and PROM. Code wise it's extremely similar to wboy3, with a small routine added at the end of ROM 3.
+ROM_START( wboyblt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin", 0x0000, 0x4000, CRC(67d5af52) SHA1(92d08d65b0e54f5c56dfa7a583650fd6b18e2c81) ) // encrypted
+	ROM_LOAD( "2.bin", 0x4000, 0x4000, CRC(e0d36862) SHA1(5e25cee7f972c571edddb5b18682817fbf2e72b3) ) // encrypted
+	ROM_LOAD( "3.bin", 0x8000, 0x4000, CRC(8dba0aad) SHA1(fd964ee39046e46f2685eb5f49144744001758e8) )
+
+	// sound and GFX ROMs match the original wboy sets
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "14.bin", 0x0000, 0x2000, CRC(78ae1e7b) SHA1(86032f443359b0bb2766e33024ed2e320aa9bc84) )
+
+	ROM_REGION( 0xc000, "tiles", 0 )
+	ROM_LOAD( "9.bin",  0x0000, 0x2000, CRC(08d609ca) SHA1(11799e9ef7e6942b304f132b404bff3ed44d524b) )
+	ROM_LOAD( "8.bin",  0x2000, 0x2000, CRC(6f61fdf1) SHA1(21826aebf5835b9f3d9c467c8647809c1bc0d01f) )
+	ROM_LOAD( "11.bin", 0x4000, 0x2000, CRC(6a0d2c2d) SHA1(8c21d7f0768e8dda2b7185f3c510cae4229a4a2e) )
+	ROM_LOAD( "10.bin", 0x6000, 0x2000, CRC(a8e281c7) SHA1(a88b80a7b94ab1401bbf28d7707fdf28a5505127) )
+	ROM_LOAD( "13.bin", 0x8000, 0x2000, CRC(89305df4) SHA1(7a5098624769a31e7512f56831e818bce6a18871) )
+	ROM_LOAD( "12.bin", 0xa000, 0x2000, CRC(60f806b1) SHA1(f91e5868a455dff2bce3c2891a7cfd648957cd73) )
+
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "4.bin",  0x0000, 0x4000, CRC(c2891722) SHA1(e4e11c0e9bd0dc121c25349493f2b13d2ff8c807) )
+	ROM_LOAD( "6.bin",  0x4000, 0x4000, CRC(2d3a421b) SHA1(d70440a8703ccface3212cd9544c950b36263e8c) )
+	ROM_LOAD( "5.bin",  0x8000, 0x4000, CRC(8d622c50) SHA1(9a76a50204c618347d3e8eee6cda841becd906eb) )
+	ROM_LOAD( "7.bin",  0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) )
+
+	ROM_REGION( 0x0100, "lookup_proms", 0 ) // not dumped for this set, but should match
+	ROM_LOAD( "pr-5317.76", 0x0000, 0x0100, BAD_DUMP CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+
+	// the following are on the small daughterboard along with the Z80
+	ROM_REGION( 0x0100, "decryption_prom", 0 )
+	ROM_LOAD( "tbp24s10n", 0x0000, 0x0100, NO_DUMP )
+
+	ROM_REGION( 0x00cc, "decryption_pal", 0 )
+	ROM_LOAD( "pal20l10cns", 0x0000, 0x00cc, NO_DUMP )
+ROM_END
+
 /*
 This wonderboy romset runs on a system1 1985 pcb with some flying wires.
 Serial number of the pcb is 257
@@ -5696,6 +5732,7 @@ GAME( 1986, wboy4,      wboy,     sys1piox_315_5162, wboy,      system1_state, e
 GAME( 1986, wboyu,      wboy,     sys1pio,           wboyu,     system1_state, empty_init,        ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", MACHINE_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
 GAME( 1986, wboy5,      wboy,     sys1piox_315_5135, wboy3,     system1_state, empty_init,        ROT0,   "bootleg", "Wonder Boy (set 5, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboyub,     wboy,     sys1piox_315_5177, wboy,      system1_state, empty_init,        ROT0,   "bootleg", "Wonder Boy (US bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboyblt,    wboy,     sys1piox_315_5135, wboy3,     system1_state, empty_init,        ROT0,   "bootleg (Tecfri)", "Wonder Boy (Tecfri bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blockgal,   0,        blockgal,          blockgal,  system1_state, init_blockgal,     ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
 
 /* PIO-based System 1 with ROM banking */

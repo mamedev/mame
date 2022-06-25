@@ -320,6 +320,13 @@ ROM_START( thoop2 ) /* REF.940411 PCB */
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "th2-c1.c1",     0x000000, 0x100000, CRC(8fac8c30) SHA1(8e49bb596144761eae95f3e1266e57fb386664f2) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched */
+
+	ROM_REGION(0x0a00, "plds", 0) // PALs
+	ROM_LOAD("pal16r8-1.b16",   0x0000, 0x0104, CRC(27b1ca8b) SHA1(038d1352baff18f619ac4149e5825ef9664c983b) )
+	ROM_LOAD("pal20l8-2.b23",   0x0200, 0x0144, CRC(87e5e6ab) SHA1(f42b952128bd26fe565b06403c7b1c95061e5034) )
+	ROM_LOAD("pal16r4-3.e2",    0x0400, 0x0104, CRC(0488f37b) SHA1(e2e4e3ca57713da7b0fcae57b34b0bfc5c9d3635) )
+	ROM_LOAD("pal20l8-4.h15",   0x0600, 0x0144, CRC(49053906) SHA1(f6c92f26d66c7286f9845ebf7d3ee729ed0b4f22) )
+	ROM_LOAD("palce16v8-5.h21", 0x0800, 0x0117, CRC(b651bc3b) SHA1(89f8bc2d3ae710189912373464c2f35b6780357d) )
 ROM_END
 
 ROM_START( thoop2a ) /* REF.940411 PCB */
@@ -343,6 +350,13 @@ ROM_START( thoop2a ) /* REF.940411 PCB */
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "th2-c1.c1",     0x000000, 0x100000, CRC(8fac8c30) SHA1(8e49bb596144761eae95f3e1266e57fb386664f2) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched */
+
+	ROM_REGION(0x0a00, "plds", 0) // PALs
+	ROM_LOAD("pal16r8-1.b16",   0x0000, 0x0104, CRC(27b1ca8b) SHA1(038d1352baff18f619ac4149e5825ef9664c983b) )
+	ROM_LOAD("pal20l8-2.b23",   0x0200, 0x0144, CRC(87e5e6ab) SHA1(f42b952128bd26fe565b06403c7b1c95061e5034) )
+	ROM_LOAD("pal16r4-3.e2",    0x0400, 0x0104, CRC(0488f37b) SHA1(e2e4e3ca57713da7b0fcae57b34b0bfc5c9d3635) )
+	ROM_LOAD("pal20l8-4.h15",   0x0600, 0x0144, CRC(49053906) SHA1(f6c92f26d66c7286f9845ebf7d3ee729ed0b4f22) )
+	ROM_LOAD("palce16v8-5.h21", 0x0800, 0x0117, CRC(b651bc3b) SHA1(89f8bc2d3ae710189912373464c2f35b6780357d) )
 ROM_END
 
 GAME( 1994, thoop2,       0, thoop2, thoop2, thoop2_state, empty_init, ROT0, "Gaelco", "TH Strikes Back (Non North America, Version 1.0, Checksum 020E0867)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

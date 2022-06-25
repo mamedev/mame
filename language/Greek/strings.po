@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-11 09:24+1000\n"
-"PO-Revision-Date: 2021-12-11 12:00+0300\n"
+"PO-Revision-Date: 2021-06-24 16:00+0300\n"
 "Last-Translator: Mame.gr - BraiNKilleR\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -292,7 +292,7 @@ msgstr "Λίστα λογισμικού/αντικείμενο: %1$s:%2$s"
 
 #: src/frontend/mame/ui/optsmenu.cpp:45 src/frontend/mame/ui/selgame.cpp:441
 msgid "General Settings"
-msgstr ""
+msgstr "Γενικές Ρυθμίσεις"
 
 #: src/frontend/mame/ui/optsmenu.cpp:77 src/frontend/mame/ui/sndmenu.cpp:30
 msgid "Sound Options"
@@ -300,7 +300,7 @@ msgstr "Επιλογές Ήχου"
 
 #: src/frontend/mame/ui/optsmenu.cpp:80
 msgid "Input Assignments"
-msgstr ""
+msgstr "Ανάθεση Εισαγωγών"
 
 #: src/frontend/mame/ui/optsmenu.cpp:83 src/frontend/mame/ui/miscmenu.cpp:879
 msgid "Plugins"
@@ -308,7 +308,7 @@ msgstr "Πρόσθετα"
 
 #: src/frontend/mame/ui/optsmenu.cpp:85
 msgid "Input Devices"
-msgstr ""
+msgstr "Συσκευές Εισαγωγής"
 
 #: src/frontend/mame/ui/optsmenu.cpp:87
 msgid "Save Settings"
@@ -316,7 +316,7 @@ msgstr "Αποθήκευση Ρυθμίσεων"
 
 #: src/frontend/mame/ui/optsmenu.cpp:185 src/frontend/mame/ui/optsmenu.cpp:227
 msgid "System Filter"
-msgstr ""
+msgstr "Φίλτρο Συστήματος"
 
 #: src/frontend/mame/ui/optsmenu.cpp:197 src/frontend/mame/ui/custui.cpp:82
 msgid "Customize UI"
@@ -324,7 +324,7 @@ msgstr "Προσαρμογή UI"
 
 #: src/frontend/mame/ui/optsmenu.cpp:198 src/frontend/mame/ui/dirmenu.cpp:525
 msgid "Configure Folders"
-msgstr ""
+msgstr "Διαμόρφωση Φακέλων"
 
 #: src/frontend/mame/ui/pluginopt.cpp:35
 msgid "Plugin Options"
@@ -749,7 +749,7 @@ msgstr "Οθόνη #%d"
 #: src/frontend/mame/ui/videoopt.cpp:101
 #, c-format
 msgid "Video Options: %1$s"
-msgstr ""
+msgstr "Επιλογές Βίντεο: %1$s"
 
 #: src/frontend/mame/ui/videoopt.cpp:159
 msgid "Zoom to Screen Area"
@@ -888,7 +888,8 @@ msgstr "Δίκτυο WAN"
 msgid ""
 "One or more ROMs/disk images for this system are incorrect. The system may "
 "not run correctly.\n"
-msgstr ""
+msgstr "Μία ή περισσότερες ROMs/εικόνες δίσκων για αυτό το σύστημα είναι εσφαλμένες. "
+"Το σύστημα μπορεί να μην εκτελείται σωστά.\n"
 
 #: src/frontend/mame/ui/info.cpp:80
 msgid ""
@@ -902,7 +903,8 @@ msgstr ""
 msgid ""
 "One or more ROMs/disk images for this system have not been correctly "
 "dumped.\n"
-msgstr ""
+msgstr "Μία ή περισσότερες ROMs/εικόνες δίσκων για αυτό το σύστημα δεν έχουν γίνει "
+"dump σωστά.\n"
 
 #: src/frontend/mame/ui/info.cpp:93
 msgid "Completely unemulated features: "
@@ -1067,7 +1069,7 @@ msgstr "%1$s:\n"
 
 #: src/frontend/mame/ui/info.cpp:618
 msgid "Media Image Information"
-msgstr ""
+msgstr "Πληροφορίες εικόνας μέσου"
 
 #: src/frontend/mame/ui/info.cpp:666
 msgid "Not supported"
@@ -1140,7 +1142,7 @@ msgstr "Επιλογή αρχικού περιεχομένου"
 #: src/frontend/mame/ui/keyboard.cpp:29
 msgctxt "menu-keyboard"
 msgid "Keyboard Selection"
-msgstr ""
+msgstr "Επιλογή Πληκτρολογίου"
 
 #: src/frontend/mame/ui/keyboard.cpp:46
 msgctxt "menu-keyboard"
@@ -1472,7 +1474,7 @@ msgstr "<ρύθμιση φίλτρων>"
 
 #: src/frontend/mame/ui/utils.cpp:390
 msgid "Select Filters"
-msgstr ""
+msgstr "Επιλογή Φίλτρων"
 
 #: src/frontend/mame/ui/utils.cpp:538
 #, c-format
@@ -1517,7 +1519,7 @@ msgstr "Περιλαμβάνονται κλώνοι"
 
 #: src/frontend/mame/ui/utils.cpp:1130
 msgid "Category File"
-msgstr ""
+msgstr "Αρχείο Κατηγοριών"
 
 #: src/frontend/mame/ui/utils.cpp:2029 src/frontend/mame/ui/inifile.cpp:277
 msgctxt "swlist-info"
@@ -1539,7 +1541,7 @@ msgstr "Επιλογή BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:74 src/frontend/mame/ui/miscmenu.cpp:812
 msgid "System"
-msgstr ""
+msgstr "Σύστημα"
 
 #: src/frontend/mame/ui/miscmenu.cpp:80
 msgid "Reset"
@@ -1592,7 +1594,7 @@ msgstr " (κλειδωμένο)"
 #: src/frontend/mame/ui/miscmenu.cpp:354 src/frontend/mame/ui/miscmenu.cpp:541
 msgctxt "menu-crosshair"
 msgid "[built-in]"
-msgstr ""
+msgstr "[ενσωματομένο]"
 
 #: src/frontend/mame/ui/miscmenu.cpp:395
 msgctxt "menu-crosshair"
@@ -1602,17 +1604,17 @@ msgstr "Επιλογές Στόχαστρου"
 #: src/frontend/mame/ui/miscmenu.cpp:456
 msgctxt "menu-crosshair"
 msgid "Always"
-msgstr ""
+msgstr "Πάντα"
 
 #: src/frontend/mame/ui/miscmenu.cpp:457
 msgctxt "menu-crosshair"
 msgid "Never"
-msgstr ""
+msgstr "Ποτέ"
 
 #: src/frontend/mame/ui/miscmenu.cpp:458
 msgctxt "menu-crosshair"
 msgid "When moved"
-msgstr ""
+msgstr "Όταν κινείται"
 
 #: src/frontend/mame/ui/miscmenu.cpp:482
 #, c-format
@@ -1629,17 +1631,17 @@ msgstr "Στόχαστρο P%1$d"
 #: src/frontend/mame/ui/miscmenu.cpp:562
 msgctxt "menu-crosshair"
 msgid "Auto-Hide Delay"
-msgstr ""
+msgstr "Καθυστέρηση αυτόματης απόκρυψης"
 
 #: src/frontend/mame/ui/miscmenu.cpp:563
 #, c-format
 msgctxt "menu-crosshair"
 msgid "%1$d s"
-msgstr ""
+msgstr "%1$d s"
 
 #: src/frontend/mame/ui/miscmenu.cpp:584
 msgid "Export Displayed List to File"
-msgstr ""
+msgstr "Εξαγωγή προβαλόμενης λίστας σε αρχείο"
 
 #: src/frontend/mame/ui/miscmenu.cpp:644
 #, c-format
@@ -1673,6 +1675,8 @@ msgid ""
 "System Settings:\n"
 "%1$s"
 msgstr ""
+"Ρυθμίσεις Συστήματος:\n"
+"%1$s"
 
 #: src/frontend/mame/ui/miscmenu.cpp:808
 msgid "BIOS"
@@ -1680,7 +1684,7 @@ msgstr "BIOS"
 
 #: src/frontend/mame/ui/miscmenu.cpp:815
 msgid "[this system has no BIOS settings]"
-msgstr ""
+msgstr "[αυτό το σύστημα δεν έχει ρυθμίσεις BIOS]"
 
 #: src/frontend/mame/ui/miscmenu.cpp:824
 msgid "Add To Favorites"
@@ -1692,7 +1696,7 @@ msgstr "Αφαίρεση Από Τα Αγαπημένα"
 
 #: src/frontend/mame/ui/miscmenu.cpp:829
 msgid "Save System Settings"
-msgstr ""
+msgstr "Αποθήκευση Ρυθμίσεων Συστήματος"
 
 #: src/frontend/mame/ui/miscmenu.cpp:862 src/frontend/mame/ui/selmenu.cpp:2615
 msgid " (default)"
@@ -1792,7 +1796,7 @@ msgstr "%s [εσωτερικό]"
 
 #: src/frontend/mame/ui/inputmap.cpp:29
 msgid "Input Assignments (general)"
-msgstr ""
+msgstr "Ανάθεση εισαγωγών (γενικά)"
 
 #: src/frontend/mame/ui/inputmap.cpp:39
 msgid "User Interface"
@@ -1810,15 +1814,15 @@ msgstr "Άλλα Στοιχεία Ελέγχου"
 #: src/frontend/mame/ui/inputmap.cpp:58
 #, c-format
 msgid "Input Assignments (%1$s)"
-msgstr ""
+msgstr "Ανάθεση Εισαγωγών (%1$s)"
 
 #: src/frontend/mame/ui/inputmap.cpp:152
 msgid "Input Assignments (this system)"
-msgstr ""
+msgstr "Ανάθεση εισαγωγών (αυτό το σύστημα)"
 
 #: src/frontend/mame/ui/inputmap.cpp:254
 msgid "[no assignable inputs are enabled]"
-msgstr ""
+msgstr "[μη αναθέσιμες εισαγωγές είναι ενεργοποιημένες]"
 
 #: src/frontend/mame/ui/inputmap.cpp:348
 msgid "Pressed"
@@ -1826,7 +1830,7 @@ msgstr "Πατήθηκε"
 
 #: src/frontend/mame/ui/inputmap.cpp:418
 msgid "Invalid combination entered"
-msgstr ""
+msgstr "Ησύχθη μη έγκυρος συνδυασμός"
 
 #: src/frontend/mame/ui/inputmap.cpp:563
 #, c-format
@@ -1870,27 +1874,27 @@ msgstr "Πιέστε το πλήκτρο %1$s για επαναφορά προε
 #, c-format
 msgctxt "menu-inputdev"
 msgid "%1$s (%2$s %3$d)"
-msgstr ""
+msgstr "%1$s (%2$s %3$d)"
 
 #: src/frontend/mame/ui/inputdevices.cpp:147
 msgctxt "menu-inputdev"
 msgid "Input Devices"
-msgstr ""
+msgstr "Συσκευές Εισαγωγής"
 
 #: src/frontend/mame/ui/inputdevices.cpp:188
 msgctxt "menu-inputdev"
 msgid "[no input devices are enabled]"
-msgstr ""
+msgstr "[δεν ειναι ενεργοποιημένες συσκευές εισαγωγής]"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:22
 msgctxt "menu-inputtoggle"
 msgid "Toggle Inputs"
-msgstr ""
+msgstr "Εναλλάξιμες Εισαγωγές"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:107
 msgctxt "menu-inputtoggle"
 msgid "[no toggle inputs are enabled]"
-msgstr ""
+msgstr "[μη εναλλάξιμες εισαγωγές είναι ενεργοποιημένες]"
 
 #: src/frontend/mame/ui/tapectrl.cpp:42
 msgid "Tape Control"
@@ -1939,37 +1943,37 @@ msgstr "Γρήγορη Προώθηση"
 #: src/frontend/mame/ui/inputopts.cpp:75
 msgctxt "menu-inputopts"
 msgid "Input Settings"
-msgstr ""
+msgstr "Ρυθμίσεις Εισαγωγής"
 
 #: src/frontend/mame/ui/inputopts.cpp:95
 msgctxt "menu-inputopts"
 msgid "Input Assignments (general)"
-msgstr ""
+msgstr "Ανάθεση Εισαγωγών (γενικά)"
 
 #: src/frontend/mame/ui/inputopts.cpp:97
 msgctxt "menu-inputopts"
 msgid "Input Assignments (this system)"
-msgstr ""
+msgstr "Ανάθεση Εισαγωγών (αυτό το σύστημα)"
 
 #: src/frontend/mame/ui/inputopts.cpp:99
 msgctxt "menu-inputopts"
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "Ρυθμίσεις Αναλογικών Εισαγωγών"
 
 #: src/frontend/mame/ui/inputopts.cpp:101
 msgctxt "menu-inputopts"
 msgid "Keyboard Selection"
-msgstr ""
+msgstr "Επιλογή Πληκτρολογίου"
 
 #: src/frontend/mame/ui/inputopts.cpp:103
 msgctxt "menu-inputopts"
 msgid "Toggle Inputs"
-msgstr ""
+msgstr "Εναλλάξιμες Εισαγωγές"
 
 #: src/frontend/mame/ui/inputopts.cpp:107
 msgctxt "menu-inputopts"
 msgid "Input Devices"
-msgstr ""
+msgstr "Συσκευές Εισαγωγής"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:132
 msgid "Cannot save over directory"
@@ -2286,12 +2290,12 @@ msgstr "Πιέστε το πλήκτρο TAB για να ορίσετε"
 #: src/frontend/mame/ui/dirmenu.cpp:421
 #, c-format
 msgid "%1$s Folders"
-msgstr ""
+msgstr "%1$s Φάκελοι"
 
 #: src/frontend/mame/ui/dirmenu.cpp:421
 #, c-format
 msgid "%1$s Folder"
-msgstr ""
+msgstr "%1$s Φάκελος"
 
 #: src/frontend/mame/ui/dirmenu.cpp:484
 msgid "Change Folder"
@@ -2325,19 +2329,19 @@ msgstr "Μέγιστη Επέκταση"
 #: src/frontend/mame/ui/viewgfx.cpp:822
 msgctxt "gfxview"
 msgid "All categories"
-msgstr ""
+msgstr "Όλες οι κατηγορίες"
 
 #: src/frontend/mame/ui/viewgfx.cpp:824 src/frontend/mame/ui/viewgfx.cpp:829
 #, c-format
 msgctxt "gfxview"
 msgid "Category %1$d"
-msgstr ""
+msgstr "Κατηγορία %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:926
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s]"
-msgstr ""
+msgstr "[root%1$s]"
 
 #: src/frontend/mame/ui/viewgfx.cpp:926
 #, c-format
@@ -2355,65 +2359,65 @@ msgstr "[root%1$s] γραφίδες"
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X → %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
-msgstr ""
+msgstr " #%1$X → %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
 
 #: src/frontend/mame/ui/viewgfx.cpp:947
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X = %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
-msgstr ""
+msgstr " #%1$X = %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
 
 #: src/frontend/mame/ui/viewgfx.cpp:954
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X (A:%2$02X R:%3$02X G:%4$02X B:%5$02X)"
-msgstr ""
+msgstr " #%1$X (A:%2$02X R:%3$02X G:%4$02X B:%5$02X)"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1134
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] %2$d/%3$d"
-msgstr ""
+msgstr "[root%1$s] %2$d/%3$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1157
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X:%2$X (%3$d %4$d) = %5$X"
-msgstr ""
+msgstr " #%1$X:%2$X (%3$d %4$d) = %5$X"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1165
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d color %3$X/%4$X"
-msgstr ""
+msgstr " %1$d×%2$d χρώμα %3$X/%4$X"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1305
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d category %3$u"
-msgstr ""
+msgstr "Tilemap %1$d/%2$d κατηγορία %3$u"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1305
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d "
-msgstr ""
+msgstr "Tilemap %1$d/%2$d "
 
 #: src/frontend/mame/ui/viewgfx.cpp:1327
 #, c-format
 msgctxt "gfxview"
 msgid " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
-msgstr ""
+msgstr " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1334
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
-msgstr ""
+msgstr " %1$d×%2$d προέλευση (%3$d %4$d)"
 
 #: src/frontend/mame/ui/selgame.cpp:442
 msgid "System Settings"
-msgstr ""
+msgstr "Ρυθμίσεις Συστήματος"
 
 #: src/frontend/mame/ui/selgame.cpp:1058
 #, c-format
@@ -2434,12 +2438,12 @@ msgstr "%1$s - Αναζήτηση: %2$s_"
 #: src/frontend/mame/ui/selector.cpp:105
 msgctxt "menu-selector"
 msgid "[no matches]"
-msgstr ""
+msgstr "[χωρίς ταιριάσματα]"
 
 #: src/frontend/mame/ui/selector.cpp:118
 msgctxt "menu-selector"
 msgid "[no choices]"
-msgstr ""
+msgstr "[χωρίς επιλογές]"
 
 #: src/frontend/mame/ui/selector.cpp:133
 #, c-format
@@ -2449,7 +2453,7 @@ msgstr "Κάντε διπλό κλικ ή πατήστε %1$s για να επι
 
 #: src/frontend/mame/ui/auditmenu.cpp:59
 msgid "Audit Media"
-msgstr ""
+msgstr "Έλεγχος μέσων"
 
 #: src/frontend/mame/ui/auditmenu.cpp:63
 #, c-format
@@ -2511,7 +2515,7 @@ msgstr "Απόκρυψη Όλων"
 
 #: src/frontend/mame/ui/custui.cpp:142
 msgid "UI Language"
-msgstr ""
+msgstr "Γλώσσα UI"
 
 #: src/frontend/mame/ui/custui.cpp:167 src/frontend/mame/ui/custui.cpp:220
 msgid "System Names"
@@ -2539,7 +2543,7 @@ msgstr "[ενσωματομένο]"
 
 #: src/frontend/mame/ui/custui.cpp:334
 msgid "UI Fonts"
-msgstr ""
+msgstr "Γραμματοσειρές UI"
 
 #: src/frontend/mame/ui/custui.cpp:363
 msgid "default"
@@ -2572,7 +2576,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:545
 msgid "UI Colors"
-msgstr ""
+msgstr "Χρώματα UI"
 
 #: src/frontend/mame/ui/custui.cpp:608
 msgctxt "color-option"
@@ -2794,7 +2798,7 @@ msgstr "Αναθεώρηση: %1$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:60
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "Ρύθμισεις Αναλογικών Εισαγωγών"
 
 #: src/frontend/mame/ui/analogipt.cpp:92
 #, c-format
@@ -2823,7 +2827,7 @@ msgstr "%1$s Ευαισθησία"
 
 #: src/frontend/mame/ui/analogipt.cpp:402
 msgid "[no analog inputs are enabled]"
-msgstr ""
+msgstr "[μη αναλογικές εισαγωγές είναι ενεργοποιημένες]"
 
 #: src/frontend/mame/ui/barcode.cpp:40
 msgid "Barcode Reader"
@@ -2844,7 +2848,7 @@ msgstr "Μη έγκυρο μήκος γραμμωτού κώδικα!"
 #: src/frontend/mame/ui/mainmenu.cpp:114
 msgctxt "menu-main"
 msgid "Input Settings"
-msgstr ""
+msgstr "Ρυθμίσεις Εισαγωγής"
 
 #: src/frontend/mame/ui/mainmenu.cpp:117
 msgctxt "menu-main"
@@ -2864,7 +2868,7 @@ msgstr "Λογιστικές Πληροφορίες"
 #: src/frontend/mame/ui/mainmenu.cpp:123
 msgctxt "menu-main"
 msgid "System Information"
-msgstr ""
+msgstr "Πληροφορίες Συστήματος"
 
 #: src/frontend/mame/ui/mainmenu.cpp:126
 msgctxt "menu-main"
@@ -2874,7 +2878,7 @@ msgstr "Πληροφορίες Προειδοποιήσεων"
 #: src/frontend/mame/ui/mainmenu.cpp:132
 msgctxt "menu-main"
 msgid "Media Image Information"
-msgstr ""
+msgstr "Πληροφορίες εικόνας μέσου"
 
 #: src/frontend/mame/ui/mainmenu.cpp:134
 msgctxt "menu-main"
@@ -2970,7 +2974,7 @@ msgstr "Επιλέξτε Νέο Σύστημα"
 #: src/frontend/mame/ui/mainmenu.cpp:199
 msgctxt "menu-main"
 msgid "Close Menu"
-msgstr ""
+msgstr "Κλείσιμο Μενού"
 
 #: src/frontend/mame/ui/selmenu.cpp:77
 msgctxt "selmenu-artwork"
@@ -3075,11 +3079,11 @@ msgstr "Εμφάνιση προβολής DATs"
 
 #: src/frontend/mame/ui/selmenu.cpp:260
 msgid "Select Software Package Part"
-msgstr ""
+msgstr "Επιλογή μέρους Πακέτου Λογισμικού"
 
 #: src/frontend/mame/ui/selmenu.cpp:330
 msgid "Select System BIOS"
-msgstr ""
+msgstr "Επιλογή BIOS Συστήματος"
 
 #: src/frontend/mame/ui/selmenu.cpp:644 src/frontend/mame/ui/selmenu.cpp:675
 #, c-format
@@ -3185,7 +3189,7 @@ msgstr "Γενικές Πληροφορίες"
 #: src/frontend/mame/ui/selmenu.cpp:2864
 #, c-format
 msgid "Short Name\t%1$s\n"
-msgstr ""
+msgstr "Μικρό Όνομα\t%1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:2865
 #, c-format
@@ -3400,11 +3404,11 @@ msgstr "Χρονισμός\tΑτελής\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2998
 msgid "Mechanical System\tYes\n"
-msgstr ""
+msgstr "Μηχανικό Σύστημα\tΝαι"
 
 #: src/frontend/mame/ui/selmenu.cpp:2998
 msgid "Mechanical System\tNo\n"
-msgstr ""
+msgstr "Μηχανικό Σύστημα\tΌχι"
 
 #: src/frontend/mame/ui/selmenu.cpp:2999
 msgid "Requires Artwork\tYes\n"
@@ -6186,7 +6190,7 @@ msgstr "[δεν ρυθμιστηκε]"
 #: plugins/inputmacro/inputmacro_menu.lua:359
 msgctxt "plugin-inputmacro"
 msgid "Activation combination"
-msgstr ""
+msgstr "Συνδυασμός Ενεργοποίησης"
 
 #: plugins/inputmacro/inputmacro_menu.lua:362
 msgctxt "plugin-inputmacro"
@@ -6481,7 +6485,7 @@ msgstr "Ακύρωση"
 #: plugins/commonui/init.lua:197
 msgctxt "plugin-commonui"
 msgid "Invalid combination entered"
-msgstr ""
+msgstr "Ησύχθη μη έγκυρος συνδυασμός"
 
 #: plugins/commonui/init.lua:203
 #, lua-format
@@ -6490,133 +6494,6 @@ msgid ""
 "Enter combination or press %s to cancel\n"
 "%s"
 msgstr ""
+"Εισάγετε συνδυασμό ή πατήστε %s για ακύρωση\n"
+"%s"
 
-#~ msgctxt "menu-main"
-#~ msgid "Return to Machine"
-#~ msgstr "Επιστροφή στο Μηχάνημα"
-
-#~ msgid "Software part selection:"
-#~ msgstr "Επιλογή τμημάτων λογισμικού:"
-
-#~ msgid "BIOS selection:"
-#~ msgstr "Επιλογή BIOS:"
-
-#~ msgid ""
-#~ "This driver requires images to be loaded in the following device(s): "
-#~ msgstr ""
-#~ "Αυτός ο οδηγός απαιτεί εικόνες να φορτωθούν στην ακόλουθη συσκευή (ες): "
-
-#~ msgid ""
-#~ "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
-#~ "run correctly.\n"
-#~ msgstr ""
-#~ "Μία ή περισσότερες ROMs/CHDs για αυτό το μηχάνημα είναι εσφαλμένες. Το "
-#~ "μηχάνημα μπορεί να μην εκτελείται σωστά.\n"
-
-#~ msgid ""
-#~ "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-#~ msgstr ""
-#~ "Μία ή περισσότερες ROMs/CHDs για αυτό το μηχάνημα δεν έχουν γίνει dump "
-#~ "σωστά.\n"
-
-#~ msgid ""
-#~ "No machines found. Please check the rompath specified in the %1$s.ini "
-#~ "file.\n"
-#~ "\n"
-#~ "If this is your first time using %2$s, please see the config.txt file in "
-#~ "the docs directory for information on configuring %2$s."
-#~ msgstr ""
-#~ "Δεν βρέθηκαν μηχανήματα . Παρακαλώ ελέγξτε τη διαδρομή roms που "
-#~ "καθορίζεται στο αρχείο %1$s.ini.\n"
-#~ "\n"
-#~ "Αν αυτή είναι η πρώτη φορά που χρησιμοποιείτε %2$s., παρακαλούμε δείτε το "
-#~ "αρχείο config.txt στον κατάλογο docs για πληροφορίες σχετικά με τη "
-#~ "διαμόρφωση %2$s.."
-
-#~ msgid "Mechanical Machine\tYes\n"
-#~ msgstr "Μηχανική Συσκευή\tΝαι\n"
-
-#~ msgid "Mechanical Machine\tNo\n"
-#~ msgstr "Μηχανική Συσκευή\tΌχι\n"
-
-#~ msgid "General Inputs"
-#~ msgstr "Γενικός Χειρισμός"
-
-#~ msgid "Settings"
-#~ msgstr "Ρυθμίσεις"
-
-#~ msgid "Configure Directories"
-#~ msgstr "Ρύθμιση Φακέλων"
-
-#~ msgid "Select custom filters:"
-#~ msgstr "Επιλογή προσαρμοσμένων φίλτρων:"
-
-#~ msgid "Select category:"
-#~ msgstr "Επιλογή κατηγορίας:"
-
-#~ msgid "This machine has no BIOS."
-#~ msgstr "Αυτό το μηχάνημα δεν έχει BIOS."
-
-#~ msgid "Save Machine Configuration"
-#~ msgstr "Αποθήκευση Παραμετροποίησης Μηχανήματος"
-
-#~ msgid "Configure Machine:"
-#~ msgstr "Ρύθμιση Μηχανήματος:"
-
-#~ msgid "Pseudo terminals"
-#~ msgstr "Ψευδο τερματικά"
-
-#~ msgid "This machine has no configurable inputs."
-#~ msgstr "Αυτό το μηχάνημα δεν έχει είσαγωγές προς ρύθμιση."
-
-#~ msgid "Invalid sequence entered"
-#~ msgstr "Έγινε εισαγωγή μη έγκυρης ακολουθίας"
-
-#~ msgid "Folders Setup"
-#~ msgstr "Ρύθμιση Φακέλων"
-
-#~ msgid "Current %1$s Folders"
-#~ msgstr "Τρέχοντες Φάκελοι για %1$s"
-
-#~ msgid "Configure Machine"
-#~ msgstr "Ρύθμιση Μηχανήματος"
-
-#~ msgid "UI Customization Settings"
-#~ msgstr "Ρυθμίσεις Προσαρμογής UI"
-
-#~ msgid "UI Fonts Settings"
-#~ msgstr "Ρυθμίσεις γραμματοσειρών UI"
-
-#~ msgid "UI Color Settings"
-#~ msgstr "Ρυθμίσεις χρωμάτων UI"
-
-#~ msgid "Input (general)"
-#~ msgstr "Χειρισμός (γενικά)"
-
-#~ msgid "Input (this machine)"
-#~ msgstr "Χειρισμός (τρέχων μηχάνημα)"
-
-#~ msgid "Analog Controls"
-#~ msgstr "Αναλογικά Χειριστήρια"
-
-#~ msgid "Machine Information"
-#~ msgstr "Πληροφορίες Μηχανήματος"
-
-#~ msgid "Image Information"
-#~ msgstr "Πληροφορίες Τίτλου"
-
-#~ msgctxt "plugin-inputmacro"
-#~ msgid "Activation sequence"
-#~ msgstr "Ακολουθία ενεργοποίησης"
-
-#~ msgctxt "plugin-commonui"
-#~ msgid "Invalid sequence entered"
-#~ msgstr "Έγινε εισαγωγή μη έγκυρης ακολουθίας"
-
-#~ msgctxt "plugin-commonui"
-#~ msgid ""
-#~ "Enter sequence or press %s to cancel\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Δώστε ακολουθία ή πατήστε %s για ακύρωση\n"
-#~ "%s"

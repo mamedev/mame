@@ -55,36 +55,35 @@
 #define ADB_HLE (0)             // connect the ADB microcontroller to the macadb.cpp ADB bit-serial keyboard+mouse
 #define LOG_ADB (0)             // log ADB activity in the old-style HLE simulation of the microcontroller and GLU
 
+#include "machine/apple2common.h"
+//#include "machine/apple2host.h"
+#include "machine/macadb.h"
+
+#include "bus/a2bus/a2bus.h"
+#include "bus/a2bus/cards.h"
+#include "bus/a2gameio/gameio.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/g65816/g65816.h"
+#include "cpu/m6502/m5074x.h"
+#include "machine/bankdev.h"
+#include "machine/kb3600.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/timer.h"
+#include "machine/z80scc.h"
+#include "sound/es5503.h"
+#include "sound/spkrdev.h"
+
+#include "machine/applefdintf.h"
+#include "machine/iwm.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "cpu/g65816/g65816.h"
-#include "cpu/m6502/m5074x.h"
-#include "sound/spkrdev.h"
-#include "sound/es5503.h"
-#include "machine/bankdev.h"
-#include "machine/timer.h"
-#include "machine/z80scc.h"
-#include "machine/ram.h"
-#include "machine/kb3600.h"
-#include "machine/nvram.h"
-#include "machine/macadb.h"
-
-#include "machine/applefdintf.h"
-#include "machine/iwm.h"
-#include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
+#include "formats/ap2_dsk.h"
 
-#include "bus/rs232/rs232.h"
-
-#include "emu.h"
-#include "video/apple2.h"
-#include "machine/apple2common.h"
-//#include "machine/apple2host.h"
-
-#include "bus/a2bus/cards.h"
-#include "bus/a2gameio/gameio.h"
 
 namespace {
 

@@ -1087,7 +1087,7 @@ ROM_START( ptblank ) /* World set using 4Mb sound data ROM (verified) */
 	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
-ROM_START( ptblanka ) /* World set using non standard ROM labels (NR is Namco's prefix for Nebulas Ray, but NOT here!!), verified on 2 seperate PCBs */
+ROM_START( ptblanka ) /* World set using non standard ROM labels (NR is Namco's prefix for Nebulas Ray, but NOT here!!), verified on 2 separate PCBs */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "nr3_spr0.15b", 0x00002, 0x80000, CRC(fe2d9425) SHA1(51b166a629cbb522720d63720558816b496b6b76) ) // == gn2_mprlb.15b
 	ROM_LOAD32_WORD( "nr2_spr0.13b", 0x00000, 0x80000, CRC(3bf4985a) SHA1(f559e0d5f55d23d886fe61bd7d5ca556acc7f87c) ) // == gn2_mprub.12b

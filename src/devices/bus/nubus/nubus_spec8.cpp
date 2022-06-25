@@ -48,6 +48,8 @@
 #include "emu.h"
 #include "nubus_spec8.h"
 
+#include "supermac.h"
+
 #include "layout/generic.h"
 #include "screen.h"
 
@@ -63,7 +65,70 @@
 #define VRAM_SIZE   (0x10'0000) // 1M of VRAM for 1024x768 @ 8 bit
 
 
-static INPUT_PORTS_START( spec8s3 )
+namespace {
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class nubus_spec8s3_device :
+		public device_t,
+		public device_nubus_card_interface,
+		public device_video_interface,
+		public device_palette_interface
+{
+public:
+	// construction/destruction
+	nubus_spec8s3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	nubus_spec8s3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	// palette implementation
+	virtual uint32_t palette_entries() const override;
+
+	TIMER_CALLBACK_MEMBER(vbl_tick);
+
+private:
+	uint32_t spec8s3_r(offs_t offset, uint32_t mem_mask = ~0);
+	void spec8s3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t vram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
+	void update_crtc();
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	required_ioport m_userosc;
+	emu_timer *m_timer;
+
+	supermac_spec_crtc m_crtc;
+	supermac_spec_shift_reg m_shiftreg;
+
+	std::vector<uint32_t> m_vram;
+	uint32_t m_mode, m_vbl_disable;
+	uint32_t m_colors[3], m_count, m_clutoffs;
+
+	uint8_t m_osc;
+	bool m_interlace;
+
+	uint16_t m_hpan, m_vpan;
+	uint8_t m_zoom;
+
+	bool m_vbl_pending;
+};
+
+
+INPUT_PORTS_START( spec8s3 )
 	PORT_START("USEROSC")
 	PORT_CONFNAME(0x07, 0x01, "Oscillator Y1")
 	PORT_CONFSETTING(   0x00, "14.32 MHz (NTSC Underscan)")
@@ -81,13 +146,6 @@ ROM_START( spec8s3 )
 	ROMX_LOAD( "1003067-0001d.11b.bin", 0x000000, 0x008000, CRC(12188e2b) SHA1(6552d40364eae99b449842a79843d8c0114c4c70), ROM_BIOS(0) ) // "1003067-0001D Spec/8 Ser III // Ver. 1.2 (C)Copyright 1990 // SuperMac Technology // All Rights Reserved" 27c256 @11B
 	ROMX_LOAD( "1003067-0001e.11b.bin", 0x000000, 0x008000, CRC(39fab193) SHA1(124c9847bf07733d131c977c4395cfbbb6470973), ROM_BIOS(1) ) // "1003067-0001E Spec/8 Ser III // Ver. 1.3 (C)Copyright 1993 // SuperMac Technology // All Rights Reserved" NMC27C256Q @11B
 ROM_END
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(NUBUS_SPEC8S3, nubus_spec8s3_device, "nb_sp8s3", "SuperMac Spectrum/8 Series III video card")
 
 
 //-------------------------------------------------
@@ -565,3 +623,12 @@ uint32_t nubus_spec8s3_device::vram_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_vram[offset] ^ 0xffffffff;
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE TYPE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(NUBUS_SPEC8S3, device_nubus_card_interface, nubus_spec8s3_device, "nb_sp8s3", "SuperMac Spectrum/8 Series III video card")

@@ -2775,6 +2775,8 @@ end
 
 if (BUSES["NUBUS"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/nubus/cards.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/cards.h",
 		MAME_DIR .. "src/devices/bus/nubus/nubus.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/nubus.h",
 		MAME_DIR .. "src/devices/bus/nubus/nubus_48gc.cpp",

@@ -3761,15 +3761,13 @@ EPR-18742 - Sound CPU rom (on Sound BD)
 MPR-18743 - Sound Samples (on Sound BD)
 EPR-18744.12 - Program rom
 EPR-18745.13 - Program rom
-EPR-18784.14 - Program rom*
-EPR-18785.15 - Program rom*
-EPR-18746.30 - Sound CPU rom*
-EPR-18767.5  - Data*
-EPR-18768.4  - Data*
+EPR-18784.14 - Program rom
+EPR-18785.15 - Program rom
+EPR-18746.30 - Sound CPU rom
+EPR-18767.5  - Data
+EPR-18768.4  - Data
 
 EPR-18763.31 & alt sound CPU code EPR-18924a.30 are dumped
-
-* Note: The manual scan was low-res and these numbers might be incorrect as they were VERY hard to read!
 
 */
 

@@ -19146,6 +19146,7 @@ j80wsprt2                       // Winsprint (JPM)
 j80wsprt3                       // Winsprint (JPM)
 
 @source:jpmsru.cpp
+j_cnudgr                        // Cash Nudger?
 j_dt                            // Double Top (JPM)
 j_dud                           // Nudge Double Up Deluxe (JPM)
 j_duda                          //
@@ -19154,9 +19155,11 @@ j_ewn                           // Each Way Nudger (JPM)
 j_ewna                          //
 j_ewnb                          //
 j_ewnc                          //
+j_ewnd                          //
 j_ews                           // Each Way Shuffle (JPM)
 j_ewsa                          //
 j_ewsb                          //
+j_ewsbl                         //
 j_ewsdlx                        // Each Way Shuffle Deluxe (CTL)
 j_goldn2                        // Golden 2's (CTL)
 j_la                            // Lucky Aces
@@ -20252,6 +20255,7 @@ lethalenux                      // GX191 (c) 1992
 cclownz                         // (c) 1999 LAI Games
 cfarm                           // (c) 1999 LAI Games
 eggventr                        // (c) 1997 The Game Room
+eggventr1                       // (c) 1997 The Game Room
 eggventr2                       // (c) 1997 The Game Room
 eggventr7                       // (c) 1997 The Game Room
 eggventr8                       // (c) 1997 The Game Room
@@ -40657,6 +40661,7 @@ wboy3                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy4                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy5                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy6                           // 834-5984 (c) 1986 + Escape license (S1)
+wboyblt                         // Tecfri bootleg of wboy3
 wboyo                           // 834-5984 (c) 1986 + Escape license (S1)
 wboysys2                        // 834-5984  (c) 1986 + Escape license (S1)
 wboysys2a                       //
@@ -41321,6 +41326,7 @@ silkwormb2                      // bootleg
 @source:tecmo16.cpp
 fstarfrc                        // (c) 1992 Tecmo
 fstarfrcj                       // (c) 1992 Tecmo
+fstarfrcja                      // (c) 1992 Tecmo
 fstarfrcw                       // (c) 1992 Tecmo
 ginkun                          // (c) 1995 Tecmo
 riot                            // (c) 1992 NMK
@@ -44046,64 +44052,65 @@ xsleenaba                       // bootleg
 xsleenaj                        // TA-0019 (c) 1986
 
 @source:xavix.cpp
-taitons1                        //
-taitons2                        //
+ddrfammt                        //
+ekara                           //
+ekaraa                          //
+ekarag                          //
+ekaraj                          //
+ekaramix                        //
+ekaraphs                        //
+ekaras                          //
+epitch                          //
+epo_dmon                        //
+epo_efdx                        //
+epo_epp                         //
+epo_epp3                        //
+epo_eppk                        //
+epo_esdx                        //
+epo_guru                        //
+evio                            //
+gcslottv                        //
+has_wamg                        //
+jarajal                         //
+jpopira                         //
+ltv_tam                         //
 namcons1                        //
 namcons2                        //
-rad_ping                        //
-rad_pingp                       //
-rad_mtrk                        //
-rad_mtrkp                       //
+popira                          //
+popira2                         //
+rad_bass                        //
+rad_bassp                       //
 rad_bb                          //
 rad_bb2                         //
+rad_bdp                         //
 rad_box                         //
 rad_boxp                        //
 rad_crdn                        //
 rad_crdnp                       //
-rad_opus                        //
+rad_fb                          //
 rad_hnt                         //
 rad_hnt2                        //
-rad_bass                        //
-rad_bassp                       //
+rad_jcon                        //
+rad_madf                        //
+rad_mtrk                        //
+rad_mtrkp                       //
+rad_opus                        //
+rad_ping                        //
+rad_pingp                       //
+rad_rh                          //
+rad_sbw                         //
 rad_snow                        //
 rad_snowp                       //
-rad_madf                        //
-rad_fb                          //
 rad_socr                        //
-epo_esdx                        //
-epo_epp                         //
-epo_eppk                        //
-epo_epp3                        //
-epo_efdx                        //
-epo_guru                        //
-epo_dmon                        //
-rad_rh                          //
 rad_ssx                         //
 rad_ssxp                        //
-rad_sbw                         //
-rad_bdp                         //
-has_wamg                        //
-ltv_tam                         //
-tak_geig                        //
-jarajal                         //
-tcarnavi                        //
-tomcpin
-tomplc
-ekara                           //
-ekaraa                          //
-ekaraj                          //
-ekarag                          //
-ekaras                          //
-ekaraphs                        //
-epitch                          //
-ekaramix                        //
-ddrfammt                        //
-popira                          //
-popira2                         //
 taikodp                         //
-jpopira                         //
-evio                            //
-gcslottv                        //
+taitons1                        //
+taitons2                        //
+tak_geig                        //
+tcarnavi                        //
+tomcpin                         //
+tomplc                          //
 
 @source:xavix_2000.cpp
 epo_ebox                        //

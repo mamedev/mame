@@ -251,7 +251,6 @@ uint8_t specpls3_state::rom_r(offs_t offset)
 		: (m_port_1ffd_data & 0x01)
 		  ? ((u8*)m_bank_ram[0]->base())[offset]
 		  : ((u8*)m_bank_rom[0]->base())[offset];
-
 }
 
 void specpls3_state::port_7ffd_w(offs_t offset, uint8_t data)

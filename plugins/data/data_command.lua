@@ -1,13 +1,16 @@
 local dat = {}
+
 local info, ver
-local datread = require("data/load_dat")
+local datread = require('data/load_dat')
 do
 	local buttonchar
 	local function convert(str)
-		if not buttonchar then buttonchar = require("data/button_char") end
+		if not buttonchar then
+			buttonchar = require("data/button_char")
+		end
 		return buttonchar(str)
 	end
-	datread, ver = datread.open("command.dat", "#[^V]*Ver[^.:]*[.:]", convert)
+	datread, ver = datread.open('command.dat', '#[^V]*Ver[^.:]*[.:]', convert)
 end
 
 function dat.check(set, softlist)
@@ -15,11 +18,11 @@ function dat.check(set, softlist)
 		return nil
 	end
 	local status
-	status, info = pcall(datread, "cmd", "info", set)
+	status, info = pcall(datread, 'cmd', 'info', set)
 	if not status or not info then
 		return nil
 	end
-	return _p("plugin-data", "Command")
+	return _p('plugin-data', 'Command')
 end
 
 function dat.get()

@@ -10,7 +10,7 @@
 
   06 = ?
   07 = command - 002 = pattern fill, 100/101 = copy forward/backward
-  08 = pattern offset - X in bits 0-2, Y in bits 3-6
+  08 = pattern Y offset * 8
   09 = VRAM destination * 4
   0a = VRAM source * 4
   0b = height (inclusive)
@@ -32,6 +32,8 @@
 #include "emu.h"
 #include "nubus_specpdq.h"
 
+#include "supermac.h"
+
 #include "layout/generic.h"
 #include "screen.h"
 
@@ -47,7 +49,79 @@
 #define VRAM_SIZE   (0x40'0000)
 
 
-static INPUT_PORTS_START( specpdq )
+namespace {
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class nubus_specpdq_device :
+		public device_t,
+		public device_nubus_card_interface,
+		public device_video_interface,
+		public device_palette_interface
+{
+public:
+	// construction/destruction
+	nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	// palette implementation
+	virtual uint32_t palette_entries() const override;
+
+	TIMER_CALLBACK_MEMBER(vbl_tick);
+
+private:
+	uint32_t specpdq_r(offs_t offset, uint32_t mem_mask = ~0);
+	void specpdq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t vram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
+	void blitter_pattern_fill();
+	void blitter_copy_forward();
+	void blitter_copy_backward();
+
+	void update_crtc();
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	required_ioport m_userosc;
+	emu_timer *m_timer;
+
+	supermac_spec_crtc m_crtc;
+	supermac_spec_shift_reg m_shiftreg;
+
+	std::vector<uint32_t> m_vram;
+	uint32_t m_mode, m_vbl_disable;
+	uint32_t m_colors[3], m_count, m_clutoffs;
+
+	uint16_t m_stride;
+	uint16_t m_vint;
+	uint8_t m_hdelay;
+	uint8_t m_osc;
+
+	uint16_t m_blit_stride;
+	uint32_t m_blit_src, m_blit_dst;
+	uint32_t m_blit_width, m_blit_height;
+	uint8_t m_blit_patoffs;
+	uint32_t m_blit_pat[64];
+
+	uint32_t m_7xxxxx_regs[0x100000 / 4];
+};
+
+
+INPUT_PORTS_START( specpdq )
 	PORT_START("USEROSC")
 	PORT_CONFNAME(0x07, 0x00, "Alternate oscillator")
 	PORT_CONFSETTING(   0x00, "55.00 MHz (SuperMac 16\")")
@@ -59,12 +133,6 @@ ROM_START( specpdq )
 	ROM_REGION(0x10000, SPECPDQ_ROM_REGION, 0)
 	ROM_LOAD( "specpdq.bin",  0x000000, 0x010000, CRC(82a35f78) SHA1(9511c2df47140f4279196d3b8836b53429879dd9) )
 ROM_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(NUBUS_SPECPDQ, nubus_specpdq_device, "nb_spdq", "SuperMac Spectrum PDQ video card")
 
 
 //-------------------------------------------------
@@ -663,3 +731,12 @@ void nubus_specpdq_device::blitter_copy_backward()
 		}
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE TYPE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(NUBUS_SPECPDQ, device_nubus_card_interface, nubus_specpdq_device, "nb_spdq", "SuperMac Spectrum PDQ video card")

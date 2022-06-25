@@ -40,7 +40,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="commumutpv" cloneof="commumut">
-		<description>Communist Mutants from Space (Preview)</description>
+		<description>Communist Mutants from Space (preview)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4101"/>
@@ -68,7 +68,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="commumutepv" cloneof="commumut">
-		<description>Communist Mutants from Space (Preview) (PAL)</description>
+		<description>Communist Mutants from Space (preview) (PAL)</description>
 		<year>1982</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4101"/>
@@ -106,7 +106,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="dstomperpv" cloneof="dstomper">
-		<description>Dragonstomper (Preview)</description>
+		<description>Dragonstomper (preview)</description>
 		<year>1982</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4100"/>
@@ -144,7 +144,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="dstomperepv" cloneof="dstomper">
-		<description>Dragonstomper (Preview) (PAL)</description>
+		<description>Dragonstomper (preview) (PAL)</description>
 		<year>1982</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4100"/>
@@ -187,7 +187,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="mindmstrpv" cloneof="mindmstr">
-		<description>Escape from the Mindmaster (Preview)</description>
+		<description>Escape from the Mindmaster (preview)</description>
 		<year>1982</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4200"/>
@@ -230,7 +230,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="mindmstrepv" cloneof="mindmstr">
-		<description>Escape from the Mindmaster (Preview) (PAL)</description>
+		<description>Escape from the Mindmaster (preview) (PAL)</description>
 		<year>1982</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4200"/>
@@ -244,7 +244,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="xcalibur" cloneof="dstomper">
-		<description>Excalibur (Prototype)</description>
+		<description>Excalibur (prototype)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Stephen Harland Landrum"/>
@@ -257,7 +257,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="xcalibura" cloneof="dstomper">
-		<description>Excalibur (Prototype, Alt)</description>
+		<description>Excalibur (prototype, alt)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Stephen Harland Landrum"/>
@@ -270,7 +270,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="xcalibur36" cloneof="dstomper">
-		<description>Excalibur (Prototype, v. 36)</description>
+		<description>Excalibur (prototype, v. 36)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Stephen Harland Landrum"/>
@@ -283,7 +283,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="xcalibur39" cloneof="dstomper">
-		<description>Excalibur (Prototype, v. 39)</description>
+		<description>Excalibur (prototype, v. 39)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Stephen Harland Landrum"/>
@@ -310,7 +310,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="fireballpv" cloneof="fireball">
-		<description>Fireball (Preview)</description>
+		<description>Fireball (preview)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4300"/>
@@ -338,7 +338,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="fireballepv" cloneof="fireball">
-		<description>Fireball (Preview) (PAL)</description>
+		<description>Fireball (preview) (PAL)</description>
 		<year>1982</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4300"/>
@@ -352,7 +352,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="fireballp" cloneof="fireball">
-		<description>Fireball (Prototype)</description>
+		<description>Fireball (prototype)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Scott Nelson"/>
@@ -393,7 +393,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="killsatp" cloneof="killsat">
-		<description>Killer Satellites (Prototype)</description>
+		<description>Killer Satellites (prototype)</description>
 		<year>1983</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4103"/>
@@ -407,7 +407,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="labyrint" cloneof="mindmstr">
-		<description>Labyrinth (Prototype)</description>
+		<description>Labyrinth (prototype)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Dennis Caswell"/>
@@ -420,7 +420,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="labyrinta" cloneof="mindmstr">
-		<description>Labyrinth (Prototype, Alt)</description>
+		<description>Labyrinth (prototype, alt)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Dennis Caswell"/>
@@ -433,7 +433,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="meteroid" cloneof="suicidem">
-		<description>Meteoroids (Prototype)</description>
+		<description>Meteoroids (prototype)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
@@ -460,7 +460,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="offifrogpv" cloneof="offifrog">
-		<description>The Official Frogger (Preview)</description>
+		<description>The Official Frogger (preview)</description>
 		<year>1983</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4105"/>
@@ -512,7 +512,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="partymixpv" cloneof="partymix">
-		<description>Party Mix (Preview)</description>
+		<description>Party Mix (preview)</description>
 		<year>1983</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4302"/>
@@ -550,7 +550,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="partymixepv" cloneof="partymix">
-		<description>Party Mix (Preview) (PAL)</description>
+		<description>Party Mix (preview) (PAL)</description>
 		<year>1983</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4302"/>
@@ -592,7 +592,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="ppatrolp" cloneof="ppatrol">
-		<description>Phaser Patrol (Prototype)</description>
+		<description>Phaser Patrol (prototype)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4000"/>
@@ -606,7 +606,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="ppatrolpa" cloneof="ppatrol">
-		<description>Phaser Patrol (Prototype, Alt)</description>
+		<description>Phaser Patrol (prototype, alt)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4000"/>
@@ -634,7 +634,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="rabbitpv" cloneof="rabbit">
-		<description>Rabbit Transit (Preview)</description>
+		<description>Rabbit Transit (preview)</description>
 		<year>1983</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4104"/>
@@ -676,7 +676,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="suicidempv" cloneof="suicidem">
-		<description>Suicide Mission (Preview)</description>
+		<description>Suicide Mission (preview)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="serial" value="AR-4102"/>
@@ -704,7 +704,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="suicidemepv" cloneof="suicidem">
-		<description>Suicide Mission (Preview) (PAL)</description>
+		<description>Suicide Mission (preview) (PAL)</description>
 		<year>1982</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4102"/>
@@ -718,7 +718,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="suicidemp" cloneof="suicidem">
-		<description>Suicide Mission (Prototype)</description>
+		<description>Suicide Mission (prototype)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
 		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
@@ -779,7 +779,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 	</software>
 
 	<software name="sweat">
-		<description>Sweat! The Decathlon Game (Prototype)</description>
+		<description>Sweat! The Decathlon Game (prototype)</description>
 		<year>1983</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="developer" value="Scott Nelson"/>
