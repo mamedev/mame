@@ -722,7 +722,7 @@ void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 	nubus.out_irqe_callback().set(FUNC(mac_state::nubus_irq_e_w));
 	if (bank1)
 	{
-		NUBUS_SLOT(config, "nb9", "nubus", mac_nubus_cards, "48gc");
+		NUBUS_SLOT(config, "nb9", "nubus", mac_nubus_cards, "mdc824");
 		NUBUS_SLOT(config, "nba", "nubus", mac_nubus_cards, nullptr);
 		NUBUS_SLOT(config, "nbb", "nubus", mac_nubus_cards, nullptr);
 	}
