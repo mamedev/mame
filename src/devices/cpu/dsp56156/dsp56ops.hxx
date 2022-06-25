@@ -243,7 +243,7 @@ static void dsp56156_set_program_memory_value(dsp56156_core* cpustate, typed_poi
     IMPLEMENTATION
 ***************************************************************************/
 
-size_t get_op_size(uint16_t op, uint16_t op2)
+static size_t dsp56156_get_op_size(uint16_t op, uint16_t op2)
 {
 	/* Dual X Memory Data Read : 011m mKKK .rr. .... : A-142*/
 	if ((op & 0xe000) == 0x6000)
@@ -4789,7 +4789,7 @@ static size_t dsp56156_op_rep_1(dsp56156_core* cpustate, const uint16_t op, uint
 		uint16_t op1 = ROPCODE(PC + 1);
 		uint16_t op2 = ROPCODE(PC + 2);
 		cycles += 6;        /* TODO: + mv oscillator clock cycles */
-		return 1 + get_op_size(op1, op2);
+		return 1 + dsp56156_get_op_size(op1, op2);
 	}
 
 
@@ -4828,7 +4828,7 @@ static size_t dsp56156_op_rep_2(dsp56156_core* cpustate, const uint16_t op, uint
 		uint16_t op1 = ROPCODE(PC + 1);
 		uint16_t op2 = ROPCODE(PC + 2);
 		cycles += 6;        /* TODO: + mv oscillator clock cycles */
-		return 1 + get_op_size(op1, op2);
+		return 1 + dsp56156_get_op_size(op1, op2);
 	}
 
 	/* S L E U N Z V C */

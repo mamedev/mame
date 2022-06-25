@@ -76,13 +76,6 @@
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
-#include "png.h"
-#include "emuopts.h"
-#include "fileio.h"
-
-#include "debug/debugcon.h"
-#include "debug/debugcmd.h"
-#include "debugger.h"
 
 #define LOG_DSP_AB0         (1U << 1)
 #define LOG_DSP_A6          (1U << 2)
@@ -821,18 +814,18 @@ GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
 {
-	const u16 *ttl_vram = (u16 *)&m_ttl_vram[0];
-	const int code = ttl_vram[BYTE_XOR_BE(tile_index)] & 0xfff;
-	const int attr = ttl_vram[BYTE_XOR_BE(tile_index)] >> 12;  // Is the palette in all 4 bits?
+	const auto ttl_vram = util::big_endian_cast<const u16>(m_ttl_vram.target());
+	const int code = ttl_vram[tile_index] & 0xfff;
+	const int attr = ttl_vram[tile_index] >> 12;  // Is the palette in all 4 bits?
 
 	tileinfo.set(m_ttl_gfx_index, code, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 {
-	const u16 *roz_vram = (u16 *)&m_roz_vram[0];
-	const int code = roz_vram[BYTE_XOR_BE(tile_index)] & 0x3ff;
-	const int attr = (roz_vram[BYTE_XOR_BE(tile_index)] >> 12) + 16; // ROZ base palette is palette index 16 onward
+	const auto roz_vram = util::big_endian_cast<const u16>(m_roz_vram.target());
+	const int code = roz_vram[tile_index] & 0x3ff;
+	const int attr = (roz_vram[tile_index] >> 12) + 16; // ROZ base palette is palette index 16 onward
 
 	tileinfo.set(0, code, attr, 0);
 }
