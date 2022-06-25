@@ -1006,7 +1006,7 @@ void polygonet_state::sound_map(address_map &map)
 void polygonet_state::sound_ctrl_w(u8 data)
 {
 	// .... .xxx - Sound bank
-	// ...x .... - NMI clear (clocked?) (or NMI enable mask?) (or maybe just something else)
+	// ...x .... - NMI clear (clocked?) (or NMI enable mask?)
 
 	if ((m_sound_ctrl & 7) != (data & 7))
 		m_sound_bank->set_entry(data & 7);
