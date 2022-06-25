@@ -62,7 +62,7 @@ public:
 	void gundhara(machine_config &config);
 	void triplfun(machine_config &config);
 	void blandiap(machine_config &config);
-	void wits(machine_config& config);
+	void wits(machine_config &config);
 	void msgundam(machine_config &config);
 	void msgundamb(machine_config &config);
 	void extdwnhl(machine_config &config);
@@ -196,7 +196,7 @@ protected:
 	void utoukond_sound_map(address_map &map);
 	void wiggie_map(address_map &map);
 	void wiggie_sound_map(address_map &map);
-	void wits_map(address_map& map);
+	void wits_map(address_map &map);
 	void wrofaero_map(address_map &map);
 	void zingzipbl_map(address_map &map);
 };
@@ -332,12 +332,12 @@ private:
 class thunderl_state : public seta_state
 {
 public:
-	thunderl_state(const machine_config& mconfig, device_type type, const char* tag) :
+	thunderl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		seta_state(mconfig, type, tag)
 	{ }
 
-	void thunderl(machine_config& config);
-	void thunderlbl(machine_config& config);
+	void thunderl(machine_config &config);
+	void thunderlbl(machine_config &config);
 
 protected:
 	u16 thunderl_protection_r();
@@ -345,10 +345,10 @@ protected:
 
 	virtual void machine_start() override;
 
-	void thunderl_map(address_map& map);
-	void thunderlbl_map(address_map& map);
-	void thunderlbl_sound_map(address_map& map);
-	void thunderlbl_sound_portmap(address_map& map);
+	void thunderl_map(address_map &map);
+	void thunderlbl_map(address_map &map);
+	void thunderlbl_sound_map(address_map &map);
+	void thunderlbl_sound_portmap(address_map &map);
 
 private:
 	u8 m_thunderl_protection_reg;

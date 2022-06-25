@@ -3138,7 +3138,7 @@ void thunderl_state::thunderlbl_map(address_map &map)
 ***************************************************************************/
 /* Similar to thunderl but without protection */
 
-void seta_state::wits_map(address_map& map)
+void seta_state::wits_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();                       // ROM
 	map(0xffc000, 0xffffff).ram();                       // RAM

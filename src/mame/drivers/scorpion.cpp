@@ -136,7 +136,7 @@ u8 scorpion_state::beta_enable_r(offs_t offset)
 {
 	if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
 
-	if(m_beta->started() && m_bank_rom[0]->entry() == 1) {
+	if (m_beta->started() && m_bank_rom[0]->entry() == 1) {
 		m_beta->enable();
 		m_bank_rom[0]->set_entry(3);
 	}

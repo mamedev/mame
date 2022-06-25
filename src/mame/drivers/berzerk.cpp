@@ -18,7 +18,8 @@ RC28 uses only 3 different colors for robots based on player score:
   300     Red           1
  1500+    Dark Blue     2
 
-Evil Otto shows up based on a formula of 5(-1 for each new room) plus the number of spawned robots times 40 frames
+Evil Otto shows up based on a formula of 5(-1 for each new room) plus
+the number of spawned robots times 40 frames
 
 RC31 is a rebalanced game with numerous changes:
 
@@ -39,11 +40,15 @@ RC31 is a rebalanced game with numerous changes:
  19000+     Light Blue   5*       5 frames
 
 * Indicates a faster speed laser
-Score values are when the player advances to the next "level" or Robot color
-Lasers are the maximum robot lasers on the screen at one time.
-Delay is the number of frames between initial robot firing when you enter a room as well as "reload" time.
 
-In RC31 Evil Otto's formula is modified by adding in the number of lasers before multiplying by 40 frames
+- Score values are when the player advances to the next "level" or Robot
+  color.
+- Lasers are the maximum robot lasers on the screen at one time.
+- Delay is the number of frames between initial robot firing when you
+  enter a room as well as "reload" time.
+
+In RC31, Evil Otto's formula is modified by adding in the number of lasers
+before multiplying by 40 frames
 
 Game difference analysis by The Cutting Room Floor (tcrf.net)
 
