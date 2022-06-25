@@ -19146,6 +19146,7 @@ j80wsprt2                       // Winsprint (JPM)
 j80wsprt3                       // Winsprint (JPM)
 
 @source:jpmsru.cpp
+j_cnudgr                        // Cash Nudger?
 j_dt                            // Double Top (JPM)
 j_dud                           // Nudge Double Up Deluxe (JPM)
 j_duda                          //
@@ -19154,9 +19155,11 @@ j_ewn                           // Each Way Nudger (JPM)
 j_ewna                          //
 j_ewnb                          //
 j_ewnc                          //
+j_ewnd                          //
 j_ews                           // Each Way Shuffle (JPM)
 j_ewsa                          //
 j_ewsb                          //
+j_ewsbl                         //
 j_ewsdlx                        // Each Way Shuffle Deluxe (CTL)
 j_goldn2                        // Golden 2's (CTL)
 j_la                            // Lucky Aces
