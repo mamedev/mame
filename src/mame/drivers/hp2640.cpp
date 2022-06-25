@@ -120,30 +120,30 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-// Bit manipulation
 namespace {
-	template<typename T> constexpr T BIT_MASK(unsigned n)
-	{
-		return (T)1U << n;
-	}
 
-	template<typename T> void BIT_CLR(T& w , unsigned n)
-	{
-		w &= ~BIT_MASK<T>(n);
-	}
+// Bit manipulation
+template<typename T> constexpr T BIT_MASK(unsigned n)
+{
+	return (T)1U << n;
+}
 
-	template<typename T> void BIT_SET(T& w , unsigned n)
-	{
-		w |= BIT_MASK<T>(n);
-	}
+template<typename T> void BIT_CLR(T& w , unsigned n)
+{
+	w &= ~BIT_MASK<T>(n);
+}
 
-	template<typename T> void COPY_BIT(bool bit , T& w , unsigned n)
-	{
-		if (bit) {
-			BIT_SET(w , n);
-		} else {
-			BIT_CLR(w , n);
-		}
+template<typename T> void BIT_SET(T& w , unsigned n)
+{
+	w |= BIT_MASK<T>(n);
+}
+
+template<typename T> void COPY_BIT(bool bit , T& w , unsigned n)
+{
+	if (bit) {
+		BIT_SET(w , n);
+	} else {
+		BIT_CLR(w , n);
 	}
 }
 
@@ -318,6 +318,18 @@ hp2640_base_state::hp2640_base_state(const machine_config &mconfig, device_type 
 void hp2640_base_state::machine_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
+
+	// these are set in machine_reset, but device reset callbacks end up reading them before then
+	// (machine_reset is called after all child devices are reset)
+	m_mode_byte = false;
+	m_timer_irq = m_datacom_irq = m_tape_irq = false;
+	m_async_control = 0;
+
+	m_even = true;
+	m_line_done = false;
+	m_dma_addr = 0;
+	m_row_counter = 0;
+	m_row_reset = false;
 
 	// TODO: save more state
 	save_item(NAME(m_mode_byte));
@@ -1257,6 +1269,8 @@ ROM_START(hp2645)
 	ROM_REGION(0x400, "chargen3", 0)
 	ROM_LOAD("1816-1425.bin", 0x0000, 0x400, CRC(69a34fef) SHA1(816929cadd53c2fe42b3ca561c029cb1ccd4ca24))
 ROM_END
+
+} // anonymous namespace
 
 COMP( 1976, hp2641, 0, 0, hp2641, hp2641     , hp2641_state, empty_init, "Hewlett-Packard", "HP 2641A", 0)
 COMP( 1976, hp2645, 0, 0, hp2645, hp2640_base, hp2645_state, empty_init, "Hewlett-Packard", "HP 2645A", 0)

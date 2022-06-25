@@ -122,7 +122,7 @@ Sega ID# for Model 3 PCBs:
 837-12875 MODEL3 STEP 1.5 VIDEO BOARD
 837-12715-91 MODEL3 STEP2 CPU BOARD
 837-12716-91 MODEL3 STEP2 VIDEO BOARD (has been listed with and without the "-91")
-837-13368 MODEL3 STEP2.1 VIDEO BD (most manuals show this is interchangable with 837-12716 STEP2 video board)
+837-13368 MODEL3 STEP2.1 VIDEO BD (most manuals show this is interchangeable with 837-12716 STEP2 video board)
 
 This document is for MODEL3 (the first version).
 The games that exist on this hardware include....

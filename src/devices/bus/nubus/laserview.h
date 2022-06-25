@@ -38,7 +38,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	std::vector<uint8_t> m_vram;
+	std::vector<uint32_t> m_vram;
 	uint32_t m_vbl_disable, m_palette[2];
 	int m_prot_state;
 	int m_toggle;

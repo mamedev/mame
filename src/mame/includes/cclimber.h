@@ -58,6 +58,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override { m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); }
 
 private:
 	required_device<cpu_device> m_maincpu;

@@ -62,7 +62,8 @@ enum drvstatus_mask : u8
 	DRVSTATUS_G  = 0x08, // FD3 is mini floppy
 	DRVSTATUS_B  = 0x10, // not used
 	DRVSTATUS_D  = 0x20, // not used
-	DRVSTATUS_SS = 0x40, // 8" floppy is single-sided
+	DRVSTATUS_F  = 0x40, // ?
+	DRVSTATUS_DS = 0x80, // floppy is double-sided
 };
 
 DEFINE_DEVICE_TYPE(LABTAM_Z80SBC, labtam_z80sbc_device, "labtam_z80sbc", "Labtam Z80 SBC")
@@ -240,6 +241,7 @@ void labtam_z80sbc_device::device_start()
 
 	save_item(NAME(m_map_mux));
 	save_item(NAME(m_map_num));
+	save_item(NAME(m_map_cnt));
 }
 
 void labtam_z80sbc_device::device_reset()
@@ -264,6 +266,7 @@ void labtam_z80sbc_device::device_reset()
 
 	m_map_mux = 0;
 	m_map_num = 0;
+	m_map_cnt = 0;
 	m_fdcstatus = 0x3c;
 
 	m_dma[0]->iei_w(1);
@@ -283,7 +286,6 @@ void labtam_z80sbc_device::device_add_mconfig(machine_config &config)
 {
 	Z80(config, m_cpu, 20_MHz_XTAL / 4);
 	m_cpu->set_addrmap(AS_PROGRAM, &labtam_z80sbc_device::cpu_mem);
-	m_cpu->set_addrmap(AS_OPCODES, &labtam_z80sbc_device::cpu_mem);
 	m_cpu->set_addrmap(AS_IO, &labtam_z80sbc_device::cpu_pio);
 	m_cpu->irqack_cb().set([this](int state) { m_map_mux |= MM_PND; });
 	m_cpu->set_daisy_config(daisy_chain);
@@ -389,13 +391,18 @@ void labtam_z80sbc_device::cpu_pio(address_map &map)
 	map(0x00e0, 0x00ff).mirror(0xff00).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write));
 }
 
-u8 labtam_z80sbc_device::mem_r(address_space &space, offs_t offset)
+u8 labtam_z80sbc_device::mem_r(offs_t offset)
 {
 	// check for and complete pending map number change
-	if ((m_map_mux & MM_PND) && (space.spacenum() == AS_PROGRAM) && !machine().side_effects_disabled())
+	if ((m_map_mux & MM_PND) && !machine().side_effects_disabled())
 	{
-		m_map_mux &= ~MM_PND;
-		m_map_mux ^= MM_INT;
+		if (m_map_cnt == 0)
+		{
+			m_map_mux &= ~MM_PND;
+			m_map_mux ^= MM_INT;
+		}
+		else
+			m_map_cnt--;
 	}
 
 	if (m_map_mux & MM_ENB)
@@ -485,27 +492,17 @@ void labtam_z80sbc_device::map_w(unsigned map_num, offs_t offset, u8 data)
 void labtam_z80sbc_device::intswt_w(u8 data)
 {
 	/*
-	 * Writing to this port toggles between interrupt (map number forced to 0) and
-	 * user (map number from mapnum latch) mode. The mapping mode can be applied
-	 * immediately, or only upon the next non-instruction memory read. The delay
-	 * mechanism is used to support interrupts:
-	 *
-	 *  - When an interrupt is taken, the delayed map change allows the Z80 to
-	 *    store the return address on the currently mapped stack, before switching
-	 *    to map 0 to fetch the interrupt vector address.
-	 *
-	 *  - When returning from an interrupt handler, the delayed map change allows
-	 *    further instructions (including RET) to be fetched from the interrupt
-	 *    service routine using map 0, while the return address will be fetched
-	 *    from the user mapped stack.
+	 * Writing to this port deactivates the interrupt map after the next three
+	 * Z80 memory read cycles. This delay supports interrupt return, allowing
+	 * the standard epilogue of NOP, EI, and RET to be fetched and executed
+	 * from map 0, before the return address is fetched from the non-interrupt
+	 * memory map.
 	 */
 
-	LOG("intswt_w 0x%02x mapnum 0x%02x (%s)\n", data, m_map_num, machine().describe_context());
+	LOG("intswt map 0x%02x mux 0x%02x (%s)\n", m_map_num, m_map_mux, machine().describe_context());
 
-	if (BIT(data, 0))
-		m_map_mux ^= MM_INT;
-	else
-		m_map_mux |= MM_PND;
+	m_map_mux |= MM_PND;
+	m_map_cnt = 3;
 }
 
 void labtam_z80sbc_device::mapnum_w(u8 data)
@@ -515,7 +512,7 @@ void labtam_z80sbc_device::mapnum_w(u8 data)
 	m_map_mux |= MM_ENB;
 
 	// TODO: what are bits 3, 4 and 5 used for?
-	m_map_num = data & 0x3f;
+	m_map_num = data & 0x07;
 }
 
 void labtam_z80sbc_device::fdcint_w(int state)
@@ -596,12 +593,12 @@ u8 labtam_z80sbc_device::drvstatus_r()
 {
 	u8 data = m_e21->read();
 
-	// TODO: read selected floppy twosid_r()
-#if 0
-	floppy_image_device *fid = m_fdd[*m_drive]->get_device();
-	if (fid && !fid->twosid_r())
-		data |= DRVSTATUS_SS;
-#endif
+	if (m_drive)
+	{
+		floppy_image_device *fid = m_fdd[*m_drive]->get_device();
+		if (fid && !fid->twosid_r())
+			data |= DRVSTATUS_DS;
+	}
 
 	return data;
 }

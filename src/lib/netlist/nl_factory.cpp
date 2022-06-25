@@ -5,26 +5,30 @@
 /// \file nl_factory.cpp
 ///
 
-#include "nl_errstr.h"
 #include "nl_factory.h"
+
+#include "nl_errstr.h"
 #include "nl_setup.h"
 
 #include "core/core_device.h"
 
 #include "plib/putil.h"
 
-namespace netlist::factory {
+namespace netlist::factory
+{
 
 	// FIXME: this doesn't do anything, check how to remove
-	class NETLIB_NAME(wrapper) : public base_device_t
+	class NETLIB_NAME(wrapper)
+	: public base_device_t
 	{
 	public:
-		NETLIB_NAME(wrapper)(netlist_state_t &anetlist, const pstring &name)
-		: base_device_t(anetlist, name)
+		NETLIB_NAME(wrapper)(base_device_param_t data)
+		: base_device_t(data)
 		{
 		}
+
 	protected:
-		//NETLIB_RESETI() {}
+		// NETLIB_RESETI() {}
 	};
 
 	element_t::element_t(const pstring &name, properties &&props)
@@ -33,9 +37,9 @@ namespace netlist::factory {
 	{
 	}
 
-	// ----------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// net_device_t_base_factory
-	// ----------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	list_t::list_t(log_type &alog)
 	: m_log(alog)
@@ -46,7 +50,7 @@ namespace netlist::factory {
 
 	bool list_t::exists(const pstring &name) const noexcept
 	{
-		for (const auto & e : *this)
+		for (const auto &e : *this)
 			if (e->name() == name)
 				return true;
 		return false;
@@ -62,9 +66,9 @@ namespace netlist::factory {
 		push_back(std::move(factory));
 	}
 
-	factory::element_t * list_t::factory_by_name(const pstring &devname)
+	factory::element_t *list_t::factory_by_name(const pstring &devname)
 	{
-		for (auto & e : *this)
+		for (auto &e : *this)
 		{
 			if (e->name() == devname)
 				return e.get();
@@ -74,19 +78,22 @@ namespace netlist::factory {
 		throw nl_exception(MF_CLASS_1_NOT_FOUND(devname));
 	}
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// library_element_t: factory class to wrap macro based chips/elements
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
-	library_element_t::library_element_t(const pstring &name, properties &&props)
-	: element_t(name, std::move(properties(props).set_type(element_type::MACRO)))
+	library_element_t::library_element_t(const pstring &name,
+		properties &&                                   props)
+	: element_t(name,
+		std::move(properties(props).set_type(element_type::MACRO)))
 	{
 	}
 
-	device_arena::unique_ptr<core_device_t> library_element_t::make_device(device_arena &pool, netlist_state_t &anetlist, const pstring &name)
+	device_arena::unique_ptr<core_device_t> library_element_t::make_device(
+		device_arena &pool, netlist_state_t &anetlist, const pstring &name)
 	{
-		return plib::make_unique<NETLIB_NAME(wrapper)>(pool, anetlist, name);
+		return plib::make_unique<NETLIB_NAME(wrapper)>(pool,
+			base_device_data_t{anetlist, name});
 	}
-
 
 } // namespace netlist::factory

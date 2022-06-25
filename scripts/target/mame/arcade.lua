@@ -750,6 +750,7 @@ MACHINES["AIC565"] = true
 MACHINES["AIC580"] = true
 MACHINES["AIC6250"] = true
 MACHINES["VRENDER0"] = true
+MACHINES["AT_MB"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1457,9 +1458,9 @@ createMAMEProjects(_target, _subtarget, "barcrest")
 files {
 	MAME_DIR .. "src/mame/drivers/mpu2.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu3.cpp",
-	MAME_DIR .. "src/mame/machine/mpu4.cpp",
-	MAME_DIR .. "src/mame/includes/mpu4.h",
 	MAME_DIR .. "src/mame/drivers/mpu4.cpp",
+	MAME_DIR .. "src/mame/includes/mpu4.h",
+	MAME_DIR .. "src/mame/drivers/mpu4unsorted.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4avan.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4bwb.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4concept.cpp",
@@ -1469,11 +1470,17 @@ files {
 	MAME_DIR .. "src/mame/drivers/mpu4mdm.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4misc.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4mod2sw.cpp",
+	MAME_DIR .. "src/mame/drivers/mpu4mod4oki.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4mod4yam.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4plasma.cpp",
-	MAME_DIR .. "src/mame/drivers/mpu4sw.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4union.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4vid.cpp",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_pal.cpp",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_pal.h",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_pal_bwb.cpp",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_pal_bwb.h",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_bootleg.cpp",
+	MAME_DIR .. "src/mame/machine/mpu4_characteriser_bootleg.h",
 	MAME_DIR .. "src/mame/includes/mpu5.h",
 	MAME_DIR .. "src/mame/drivers/mpu5.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu5sw.cpp",
@@ -1795,8 +1802,6 @@ files {
 	MAME_DIR .. "src/mame/includes/rohga.h",
 	MAME_DIR .. "src/mame/video/rohga.cpp",
 	MAME_DIR .. "src/mame/drivers/shootout.cpp",
-	MAME_DIR .. "src/mame/includes/shootout.h",
-	MAME_DIR .. "src/mame/video/shootout.cpp",
 	MAME_DIR .. "src/mame/drivers/sidepckt.cpp",
 	MAME_DIR .. "src/mame/includes/sidepckt.h",
 	MAME_DIR .. "src/mame/video/sidepckt.cpp",
@@ -2276,8 +2281,6 @@ files {
 	MAME_DIR .. "src/mame/includes/bigstrkb.h",
 	MAME_DIR .. "src/mame/video/bigstrkb.cpp",
 	MAME_DIR .. "src/mame/drivers/blueprnt.cpp",
-	MAME_DIR .. "src/mame/includes/blueprnt.h",
-	MAME_DIR .. "src/mame/video/blueprnt.cpp",
 	MAME_DIR .. "src/mame/drivers/bnstars.cpp",
 	MAME_DIR .. "src/mame/drivers/cischeat.cpp",
 	MAME_DIR .. "src/mame/includes/cischeat.h",
@@ -2583,8 +2586,6 @@ files {
 	MAME_DIR .. "src/mame/includes/rocnrope.h",
 	MAME_DIR .. "src/mame/video/rocnrope.cpp",
 	MAME_DIR .. "src/mame/drivers/rollerg.cpp",
-	MAME_DIR .. "src/mame/includes/rollerg.h",
-	MAME_DIR .. "src/mame/video/rollerg.cpp",
 	MAME_DIR .. "src/mame/drivers/rungun.cpp",
 	MAME_DIR .. "src/mame/includes/rungun.h",
 	MAME_DIR .. "src/mame/video/rungun.cpp",
@@ -2747,8 +2748,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/meritsdx.cpp",
 	MAME_DIR .. "src/mame/drivers/mtouchxl.cpp",
 	MAME_DIR .. "src/mame/drivers/pubtimed.cpp",
-	MAME_DIR .. "src/mame/machine/at.h",
-	MAME_DIR .. "src/mame/machine/at.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "metro")
@@ -3349,8 +3348,6 @@ files {
 	MAME_DIR .. "src/mame/video/playmark.cpp",
 	MAME_DIR .. "src/mame/drivers/powerbal.cpp",
 	MAME_DIR .. "src/mame/drivers/sderby.cpp",
-	MAME_DIR .. "src/mame/includes/sderby.h",
-	MAME_DIR .. "src/mame/video/sderby.cpp",
 	MAME_DIR .. "src/mame/drivers/sslam.cpp",
 	MAME_DIR .. "src/mame/includes/sslam.h",
 	MAME_DIR .. "src/mame/video/sslam.cpp",
@@ -4449,8 +4446,6 @@ files {
 	MAME_DIR .. "src/mame/machine/bagman.cpp",
 	MAME_DIR .. "src/mame/video/bagman.cpp",
 	MAME_DIR .. "src/mame/drivers/tankbust.cpp",
-	MAME_DIR .. "src/mame/includes/tankbust.h",
-	MAME_DIR .. "src/mame/video/tankbust.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "venture")
@@ -4500,8 +4495,6 @@ files {
 	MAME_DIR .. "src/mame/video/ojankohs.cpp",
 	MAME_DIR .. "src/mame/drivers/pipedrm.cpp",
 	MAME_DIR .. "src/mame/drivers/rpunch.cpp",
-	MAME_DIR .. "src/mame/includes/rpunch.h",
-	MAME_DIR .. "src/mame/video/rpunch.cpp",
 	MAME_DIR .. "src/mame/drivers/suprslam.cpp",
 	MAME_DIR .. "src/mame/includes/suprslam.h",
 	MAME_DIR .. "src/mame/video/suprslam.cpp",

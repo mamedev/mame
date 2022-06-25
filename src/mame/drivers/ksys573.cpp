@@ -5643,6 +5643,7 @@ ROM_END
 
 ROM_START( mamboagg )
 	SYS573_BIOS_A
+	ROM_DEFAULT_BIOS("dsem2")
 
 	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gqa40jab.u1",  0x000000, 0x00008c, BAD_DUMP CRC(bbb6033d) SHA1(22f3d0e9541be7c24338e97a8c29f0baadf40557) )
@@ -5656,6 +5657,7 @@ ROM_END
 
 ROM_START( mamboagga )
 	SYS573_BIOS_A
+	ROM_DEFAULT_BIOS("dsem2")
 
 	ROM_REGION( 0x000008c, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gqa40jrb.u1",  0x000000, 0x00008c, BAD_DUMP CRC(313b5685) SHA1(8df9cab660af8f9d057a1360ec4dc9f9ed50e185) )

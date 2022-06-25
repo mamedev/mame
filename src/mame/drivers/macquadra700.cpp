@@ -12,46 +12,36 @@
 #include "emu.h"
 
 #include "machine/macrtc.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/6522via.h"
-#include "machine/ram.h"
-#include "machine/timer.h"
-#include "machine/z80scc.h"
-#include "machine/macadb.h"
-#include "machine/applefdintf.h"
-#include "machine/swim1.h"
-#include "machine/dp83932c.h"
-#include "machine/nscsi_bus.h"
-#include "machine/ncr5390.h"
-#include "sound/asc.h"
-#include "formats/ap_dsk35.h"
 
 #include "bus/nscsi/devices.h"
-
+#include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
-#include "bus/nubus/nubus_48gc.h"
-#include "bus/nubus/nubus_cb264.h"
-#include "bus/nubus/nubus_vikbw.h"
-#include "bus/nubus/nubus_specpdq.h"
-#include "bus/nubus/nubus_m2hires.h"
-#include "bus/nubus/nubus_spec8.h"
-#include "bus/nubus/nubus_radiustpd.h"
-#include "bus/nubus/nubus_wsportrait.h"
-#include "bus/nubus/nubus_asntmc3b.h"
-#include "bus/nubus/nubus_image.h"
-#include "bus/nubus/nubus_m2video.h"
-#include "bus/nubus/bootbug.h"
-#include "bus/nubus/quadralink.h"
-#include "bus/nubus/laserview.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/6522via.h"
+#include "machine/applefdintf.h"
+#include "machine/dp83932c.h"
+#include "machine/macadb.h"
+#include "machine/ncr5390.h"
+#include "machine/nscsi_bus.h"
+#include "machine/ram.h"
+#include "machine/swim1.h"
+#include "machine/timer.h"
+#include "machine/z80scc.h"
+#include "sound/asc.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "formats/ap_dsk35.h"
+
 #define C7M (7833600)
 #define C15M (C7M*2)
 #define C32M (C15M*2)
+
+
+namespace {
 
 class macquadra_state : public driver_device
 {
@@ -142,9 +132,9 @@ private:
 	int m_adb_irq_pending = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_539x_2_w);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_539x_2_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_539x_2_w);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(drq_539x_2_w);
 
 	floppy_image_device *m_cur_floppy = nullptr;
 	int m_hdsel = 0;
@@ -249,6 +239,31 @@ void macquadra_state::machine_start()
 
 	m_6015_timer = timer_alloc(FUNC(macquadra_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
+
+	save_item(NAME(m_cursor_line));
+	save_item(NAME(m_dafb_int_status));
+	save_item(NAME(m_dafb_scsi1_drq));
+	save_item(NAME(m_dafb_scsi2_drq));
+	save_item(NAME(m_dafb_mode));
+	save_item(NAME(m_dafb_base));
+	save_item(NAME(m_dafb_stride));
+	save_item(NAME(m_dafb_colors));
+	save_item(NAME(m_dafb_count));
+	save_item(NAME(m_dafb_clutoffs));
+	save_item(NAME(m_dafb_montype));
+	save_item(NAME(m_dafb_vbltime));
+	save_item(NAME(m_dafb_palette));
+	save_item(NAME(m_via2_ca1_hack));
+	save_item(NAME(m_nubus_irq_state));
+	save_item(NAME(m_adb_irq_pending));
+	save_item(NAME(m_hdsel));
+	save_item(NAME(m_via_interrupt));
+	save_item(NAME(m_via2_interrupt));
+	save_item(NAME(m_scc_interrupt));
+	save_item(NAME(m_last_taken_interrupt));
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_ca2_data));
+	save_item(NAME(m_overlay));
 }
 
 void macquadra_state::machine_reset()
@@ -525,19 +540,18 @@ void macquadra_state::dafb_dac_w(offs_t offset, uint32_t data, uint32_t mem_mask
 
 uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	auto const vram8 = util::big_endian_cast<uint8_t const>(m_vram.target()) + m_dafb_base;
+
 	switch (m_dafb_mode)
 	{
 		case 0: // 1bpp
 		{
-			uint8_t const *vram8 = (uint8_t *)m_vram.target();
-			vram8 += m_dafb_base;
-
 			for (int y = 0; y < 870; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
-				for (int x = 0; x < 1152; x+=8)
+				for (int x = 0; x < 1152/8; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_dafb_stride) + ((x/8)^3)];
+					uint8_t const pixels = vram8[(y * m_dafb_stride) + x];
 
 					*scanline++ = m_dafb_palette[(pixels>>7)&1];
 					*scanline++ = m_dafb_palette[(pixels>>6)&1];
@@ -554,15 +568,12 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 
 		case 1: // 2bpp
 		{
-			uint8_t const *vram8 = (uint8_t *)m_vram.target();
-			vram8 += m_dafb_base;
-
 			for (int y = 0; y < 870; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152/4; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_dafb_stride) + x];
 
 					*scanline++ = m_dafb_palette[((pixels>>6)&3)];
 					*scanline++ = m_dafb_palette[((pixels>>4)&3)];
@@ -575,15 +586,12 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 
 		case 2: // 4bpp
 		{
-			uint8_t const *vram8 = (uint8_t *)m_vram.target();
-			vram8 += m_dafb_base;
-
 			for (int y = 0; y < 870; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152/2; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_dafb_stride) + x];
 
 					*scanline++ = m_dafb_palette[(pixels>>4)];
 					*scanline++ = m_dafb_palette[(pixels&0xf)];
@@ -594,15 +602,12 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 
 		case 3: // 8bpp
 		{
-			uint8_t const *vram8 = (uint8_t *)m_vram.target();
-			vram8 += m_dafb_base;
-
 			for (int y = 0; y < 870; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 1152; x++)
 				{
-					uint8_t const pixels = vram8[(y * m_dafb_stride) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * m_dafb_stride) + x];
 					*scanline++ = m_dafb_palette[pixels];
 				}
 			}
@@ -613,7 +618,7 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 			for (int y = 0; y < 480; y++)
 			{
 				uint32_t *scanline = &bitmap.pix(y);
-				uint32_t const *base = (uint32_t *)&m_vram[(y * (m_dafb_stride/4)) + (m_dafb_base/4)];
+				uint32_t const *base = &m_vram[(y * (m_dafb_stride/4)) + (m_dafb_base/4)];
 				for (int x = 0; x < 640; x++)
 				{
 					*scanline++ = *base++;
@@ -916,27 +921,6 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static void mac_nubus_cards(device_slot_interface &device)
-{
-	device.option_add("m2video", NUBUS_M2VIDEO);    /* Apple Macintosh II Video Card */
-	device.option_add("48gc", NUBUS_48GC);      /* Apple 4*8 Graphics Card */
-	device.option_add("824gc", NUBUS_824GC);    /* Apple 8*24 Graphics Card */
-	device.option_add("cb264", NUBUS_CB264);    /* RasterOps ColorBoard 264 */
-	device.option_add("vikbw", NUBUS_VIKBW);    /* Moniterm Viking board */
-	device.option_add("image", NUBUS_IMAGE);    /* Disk Image Pseudo-Card */
-	device.option_add("specpdq", NUBUS_SPECPDQ);    /* SuperMac Spectrum PDQ */
-	device.option_add("m2hires", NUBUS_M2HIRES);    /* Apple Macintosh II Hi-Resolution Card */
-	device.option_add("spec8s3", NUBUS_SPEC8S3);    /* SuperMac Spectrum/8 Series III */
-//  device.option_add("thundergx", NUBUS_THUNDERGX);        /* Radius Thunder GX (not yet) */
-	device.option_add("radiustpd", NUBUS_RADIUSTPD);        /* Radius Two Page Display */
-	device.option_add("asmc3nb", NUBUS_ASNTMC3NB);  /* Asante MC3NB Ethernet card */
-	device.option_add("portrait", NUBUS_WSPORTRAIT);    /* Apple Macintosh II Portrait video card */
-	device.option_add("enetnb", NUBUS_APPLEENET);   /* Apple NuBus Ethernet */
-	device.option_add("bootbug", NUBUS_BOOTBUG);    /* Brigent BootBug debugger card */
-	device.option_add("quadralink", NUBUS_QUADRALINK);  /* AE Quadralink serial card */
-	device.option_add("laserview", NUBUS_LASERVIEW);  /* Sigma Designs LaserView monochrome video card */
-}
-
 void macquadra_state::macqd700(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1038,4 +1022,6 @@ ROM_START( macqd700 )
 	ROM_LOAD( "420dbff3.rom", 0x000000, 0x100000, CRC(88ea2081) SHA1(7a8ee468d16e64f2ad10cb8d1a45e6f07cc9e212) )
 ROM_END
 
-COMP( 1991, macqd700, 0, 0, macqd700, macadb, macquadra_state, init_macqd700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
+} // anonymous namespace
+
+COMP( 1991, macqd700, 0, 0, macqd700, macadb, macquadra_state, init_macqd700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)

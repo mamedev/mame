@@ -320,8 +320,8 @@ namespace netlist::solver
 		std::size_t max_rail_start() const noexcept
 		{
 			std::size_t max_rail = 0;
-			for (std::size_t k = 0; k < m_terms.size(); k++)
-				max_rail = std::max(max_rail, m_terms[k].rail_start());
+			for (const auto &term : m_terms)
+				max_rail = std::max(max_rail, term.rail_start());
 			return max_rail;
 		}
 

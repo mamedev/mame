@@ -260,7 +260,7 @@ than using a walking zero as the OS-9 driver does. This meant that SelectKeyrow
 never moved past the first row, by scanning for the last active row
 the beta_test rom works, and it does not break the OS-9 driver :)
 */
-int dgn_beta_state::SelectedKeyrow(dgn_beta_state *state, int Rows)
+int dgn_beta_state::SelectedKeyrow(int Rows)
 {
 	int Idx;
 	int Row;    /* Row selected */
@@ -288,7 +288,7 @@ int dgn_beta_state::SelectedKeyrow(dgn_beta_state *state, int Rows)
 
 /* GetKeyRow, returns the value of a keyrow, checking for invalid rows */
 /* and returning no key pressed if row is invalid */
-int dgn_beta_state::GetKeyRow(dgn_beta_state *state, int RowNo)
+int dgn_beta_state::GetKeyRow(int RowNo)
 {
 	if(RowNo==INVALID_KEYROW)
 		return NO_KEY_PRESSED;  /* row is invalid, so return no key down */
@@ -336,7 +336,7 @@ uint8_t dgn_beta_state::d_pia0_pb_r()
 
 	m_KAny_next = 0;
 
-	Selected = SelectedKeyrow(this, m_RowShifter);
+	Selected = SelectedKeyrow(m_RowShifter);
 
 	/* Scan the whole keyboard, if output shifter is all low */
 	/* This actually scans in the keyboard */
@@ -352,7 +352,7 @@ uint8_t dgn_beta_state::d_pia0_pb_r()
 	}
 	else    /* Just scan current row, from previously read values */
 	{
-		if(GetKeyRow(this, Selected) != NO_KEY_PRESSED)
+		if(GetKeyRow(Selected) != NO_KEY_PRESSED)
 			m_KAny_next = 1;
 	}
 
@@ -398,8 +398,8 @@ WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_cb2_w)
 	/* load keyrow on rising edge of CB2 */
 	if((state==1) && (m_d_pia0_cb2_last==0))
 	{
-		RowNo=SelectedKeyrow(this, m_RowShifter);
-		m_Keyrow=GetKeyRow(this, RowNo);
+		RowNo=SelectedKeyrow(m_RowShifter);
+		m_Keyrow=GetKeyRow(RowNo);
 
 		/* Output clock rising edge, clock CB2 value into rowshifterlow to high transition */
 		/* In the beta the shift registers are a cmos 4015, and a cmos 4013 in series */

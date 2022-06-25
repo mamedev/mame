@@ -132,7 +132,7 @@ namespace plib {
 	protected:
 		int parse(const pstring &argument) override
 		{
-			auto raw = plib::container::indexof(limit(), argument);
+			auto raw = plib::container::index_of(limit(), argument);
 
 			if (raw != plib::container::npos)
 			{

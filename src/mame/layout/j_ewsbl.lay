@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<!--
+Each Way Shuffle (bootleg)
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="matrixlamp">
+		<rect state ="0">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.7" green="0.7" blue="0.7" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.95" green="0.95" blue="0.43" />
+		</rect>
+	</element>
+	<element name="rect_white">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0"/>
+		</rect>
+	</element>
+	<element name="rect_black">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0"/>
+		</rect>
+	</element>
+	<element name="text_credits">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0"/>
+		</rect>
+		<text string="Plays">
+			<color red="1.0" green="1.0" blue="1.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
+		</text>
+	</element>
+	<element name="Reel 1">
+		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
+		<text string="Melon">   <bounds x="0" y="40" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear">    <bounds x="0" y="60" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell">    <bounds x="0" y="80" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">  <bounds x="0" y="100" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell">    <bounds x="0" y="120" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear">    <bounds x="0" y="140" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">  <bounds x="0" y="160" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell">    <bounds x="0" y="180" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear">    <bounds x="0" y="200" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange">  <bounds x="0" y="220" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell">    <bounds x="0" y="240" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">  <bounds x="0" y="260" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">  <bounds x="0" y="280" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear">    <bounds x="0" y="300" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">  <bounds x="0" y="320" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange">  <bounds x="0" y="340" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear">    <bounds x="0" y="360" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Jackpot"> <bounds x="0" y="380" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum">    <bounds x="0" y="0" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="JPM">     <bounds x="0" y="20" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+	</element>
+	<element name="Reel 2">
+		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
+		<text string="Orange">  <bounds x="0" y="40" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum">    <bounds x="0" y="60" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Melon">   <bounds x="0" y="80" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum">    <bounds x="0" y="100" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">  <bounds x="0" y="120" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Melon">   <bounds x="0" y="140" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange">  <bounds x="0" y="160" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum">    <bounds x="0" y="180" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">  <bounds x="0" y="200" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">  <bounds x="0" y="220" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum">    <bounds x="0" y="240" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear">    <bounds x="0" y="260" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">  <bounds x="0" y="280" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Melon">   <bounds x="0" y="300" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell">    <bounds x="0" y="320" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum">    <bounds x="0" y="340" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Jackpot"> <bounds x="0" y="360" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum">    <bounds x="0" y="380" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">  <bounds x="0" y="0" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="JPM">     <bounds x="0" y="20" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+	</element>
+	<element name="Reel 3">
+		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
+		<text string="Orange">  <bounds x="0" y="40" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum">    <bounds x="0" y="60" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Jackpot"> <bounds x="0" y="80" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange">  <bounds x="0" y="100" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">  <bounds x="0" y="120" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell">    <bounds x="0" y="140" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Melon">   <bounds x="0" y="160" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">  <bounds x="0" y="180" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange">  <bounds x="0" y="200" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">  <bounds x="0" y="220" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange">  <bounds x="0" y="240" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear">    <bounds x="0" y="260" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">  <bounds x="0" y="280" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear">    <bounds x="0" y="300" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum">    <bounds x="0" y="320" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange">  <bounds x="0" y="340" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">  <bounds x="0" y="360" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">  <bounds x="0" y="380" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell">    <bounds x="0" y="0" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="JPM">     <bounds x="0" y="20" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+	</element>
+	<element name="LCD" defstate="0">
+		<led7seg>
+			<color red="0.9" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<view name="AWP Simulated Video (No Artwork)">
+		<repeat count="3">
+			<param name="i" start="1" increment="1" />
+			<param name="x" start="20" increment="50" />
+			<element ref="rect_white">
+				<bounds x="~x~" y="300" width="30" height="100"/>
+			</element>
+			<element ref="Reel ~i~" state="0">
+				<bounds x="~x~" y="300" width="30" height="100"/>
+				<yscroll name="sreel~i~" size="0.25" wrap="yes" min="65536" max="0"/>
+			</element>
+		</repeat>
+		<element ref="rect_black">
+			<bounds x="20" y="350" width="150" height="1"/>
+		</element>
+		<element name="digit0" ref="LCD"><bounds x="170" y="390" width="18" height="30" /></element>
+		<element name="digit1" ref="LCD"><bounds x="194" y="390" width="18" height="30" /></element>
+		<element ref="text_credits">
+			<bounds x="170" y="420" width="36" height="15"/>
+		</element>
+		<repeat count="7">
+			<param name="i" start="0" increment="8" />
+			<param name="y" start="0" increment="8" />
+			<repeat count="8">
+				<param name="j" start="~i~" increment="1" />
+				<param name="x" start="0" increment="8" />
+				<element name="lamp~j~" ref="matrixlamp" state="0">
+					<bounds x="~x~" y="~y~" width="7" height="7"/>
+				</element>
+			</repeat>
+		</repeat>
+	</view>
+</mamelayout>
+

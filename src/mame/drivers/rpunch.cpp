@@ -107,17 +107,365 @@
 
 
 #include "emu.h"
-#include "includes/rpunch.h"
 
+// mame
+#include "video/vsystem_gga.h"
+
+// devices
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/input_merger.h"
+#include "sound/upd7759.h"
 #include "sound/ymopm.h"
+
+// emu
+#include "emupal.h"
+#include "screen.h"
+#include "tilemap.h"
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK        XTAL(16'000'000)
 #define VIDEO_CLOCK         XTAL(13'333'000)
+
+
+class rpunch_state : public driver_device
+{
+public:
+	rpunch_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch"),
+		m_upd7759(*this, "upd"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_gga(*this, "gga"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_hi_bits(*this, "SERVICE")
+	{ }
+
+	void rpunch(machine_config &config);
+	void svolleybl(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(hi_bits_r) { return m_hi_bits->read(); }
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<upd7759_device> m_upd7759;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<vsystem_gga_device> m_gga;
+
+	required_shared_ptr<u16> m_videoram;
+	required_shared_ptr<u16> m_spriteram;
+
+	required_ioport m_hi_bits;
+
+	tilemap_t *m_background[2]{};
+
+	void set_sprite_palette(int val) { m_sprite_palette = val; }
+	void set_sprite_xoffs(int val) { m_sprite_xoffs = val; }
+
+	virtual void machine_start() override;
+
+	void svolley_map(address_map &map);
+	void rpunch_map(address_map &map);
+	void svolleybl_main_map(address_map &map);
+	void sound_map(address_map &map);
+	void svolleybl_sound_map(address_map &map);
+
+private:
+	// hardware configuration
+	int m_sprite_palette = 0;
+	int m_sprite_xoffs = 0;
+
+	u8 m_upd_rom_bank = 0;
+	u16 m_videoflags = 0;
+	u8 m_sprite_pri = 0;
+	u8 m_sprite_num = 0;
+	std::unique_ptr<bitmap_ind16> m_pixmap;
+	emu_timer *m_crtc_timer = nullptr;
+
+	u16 sound_busy_r();
+	u8 pixmap_r(offs_t offset);
+	void pixmap_w(offs_t offset, u8 data);
+	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void videoreg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void scrollreg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gga_w(offs_t offset, u8 data);
+	void gga_data_w(offs_t offset, u8 data);
+	void sprite_ctrl_w(offs_t offset, u8 data);
+	void upd_control_w(u8 data);
+	void upd_data_w(u8 data);
+	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
+
+class svolley_state : public rpunch_state
+{
+public:
+	svolley_state(const machine_config &mconfig, device_type type, const char *tag) :
+		rpunch_state(mconfig, type, tag)
+	{
+	}
+
+	void svolley(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+};
+
+
+/*************************************
+ *
+ *  Tilemap callbacks
+ *
+ *************************************/
+
+TILE_GET_INFO_MEMBER(rpunch_state::get_bg0_tile_info)
+{
+	const u16 data = m_videoram[tile_index];
+	int code;
+	if (m_videoflags & 0x0400)  code = (data & 0x0fff) | 0x2000;
+	else                        code = (data & 0x1fff);
+
+	tileinfo.set(0,
+			code,
+			((m_videoflags & 0x0010) >> 1) | ((data >> 13) & 7),
+			0);
+}
+
+TILE_GET_INFO_MEMBER(rpunch_state::get_bg1_tile_info)
+{
+	const u16 data = m_videoram[0x1000 | tile_index];
+	int code;
+	if (m_videoflags & 0x0800)  code = (data & 0x0fff) | 0x2000;
+	else                        code = (data & 0x1fff);
+
+	tileinfo.set(1,
+			code,
+			((m_videoflags & 0x0020) >> 2) | ((data >> 13) & 7),
+			0);
+}
+
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+TIMER_CALLBACK_MEMBER(rpunch_state::crtc_interrupt_gen)
+{
+	m_maincpu->set_input_line(1, HOLD_LINE);
+	if (param != 0)
+		m_crtc_timer->adjust(m_screen->frame_period() / param, 0, m_screen->frame_period() / param);
+}
+
+
+/*************************************
+ *
+ *  Write handlers
+ *
+ *************************************/
+
+u8 rpunch_state::pixmap_r(offs_t offset)
+{
+	const int sy = offset >> 8;
+	const int sx = (offset & 0xff) << 1;
+
+	return ((m_pixmap->pix(sy & 0xff, sx & ~1) & 0xf) << 4) | (m_pixmap->pix(sy & 0xff, sx |  1) & 0xf);
+}
+
+void rpunch_state::pixmap_w(offs_t offset, u8 data)
+{
+	const int sy = offset >> 8;
+	const int sx = (offset & 0xff) << 1;
+
+	m_pixmap->pix(sy & 0xff, sx & ~1) = ((data & 0xf0) >> 4);
+	m_pixmap->pix(sy & 0xff, sx |  1) = (data & 0x0f);
+}
+
+void rpunch_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	const int tmap = offset >> 12;
+	const int tile_index = offset & 0xfff;
+	COMBINE_DATA(&m_videoram[offset]);
+	m_background[tmap]->mark_tile_dirty(tile_index);
+}
+
+
+void rpunch_state::videoreg_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	const int oldword = m_videoflags;
+	COMBINE_DATA(&m_videoflags);
+
+	if (m_videoflags != oldword)
+	{
+		/* invalidate tilemaps */
+		if ((oldword ^ m_videoflags) & 0x0410)
+			m_background[0]->mark_all_dirty();
+		if ((oldword ^ m_videoflags) & 0x0820)
+			m_background[1]->mark_all_dirty();
+	}
+}
+
+
+void rpunch_state::scrollreg_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
+		switch (offset)
+		{
+			case 0:
+				m_background[0]->set_scrolly(0, data & 0x1ff);
+				break;
+
+			case 1:
+				m_background[0]->set_scrollx(0, data & 0x1ff);
+				break;
+
+			case 2:
+				m_background[1]->set_scrolly(0, data & 0x1ff);
+				break;
+
+			case 3:
+				m_background[1]->set_scrollx(0, data & 0x1ff);
+				break;
+		}
+}
+
+
+void rpunch_state::gga_w(offs_t offset, u8 data)
+{
+	m_gga->write(offset >> 5, data & 0xff);
+}
+
+
+void rpunch_state::gga_data_w(offs_t offset, u8 data)
+{
+	switch (offset)
+	{
+		/* only register we know about.... */
+		case 0x0b:
+			m_crtc_timer->adjust(m_screen->time_until_vblank_start(), (data == 0xc0) ? 2 : 1);
+			break;
+
+		default:
+			logerror("CRTC register %02X = %02X\n", offset, data);
+			break;
+	}
+}
+
+
+void rpunch_state::sprite_ctrl_w(offs_t offset, u8 data)
+{
+	if (offset == 0)
+	{
+		m_sprite_num = data & 0x3f;
+		logerror("Number of sprites = %02X\n", data & 0x3f);
+	}
+	else
+	{
+		m_sprite_pri = data & 0x3f;
+		logerror("Sprite priority point = %02X\n", data & 0x3f);
+	}
+}
+
+
+/*************************************
+ *
+ *  Sprite routines
+ *
+ *************************************/
+
+void rpunch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* draw the sprites */
+	int offs = m_sprite_num;
+	while (offs > 0)
+	{
+		offs--;
+		const u32 ram = offs << 2;
+		u32 pri = 0; // above everything except direct mapped bitmap
+		/* this seems like the most plausible explanation */
+		if (offs < m_sprite_pri)
+			pri |= GFX_PMASK_2; // behind foreground
+
+		const u16 data1 = m_spriteram[ram + 1];
+		const u32 code = data1 & 0x7ff;
+
+		const u16 data0 = m_spriteram[ram + 0];
+		const u16 data2 = m_spriteram[ram + 2];
+		int x = (data2 & 0x1ff) + 8;
+		int y = 513 - (data0 & 0x1ff);
+		const bool xflip = data1 & 0x1000;
+		const bool yflip = data1 & 0x0800;
+		const u32 color = ((data1 >> 13) & 7) | ((m_videoflags & 0x0040) >> 3);
+
+		if (x > cliprect.max_x) x -= 512;
+		if (y > cliprect.max_y) y -= 512;
+
+		m_gfxdecode->gfx(2)->prio_transpen(bitmap,cliprect,
+				code, color + (m_sprite_palette / 16), xflip, yflip, x + m_sprite_xoffs, y,
+				m_screen->priority(), pri, 15);
+	}
+}
+
+
+/*************************************
+ *
+ *  Bitmap routines
+ *
+ *************************************/
+
+void rpunch_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const u32 colourbase = 512 + ((m_videoflags & 0x000f) << 4);
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		u16 const *const src = &m_pixmap->pix(y & 0xff);
+		u16 *const dst = &bitmap.pix(y);
+		for(int x = cliprect.min_x / 4; x <= cliprect.max_x; x++)
+		{
+			const u16 pix = src[(x + 4) & 0x1ff];
+			if ((pix & 0xf) != 0xf)
+				dst[x] = colourbase + pix;
+		}
+	}
+}
+
+
+/*************************************
+ *
+ *  Main screen refresh
+ *
+ *************************************/
+
+u32 rpunch_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen.priority().fill(0, cliprect);
+	m_background[0]->draw(screen, bitmap, cliprect, 0,1);
+	m_background[1]->draw(screen, bitmap, cliprect, 0,2);
+	draw_sprites(bitmap, cliprect);
+	draw_bitmap(bitmap, cliprect);
+	return 0;
+}
 
 
 /*************************************
@@ -128,27 +476,35 @@
 
 void rpunch_state::machine_start()
 {
+	m_videoflags = 0;
+
+	/* allocate tilemaps for the backgrounds */
+	m_background[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rpunch_state::get_bg0_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 64);
+	m_background[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rpunch_state::get_bg1_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 64);
+
+	/* configure the tilemaps */
+	m_background[1]->set_transparent_pen(15);
+
+	m_pixmap = std::make_unique<bitmap_ind16>(512, 256);
+
+	const rectangle pixmap_rect(0,511,0,255);
+	m_pixmap->fill(0xf, pixmap_rect);
+
+	/* reset the timer */
+	m_crtc_timer = timer_alloc(FUNC(rpunch_state::crtc_interrupt_gen), this);
+
 	save_item(NAME(m_upd_rom_bank));
-	save_item(NAME(m_sprite_xoffs));
 	save_item(NAME(m_videoflags));
 	save_item(NAME(m_sprite_pri));
 	save_item(NAME(m_sprite_num));
+	save_item(NAME(*m_pixmap));
 }
 
-void rpunch_state::machine_reset()
+void svolley_state::machine_start()
 {
-}
+	rpunch_state::machine_start();
 
-
-/*************************************
- *
- *  Input ports
- *
- *************************************/
-
-CUSTOM_INPUT_MEMBER(rpunch_state::hi_bits_r)
-{
-	return ioport("SERVICE")->read();
+	m_background[0]->set_scrolldx(8, 0); // aligns middle net sprite with bg as shown in reference
 }
 
 
@@ -213,7 +569,6 @@ void rpunch_state::svolley_map(address_map &map)
 void rpunch_state::rpunch_map(address_map &map)
 {
 	svolley_map(map);
-	map.global_mask(0xfffff);
 	map(0x040000, 0x04ffff).rw(FUNC(rpunch_state::pixmap_r), FUNC(rpunch_state::pixmap_w)); // mirrored?
 }
 
@@ -481,6 +836,8 @@ void rpunch_state::rpunch(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
 	/* video hardware */
+	set_sprite_palette(0x300);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(304, 224);
@@ -494,8 +851,6 @@ void rpunch_state::rpunch(machine_config &config)
 	VSYSTEM_GGA(config, m_gga, VIDEO_CLOCK/2); // verified from rpunch schematics
 	m_gga->write_cb().set(FUNC(rpunch_state::gga_data_w));
 
-	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -507,15 +862,21 @@ void rpunch_state::rpunch(machine_config &config)
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void rpunch_state::svolley(machine_config &config)
+
+// the main differences between Super Volleyball and Rabbit Punch are
+// the lack of direct-mapped bitmap and a different palette base for sprites
+void svolley_state::svolley(machine_config &config)
 {
 	rpunch(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &rpunch_state::svolley_map);
-	MCFG_VIDEO_START_OVERRIDE(rpunch_state,svolley)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &svolley_state::svolley_map);
+
+	set_sprite_palette(0x080);
+	set_sprite_xoffs(-4); // aligns middle net sprite with bg as shown in reference
 }
 
 
-// c+p of above for now, bootleg hw, things need verifying
+// FIXME: copy/paste of above for now, bootleg hardware, things need verifying
 void rpunch_state::svolleybl(machine_config &config)
 {
 	/* basic machine hardware */
@@ -529,6 +890,8 @@ void rpunch_state::svolleybl(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	/* video hardware */
+	set_sprite_palette(0x080);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(304, 224);
@@ -542,10 +905,7 @@ void rpunch_state::svolleybl(machine_config &config)
 	VSYSTEM_GGA(config, m_gga, VIDEO_CLOCK/2);
 	m_gga->write_cb().set(FUNC(rpunch_state::gga_data_w));
 
-	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
-
 	/* sound hardware */
-
 	SPEAKER(config, "mono").front_center();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK/4));
@@ -785,25 +1145,7 @@ ROM_START( svolleybl )
 	ROM_LOAD( "1-snd.bin", 0x10000, 0x08000, CRC(009d7157) SHA1(2cdda7094c7476289d75a78ee25b34fa3b3225c0) ) // matches 2.ic141 from spikes91, when halved
 ROM_END
 
-
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
-
-void rpunch_state::init_rabiolep()
-{
-	m_sprite_palette = 0x300;
-}
-
-
-void rpunch_state::init_svolley()
-{
-	/* the main differences between Super Volleyball and Rabbit Punch are */
-	/* the lack of direct-mapped bitmap and a different palette base for sprites */
-	m_sprite_palette = 0x080;
-}
+} // anonymous namespace
 
 
 
@@ -813,12 +1155,13 @@ void rpunch_state::init_svolley()
  *
  *************************************/
 
-GAME( 1987, rabiolep,  0,        rpunch,    rabiolep, rpunch_state, init_rabiolep, ROT0, "V-System Co.",                              "Rabio Lepus (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1987, rpunch,    rabiolep, rpunch,    rpunch,   rpunch_state, init_rabiolep, ROT0, "V-System Co. (Bally/Midway/Sente license)", "Rabbit Punch (US)",        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolley,   0,        svolley,   svolley,  rpunch_state, init_svolley,  ROT0, "V-System Co.",                              "Super Volleyball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolleyk,  svolley,  svolley,   svolley,  rpunch_state, init_svolley,  ROT0, "V-System Co.",                              "Super Volleyball (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolleyu,  svolley,  svolley,   svolley,  rpunch_state, init_svolley,  ROT0, "V-System Co. (Data East license)",          "Super Volleyball (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+//    year  name       parent    machine    input     class          init        rot   company                                      description                 flags
+GAME( 1987, rabiolep,  0,        rpunch,    rabiolep, rpunch_state,  empty_init, ROT0, "V-System Co.",                              "Rabio Lepus (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1987, rpunch,    rabiolep, rpunch,    rpunch,   rpunch_state,  empty_init, ROT0, "V-System Co. (Bally/Midway/Sente license)", "Rabbit Punch (US)",        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolley,   0,        svolley,   svolley,  svolley_state, empty_init, ROT0, "V-System Co.",                              "Super Volleyball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolleyk,  svolley,  svolley,   svolley,  svolley_state, empty_init, ROT0, "V-System Co.",                              "Super Volleyball (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolleyu,  svolley,  svolley,   svolley,  svolley_state, empty_init, ROT0, "V-System Co. (Data East license)",          "Super Volleyball (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 // video registers are changed, and there's some kind of RAM at 090xxx, possible a different sprite scheme for the bootleg (even if the original is intact)
 // the sound system seems to be ripped from the later Power Spikes (see aerofgt.cpp)
-GAME( 1991, svolleybl, svolley,  svolleybl, svolley,  rpunch_state, init_svolley,  ROT0, "bootleg",  "Super Volleyball (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // aka 1991 Spikes?
+GAME( 1991, svolleybl, svolley,  svolleybl, svolley,  rpunch_state,  empty_init, ROT0, "bootleg",  "Super Volleyball (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // aka 1991 Spikes?

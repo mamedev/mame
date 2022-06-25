@@ -299,6 +299,15 @@ ROM_START( mmaruchan )
 	ROM_LOAD16_WORD_SWAP( "spt_01.ic31", 0x000000, 0x400000, CRC(790b4bed) SHA1(3df68610f8b81dd5f74dca0f05da47a539b45163) )
 ROM_END
 
+ROM_START( mmaruchana )
+	ROM_REGION32_LE( 0x1000000, "maincpu", 0 )
+	ROM_LOAD32_WORD( "spt_04a.ic30", 0x000000, 0x400000, CRC(9c919870) SHA1(376a5f51e09ea0f32f511994d6a492bccdbbe0e2) )
+	ROM_LOAD32_WORD( "spt_05a.ic33", 0x000002, 0x400000, CRC(f8794160) SHA1(86a44ce678f38413fc40bdc0bd5633fa00af8ddb) )
+
+	ROM_REGION( 0x400000, "ymz770b", 0 )
+	ROM_LOAD16_WORD_SWAP( "spt_01.ic31", 0x000000, 0x400000, CRC(790b4bed) SHA1(3df68610f8b81dd5f74dca0f05da47a539b45163) )
+ROM_END
+
 ////////////////////////
 // Medalusion 2 platform
 ////////////////////////
@@ -349,7 +358,8 @@ GAME( 2004, masmarios, 0,        alien, alien, alien_state, empty_init,    ROT0,
 GAME( 2005, masmario2, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // Medalusion 1
 GAME( 2006, mariojjl,  0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no JanJanLand", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2005, mmaruchan, 0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
+GAME( 2005, mmaruchan, 0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00B, 05/06/22)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
+GAME( 2004, mmaruchana,mmaruchan,alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki (Ver.1.00A, 04/04/20)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
 // Medalusion 2
 GAME( 2006, dokodemo,  0,        alien, alien, alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2006, pingu,     0,        alien, alien, alien_state, empty_init,    ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

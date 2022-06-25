@@ -232,13 +232,13 @@ void twins_state::video_start()
 
 void twins_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = (uint8_t*)m_bgvram.get();
+	auto const videoram = util::little_endian_cast<uint8_t const>(m_bgvram.get());
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int count = (y * 320) + cliprect.left();
-		for(int x = cliprect.left(); x <= cliprect.right(); x++)
-			bitmap.pix(y, x) = videoram[BYTE_XOR_LE(count++)];
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+			bitmap.pix(y, x) = videoram[count++];
 	}
 }
 
@@ -251,14 +251,14 @@ uint32_t twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &b
 
 void spider_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = (uint8_t*)m_fgvram.get();
+	auto const videoram = util::little_endian_cast<uint8_t const>(m_fgvram.get());
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int count = (y * 320) + cliprect.left();
 		for(int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			u8 pixel = videoram[BYTE_XOR_LE(count++)];
+			u8 const pixel = videoram[count++];
 			if (pixel)
 				bitmap.pix(y, x) = pixel;
 		}

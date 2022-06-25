@@ -98,7 +98,7 @@ void nubus_bootbug_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(this, BOOTBUG_ROM_REGION);
+	install_declaration_rom(BOOTBUG_ROM_REGION);
 
 	slotspace = get_slotspace();
 

@@ -27,8 +27,8 @@ NETLIST_START(jpmsru)
 	RES(R7, 470)
 	POT(R8, RES_K(4.7))
 	NET_C(R8.3, GND)
+	PARAM(R8.DIAL, 0.170441) // Stops tones cutting out and popping when idle
 	RES(R9, RES_K(6.8))
-	RES(R10, 270)
 
 	CAP(C1, CAP_P(1000))
 	CAP(C2, CAP_U(0.22))
@@ -49,8 +49,7 @@ NETLIST_START(jpmsru)
 	NET_C(VM5, IC14.1, C2.1)
 	NET_C(C2.2, IC14.7)
 
-	NET_C(IC14.3, R10.1)
-	ALIAS(OUT, R10.2)
+	ALIAS(OUT, IC14.3)
 
 	NET_C(V5, IC14.8)
 

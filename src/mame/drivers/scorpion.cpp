@@ -2,7 +2,6 @@
 // copyright-holders:Miodrag Milanovic
 
 #include "emu.h"
-#include "includes/spectrum.h"
 #include "includes/spec128.h"
 
 #include "machine/beta.h"

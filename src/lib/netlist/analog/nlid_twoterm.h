@@ -37,8 +37,10 @@
 #include "../nl_setup.h"
 #include "nl_base.h"
 #include "nld_generic_models.h"
-#include "plib/pfunction.h"
+
 #include "solver/nld_solver.h"
+
+#include "plib/pfunction.h"
 
 // -----------------------------------------------------------------------------
 // Implementation
@@ -47,45 +49,37 @@
 namespace netlist::analog
 {
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// nld_two_terminal
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
-	template <class C>
-	static inline core_device_t &bselect(bool b, C &d1, core_device_t &d2)
+	class nld_two_terminal : public base_device_t
 	{
-		auto *h = dynamic_cast<core_device_t *>(&d1);
-		return b ? *h : d2;
-	}
-	template <>
-	inline core_device_t &bselect(bool b, [[maybe_unused]] netlist_state_t &d1, core_device_t &d2)
-	{
-		if (b)
-			throw nl_exception("bselect with netlist and b==true");
-		return d2;
-	}
-
-	NETLIB_BASE_OBJECT(two_terminal)
-	{
-		NETLIB_CONSTRUCTOR(two_terminal)
+	public:
+		nld_two_terminal(constructor_param_t data)
+		: base_device_t(data)
 		, m_P(*this, "1", &m_N, NETLIB_DELEGATE(terminal_handler))
 		, m_N(*this, "2", &m_P, NETLIB_DELEGATE(terminal_handler))
 		{
 		}
-		//#NETLIB_CONSTRUCTOR_EX(twoterm, nldelegate owner_delegate)
-		template <class C>
-		NETLIB_NAME(two_terminal)(C &owner, const pstring &name, nl_delegate owner_delegate) \
-				: base_type(owner, name)
+
+		// This constructor covers the case in which the terminals are "owned"
+		// by the device using a two_terminal. In this case it passes
+		// the terminal handler on to the terminals.
+
+		nld_two_terminal(base_device_t &owner, const pstring &name,
+						 nl_delegate owner_delegate)
+		: base_device_t(
+			constructor_data_t{owner.state(), owner.name() + "." + name})
 		, m_P(owner, name + ".1", &m_N, owner_delegate)
 		, m_N(owner, name + ".2", &m_P, owner_delegate)
 		{
 		}
 
-		//NETLIB_UPDATE_TERMINALSI() { }
-		//NETLIB_RESETI() {}
+		// NETLIB_UPDATE_TERMINALSI() { }
+		// NETLIB_RESETI() {}
 
 	public:
-
 		NETLIB_HANDLERI(terminal_handler);
 
 		solver::matrix_solver_t *solver() const noexcept;
@@ -112,18 +106,13 @@ namespace netlist::analog
 			return m_P.net().Q_Analog() - m_N.net().Q_Analog();
 		}
 
-		nl_fptype V1P() const noexcept
-		{
-			return m_P.net().Q_Analog();
-		}
+		nl_fptype V1P() const noexcept { return m_P.net().Q_Analog(); }
 
-		nl_fptype V2N() const noexcept
-		{
-			return m_N.net().Q_Analog();
-		}
+		nl_fptype V2N() const noexcept { return m_N.net().Q_Analog(); }
 
-		void set_mat(nl_fptype a11, nl_fptype a12, nl_fptype rhs1,
-					 nl_fptype a21, nl_fptype a22, nl_fptype rhs2) const noexcept
+		void set_mat(nl_fptype a11, nl_fptype a12, nl_fptype rhs1, //
+					 nl_fptype a21, nl_fptype a22, nl_fptype rhs2  //
+		) const noexcept
 		{
 			//               GO,  GT,     I
 			m_P.set_go_gt_I(a12, a11, rhs1);
@@ -173,78 +162,75 @@ namespace netlist::analog
 	private:
 		terminal_t m_P;
 		terminal_t m_N;
-
 	};
 
-
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// nld_R
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(R_base, two_terminal)
+	class nld_R_base : public nld_two_terminal
 	{
-		NETLIB_CONSTRUCTOR(R_base)
+	public:
+		nld_R_base(constructor_param_t data)
+		: nld_two_terminal(data)
 		{
 		}
 
 		void set_R(nl_fptype R) const noexcept
 		{
 			const nl_fptype G = plib::reciprocal(R);
-			set_mat( G, -G, nlconst::zero(),
-					-G,  G, nlconst::zero());
+			set_mat(G, -G, nlconst::zero(), //
+					-G, G, nlconst::zero());
 		}
 
 		void set_G(nl_fptype G) const noexcept
 		{
-			set_mat( G, -G, nlconst::zero(),
-					-G,  G, nlconst::zero());
+			set_mat(G, -G, nlconst::zero(), //
+					-G, G, nlconst::zero());
 		}
 
-		//NETLIB_RESETI();
+		// NETLIB_RESETI();
 
 	protected:
-		//NETLIB_UPDATEI();
-
+		// NETLIB_UPDATEI();
 	};
 
-	NETLIB_OBJECT_DERIVED(R, R_base)
+	class nld_R : public nld_R_base
 	{
-		NETLIB_CONSTRUCTOR(R)
+	public:
+		nld_R(constructor_param_t data)
+		: nld_R_base(data)
 		, m_R(*this, "R", nlconst::magic(1e9))
 		{
 		}
 
-
 	protected:
-
-		NETLIB_RESETI()
-		{
-			set_R(std::max(m_R(), exec().gmin()));
-		}
+		NETLIB_RESETI() { set_R(std::max(m_R(), exec().gmin())); }
 
 		NETLIB_UPDATE_PARAMI()
 		{
-			// FIXME: We only need to update the net first if this is a time stepping net
-			change_state([this]()
-			{
-				set_R(std::max(m_R(), exec().gmin()));
-			});
+			// FIXME: We only need to update the net first if this is a time
+			// stepping net
+			change_state([this]() { set_R(std::max(m_R(), exec().gmin())); });
 		}
 
 	private:
 		param_fp_t m_R;
-		// protect set_R ... it's a recipe to disaster when used to bypass the parameter
-		using NETLIB_NAME(R_base)::set_R;
-		using NETLIB_NAME(R_base)::set_G;
+		// protect set_R ... it's a recipe to disaster when used to bypass the
+		// parameter
+		using nld_R_base::set_G;
+		using nld_R_base::set_R;
 	};
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// nld_POT
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
-	NETLIB_BASE_OBJECT(POT)
+	class nld_POT : public base_device_t
 	{
-		NETLIB_CONSTRUCTOR(POT)
+	public:
+		nld_POT(constructor_param_t data)
+		: base_device_t(data)
 		, m_R1(*this, "_R1")
 		, m_R2(*this, "_R2")
 		, m_R(*this, "R", 10000)
@@ -252,63 +238,65 @@ namespace netlist::analog
 		, m_DialIsLog(*this, "DIALLOG", false)
 		, m_Reverse(*this, "REVERSE", false)
 		{
-			register_sub_alias("1", m_R1.P());
-			register_sub_alias("2", m_R1.N());
-			register_sub_alias("3", m_R2.N());
+			register_sub_alias("1", m_R1().P());
+			register_sub_alias("2", m_R1().N());
+			register_sub_alias("3", m_R2().N());
 
-			connect(m_R2.P(), m_R1.N());
-
+			connect(m_R2().P(), m_R1().N());
 		}
 
-		//NETLIB_UPDATEI();
+		// NETLIB_UPDATEI();
 		NETLIB_RESETI();
 		NETLIB_UPDATE_PARAMI();
 
 	private:
-		NETLIB_SUB(R_base) m_R1;
-		NETLIB_SUB(R_base) m_R2;
+		NETLIB_SUB_NS(analog, R_base) m_R1;
+		NETLIB_SUB_NS(analog, R_base) m_R2;
 
-		param_fp_t m_R;
-		param_fp_t m_Dial;
+		param_fp_t    m_R;
+		param_fp_t    m_Dial;
 		param_logic_t m_DialIsLog;
 		param_logic_t m_Reverse;
 	};
 
-	NETLIB_BASE_OBJECT(POT2)
+	class nld_POT2 : public base_device_t
 	{
-		NETLIB_CONSTRUCTOR(POT2)
+	public:
+		nld_POT2(constructor_param_t data)
+		: base_device_t(data)
 		, m_R1(*this, "_R1")
 		, m_R(*this, "R", nlconst::magic(10000.0))
 		, m_Dial(*this, "DIAL", nlconst::half())
 		, m_DialIsLog(*this, "DIALLOG", false)
 		, m_Reverse(*this, "REVERSE", false)
 		{
-			register_sub_alias("1", m_R1.P());
-			register_sub_alias("2", m_R1.N());
-
+			register_sub_alias("1", m_R1().P());
+			register_sub_alias("2", m_R1().N());
 		}
 
-		//NETLIB_UPDATEI();
+		// NETLIB_UPDATEI();
 		NETLIB_RESETI();
 		NETLIB_UPDATE_PARAMI();
 
 	private:
-		NETLIB_SUB(R_base) m_R1;
+		NETLIB_SUB_NS(analog, R_base) m_R1;
 
-		param_fp_t m_R;
-		param_fp_t m_Dial;
+		param_fp_t    m_R;
+		param_fp_t    m_Dial;
 		param_logic_t m_DialIsLog;
 		param_logic_t m_Reverse;
 	};
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// nld_C
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+
 #if 1
-	NETLIB_OBJECT_DERIVED(C, two_terminal)
+	class nld_C : public nld_two_terminal
 	{
 	public:
-		NETLIB_CONSTRUCTOR(C)
+		nld_C(constructor_param_t data)
+		: nld_two_terminal(data)
 		, m_C(*this, "C", nlconst::magic(1e-6))
 		, m_cap(*this, "m_cap")
 		{
@@ -320,20 +308,17 @@ namespace netlist::analog
 			if (ts_type == time_step_type::FORWARD)
 			{
 				// G, Ieq
-				const auto res(m_cap.time_step(m_C(), deltaV(), step));
+				const auto      res(m_cap.time_step(m_C(), deltaV(), step));
 				const nl_fptype G = res.first;
 				const nl_fptype I = res.second;
-				set_mat( G, -G, -I,
-						-G,  G,  I);
+				set_mat(G, -G, -I, //
+						-G, G, I);
 			}
 			else
 				m_cap.restore_state();
 		}
 
-		NETLIB_RESETI()
-		{
-			m_cap.set_parameters(exec().gmin());
-		}
+		NETLIB_RESETI() { m_cap.set_parameters(exec().gmin()); }
 
 		/// \brief Set capacitance
 		///
@@ -343,27 +328,25 @@ namespace netlist::analog
 		///
 		/// \param val Capacitance value
 		///
-		void set_cap_embedded(nl_fptype val)
-		{
-			m_C.set(val);
-		}
+		void set_cap_embedded(nl_fptype val) { m_C.set(val); }
 
 	protected:
-		//NETLIB_UPDATEI();
-		//FIXME: should be able to change
-		NETLIB_UPDATE_PARAMI() { }
+		// NETLIB_UPDATEI();
+		// FIXME: should be able to change
+		NETLIB_UPDATE_PARAMI() {}
 
 	private:
-		param_fp_t m_C;
+		param_fp_t              m_C;
 		generic_capacitor_const m_cap;
 	};
 
 #else
 	// Code preserved as a basis for a current/voltage controlled capacitor
-	NETLIB_OBJECT_DERIVED(C, two_terminal)
+	class nld_C : public nld_two_terminal)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(C, two_terminal)
+		nld_C(constructor_param_t data)
+		: nld_two_terminal(data)
 		, m_C(*this, "C", nlconst::magic(1e-6))
 		, m_cap(*this, "m_cap")
 		{
@@ -377,8 +360,8 @@ namespace netlist::analog
 			{
 				const nl_fptype I = m_cap.Ieq(m_C(), deltaV());
 				const nl_fptype G = m_cap.G(m_C());
-				set_mat( G, -G, -I,
-						-G,  G,  I);
+				set_mat(G, -G, -I, //
+						-G, G, I);
 			}
 		}
 
@@ -387,34 +370,33 @@ namespace netlist::analog
 		{
 			const nl_fptype I = m_cap.Ieq(m_C(), deltaV());
 			const nl_fptype G = m_cap.G(m_C());
-			set_mat( G, -G, -I,
-					-G,  G,  I);
+			set_mat(G, -G, -I, //
+					-G, G, I);
 		}
 
 		param_fp_t m_C;
-		NETLIB_RESETI()
-		{
-			m_cap.set_parameters(exec().gmin());
-		}
+		NETLIB_RESETI() { m_cap.set_parameters(exec().gmin()); }
 
 	protected:
-		//NETLIB_UPDATEI();
-		//FIXME: should be able to change
-		NETLIB_UPDATE_PARAMI() { }
+		// NETLIB_UPDATEI();
+		// FIXME: should be able to change
+		NETLIB_UPDATE_PARAMI() {}
 
 	private:
-		//generic_capacitor<capacitor_e::VARIABLE_CAPACITY> m_cap;
+		// generic_capacitor<capacitor_e::VARIABLE_CAPACITY> m_cap;
 		generic_capacitor<capacitor_e::CONSTANT_CAPACITY> m_cap;
 	};
 #endif
-	// -----------------------------------------------------------------------------
-	// nld_L
-	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(L, two_terminal)
+	// -------------------------------------------------------------------------
+	// nld_L
+	// -------------------------------------------------------------------------
+
+	class nld_L : public nld_two_terminal
 	{
 	public:
-		NETLIB_CONSTRUCTOR(L)
+		nld_L(constructor_param_t data)
+		: nld_two_terminal(data)
 		, m_L(*this, "L", nlconst::magic(1e-6))
 		, m_gmin(nlconst::zero())
 		, m_G(*this, "m_G", nlconst::zero())
@@ -422,8 +404,8 @@ namespace netlist::analog
 		, m_last_I(*this, "m_last_I", nlconst::zero())
 		, m_last_G(*this, "m_last_G", nlconst::zero())
 		{
-			//register_term("1", m_P);
-			//register_term("2", m_N);
+			// register_term("1", m_P);
+			// register_term("2", m_N);
 		}
 
 		NETLIB_IS_TIMESTEP(true)
@@ -431,13 +413,13 @@ namespace netlist::analog
 		NETLIB_RESETI();
 
 	protected:
-		//NETLIB_UPDATEI();
+		// NETLIB_UPDATEI();
 		NETLIB_UPDATE_PARAMI();
 
 	private:
 		param_fp_t m_L;
 
-		nl_fptype m_gmin;
+		nl_fptype            m_gmin;
 		state_var<nl_fptype> m_G;
 		state_var<nl_fptype> m_I;
 		state_var<nl_fptype> m_last_I;
@@ -446,9 +428,9 @@ namespace netlist::analog
 
 	/// \brief Class representing the diode model parameters.
 	///
-	///  This is the model representation of the diode model. Typically, SPICE uses
-	///  the following parameters. A "Y" in the first column indicates that the
-	///  parameter is actually used in netlist.
+	///  This is the model representation of the diode model. Typically, SPICE
+	///  uses the following parameters. A "Y" in the first column indicates that
+	///  the parameter is actually used in netlist.
 	///
 	///  NBV, BV and IBV are only used in the ZDIODE model. It is assumed
 	///  that DIODEs are not modeled up to their breakdown voltage.
@@ -478,10 +460,11 @@ namespace netlist::analog
 		diode_model_t(param_model_t &model)
 		: m_IS(model, "IS")
 		, m_N(model, "N")
-		{}
+		{
+		}
 
-		param_model_t::value_t m_IS;    //!< saturation current.
-		param_model_t::value_t m_N;     //!< emission coefficient.
+		param_model_t::value_t m_IS; //!< saturation current.
+		param_model_t::value_t m_N;  //!< emission coefficient.
 	};
 
 	class zdiode_model_t : public diode_model_t
@@ -492,21 +475,23 @@ namespace netlist::analog
 		, m_NBV(model, "NBV")
 		, m_BV(model, "BV")
 		, m_IBV(model, "IBV")
-		{}
+		{
+		}
 
-		param_model_t::value_t m_NBV;    //!< reverse emission coefficient.
-		param_model_t::value_t m_BV;     //!< reverse breakdown voltage.
-		param_model_t::value_t m_IBV;    //!< current at breakdown voltage.
+		param_model_t::value_t m_NBV; //!< reverse emission coefficient.
+		param_model_t::value_t m_BV;  //!< reverse breakdown voltage.
+		param_model_t::value_t m_IBV; //!< current at breakdown voltage.
 	};
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// nld_D
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(D, two_terminal)
+	class nld_D : public nld_two_terminal
 	{
 	public:
-		NETLIB_CONSTRUCTOR_EX(D, const pstring &model = "D")
+		nld_D(constructor_param_t data, const pstring &model = "D")
+		: nld_two_terminal(data)
 		, m_model(*this, "MODEL", model)
 		, m_modacc(m_model)
 		, m_D(*this, "m_D")
@@ -520,23 +505,24 @@ namespace netlist::analog
 		NETLIB_RESETI();
 
 	protected:
-		//NETLIB_UPDATEI();
+		// NETLIB_UPDATEI();
 		NETLIB_UPDATE_PARAMI();
 
 	private:
-		param_model_t m_model;
-		diode_model_t m_modacc;
+		param_model_t                   m_model;
+		diode_model_t                   m_modacc;
 		generic_diode<diode_e::BIPOLAR> m_D;
 	};
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// nld_Z - Zener Diode
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(Z, two_terminal)
+	class nld_Z : public nld_two_terminal
 	{
 	public:
-		NETLIB_CONSTRUCTOR_EX(Z, const pstring &model = "D")
+		nld_Z(constructor_param_t data, const pstring &model = "D")
+		: nld_two_terminal(data)
 		, m_model(*this, "MODEL", model)
 		, m_modacc(m_model)
 		, m_D(*this, "m_D")
@@ -551,38 +537,40 @@ namespace netlist::analog
 		NETLIB_RESETI();
 
 	protected:
-		//NETLIB_UPDATEI();
+		// NETLIB_UPDATEI();
 		NETLIB_UPDATE_PARAMI();
 
 	private:
-		param_model_t m_model;
-		zdiode_model_t m_modacc;
+		param_model_t                   m_model;
+		zdiode_model_t                  m_modacc;
 		generic_diode<diode_e::BIPOLAR> m_D;
 		// REVERSE diode
 		generic_diode<diode_e::BIPOLAR> m_R;
 	};
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// nld_VS - Voltage source
 	//
 	// netlist voltage source must have inner resistance
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(VS, two_terminal)
+	class nld_VS : public nld_two_terminal
 	{
 	public:
-		NETLIB_CONSTRUCTOR(VS)
+		nld_VS(constructor_param_t data)
+		: nld_two_terminal(data)
 		, m_t(*this, "m_t", nlconst::zero())
 		, m_R(*this, "RI", nlconst::magic(0.1))
 		, m_V(*this, "V", nlconst::zero())
-		, m_func(*this,"FUNC", "")
+		, m_func(*this, "FUNC", "")
 		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
 			register_sub_alias("P", P());
 			register_sub_alias("N", N());
 			if (!m_func().empty())
-				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
+				m_compiled->compile(m_func(),
+									std::vector<pstring>({{pstring("T")}}));
 		}
 
 		NETLIB_IS_TIMESTEP(!m_func().empty())
@@ -594,48 +582,49 @@ namespace netlist::analog
 				m_t += step;
 				m_funcparam[0] = m_t;
 				this->set_G_V_I(plib::reciprocal(m_R()),
-						m_compiled->evaluate(m_funcparam),
-						nlconst::zero());
+								m_compiled->evaluate(m_funcparam),
+								nlconst::zero());
 			}
 			else
 				m_t -= step; // only need to restore state, will be called again
 		}
 
 	protected:
-
 		NETLIB_RESETI()
 		{
-			NETLIB_NAME(two_terminal)::reset();
+			nld_two_terminal::reset();
 			this->set_G_V_I(plib::reciprocal(m_R()), m_V(), nlconst::zero());
 		}
 
 	private:
-		state_var<nl_fptype> m_t;
-		param_fp_t m_R;
-		param_fp_t m_V;
-		param_str_t m_func;
+		state_var<nl_fptype>                  m_t;
+		param_fp_t                            m_R;
+		param_fp_t                            m_V;
+		param_str_t                           m_func;
 		state_var<plib::pfunction<nl_fptype>> m_compiled;
-		std::vector<nl_fptype> m_funcparam;
+		std::vector<nl_fptype>                m_funcparam;
 	};
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// nld_CS - Current source
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(CS, two_terminal)
+	class nld_CS : public nld_two_terminal
 	{
 	public:
-		NETLIB_CONSTRUCTOR(CS)
+		nld_CS(constructor_param_t data)
+		: nld_two_terminal(data)
 		, m_t(*this, "m_t", nlconst::zero())
 		, m_I(*this, "I", nlconst::one())
-		, m_func(*this,"FUNC", "")
+		, m_func(*this, "FUNC", "")
 		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
 			register_sub_alias("P", "1");
 			register_sub_alias("N", "2");
 			if (!m_func().empty())
-				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
+				m_compiled->compile(m_func(),
+									std::vector<pstring>({{pstring("T")}}));
 		}
 
 		NETLIB_IS_TIMESTEP(!m_func().empty())
@@ -646,42 +635,43 @@ namespace netlist::analog
 				m_t += step;
 				m_funcparam[0] = m_t;
 				const nl_fptype I = m_compiled->evaluate(m_funcparam);
-				const auto zero(nlconst::zero());
-				set_mat(zero, zero, -I,
-						zero, zero,  I);
+				const auto      zero(nlconst::zero());
+				set_mat(zero, zero, -I, //
+						zero, zero, I);
 			}
 			else
 				m_t -= step;
 		}
 
 	protected:
-
 		NETLIB_RESETI()
 		{
-			NETLIB_NAME(two_terminal)::reset();
+			nld_two_terminal::reset();
 			const auto zero(nlconst::zero());
-			set_mat(zero, zero, -m_I(),
-					zero, zero,  m_I());
+			set_mat(zero, zero, -m_I(), //
+					zero, zero, m_I());
 		}
 
 		NETLIB_UPDATE_PARAMI()
 		{
-			// FIXME: We only need to update the net first if this is a time stepping net
-			//FIXME: works only for CS without function
-			change_state([this]()
-			{
-				const auto zero(nlconst::zero());
-				set_mat(zero, zero, -m_I(),
-						zero, zero,  m_I());
-			});
+			// FIXME: We only need to update the net first if this is a time
+			// stepping net
+			// FIXME: works only for CS without function
+			change_state(
+				[this]()
+				{
+					const auto zero(nlconst::zero());
+					set_mat(zero, zero, -m_I(), //
+							zero, zero, m_I());
+				});
 		}
 
 	private:
-		state_var<nl_fptype> m_t;
-		param_fp_t m_I;
-		param_str_t m_func;
+		state_var<nl_fptype>                  m_t;
+		param_fp_t                            m_I;
+		param_str_t                           m_func;
 		state_var<plib::pfunction<nl_fptype>> m_compiled;
-		std::vector<nl_fptype> m_funcparam;
+		std::vector<nl_fptype>                m_funcparam;
 	};
 
 } // namespace netlist::analog

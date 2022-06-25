@@ -1146,6 +1146,7 @@ masmario                        // (c) 2004 Capcom
 masmarios                       // (c) 2004 Capcom
 masmario2                       // (c) 2005 Capcom
 mmaruchan                       // (c) 2005 Capcom
+mmaruchana                      // (c) 2004 Capcom
 pingu                           // (c) 2006 The Pygos Group / Capcom
 wontame                         // (c) 2008 Capcom
 
@@ -2258,6 +2259,7 @@ spcrocks                        // J.Estevez        (c) 1981
 
 @source:astinvad.cpp
 astinvad                        // (c) 1980 Stern
+betafrce                        // bootleg
 kamikaze                        // (c) 1979 Leijac Corporation
 kosmokil                        // bootleg
 spaceint                        // [1980] Shoei
@@ -9514,6 +9516,7 @@ mineswpr4                       // [1977 Amutech]
 
 @source:blockch.cpp
 blockch
+tvgm8080
 
 @source:blockhl.cpp
 blockhl                         // GX973 (c) 1989
@@ -9555,6 +9558,7 @@ blueprnt                        // (c) 1982 Bally Midway (Zilec in ROM 3U, and t
 blueprntj                       // (c) 1982 Jaleco (Zilec in ROM 3U, and the programmer names)
 grasspin                        // (c) 1983 Jaleco (Zilec / Ashby programmer names in sound rom)
 saturnzi                        // (c) 1983 Jaleco (Zilec in ROM R6, and the programmer names)
+unkzilec                        // (c) 198? Exodis / Zilec
 
 @source:blw700i.cpp
 blw700i                         // (c) 1995 Brother
@@ -11805,6 +11809,7 @@ d6809                           //
 
 @source:d9final.cpp
 d9final                         // (c) 1992 Excellent System
+rpanic                          // (c) 1992 Excellent System / Jaleco
 
 @source:dacholer.cpp
 dacholer                        // (c) 1983
@@ -12777,6 +12782,9 @@ drumsta                         //
 @source:drw80pkr.cpp
 drw80pk2                        // (c) 1983 IGT
 drw80pkr                        // (c) 1982 IGT
+
+@source:ds90.cpp
+x37                             //
 
 @source:dsb46.cpp
 dsb46                           //
@@ -15404,8 +15412,9 @@ genmod                          // 1990 Myarc / Ron G. Walters Geneve 9640 Mod
 @source:geniusiq.cpp
 iq128                           // 1997 Genius IQ 128 (Germany)
 iq128_fr                        // 1997 Genius PC (France)
-iqtv512                         // IQ TV512 (Germany)
-itunlim                         // 199? IT Unlimited
+iqtv512                         // 1998 IQ TV512 (Germany)
+itunlim                         // 1998 IT Unlimited (UK)
+pcunlim                         // 1997 PC Unlimited (USA/Canada)
 
 @source:geniusjr.cpp
 gj4000                          // Genius Junior 4000 (Germany)
@@ -16110,45 +16119,46 @@ vegas                           //
 
 @source:gts3a.cpp
 andretti                        //
-andretti4                       //
+andretti0                       //
 barbwire                        //
 bighurt                         //
 brooks                          //
 cueball                         //
-cueball2                        //
-cueball3                        //
+cueballa                        //
+cueballb                        //
 freddy                          //
-freddy4                         //
+freddy3                         //
 gladiatp                        //
 mac_zois                        //
 rescu911                        //
-sfight2                         //
-sfight2a                        //
-sfight2b                        //
+sfightii                        //
+sfightiia                       //
+sfightiib                       //
 shaqattq                        //
 shaqattq2                       //
-smb                             //
-smb1                            //
-smb2                            //
-smb3                            //
+smbp                            //
+smbpa                           //
+smbpb                           //
+smbpc                           //
 smbmush                         //
 snspares                        //
 snspares1                       //
 snspares2                       //
 stargatp                        //
+stargatp0                       //
 stargatp1                       //
 stargatp2                       //
 stargatp3                       //
 stargatp4                       //
-stargatp5                       //
 teedoffp                        //
+teedoffp0                       //
 teedoffp1                       //
-teedoffp3                       //
 waterwld                        //
 waterwld2                       //
 wcsoccer                        //
-wcsoccerd2                      //
+wcsoccer1a                      //
 wipeout                         //
+wipeout2a                       //
 
 @source:gts80.cpp
 blckhole                        //
@@ -17915,6 +17925,7 @@ faeton                          //
 faeton6d                        //
 halley                          //
 halleya                         //
+halleyb                         //
 lortium                         //
 olympus                         //
 petacon                         //
@@ -19135,6 +19146,7 @@ j80wsprt2                       // Winsprint (JPM)
 j80wsprt3                       // Winsprint (JPM)
 
 @source:jpmsru.cpp
+j_cnudgr                        // Cash Nudger?
 j_dt                            // Double Top (JPM)
 j_dud                           // Nudge Double Up Deluxe (JPM)
 j_duda                          //
@@ -19143,9 +19155,11 @@ j_ewn                           // Each Way Nudger (JPM)
 j_ewna                          //
 j_ewnb                          //
 j_ewnc                          //
+j_ewnd                          //
 j_ews                           // Each Way Shuffle (JPM)
 j_ewsa                          //
 j_ewsb                          //
+j_ewsbl                         //
 j_ewsdlx                        // Each Way Shuffle Deluxe (CTL)
 j_goldn2                        // Golden 2's (CTL)
 j_la                            // Lucky Aces
@@ -20241,6 +20255,7 @@ lethalenux                      // GX191 (c) 1992
 cclownz                         // (c) 1999 LAI Games
 cfarm                           // (c) 1999 LAI Games
 eggventr                        // (c) 1997 The Game Room
+eggventr1                       // (c) 1997 The Game Room
 eggventr2                       // (c) 1997 The Game Room
 eggventr7                       // (c) 1997 The Game Room
 eggventr8                       // (c) 1997 The Game Room
@@ -24394,7 +24409,7 @@ m3xchngg                        // Exchanges Galore (Barcrest)
 m3xchngu                        // Exchanges Unlimited (Barcrest)
 m3xchngua                       //
 
-@source:mpu4.cpp
+@source:mpu4unsorted.cpp
 m4aao                           // Against All Odds (Eurotek)
 m4addrd                         //
 m4aliz                          // AlizBaz (Qps)
@@ -24408,7 +24423,6 @@ m4bigbena                       //
 m4bigbenb                       //
 m4bigbend                       //
 m4bigbene                       //
-m4blkbul                        // Black Bull (Barcrest)
 m4blkbuld                       //
 m4blkcat                        // Black Cat (Barcrest)
 m4blkgd                         // Black Gold (Gemini)
@@ -24421,18 +24435,7 @@ m4boltblb                       //
 m4boltblc                       //
 m4bonzbn                        // Bingo Bonanza (unknown)
 m4booze                         // Booze Cruise
-m4brnze                         // Bronze Voyage (unknown)
-m4brnzea                        //
-m4brnzeb                        //
-m4brook                         // Brooklyn (Barcrest)
-m4bucks                         // Bucks Fizz Club (Barcrest)
 m4c2                            // Circus Circus 2 (Nova)
-m4c9c                           // Cloud Nine Club (Barcrest)
-m4calicl                        // California Club (Barcrest)
-m4calicla                       //
-m4caliclb                       //
-m4caliclc                       //
-m4calicld                       //
 m4captb                         // Captain Bear
 m4casmul                        // Casino Multiplay (Barcrest)
 m4casot                         // Casino Old Timer (Barcrest)
@@ -24442,45 +24445,11 @@ m4ccop                          //
 m4ccopa                         //
 m4ccopb                         //
 m4ceptr                         // Ceptor (Barcrest)
-m4ch30                          // Unknown MPU4 'CH30' (Barcrest)
-m4chasei                        // Chase Invaders (Barcrest)
-m4chaseia                       //
-m4chaseib                       //
-m4chaseic                       //
-m4chaseid                       //
-m4chaseie                       //
-m4chaseif                       //
-m4chaseig                       //
-m4clbveg                        // Club Vegas (Barcrest)
-m4clbvega                       //
-m4clbvegb                       //
-m4clbvegc                       //
-m4clbx                          // Club X (Barcrest)
-m4clbxa                         //
-m4clbxb                         //
-m4cld02                         // Unknown MPU4 'CLD 0.2C'
 m4clr                           // MPU4 Meter Clear ROM
 m4coney                         // Coney Island (Qps)
-m4crjwl                         // Crown Jewels Club (Barcrest)
-m4crjwl2                        // Crown Jewels Mk II Club (Barcrest)
-m4crjwl2a                       //
-m4crjwl2b                       //
-m4crjwla                        //
-m4crjwlb                        //
-m4crjwlc                        //
 m4crzcav                        // Crazy Cavern (Nova)
 m4crzcsn                        // Crazy Casino (Nova)
 m4crzjk                         // Crazy Jokers (Barcrest)
-m4crzjwl                        // Crown Jewels (Barcrest)
-m4crzjwla                       //
-m4crzjwlb                       //
-m4crzjwlc                       //
-m4crzjwld                       //
-m4crzjwle                       //
-m4crzjwlf                       //
-m4crzjwlg                       //
-m4crzjwlh                       //
-m4czne                          // Cash Zone (Bwb)
 m4dblchn                        // Double Chance (DJE)
 m4ddb                           // Ding Dong Bells (Coinworld)
 m4ddba                          //
@@ -24491,14 +24460,11 @@ m4drac                          // Dracula (Barcrest - Nova)
 m4draca                         //
 m4dracb                         //
 m4dragon                        // Dragon (Nova)
+m4eaw51                         // Everyone's A Winner?
 m4esctbg                        // Escalera Tobogan (Vifico)
 m4esctbga                       //
 m4esctbgb                       //
 m4exgam                         // Extra Game (Fairplay - Barcrest)
-m4fortcb                        // Fortune Club (Barcrest)
-m4fortcba                       //
-m4fortcbb                       //
-m4fourmr                        // Four More (Bwb)
 m4frtgm                         // Fruit Game (Barcrest)
 m4fsx                           // Fun Spot X
 m4fsxa                          //
@@ -24512,16 +24478,8 @@ m4hapfrt                        // Happy Fruits (Coinworld)
 m4hapfrta                       //
 m4hapfrtb                       //
 m4hilonv                        // Hi Lo Casino (Nova)
-m4hirise                        // High Rise (Barcrest)
-m4hirisea                       //
-m4hiriseb                       //
-m4hirisec                       //
-m4hirised                       //
-m4hirisee                       //
 m4holdtm                        // Hold Timer (Barcrest)
-m4holywd                        // Hollywood (Bwb)
 m4hpyjok                        // Happy Joker (Barcrest)
-m4hslo                          // Unknown MPU4 'HOT 3.0'
 m4hstr                          // Happy Streak (Coinworld)
 m4hstra                         //
 m4hstrb                         //
@@ -24540,10 +24498,7 @@ m4jungja                        //
 m4jungjb                        //
 m4jungjc                        //
 m4kqclub                        // Kings & Queens Club (Newby)
-m4lazy                          // Lazy Bones (Bwb)
-m4lazya                         //
-m4lazyb                         //
-m4lineup                        // Line Up (Bwb - Barcrest)
+m4lineup                        // Line Up (BWB - Barcrest)
 m4lineupa                       //
 m4luck7                         // Lucky 7 (Barcrest)
 m4luckdv                        // Lucky Devil (Barcrest) [Czech]
@@ -24558,25 +24513,15 @@ m4luckwbf                       //
 m4magdrg                        // Magic Dragon (Barcrest)
 m4maglin                        // Magic Liner (Barcrest)
 m4magrep                        // Magic Replay DeLuxe (Barcrest)
-m4magtbo                        // Magic Turbo
 m4matdr                         // Matador (unknown)
 m4mgpn                          // Monaco Grand Prix (Nova)
 m4nile                          // Nile Jewels (Barcrest)
 m4nod                           //
-m4nspot                         // Night Spot Club (Barcrest)
-m4nspota                        //
-m4nspotb                        //
-m4nudshf                        // Nudge Shuffle (Barcrest)
-m4nudshfa                       //
-m4nudshfb                       //
-m4nudshfc                       //
 m4octo                          // Octopus (Nova)
 m4oldtmr                        // Old Timer (Barcrest)
 m4ordmnd                        // Oriental Diamonds (Barcrest)
 m4prem                          // Premier (Barcrest)
-m4ptblkc                        // Pot Black Casino (Bwb - Barcrest)
 m4rdht                          // Red Heat (Barcrest)
-m4reeltm                        // Reel Timer (Barcrest)
 m4remag                         // Unknown MPU4 'ZTP 0.7'
 m4ringfr                        // Ring Of Fire (Barcrest)
 m4riotrp                        // Rio Tropico (unknown)
@@ -24595,33 +24540,16 @@ m4sbxe                          //
 m4sctagt                        // Secret Agent (Nova)
 m4showtm                        // Show Timer (Barcrest)
 m4snookr                        // Snooker (Eurocoin)
-m4specu                         // Speculator Club (Bwb)
+m4specu                         // Speculator Club (BWB)
 m4spotln                        // Spotlight (Nova)
 m4stakex                        // Stake X (Leisurama)
 m4stakexa                       // Stake X (Leisurama)
 m4stand2                        // Stand To Deliver (DJE)
 m4steptm                        // Step Timer (Barcrest)
-m4sunclb                        // Sun Club (Bwb)
-m4sunclba                       //
 m4sunday                        // Sunday Sport
-m4sunscl                        // Sunset Club (Bwb)
-m4sunscla                       //
-m4sunsclb                       //
-m4sunseta                       //
-m4sunsetb                       //
-m4sunsetc                       //
-m4supbf                         // Super Bucks Fizz Club (Barcrest)
-m4supbfa                        //
-m4supbjc                        // Super Blackjack Club (Barcrest)
-m4supbjca                       //
-m4supbjcb                       //
-m4supbjcc                       //
-m4supbjcd                       //
 m4surf                          // Super Surfin' (Gemini)
 m4surfa                         //
 m4surfb                         //
-m4t266                          // Unknown MPU4 'TTO 1.1'
-m4take5                         // Take 5 (Barcrest)
 m4tbplay                        // Turbo Play (Barcrest)
 m4tbplaya                       //
 m4tbplayb                       //
@@ -24629,26 +24557,16 @@ m4techno                        // Techno Reel (Barcrest)
 m4technoa                       //
 m4toma                          // Tomahawk (Barcrest)
 m4topdk                         // Top Deck (Barcrest)
-m4toprn                         // Top Run (Barcrest)
 m4toptim                        // Top Timer (Barcrest)
 m4toptima                       //
 m4treel                         //
 m4treela                        //
-m4tropcl                        // Tropicana Club (Barcrest)
-m4tropcla                       //
-m4tropclb                       //
-m4tropclc                       //
-m4tropcld                       //
 m4tst2                          // MPU4 Unit Test (Program 2)
 m4twintm                        // Twin Timer (Barcrest)
 m4twist                         // Twist Again (Barcrest)
 m4twista                        //
 m4twistb                        //
 m4univ                          // Universe (Barcrest)
-m4unkjok                        // Unknown MPU4 'Joker'
-m4unkjoka                       //
-m4unkjokb                       //
-m4unkjokc                       //
 m4vegastg                       //
 m4vivalvd                       //
 m4vivan                         // Viva Las Vegas (Nova)
@@ -25161,18 +25079,17 @@ m4trg__y                        //
 m4trg__z                        //
 
 @source:mpu4bwb.cpp
-m4abra                          // Abracadabra (Bwb)
+m4abra                          // Abracadabra (BWB)
 m4abra__a                       //
 m4abra__b                       //
 m4abra__c                       //
-m4bigmt                         // The Big Match (Bwb)
+m4bigmt                         // The Big Match (BWB)
 m4bigmt__a                      //
 m4bigmt__b                      //
 m4bigmt__c                      //
 m4bigmt__d                      //
-m4bigmt__e                      //
 m4bigmt__f                      //
-m4bingbl                        // Bingo Belle (Bwb)
+m4bingbl                        // Bingo Belle (BWB)
 m4bingbl__a                     //
 m4bingbl__b                     //
 m4bingbl__c                     //
@@ -25180,17 +25097,17 @@ m4bingbl__d                     //
 m4bingbl__e                     //
 m4bingbl__f                     //
 m4bingbl__g                     //
-m4bingbs                        // Bingo Belle Showcase (Bwb)
+m4bingbs                        // Bingo Belle Showcase (BWB)
 m4bingbs__a                     //
 m4bingbs__b                     //
 m4bingbs__c                     //
 m4bingbs__d                     //
 m4bingbs__e                     //
 m4bingbs__f                     //
-m4bingcl                        // Bingo Club (Bwb)
+m4bingcl                        // Bingo Club (BWB)
 m4bingcl__a                     //
 m4bingcl__b                     //
-m4blsbys                        // Blues Boys (Bwb)
+m4blsbys                        // Blues Boys (BWB)
 m4blsbys__0                     //
 m4blsbys__1                     //
 m4blsbys__2                     //
@@ -25234,7 +25151,7 @@ m4blsbys__z                     //
 m4bluesn                        // Blues Boys (Nova)
 m4cfinln                        // Cup Final (Nova)
 m4cfinln__a                     //
-m4cpfinl                        // Cup Final (Bwb)
+m4cpfinl                        // Cup Final (BWB)
 m4cpfinl__a                     //
 m4cpfinl__b                     //
 m4cpfinl__c                     //
@@ -25246,7 +25163,7 @@ m4cpfinl__h                     //
 m4cpfinl__i                     //
 m4cpfinl__j                     //
 m4cpfinl__k                     //
-m4csoc                          // Championship Soccer (Bwb)
+m4csoc                          // Championship Soccer (BWB)
 m4csoc__a                       //
 m4csoc__b                       //
 m4csoc__c                       //
@@ -25257,7 +25174,7 @@ m4csoc__g                       //
 m4csoc__h                       //
 m4csoc__i                       //
 m4csoc__j                       //
-m4danced                        // Dancing Diamonds (Bwb)
+m4danced                        // Dancing Diamonds (BWB)
 m4danced__a                     //
 m4danced__b                     //
 m4danced__c                     //
@@ -25281,7 +25198,7 @@ m4danced__t                     //
 m4danced__u                     //
 m4danced__v                     //
 m4danced__w                     //
-m4daytn                         // Daytona (Bwb)
+m4daytn                         // Daytona (BWB)
 m4daytn__a                      //
 m4daytn__b                      //
 m4daytn__c                      //
@@ -25296,7 +25213,7 @@ m4daytn__k                      //
 m4daytn__l                      //
 m4daytn__m                      //
 m4daytn__n                      //
-m4excal                         // Excalibur (Bwb)
+m4excal                         // Excalibur (BWB)
 m4excal__a                      //
 m4excal__b                      //
 m4excal__c                      //
@@ -25309,13 +25226,13 @@ m4excal__i                      //
 m4excal__j                      //
 m4excaln                        // Excalibur (Nova)
 m4excaln__a                     //
-m4exotic                        // Exotic Fruits (Bwb)
+m4exotic                        // Exotic Fruits (BWB)
 m4exotic__a                     //
 m4exotic__b                     //
 m4exotic__c                     //
 m4exotic__d                     //
 m4exotic__e                     //
-m4firice                        // Fire & Ice (Bwb)
+m4firice                        // Fire & Ice (BWB)
 m4firice__a                     //
 m4firice__b                     //
 m4firice__c                     //
@@ -25327,7 +25244,7 @@ m4firice__h                     //
 m4firice__i                     //
 m4firice__j                     //
 m4ftladn                        // Find the Lady (Nova)
-m4harle                         // Harlequin (Bwb)
+m4harle                         // Harlequin (BWB)
 m4harle__a                      //
 m4harle__b                      //
 m4harle__c                      //
@@ -25352,7 +25269,7 @@ m4harle__u                      //
 m4harle__v                      //
 m4harle__w                      //
 m4harle__x                      //
-m4hvhel                         // Heaven & Hell (Bwb)
+m4hvhel                         // Heaven & Hell (BWB)
 m4hvhel__a                      //
 m4hvhel__b                      //
 m4hvhel__c                      //
@@ -25361,19 +25278,19 @@ m4hvhel__e                      //
 m4hvhel__f                      //
 m4hvhel__g                      //
 m4hvhel__h                      //
-m4indycr                        // Indy Cars (Bwb)
+m4indycr                        // Indy Cars (BWB)
 m4indycr__a                     //
 m4indycr__b                     //
 m4indycr__c                     //
 m4indycr__d                     //
 m4indycr__e                     //
 m4indycr__f                     //
-m4jakjok                        // Jackpot Jokers (Bwb)
+m4jakjok                        // Jackpot Jokers (BWB)
 m4jakjok__a                     //
 m4jakjok__b                     //
 m4jakjok__c                     //
 m4jakjoka                       //
-m4jflash                        // Jumping Jack Flash (Bwb)
+m4jflash                        // Jumping Jack Flash (BWB)
 m4jflash__a                     //
 m4jflash__b                     //
 m4jflash__c                     //
@@ -25383,12 +25300,12 @@ m4jflash__f                     //
 m4jflash__g                     //
 m4jflash__h                     //
 m4jflash__i                     //
-m4ln7                           // Lucky No7 (Bwb)
+m4ln7                           // Lucky No7 (BWB)
 m4ln7__a                        //
 m4ln7__b                        //
 m4ln7__c                        //
 m4ln7__d                        //
-m4madmnc                        // Mad Money Classic (Bwb)
+m4madmnc                        // Mad Money Classic (BWB)
 m4madmnc__a                     //
 m4madmnc__b                     //
 m4madmnc__c                     //
@@ -25412,7 +25329,7 @@ m4madmnc__t                     //
 m4madmnc__u                     //
 m4madmnc__v                     //
 m4madmnc__w                     //
-m4madmon                        // Mad Money (Bwb)
+m4madmon                        // Mad Money (BWB)
 m4madmon__a                     //
 m4madmon__b                     //
 m4madmon__c                     //
@@ -25424,7 +25341,7 @@ m4madmon__h                     //
 m4madmon__i                     //
 m4madmon__j                     //
 m4madmon__k                     //
-m4mmm                           // Money Mummy Money (Bwb)
+m4mmm                           // Money Mummy Money (BWB)
 m4mmm__a                        //
 m4mmm__b                        //
 m4mmm__c                        //
@@ -25433,7 +25350,7 @@ m4mmm__e                        //
 m4mmm__f                        //
 m4olygn                         // Olympic Gold (Nova)
 m4olygn__a                      //
-m4orland                        // Orlando Magic (Bwb)
+m4orland                        // Orlando Magic (BWB)
 m4orland__a                     //
 m4orland__b                     //
 m4orland__c                     //
@@ -25442,26 +25359,26 @@ m4orland__e                     //
 m4orland__f                     //
 m4orland__g                     //
 m4orland__h                     //
-m4pzbing                        // Prize Bingo (Bwb)
+m4pzbing                        // Prize Bingo (BWB)
 m4pzbing__a                     //
 m4pzbing__b                     //
 m4pzbing__c                     //
 m4pzbing__d                     //
 m4pzbing__e                     //
-m4quidin                        // Quids In (Bwb)
+m4quidin                        // Quids In (BWB)
 m4quidin__a                     //
 m4quidin__b                     //
-m4quidis                        // Quids In Showcase (Bwb)
+m4quidis                        // Quids In Showcase (BWB)
 m4quidis__a                     //
 m4quidis__b                     //
 m4quidis__c                     //
 m4quidis__d                     //
-m4rackem                        // Rack Em Up (Bwb)
+m4rackem                        // Rack Em Up (BWB)
 m4rackem__a                     //
 m4rackem__b                     //
 m4rackem__c                     //
 m4rackem__d                     //
-m4rbgold                        // Rainbow Gold (Bwb)
+m4rbgold                        // Rainbow Gold (BWB)
 m4rbgold__a                     //
 m4rbgold__b                     //
 m4rbgold__c                     //
@@ -25479,12 +25396,12 @@ m4rbgold__n                     //
 m4rbgold__o                     //
 m4rbgold__p                     //
 m4rbgold__q                     //
-m4rhfev                         // Red Hot Fever (Bwb)
+m4rhfev                         // Red Hot Fever (BWB)
 m4rhfev__a                      //
 m4rhfev__b                      //
 m4rhfev__c                      //
 m4rhfev__d                      //
-m4sinbd                         // Sinbad (Bwb)
+m4sinbd                         // Sinbad (BWB)
 m4sinbd__a                      //
 m4sinbd__b                      //
 m4sinbd__c                      //
@@ -25516,19 +25433,19 @@ m4sinbdn__c                     //
 m4sinbdn__d                     //
 m4sinbdn__e                     //
 m4sinbdn__f                     //
-m4sky                           // Sky Sports (Bwb)
+m4sky                           // Sky Sports (BWB)
 m4sky__a                        //
 m4sky__b                        //
 m4sky__c                        //
 m4sky__d                        //
-m4souls                         // Soul Sister (Bwb)
+m4souls                         // Soul Sister (BWB)
 m4souls__a                      //
 m4souls__b                      //
 m4souls__c                      //
 m4souls__d                      //
 m4souls__e                      //
 m4souls__f                      //
-m4spinbt                        // Spin The Bottle (Bwb)
+m4spinbt                        // Spin The Bottle (BWB)
 m4spinbt__a                     //
 m4spinbt__b                     //
 m4spinbt__c                     //
@@ -25536,7 +25453,7 @@ m4spinbt__d                     //
 m4spinbt__e                     //
 m4spinbt__f                     //
 m4spinbt__g                     //
-m4starst                        // Stars & Stripes (Bwb)
+m4starst                        // Stars & Stripes (BWB)
 m4starst__a                     //
 m4starst__b                     //
 m4starst__c                     //
@@ -25547,13 +25464,13 @@ m4starst__g                     //
 m4starst__h                     //
 m4starst__i                     //
 m4starst__j                     //
-m4supleg                        // Super League (Bwb)
+m4supleg                        // Super League (BWB)
 m4supleg__a                     //
 m4supleg__b                     //
 m4supleg__c                     //
 m4supleg__d                     //
 m4suplegw                       //
-m4supscr                        // Super Soccer (Bwb)
+m4supscr                        // Super Soccer (BWB)
 m4supscr__a                     //
 m4supscr__b                     //
 m4supscr__c                     //
@@ -25568,11 +25485,11 @@ m4supscr__k                     //
 m4supscr__l                     //
 m4supscr__m                     //
 m4supscr__n                     //
-m4sure                          // Sure Thing (Bwb)
+m4sure                          // Sure Thing (BWB)
 m4sure__a                       //
 m4sure__b                       //
 m4sure__c                       //
-m4trex                          // Trex (Bwb)
+m4trex                          // Trex (BWB)
 m4trex__a                       //
 m4trex__b                       //
 m4trex__c                       //
@@ -25585,12 +25502,23 @@ m4trex__i                       //
 m4trex__j                       //
 m4trex__k                       //
 m4trex__l                       //
-m4vdexpr                        // Voodoo Express (Bwb)
+m4tutbwb                        //
+m4tutbwb_a                      //
+m4tutbwb_b                      //
+m4tutbwb_c                      //
+m4tutbwb_d                      //
+m4tutbwb_e                      //
+m4tutbwb_f                      //
+m4tutbwb_g                      //
+m4tutbwb_h                      //
+m4tutbwb_i                      //
+m4tutbwb_j                      //
+m4vdexpr                        // Voodoo Express (BWB)
 m4vdexpr__a                     //
 m4vdexpr__b                     //
 m4vdexpr__c                     //
 m4vdexpr__d                     //
-m4volcan                        // Volcano (Bwb)
+m4volcan                        // Volcano (BWB)
 m4volcan__a                     //
 m4volcan__b                     //
 m4volcan__c                     //
@@ -25599,7 +25527,7 @@ m4volcan__e                     //
 m4volcan__f                     //
 m4volcan__g                     //
 m4wcnov                         // World Cup (Nova)
-m4xch                           // X-change (Bwb)
+m4xch                           // X-change (BWB)
 m4xch__a                        //
 m4xch__b                        //
 m4xch__c                        //
@@ -25611,14 +25539,14 @@ m4xch__h                        //
 m4xch__i                        //
 m4xch__j                        //
 m4xch__k                        //
-m4xs                            // X-s (Bwb)
+m4xs                            // X-s (BWB)
 m4xs__a                         //
 m4xs__b                         //
 m4xs__c                         //
 m4xs__d                         //
 m4xs__e                         //
 m4xs__f                         //
-m4xtrm                          // X-treme (Bwb)
+m4xtrm                          // X-treme (BWB)
 m4xtrm__a                       //
 m4xtrm__b                       //
 
@@ -26090,12 +26018,13 @@ m4bjacka                        //
 m4bjc                           // Black Jack Club (Barcrest) [Dutch]
 m4bjsm                          // Blackjack Super Multi (Barcrest)
 m4bjsma                         //
-m4blflsh                        // Blue Flash (Bwb)
+m4blflsh                        // Blue Flash (BWB)
 m4blflsha                       //
 m4blflshb                       //
 m4blflshc                       //
 m4blflshd                       //
 m4blflshe                       //
+m4blkbul                        // Super Play (Barcrest)
 m4blstbk                        // Blast A Bank (Barcrest)
 m4bluemn                        // Blue Moon (Barcrest)
 m4bluemna                       //
@@ -26108,6 +26037,14 @@ m4c999                          // Cloud 999 (Barcrest)
 m4c999a                         //
 m4c999b                         //
 m4c999c                         //
+m4c999d                         //
+m4c999e                         //
+m4c999f                         //
+m4c999g                         //
+m4c999h                         //
+m4c999i                         //
+m4c999j                         //
+m4c9c                           // Cloud Nine Club (Barcrest)
 m4cardcs                        // Card Cash (Barcrest)
 m4cashcn                        // Cash Connect (Barcrest)
 m4cashco                        // Cash Counter (Barcrest)
@@ -26119,9 +26056,9 @@ m4cashmx                        // Cash Matrix (Barcrest)
 m4cashmxa                       //
 m4cashzn                        // Cash Zone (Barcrest)
 m4cashzna                       //
+m4czne                          // Cash Zone (BWB)
 m4celclb                        // Celebration Club (Barcrest)
 m4centpt                        // Centrepoint (Barcrest)
-m4centpta                       // Centrepoint (Barcrest)
 m4cheryo                        // Cherryo (Barcrest)
 m4class                         // First Class (Barcrest)
 m4classa                        //
@@ -26156,7 +26093,7 @@ m4exlin                         // Extra Lines (Pcp)
 m4exlina                        //
 m4exprs                         // Express (Barcrest)
 m4flash                         // Flash Cash (Barcrest)
-m4flshlt                        // Flashlite (Bwb)
+m4flshlt                        // Flashlite (BWB)
 m4flshlta                       //
 m4flshltb                       //
 m4flshltc                       //
@@ -26164,6 +26101,7 @@ m4flshltd                       //
 m4flshlte                       //
 m4flshltf                       //
 m4flshltg                       //
+m4fourmr                        // Four More (BWB)
 m4frcrak                        // Fruit Cracker
 m4frtfl                         // Fruit Full (Barcrest)
 m4frtfla                        //
@@ -26174,15 +26112,23 @@ m4frtprs                        // Fruit Preserve (Barcrest)
 m4frtprsa                       //
 m4giant                         // Giant (Barcrest)
 m4gldstr                        // Gold Strike (Barcrest)
+m4graffd                        // Graffiti (Dutch) (Barcrest)
 m4grands                        // Grandstand Club (Barcrest)
 m4grandsa                       //
 m4grbbnk                        // Grab The Bank (Barcrest)
 m4grbbnka                       //
 m4grbbnkb                       //
+m4hirise                        // High Rise (Barcrest)
+m4hirisea                       //
+m4hiriseb                       //
+m4hirisec                       //
+m4hirised                       //
+m4hirisee                       //
 m4hiroll                        // High Roller (Barcrest)
 m4hittp2                        //
 m4hittp2a                       //
 m4holdon                        // Hold On (Barcrest)
+m4holywd                        // Hollywood (BWB)
 m4intcep                        // Interceptor (Barcrest)
 m4intcepa                       //
 m4intcepb                       //
@@ -26221,6 +26167,27 @@ m4nicke                         //
 m4nifty                         // Nifty Fifty (Barcrest)
 m4niftya                        //
 m4niftyb                        //
+m4nnww2                         // Nudge Nudge Wink Wink
+m4nnww2__a                      //
+m4nnww2__b                      //
+m4nnww2__c                      //
+m4nnww2__d                      //
+m4nnww2__e                      //
+m4nnww2__f                      //
+m4nnww2__g                      //
+m4nnww2__h                      //
+m4nnww2__i                      //
+m4nnww2__j                      //
+m4nnww2__k                      //
+m4nnww2__l                      //
+m4nnww2__m                      //
+m4nnww2__n                      //
+m4nnww2__o                      //
+m4nnww2__hx1                    //
+m4nnww2__hx2                    //
+m4nnww2__hx3                    //
+m4nnww2__hx4                    //
+m4nnww2__hx5                    //
 m4nudqst                        // Nudge Quest (Barcrest)
 m4nudup                         // Nudge Up (Barcrest)
 m4num1                          // Number One (Barcrest)
@@ -26232,6 +26199,7 @@ m4potlck                        // Pot Luck Club (Barcrest)
 m4potlcka                       //
 m4r2r                           // Reel 2 Reel (Barcrest)
 m4randr                         // Random Roulette (Barcrest)
+m4redunk                        // unknown RED
 m4reelpk                        // Reel Poker (Barcrest)
 m4rsg                           // Ready Steady Go (Barcrest) (type 1)
 m4rsga                          //
@@ -26255,7 +26223,10 @@ m4stakeua                       //
 m4starbr                        // Stars And Bars (Barcrest)
 m4stards                        // Stardust (Barcrest)
 m4stopcl                        // Stop the Clock (Barcrest)
+m4sunclb                        // Sun Club (BWB)
+m4sunclba                       //
 m4sunset                        // Sunset Boulevard (Barcrest)
+m4sunsetc                       //
 m4sunsetd                       //
 m4sunsete                       //
 m4sunsetf                       //
@@ -26286,10 +26257,12 @@ m4suptub                        // Super Tubes (Barcrest)
 m4suptuba                       //
 m4suptwo                        // Super Two (Barcrest)
 m4swpnot                        // Swap-A-Note (Barcrest)
-m4swpnota                       // Swap-A-Note (Barcrest)
+m4swpnota                       //
+m4swpnotb                       //
 m4taj                           // Taj Mahal (Barcrest)
 m4take2                         // Take Two (Barcrest)
 m4take2a                        //
+m4t266                          // Unknown MPU4 'TTO 1.1'
 m4tbreel                        // Turbo Reel (Barcrest)
 m4tbrldx                        // Turbo Reel Deluxe (Barcrest)
 m4thehit                        // The Hit (Barcrest)
@@ -26298,6 +26271,7 @@ m4topact                        // Top Action (Barcrest)
 m4topacta                       //
 m4topgr                         // Top Gear (Barcrest)
 m4toplot                        // Top The Lot (Barcrest)
+m4toprn                         // Top Run (unknown)
 m4topst                         // Top Stop (Barcrest)
 m4toptak                        // Top Take (Barcrest)
 m4toptena                       //
@@ -26307,306 +26281,15 @@ m4tridic                        // Triple Dice (Barcrest)
 m4ttak                          // Tic Tac Take (unknown)
 m4tupen                         // Tuppenny Cracker (Barcrest - Bootleg)
 m4twilgt                        // Twilight (Barcrest)
+m4unkjok                        // Unknown MPU4 'Joker'
+m4unkjoka                       //
+m4unkjokb                       //
+m4unkjokc                       //
 m4wayin                         // Way In (Barcrest)
 m4wayina                        //
 m4wildms                        // Wild Mystery (Barcrest)
 
-@source:mpu4mod4yam.cpp
-m4acechs                        // Ace Chase (Bwb)
-m4acechs__a                     //
-m4acechs__b                     //
-m4acechs__c                     //
-m4acechs__d                     //
-m4acechs__e                     //
-m4acechs__f                     //
-m4acechs__g                     //
-m4acechs__h                     //
-m4acechs__i                     //
-m4acechs__j                     //
-m4acechs__k                     //
-m4acechs__l                     //
-m4acechs__m                     //
-m4acechs__n                     //
-m4acechs__o                     //
-m4acechs__p                     //
-m4acechs__q                     //
-m4acechs__r                     //
-m4acechs__s                     //
-m4acechs__t                     //
-m4acechs__u                     //
-m4clbshf                        // Club Shuffle (Barcrest)
-m4cojok                         // Carry On Joker (Barcrest)
-m4cojok__a                      //
-m4cojok__b                      //
-m4cojok__c                      //
-m4cojok__d                      //
-m4cojok__e                      //
-m4cojok__f                      //
-m4fastfw                        // Fast Forward (Barcrest - Bwb)
-m4fastfw__a                     //
-m4fastfw__b                     //
-m4fastfw__c                     //
-m4fastfw__d                     //
-m4fastfw__e                     //
-m4fastfw__f                     //
-m4gambal                        // Gamball (Barcrest)
-m4gambal__a                     //
-m4gambal__b                     //
-m4gambal__c                     //
-m4graff                         // Graffiti (Barcrest)
-m4graff__a                      //
-m4graff__b                      //
-m4graffd                        //
-m4joljokd                       //
-m4monte                         // Monte Carlo (Barcrest)
-m4monte__a                      //
-m4monte__b                      //
-m4monte__c                      //
-m4monte__d                      //
-m4monte__e                      //
-m4monte__f                      //
-m4monte__g                      //
-m4monte__h                      //
-m4monte__i                      //
-m4monte__j                      //
-m4monte__k                      //
-m4monte__l                      //
-m4monte__m                      //
-m4montez
-m4monteza
-m4montezb
-m4montezc
-m4montezd
-m4monteze
-m4montezf
-m4montezg
-m4montezh
-m4montezi
-m4montezj
-m4nudbnk                        // Nudge Banker (Barcrest)
-m4nudbnk__a                     //
-m4nudbnk__b                     //
-m4nudbnk__c                     //
-m4nudbnk__d                     //
-m4przmc                         // Prize Monte Carlo (Barcrest)
-m4przmc__a                      //
-m4przmc__b                      //
-m4przmc__c                      //
-m4przmc__d                      //
-m4przmc__e                      //
-m4przmc__f                      //
-m4przsss                        // Prize Spend Spend Spend (Barcrest)
-m4przsss__0                     //
-m4przsss__a                     //
-m4przsss__b                     //
-m4przsss__c                     //
-m4przsss__d                     //
-m4przsss__e                     //
-m4przsss__f                     //
-m4przsss__g                     //
-m4przsss__h                     //
-m4przsss__i                     //
-m4przsss__j                     //
-m4przsss__k                     //
-m4przsss__l                     //
-m4przsss__m                     //
-m4przsss__n                     //
-m4przsss__o                     //
-m4przsss__p                     //
-m4przsss__q                     //
-m4przsss__r                     //
-m4przsss__s                     //
-m4przsss__t                     //
-m4przsss__u                     //
-m4przsss__v                     //
-m4przsss__w                     //
-m4przsss__x                     //
-m4przsss__y                     //
-m4przsss__z                     //
-m4ra                            // Red Alert (Barcrest)
-m4ra__a                         //
-m4ra__b                         //
-m4ra__c                         //
-m4ra__d                         //
-m4ra__e                         //
-m4ra__f                         //
-m4ra__g                         //
-m4ra__h                         //
-m4ra__i                         //
-m4ra__j                         //
-m4ra__k                         //
-m4ra__l                         //
-m4ra__m                         //
-m4ra__n                         //
-m4ra__o                         //
-m4ra__p                         //
-m4ra__q                         //
-m4ra__r                         //
-m4sayno                         // Say No More (Barcrest)
-m4sayno__a                      //
-m4sayno__b                      //
-m4sayno__c                      //
-m4sayno__d                      //
-m4sss                           // Spend Spend Spend (Barcrest)
-m4sss__a                        //
-m4sss__b                        //
-m4sss__c                        //
-m4sss__d                        //
-m4sss__e                        //
-m4sss__f                        //
-m4sss__g                        //
-m4sss__h                        //
-m4sss__i                        //
-m4sss__j                        //
-m4sss__k                        //
-m4sss__l                        //
-m4sstrek                        // Super Streak (bootleg)
-m4stc                           // Unknown MPU4 'STC 0.1' (Barcrest)
-m4supst                         // Super Streak (Barcrest)
-m4supst__0                      //
-m4supst__1                      //
-m4supst__2                      //
-m4supst__3                      //
-m4supst__4                      //
-m4supst__5                      //
-m4supst__6                      //
-m4supst__7                      //
-m4supst__8                      //
-m4supst__9                      //
-m4supst__a                      //
-m4supst__a0                     //
-m4supst__a1                     //
-m4supst__a2                     //
-m4supst__a3                     //
-m4supst__a4                     //
-m4supst__a5                     //
-m4supst__a6                     //
-m4supst__a7                     //
-m4supst__a8                     //
-m4supst__a9                     //
-m4supst__aa                     //
-m4supst__ab                     //
-m4supst__ac                     //
-m4supst__ad                     //
-m4supst__ae                     //
-m4supst__af                     //
-m4supst__ag                     //
-m4supst__ah                     //
-m4supst__ai                     //
-m4supst__aj                     //
-m4supst__ak                     //
-m4supst__al                     //
-m4supst__am                     //
-m4supst__an                     //
-m4supst__ao                     //
-m4supst__ap                     //
-m4supst__aq                     //
-m4supst__ar                     //
-m4supst__as                     //
-m4supst__at                     //
-m4supst__au                     //
-m4supst__av                     //
-m4supst__aw                     //
-m4supst__ax                     //
-m4supst__ay                     //
-m4supst__az                     //
-m4supst__b                      //
-m4supst__b0                     //
-m4supst__b1                     //
-m4supst__b2                     //
-m4supst__b3                     //
-m4supst__b4                     //
-m4supst__b5                     //
-m4supst__ba                     //
-m4supst__bb                     //
-m4supst__bc                     //
-m4supst__bd                     //
-m4supst__be                     //
-m4supst__bf                     //
-m4supst__bg                     //
-m4supst__bh                     //
-m4supst__bi                     //
-m4supst__bj                     //
-m4supst__bk                     //
-m4supst__bl                     //
-m4supst__bm                     //
-m4supst__bn                     //
-m4supst__bo                     //
-m4supst__bp                     //
-m4supst__bq                     //
-m4supst__br                     //
-m4supst__bs                     //
-m4supst__bt                     //
-m4supst__bu                     //
-m4supst__bv                     //
-m4supst__bw                     //
-m4supst__bx                     //
-m4supst__by                     //
-m4supst__bz                     //
-m4supst__c                      //
-m4supst__d                      //
-m4supst__e                      //
-m4supst__f                      //
-m4supst__g                      //
-m4supst__h                      //
-m4supst__i                      //
-m4supst__j                      //
-m4supst__k                      //
-m4supst__l                      //
-m4supst__m                      //
-m4supst__n                      //
-m4supst__o                      //
-m4supst__p                      //
-m4supst__q                      //
-m4supst__r                      //
-m4supst__s                      //
-m4supst__t                      //
-m4supst__u                      //
-m4supst__v                      //
-m4supst__w                      //
-m4supst__x                      //
-m4supst__y                      //
-m4supst__z                      //
-m4tst                           // MPU4 Unit Test (Program 4)
-m4vivalv                        // Viva Las Vegas (Barcrest)
-m4vivalv__0                     //
-m4vivalv__1                     //
-m4vivalv__2                     //
-m4vivalv__3                     //
-m4vivalv__4                     //
-m4vivalv__5                     //
-m4vivalv__6                     //
-m4vivalv__7                     //
-m4vivalv__8                     //
-m4vivalv__9                     //
-m4vivalv__a                     //
-m4vivalv__b                     //
-m4vivalv__c                     //
-m4vivalv__e                     //
-m4vivalv__f                     //
-m4vivalv__g                     //
-m4vivalv__h                     //
-m4vivalv__i                     //
-m4vivalv__j                     //
-m4vivalv__k                     //
-m4vivalv__l                     //
-m4vivalv__m                     //
-m4vivalv__n                     //
-m4vivalv__o                     //
-m4vivalv__p                     //
-m4vivalv__q                     //
-m4vivalv__r                     //
-m4vivalv__s                     //
-m4vivalv__t                     //
-m4vivalv__u                     //
-m4vivalv__v                     //
-m4vivalv__w                     //
-m4vivalv__x                     //
-m4vivalv__y                     //
-m4vivalv__z                     //
-m4voodoo                        // Voodoo 1000 (Barcrest)
-
-@source:mpu4sw.cpp
+@source:mpu4mod4oki.cpp
 m4actbnk                        // Action Bank (Barcrest)
 m4actbnk__a                     //
 m4actbnk__b                     //
@@ -26617,70 +26300,6 @@ m4actbnk__f                     //
 m4actbnk__g                     //
 m4actbnk__h                     //
 m4actbnk__i                     //
-m4addr                          // Adders & Ladders (Barcrest)
-m4addr_h1                       //
-m4addr_h2                       //
-m4addr10                        //
-m4addr10_a                      //
-m4addr10c                       //
-m4addr10c_a                     //
-m4addr10d                       //
-m4addr10d_a                     //
-m4addr10yd                      //
-m4addr10yd_a                    //
-m4addr3                         //
-m4addr3_a                       //
-m4addr3_b                       //
-m4addr3_c                       //
-m4addr3_d                       //
-m4addr3d                        //
-m4addr3d_a                      //
-m4addr3d_b                      //
-m4addr3d_c                      //
-m4addr3yd                       //
-m4addr3yd_a                     //
-m4addr3yd_b                     //
-m4addr3yd_c                     //
-m4addr4                         //
-m4addr4_a                       //
-m4addr4c                        //
-m4addr4c_a                      //
-m4addr4c_b                      //
-m4addr4d                        //
-m4addr4yd                       //
-m4addr5                         //
-m4addr5_a                       //
-m4addr5c                        //
-m4addr5c_a                      //
-m4addr5d                        //
-m4addr5d_a                      //
-m4addr5yd                       //
-m4addr5yd_a                     //
-m4addr6lc                       //
-m4addr6ld                       //
-m4addr6lk                       //
-m4addr6ly                       //
-m4addr6lybd                     //
-m4addr6lyd                      //
-m4addrc                         // Adders & Ladders Classic (Barcrest)
-m4addrc__a                      //
-m4addrc__b                      //
-m4addrc__c                      //
-m4addrc__d                      //
-m4addrc__e                      //
-m4addrc__f                      //
-m4addrc__h                      //
-m4addrc__i                      //
-m4addrc__j                      //
-m4addrc__k                      //
-m4addrc__l                      //
-m4addrc__m                      //
-m4addrc__n                      //
-m4addrcc                        // Adders & Ladders Classic Club (Barcrest)
-m4addrcc__a                     //
-m4addrcc__b                     //
-m4addrcc__c                     //
-m4addrcc__d                     //
 m4andybt                        // Andy's Big Time Club (Barcrest)
 m4andybt__a                     //
 m4andybt__b                     //
@@ -27066,6 +26685,10 @@ m4bnkrol__b                     //
 m4bnkrol__c                     //
 m4bnkrol__d                     //
 m4bnkrol__e                     //
+m4brnze                         // Bronze Voyage (unknown)
+m4brnzea                        //
+m4brnzeb                        //
+m4brook                         // Brooklyn (Barcrest)
 m4buc                           // Buccaneer (Barcrest)
 m4buc__0                        //
 m4buc__1                        //
@@ -27141,10 +26764,6 @@ m4c9__7                         //
 m4c9__8                         //
 m4c9__9                         //
 m4c9__a                         //
-m4c9__a0                        //
-m4c9__a1                        //
-m4c9__a2                        //
-m4c9__a3                        //
 m4c9__aa                        //
 m4c9__ab                        //
 m4c9__ac                        //
@@ -27169,8 +26788,6 @@ m4c9__au                        //
 m4c9__av                        //
 m4c9__aw                        //
 m4c9__ax                        //
-m4c9__ay                        //
-m4c9__az                        //
 m4c9__b                         //
 m4c9__c                         //
 m4c9__d                         //
@@ -27183,7 +26800,6 @@ m4c9__j                         //
 m4c9__k                         //
 m4c9__l                         //
 m4c9__m                         //
-m4c9__n                         //
 m4c9__o                         //
 m4c9__p                         //
 m4c9__q                         //
@@ -27396,6 +27012,21 @@ m4cashmn__y                     //
 m4cashmn__z                     //
 m4cashmn__za                    //
 m4cashmn__zb                    //
+m4chasei                        // Chase Invaders (Barcrest)
+m4chaseia                       //
+m4chaseib                       //
+m4chaseic                       //
+m4chaseid                       //
+m4chaseie                       //
+m4chaseig                       //
+m4cjdlx                         // Crown Jewels Deluxe (German)
+m4clbveg                        // Club Vegas (Barcrest)
+m4clbvega                       //
+m4clbvegb                       //
+m4clbvegc                       //
+m4clbx                          // Club X (Barcrest)
+m4clbxa                         //
+m4clbxb                         //
 m4coscas                        // Cosmic Casino (Barcrest)
 m4coscas__a                     //
 m4coscas__b                     //
@@ -27419,7 +27050,7 @@ m4coscas__s                     //
 m4coscas__t                     //
 m4coscas__u                     //
 m4coscas__v                     //
-m4cpycat                        // Copy Cat (Bwb)
+m4cpycat                        // Copy Cat (BWB)
 m4cpycat__0                     //
 m4cpycat__1                     //
 m4cpycat__2                     //
@@ -27470,6 +27101,21 @@ m4crdome__k                     //
 m4crdome__l                     //
 m4crdome__m                     //
 m4crdome__n                     //
+m4crjwl                         // Crown Jewels Club (Barcrest)
+m4crjwl2                        // Crown Jewels Mk II Club (Barcrest)
+m4crjwl2a                       //
+m4crjwl2b                       //
+m4crjwla                        //
+m4crjwlb                        //
+m4crjwlc                        //
+m4crzjwl                        // Crown Jewels (Barcrest) (German)
+m4crzjwla                       //
+m4crzjwlb                       //
+m4crzjwlc                       //
+m4crzjwld                       //
+m4crzjwle                       //
+m4crzjwlf                       //
+m4crzjwlg                       //
 m4crmaze                        // Crystal Maze (Barcrest)
 m4crmaze__c                     //
 m4crmaze__d                     //
@@ -27488,7 +27134,7 @@ m4crmaze__p                     //
 m4crmaze__q                     //
 m4crmaze__r                     //
 m4crmaze__s                     //
-m4cshenc                        // Cash Encounters (Bwb)
+m4cshenc                        // Cash Encounters (BWB)
 m4cshenc__a                     //
 m4cshenc__b                     //
 m4cshenc__c                     //
@@ -27668,7 +27314,6 @@ m4eaw__bu                       //
 m4eaw__bv                       //
 m4eaw__bw                       //
 m4eaw__bx                       //
-m4eaw__bz                       //
 m4eaw__c                        //
 m4eaw__d                        //
 m4eaw__e                        //
@@ -27693,34 +27338,13 @@ m4eaw__w                        //
 m4eaw__x                        //
 m4eaw__y                        //
 m4eaw__z                        //
+m4fortcb                        // Fortune Club (Barcrest)
+m4fortcba                       //
+m4fortcbb                       //
 m4gb006                         // Games Bond 006 (Barcrest)
 m4gb006__a                      //
 m4gb006__b                      //
 m4gb006__c                      //
-m4gbust                         // Ghost Buster (Barcrest)
-m4gbust__a                      //
-m4gbust__b                      //
-m4gbust__c                      //
-m4gbust__d                      //
-m4gbust__e                      //
-m4gbust__f                      //
-m4gbust__g                      //
-m4gbust__h                      //
-m4gbust__i                      //
-m4gbust__j                      //
-m4gbust__k                      //
-m4gbust__l                      //
-m4gbust__m                      //
-m4gbust__n                      //
-m4gbust__o                      //
-m4gbust__p                      //
-m4gbust__q                      //
-m4gbust__r                      //
-m4gbust__s                      //
-m4gbust__t                      //
-m4gbust__u                      //
-m4gbust__v                      //
-m4gbust__w                      //
 m4gclue                         // Give Us A Clue (Barcrest)
 m4gclue__a                      //
 m4gclue__b                      //
@@ -27938,33 +27562,6 @@ m4hotrod__s                     //
 m4hotrod__t                     //
 m4hotrod__u                     //
 m4hotrod__v                     //
-m4hypclb                        // Hyper Viper Club (Barcrest)
-m4hypclb__a                     //
-m4hypclb__b                     //
-m4hypclb__c                     //
-m4hypvip                        // Hyper Viper (Barcrest)
-m4hypvip__a                     //
-m4hypvip__b                     //
-m4hypvip__c                     //
-m4hypvip__d                     //
-m4hypvip__e                     //
-m4hypvip__f                     //
-m4hypvip__g                     //
-m4hypvip__h                     //
-m4hypvip__i                     //
-m4hypvip__j                     //
-m4hypvip__k                     //
-m4hypvip__l                     //
-m4hypvip__m                     //
-m4hypvip__n                     //
-m4hypvip__o                     //
-m4hypvip__p                     //
-m4hypvip__q                     //
-m4hypvip__r                     //
-m4hypvip__s                     //
-m4hypvip__t                     //
-m4hypvip__u                     //
-m4hypvip__v                     //
 m4jolgem                        // Jolly Gems (Barcrest)
 m4jolgem__0                     //
 m4jolgem__1                     //
@@ -28165,7 +27762,7 @@ m4jwlcwn__w                     //
 m4jwlcwn__x                     //
 m4jwlcwn__y                     //
 m4jwlcwn__z                     //
-m4kingq                         // Kings & Queens (Bwb)
+m4kingq                         // Kings & Queens (BWB)
 m4kingq__a                      //
 m4kingq__b                      //
 m4kingq__c                      //
@@ -28185,7 +27782,7 @@ m4kingq__p                      //
 m4kingq__r                      //
 m4kingq__s                      //
 m4kingq__t                      //
-m4kingqc                        // Kings & Queens Classic (Bwb)
+m4kingqc                        // Kings & Queens Classic (BWB)
 m4kingqc__0                     //
 m4kingqc__1                     //
 m4kingqc__2                     //
@@ -28216,6 +27813,9 @@ m4kingqc__w                     //
 m4kingqc__x                     //
 m4kingqc__y                     //
 m4kingqc__z                     //
+m4lazy                          // Lazy Bones (BWB)
+m4lazya                         //
+m4lazyb                         //
 m4lucklv                        // Lucky Las Vegas (Barcrest)
 m4lucklv__0                     //
 m4lucklv__1                     //
@@ -28361,7 +27961,7 @@ m4luxor__w                      //
 m4luxor__x                      //
 m4luxor__y                      //
 m4luxor__z                      //
-m4lvlcl                         // Lucky Las Vegas Classic (Bwb)
+m4lvlcl                         // Lucky Las Vegas Classic (BWB)
 m4lvlcl__a                      //
 m4lvlcl__b                      //
 m4lvlcl__c                      //
@@ -28457,6 +28057,7 @@ m4mag7s__w                      //
 m4mag7s__x                      //
 m4mag7s__y                      //
 m4mag7s__z                      //
+m4magtbo                        // Star Play / Magic Turbo
 m4makmnt                        // Make A Mint (Barcrest)
 m4makmnt__0                     //
 m4makmnt__1                     //
@@ -28525,15 +28126,6 @@ m4nhtt__h                       //
 m4nhtt__i                       //
 m4nhtt__j                       //
 m4nnww                          // Nudge Nudge Wink Wink (Barcrest)
-m4nnww__0                       //
-m4nnww__1                       //
-m4nnww__2                       //
-m4nnww__3                       //
-m4nnww__4                       //
-m4nnww__5                       //
-m4nnww__6                       //
-m4nnww__7                       //
-m4nnww__8                       //
 m4nnww__9                       //
 m4nnww__a                       //
 m4nnww__aa                      //
@@ -28554,14 +28146,8 @@ m4nnww__ao                      //
 m4nnww__ap                      //
 m4nnww__aq                      //
 m4nnww__ar                      //
-m4nnww__as                      //
-m4nnww__at                      //
-m4nnww__au                      //
-m4nnww__av                      //
-m4nnww__aw                      //
 m4nnww__ax                      //
 m4nnww__ay                      //
-m4nnww__az                      //
 m4nnww__b                       //
 m4nnww__c                       //
 m4nnww__d                       //
@@ -28585,8 +28171,6 @@ m4nnww__u                       //
 m4nnww__v                       //
 m4nnww__w                       //
 m4nnww__x                       //
-m4nnww__y                       //
-m4nnww__z                       //
 m4nnwwc                         // Nudge Nudge Wink Wink Classic (Barcrest)
 m4nnwwc__0                      //
 m4nnwwc__1                      //
@@ -28628,7 +28212,7 @@ m4nnwwc__w                      //
 m4nnwwc__x                      //
 m4nnwwc__y                      //
 m4nnwwc__z                      //
-m4oadrac                        // Ooh Aah Dracula (Bwb)
+m4oadrac                        // Ooh Aah Dracula (BWB)
 m4oadrac__a                     //
 m4oadrac__b                     //
 m4oadrac__c                     //
@@ -28786,6 +28370,7 @@ m4potblk__w                     //
 m4potblk__x                     //
 m4potblk__y                     //
 m4potblk__z                     //
+m4ptblkc                        // Pot Black Casino (BWB - Barcrest)
 m4przdty                        // Prize Duty Free (Barcrest)
 m4przdty__a                     //
 m4przdty__b                     //
@@ -28856,8 +28441,6 @@ m4przmns__l                     //
 m4przmns__m                     //
 m4przmns__n                     //
 m4przmon                        // Prize Money (Barcrest)
-m4przmon__0                     //
-m4przmon__1                     //
 m4przmon__a                     //
 m4przmon__b                     //
 m4przmon__c                     //
@@ -28874,16 +28457,6 @@ m4przmon__m                     //
 m4przmon__n                     //
 m4przmon__o                     //
 m4przmon__p                     //
-m4przmon__q                     //
-m4przmon__r                     //
-m4przmon__s                     //
-m4przmon__t                     //
-m4przmon__u                     //
-m4przmon__v                     //
-m4przmon__w                     //
-m4przmon__x                     //
-m4przmon__y                     //
-m4przmon__z                     //
 m4przrf                         // Prize Rich And Famous (Barcrest)
 m4przrf__a                      //
 m4przrf__b                      //
@@ -29156,7 +28729,6 @@ m4rhr__5                        //
 m4rhr__6                        //
 m4rhr__7                        //
 m4rhr__8                        //
-m4rhr__9                        //
 m4rhr__a                        //
 m4rhr__a0                       //
 m4rhr__a1                       //
@@ -29224,6 +28796,7 @@ m4rhrc__5                       //
 m4rhrc__6                       //
 m4rhrc__7                       //
 m4rhrc__8                       //
+m4rhrc__9                       //
 m4rhrc__a                       //
 m4rhrc__aa                      //
 m4rhrc__b                       //
@@ -29255,7 +28828,7 @@ m4rhrcl                         // Red Hot Roll Club (Barcrest)
 m4rhrcl__a                      //
 m4rhrcl__b                      //
 m4rhrcl__c                      //
-m4rhs                           // Rocky Horror Show (Bwb)
+m4rhs                           // Rocky Horror Show (BWB)
 m4rhs__a                        //
 m4rhs__b                        //
 m4rhs__c                        //
@@ -29339,30 +28912,20 @@ m4squid                         // Squids In (Barcrest)
 m4squid__a                      //
 m4squid__b                      //
 m4squid__c                      //
-m4ssclas                        // Super Streak Classic (Bwb)
+m4ssclas                        // Super Streak Classic (BWB)
 m4ssclas__a                     //
 m4ssclas__b                     //
 m4ssclas__c                     //
 m4ssclas__d                     //
 m4ssclas__e                     //
-m4ssclas__f                     //
-m4suphv                         // Super Hyper Viper (Barcrest)
-m4suphv__a                      //
-m4suphv__b                      //
-m4suphv__c                      //
-m4suphv__d                      //
-m4suphv__e                      //
-m4suphv__f                      //
-m4suphv__g                      //
-m4suphv__h                      //
-m4suphv__i                      //
-m4suphv__j                      //
-m4suphv__k                      //
-m4suphv__l                      //
-m4suphv__m                      //
-m4suphv__n                      //
-m4suphv__o                      //
-m4suphv__p                      //
+m4sunseta                       // Sunset Boulevard (Barcrest)
+m4sunsetb                       //
+m4supbjc                        // Super Blackjack Club (Barcrest)
+m4supbjca                       //
+m4supbjcb                       //
+m4supbjcc                       //
+m4supbjcd                       //
+m4take5                         // Top Tenner / Take 5 (bootleg)
 m4takepk                        // Take Your Pick (Barcrest)
 m4takepk__0                     //
 m4takepk__1                     //
@@ -29458,7 +29021,7 @@ m4tenten__w                     //
 m4tenten__x                     //
 m4tenten__y                     //
 m4tenten__z                     //
-m4thestr                        // The Streak (Bwb)
+m4thestr                        // The Streak (BWB)
 m4thestr__a                     //
 m4thestr__b                     //
 m4thestr__c                     //
@@ -29484,7 +29047,7 @@ m4thestr__v                     //
 m4thestr__w                     //
 m4thestr__x                     //
 m4thestr__y                     //
-m4tic                           // Tic Tac Toe (Bwb)
+m4tic                           // Tic Tac Toe (BWB)
 m4tic__a                        //
 m4tic__b                        //
 m4tic__c                        //
@@ -29503,7 +29066,7 @@ m4tic__o                        //
 m4tic__p                        //
 m4tic__r                        //
 m4tic__s                        //
-m4ticcla                        // Tic Tac Toe Classic (Bwb)
+m4ticcla                        // Tic Tac Toe Classic (BWB)
 m4ticcla__0                     //
 m4ticcla__a                     //
 m4ticcla__b                     //
@@ -29531,7 +29094,7 @@ m4ticcla__w                     //
 m4ticcla__x                     //
 m4ticcla__y                     //
 m4ticcla__z                     //
-m4ticglc                        // Tic Tac Toe Gold (Bwb)
+m4ticglc                        // Tic Tac Toe Gold (BWB)
 m4ticglc__a                     //
 m4ticglc__b                     //
 m4ticglc__c                     //
@@ -29587,7 +29150,7 @@ m4toot__y                       //
 m4toot__z                       //
 m4toot__za                      //
 m4toot__zb                      //
-m4topdog                        // Top Dog (Bwb)
+m4topdog                        // Top Dog (BWB)
 m4topdog__a                     //
 m4topdog__b                     //
 m4topdog__c                     //
@@ -29711,12 +29274,6 @@ m4tutfrt__7                     //
 m4tutfrt__8                     //
 m4tutfrt__9                     //
 m4tutfrt__a                     //
-m4tutfrt__a0                    //
-m4tutfrt__a1                    //
-m4tutfrt__a2                    //
-m4tutfrt__a3                    //
-m4tutfrt__a4                    //
-m4tutfrt__a5                    //
 m4tutfrt__aa                    //
 m4tutfrt__ab                    //
 m4tutfrt__ac                    //
@@ -29737,11 +29294,6 @@ m4tutfrt__ar                    //
 m4tutfrt__as                    //
 m4tutfrt__at                    //
 m4tutfrt__au                    //
-m4tutfrt__av                    //
-m4tutfrt__aw                    //
-m4tutfrt__ax                    //
-m4tutfrt__ay                    //
-m4tutfrt__az                    //
 m4tutfrt__b                     //
 m4tutfrt__c                     //
 m4tutfrt__d                     //
@@ -29848,8 +29400,9 @@ m4vegast__r                     //
 m4vegast__s                     //
 m4vegast__t                     //
 m4vegast__u                     //
-m4vegast__v                     //
 m4vegast__x                     //
+m4vegast__0                     //
+m4vegast__1                     //
 m4vivaes                        // Viva Espana (Barcrest)
 m4vivaes__0                     //
 m4vivaes__1                     //
@@ -29984,6 +29537,465 @@ m4wta__w                        //
 m4wta__x                        //
 m4wta__y                        //
 m4wta__z                        //
+
+@source:mpu4mod4yam.cpp
+m4acechs                        // Ace Chase (BWB)
+m4acechs__a                     //
+m4acechs__b                     //
+m4acechs__c                     //
+m4acechs__d                     //
+m4acechs__e                     //
+m4acechs__f                     //
+m4acechs__g                     //
+m4acechs__h                     //
+m4acechs__i                     //
+m4acechs__j                     //
+m4acechs__k                     //
+m4acechs__l                     //
+m4acechs__m                     //
+m4acechs__n                     //
+m4acechs__o                     //
+m4acechs__p                     //
+m4acechs__q                     //
+m4acechs__r                     //
+m4acechs__s                     //
+m4acechs__t                     //
+m4acechs__u                     //
+m4addr                          // Adders & Ladders (Barcrest)
+m4addr_h1                       //
+m4addr_h2                       //
+m4addr10                        //
+m4addr10_a                      //
+m4addr10c                       //
+m4addr10c_a                     //
+m4addr10d                       //
+m4addr10d_a                     //
+m4addr10yd                      //
+m4addr10yd_a                    //
+m4addr3                         //
+m4addr3_a                       //
+m4addr3_b                       //
+m4addr3_c                       //
+m4addr3_d                       //
+m4addr3d                        //
+m4addr3d_a                      //
+m4addr3d_b                      //
+m4addr3d_c                      //
+m4addr3yd                       //
+m4addr3yd_a                     //
+m4addr3yd_b                     //
+m4addr3yd_c                     //
+m4addr4                         //
+m4addr4_a                       //
+m4addr4c                        //
+m4addr4c_a                      //
+m4addr4c_b                      //
+m4addr4d                        //
+m4addr4yd                       //
+m4addr5                         //
+m4addr5_a                       //
+m4addr5c                        //
+m4addr5c_a                      //
+m4addr5d                        //
+m4addr5d_a                      //
+m4addr5yd                       //
+m4addr5yd_a                     //
+m4addr6lc                       //
+m4addr6ld                       //
+m4addr6lk                       //
+m4addr6ly                       //
+m4addr6lybd                     //
+m4addr6lyd                      //
+m4addrc                         // Adders & Ladders Classic (Barcrest)
+m4addrc__a                      //
+m4addrc__b                      //
+m4addrc__c                      //
+m4addrc__d                      //
+m4addrc__h                      //
+m4addrc__i                      //
+m4addrc__j                      //
+m4addrc__k                      //
+m4addrc__l                      //
+m4addrc__m                      //
+m4addrcc                        // Adders & Ladders Classic Club (Barcrest)
+m4addrcc__a                     //
+m4addrcc__b                     //
+m4addrcc__c                     //
+m4addrcc__d                     //
+m4bucks                         // Bucks Fizz Club (Barcrest)
+m4bucksa                        //
+m4calicl                        // California Club (Barcrest)
+m4calicla                       //
+m4caliclb                       //
+m4caliclc                       //
+m4calicld                       //
+m4clbshf                        // Club Shuffle (Barcrest)
+m4cojok                         // Carry On Joker (Barcrest)
+m4cojok__a                      //
+m4cojok__b                      //
+m4cojok__c                      //
+m4cojok__d                      //
+m4cojok__e                      //
+m4cojok__f                      //
+m4fastfw                        // Fast Forward (Barcrest - Bwb)
+m4fastfw__a                     //
+m4fastfw__b                     //
+m4fastfw__c                     //
+m4fastfw__d                     //
+m4fastfw__e                     //
+m4fastfw__f                     //
+m4gambal                        // Gamball (Barcrest)
+m4gambal__a                     //
+m4gambal__b                     //
+m4gambal__c                     //
+m4gbust                         // Ghost Buster (Barcrest)
+m4gbust__a                      //
+m4gbust__b                      //
+m4gbust__c                      //
+m4gbust__d                      //
+m4gbust__e                      //
+m4gbust__f                      //
+m4gbust__g                      //
+m4gbust__h                      //
+m4gbust__i                      //
+m4gbust__j                      //
+m4gbust__k                      //
+m4gbust__l                      //
+m4gbust__m                      //
+m4gbust__n                      //
+m4gbust__o                      //
+m4gbust__p                      //
+m4gbust__q                      //
+m4gbust__r                      //
+m4gbust__s                      //
+m4gbust__t                      //
+m4gbust__u                      //
+m4gbust__v                      //
+m4gbust__w                      //
+m4graff                         // Graffiti (Barcrest)
+m4graff__a                      //
+m4graff__b                      //
+m4hslo                          // Hot Slot (bootleg)
+m4hypclb                        // Hyper Viper Club (Barcrest)
+m4hypclb__a                     //
+m4hypclb__b                     //
+m4hypclb__c                     //
+m4joljokd                       //
+m4monte                         // Monte Carlo (Barcrest)
+m4monte__a                      //
+m4monte__b                      //
+m4monte__c                      //
+m4monte__d                      //
+m4monte__e                      //
+m4monte__f                      //
+m4monte__g                      //
+m4monte__h                      //
+m4monte__i                      //
+m4monte__j                      //
+m4monte__k                      //
+m4monte__l                      //
+m4monte__m                      //
+m4monteza
+m4montezb
+m4montezc
+m4montezd
+m4monteze
+m4montezf
+m4montezg
+m4montezh
+m4montezi
+m4montezj
+m4nspot                         // Night Spot Club (Barcrest)
+m4nspota                        //
+m4nspotb                        //
+m4nudbnk                        // Nudge Banker (Barcrest)
+m4nudbnk__a                     //
+m4nudbnk__b                     //
+m4nudbnk__c                     //
+m4nudbnk__d                     //
+m4nudshf                        // Nudge Shuffle (Barcrest)
+m4nudshfa                       //
+m4nudshfb                       //
+m4nudshfc                       //
+m4przmc                         // Prize Monte Carlo (Barcrest)
+m4przmc__a                      //
+m4przmc__b                      //
+m4przmc__c                      //
+m4przmc__d                      //
+m4przmc__e                      //
+m4przmc__f                      //
+m4przmc__g                      //
+m4przmc__h                     //
+m4przmc__i                     //
+m4przmc__j                     //
+m4przmc__k                     //
+m4przmc__l                     //
+m4przmc__m                     //
+m4przmc__n                     //
+m4przmc__o                     //
+m4przmc__p                     //
+m4przmc__q                     //
+m4przmc__r                     //
+m4przmc__s                     //
+m4przsss                        // Prize Spend Spend Spend (Barcrest)
+m4przsss__0                     //
+m4przsss__1                     //
+m4przsss__a                     //
+m4przsss__b                     //
+m4przsss__c                     //
+m4przsss__d                     //
+m4przsss__e                     //
+m4przsss__f                     //
+m4przsss__g                     //
+m4przsss__h                     //
+m4przsss__i                     //
+m4przsss__j                     //
+m4przsss__k                     //
+m4przsss__l                     //
+m4przsss__m                     //
+m4przsss__n                     //
+m4przsss__o                     //
+m4przsss__p                     //
+m4przsss__q                     //
+m4przsss__r                     //
+m4przsss__s                     //
+m4przsss__t                     //
+m4przsss__u                     //
+m4przsss__v                     //
+m4przsss__w                     //
+m4przsss__x                     //
+m4przsss__y                     //
+m4przsss__z                     //
+m4ra                            // Red Alert (Barcrest)
+m4ra__a                         //
+m4ra__b                         //
+m4ra__c                         //
+m4ra__d                         //
+m4ra__e                         //
+m4ra__f                         //
+m4ra__g                         //
+m4ra__h                         //
+m4ra__i                         //
+m4ra__j                         //
+m4ra__k                         //
+m4ra__l                         //
+m4ra__m                         //
+m4ra__n                         //
+m4ra__o                         //
+m4ra__p                         //
+m4ra__q                         //
+m4sayno                         // Say No More (Barcrest)
+m4sayno__a                      //
+m4sayno__b                      //
+m4sayno__c                      //
+m4sayno__d                      //
+m4sunscl                        // Sunset Club (BWB)
+m4sunscla                       //
+m4sunsclb                       //
+m4supbf                         // Super Bucks Fizz Club (Barcrest)
+m4supbfa                        //
+m4sss                           // Spend Spend Spend (Barcrest)
+m4sss__b                        //
+m4sss__c                        //
+m4sss__d                        //
+m4sss__e                        //
+m4sss__f                        //
+m4sss__g                        //
+m4sss__h                        //
+m4sss__i                        //
+m4sss__j                        //
+m4sss__k                        //
+m4sss__l                        //
+m4sstrek                        // Super Streak (bootleg)
+m4stc                           //
+m4shv                           // Super Hyper Viper (Barcrest)
+m4shv__0
+m4shv__1
+m4shv__10
+m4shv__11
+m4shv__12
+m4shv__2
+m4shv__3
+m4shv__4
+m4shv__5
+m4shv__6
+m4shv__7
+m4shv__8
+m4shv__9
+m4shv__a
+m4shv__b
+m4shv__c
+m4shv__d
+m4shv__e
+m4shv__f
+m4shv__g
+m4shv__h
+m4shv__i
+m4shv__j
+m4shv__k
+m4shv__l
+m4shv__m
+m4shv__n
+m4shv__o
+m4shv__p
+m4shv__q
+m4shv__r
+m4shv__s
+m4shv__t
+m4shv__u
+m4shv__v
+m4shv__w
+m4shv__x
+m4shv__y
+m4shv__z
+m4supst                         // Super Streak (Barcrest)
+m4supst__0                      //
+m4supst__1                      //
+m4supst__2                      //
+m4supst__3                      //
+m4supst__4                      //
+m4supst__5                      //
+m4supst__6                      //
+m4supst__7                      //
+m4supst__8                      //
+m4supst__9                      //
+m4supst__a                      //
+m4supst__a0                     //
+m4supst__a1                     //
+m4supst__a2                     //
+m4supst__a3                     //
+m4supst__a4                     //
+m4supst__a5                     //
+m4supst__a6                     //
+m4supst__a7                     //
+m4supst__a8                     //
+m4supst__a9                     //
+m4supst__aa                     //
+m4supst__ab                     //
+m4supst__ac                     //
+m4supst__ad                     //
+m4supst__ae                     //
+m4supst__af                     //
+m4supst__ag                     //
+m4supst__ah                     //
+m4supst__ai                     //
+m4supst__aj                     //
+m4supst__ak                     //
+m4supst__al                     //
+m4supst__am                     //
+m4supst__an                     //
+m4supst__ao                     //
+m4supst__ap                     //
+m4supst__aq                     //
+m4supst__ar                     //
+m4supst__as                     //
+m4supst__at                     //
+m4supst__au                     //
+m4supst__av                     //
+m4supst__aw                     //
+m4supst__ax                     //
+m4supst__ay                     //
+m4supst__az                     //
+m4supst__b                      //
+m4supst__b0                     //
+m4supst__b1                     //
+m4supst__b2                     //
+m4supst__b3                     //
+m4supst__b4                     //
+m4supst__b5                     //
+m4supst__b6                     //
+m4supst__b7                     //
+m4supst__ba                     //
+m4supst__bb                     //
+m4supst__bc                     //
+m4supst__bd                     //
+m4supst__be                     //
+m4supst__bf                     //
+m4supst__bg                     //
+m4supst__bh                     //
+m4supst__bi                     //
+m4supst__bj                     //
+m4supst__bk                     //
+m4supst__bl                     //
+m4supst__bm                     //
+m4supst__bn                     //
+m4supst__bo                     //
+m4supst__bp                     //
+m4supst__bq                     //
+m4supst__br                     //
+m4supst__bs                     //
+m4supst__bt                     //
+m4supst__bu                     //
+m4supst__bv                     //
+m4supst__bw                     //
+m4supst__bx                     //
+m4supst__by                     //
+m4supst__bz                     //
+m4supst__c                      //
+m4supst__d                      //
+m4supst__e                      //
+m4supst__f                      //
+m4supst__g                      //
+m4supst__h                      //
+m4supst__i                      //
+m4supst__j                      //
+m4supst__k                      //
+m4supst__l                      //
+m4supst__m                      //
+m4supst__n                      //
+m4supst__o                      //
+m4supst__p                      //
+m4supst__q                      //
+m4supst__r                      //
+m4supst__s                      //
+m4supst__t                      //
+m4supst__u                      //
+m4supst__v                      //
+m4supst__w                      //
+m4supst__x                      //
+m4supst__y                      //
+m4supst__z                      //
+m4tropcl                        // Tropicana Club (Barcrest)
+m4tropcla                       //
+m4tropclb                       //
+m4tropclc                       //
+m4tropcld                       //
+m4tst                           // MPU4 Unit Test (Program 4)
+m4vivalv                        // Viva Las Vegas (Barcrest)
+m4vivalv__0                     //
+m4vivalv__1                     //
+m4vivalv__2                     //
+m4vivalv__3                     //
+m4vivalv__4                     //
+m4vivalv__5                     //
+m4vivalv__6                     //
+m4vivalv__a                     //
+m4vivalv__b                     //
+m4vivalv__c                     //
+m4vivalv__d                     //
+m4vivalv__e                     //
+m4vivalv__f                     //
+m4vivalv__g                     //
+m4vivalv__h                     //
+m4vivalv__i                     //
+m4vivalv__j                     //
+m4vivalv__k                     //
+m4vivalv__l                     //
+m4vivalv__m                     //
+m4vivalv__n                     //
+m4vivalv__o                     //
+m4vivalv__p                     //
+m4vivalv__q                     //
+m4vivalv__r                     //
+m4vivalv__s                     //
+m4vivalv__t                     //
+m4vivalv__u                     //
+m4vivalv__v                     //
+m4vivalv__w                     //
+m4vivalv__x                     //
+m4vivalv__y                     //
+m4vivalv__z                     //
+m4voodoo                        // Voodoo 1000 (Barcrest)
 
 @source:mpu4union.cpp
 m4crzbn                         // Crazy Bingo
@@ -30434,7 +30446,7 @@ v4wized
 v4wizeo                         // Wize Move
 
 @source:mpu5sw.cpp
-m55050                          // Fifty Fifty (Bwb)
+m55050                          // Fifty Fifty (BWB)
 m5aceclb                        // Ace Of Clubs (Empire)
 m5aceclba                       //
 m5aceclbb                       //
@@ -30541,9 +30553,9 @@ m5caesc                         // Caesar's Cash (Vivid)
 m5carclb                        // Caribbean Club (Barcrest)
 m5card                          // Card Shark (Vivid)
 m5carou                         // Carousel (Empire)
-m5carpet                        // Magic Carpet (Bwb)
+m5carpet                        // Magic Carpet (BWB)
 m5carpet12                      //
-m5carwsh                        // Car Wash (Bwb)
+m5carwsh                        // Car Wash (BWB)
 m5carwsh10                      //
 m5casfev                        // Casino Fever (Red Gaming)
 m5casfev12                      //
@@ -30564,11 +30576,11 @@ m5centcl20                      //
 m5centcl21                      //
 m5centcl21a                     //
 m5centcla                       //
-m5circlb                        // Circus Club (Bwb)
+m5circlb                        // Circus Club (BWB)
 m5circlb00                      //
 m5circlb15                      //
 m5circlb33                      //
-m5circus                        // Circus (Bwb)
+m5circus                        // Circus (BWB)
 m5circus0a                      //
 m5circus0b                      //
 m5circus11                      //
@@ -30578,11 +30590,11 @@ m5clbtro                        // Club Tropicana (Empire)
 m5clbtro24                      //
 m5clbtro25                      //
 m5clifhn                        // Cliffhanger (Vivid)
-m5clown                         // Clown In Around (Bwb)
+m5clown                         // Clown In Around (BWB)
 m5clown11                       //
 m5clown13                       //
 m5clr                           // MPU 5 Ram & Meter Clear (Barcrest)
-m5clubsn                        // Club Sandwich (Bwb)
+m5clubsn                        // Club Sandwich (BWB)
 m5clubsn11                      //
 m5clubsn14                      //
 m5clubsn16                      //
@@ -30608,17 +30620,17 @@ m5crzkni03                      //
 m5cshkcb                        // Card Shark Club (Vivid)
 m5cshkcb12                      //
 m5cshkcb13                      //
-m5cshstx                        // Cash Stax (Bwb)
+m5cshstx                        // Cash Stax (BWB)
 m5cworan                        // Clockwork Oranges (Empire)
 m5cworan12                      //
 m5dblfun                        // Double Fun (Lowen)
-m5dblqts                        // Double Or Quits (Bwb)
+m5dblqts                        // Double Or Quits (BWB)
 m5dblqts1b                      //
 m5dblqtsa                       //
 m5dblqtsb                       //
 m5dbubl                         // Double Bubble (Barcrest - Red Gaming)
 m5devil                         // Devil Of A Deal (Vivid)
-m5dick                          // Dick Turnip (Bwb)
+m5dick                          // Dick Turnip (BWB)
 m5dick10                        //
 m5dmnf                          // Diamonds Are Forever (Empire)
 m5dmnf10                        //
@@ -30626,7 +30638,7 @@ m5dmnfcl                        // Diamonds Are Forever Club (Empire)
 m5dmnfcl04                      //
 m5dmnstr                        // Demon Streak (Barcrest - Red Gaming)
 m5dmnstra                       //
-m5donna                         // Donna Kebab (Bwb)
+m5donna                         // Donna Kebab (BWB)
 m5donnaa                        //
 m5donnad                        //
 m5doshpk                        // Do$h & Pecks (Barcrest)
@@ -30636,7 +30648,7 @@ m5draclb01                      //
 m5draclb07                      //
 m5dragnd                        // Dragon Drop (Barcrest - Red Gaming)
 m5dragnda                       //
-m5eggold                        // Egyptian Gold (Bwb)
+m5eggold                        // Egyptian Gold (BWB)
 m5egr                           // Elvis Gold Rush (Barcrest)
 m5egra                          //
 m5egss                          // Elvis Gold Super Streak (Barcrest)
@@ -30691,10 +30703,10 @@ m5ggems                         // Giant Gems (Vivid)
 m5ggems20                       //
 m5gimmie                        // Gimmie Gimmie Gimmie (Barcrest)
 m5gkeys                         // Golden Keys (Barcrest)
-m5goape                         // Going Ape (Bwb)
+m5goape                         // Going Ape (BWB)
 m5gophcl                        // Gopher Gold Club (Empire)
 m5gophr                         // Gopher Gold (Empire)
-m5gpclub                        // Get Plastered Club (Bwb)
+m5gpclub                        // Get Plastered Club (BWB)
 m5groll                         // Golden Roll (Vivid)
 m5grush                         // Gold Rush (Barcrest)
 m5grush01                       //
@@ -30718,7 +30730,7 @@ m5gstrik02                      //
 m5gstrik11                      //
 m5gstrika                       //
 m5hellrz                        // Hellraiser (Barcrest)
-m5hgl                           // Happy Go Lucky (Bwb)
+m5hgl                           // Happy Go Lucky (BWB)
 m5hgl14                         //
 m5hgl16                         //
 m5hiclau                        // High Claudius (Vivid)
@@ -30776,7 +30788,7 @@ m5jmpjok                        // Jumpin Jokers (Vivid)
 m5jmpjok11                      //
 m5jmpjoka                       //
 m5jmpjokb                       //
-m5jokpak                        // Joker In The Pack (Bwb)
+m5jokpak                        // Joker In The Pack (BWB)
 m5kaleid                        // Kaleidoscope Club (Empire)
 m5kcclb                         // King Cobra Club (Empire)
 m5kcclb24                       //
@@ -30803,7 +30815,7 @@ m5loony                         // Loony Juice (Vivid)
 m5loot                          // Loot 'n' Khamun (Vivid)
 m5loota                         //
 m5lotta                         // Lotta Luck (Barcrest)
-m5lvwire                        // Live Wire (Bwb)
+m5lvwire                        // Live Wire (BWB)
 m5lvwirea                       //
 m5mag7s                         // Magnificent 7s (Vivid)
 m5mag7sa                        //
@@ -30814,7 +30826,7 @@ m5mag7se                        //
 m5martns                        // Money Mad Martians (Barcrest)
 m5martns07                      //
 m5mega                          // Mega Zone (Barcrest)
-m5minesw                        // Minesweeper (Bwb)
+m5minesw                        // Minesweeper (BWB)
 m5mmak                          // Money Maker (Barcrest)
 m5mmak06                        //
 m5monjok                        // Monedin Joker (Spanish) (Barcrest)
@@ -30856,12 +30868,12 @@ m5ppussy                        // Pink Pussy (Mdm)
 m5psy2                          // Psycho Cash Beast 2 (Barcrest)
 m5psyccl                        // Psycho Cash Beast Club (Barcrest)
 m5psyccl01                      //
-m5psyccla                       // Psycho Cash Beast Club (Bwb)
+m5psyccla                       // Psycho Cash Beast Club (BWB)
 m5psyccla02                     //
 m5psyccla24                     //
 m5psycho                        // Psycho Cash Beast (Barcrest)
 m5psycho06                      //
-m5psychoa                       // Psycho Cash Beast (Bwb)
+m5psychoa                       // Psycho Cash Beast (BWB)
 m5psychoa21                     //
 m5ptyani                        // Party Animal (Barcrest)
 m5ptyani01                      //
@@ -30896,8 +30908,8 @@ m5redrck10                      //
 m5redrcka                       //
 m5redx                          // Red X (Barcrest - Red Gaming)
 m5redx12                        //
-m5reelth                        // Reel Thunder (Bwb)
-m5reelwn                        // Reel A Win (Bwb)
+m5reelth                        // Reel Thunder (BWB)
+m5reelwn                        // Reel A Win (BWB)
 m5reelwn24                      //
 m5resfrg                        // Reservoir Frogs (Empire)
 m5revo                          // Revolution (Barcrest)
@@ -30920,7 +30932,7 @@ m5rhrgt                         // Red Hot Roll Triple (Barcrest)
 m5rhrgt02                       //
 m5rhrgt12                       //
 m5ritj                          // Rumble In The Jungle (Barcrest)
-m5rlup                          // Roll Up (Bwb)
+m5rlup                          // Roll Up (BWB)
 m5rollup                        // Roll Up Roll Up (Vivid)
 m5rollx                         // Roll X (Empire)
 m5rollx12                       //
@@ -30929,12 +30941,12 @@ m5ronr05                        //
 m5ronr07                        //
 m5roof                          // Raise The Roof (Barcrest)
 m5roofa                         //
-m5round                         // Round & Round (Bwb)
+m5round                         // Round & Round (BWB)
 m5roundl                        // Round & Round (Lowen)
 m5rthh                          // Return To The Haunted House (Empire)
 m5rub                           // Rubies & Diamonds (Barcrest)
 m5rwb                           // Red White & Blue (Barcrest)
-m5rwbbwb                        // Red White & Blue (Bwb)
+m5rwbbwb                        // Red White & Blue (BWB)
 m5rwbbwb15                      //
 m5rwbbwb24                      //
 m5rwbbwb25                      //
@@ -30944,14 +30956,14 @@ m5scharg                        // Super Charged (Barcrest)
 m5scharg05                      //
 m5scharg06                      //
 m5scharga                       //
-m5sec7                          // Secret 7s (Bwb)
+m5sec7                          // Secret 7s (BWB)
 m5sec7a                         //
 m5seven                         // Seven Deadly Spins (Barcrest)
 m5shark                         // Shark Raving Mad (Vivid)
 m5sharka                        //
 m5sheik                         // Sheik Yer Money (Barcrest)
 m5showtm                        // Showtime (Barcrest)
-m5sil7                          // Silver 7s (Bwb)
+m5sil7                          // Silver 7s (BWB)
 m5sil7a                         //
 m5silver                        // Silver Screen (Barcrest)
 m5silver03                      //
@@ -30975,7 +30987,7 @@ m5skulcl                        // Skullduggery Club (Empire)
 m5skulcl20                      //
 m5skulcl23                      //
 m5slide                         // Slider (Barcrest - Red Gaming)
-m5smobik                        // Smokey Bikin (Bwb)
+m5smobik                        // Smokey Bikin (BWB)
 m5smobik12                      //
 m5sondr                         // Son Of Dracula (Barcrest)
 m5sondr05                       //
@@ -31025,7 +31037,7 @@ m5tempta                        //
 m5temptb                        //
 m5thtsmg                        // That's Magic (Barcrest - Red Gaming)
 m5tictac                        // Tic Tac Tut (Vivid)
-m5tictacbwb                     // Tic Tac Tut (Bwb)
+m5tictacbwb                     // Tic Tac Tut (BWB)
 m5tictacbwb16                   //
 m5tomb                          // Tomb Raiders (Empire)
 m5topdog                        // Top Dog (Barcrest)
@@ -31059,7 +31071,7 @@ m5wthing                        // Wild Thing Club (Empire)
 m5wthing11                      //
 m5wthing20                      //
 m5xchn                          // Exchanges Unlimited (Barcrest)
-m5xena                          // Xena Warrior Princess (Bwb)
+m5xena                          // Xena Warrior Princess (BWB)
 m5xfact                         // X Factor (Empire)
 m5xfact02                       //
 m5xfact04                       //
@@ -32149,7 +32161,8 @@ nflclsfb                        // 2003.?? NFL Classic Football
 pacmball                        // 2003.?? Pacman Ball
 panikuru                        // 2002.03 Panicuru Panekuru
 ptblank3                        // 2000.12 Point Blank 3 (GNN2 Ver.A)
-sekaikh                         // 2004.04 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
+sekaikh                         // 2004.0? Sekai Kaseki Hakken (Japan, SKH1 Ver.B)
+sekaikha                        // 2004.04 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
 startrgn                        // 2002.07 Star Trigon (STT1 Ver.A)
 taiko6                          // 2004.?? Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
 unks10md                        // 200?.?? unknown Namco System 10 medal game (MTL1 SPRB0)
@@ -37691,6 +37704,7 @@ scyclone                        // (c) 1980 Taito Corporation
 croupier                        // (c) 1997 Playmark
 croupiera                       // (c) 1997 Playmark
 luckboom                        //
+magictch                        //
 sderby                          // (c) 1996
 sderbya                         // (c) 1996
 shinygld                        //
@@ -38265,7 +38279,7 @@ titlefu                         // 1993.04 Title Fight (US)
 
 @source:segasm1.cpp
 tinkerbl                        // (c) 1990 Sega
-blicks							// (c) 1991 Sega
+blicks                          // (c) 1991 Sega
 unkm1                           // (c) 1992 Sega
 bingpty                         // (c) 1994 Sega
 
@@ -39082,6 +39096,7 @@ skykids                         // (c) 1985
 @source:skylncr.cpp
 bdream97                        // Bootleg?
 butrfly                         // (c) 1995 Bordun International
+butrflybl                       // Bootleg
 gallag50                        // Bootleg?
 leader                          // Bootleg?
 leadera                         // Bootleg?
@@ -39092,9 +39107,12 @@ neraidou                        // Bootleg?
 olymp                           // Z Games
 rolla                           //
 score5                          // Z Games
+seadevil                        // Z Games
 skylncr                         // (c) 1995 Bordun International
 sonikfig                        // Z Games
+spcliner                        // Z Games
 speedway                        //
+speedwaya                       //
 sstar97                         // (c) 199? Bordun International
 superb2k                        // Random Games
 tigerslt                        // Bootleg?
@@ -40258,6 +40276,7 @@ tesorone230                     // (c) 1995 Subsino
 tesorone240                     // (c) 1995 Subsino
 tisub                           // (c) 1992 Subsino
 tisuba                          // (c) 1992 Subsino
+tisubb                          // (c) 1992 Subsino (Alpha license)
 victor21                        // (c) 1990 Subsino
 victor5                         // (c) 1990 Subsino
 victor5a                        // (c) 1990 Subsino
@@ -40487,7 +40506,8 @@ suprridr                        // (c) 1983 Venture Line + Taito license
 suprslam                        // (c) 1995 Banpresto
 
 @source:supstarf.cpp
-supstarf                        //
+supstarf                        // (c) 1986 Recreativos Franco
+supstarfa                       // (c) 1986 Recreativos Franco
 
 @source:surpratk.cpp
 suratk                          // GX911 (c) 1990 (World)
@@ -40641,6 +40661,7 @@ wboy3                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy4                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy5                           // 834-5984 (c) 1986 + Escape license (S1)
 wboy6                           // 834-5984 (c) 1986 + Escape license (S1)
+wboyblt                         // Tecfri bootleg of wboy3
 wboyo                           // 834-5984 (c) 1986 + Escape license (S1)
 wboysys2                        // 834-5984  (c) 1986 + Escape license (S1)
 wboysys2a                       //
@@ -41305,6 +41326,7 @@ silkwormb2                      // bootleg
 @source:tecmo16.cpp
 fstarfrc                        // (c) 1992 Tecmo
 fstarfrcj                       // (c) 1992 Tecmo
+fstarfrcja                      // (c) 1992 Tecmo
 fstarfrcw                       // (c) 1992 Tecmo
 ginkun                          // (c) 1995 Tecmo
 riot                            // (c) 1992 NMK
@@ -41947,6 +41969,7 @@ grindstma                       // TP-027 (c) 1993 Toaplan + Unite Trading licen
 kbash                           // TP-023 (c) 1993 Toaplan
 kbash2                          // bootleg
 kbashk                          // TP-023 (c) 1993 Toaplan
+kbashp                          // TP-023 (c) 1993 Toaplan
 kingdmgp                        // (c) 1994 Raizing/8ing
 mahoudai                        // (c) 1993 Raizing + Able license
 nprobowl                        // (c) 1996 Zuck + Able license
@@ -44029,64 +44052,65 @@ xsleenaba                       // bootleg
 xsleenaj                        // TA-0019 (c) 1986
 
 @source:xavix.cpp
-taitons1                        //
-taitons2                        //
+ddrfammt                        //
+ekara                           //
+ekaraa                          //
+ekarag                          //
+ekaraj                          //
+ekaramix                        //
+ekaraphs                        //
+ekaras                          //
+epitch                          //
+epo_dmon                        //
+epo_efdx                        //
+epo_epp                         //
+epo_epp3                        //
+epo_eppk                        //
+epo_esdx                        //
+epo_guru                        //
+evio                            //
+gcslottv                        //
+has_wamg                        //
+jarajal                         //
+jpopira                         //
+ltv_tam                         //
 namcons1                        //
 namcons2                        //
-rad_ping                        //
-rad_pingp                       //
-rad_mtrk                        //
-rad_mtrkp                       //
+popira                          //
+popira2                         //
+rad_bass                        //
+rad_bassp                       //
 rad_bb                          //
 rad_bb2                         //
+rad_bdp                         //
 rad_box                         //
 rad_boxp                        //
 rad_crdn                        //
 rad_crdnp                       //
-rad_opus                        //
+rad_fb                          //
 rad_hnt                         //
 rad_hnt2                        //
-rad_bass                        //
-rad_bassp                       //
+rad_jcon                        //
+rad_madf                        //
+rad_mtrk                        //
+rad_mtrkp                       //
+rad_opus                        //
+rad_ping                        //
+rad_pingp                       //
+rad_rh                          //
+rad_sbw                         //
 rad_snow                        //
 rad_snowp                       //
-rad_madf                        //
-rad_fb                          //
 rad_socr                        //
-epo_esdx                        //
-epo_epp                         //
-epo_eppk                        //
-epo_epp3                        //
-epo_efdx                        //
-epo_guru                        //
-epo_dmon                        //
-rad_rh                          //
 rad_ssx                         //
 rad_ssxp                        //
-rad_sbw                         //
-rad_bdp                         //
-has_wamg                        //
-ltv_tam                         //
-tak_geig                        //
-jarajal                         //
-tcarnavi                        //
-tomcpin
-tomplc
-ekara                           //
-ekaraa                          //
-ekaraj                          //
-ekarag                          //
-ekaras                          //
-ekaraphs                        //
-epitch                          //
-ekaramix                        //
-ddrfammt                        //
-popira                          //
-popira2                         //
 taikodp                         //
-jpopira                         //
-evio                            //
-gcslottv                        //
+taitons1                        //
+taitons2                        //
+tak_geig                        //
+tcarnavi                        //
+tomcpin                         //
+tomplc                          //
 
 @source:xavix_2000.cpp
 epo_ebox                        //

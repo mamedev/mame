@@ -453,8 +453,8 @@ void menu_crosshair::populate(float &customtop, float &custombottom)
 
 	// Make sure to keep these matched to the CROSSHAIR_VISIBILITY_xxx types
 	static char const *const vis_text[] = {
-			N_p("menu-crosshair", "Always"),
 			N_p("menu-crosshair", "Never"),
+			N_p("menu-crosshair", "Always"),
 			N_p("menu-crosshair", "When moved") };
 
 	bool use_auto = false;

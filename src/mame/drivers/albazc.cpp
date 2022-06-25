@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Stephane Humbert
-// Hanaroku - Alba ZC HW
+// Hanaroku - Alba ZC HW (actually Seta HW in disguise; PCB is numbered P0-036A)
 /*
 TODO:
 - colour decoding might not be perfect
@@ -16,6 +16,7 @@ TODO:
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
+#include "video/seta001.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -27,10 +28,8 @@ class albazc_state : public driver_device
 public:
 	albazc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram%u", 1U),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
+		m_sprites(*this, "sprites"),
 		m_hopper(*this, "hopper")
 	{ }
 
@@ -41,16 +40,12 @@ private:
 	void out_0_w(uint8_t data);
 	void out_1_w(uint8_t data);
 	void out_2_w(uint8_t data);
-	void vregs_w(offs_t offset, uint8_t data);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void prg_map(address_map &map);
 
-	required_shared_ptr_array <uint8_t, 3> m_spriteram;
 	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	required_device<seta001_device> m_sprites;
 	required_device<ticket_dispenser_device> m_hopper;
 };
 
@@ -72,32 +67,10 @@ void albazc_state::palette(palette_device &palette) const
 }
 
 
-void albazc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	for (int i = 511; i >= 0; i--)
-	{
-		int code = m_spriteram[0][i] | (m_spriteram[1][i] << 8);
-		int color = (m_spriteram[1][i + 0x200] & 0xf8) >> 3;
-		int flipx = 0;
-		int flipy = 0;
-		int sx = m_spriteram[0][i + 0x200] | ((m_spriteram[1][i + 0x200] & 0x07) << 8);
-		int sy = 242 - m_spriteram[2][i];
-
-		if (flip_screen())
-		{
-			sy = 242 - sy;
-			flipx = !flipx;
-			flipy = !flipy;
-		}
-
-		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
-	}
-}
-
 uint32_t albazc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1f0, cliprect);   // ???
-	draw_sprites(bitmap, cliprect);
+	m_sprites->draw_sprites(screen, bitmap, cliprect, 0);
 	return 0;
 }
 
@@ -146,31 +119,16 @@ void albazc_state::out_2_w(uint8_t data)
 	// unused
 }
 
-void albazc_state::vregs_w(offs_t offset, uint8_t data)
-{
-#if 0
-	{
-		static uint8_t x[5];
-		x[offset] = data;
-		popmessage("%02x %02x %02x %02x %02x",x[0],x[1],x[2],x[3],x[4]);
-	}
-#endif
-
-	if (offset == 0)
-		flip_screen_set((data & 0x40) >> 6);
-}
-
 // main CPU
 
 void albazc_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().share(m_spriteram[0]);
-	map(0x9000, 0x97ff).ram().share(m_spriteram[1]);
-	map(0xa000, 0xa1ff).ram().share(m_spriteram[2]);
-	map(0xa200, 0xa2ff).nopw();    // ??? written once during P.O.S.T.
-	map(0xa300, 0xa304).w(FUNC(albazc_state::vregs_w));   // ???
-	map(0xb000, 0xb000).nopw();    // ??? always 0x40
+	map(0x8000, 0x87ff).rw(m_sprites, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
+	map(0x9000, 0x97ff).rw(m_sprites, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0xa000, 0xa2ff).rw(m_sprites, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
+	map(0xa300, 0xa303).w(m_sprites, FUNC(seta001_device::spritectrl_w8));   // ???
+	map(0xb000, 0xb000).w(m_sprites, FUNC(seta001_device::spritebgflag_w8));    // ??? always 0x40
 	map(0xc000, 0xc3ff).ram();         // main RAM
 	map(0xc400, 0xc4ff).ram().share("nvram");
 	map(0xd000, 0xd000).r("aysnd", FUNC(ay8910_device::data_r));
@@ -277,16 +235,18 @@ void albazc_state::hanaroku(machine_config &config)
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0, 48*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(albazc_state::screen_update));
-	screen.set_palette(m_palette);
+	screen.set_palette("palette");
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hanaroku);
+	SETA001_SPRITE(config, m_sprites, 16_MHz_XTAL, "palette", gfx_hanaroku);
+	m_sprites->set_fg_yoffsets( -0x12, 0x0e );
+	m_sprites->set_bg_yoffsets( 2, -2 );
 
-	PALETTE(config, m_palette, FUNC(albazc_state::palette), 0x200);
+	PALETTE(config, "palette", FUNC(albazc_state::palette), 0x200);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000)); // ? MHz
+	ym2149_device &aysnd(YM2149(config, "aysnd", 1500000)); // ? MHz
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);

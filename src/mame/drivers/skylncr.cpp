@@ -162,12 +162,14 @@ public:
 	void mbutrfly(machine_config &config);
 	void olymp(machine_config &config);
 
+	void init_butrfly();
 	void init_leadera();
 	void init_mbutrfly() { save_item(NAME(m_mbutrfly_prot)); }
 	void init_miaction();
 	void init_olymp();
 	void init_sonikfig();
 	void init_speedway();
+	void init_speedwaya();
 	void init_superb2k();
 
 	READ_LINE_MEMBER(mbutrfly_prot_r);
@@ -1804,9 +1806,9 @@ ROM_START( skylncr )
 	ROM_LOAD( "574200.u33", 0x00000, 0x80000, CRC(19b25221) SHA1(2f32d337125a9fd0bc7f50713b05e564fd4f81b2) )
 ROM_END
 
-ROM_START( butrfly )
+ROM_START( butrfly ) // this has original Bordun copyright in ROMs and test mode in Chinese
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "butterfly.prg",  0x00000, 0x10000, CRC(b35b289c) SHA1(5a02bfb6e1fb608099b9f491c10795ef888a3b36) )
+	ROM_LOAD( "sub-pcb.bin", 0x00000, 0x10000, CRC(f5618f8e) SHA1(390b238821b195f444e69c45786617524e6f5394) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "u29", 0x00000, 0x20000, CRC(2ff775ea) SHA1(2219c75cbac2969485607446ab116587bdee7278) )
@@ -1815,6 +1817,23 @@ ROM_START( butrfly )
 	ROM_LOAD16_BYTE( "u35", 0x40001, 0x20000, CRC(d14c7713) SHA1(c229ef64f3b0a04ff8e27bc56cff6a55ca34b80c) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "u52", 0x00000, 0x20000, CRC(15051537) SHA1(086c38c05c605f297a7bc470eb51763a7648e72c) )
+	ROM_LOAD16_BYTE( "u54", 0x00001, 0x20000, CRC(8e34d029) SHA1(ae316f2f34768938a07d62db110ce59d2751abaa) )
+	ROM_LOAD16_BYTE( "u56", 0x40000, 0x20000, CRC(226cb483) SHA1(89efa0e11700bcab0024a6058a5f1ee6b4a09953) )
+	ROM_LOAD16_BYTE( "u58", 0x40001, 0x20000, CRC(a69b5994) SHA1(f7f849c752740089a49dc6693822466d73010ea0) )
+ROM_END
+
+ROM_START( butrflybl ) // this has Bordun copyright removed and test mode in English
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "butterfly.prg",  0x00000, 0x10000, CRC(b35b289c) SHA1(5a02bfb6e1fb608099b9f491c10795ef888a3b36) ) // Mata Electronic / Sen Xing Trading copyright instead of Bordun
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "u29", 0x00000, 0x20000, CRC(2ff775ea) SHA1(2219c75cbac2969485607446ab116587bdee7278) )
+	ROM_LOAD16_BYTE( "u31", 0x00001, 0x20000, CRC(029d2214) SHA1(cf8256157db0b297ed457b3da6b6517907128843) )
+	ROM_LOAD16_BYTE( "u33", 0x40000, 0x20000, CRC(37bad677) SHA1(c077f0c07b097b376a01e5637446e4c4f82d9e28) )
+	ROM_LOAD16_BYTE( "u35", 0x40001, 0x20000, CRC(d14c7713) SHA1(c229ef64f3b0a04ff8e27bc56cff6a55ca34b80c) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) // u56 and u58 are slightly modified to erase the Bordun copyright on the title screen
 	ROM_LOAD16_BYTE( "u52", 0x00000, 0x20000, CRC(15051537) SHA1(086c38c05c605f297a7bc470eb51763a7648e72c) )
 	ROM_LOAD16_BYTE( "u54", 0x00001, 0x20000, CRC(8e34d029) SHA1(ae316f2f34768938a07d62db110ce59d2751abaa) )
 	ROM_LOAD16_BYTE( "u56", 0x40000, 0x20000, CRC(a53daaef) SHA1(7b88bb986bd5e47576163d6999f8770c720c5bfc) )
@@ -2204,6 +2223,57 @@ ROM_START( speedway ) // runs on a Rolla PCB with small sub board with main CPU,
 	ROM_LOAD16_BYTE( "8.u58", 0x40001, 0x20000, CRC(b93b221f) SHA1(efd6962a0f5e150c60d258fea116d726228dc39c) )
 ROM_END
 
+ROM_START( speedwaya ) // runs on a Rolla PCB with small sub board with main CPU, ROM and Altera EPM. All ROMs differ quite a bit from the other set.
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "sub.bin", 0x00000, 0x10000, CRC(78a6a047) SHA1(15b7b7e90ff2d2821edb081880be71fee4e222a8) ) //27C512
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "1 sw.u29", 0x00000, 0x20000, CRC(998afc41) SHA1(509c70eee12a461b660abdc74a9dc8db181b76bd) )
+	ROM_LOAD16_BYTE( "2 sw.u31", 0x00001, 0x20000, CRC(f143376a) SHA1(83913a31c89f5e06cebb686e89246762753131b9) )
+	ROM_LOAD16_BYTE( "3 sw.u33", 0x40000, 0x20000, CRC(dea9a31c) SHA1(108dbee2a36ee2591a18be9a4336a1994370d612) )
+	ROM_LOAD16_BYTE( "4 sw.u35", 0x40001, 0x20000, CRC(3bc35ea6) SHA1(eafd67c2abec810d4a86564f4d5d34059013e6e9) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "5 sw.u52", 0x00000, 0x20000, CRC(03af0672) SHA1(87fe8036ab270a5431751cfcccb4094372650173) )
+	ROM_LOAD16_BYTE( "6 sw.u54", 0x00001, 0x20000, CRC(5cc4c0a8) SHA1(4cf01c5f34674ab26834ed8f32751e74fe1df1e7) )
+	ROM_LOAD16_BYTE( "7 sw.u56", 0x40000, 0x20000, CRC(3adf8590) SHA1(7704e6b90567602497c52550bbd8831e876d1e5d) )
+	ROM_LOAD16_BYTE( "8 sw.u58", 0x40001, 0x20000, CRC(da21a487) SHA1(6bf7b97e682da9b97f3165a4d718cfdeeb3d956e) )
+ROM_END
+
+ROM_START( seadevil ) // on a POCKBOY REV.0 PCB
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "v42 scr scm.u13", 0x00000, 0x10000, CRC(23b6eb48) SHA1(469d9f766ce96d2c850d611cd9a8b48545c71aaf) ) // on sub PCB, M27C512
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) // all AM27C010
+	ROM_LOAD16_BYTE( "1.u26", 0x00000, 0x20000, CRC(e032f4f7) SHA1(accf48ce1447931ca7f7fdabe1684cabed03fe5f) )
+	ROM_LOAD16_BYTE( "2.u28", 0x00001, 0x20000, CRC(b8aa9742) SHA1(6c22ab987db6c10c8ae6c0278a5edc88b22fcb3a) )
+	ROM_LOAD16_BYTE( "3.u22", 0x40000, 0x20000, CRC(84a09db8) SHA1(6487e5bf97f43c6478c5b986587399213d7ff724) )
+	ROM_LOAD16_BYTE( "4.u24", 0x40001, 0x20000, CRC(d02354b9) SHA1(934663853c7d831eb4038c5f511acf2801b8be81) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) // all AM27C010
+	ROM_LOAD16_BYTE( "5.u32", 0x00000, 0x20000, CRC(d079830f) SHA1(f12fad5c69545096255a9f79b1cf94bccf85320b) )
+	ROM_LOAD16_BYTE( "6.u36", 0x00001, 0x20000, CRC(4db80352) SHA1(21ebd6e0e9fc712ee2c9bc61d2493b4208410260) )
+	ROM_LOAD16_BYTE( "7.u30", 0x40000, 0x20000, CRC(64997653) SHA1(4328892974cbd2b42b864b01cd5d621a4a550bc6) )
+	ROM_LOAD16_BYTE( "8.u34", 0x40001, 0x20000, CRC(469f8fe2) SHA1(5d271ed0925eceff0d5d095d2443c666de69a58e) )
+ROM_END
+
+ROM_START( spcliner ) // on a ROLLA PCB, might actually be another title, won't know until palette is fixed. GFX ROM loading is wrong.
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9.sub", 0x00000, 0x10000, CRC(80f65def) SHA1(a0716d57ae4935a79d32971d0bcb9f40dd9f1d54) ) // on sub PCB
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "5.u22", 0x40000, 0x20000, CRC(522132fb) SHA1(395530f137e19c177a276b6159f14fad66f25f75) )
+	ROM_LOAD16_BYTE( "6.u24", 0x40001, 0x20000, CRC(0ad80e17) SHA1(3a22f19d5aa329e666cc9a5f856723deaa575413) )
+	ROM_LOAD16_BYTE( "7.u26", 0x00000, 0x20000, CRC(1ab7559d) SHA1(57f93fa8da50f5fb6099f6fe0be656accc3eacb1) )
+	ROM_LOAD16_BYTE( "8.u28", 0x00001, 0x20000, CRC(2bdcb2e6) SHA1(08834ff52791934b705b77e59d0b12b3904d27cf) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "1.u30", 0x40000, 0x20000, CRC(700831b4) SHA1(6b129a0f16bbae2b0d789ee4023db4e3af2c6b71) )
+	ROM_LOAD16_BYTE( "2.u32", 0x00000, 0x20000, CRC(8b770912) SHA1(89cfcc6f1d76c00b970cadfcc106f0fcd738ffa1) )
+	ROM_LOAD16_BYTE( "3.u34", 0x40001, 0x20000, CRC(c8e64ae1) SHA1(cd5859e857a7771b3b11215f120567eef53f72cb) )
+	ROM_LOAD16_BYTE( "4.u36", 0x00001, 0x20000, CRC(315e7e28) SHA1(c25ca2c9e4bf973cfe9e56a8dc849e53bdc1ebe3) )
+ROM_END
+
 /**********************************
 *           Driver Init           *
 **********************************/
@@ -2357,6 +2427,16 @@ void skylncr_state::init_speedway() // TODO: complete this. These XORs and range
 	}
 }
 
+void skylncr_state::init_speedwaya() // this was done by comparing with an ICE dump, should be correct.
+{
+	uint8_t *const ROM = memregion("maincpu")->base();
+
+	for (int x = 0x0000; x < 0x6500; x++)
+		ROM[x] ^= 0x40;
+
+	// 0x6500 - 0xffff isn't xored
+}
+
 void skylncr_state::init_leadera()
 {
 	uint8_t *const ROM = memregion("maincpu")->base();
@@ -2373,6 +2453,14 @@ void skylncr_state::init_leadera()
 	ROM[0x762a] = ROM[0x762b] = 0x00; // TODO: some minor protection? bypass for now
 }
 
+void skylncr_state::init_butrfly()
+{
+	uint8_t *const ROM = memregion("maincpu")->base();
+
+	for (int x = 0x0000; x < 0x10000; x++)
+		ROM[x] = bitswap<8>(ROM[x] ^ 0x1b, 4, 2, 6, 7, 1, 5, 3, 0);
+}
+
 } // Anonymous namespace
 
 
@@ -2380,22 +2468,26 @@ void skylncr_state::init_leadera()
 *                  Game Drivers                     *
 ****************************************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT   COMPANY                 FULLNAME                                          FLAGS
-GAME( 1995, skylncr,   0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1995, butrfly,   0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mbutrfly,  0,        mbutrfly, mbutrfly, skylncr_state,  init_mbutrfly, ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1995, madzoo,    0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Mad Zoo (version U450C)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, leader,    0,        skylncr,  leader,   skylncr_state,  empty_init,    ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1995, leadera,   leader,   skylncr,  leader,   skylncr_state,  init_leadera,  ROT0, "bootleg",              "Leader (version Z 2F, Greece)",                  MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Needs correct protection emulation instead of ROM patch
-GAME( 199?, speedway,  0,        olymp,    leader,   skylncr_state,  init_speedway, ROT0, "hack (Drivers)",       "Speedway",                                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Incomplete decryption (?)
-GAME( 199?, gallag50,  0,        skylncr,  gallag50, skylncr_state,  empty_init,    ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, neraidou,  0,        neraidou, neraidou, skylncr_state,  empty_init,    ROT0, "bootleg",              "Neraidoula",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction, ROT0, "Vegas",                "Missing In Action",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction, ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE  )
-GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  empty_init,    ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2000?,olymp,     0,        olymp,    skylncr,  skylncr_state,  init_olymp,    ROT0, "Z Games",              "Olympus (Z Games, version 10)",                  MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Still has Bordun International 1992 strings
-GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, rolla,     0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Random Games",         "unknown 'Rolla' slot machine",                   MACHINE_IS_SKELETON ) // internal CPU ROM not dumped
-GAME( 2000?,score5,    0,        skylncr,  score5,   skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Score 5",                                        MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // game runs but screen is completely black due to palette mishandling
-GAME( 2000?,superb2k,  0,        skylncr,  skylncr,  skylncr_state,  init_superb2k, ROT0, "Random Games",         "Super Butterfly 2000",                           MACHINE_IS_SKELETON ) // encrypted / different CPU type ?
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT            ROT   COMPANY                 FULLNAME                                          FLAGS
+GAME( 1995, skylncr,   0,        skylncr,  skylncr,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1995, butrfly,   0,        skylncr,  skylncr,  skylncr_state,  init_butrfly,   ROT0, "Bordun International", "Butterfly Video Game (version A00)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1995, butrflybl, butrfly,  skylncr,  skylncr,  skylncr_state,  empty_init,     ROT0, "bootleg",              "Butterfly Video Game (version U350C)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mbutrfly,  0,        mbutrfly, mbutrfly, skylncr_state,  init_mbutrfly,  ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995, madzoo,    0,        skylncr,  skylncr,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Mad Zoo (version U450C)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, leader,    0,        skylncr,  leader,   skylncr_state,  empty_init,     ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, leadera,   leader,   skylncr,  leader,   skylncr_state,  init_leadera,   ROT0, "bootleg",              "Leader (version Z 2F, Greece)",                  MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Needs correct protection emulation instead of ROM patch
+GAME( 199?, speedway,  0,        olymp,    leader,   skylncr_state,  init_speedway,  ROT0, "hack (Drivers)",       "Speedway (set 1)",                               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Incomplete decryption (?)
+GAME( 199?, speedwaya, speedway, skylncr,  leader,   skylncr_state,  init_speedwaya, ROT0, "hack",                 "Speedway (set 2)",                               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Decryption should be correct (unless ICE dump was bad), but doesn't boot
+GAME( 199?, gallag50,  0,        skylncr,  gallag50, skylncr_state,  empty_init,     ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, neraidou,  0,        neraidou, neraidou, skylncr_state,  empty_init,     ROT0, "bootleg",              "Neraidoula",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction,  ROT0, "Vegas",                "Missing In Action",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction,  ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE  )
+GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,     ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  empty_init,     ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000?,olymp,     0,        olymp,    skylncr,  skylncr_state,  init_olymp,     ROT0, "Z Games",              "Olympus (Z Games, version 10)",                  MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Still has Bordun International 1992 strings
+GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig,  ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, spcliner,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig,  ROT0, "Z Games",              "Space Liner",                                    MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // game runs but screen is completely black due to palette mishandling
+GAME( 199?, rolla,     0,        skylncr,  skylncr,  skylncr_state,  empty_init,     ROT0, "Random Games",         "unknown 'Rolla' slot machine",                   MACHINE_IS_SKELETON ) // internal CPU ROM not dumped
+GAME( 2000?,score5,    0,        skylncr,  score5,   skylncr_state,  init_sonikfig,  ROT0, "Z Games",              "Score 5",                                        MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // game runs but screen is completely black due to palette mishandling
+GAME( 2000?,superb2k,  0,        skylncr,  skylncr,  skylncr_state,  init_superb2k,  ROT0, "Random Games",         "Super Butterfly 2000",                           MACHINE_IS_SKELETON ) // encrypted / different CPU type ?
+GAME( 2000, seadevil,  0,        skylncr,  score5,   skylncr_state,  init_sonikfig,  ROT0, "Z Games",              "Sea Devil",                                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // GFX ROM loading is wrong, causing severe GFX glitches
