@@ -316,7 +316,7 @@ void isbc202_device::io_w(address_space &space, offs_t offset, uint8_t data)
 	}
 }
 
-void isbc202_device::co_w(bool state)
+WRITE_LINE_MEMBER(isbc202_device::co_w)
 {
 	m_inputs[ IN_SEL_CO ] = state;
 	m_mcu->fi_w(state);
@@ -510,19 +510,19 @@ void isbc202_device::device_add_mconfig(machine_config &config)
 	m_cpes[ 3 ]->set_ro_w_cb(m_cpes[ 2 ] , FUNC(i3002_device::li_w));
 
 	// Connect M-bus
-	m_cpes[ 0 ]->set_mbus_r_cb([this]() { return mbus_r(); } , "");
-	m_cpes[ 1 ]->set_mbus_r_cb([this]() { return mbus_r() >> 2; } , "");
-	m_cpes[ 2 ]->set_mbus_r_cb([this]() { return mbus_r() >> 4; } , "");
-	m_cpes[ 3 ]->set_mbus_r_cb([this]() { return mbus_r() >> 6; } , "");
+	m_cpes[ 0 ]->set_mbus_r_cb(NAME([this]() { return mbus_r(); }));
+	m_cpes[ 1 ]->set_mbus_r_cb(NAME([this]() { return mbus_r() >> 2; }));
+	m_cpes[ 2 ]->set_mbus_r_cb(NAME([this]() { return mbus_r() >> 4; }));
+	m_cpes[ 3 ]->set_mbus_r_cb(NAME([this]() { return mbus_r() >> 6; }));
 
 	// Connect I-bus
-	m_cpes[ 0 ]->set_ibus_r_cb([this]() { return ibus_r(); } , "");
-	m_cpes[ 1 ]->set_ibus_r_cb([this]() { return ibus_r() >> 2; } , "");
-	m_cpes[ 2 ]->set_ibus_r_cb([this]() { return ibus_r() >> 4; } , "");
-	m_cpes[ 3 ]->set_ibus_r_cb([this]() { return ibus_r() >> 6; } , "");
+	m_cpes[ 0 ]->set_ibus_r_cb(NAME([this]() { return ibus_r(); }));
+	m_cpes[ 1 ]->set_ibus_r_cb(NAME([this]() { return ibus_r() >> 2; }));
+	m_cpes[ 2 ]->set_ibus_r_cb(NAME([this]() { return ibus_r() >> 4; }));
+	m_cpes[ 3 ]->set_ibus_r_cb(NAME([this]() { return ibus_r() >> 6; }));
 
 	// Connect SX input
-	m_mcu->set_sx_r_cb([this]() { return m_microcode_addr & 0xf; } , "");
+	m_mcu->set_sx_r_cb(NAME([this]() { return m_microcode_addr & 0xf; }));
 	// Connect PX input
 	m_mcu->set_px_r_cb(FUNC(isbc202_device::px_r));
 

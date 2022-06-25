@@ -87,9 +87,11 @@ public:
 	template <unsigned I> auto int_callback() { return m_int_cb[I].bind(); }
 	template <unsigned I> void int_w(int state) { m_int_cb[I](state); }
 
-	// wait signal (split for read/write operations)
+	// wait signal callbacks (split for read/write operations)
 	auto wait_io_rd_cb() { return m_wait_rd_cb.bind(); }
 	auto wait_io_wr_cb() { return m_wait_wr_cb.bind(); }
+
+	// Set wait signals (these are meant for "device_multibus_interface" devices)
 	void set_wait_io_rd(int state) { m_wait_rd_cb(state); }
 	void set_wait_io_wr(int state) { m_wait_wr_cb(state); }
 

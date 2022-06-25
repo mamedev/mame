@@ -31,7 +31,7 @@ public:
 	uint8_t io_r(address_space &space, offs_t offset);
 	void io_w(address_space &space, offs_t offset, uint8_t data);
 
-	void co_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER(co_w);
 
 	uint8_t px_r();
 
