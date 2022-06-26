@@ -1054,7 +1054,7 @@ void polygonet_state::plygonet(machine_config &config)
 	Z80(config, m_audiocpu, 8000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &polygonet_state::sound_map);
 
-	config.set_perfect_quantum(m_maincpu); // TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE
+	config.set_maximum_quantum(attotime::from_hz(600)); // NOTE: This does not appear to be necessary, but is retained for later testing.
 
 	EEPROM_ER5911_8BIT(config, m_eeprom);
 
