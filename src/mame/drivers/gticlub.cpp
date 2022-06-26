@@ -482,8 +482,8 @@ void gticlub_state::gticlub_map(address_map &map)
 	map(0x78080000, 0x7808000f).rw(m_k001006[1], FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::read), FUNC(k056230_device::write));
-	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
+	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::regs_r), FUNC(k056230_device::regs_w));
+	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("datarom", 0);
 	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
@@ -504,8 +504,8 @@ void gticlub_state::hangplt_map(address_map &map)
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::read), FUNC(k056230_device::write));
-	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
+	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::regs_r), FUNC(k056230_device::regs_w));
+	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("datarom", 0);
 	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
@@ -868,7 +868,8 @@ void gticlub_state::gticlub(machine_config &config)
 	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
 	m_adc1038->set_gti_club_hack(true);
 
-	K056230(config, m_k056230, "maincpu");
+	K056230(config, m_k056230);
+	m_k056230->irq_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -948,7 +949,8 @@ void gticlub_state::hangplt(machine_config &config)
 	ADC1038(config, m_adc1038, 0);
 	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
 
-	K056230(config, m_k056230, "maincpu");
+	K056230(config, m_k056230);
+	m_k056230->irq_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	VOODOO_1(config, m_voodoo[0], voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo[0]->set_fbmem(2);
