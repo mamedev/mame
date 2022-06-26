@@ -17333,6 +17333,33 @@ ROM_START( cmtetrsb )
 ROM_END
 
 
+ROM_START( cmtetrsc ) // this set uses a standard Z80 + an Altera EPM7032LC
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sub-pcb.bin", 0x00000, 0x10000, CRC(8e19fec2) SHA1(796746f8b4715b7a1c6324d7f9ff288aa7367026) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7__cmtetris.u16", 0x00000, 0x8000, CRC(2f5c94bd) SHA1(d99bcaa788f8abf5c75b29572d53be109b20c4bb) )
+	ROM_LOAD( "6__cmtetris.u11", 0x08000, 0x8000, CRC(dac50071) SHA1(7d1c8ec0d81897fe2155578d8c7455dc07104899) )
+	ROM_LOAD( "5__cmtetris.u4",  0x10000, 0x8000, CRC(9d67e265) SHA1(62eba137d881789c70121d5c07b5247684b917dd) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15", 0x0000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10", 0x2000, 0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14", 0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u53", 0x00000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u43", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
 /********************** Flaming 7, from Cyberdyne Systems, Inc. ***********************
 
   Flaming 7.
@@ -18713,6 +18740,16 @@ void cmaster_state::init_cmpacmanb()
 	init_cm();
 }
 
+void cmaster_state::init_cmtetrsc()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+		rom[i] = bitswap<8>(rom[i] ^ 0x53, 4, 1, 6, 5, 7, 0, 3, 2);
+
+	init_cm();
+}
+
 void goldstar_state::init_cmast91()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -19874,9 +19911,10 @@ GAME( 200?, ss2001,    0,        ss2001,   cmaster,   cmaster_state,  empty_init
 GAMEL( 198?, cmpacman,  0,        cm,        cmpacman, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, unencrypted, set 1)", 0,                                              layout_cmpacman ) // need to press K to switch between games...
 GAMEL( 198?, cmpacmana, cmpacman, cm,        cmpacman, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, unencrypted, set 2)", 0,                                              layout_cmpacman ) // need to press K to switch between games...
 GAMEL( 198?, cmpacmanb, cmpacman, cm,        cmpacman, cmaster_state,  init_cmpacmanb, ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, encrypted)",          0,                                              layout_cmpacman ) // need to press K to switch between games...
-GAMEL( 198?, cmtetris,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 1)",                           0,                                              layout_cmpacman ) // need to press K/L to switch between games...
-GAMEL( 198?, cmtetrsa,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 2)",                           0,                                              layout_cmpacman )
+GAMEL( 198?, cmtetris,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, unencrypted, set 1)",              0,                                              layout_cmpacman ) // need to press K/L to switch between games...
+GAMEL( 198?, cmtetrsa,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, unencrypted, set 2)",              0,                                              layout_cmpacman )
 GAMEL( 198?, cmtetrsb,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (+K, Canada Version, encrypted)",                   MACHINE_NOT_WORKING,                            layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
+GAMEL( 198?, cmtetrsc,  0,        cm,        cmtetris, cmaster_state,  init_cmtetrsc,  ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, encrypted)",                       0,                                              layout_cmpacman )
 GAMEL( 1997, crazybon,  0,        crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, set 1)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
 GAMEL( 1997, crazybona, crazybon, crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, set 2)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon )
 GAMEL( 1997, crazybonb, crazybon, crazybonb, pkrmast,  goldstar_state, init_crazybonb, ROT0, "bootleg (TV Games)",  "Crazy Bonus 2002 (Ver. 1, set 3)",                                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_crazybon ) // F.B. & POKER 94, VER.1 in NVRAM, decryption seems ok, possibly needs proper memory map
