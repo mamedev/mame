@@ -35507,16 +35507,6 @@ tetriskr                        // (c) 1988? bootleg
 @source:pc/poisk1.cpp
 poisk1                          //
 
-@source:pc/ps2.cpp
-i8530286                        // IBM PS/2 Model 30-286
-i8530h31                        // IBM PS/2 8530-H31 (Model 30/286)
-i8535043                        // IBM PS/2 8535-043 (Model 35)
-i8550021                        // IBM PS/2 8550-021 (Model 50)
-i8550061                        // IBM PS/2 8550-061 (Model 50Z)
-i8555081                        // IBM PS/2 8550-081 (Model 55SX)
-i8580071                        // IBM PS/2 8580-071 (Model 80)
-i8580111                        // IBM PS/2 8580-111 (Model 80)
-
 @source:pc/quakeat.cpp
 quake                           // (c) 19?? Lazer-Tron / iD Software
 
@@ -36497,6 +36487,1050 @@ theraid                         //
 theraida                        // (c) 1984 Playmatic / EFOSA
 trailer                         //
 ufo_x                           //
+
+@source:misc/playcenter.cpp
+plycntrchtr                     // (c) 2000 Recreativos Presas / Undergaming
+
+@source:nintendo/playch10.cpp
+pc_1942                         // (c) 1985 Capcom
+pc_bball                        // (c) 1984 Nintendo of America
+pc_bfght                        // (c) 1984 Nintendo
+pc_bload                        // (c) 1990 Jaleco (Nintendo of America license)
+pc_bstar                        // (c) 1989 SNK (Nintendo of America license)
+pc_cntra                        // (c) 1988 Konami (Nintendo of America license)
+pc_cshwk                        // (c) 1989 Rare (Nintendo of America license)
+pc_cvnia                        // (c) 1987 Konami (Nintendo of America license)
+pc_dbldr                        // (c) 1987 Konami (Nintendo of America license)
+pc_ddrgn                        // (c) 1988 Technos
+pc_drmro                        // (c) 1990 Nintendo
+pc_duckh                        // (c) 1984 Nintendo
+pc_ebike                        // (c) 1984 Nintendo
+pc_ftqst                        // (c) 1989 Sunsoft (Nintendo of America license)
+pc_gntlt                        // (c) 1985 Atari/Tengen (Nintendo of America license)
+pc_golf                         // (c) 1984 Nintendo
+pc_goons                        // (c) 1986 Konami
+pc_grdue                        // (c) 1986 Konami
+pc_grdus                        // (c) 1986 Konami
+pc_hgaly                        // (c) 1984 Nintendo
+pc_kngfu                        // (c) 1984 Irem (Nintendo license)
+pc_mario                        // (c) 1983 Nintendo
+pc_miket                        // (c) 1987 Nintendo
+pc_mman3                        // (c) 1990 Capcom USA (Nintendo of America license)
+pc_moglf                        // (c) 1991 Nintendo
+pc_mtoid                        // (c) 1986 Nintendo
+pc_ngai2                        // (c) 1990 Tecmo (Nintendo of America license)
+pc_ngai3                        // (c) 1991 Tecmo (Nintendo of America license)
+pc_ttoon                        //
+pc_ngaid                        // (c) 1989 Tecmo (Nintendo of America license)
+pc_pinbt                        // (c) 1988 Rare (Nintendo of America license)
+pc_pwbld                        // (c) 1991 Taito (Nintendo of America license)
+pc_pwrst                        // (c) 1986 Nintendo
+pc_radr2                        // (c) 1990 Square (Nintendo of America license)
+pc_radrc                        // (c) 1987 Square
+pc_rcpam                        // (c) 1987 Rare
+pc_rkats                        // (c) 1991 Atlus (Nintendo of America license)
+pc_rnatk                        // (c) 1987 Konami (Nintendo of America license)
+pc_rrngr                        // (c) Capcom USA (Nintendo of America license)
+pc_rygar                        // (c) 1987 Tecmo (Nintendo of America license)
+pc_sjetm                        // (c) 1990 Rare
+pc_smb                          // (c) 1985 Nintendo
+pc_smb2                         // (c) 1988 Nintendo
+pc_smb3                         // (c) 1988 Nintendo
+pc_suprc                        // (c) 1990 Konami (Nintendo of America license)
+pc_tbowl                        // (c) 1989 Tecmo (Nintendo of America license)
+pc_tenis                        // (c) 1983 Nintendo
+pc_tkfld                        // (c) 1987 Konami (Nintendo of America license)
+pc_tmnt                         // (c) 1989 Konami (Nintendo of America license)
+pc_tmnt2                        // (c) 1990 Konami (Nintendo of America license)
+pc_trjan                        // (c) 1986 Capcom USA (Nintendo of America license)
+pc_vball                        // (c) 1986 Nintendo
+pc_virus                        // (c) 1990 Nintendo
+pc_wcup                         // (c) 1990 Technos (Nintendo license)
+pc_wgnmn                        // (c) 1984 Nintendo
+pc_ynoid                        // (c) 1990 Capcom USA (Nintendo of America license)
+playch10                        //
+
+@source:playmark/playmark.cpp
+bigtwin                         // (c) 1995
+bigtwinb                        // (c) 1995
+excelsr                         // (c) 1995
+excelsra                        // (c) 1995
+hotmind                         // (c) 1995
+hrdtimes                        // (c) 1994
+hrdtimesa                       // (c) 1994
+luckboomh                       // (c) 1995
+wbeachvl                        // (c) 1995
+wbeachvl2                       // (c) 1995
+wbeachvl3                       // (c) 1995
+wbeachvla                       // (c) 1995
+
+@source:misc/plsonic4.cpp
+plsonic4                        //
+
+@source:commodore/plus4.cpp
+c116                            //
+c16                             //
+c16_hu                          //
+c16p                            //
+c232                            //
+c264                            //
+plus4                           //
+plus4p                          //
+v364                            //
+
+@source:jpm/pluto5.cpp
+hb_bar7                         // Bar Seven (Fairgames)
+hb_bar7a                        //
+hb_bigx                         // Big X (JPM)
+hb_bigxa                        //
+hb_bigxb                        //
+hb_bigxc                        //
+hb_bigxd                        //
+hb_cashc                        // Cash Crusade (Qps)
+hb_cashca                       //
+hb_cashcb                       //
+hb_cashx                        // Cash X (Fairgames)
+hb_cashxa                       //
+hb_ccow                         // Cash Cow (Qps)
+hb_ccowa                        //
+hb_ccowb                        //
+hb_cr                           // Cash Raker (QPS)
+hb_cra                          //
+hb_crb                          //
+hb_cwf                          // Cherry Win Falls (Fairgames)
+hb_cwfa                         //
+hb_dac                          // Dough & Arrow Club (Qps) [c]
+hb_daca                         //
+hb_dacb                         //
+hb_dacc                         //
+hb_dacd                         //
+hb_dace                         //
+hb_dacf                         //
+hb_dacg                         //
+hb_dacz                         //
+hb_frtcl                        // Fruitopia Club (Qps) [c]
+hb_frtcla                       //
+hb_frtclb                       //
+hb_frtclc                       //
+hb_frtcld                       //
+hb_frtcle                       //
+hb_frtclf                       //
+hb_frtclg                       //
+hb_frtclh                       //
+hb_frtcli                       //
+hb_frtclj                       //
+hb_frtclk                       //
+hb_frtcll                       //
+hb_frtclm                       //
+hb_frtcln                       //
+hb_gldpl                        // Golden Palace (Mazooma)
+hb_gldpla                       //
+hb_gldwn                        // Golden Winner (Fairgames)
+hb_gldwna                       //
+hb_gpal                         // G' Palace (Qps)
+hb_gpala                        //
+hb_gpalb                        //
+hb_gpalc                        //
+hb_gpald                        //
+hb_gpale                        //
+hb_gpalf                        //
+hb_gpalg                        //
+hb_gpalh                        //
+hb_gpali                        //
+hb_hotst                        // Hot Stuff??
+hb_hotsta                       //
+hb_hotstb                       //
+hb_hotstc                       //
+hb_hotstd                       //
+hb_hotste                       //
+hb_hotstf                       //
+hb_hotstg                       //
+hb_hotsth                       //
+hb_jailb                        // Jail Break (Qps)
+hb_jailba                       //
+hb_jkrwl                        // Jokers Wild (Fairgames)
+hb_jkrwla                       //
+hb_junglet                      // Jungle Treasures (Sega)
+hb_medal                        // Medallion Job (Qps)
+hb_mrmon                        // Mr. Money (Qps)
+hb_mrmona                       //
+hb_mrmonb                       //
+hb_mrmonc                       //
+hb_rckrl                        // Rock 'n' Roll (Qps)
+hb_rckrla                       //
+hb_rckrlb                       //
+hb_rckrlc                       //
+hb_rckrld                       //
+hb_rckrle                       //
+hb_rckrlf                       //
+hb_rckrlg                       //
+hb_rhv                          // Red Hot Voucher (Qps)
+hb_rhva                         //
+hb_ringb                        // Ring A Bell (JPM)
+hb_ringba                       //
+hb_ringbb                       //
+hb_ringbc                       //
+hb_ringbd                       //
+hb_ringbe                       //
+hb_ydd                          // Yabba-Dabba-Dough (Qps)
+hb_ydda                         //
+
+@source:konami/plygonet.cpp
+plygonet                        // GX305 (c) 1993
+polynetw                        // GX305 too? (c) 1993
+
+@source:skeleton/pm68k.cpp
+pm68k                           //
+
+@source:misc/pmc.cpp
+unkpmc
+
+@source:tesla/pmd85.cpp
+alfa                            // Alfa (PMD-85.1 clone)
+c2717                           // Consul 2717 (PMD-85.2 clone)
+c2717pmd                        // Consul 2717 with PMD-32
+mato                            // Mato (PMD-85.2 clone)
+pmd851                          // PMD-85.1
+pmd852                          // PMD-85.2
+pmd852a                         // PMD-85.2A
+pmd852b                         // PMD-85.2B
+pmd853                          // PMD-85.3
+
+@source:tesla/pmi80.cpp
+pmi80                           //
+
+@source:misc/pntnpuzl.cpp
+pntnpuzl                        // Century?
+
+@source:sharp/pocketc.cpp
+pc1245                          // Pocket Computer 1245
+pc1250                          // Pocket Computer 1250
+pc1251                          // Pocket Computer 1251
+pc1255                          // Pocket Computer 1255
+pc1260                          // Pocket Computer 1260
+pc1261                          // Pocket Computer 1261
+pc1350                          // Pocket Computer 1350
+pc1360                          // Pocket Computer 1360
+pc1401                          // Pocket Computer 1401
+pc1402                          // Pocket Computer 1402
+pc1403                          // Pocket Computer 1403
+pc1403h                         // Pocket Computer 1403H
+pc1450                          // Pocket Computer 1450
+trs80pc3                        // Tandy TRS80 PC-3
+
+@source:skeleton/pockchal.cpp
+pockchal
+
+@source:sony/pockstat.cpp
+pockstat                        // 1999 Sony PocketStation
+
+@source:atari/pofo.cpp
+pofo                            //
+
+@source:pc/poisk1.cpp
+poisk1                          //
+
+@source:dgrm/pokechmp.cpp
+billlist                        //
+pokechmp                        // Korean hack of Pocket Gal
+pokechmpa                       //
+
+@source:nintendo/pokemini.cpp
+pokemini                        // Nintendo Pokemon Mini
+
+@source:misc/poker72.cpp
+poker72                         //
+
+@source:misc/pokerout.cpp
+pokerout                        // 19??, unknown
+
+@source:namco/polepos.cpp
+grally                          // bootleg
+polepos                         // (c) 1982
+polepos2                        // (c) 1983
+polepos2a                       // 136014   (c) 1983 + Atari license
+polepos2b                       // bootleg
+polepos2bi                      // bootleg
+polepos2bs                      // 1984, BCN Internacional S.A. (bootleg)
+poleposa1                       // 136014   (c) 1982 Atari
+poleposa2                       // 136014   (c) 1982 + Atari license
+poleposj                        // (c) 1982
+ppspeed                         // bootleg
+topracer                        // bootleg
+topracera                       // bootleg
+topracern                       // bootleg
+
+@source:misc/policetr.cpp
+policetr                        // (c) 1996 P&P Marketing
+policetr10                      // (c) 1996 P&P Marketing
+policetr11                      // (c) 1996 P&P Marketing
+policetr13                      // (c) 1996 P&P Marketing
+policetr13a                     // (c) 1996 P&P Marketing
+policetr13b                     // (c) 1996 P&P Marketing
+sshooter                        // (c) 1998 P&P Marketing
+sshooter11                      // (c) 1998 P&P Marketing
+sshooter12                      // (c) 1998 P&P Marketing
+sshooter17                      // (c) 1998 P&P Marketing
+
+@source:ausnz/poly.cpp
+poly1                           // Poly 1
+poly1e                          // Poly 1 (early)
+poly2                           // Poly 2
+polydev                         // Poly Development
+
+@source:poly88/poly88.cpp
+poly88                          //
+poly8813                        //
+
+@source:korg/poly800.cpp
+poly800                         //
+poly800ii                       //
+poly800mdk                      //
+
+@source:ddr/poly880.cpp
+poly880                         //
+poly880s                        //
+
+@source:ddr/polyplay.cpp
+polyplay                        //
+polyplay2                       //
+polyplay2c                      //
+
+@source:korg/polysix.cpp
+polysix                         //
+poly61                          //
+
+@source:atari/pong.cpp
+breakout                        // (c) 1976 Atari
+pong                            // (c) 1972 Atari
+pongd                           // (c) 1973 Atari
+rebound                         //
+
+@source:atari/poolshrk.cpp
+poolshrk                        // 006281           1977/06 [6800]
+
+@source:konami/pooyan.cpp
+pootan                          // bootleg
+pooyan                          // GX320 (c) 1982
+pooyans                         // GX320 (c) 1982 Stern
+
+@source:nintendo/popeye.cpp
+popeye                          // (c) 1982
+popeyehs
+popeyebl                        // bootleg
+popeyeb2                        // bootleg
+popeyeb3                        // bootleg
+popeyef                         // (c) 1982
+popeyeu                         // (c) 1982
+popeyej                         //
+popeyejo                        //
+skyskipr                        // (c) 1981
+
+@source:bmc/popobear.cpp
+popobear                        // (c) 2000 BMC
+
+@source:omori/popper.cpp
+popper                          // (c) 1983 Omori Electric Co., Ltd.
+
+@source:positron/positron.cpp
+positron                        // 1982 Positron 9000
+
+@source:olympia/portrait.cpp
+portrait                        // (c) 1983 Olympia
+portraita                       // (c) 1983 Olympia
+
+@source:misc/potgoldu.cpp
+potgoldu                        // (c) 200? U.S. Games
+potgoldu580                     // (c) 200? U.S. Games
+
+@source:playmark/powerbal.cpp
+atombjt                         // bootleg
+hotminda                        // (c) 1995
+magicstk                        // (c) 1995
+powerbal                        // (c) 1994
+
+@source:nmk/powerins.cpp
+powerins                        // (c) 1993 Atlus (USA)
+powerinsa                       // (c) 1993 Atlus (bootleg of USA version)
+powerinsb                       // (c) 1993 Atlus (bootleg of USA version)
+powerinsc                       // (c) 1993 Atlus (bootleg of USA version)
+powerinsj                       // (c) 1993 Atlus (Japan)
+powerinspj                      // prototype (Japan)
+powerinspu                      // prototype (USA)
+
+@source:motorola/powerstack.cpp
+powerstk                        // Motorola Powerstack II
+
+@source:stm/pp.cpp
+pp                              // STM Pied Piper Communicator 1
+
+@source:zvt/pp01.cpp
+pp01                            //
+
+@source:edevices/ppmast93.cpp
+ppmast93                        // (c) 1993 Electronic Devices S.R.L.
+
+@source:snk/prehisle.cpp
+gensitou                        // A8003 'GT' (c) 1989
+prehisle                        // A8003 'GT' (c) 1989
+prehislek                       // A8003 'GT' (c) 1989
+prehisleu                       // A8003 'GT' (c) 1989
+prehisleb                       // bootleg
+
+@source:vtech/prestige.cpp
+gl6000sl                        // Genius Leader 6000SL (Germany)
+gl7007sl                        // Genius Leader 7007SL (Germany)
+glcolor                         // Genius Leader Color (Germany)
+glmcolor                        // Genius Leader Magic Color (Germany)
+glscolor                        // Genius Leader Super Color (Germany)
+pcscolor                        // PC Super Color (Spain)
+gmmc                            // Genius Master Mega Color (Germany)
+gwnf                            // Genius Winner Notebook Fun (Germany)
+prestige                        // PreComputer Prestige Elite
+snotec                          // Bandai Super Note Club (Japan)
+snotecex                        // Bandai Super Note Club EX (Japan)
+snotecu                         // Bandai Super Note Club U (Japan)
+
+@source:microkey/primo.cpp
+primoa32                        // Primo A-32
+primoa48                        // Primo A-48
+primoa64                        // Primo A-64
+primob32                        // Primo B-32
+primob48                        // Primo B-48
+primob64                        // Primo B-64
+primoc64                        // Primo C-64
+
+@source:trainer/pro80.cpp
+pro80                           //
+
+@source:misc/proconn.cpp
+pr_5xcsh                        // 5x Cash (Project)
+pr_7hvn                         // 777 Heaven (Project)
+pr_7hvna                        //
+pr_7hvnb                        //
+pr_7hvnc                        //
+pr_7hvnd                        //
+pr_7hvne                        //
+pr_7hvnf                        //
+pr_7hvng                        //
+pr_7hvnh                        //
+pr_7hvni                        //
+pr_7hvnj                        //
+pr_7hvnk                        //
+pr_7hvnl                        //
+pr_7hvnm                        //
+pr_7hvnn                        //
+pr_7hvno                        //
+pr_7hvnp                        //
+pr_7hvnq                        //
+pr_7hvnr                        //
+pr_7hvns                        //
+pr_7hvnt                        //
+pr_7hvnu                        //
+pr_alwy9                        // Always Nine (Pcp)
+pr_alwy9a                       //
+pr_barbl                        // Bars & Bells (Project)
+pr_batls                        // Battleships (Project)
+pr_batlsa                       //
+pr_batlsb                       //
+pr_bears                        // Bear Streak (Coinworld)
+pr_bearsa                       //
+pr_bearsb                       //
+pr_bearx                        // Bear X (Coinworld)
+pr_bearxa                       //
+pr_bearxb                       //
+pr_bearxc                       //
+pr_bearxd                       //
+pr_bearxe                       //
+pr_bearxf                       //
+pr_bearxg                       //
+pr_bearxh                       //
+pr_bearxi                       //
+pr_bearxj                       //
+pr_bearxk                       //
+pr_bearxl                       //
+pr_bearxlp                      //
+pr_bearxm                       //
+pr_bigdp                        // Big Dipper (Project)
+pr_bigdpa                       //
+pr_btwar                        // Beat The Warden (Project)
+pr_btwara                       //
+pr_btwarb                       //
+pr_bulbn                        // Bully's Big Night (Project)
+pr_bulbna                       //
+pr_bulbnb                       //
+pr_buljp                        // Bully's Jackpot (Project)
+pr_buljpa                       //
+pr_bulls                        // Bullseye (Project)
+pr_bullsa                       //
+pr_bullsb                       //
+pr_cas7                         // Casino Jackpot 7s (Project)
+pr_cashb                        // Cash Back (Project)
+pr_chico                        // Chico the Bandit (Project)
+pr_chicoa                       //
+pr_chicob                       //
+pr_coolm                        // Cool Million (Project)
+pr_coolma                       //
+pr_coolmb                       //
+pr_coyot                        // Crazy Coyote (Pcp)
+pr_coyota                       //
+pr_crz77                        // Crazy 777s (Project)
+pr_crzbr                        // Crazy Bars (Project)
+pr_crzpy                        // Crazy Pays (Project)
+pr_dblup                        // Double Up (Project)
+pr_fire                         // Fircecracker (Project)
+pr_flshc                        // Flash The Cash (Project)
+pr_fspot                        // Fun Spot (Coinworld)
+pr_fspota                       //
+pr_fspotb                       //
+pr_fspotc                       //
+pr_fspotd                       //
+pr_fspote                       //
+pr_fspotf                       //
+pr_fspotg                       //
+pr_ftwhl                        // Fortune Wheel (Project)
+pr_funrn                        // Fun On The Run (Project)
+pr_gdft                         // Good Fortune (Project)
+pr_gldng                        // Golden Nugget (Project)
+pr_gldnl                        // Golden Nile (Project)
+pr_gnuc                         // Golden Nugget (Coinworld)
+pr_gnuca                        //
+pr_gogld                        // Go For Gold (Project)
+pr_happy                        // Happy Days (Project)
+pr_heato                        // The Heat Is On (Project)
+pr_hiclm                        // Hi Climber (Project)
+pr_hit6                         // Hit The Six (Project)
+pr_hit6a                        //
+pr_hit6b                        //
+pr_hotcs                        // Hot Cash (Project)
+pr_hotsp                        // Hot Spots (Project)
+pr_jkpt7                        // Jackpot 7's (Project)
+pr_jkrwd                        // Jokers Wild (Project)
+pr_jumpj                        // Jumping Jacks (Project)
+pr_jumpja                       //
+pr_lday                         // 'L' Of A Day (Project)
+pr_ldaya                        //
+pr_magln                        // Magic Lines (Coinworld)
+pr_maglna                       //
+pr_medl                         // Medalist (Project)
+pr_megmn                        // Mega Money (Project)
+pr_nifty                        // Nifty Fifty (Project)
+pr_nudxs                        // Nudge XS (Project)
+pr_qksht                        // Quickshot (Maygay)
+pr_rags                         // Rags To Riches (Project)
+pr_reflx                        // Reflex (Project)
+pr_roadr                        // Road Riot (Project)
+pr_roll                         // The Roll (Project)
+pr_sevab                        // Seven's Above (Project)
+pr_sevml                        // Sevens & Melons (Project)
+pr_sptb                         // Simply The Best (Pcp)
+pr_supbr                        // Super Bars (PCP)
+pr_swop                         // Swop It (Ace)
+pr_theme                        // Theme Park (Project)
+pr_trktp                        //
+pr_trktr                        // Trick or Treat (Project)
+pr_trpx                         // Triple X (Project)
+pr_ttrai                        // Treasure Trail (Project)
+pr_upnun                        // Up & Under (Project)
+pr_walls                        // Wall Street (Project)
+pr_whlft                        // Wheel Of Fortune (Project)
+pr_wldkn                        // Wild Kings (Project)
+pr_wnstk                        // Winning Streak (Coinworld)
+
+@source:conitec/prof180x.cpp
+prof180x                        //
+prof181x                        //
+
+@source:conitec/prof80.cpp
+prof80                          //
+
+@source:dataeast/progolf.cpp
+progolf                         // (c) 1981
+progolfa                        // (c) 1981
+
+@source:sequential/prophet600.cpp
+prpht600                        // 1983 Sequential Circuits
+
+@source:ausnz/proteus.cpp
+proteus                         // Poly Proteus
+
+@source:skeleton/proteus3.cpp
+proteus3                        //
+
+@source:pc/ps2.cpp
+ibm8535_043                     // IBM PS/2 8535-043 (Model 35)
+ibm8555_081                     // IBM PS/2 8550-081 (Model 55SX)
+ibm8550_021                     // IBM PS/2 8550-021 (Model 50)
+ibm8550_061                     // IBM PS/2 8550-061 (Model 50Z)
+ibm8560                         // IBM PS/2 8560     (Model 60)
+ibm8580_071                     // IBM PS/2 8580-071 (Model 80, Type 1)
+ibm8580_111                     // IBM PS/2 8580-111 (Model 80, Type 2)
+ibm8580_a21                     // IBM PS/2 8580-A21 (Model 80, Type 3)
+
+@source:pc/ps2m30.cpp
+ibm8530_286                     // IBM PS/2 Model 30-286
+ibm8530_h31                     // IBM PS/2 8530-H31 (Model 30/286)
+
+@source:sony/ps2sony.cpp
+ps2                             // Sony Playstation 2
+
+@source:misc/psattack.cpp
+psattack                        // 2004 Uniana
+
+@source:misc/pse.cpp
+bazooka                         // (c) 1976 PSE
+bazookabr                       // (c) 1977 Taito do Brasil
+dpatrol                         // (c) 1977 PSE
+dpatrola                        // (c) 1977 PSE / Telegames
+gametree                        // (c) 1978 PSE
+
+@source:psikyo/psikyo.cpp
+btlkroad                        // (c) 1994
+btlkroadk                       // (c) 1994 (Korea)
+gunbird                         // (c) 1994
+gunbirdj                        // (c) 1994 (Japan)
+gunbirdk                        // (c) 1994 (Korea)
+s1945                           // (c) 1995 (Japan)
+s1945a                          // (c) 1995
+s1945bl                         // (c) 1995 (Hong Kong bootleg)
+s1945j                          // (c) 1995 (Japan)
+s1945k                          // (c) 1995 (Korea)
+s1945n                          // (c) 1995 (World, unprotected)
+s1945nj                         // (c) 1995 (Japan, unprotected)
+samuraia                        // (c) 1993 (World)
+sngkace                         // (c) 1993 (Japan)
+sngkacea                        // (c) 1993 (Japan)
+tengai                          // (c) 1996 (World)
+tengaij                         // (c) 1996 (Japan)
+
+@source:psikyo/psikyo4.cpp
+hgkairak                        // (c) 1998
+hotdebut                        // (c) 2000
+hotgm4ev                        // (c) 2000
+hotgmck                         // (c) 1997
+hotgmck3                        // (c) 1999
+hotgmcki                        // (c) 2001
+loderndf                        // (c) 2000
+loderndfa                       // (c) 2000
+
+@source:psikyo/psikyosh.cpp
+daraku                          // (c) 1998
+dragnblz                        // (c) 2000
+gnbarich                        // (c) 2001
+gunbird2                        // (c) 1998
+gunbird2a                       // (c) 1998
+mjgtaste                        // (c) 2002
+s1945ii                         // (c) 1997
+s1945iii                        // (c) 1999
+s1945iiibl                      // bootleg
+sbomber                         // (c) 1998
+sbombera                        // (c) 1998
+soldivid                        // (c) 1997
+soldividk                       // (c) 1997 (Korea)
+tgm2                            // (c) 2000
+tgm2p                           // (c) 2000
+
+@source:psion/psion.cpp
+psion1                          //
+psioncm                         //
+psionla                         //
+psionlam                        //
+psionlz                         //
+psionlz64                       //
+psionlz64s                      //
+psionp200                       //
+psionp350                       //
+psionp464                       //
+psionxp                         //
+
+@source:psion/psion5.cpp
+psion5mx                        //
+
+@source:capcom/psrockman.cpp
+psrockmn                        //
+
+@source:sony/psx.cpp
+psa                             // 1995 Sony PlayStation (Asia-Pacific)
+pse                             // 1995 Sony PlayStation (Europe)
+psj                             // 1994 Sony PlayStation (Japan)
+psu                             // 1995 Sony PlayStation (USA)
+
+@source:jaleco/psychic5.cpp
+bombsa                          // (c) 1988 Jaleco
+psychic5                        // (c) 1987 Jaleco
+psychic5j                       // (c) 1987 Jaleco
+
+@source:skeleton/pt68k4.cpp
+pt68k2                          //
+pt68k4                          //
+
+@source:skeleton/ptcsol.cpp
+sol20                           //
+
+@source:jaleco/pturn.cpp
+pturn                           // (c) 1984 Jaleco
+
+@source:tvgames/pubint_storyreader.cpp
+pi_stry
+pi_stry2
+
+@source:merit/pubtimed.cpp
+pubtimed                        //
+
+@source:sega/puckpkmn.cpp
+jzth                            //
+puckpkmn                        // (c) 2000 Genie
+puckpkmna                       // (c) 2000 IBS
+puckpkmnb                       // (c) 2000 IBS
+
+@source:ausnz/pulsar.cpp
+pulsarlb                        //
+
+@source:nintendo/punchout.cpp
+armwrest                        // (c) 1985
+punchita                        // bootleg
+punchout                        // (c) 1984
+punchouta                       // (c) 1984
+punchoutj                       // (c) 1984 (Japan)
+spnchout                        // (c) 1984
+spnchouta                       // (c) 1984
+spnchoutj                       // (c) 1984 (Japan)
+
+@source:casio/pv1000.cpp
+pv1000                          // Casio PV-1000
+
+@source:casio/pv2000.cpp
+pv2000                          // Casio PV-2000
+
+@source:skeleton/pv9234.cpp
+pv9234                          //
+
+@source:sony/pve500.cpp
+pve500                          // SONY PVE-500
+
+@source:skeleton/pwp14.cpp
+pwp14                           // Smith Corona PWP System 14
+
+@source:compugraphic/pwrview.cpp
+pwrview                         // Compugraphic MCS PowerView 10
+
+@source:epson/px4.cpp
+px4                             // 1985 Epson PX-4
+px4p                            // 1985 Epson PX-4+
+
+@source:epson/px8.cpp
+px8                             //
+
+@source:ussr/pyl601.cpp
+pyl601                          //
+pyl601a                         //
+
+@source:edevices/pzletime.cpp
+pzletime                        //
+
+@source:konami/qdrmfgp.cpp
+qdrmfgp                         // 1994.12 GQ460 (Japan)
+qdrmfgp2                        // 1995.09 GE557 (Japan)
+
+@source:taito/qix.cpp
+complexx                        // CX  (c) 1984 Taito America Corporation
+elecyoyo                        // YY  (c) 1982 Taito America Corporation
+elecyoyo2                       // YY  (c) 1982 Taito America Corporation
+kram                            // KS  (c) 1982 Taito America Corporation
+kram2                           // KS  (c) 1982 Taito America Corporation
+kram3                           // KS  (c) 1982 Taito America Corporation
+qix                             // LK  (c) 1981 Taito America Corporation
+qix2                            // ??  (c) 1981 Taito America Corporation
+qixa                            // LK  (c) 1981 Taito America Corporation
+qixb                            // LK  (c) 1981 Taito America Corporation
+qixo                            // LK  (c) 1981 Taito America Corporation
+sdungeon                        // SD  (c) 1981 Taito America Corporation
+sdungeona                       // SD  (c) 1981 Taito America Corporation
+slither                         // (c) 1982 Century II
+slithera                        // (c) 1982 Century II
+zookeep                         // ZA  (c) 1982 Taito America Corporation
+zookeep2                        // ZA  (c) 1982 Taito America Corporation
+zookeep3                        // ZA  (c) 1982 Taito America Corporation
+zookeepbl                       // bootleg
+
+@source:sinclair/ql.cpp
+ql                              // 1984 Sinclair QL (UK)
+ql_de                           // 1984 Sinclair QL (Germany)
+ql_dk                           // 1984 Sinclair QL (Denmark)
+ql_es                           // 1984 Sinclair QL (Spain)
+ql_fr                           // 1984 Sinclair QL (France)
+ql_gr                           // 1984 Sinclair QL (Greece)
+ql_it                           // 1984 Sinclair QL (Italy)
+ql_se                           // 1984 Sinclair QL (Sweden)
+ql_us                           // 1984 Sinclair QL (USA)
+tonto                           //
+
+@source:skeleton/qtsbc.cpp
+qtsbc                           //
+
+@source:pc/quakeat.cpp
+quake                           // (c) 19?? Lazer-Tron / iD Software
+
+@source:skeleton/controlid.cpp
+cidx628                         // 200? Control ID X628
+
+@source:atari/quantum.cpp
+quantum                         // 136016           (c) 1982        // made by Gencomp
+quantum1                        // 136016           (c) 1982        // made by Gencomp
+quantump                        // 136016           (c) 1982        // made by Gencomp
+
+@source:cvs/quasar.cpp
+quasar                          // (c) 1980 Zelco Games Italy
+quasara                         // (c) 1980 Zelco Games Italy
+
+@source:pc/queen.cpp
+queen                           //
+
+@source:nmk/quizdna.cpp
+gakupara                        // (c) 1991 NMK
+gekiretu                        // (c) 1992 Face
+quizdna                         // (c) 1992 Face
+
+@source:misc/quizo.cpp
+quizo                           // (c) 1985 Seoul Coin Corp.
+quizoa                          // (c) 1985 Seoul Coin Corp.
+
+@source:nmk/quizpani.cpp
+quizpani                        // (c) 1993 NMK
+
+@source:misc/quizpun2.cpp
+quizpun                         // (c) 1989 Space Computer System of Korea
+quizpun2                        // (c) 1989 Space Computer System of Korea
+
+@source:atari/quizshow.cpp
+quizshow                        // 005464           1976/04 [2650]
+
+@source:qume/qvt70.cpp
+qvt70                           // (c) 1992 Qume Corp.
+qvt82                           // (c) 1993 Qume Corp.
+
+@source:qume/qvt102.cpp
+qvt102                          // (c) 1983 Qume Corp.
+qvt102a                         // (c) 1983 Qume Corp.
+
+@source:qume/qvt103.cpp
+qvt103                          // (c) 1983 Qume Corp.
+
+@source:qume/qvt190.cpp
+qvt190                          // Qume Corp.
+
+@source:qume/qvt201.cpp
+qvt201                          // (c) 1986 Qume Corp.
+
+@source:epson/qx10.cpp
+qx10                            //
+
+@source:sigma/r2dtank.cpp
+r2dtank                         // (c) 1980 Sigma Ent. Inc.
+
+@source:seibu/r2dx_v33.cpp
+nzeroteam                       // (c) 1997 Seibu Kaihatsu
+nzeroteama                      //
+r2dx_v33                        // (c) 1996 Seibu Kaihatsu
+r2dx_v33_r2                     // (c) 1996 Seibu Kaihatsu
+zerotm2k                        // (c) 2000 Seibu Kaihatsu
+
+@source:rolm/r9751.cpp
+r9751                           // ROLM 9751 phone system
+
+@source:metro/rabbit.cpp
+rabbit                          // (c) 1997 Electronic Arts
+rabbita                         // (c) 1996 Electronic Arts
+rabbitj                         // (c) 1997 Electronic Arts
+rabbitjt                        // (c) 1996 Electronic Arts
+
+@source:misc/radikaldarts.cpp
+radikaldrt                      // (c) 2011? Gaelco Darts
+
+@source:ussr/radio86.cpp
+impuls03                        //
+kr03                            //
+mikron2                         //
+radio16                         //
+radio4k                         //
+radio86                         //
+radioram                        //
+radiorom                        //
+rk7007                          //
+rk700716                        //
+spektr01                        //
+
+@source:trs/radionic.cpp
+radionic                        // Komtek 1
+
+@source:seibu/raiden.cpp
+raiden                          // (c) 1990 Seibu Kaihatsu
+raidena                         // (c) 1990 Seibu Kaihatsu
+raidenb                         // (c) 1990 Seibu Kaihatsu
+raidenk                         // (c) 1990 Seibu Kaihatsu + IBL Corporation license
+raidenkb                        // (c) bootleg
+raident                         // (c) 1990 Seibu Kaihatsu + Liang HWA Electronics license
+raidenu                         // (c) 1990 Seibu Kaihatsu + Fabtek license
+raidenua                        // (c) 1990 Seibu Kaihatsu + Fabtek license
+raidenub                        // (c) 1990 Seibu Kaihatsu + Fabtek license
+
+@source:seibu/raiden_ms.cpp
+raidenm                         // bootleg
+
+@source:seibu/raiden2.cpp
+raiden2                         // (c) 1993 Seibu Kaihatsu + Fabtek license
+raiden2dx                       // (c) 1993 Seibu Kaihatsu
+raiden2e                        // (c) 1993 Seibu Kaihatsu
+raiden2eup
+raiden2ea                       // (c) 1993 Seibu Kaihatsu
+raiden2eg                       // (c) 1993 Seibu Kaihatsu + Tuning license
+raiden2es                       // (c) 1993 Seibu Kaihatsu
+raiden2eu                       // (c) 1993 Seibu Kaihatsu + Fabtek license
+raiden2eua                      // (c) 1993 Seibu Kaihatsu + Fabtek license
+raiden2eub                      // (c) 1993 Seibu Kaihatsu + Fabtek license
+raiden2f                        // (c) 1993 Seibu Kaihatsu
+raiden2g                        // (c) 1993 Seibu Kaihatsu + Tuning license
+raiden2hk                       // (c) 1993 Seibu Kaihatsu + Metrotainment license
+raiden2i                        // (c) 1993 Seibu Kaihatsu
+raiden2j                        // (c) 1993 Seibu Kaihatsu
+raiden2k                        // (c) 1993 Seibu Kaihatsu
+raiden2nl                       // (c) 1993 Seibu Kaihatsu
+raiden2sw                       // (c) 1993 Seibu Kaihats
+raiden2u                        // (c) 1993 Seibu Kaihatsu + Fabtek license
+raidendx                        // (c) 1994 Seibu Kaihatsu
+raidendxa1                      // (c) 1994 Seibu Kaihatsu + Metrotainment license
+raidendxa2                      // (c) 1994 Seibu Kaihatsu + Metrotainment license
+raidendxch                      //
+raidendxg                       // (c) 1994 Seibu Kaihatsu + Tuning license
+raidendxj                       // (c) 1994 Seibu Kaihatsu
+raidendxja                      // (c) 1994 Seibu Kaihatsu
+raidendxk                       // (c) 1994 Seibu Kaihatsu
+raidendxnl                      // (c) 1994 Seibu Kaihatsu
+raidendxpt                      // (c) 1994 Seibu Kaihatsu
+raidendxu                       // (c) 1994 Seibu Kaihatsu + Fabtek license
+xsedae                          // (c) 1995 Dream Island
+zeroteam                        // (c) 1993 Seibu Kaihatsu + Fabtek license
+zeroteama                       // (c) 1993 Seibu Kaihatsu
+zeroteamb                       // (c) 1993 Seibu Kaihatsu
+zeroteamc                       // (c) 1993 Seibu Kaihatsu + Liang Hwa license
+zeroteamd                       // (c) 1993 Seibu Kaihatsu + Dreamsoft license
+zeroteams                       // (c) 1993 Seibu Kaihatsu
+zeroteamsr                      // (c) 1993 Seibu Kaihatsu
+
+@source:dec/rainbow.cpp
+rainbow                         // 1983 DEC Rainbow 100-B
+rainbow100a                     // 1982 DEC Rainbow 100-A
+rainbow190                      // 1985 DEC Rainbow 190
+
+@source:atlus/rallypnt.cpp
+rallypnt2
+
+@source:namco/rallyx.cpp
+commsega                        // (c) 1983 Sega
+cottong                         // bootleg
+dngrtrck                        // Petaco bootleg
+gutangtn                        // GX359 (c) 1982 Konami + Sega license
+jackler                         // 1 9 8 2 (Jungler Bootleg)
+jungler                         // GX327 (c) 1981 Konami
+junglero                        // Olympia license
+junglers                        // GX327 (c) 1981 Stern
+locoboot                        // bootleg
+locomotn                        // GX359 (c) 1982 Konami + Centuri license
+nrallyx                         // (c) 1981 Namco
+nrallyxb                        // (c) 1981 Namco
+rallyx                          // (c) 1980 Namco
+rallyxa                         // (c) 1980 Namco
+rallyxm                         // (c) 1980 Midway
+rallyxmr                        // Model Racing bootleg
+savanna                         // Olympia (c) 1982 (Jungler bootleg)
+tactcian                        // GX335 (c) 1982 Sega
+tactcian2                       // GX335 (c) 1981 Sega
+
+@source:ultimachine/rambo.cpp
+metamaq2                        // Metamaquina 2 desktop 3d printer
+
+@source:atari/rampart.cpp
+rampart                         // 136082           (c) 1990
+rampart2p                       // 136082           (c) 1990
+rampart2pa                      // 136082           (c) 1990
+rampartj                        // 136082           (c) 1990 (Japan)
+
+@source:ramtek/ramtek.cpp
+bballrmt                        // (c) 1974 Ramtek
+cleanswp                        // (c) 1974 Ramtek
+hockyrmt                        // (c) 1973 Ramtek
+soccrrmt                        // (c) 1973 Ramtek
+trivia                          // (c) 1976 Ramtek
+vollyrmt                        // (c) 1973 Ramtek
+wipeormt                        // (c) 1974 Ramtek
+
+@source:taito/rastan.cpp
+rastan                          // B04 (c) 1987 Taito Corporation Japan (World)
+rastana                         // B04 (c) 1987 Taito Corporation Japan (World)
+rastanb                         // B04 (c) 1987 Taito Corporation Japan (World)
+rastanu                         // B04 (c) 1987 Taito America Corporation (US)
+rastanua                        // B04 (c) 1987 Taito America Corporation (US)
+rastanub                        // B04 (c) 1987 Taito America Corporation (US)
+rastsaga                        // B04 (c) 1987 Taito Corporation (Japan)
+rastsagaa                       // B04 (c) 1987 Taito Corporation (Japan)
+rastsagaabl                     // bootleg
+rastsagab                       // B04 (c) 1987 Taito Corporation (Japan)
+
+@source:bfm/rastersp.cpp
+fbcrazy                         // 1997
+rotr                            // 1994
+rotra                           // 1994
+
+@source:homebrew/ravens.cpp
+ravens                          //
+ravens2                         //
+
+@source:misc/rawthrillspc.cpp
+fnf                             // (c) 2004 Raw Thrills
+guitarheroac                    // (c) 2008 Raw Thrills / Activision / Konami
+
+@source:taito/rbisland.cpp
+jumping                         // bootleg
+jumpinga                        // bootleg (Seyutu)
+jumpingi                        // bootleg (Seyutu / Imnoe)
+rbisland                        // B22 (c) 1987 Taito Corporation
+rbislando                       // B22 (c) 1987 Taito Corporation
+rbislande                       // B39 (c) 1988 Taito Corporation
+
+@source:misc/rbmk.cpp
+magslot                         // (c) 2003 GMS
+rbmk                            // (c) 1998 GMS
+rbspm                           // (c) 1998 GMS
+sc2in1                          // (c) 2001 GMS
+super555                        // (c) 1999 GMS
+
+@source:namco/rbowlorama.cpp
+rbowlorama                      // (c) 2008 Cosmodog / Namco
+
+@source:regnecentralen/rc702.cpp
+rc702                           // 1979 RC702
+
+@source:regnecentralen/rc759.cpp
+rc759                           // 1984 RC759
+
+@source:misc/rcorsair.cpp
+rcorsair                        // (c) 1984 Nakasawa
+
+@source:skeleton/rd100.cpp
+rd100                           //
+
+@source:misc/re900.cpp
+bs94                            // (c) 1994 Entretenimientos GEMINIS
+re900                           // (c) 1993 Entretenimientos GEMINIS
+
+@source:dynax/realbrk.cpp
+dai2kaku                        // "522" DaiDaiKakumei (Japan)
+pkgnsh                          // "505" Pachinko Gindama Shoubu 1998 (Japan)
+pkgnshdx                        // "522" Pachinko Gindama Shoubu DX 1998 (Japan)
+realbrk                         // "600" Billiard Academy Real Break 1998 (Europe)
+realbrkj                        // "523" Billiard Academy Real Break 1998 (Japan)
+realbrkk                        // "600" Billiard Academy Real Break 1998 (Korea)
+realbrko                        // "600" Billiard Academy Real Break 1998 (Europe)
 
 @source:pinball/recel.cpp
 recel                           //

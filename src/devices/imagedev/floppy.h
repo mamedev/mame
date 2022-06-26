@@ -125,6 +125,7 @@ public:
 	int idx_r() { return idx; }
 	int mon_r() { return mon; }
 	bool ss_r() { return ss; }
+	bool ds_r() { return ds; }
 	bool twosid_r();
 
 	virtual bool writing_disabled() const;

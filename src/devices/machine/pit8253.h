@@ -34,13 +34,15 @@ enum class pit_type
 {
 	I8254,
 	I8253,
-	FE2010
+	FE2010,
+	PS2			/* like 8253, but weird */
 };
 
 class pit_counter_device : public device_t
 {
 	friend class pit8253_device;
 	friend class pit8254_device;
+	friend class ps2_pit_device;
 
 public:
 	// construction/destruction
@@ -116,8 +118,8 @@ public:
 	template <unsigned N> void set_clk(const XTAL &xtal) { set_clk<N>(xtal.dvalue()); }
 	template <unsigned N> auto out_handler() { return m_out_handler[N].bind(); }
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
 
 	void write_gate0(int state) { m_counter[0]->gate_w(state); }
 	void write_gate1(int state) { m_counter[1]->gate_w(state); }
@@ -177,4 +179,37 @@ public:
 };
 
 DECLARE_DEVICE_TYPE(FE2010_PIT, fe2010_pit_device)
+
+/*
+ * The PS/2 PIT is implemented in an ASIC. It's compatible with the 8253, with an extra channel
+ * at I/O port 44h replacing the disused DRAM refresh channel 1.
+ */
+class ps2_pit_device : public pit8253_device
+{
+	friend class pit_counter_device;
+	
+public:
+	ps2_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+	WRITE_LINE_MEMBER(write_gate3) { m_ch3_counter->gate_w(state); }
+	WRITE_LINE_MEMBER(write_clk3) { m_ch3_counter->set_clock_signal(state); }
+
+	auto ch3_out_handler() { return m_ch3_out_handler.bind(); }
+
+protected:
+	ps2_pit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, pit_type chip_type);
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_resolve_objects() override;
+	virtual void device_start() override;
+
+	double m_ch3_clk;
+	devcb_write_line m_ch3_out_handler;
+	required_device<pit_counter_device> m_ch3_counter;
+};
+
+DECLARE_DEVICE_TYPE(PS2_PIT, ps2_pit_device)
 #endif // MAME_MACHINE_PIT8253_H

@@ -42,7 +42,7 @@
 #define LOG_REPORT  (1U << 3)
 #define LOG_STATE   (1U << 4)
 
-//#define VERBOSE (LOG_COMMAND)
+//#define VERBOSE (LOG_GENERAL|LOG_COMMAND|LOG_RXTX|LOG_REPORT|LOG_STATE)
 
 #include "logmacro.h"
 
@@ -64,7 +64,8 @@ INPUT_PORTS_START(hle_ps2_mouse_device)
 	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static constexpr attotime serial_cycle = attotime::from_usec(25);
+// IBM documentation: serial cycle is between 30-50usec, 40usec makes the emulated PS/2 controller happy 
+static constexpr attotime serial_cycle = attotime::from_usec(40);
 
 hle_ps2_mouse_device::hle_ps2_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, HLE_PS2_MOUSE, tag, owner, clock)
@@ -329,6 +330,8 @@ void hle_ps2_mouse_device::serial(s32 param)
 
 void hle_ps2_mouse_device::command(u8 const command)
 {
+	LOGMASKED(LOG_COMMAND, "got cmd %02X\n", command);
+
 	// consume the command byte
 	m_rx_len--;
 

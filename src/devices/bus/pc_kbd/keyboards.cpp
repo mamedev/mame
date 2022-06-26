@@ -34,6 +34,11 @@ void pc_at_keyboards(device_slot_interface &device)
 	device.option_add(STR_KBD_CHERRY_G80_1500, CHERRY_G80_1500);
 }
 
+void pc_ps2_keyboards(device_slot_interface &device)
+{
+	device.option_add(STR_KBD_MICROSOFT_NATURAL, PC_KBD_MICROSOFT_NATURAL);
+}
+
 void ps2_mice(device_slot_interface &device)
 {
 	device.option_add(STR_HLE_PS2_MOUSE, HLE_PS2_MOUSE);

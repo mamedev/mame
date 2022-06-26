@@ -238,10 +238,28 @@ private:
 	u8 m_ext_mode[4];
 };
 
+class ps2_dma_device : public am9517a_device
+{
+public:
+	ps2_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	protected:
+	virtual void device_start() override;
+
+	public:
+	// Extended function support.
+	template <unsigned Channel> u32 get_address() { return m_channel[Channel].m_address; }
+	template <unsigned Channel> u16 get_count() { return m_channel[Channel].m_count; }
+
+	template <unsigned Channel> void set_address(u32 addr) { m_channel[Channel].m_address = addr; m_channel[Channel].m_base_address = addr; }
+	template <unsigned Channel> void set_count(u16 count) { m_channel[Channel].m_count = count; m_channel[Channel].m_base_count = count; }
+};
+
 // device type definition
-DECLARE_DEVICE_TYPE(AM9517A,      am9517a_device)
-DECLARE_DEVICE_TYPE(V5X_DMAU,     v5x_dmau_device)
-DECLARE_DEVICE_TYPE(PCXPORT_DMAC, pcxport_dmac_device)
-DECLARE_DEVICE_TYPE(EISA_DMA,     eisa_dma_device)
+DECLARE_DEVICE_TYPE(AM9517A,      		am9517a_device)
+DECLARE_DEVICE_TYPE(V5X_DMAU,     		v5x_dmau_device)
+DECLARE_DEVICE_TYPE(PCXPORT_DMAC, 		pcxport_dmac_device)
+DECLARE_DEVICE_TYPE(EISA_DMA,     		eisa_dma_device)
+DECLARE_DEVICE_TYPE(PS2_DMA, 			ps2_dma_device)
 
 #endif // MAME_MACHINE_AM9517_H

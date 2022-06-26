@@ -20,7 +20,13 @@
 #define LOG_LIVE    (1U << 12)  // Live states
 #define LOG_DONE    (1U << 13)  // Command done
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN)
+//#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_COMMAND | LOG_DONE | LOG_STATE | LOG_RW | LOG_FIFO | LOG_TCIRQ)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
 
 #include "logmacro.h"
 
@@ -404,9 +410,11 @@ uint8_t ps2_fdc_device::sra_r()
 	floppy_info &fi = flopi[dor & 3];
 	if(fi.dir)
 		sra |= 0x01;
+	if(fi.dev && !fi.dev->wpt_r())
+		sra |= 0x02;
 	if(fi.index)
 		sra |= 0x04;
-	if(cur_rate >= 500000)
+	if(fi.dev && fi.dev->ss_r())
 		sra |= 0x08;
 	if(fi.dev && fi.dev->trk00_r())
 		sra |= 0x10;
@@ -430,6 +438,25 @@ uint8_t ps2_fdc_device::sra_r()
 
 uint8_t ps2_fdc_device::srb_r()
 {
+ 	/*
+	 *  b7: always 1
+	 *	b6: always 1
+	 *	b5: drive 0 select
+	 *	b4: write data
+	 *	b3: read data
+	 *	b2: write enable
+	 *	b1: motor enable 1
+	 *	b0: motor enable 0
+	 */
+
+	uint8_t data = 0xc0;
+
+	data |= (flopi[0].dev && flopi[0].dev->mon_r()) ? 0x00 : 0x01;
+	data |= (flopi[1].dev && flopi[1].dev->mon_r()) ? 0x00 : 0x02;
+	data |= (flopi[0].dev && flopi[0].dev->ds_r()) ? 0x20 : 0x00;
+
+	return data;
+	/*
 	uint8_t srb = 0;
 	// TODO: rddata, wrdata, write enable bits
 	if(mode == mode_t::M30)
@@ -444,6 +471,7 @@ uint8_t ps2_fdc_device::srb_r()
 		srb = 0xc0 | ((dor & 1) << 6) | ((dor & 0x30) >> 4);
 	}
 	return srb;
+	*/
 }
 
 uint8_t upd765_family_device::dor_r()
@@ -464,11 +492,24 @@ void upd765_family_device::dor_w(uint8_t data)
 			soft_reset();
 	}
 
-	for(int i=0; i<4; i++) {
-		floppy_info &fi = flopi[i];
-		if(fi.dev)
-			fi.dev->mon_w(!(dor & (0x10 << i)));
+	if(mode == mode_t::PS2)
+	{
+		// The MON bits are qualified by Drive Select.
+		floppy_info &fi_d0 = flopi[0];
+		floppy_info &fi_d1 = flopi[1];
+
+		if(fi_d0.dev) fi_d0.dev->mon_w(!(!BIT(dor, 0) && (BIT(dor, 4) || BIT(dor, 5))));
+		if(fi_d1.dev) fi_d1.dev->mon_w(!(BIT(dor, 0) && (BIT(dor, 4) || BIT(dor, 5))));
 	}
+	else
+	{
+		for(int i=0; i<4; i++) {
+			floppy_info &fi = flopi[i];
+			if(fi.dev)
+				fi.dev->mon_w(!(dor & (0x10 << i)));
+		}
+	}
+
 	check_irq();
 }
 
@@ -619,9 +660,29 @@ void upd765_family_device::fifo_w(uint8_t data)
 uint8_t upd765_family_device::do_dir_r()
 {
 	floppy_info &fi = flopi[dor & 3];
-	if(fi.dev)
-		return fi.dev->dskchg_r() ? 0x00 : 0x80;
-	return 0x00;
+
+	if(mode == mode_t::PS2)
+	{
+		uint8_t result = 0x78; // b6-b3 always 1
+		if(fi.dev)
+		{
+			// DSKCHG is still inverted
+			if(!fi.dev->dskchg_r()) result |= 0x80;
+			
+			// b2/b1 = DSR bitrate bits
+			result |= ((dsr & 0x03) << 1);
+
+			// b0 = /HIGHDENS
+			if(cur_rate < 500000) result |= 0x01;
+		}
+		return result;
+	}
+	else
+	{
+		if(fi.dev)
+			return fi.dev->dskchg_r() ? 0x00 : 0x80;
+		return 0x00;
+	}
 }
 
 void upd765_family_device::ccr_w(uint8_t data)
@@ -654,6 +715,7 @@ void upd765_family_device::enable_transfer()
 
 	}
 	// DMA
+	LOG("%s: drq %d\n", FUNCNAME, drq);
 	if(!drq)
 		set_drq(true);
 }
@@ -727,13 +789,20 @@ void upd765_family_device::fifo_expect(int size, bool write)
 
 uint8_t upd765_family_device::dma_r()
 {
-	if(machine().side_effects_disabled())
+	LOG("%s\n", FUNCNAME);
+	if(!machine().side_effects_disabled()) {
+		uint8_t data = fifo_pop(false);
+		LOG("%s d:%02X\n", FUNCNAME, data);
+		return data;
+	}
+	else {
 		return fifo[0];
-	return fifo_pop(false);
+	}
 }
 
 void upd765_family_device::dma_w(uint8_t data)
 {
+	LOG("%s d:%d\n", FUNCNAME, data);
 	fifo_push(data, false);
 }
 

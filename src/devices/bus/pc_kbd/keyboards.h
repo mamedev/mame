@@ -31,6 +31,7 @@ void pc_xt_keyboards(device_slot_interface &device);
 #define STR_KBD_CHERRY_G80_1500     "g80_1500"
 
 void pc_at_keyboards(device_slot_interface &device);
+void pc_ps2_keyboards(device_slot_interface &device);
 
 // PS/2 protocol mice
 #define STR_HLE_PS2_MOUSE           "hle_ps2_mouse"

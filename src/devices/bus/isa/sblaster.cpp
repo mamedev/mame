@@ -31,6 +31,14 @@
 #define IRQ_MPU     0x04
 #define IRQ_ALL     0xff
 
+#define VERBOSE 1
+#include "logmacro.h"
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
 
 /*
   adlib (YM3812/OPL2 chip), part of many many soundcards (soundblaster)
@@ -248,7 +256,10 @@ void sb_device::dsp_data_w(offs_t offset, uint8_t data)
 //    printf("%02x to DSP data @ %x\n", data, offset);
 	if(offset)
 		return;
-	logerror("Soundblaster DSP data port undocumented write\n");
+	
+	LOG("%s: SB DSP port write O:%02X D:%02X\n", FUNCNAME, offset, data);
+
+	//logerror("Soundblaster DSP data port undocumented write\n");
 }
 
 uint8_t sb_device::dsp_rbuf_status_r(offs_t offset)

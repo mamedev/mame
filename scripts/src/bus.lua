@@ -1872,7 +1872,50 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/msx/slot/slot.h,BUSES["MSX_SLOT"] = true
+--@src/devices/bus/mca/mca.h,BUSES["MCA"] = true
+---------------------------------------------------
+if (BUSES["MCA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/mca/3c523.cpp",
+		MAME_DIR .. "src/devices/bus/mca/3c523.h",
+		MAME_DIR .. "src/devices/bus/mca/adlib.cpp",
+		MAME_DIR .. "src/devices/bus/mca/adlib.h",
+		MAME_DIR .. "src/devices/bus/mca/c1000.cpp",
+		MAME_DIR .. "src/devices/bus/mca/c1000.h",	
+		MAME_DIR .. "src/devices/bus/mca/curam.cpp",
+		MAME_DIR .. "src/devices/bus/mca/curam.h",
+		MAME_DIR .. "src/devices/bus/mca/ibm72x8299.cpp",
+		MAME_DIR .. "src/devices/bus/mca/ibm72x8299.h",
+		MAME_DIR .. "src/devices/bus/mca/ibm_dual_async.cpp",
+		MAME_DIR .. "src/devices/bus/mca/ibm_dual_async.h",
+		MAME_DIR .. "src/devices/bus/mca/ibm_memory_exp_16.cpp",	
+		MAME_DIR .. "src/devices/bus/mca/ibm_memory_exp_16.h",
+		MAME_DIR .. "src/devices/bus/mca/ibm_memory_exp_32.cpp",	
+		MAME_DIR .. "src/devices/bus/mca/ibm_memory_exp_32.h",
+		MAME_DIR .. "src/devices/bus/mca/ibm_svga.cpp",	
+		MAME_DIR .. "src/devices/bus/mca/ibm_svga.h",
+		MAME_DIR .. "src/devices/bus/mca/macpa.cpp",
+		MAME_DIR .. "src/devices/bus/mca/macpa.h",
+		MAME_DIR .. "src/devices/bus/mca/mca.cpp",
+		MAME_DIR .. "src/devices/bus/mca/mca.h",
+		MAME_DIR .. "src/devices/bus/mca/mca_cards.cpp",
+		MAME_DIR .. "src/devices/bus/mca/mca_cards.h",
+		MAME_DIR .. "src/devices/bus/mca/planar_fdc.cpp",
+		MAME_DIR .. "src/devices/bus/mca/planar_fdc.h",	
+		MAME_DIR .. "src/devices/bus/mca/planar_lpt.cpp",
+		MAME_DIR .. "src/devices/bus/mca/planar_lpt.h",		
+		MAME_DIR .. "src/devices/bus/mca/planar_uart.cpp",
+		MAME_DIR .. "src/devices/bus/mca/planar_uart.h",
+		MAME_DIR .. "src/devices/bus/mca/planar_vga.cpp",
+		MAME_DIR .. "src/devices/bus/mca/planar_vga.h",
+		MAME_DIR .. "src/devices/bus/mca/snark_barker.cpp",
+		MAME_DIR .. "src/devices/bus/mca/snark_barker.h",	
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/msx_slot/slot.h,BUSES["MSX_SLOT"] = true
 ---------------------------------------------------
 
 if (BUSES["MSX_SLOT"]~=null) then

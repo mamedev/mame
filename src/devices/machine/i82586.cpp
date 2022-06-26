@@ -407,7 +407,11 @@ TIMER_CALLBACK_MEMBER(i82586_base_device::cu_execute)
 	m_space->write_dword(m_cba, cb_cs | CB_B);
 
 	static const char *const CMD_NAME[] = { "NOP", "INDIVIDUAL ADDRESS SETUP", "CONFIGURE", "MULTICAST SETUP", "TRANSMIT", "TIME DOMAIN REFLECTOMETER", "DUMP", "DIAGNOSE" };
-	LOG("cu_execute command 0x%08x (%s)\n", cb_cs, CMD_NAME[(cb_cs & CB_CMD) >> 16]);
+	
+	if(((cb_cs & CB_CMD) >> 16) != 0)
+	{
+		LOG("cu_execute command 0x%08x (%s)\n", cb_cs, CMD_NAME[(cb_cs & CB_CMD) >> 16]);
+	}
 
 	if (m_cu_state != CU_IDLE)
 	{
@@ -473,11 +477,27 @@ void i82586_base_device::cu_complete(const u16 status)
 		// check for suspend or abort
 		if (m_cu_state == CU_ACTIVE)
 		{
-			// fetch link address
-			m_cba = address(m_cba, 4, 4);
+			// Is this a circular chain?
+			if(m_cba == address(m_cba, 4, 4))
+			{
+				// yes
+				//LOG("*** cu_complete: chain is circular\n");
 
-			// restart timer
-			m_cu_timer->adjust(attotime::zero);
+				// fetch link address
+				m_cba = address(m_cba, 4, 4);
+
+				// artificial delay
+				m_cu_timer->adjust(attotime::from_usec(50));
+				return;
+			}
+			else
+			{
+				// fetch link address
+				m_cba = address(m_cba, 4, 4);
+
+				// restart timer
+				m_cu_timer->adjust(attotime::zero);
+			}
 		}
 	}
 	else

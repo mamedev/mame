@@ -1790,6 +1790,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ibm72x7377.h,MACHINES["IBM72X7377"] = true
+---------------------------------------------------
+
+if (MACHINES["IBM72X7377"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ibm72x7377.cpp",
+		MAME_DIR .. "src/devices/machine/ibm72x7377.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/idectrl.h,MACHINES["IDECTRL"] = true
 --@src/devices/machine/vt83c461.h,MACHINES["IDECTRL"] = true
 ---------------------------------------------------
@@ -5178,6 +5190,17 @@ if (MACHINES["NMK112"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/nmk112.cpp",
 		MAME_DIR .. "src/devices/machine/nmk112.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ibmps2.h,MACHINES["PS2_MB"] = true
+---------------------------------------------------
+if (MACHINES["PS2_MB"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ibmps2.cpp",
+		MAME_DIR .. "src/devices/machine/ibmps2.h",
 	}
 end
 

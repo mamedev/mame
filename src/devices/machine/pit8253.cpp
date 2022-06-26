@@ -33,8 +33,8 @@
 #define LOG_1 (1U << 1)
 #define LOG_2 (1U << 2)
 
-//#define VERBOSE (LOG_1 | LOG_2)
-//#define LOG_OUTPUT_STREAM std::cout
+// #define VERBOSE (LOG_1 | LOG_2)
+// #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
@@ -45,6 +45,7 @@ DEFINE_DEVICE_TYPE(PIT_COUNTER, pit_counter_device, "pit_counter", "PIT Counter"
 DEFINE_DEVICE_TYPE(PIT8253, pit8253_device, "pit8253", "Intel 8253 PIT")
 DEFINE_DEVICE_TYPE(PIT8254, pit8254_device, "pit8254", "Intel 8254 PIT")
 DEFINE_DEVICE_TYPE(FE2010_PIT, fe2010_pit_device, "fe2010_pit", "Faraday FE2010 PIT")
+DEFINE_DEVICE_TYPE(PS2_PIT, ps2_pit_device, "ps2_pit", "IBM PS/2 PIT")
 
 pit_counter_device::pit_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PIT_COUNTER, tag, owner, clock)
@@ -76,6 +77,14 @@ fe2010_pit_device::fe2010_pit_device(const machine_config &mconfig, const char *
 {
 }
 
+ps2_pit_device::ps2_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pit8253_device(mconfig, PS2_PIT, tag, owner, clock, pit_type::I8253),
+	m_ch3_clk(0),
+	m_ch3_out_handler(*this),
+	m_ch3_counter(*this, "counter3")
+{
+}
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
@@ -87,6 +96,11 @@ void pit8253_device::device_add_mconfig(machine_config &config)
 	PIT_COUNTER(config, "counter2", 0);
 }
 
+void ps2_pit_device::device_add_mconfig(machine_config &config)
+{
+	pit8253_device::device_add_mconfig(config);
+	PIT_COUNTER(config, "counter3", 0);
+}
 
 //-------------------------------------------------
 //  device_resolve_objects - resolve objects that
@@ -104,6 +118,15 @@ void pit8253_device::device_resolve_objects()
 	}
 }
 
+void ps2_pit_device::device_resolve_objects()
+{
+	pit8253_device::device_resolve_objects();
+
+	m_ch3_out_handler.resolve_safe();
+	m_ch3_counter->m_index = 3;
+	m_ch3_counter->m_clockin = m_ch3_clk;
+	m_ch3_counter->m_clock_period = (m_ch3_clk != 0) ? attotime::from_hz(m_ch3_clk) : attotime::never;
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -162,6 +185,10 @@ void pit8253_device::device_start()
 {
 }
 
+void ps2_pit_device::device_start()
+{
+	pit8253_device::device_start();
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -305,7 +332,16 @@ void pit_counter_device::set_output(int output)
 		m_output = output;
 		LOG2("set_output() timer %d: %s\n", m_index, output ? "low to high" : "high to low");
 
-		downcast<pit8253_device *>(owner())->m_out_handler[m_index](output);
+		if (m_index == 3)
+		{
+			// only possible with a PS/2 PIT.
+			downcast<ps2_pit_device *>(owner())->m_ch3_out_handler(output);
+		}
+		else
+		{
+			downcast<pit8253_device *>(owner())->m_out_handler[m_index](output);
+		}
+
 	}
 }
 
@@ -1135,4 +1171,50 @@ void pit_counter_device::set_clock_signal(int state)
 		simulate(1);
 	}
 	m_clock_signal = state;
+}
+
+uint8_t ps2_pit_device::read(offs_t offset)
+{
+	LOG2("read(): offset %d\n", offset);
+
+	if (offset == 3)
+	{
+		/* Reading mode control register is illegal according to docs */
+		/* Experimentally determined: reading it returns 0 */
+		return 0;
+	}
+	else if(offset == 4) // register 4 is timer channel 3.
+	{
+		return m_ch3_counter->read();
+	}
+	else if (offset <= 2)
+		return m_counter[offset]->read();
+	else
+		return 0xff;
+}
+
+void ps2_pit_device::write(offs_t offset, uint8_t data)
+{
+	LOG2("write(): offset=%d data=0x%02x\n", offset, data);
+
+	if (offset == 3)
+	{
+		/* Write to mode control register */
+		int timer = (data >> 6) & 3;
+		if (timer == 3)
+			readback_command(data);
+		else
+			m_counter[timer]->control_w(data);
+	}
+	else if (offset == 7)
+	{
+		/* Write to mode control register */
+		m_ch3_counter->control_w(data);
+	}
+	else if (offset == 4)
+	{
+		m_ch3_counter->count_w(data);
+	}
+	else
+		m_counter[offset]->count_w(data);
 }
