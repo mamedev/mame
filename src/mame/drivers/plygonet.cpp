@@ -824,11 +824,18 @@ TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
 
 TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 {
-	const auto roz_vram = util::big_endian_cast<const u16>(m_roz_vram.target());
-	const int code = roz_vram[tile_index] & 0x7ff;
-	const int attr = (roz_vram[tile_index] >> 12) + 16; // ROZ base palette is palette index 16 onward
+	if (tile_index < 0x800)
+	{
+		const auto roz_vram = util::big_endian_cast<const u16>(m_roz_vram.target());
+		const int code = roz_vram[tile_index] & 0x7ff;
+		const int attr = (roz_vram[tile_index] >> 12) + 16; // ROZ base palette is palette index 16 onward
+		tileinfo.set(0, code, attr, 0);
+	}
+	else
+	{
+		tileinfo.set(0, 0, 0, 0);
+	}
 
-	tileinfo.set(0, code, attr, 0);
 }
 
 void polygonet_state::ttl_vram_w(offs_t offset, u32 data, u32 mem_mask)
@@ -886,7 +893,7 @@ void polygonet_state::video_start()
 	m_ttl_tilemap->set_transparent_pen(0);
 
 	// Set up the ROZ tilemap
-	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(polygonet_state::roz_get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(polygonet_state::roz_get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_roz_tilemap->set_transparent_pen(0);
 
 	// Register save states
@@ -896,7 +903,7 @@ void polygonet_state::video_start()
 u32 polygonet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0);
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(m_palette->pens()[0x100], cliprect);
 
 	m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, 0, 0, 0);
 
