@@ -1392,7 +1392,7 @@ GAME_CUSTOM( 199?, m4sky,     0,     bwboki_chr_cheat<m4sky_keys>, mpu4impcoin_j
 // unusual 1.8 hopper error on sets below
 GAME_CUSTOM( 199?, m4sky__a,  m4sky, bwboki_chr_cheat<m4sky_keys>, mpu4impcoin_jackpot15_20p_90pc, init_m4default_big, "sk_sj___.5_0", 0x0000, 0x040000, CRC(45ae0423) SHA1(94d5b3d4aacb69a18ff3f45681eb5f7fba7657e8), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 1)" ) // % key
 GAME_CUSTOM( 199?, m4sky__b,  m4sky, bwboki_chr_cheat<m4sky_keys>, mpu4impcoin_jackpot15_20p_90pc, init_m4default_big, "sk_sj_k_.5_0", 0x0000, 0x040000, CRC(e1bab980) SHA1(1c8b127809422ab0baf1875ca907f18269a0cc17), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 2)" ) // % key
-GAME_CUSTOM( 199?, m4sky__c,  m4sky, bwboki_chr_cheat<m4sky_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "sk_sja__.5_0", 0x0000, 0x040000, CRC(b2a16ef7) SHA1(9012dcc320e8af8fef53e0dc91d3bcd6cbafa5ee), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 3)" ) 
+GAME_CUSTOM( 199?, m4sky__c,  m4sky, bwboki_chr_cheat<m4sky_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "sk_sja__.5_0", 0x0000, 0x040000, CRC(b2a16ef7) SHA1(9012dcc320e8af8fef53e0dc91d3bcd6cbafa5ee), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 3)" )
 GAME_CUSTOM( 199?, m4sky__d,  m4sky, bwboki_chr_cheat<m4sky_keys>, mpu4impcoin_jackpot15_20p,      init_m4default_big, "sk_sjs__.5_0", 0x0000, 0x040000, CRC(d176431f) SHA1(8ca90ef61486fc5a5b6527f913cd05b42ceabe3e), "BWB",u8"Sky Sports Super Soccer (BWB) (MPU4) (20/25/30p stake £10/£15 jackpot) (set 4)" ) // Datapak
 
 

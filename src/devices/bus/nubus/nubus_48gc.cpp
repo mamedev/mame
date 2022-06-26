@@ -18,7 +18,10 @@
   “Uncorrected Gamma” profile if you don’t like it.
 
   TODO:
+  * Proper interrupt timing.
+  * CRTC status registers.
   * Interlaced modes.
+  * 1:2:1 convolution.
 
 ***************************************************************************/
 
@@ -108,7 +111,8 @@ private:
 	uint16_t m_preload;
 	uint32_t m_base, m_stride;
 
-	uint8_t m_colors[3], m_count, m_clutoffs, m_mode;
+	uint8_t m_colors[3], m_clutcnt, m_clutoffs;
+	uint8_t m_ramdac_mode, m_ramdac_conv;
 
 	uint16_t m_hactive, m_hbporch, m_hsync, m_hfporch;
 	uint16_t m_vactive, m_vbporch, m_vsync, m_vfporch;
@@ -152,10 +156,10 @@ INPUT_PORTS_START( 48gc )
 	PORT_CONFSETTING(   0x01, u8"Macintosh Portrait Display (B&W 15\" 640\u00d7870)")
 	PORT_CONFSETTING(   0x02, u8"Macintosh RGB Display (12\" 512\u00d7384)")
 	PORT_CONFSETTING(   0x03, u8"Macintosh Two-Page Monitor (B&W 21\" 1152\u00d7870)")
-	//PORT_CONFSETTING(   0x04, u8"NTSC Monitor") requires interlace modes
+	//PORT_CONFSETTING(   0x04, u8"NTSC Monitor (512\u00d7384, 640\u00d7480)") requires interlace modes
 	PORT_CONFSETTING(   0x05, u8"Macintosh Portrait Display (640\u00d7870)")
 	PORT_CONFSETTING(   0x06, u8"Macintosh Hi-Res Display (12-14\" 640\u00d7480)")
-	//PORT_CONFSETTING(   0x0b, u8"NTSC Encoder") requires interlace modes
+	//PORT_CONFSETTING(   0x0b, u8"NTSC Encoder (512\u00d7384, 640\u00d7480)") requires interlace modes
 	PORT_CONFNAME(0x10, 0x00, u8"VRAM size")
 	PORT_CONFSETTING(   0x00, u8"512 kB (4\u20228)")
 	PORT_CONFSETTING(   0x10, u8"1 MB (8\u202224)")
@@ -172,9 +176,9 @@ INPUT_PORTS_START( 824gc )
 	PORT_CONFSETTING(   0x01, u8"Mac Portrait Display (B&W 15\" 640\u00d7870)")
 	PORT_CONFSETTING(   0x02, u8"Mac RGB Display (12\" 512\u00d7384)")
 	PORT_CONFSETTING(   0x03, u8"Mac Two-Page Display (B&W 21\" 1152\u00d7870)")
-	//PORT_CONFSETTING(   0x04, u8"NTSC Monitor") requires interlace modes
+	//PORT_CONFSETTING(   0x04, u8"NTSC Monitor (512\u00d7384, 640\u00d7480)") requires interlace modes
 	PORT_CONFSETTING(   0x06, u8"Mac Hi-Res Display (12-14\" 640\u00d7480)")
-	//PORT_CONFSETTING(   0x0b, u8"NTSC Encoder") requires interlace modes
+	//PORT_CONFSETTING(   0x0b, u8"NTSC Encoder (512\u00d7384, 640\u00d7480)") requires interlace modes
 	PORT_CONFSETTING(   0x0d, u8"Mac 16\" Color Display (832\u00d7624)")
 	PORT_CONFNAME(0x10, 0x10, u8"VRAM size")
 	PORT_CONFSETTING(   0x00, u8"512 kB (4\u20228)")
@@ -334,7 +338,8 @@ void jmfb_device::device_start()
 	m_clut_addr_read = false;
 	m_monitor_type = 0;
 
-	m_mode = 0;
+	m_ramdac_mode = 0;
+	m_ramdac_conv = 0;
 
 	save_item(NAME(m_monitor_type));
 	save_pointer(NAME(m_vram), VRAM_MAX);
@@ -343,9 +348,10 @@ void jmfb_device::device_start()
 	save_item(NAME(m_base));
 	save_item(NAME(m_stride));
 	save_item(NAME(m_colors));
-	save_item(NAME(m_count));
+	save_item(NAME(m_clutcnt));
 	save_item(NAME(m_clutoffs));
-	save_item(NAME(m_mode));
+	save_item(NAME(m_ramdac_mode));
+	save_item(NAME(m_ramdac_conv));
 	save_item(NAME(m_hactive));
 	save_item(NAME(m_hbporch));
 	save_item(NAME(m_hsync));
@@ -400,8 +406,9 @@ void jmfb_device::device_reset()
 	m_stride = 80 / 4;
 
 	m_clutoffs = 0;
-	m_count = 0;
-	m_mode = 0;
+	m_clutcnt = 0;
+	m_ramdac_mode = 0;
+	m_ramdac_conv = 0;
 
 	m_hactive = 286;
 	m_hbporch = 22;
@@ -444,7 +451,7 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	auto const screenbase = util::big_endian_cast<uint8_t const>(&m_vram[0]) + (m_base << 5);
 	int const xres = screen.visible_area().right();
 
-	switch (m_mode)
+	switch (m_ramdac_mode)
 	{
 	case 0x0: // 1bpp
 		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
@@ -528,7 +535,7 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		break;
 
 	default:
-		throw emu_fatalerror("%s: Unsupported RAMDAC mode %d\n", tag(), m_mode);
+		throw emu_fatalerror("%s: Unsupported RAMDAC mode %d\n", tag(), m_ramdac_mode);
 	}
 
 	return 0;
@@ -536,10 +543,12 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void jmfb_device::update_crtc()
 {
-	int const vtotal = (m_vactive + m_vbporch + m_vsync + m_vfporch) / 2;
-	int const height = m_vactive / 2;
+	int const vtotal = m_vactive + m_vbporch + m_vsync + m_vfporch;
+	int const height = m_vactive;
 	if (vtotal && height && m_multiplier && m_modulus)
 	{
+		bool const interlace = BIT(m_control, 4);
+		bool const convolution = BIT(m_control, 5);
 		int const divider = 256 - m_preload;
 		XTAL const refclk = 20_MHz_XTAL / m_modulus;
 		XTAL const vcoout = refclk * m_multiplier;
@@ -552,7 +561,7 @@ void jmfb_device::update_crtc()
 		int const hactive = m_hactive + 2;
 
 		int scale = 0;
-		switch (m_mode)
+		switch (m_ramdac_mode)
 		{
 		case 0x0: // 1bpp - 32 pixels/longword
 			scale = 5;
@@ -570,15 +579,17 @@ void jmfb_device::update_crtc()
 			scale = 0;
 			break;
 		}
-		int const hpixels = (htotal << scale) / divider;
-		int const width = (hactive << scale) / divider;
+		int const hpixels = (htotal << scale >> (convolution ? 2 : 0)) / divider;
+		int const width = (hactive << scale >> (convolution ? 2 : 0)) / divider;
 		LOGCRTC("horizontal total %d active %d (mode %x %d/%d)\n",
-				htotal, hactive, m_mode, width, hpixels);
+				htotal, hactive, m_ramdac_mode, width, hpixels);
+
+		int const frametotal = hpixels * vtotal >> (interlace ? 0 : 1);
 
 		screen().configure(
-				hpixels, vtotal,
-				rectangle(0, width - 1, 0, height - 1),
-				attotime::from_ticks(hpixels * vtotal, pixclk).attoseconds());
+				hpixels, vtotal >> (interlace ? 0 : 1),
+				rectangle(0, width - 1, 0, (height >> (interlace ? 0 : 1)) - 1),
+				attotime::from_ticks(frametotal, pixclk).attoseconds());
 
 		// TODO: determine correct timing for vertical blanking interrupt
 		m_timer->adjust(screen().time_until_pos(height - 1, 0));
@@ -656,9 +667,9 @@ void jmfb_device::jmfb_w(offs_t offset, uint32_t data)
 	switch (offset)
 	{
 	case 0x00/4: // control
-		LOG("%s: %04x to control (sense %x interlace %x RGB %x RAM %dk)\n",
+		LOG("%s: %04x to control (sense %x convolution %x interlace %x RGB %x RAM %dk)\n",
 				machine().describe_context(), data,
-				BIT(data, 9, 3), BIT(data, 4), BIT(data, 2), BIT(data, 0) ? 256 : 128);
+				BIT(data, 9, 3), BIT(data, 5), BIT(data, 4), BIT(data, 2), BIT(data, 0) ? 256 : 128);
 		m_control = data;
 		m_vram_view.select(BIT(data, 2)); // packed RGB mode
 		break;
@@ -755,23 +766,25 @@ void jmfb_device::ramdac_w(offs_t offset, uint32_t data)
 	case 0x00/4: // CLUT address
 		LOGCLUT("%s: %u to RAMDAC color address\n", machine().describe_context(), data);
 		m_clutoffs = data;
-		m_count = 0;
+		m_clutcnt = 0;
 		break;
 
 	case 0x04/4: // CLUT data
-		m_colors[m_count++] = data & 0xff;
-		if (m_count == 3)
+		m_colors[m_clutcnt++] = data & 0xff;
+		if (m_clutcnt == 3)
 		{
 			LOGCLUT("%s: RAMDAC color %u = %02x %02x %02x\n", machine().describe_context(), m_clutoffs, m_colors[0], m_colors[1], m_colors[2]);
 			set_pen_color(m_clutoffs, rgb_t(m_colors[0], m_colors[1], m_colors[2]));
 			m_clutoffs++;
-			m_count = 0;
+			m_clutcnt = 0;
 		}
 		break;
 
 	case 0x08/4: // RAMDAC mode control
-		m_mode = (data >> 1) & 0xf;
-		LOGRAMDAC("%s: %02x to RAMDAC control (mode = %x)\n", machine().describe_context(), data, m_mode);
+		m_ramdac_mode = (data >> 1) & 0xf;
+		m_ramdac_conv = BIT(data, 0);
+		LOGRAMDAC("%s: %02x to RAMDAC control (mode %x convolution %x)\n",
+				machine().describe_context(), data, m_ramdac_mode, m_ramdac_conv);
 		update_crtc();
 		break;
 

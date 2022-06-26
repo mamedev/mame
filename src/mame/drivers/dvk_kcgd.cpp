@@ -187,7 +187,7 @@ DEVICE_INPUT_DEFAULTS_END
 /*
 TIMER_CALLBACK_MEMBER(kcgd_state::vsync_tick)
 {
-	m_maincpu->set_input_line(INPUT_LINE_EVNT, ASSERT_LINE);
+    m_maincpu->set_input_line(INPUT_LINE_EVNT, ASSERT_LINE);
 }
 */
 

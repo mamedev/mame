@@ -1433,10 +1433,10 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!--
-		Originally published as a type-in program in the October 1985 issue of LOGiN Magazine.
-		Game programmed by Hiromichi Tanaka, converted to t88 format by Dustin Hubbard / Gaming Alexandria.
+	    Originally published as a type-in program in the October 1985 issue of LOGiN Magazine.
+	    Game programmed by Hiromichi Tanaka, converted to t88 format by Dustin Hubbard / Gaming Alexandria.
 	-->
 	<software name="3156coro2">
 		<description>3156 Coro Coro</description>

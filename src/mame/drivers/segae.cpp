@@ -1140,12 +1140,12 @@ ROM_END
 //*************************************************************************************************************************
 //  Megumi Rescue
 //   Game ID# 833-6200
-// 
+//
 //   ROMs have no SEGA EPR codes but are all marked
 //
 //        Megumi Rescue
 //           V10.30
-//        Final Version 
+//        Final Version
 //            IC-x
 //       (c)1987SEGA/EXA
 //

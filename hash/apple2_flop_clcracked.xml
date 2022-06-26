@@ -48307,7 +48307,7 @@ license:CC0
 		<publisher>Electronic Courseware Systems</publisher>
 		<info name="release" value="2022-06-09"/>
 		<!--"Super Ear Challenger" is a 1985 educational program developed by Stephen Walker and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2 and will crash spectacularly without one. It is preserved here for the first time.-->
-        <!-- It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2 and will crash spectacularly without one. -->
+		<!-- It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2 and will crash spectacularly without one. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">

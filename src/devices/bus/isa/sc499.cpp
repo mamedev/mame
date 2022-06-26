@@ -17,10 +17,10 @@
 #include "emu.h"
 #include "sc499.h"
 
-#define LOG_LEVEL0		(0x1U << 1)
-#define LOG_LEVEL1		(0x3U << 1)
-#define LOG_LEVEL2		(0x7U << 1)
-#define LOG_LEVEL3		(0xfU << 1)
+#define LOG_LEVEL0      (0x1U << 1)
+#define LOG_LEVEL1      (0x3U << 1)
+#define LOG_LEVEL2      (0x7U << 1)
+#define LOG_LEVEL3      (0xfU << 1)
 
 #define VERBOSE (LOG_LEVEL0)
 #include "logmacro.h"
