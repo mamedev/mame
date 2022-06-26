@@ -39,6 +39,8 @@ Each registerpoint that is set is assigned a numeric index which can be
 used to refer to it in other registerpoint commands.  Registerpoint
 indices are unique throughout a session.
 
+Note that temporary values must be in the form **temp<number>**.
+
 Examples:
 
 ``rp {PC==150}``

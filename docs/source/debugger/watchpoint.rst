@@ -57,6 +57,8 @@ available: for all watchpoints, the variable **wpaddr** is set to the
 access address that triggered the watchpoint; for write watchpoints, the
 variable **wpdata** is set to the data being written.
 
+Note that temporary values must be in the form **temp<number>**.
+
 Examples:
 
 ``wp 1234,6,rw``
@@ -67,7 +69,7 @@ Examples:
     Set a watchpoint for the visible CPU that will halt execution
     whenever a write to the ``data`` space occurs in the address range
     23456-2345f and the data written is equal to 1.
-``wp 3456:maincpu,20,r,1,{ printf "Read @ %08X\n",wpaddr ; g }``
+``wp 3456:maincpu,20,r,1,,{ printf "Read @ %08X\n",wpaddr ; g }``
     Set a watchpoint for the CPU with the absolute tag path ``:maincpu``
     that will halt execution whenever a read from the first address
     space occurs in the address range 3456-3475.  When this happens,

@@ -45,6 +45,8 @@ Each breakpoint that is set is assigned a numeric index which can be
 used to refer to it in other breakpoint commands.  Breakpoint indices
 are unique throughout a session.
 
+Note that temporary values must be in the form **temp<number>**.
+
 Examples:
 
 ``bp 1234``
@@ -54,7 +56,7 @@ Examples:
     Set a breakpoint for the visible CPU that will halt execution
     whenever the PC is equal to 23456 *and* the expression
     ``a0 == 0 && a1 == 0`` is true.
-``bp 3456:audiocpu,1,{ printf "A0=%08X\n",a0 ; g }``
+``bp 3456:audiocpu,1,,{ printf "A0=%08X\n",a0 ; g }``
     Set a breakpoint for the CPU with the absolute tag path
     ``:audiocpu`` that will halt execution whenever the PC is equal to
     3456.  When this happens, print **A0=<a0val>** to the debugger
