@@ -3,59 +3,88 @@
 <!--
 license:CC0
 
-	3'' floppy disk images for Sinclair ZX Spectrum +3 machines.
+    3'' floppy disk images for Sinclair ZX Spectrum +3 machines.
 
-	Loading instructions:
-		Most +3 disks should load automatically upon entering the Loader in the main menu.
-		
-		If the "Insert tape" message appears instead (disk compilations without a menu, etc), users are required to load a specific file themselves. Enter +3 Basic and type CAT to see the list of files on the disk, then LOAD"<filename>".
-		
-		If it doesn't start automatically after loading, type RUN.
+    Loading instructions:
+        Most +3 disks should load automatically upon entering the Loader in the
+        main menu.
 
-	Copy protection:
-		Some disks include custom formatting tricks such as mixed sector sizes, 8K sectors, fake error sectors, etc, which may not be yet supported by MAME.
-		More info on +3 copy protections can be found here: https://simonowen.com/samdisk/sys_plus3/
+        If the "Insert tape" message appears instead (disk compilations without
+        a menu, etc), users are required to load a specific file themselves.
+        Enter +3 Basic and type CAT to see the list of files on the disk, then
+        LOAD"<filename>".
 
-	Known undumped:
-		Ci-U-Than Trilogy-III: Chichén Itzá (likely but unconfirmed)
-		Comando Tracer (dual-system Spectrum/Amstrad release)
-		Psycho Pigs UXB
+        If it doesn't start automatically after loading, type RUN.
 
-	Known existing dumps not in softlist:
-		SPS IPF dump 3585	LED Storm: Lazer Enhanced Destruction
-		SPS IPF dump 3607	Rock Star Ate My Hamster
-		SPS IPF dump 3625	Tiger Road
-		
-	Need redump/verification:
-		Artura (alt) Side B
-		Comic, Arcade & Aventura Disk 1, Side B
-		Comic, Arcade & Aventura Disk 2, Side A
-		Comic, Arcade & Aventura Disk 2, Side B
-		LED Storm Rally 2011, Side A
-		LED Storm Rally 2011, Side B
-		NARC (Spain) Side A
-		Rescate Atlántida (alt 3) Side A
-		Simulation Hits (Spain) Side B
+    Copy protection:
+        Some disks include custom formatting tricks such as mixed sector sizes,
+        8K sectors, fake error sectors, etc, which may not be yet supported by
+        MAME.
+        More info on +3 copy protections can be found here:
+        https://simonowen.com/samdisk/sys_plus3/
 
-	Observations:
-		Artura (alt) Side B has a copy of Hardball for the Amstrad CPC. Was this edition accidentally sold like this?
-		LED Storm Rally 2011 Side B has a copy of The Lords of Midnight for the Amstrad CPC. Was this edition accidentally sold like this?
-		Sootland is supposed to be compatible with the Gun-Stick light gun but has no option for it. Is there an alternate version with support for it?
-		What's the difference between the IPF dumps "Teenage Mutant Hero Turtles" and "Teenage Mutant Hero Turtles (3'')"?
+    Known undumped:
+        Ci-U-Than Trilogy-III: Chichén Itzá (likely but unconfirmed)
+        Comando Tracer (dual-system Spectrum/Amstrad release)
+        Psycho Pigs UXB
 
-	TO DO:
-		Some clone disk images may come from the same releases as their parent entries. These cases need to be compared and verified to be the same before the redundant dumps can be discarded, making sure to leave the cleanest ones.
+    Known existing dumps not in softlist:
+        SPS IPF dump 3585   LED Storm: Lazer Enhanced Destruction
+        SPS IPF dump 3607   Rock Star Ate My Hamster
+        SPS IPF dump 3625   Tiger Road
 
-	Notes about the dumps:
-		Whenever possible, each entry is presented as the full media it came in, including both sides. This should make it immediately obvious when everything in the disk has already been preserved.
-		
-		Side B in some of the "master disks" from Zeppelin Games share the same SHA-1, this is how they've been released to the public.
-		
-		The IPF dumps from SPS should in theory be considered good dumps, though they only include one side of the disk and don't specify which releases they came from. They're not considered a gold standard anymore and could be eventually replaced with more complete and better documented dumps.
-		
-		All the DSK files which have a corresponding IPF have been labeled as "alt" clones until they're confirmed to come from the exact same release and can be safely discarded (there's an added comment about it in each of these entries, to make them easy to locate).
-		
-		Other alternate versions not in the big archive websites have been kept for the same reason, since the exact source of each file doesn't seem to be properly documented anywhere, which means they'd need some research before safely removing them.
+    Need redump/verification:
+        Artura (alt) Side B
+        Comic, Arcade & Aventura Disk 1, Side B
+        Comic, Arcade & Aventura Disk 2, Side A
+        Comic, Arcade & Aventura Disk 2, Side B
+        LED Storm Rally 2011, Side A
+        LED Storm Rally 2011, Side B
+        NARC (Spain) Side A
+        Rescate Atlántida (alt 3) Side A
+        Simulation Hits (Spain) Side B
+
+    Observations:
+        Artura (alt) Side B has a copy of Hardball for the Amstrad CPC. Was this
+        edition accidentally sold like this?
+
+        LED Storm Rally 2011 Side B has a copy of The Lords of Midnight for the
+        Amstrad CPC. Was this edition accidentally sold like this?
+
+        Sootland is supposed to be compatible with the Gun-Stick light gun but
+        has no option for it. Is there an alternate version with support for it?
+
+        What's the difference between the IPF dumps "Teenage Mutant Hero
+        Turtles" and "Teenage Mutant Hero Turtles (3'')"?
+
+    TO DO:
+        Some clone disk images may come from the same releases as their parent
+        entries. These cases need to be compared and verified to be the same
+        before the redundant dumps can be discarded, making sure to leave the
+        cleanest ones.
+
+    Notes about the dumps:
+        Whenever possible, each entry is presented as the full media it came in,
+        including both sides. This should make it immediately obvious when
+        everything in the disk has already been preserved.
+
+        Side B in some of the "master disks" from Zeppelin Games share the same
+        SHA-1, this is how they've been released to the public.
+
+        The IPF dumps from SPS should in theory be considered good dumps, though
+        they only include one side of the disk and don't specify which releases
+        they came from. They're not considered a gold standard anymore and could
+        be eventually replaced with more complete and better documented dumps.
+
+        All the DSK files which have a corresponding IPF have been labeled as
+        "alt" clones until they're confirmed to come from the exact same release
+        and can be safely discarded (there's an added comment about it in each
+        of these entries, to make them easy to locate).
+
+        Other alternate versions not in the big archive websites have been kept
+        for the same reason, since the exact source of each file doesn't seem to
+        be properly documented anywhere, which means they'd need some research
+        before safely removing them.
 -->
 
 <softwarelist name="specpls3_flop" description="Sinclair ZX Spectrum +3 disk images">
@@ -1561,7 +1590,7 @@ license:CC0
 	<software name="arturaa" cloneof="artura">
 		<!-- May be the same edition as the IPF dump. -->
 		<!--
-			Side B has a copy of Hardball for the Amstrad CPC, was this edition accidentally sold like this?
+		    Side B has a copy of Hardball for the Amstrad CPC, was this edition accidentally sold like this?
 		-->
 		<description>Artura (alt)</description>
 		<year>1989</year>
@@ -2004,7 +2033,7 @@ license:CC0
 
 	<software name="bestialw">
 		<!--
-			This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC).
+		    This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC).
 		-->
 		<description>Bestial Warrior (dual-system)</description>
 		<year>1989</year>
@@ -2645,7 +2674,7 @@ license:CC0
 
 	<software name="cvaniasi">
 		<!--
-			This version is dated 20180316.
+		    This version is dated 20180316.
 		-->
 		<description>Castlevania - Spectral Interlude</description>
 		<year>2015</year>
@@ -2659,7 +2688,7 @@ license:CC0
 
 	<software name="cvaniasia" cloneof="cvaniasi">
 		<!--
-			This version is dated 20171114.
+		    This version is dated 20171114.
 		-->
 		<description>Castlevania - Spectral Interlude (alt)</description>
 		<year>2015</year>
@@ -2673,7 +2702,7 @@ license:CC0
 
 	<software name="cvaniasiit" cloneof="cvaniasi">
 		<!--
-			This version is dated 20180316.
+		    This version is dated 20180316.
 		-->
 		<description>Castlevania - Spectral Interlude (Italian)</description>
 		<year>2015</year>
@@ -2687,7 +2716,7 @@ license:CC0
 
 	<software name="cvaniasiita" cloneof="cvaniasi">
 		<!--
-			This version is dated 20171117.
+		    This version is dated 20171117.
 		-->
 		<description>Castlevania - Spectral Interlude (Italian) (alt)</description>
 		<year>2015</year>
@@ -2701,7 +2730,7 @@ license:CC0
 
 	<software name="cvaniasipo" cloneof="cvaniasi">
 		<!--
-			This version is dated 20180316.
+		    This version is dated 20180316.
 		-->
 		<description>Castlevania - Spectral Interlude (Polish)</description>
 		<year>2015</year>
@@ -2715,7 +2744,7 @@ license:CC0
 
 	<software name="cvaniasipoa" cloneof="cvaniasi">
 		<!--
-			This version is dated 20171116.
+		    This version is dated 20171116.
 		-->
 		<description>Castlevania - Spectral Interlude (Polish) (alt)</description>
 		<year>2015</year>
@@ -2729,7 +2758,7 @@ license:CC0
 
 	<software name="cvaniasiru" cloneof="cvaniasi">
 		<!--
-			This version is dated 20180316.
+		    This version is dated 20180316.
 		-->
 		<description>Castlevania - Spectral Interlude (Russian)</description>
 		<year>2015</year>
@@ -2743,7 +2772,7 @@ license:CC0
 
 	<software name="cvaniasirua" cloneof="cvaniasi">
 		<!--
-			This version is dated 20171114.
+		    This version is dated 20171114.
 		-->
 		<description>Castlevania - Spectral Interlude (Russian) (alt)</description>
 		<year>2015</year>
@@ -2757,7 +2786,7 @@ license:CC0
 
 	<software name="cvaniasisp" cloneof="cvaniasi">
 		<!--
-			This version is dated 20180316.
+		    This version is dated 20180316.
 		-->
 		<description>Castlevania - Spectral Interlude (Spanish)</description>
 		<year>2015</year>
@@ -2771,7 +2800,7 @@ license:CC0
 
 	<software name="cvaniasispa" cloneof="cvaniasi">
 		<!--
-			This version is dated 20171114.
+		    This version is dated 20171114.
 		-->
 		<description>Castlevania - Spectral Interlude (Spanish) (alt)</description>
 		<year>2015</year>
@@ -2861,7 +2890,7 @@ license:CC0
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<!--
-				Side B image shared with other master disks from Zeppelin Games.
+			    Side B image shared with other master disks from Zeppelin Games.
 			-->
 			<dataarea name="flop" size="256">
 				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98"/>
@@ -2880,7 +2909,7 @@ license:CC0
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<!--
-				Side B image shared with other master disks from Zeppelin Games.
+			    Side B image shared with other master disks from Zeppelin Games.
 			-->
 			<dataarea name="flop" size="256">
 				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98"/>
@@ -3281,7 +3310,7 @@ license:CC0
 	<software name="combatsc">
 		<!-- SPS dump 3559 -->
 		<!--
-			Includes preview of Gryzor.
+		    Includes preview of Gryzor.
 		-->
 		<description>Combat School</description>
 		<year>1987</year>
@@ -3296,7 +3325,7 @@ license:CC0
 	<software name="combatsca" cloneof="combatsc">
 		<!-- May be the same edition as the IPF dump. -->
 		<!--
-			Includes preview of Gryzor.
+		    Includes preview of Gryzor.
 		-->
 		<description>Combat School (alt)</description>
 		<year>1987</year>
@@ -4502,7 +4531,7 @@ license:CC0
 
 	<software name="hudsonhasp">
 		<!--
-			Would be clone of "Hudson Hawk".
+		    Would be clone of "Hudson Hawk".
 		-->
 		<description>El Gran Halcon</description>
 		<year>1991</year>
@@ -5548,7 +5577,7 @@ license:CC0
 
 	<software name="funkyfun">
 		<!--
-			This version adds Italian to the language selection screen.
+		    This version adds Italian to the language selection screen.
 		-->
 		<description>Funky Fungus</description>
 		<year>2013</year>
@@ -7089,8 +7118,8 @@ license:CC0
 
 	<software name="italy90sp">
 		<!--
-			This would be a clone of "Italy 1990" if a dump existed.
-			Not to confuse with "Italia '90 - World Cup Soccer".
+		    This would be a clone of "Italy 1990" if a dump existed.
+		    Not to confuse with "Italia '90 - World Cup Soccer".
 		-->
 		<description>Italia 1990</description>
 		<year>1990</year>
@@ -8017,7 +8046,7 @@ license:CC0
 
 	<software name="lc10pr11">
 		<!--
-			This dump includes a question pack for Trivial Pursuit Genus Edition on side B, currently unknown if it was accidentally included with the official release.
+		    This dump includes a question pack for Trivial Pursuit Genus Edition on side B, currently unknown if it was accidentally included with the official release.
 		-->
 		<description>LC-10 Colour Screen printer v 1.1 (+2a/+3)</description>
 		<year>1990</year>
@@ -8079,10 +8108,10 @@ license:CC0
 	<software name="leds2011" supported="no">
 		<!-- May be the same edition as the IPF dump. -->
 		<!--
-			Uses "Alkatraz" protection.
-			Dump of Side A has a few bad sectors.
-			Dump of Side B has one bad sector.
-			Side B has a copy of The Lords of Midnight for the Amstrad CPC, was this edition accidentally sold like this?
+		    Uses "Alkatraz" protection.
+		    Dump of Side A has a few bad sectors.
+		    Dump of Side B has one bad sector.
+		    Side B has a copy of The Lords of Midnight for the Amstrad CPC, was this edition accidentally sold like this?
 		-->
 		<description>LED Storm Rally 2011</description>
 		<year>1988</year>
@@ -9064,7 +9093,7 @@ license:CC0
 
 	<software name="megabox">
 		<!--
-			Disk 2 Side B seems to contain an unreadable copy of Disk 2 Side A. Needs investigation.
+		    Disk 2 Side B seems to contain an unreadable copy of Disk 2 Side A. Needs investigation.
 		-->
 		<description>Mega Box</description>
 		<year>1991</year>
@@ -9165,7 +9194,7 @@ license:CC0
 
 	<software name="mercs">
 		<!--
-			This is a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum)
+		    This is a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum)
 		-->
 		<description>Mercs (dual-system)</description>
 		<year>1991</year>
@@ -9274,7 +9303,7 @@ license:CC0
 
 	<software name="micpsocc">
 		<!--
-			Unknown if it comes from the "large case" or "small case" releases, or a different one.
+		    Unknown if it comes from the "large case" or "small case" releases, or a different one.
 		-->
 		<description>MicroProse Soccer</description>
 		<year>1989</year>
@@ -9522,7 +9551,7 @@ license:CC0
 
 	<software name="mntbkrcr">
 		<!--
-			Unrelated to Zeppelin's game with the same title.
+		    Unrelated to Zeppelin's game with the same title.
 		-->
 		<description>Mountain Bike Racer</description>
 		<year>1990</year>
@@ -9732,7 +9761,7 @@ license:CC0
 		<publisher>Erbe Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<!--
-				This dump of Side A has been manually fixed, a new untampered one may be needed for verification.
+			    This dump of Side A has been manually fixed, a new untampered one may be needed for verification.
 			-->
 			<dataarea name="flop" size="226048">
 				<rom name="Narc - Side 1 (Erbe) [corregido].dsk" size="226048" crc="b2979f21" sha1="823b6e45197c40924b16cf4d61c1ace03cc035a3" status="baddump"/>
@@ -9769,7 +9798,7 @@ license:CC0
 
 	<software name="navymovesp" cloneof="navymove">
 		<!--
-			Spanish version includes Army Moves as a bonus.
+		    Spanish version includes Army Moves as a bonus.
 		-->
 		<description>Navy Moves (Spain)</description>
 		<year>1988</year>
@@ -9783,8 +9812,8 @@ license:CC0
 
 	<software name="navymovespa" cloneof="navymove">
 		<!--
-			This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC).
-			Code in both sides is identical to their respective Spanish individual releases.
+		    This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC).
+		    Code in both sides is identical to their respective Spanish individual releases.
 		-->
 		<description>Navy Moves (Spain, dual-system)</description>
 		<year>1988</year>
@@ -9861,7 +9890,7 @@ license:CC0
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<!--
-				Side B image shared with other master disks from Zeppelin Games.
+			    Side B image shared with other master disks from Zeppelin Games.
 			-->
 			<dataarea name="flop" size="256">
 				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98"/>
@@ -9887,7 +9916,7 @@ license:CC0
 
 	<software name="neighbouch" cloneof="neighbou">
 		<!--
-			Labeled in World of Spectrum as "(CheatVersion)(MasterDisk)", might come from the developers?
+		    Labeled in World of Spectrum as "(CheatVersion)(MasterDisk)", might come from the developers?
 		-->
 		<description>Neighbours (cheat version) (master disk)</description>
 		<year>1992</year>
@@ -10109,7 +10138,7 @@ license:CC0
 	<software name="oblitera" cloneof="obliter">
 		<!-- May be the same edition as the IPF dump. -->
 		<!--
-			This is a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum).
+		    This is a dual-system Spectrum/Amstrad release (Side A: Amstrad CPC, Side B: ZX Spectrum).
 		-->
 		<description>Obliterator (dual-system)</description>
 		<year>1989</year>
@@ -10193,7 +10222,7 @@ license:CC0
 
 	<software name="operast1">
 		<!--
-			Both sides contain the same games, dumps are only slightly different by the end
+		    Both sides contain the same games, dumps are only slightly different by the end
 		-->
 		<description>Opera Storys 1</description>
 		<year>1989</year>
@@ -12997,7 +13026,7 @@ license:CC0
 
 	<software name="rescatla">
 		<!--
-			This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC).
+		    This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC).
 		-->
 		<description>Rescate Atlántida (dual-system)</description>
 		<year>1989</year>
@@ -13044,7 +13073,7 @@ license:CC0
 		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
 			<!--
-				This dump of Side A has been manually fixed, a new untampered one may be needed for verification.
+			    This dump of Side A has been manually fixed, a new untampered one may be needed for verification.
 			-->
 			<dataarea name="flop" size="150659">
 				<rom name="Rescate Atlantida - Side 1 [restaurada].dsk" size="150659" crc="b4ba8c14" sha1="e10d4fc6f2fe250dfda0cbd491b136cd99c3a1c7" status="baddump"/>
@@ -13511,7 +13540,7 @@ license:CC0
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<!--
-				Side B image shared with other master disks from Zeppelin Games.
+			    Side B image shared with other master disks from Zeppelin Games.
 			-->
 			<dataarea name="flop" size="256">
 				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98"/>
@@ -13755,7 +13784,7 @@ license:CC0
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<!--
-				Side B image shared with other master disks from Zeppelin Games.
+			    Side B image shared with other master disks from Zeppelin Games.
 			-->
 			<dataarea name="flop" size="256">
 				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98"/>
@@ -13946,7 +13975,7 @@ license:CC0
 
 	<software name="simuhitssp">
 		<!--
-			No good dump known of Side B, but Side A seems to include everything.
+		    No good dump known of Side B, but Side A seems to include everything.
 		-->
 		<description>Simulation Hits (Spain)</description>
 		<year>1989</year>
@@ -14278,8 +14307,8 @@ license:CC0
 
 	<software name="solnegro" supported="no">
 		<!--
-			Uses "OperaSoft 32K Sector" protection.
-			Side B is empty.
+		    Uses "OperaSoft 32K Sector" protection.
+		    Side B is empty.
 		-->
 		<description>Sol Negro</description>
 		<year>1989</year>
@@ -14385,7 +14414,7 @@ license:CC0
 
 	<software name="sootland">
 		<!--
-			Is this version compatible with the Gun-Stick light gun or is there an alternate version of it?
+		    Is this version compatible with the Gun-Stick light gun or is there an alternate version of it?
 		-->
 		<description>Sootland</description>
 		<year>1988</year>
@@ -14650,7 +14679,7 @@ license:CC0
 
 	<software name="stdragon">
 		<!--
-			Only the Spanish version has been dumped, unknown if it had any other releases.
+		    Only the Spanish version has been dumped, unknown if it had any other releases.
 		-->
 		<description>St. Dragon</description>
 		<year>1990</year>
@@ -15348,7 +15377,7 @@ license:CC0
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<!--
-				Side B image shared with other master disks from Zeppelin Games.
+			    Side B image shared with other master disks from Zeppelin Games.
 			-->
 			<dataarea name="flop" size="256">
 				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98"/>
@@ -15637,7 +15666,7 @@ license:CC0
 	<software name="tmht">
 		<!-- SPS dump 3540 -->
 		<!--
-			Unclear what the difference is between this IPF and the other one.
+		    Unclear what the difference is between this IPF and the other one.
 		-->
 		<description>Teenage Mutant Hero Turtles</description>
 		<year>1990</year>
@@ -15652,7 +15681,7 @@ license:CC0
 	<software name="tmht3" cloneof="tmht">
 		<!-- SPS dump 3541 -->
 		<!--
-			Unclear what the difference is between this IPF and the other one.
+		    Unclear what the difference is between this IPF and the other one.
 		-->
 		<description>Teenage Mutant Hero Turtles (3'')</description>
 		<year>1990</year>
@@ -16853,7 +16882,7 @@ license:CC0
 
 	<software name="prayoftw">
 		<!--
-			Game recovered from the original developer's archives.
+		    Game recovered from the original developer's archives.
 		-->
 		<description>The Prayer of the Warrior</description>
 		<year>1992</year>
@@ -16872,7 +16901,7 @@ license:CC0
 
 	<software name="prayoftwa" cloneof="prayoftw">
 		<!--
-			Modified version of the game which includes both loads in one side of the disc.
+		    Modified version of the game which includes both loads in one side of the disc.
 		-->
 		<description>The Prayer of the Warrior (alt)</description>
 		<year>1992</year>
@@ -17067,7 +17096,7 @@ license:CC0
 
 	<software name="swoianna">
 		<!--
-			This version is dated 20171126.
+		    This version is dated 20171126.
 		-->
 		<description>The Sword of IANNA</description>
 		<year>2017</year>
@@ -17086,7 +17115,7 @@ license:CC0
 
 	<software name="swoiannaa" cloneof="swoianna">
 		<!--
-			This version is dated 20170922.
+		    This version is dated 20170922.
 		-->
 		<description>The Sword of IANNA (alt)</description>
 		<year>2017</year>
@@ -17865,7 +17894,7 @@ license:CC0
 
 	<software name="tmhtsp2" cloneof="tmht">
 		<!--
-			This is the dump in World of Spectrum, but original version was password protected (possible mod).
+		    This is the dump in World of Spectrum, but original version was password protected (possible mod).
 		-->
 		<description>Tortugas Ninja (unprotected)</description>
 		<year>1990</year>
@@ -17879,7 +17908,7 @@ license:CC0
 
 	<software name="totalerb">
 		<!--
-			Labeled as "bad dump" in TOSEC for some reason, but it's the same dump at World of Spectrum.
+		    Labeled as "bad dump" in TOSEC for some reason, but it's the same dump at World of Spectrum.
 		-->
 		<description>Total</description>
 		<year>1989</year>
@@ -18869,7 +18898,7 @@ license:CC0
 		</part>
 		<part name="flop2" interface="floppy_3">
 			<!--
-				Side B image shared with other master disks from Zeppelin Games.
+			    Side B image shared with other master disks from Zeppelin Games.
 			-->
 			<dataarea name="flop" size="256">
 				<rom name="zeppelin games master disk side b.dsk" size="256" crc="56947af2" sha1="40428c770d847a0fd1fd005b6cf1d03a34672d98"/>
@@ -19043,7 +19072,7 @@ license:CC0
 
 	<software name="xenophob">
 		<!--
-			Side B seems to be empty.
+		    Side B seems to be empty.
 		-->
 		<description>Xenophobe</description>
 		<year>1989</year>

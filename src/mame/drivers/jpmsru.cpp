@@ -13,9 +13,6 @@
 
     TODO:
     - Layouts
-    - Netlist audio works but isn't quite right. The tone pot needs to
-      be set to 17% for it to not cut out, and even then popping can be heard.
-      Needs a look from someone with more analog knowledge than me.
 
     Expansion boards:
     Bus Extension
@@ -60,9 +57,11 @@
 #include "netlist/nl_setup.h"
 
 #include "jpmsru.lh"
+#include "j_cnudgr.lh"
 #include "j_dud.lh"
 #include "j_ewn.lh"
 #include "j_ews.lh"
+#include "j_ewsbl.lh"
 #include "j_ewsdlx.lh"
 #include "j_la.lh"
 #include "j_lan.lh"
@@ -497,7 +496,7 @@ void jpmsru_state::out_logicext_w(offs_t offset, uint8_t data)
 	switch(offset)
 	{
 		case 0: out_lamp_ext_w(m_logicext_addr, m_logicext_data); break; /* j_lc has solely lamps as outputs and is the only dumped
-																			game to use this, so keep things simple for now */
+		                                                                    game to use this, so keep things simple for now */
 		case 1: m_logicext_data = data; break;
 		case 2:
 		case 3:
@@ -627,10 +626,10 @@ static INPUT_PORTS_START( jpmsru_inputs )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Self Test")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("10p Token")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p") PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_IMPULSE(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("10p Token") PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(2)
 
 	PORT_START("IN3") // Input Extension
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -731,13 +730,8 @@ static INPUT_PORTS_START( j_ewn )
 	PORT_DIPUNUSED( 0x80, 0x00 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( j_ewn2 )
+static INPUT_PORTS_START( j_ewn1 )
 	PORT_INCLUDE( jpmsru_inputs )
-
-	PORT_MODIFY("IN0")
-	PORT_CONFNAME( 0x80, 0x80, "5p/10p jumper" )
-	PORT_CONFSETTING(    0x00, "5p" )
-	PORT_CONFSETTING(    0x80, "10p" )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
@@ -749,6 +743,15 @@ static INPUT_PORTS_START( j_ewn2 )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_ewn2 )
+	PORT_INCLUDE( j_ewn1 )
+
+	PORT_MODIFY("IN0")
+	PORT_CONFNAME( 0x80, 0x80, "5p/10p jumper" )
+	PORT_CONFSETTING(    0x00, "5p" )
+	PORT_CONFSETTING(    0x80, "10p" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_ndu )
@@ -889,10 +892,10 @@ static INPUT_PORTS_START( j_super2 )
 	PORT_CONFNAME( 0x02, 0x02, "Coin tube" )
 	PORT_CONFSETTING(    0x00, "Empty" )
 	PORT_CONFSETTING(    0x02, "Full" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("20p")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("2p")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("20p") PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_IMPULSE(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("2p") PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_ews )
@@ -922,6 +925,21 @@ static INPUT_PORTS_START( j_ews )
 	PORT_CONFSETTING(    0x02, "Full" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( j_ewsbl )
+	PORT_INCLUDE( j_ews )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) /* No stake jumper, 50p coin pulses meter 1 160 times if this is on and prizes
+	                                                are doubled as well, which doesn't make sense with 10p coins */
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // No coin tube switch
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p Token") PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(2)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( j_ewsdlx )
 	PORT_INCLUDE( j_ews )
 
@@ -939,10 +957,10 @@ static INPUT_PORTS_START( j_ssh )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // No % stabiliser
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("20p")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("2p")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("20p") PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_IMPULSE(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("2p") PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_lt )
@@ -963,9 +981,9 @@ static INPUT_PORTS_START( j_lt )
 	PORT_CONFSETTING(    0x00, "Empty" )
 	PORT_CONFSETTING(    0x02, "Full" )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p Token")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_IMPULSE(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p Token") PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_plus2 )
@@ -973,9 +991,9 @@ static INPUT_PORTS_START( j_plus2 )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("2p")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_IMPULSE(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("2p") PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_sup2p )
@@ -999,9 +1017,9 @@ static INPUT_PORTS_START( j_sup2p )
 	PORT_CONFSETTING(    0x00, "Empty" )
 	PORT_CONFSETTING(    0x02, "Full" )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("20p")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_IMPULSE(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("20p") PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_la )
@@ -1025,10 +1043,25 @@ static INPUT_PORTS_START( j_la )
 	PORT_CONFNAME( 0x02, 0x02, "Coin tube" )
 	PORT_CONFSETTING(    0x00, "Empty" )
 	PORT_CONFSETTING(    0x02, "Full" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("2p")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("1p")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p") PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_IMPULSE(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("2p") PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("1p") PORT_IMPULSE(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_cnudgr )
+	PORT_INCLUDE( jpmsru_inputs )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel/Gamble")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Feature Stop")
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_lc )
@@ -1064,8 +1097,8 @@ static INPUT_PORTS_START( j_lc )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Shuffle")
 	PORT_CONFNAME( 0x08, 0x08, "10p coin tube" )
 	PORT_CONFSETTING(    0x00, "Empty" )
@@ -1134,7 +1167,7 @@ void jpmsru_state::jpmsru_3k(machine_config &config)
 
 	NETLIST_SOUND(config, "nl_audio", 48000)
 		.set_source(NETLIST_NAME(jpmsru))
-		.add_route(ALL_OUTPUTS, "mono", 1.0);
+		.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	NETLIST_LOGIC_INPUT(config, m_audio_in[0], "IN1.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_audio_in[1], "IN2.IN", 0);
@@ -1266,6 +1299,13 @@ ROM_START( j_ewnc )
 	ROM_LOAD( "ewn.3", 0x0800, 0x400, CRC(25138e03) SHA1(644fc6144ea74f08dc892f106ad494ba364afe86) )
 ROM_END
 
+ROM_START( j_ewnd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ewn23.c1", 0x0000, 0x400, CRC(7c0f6d57) SHA1(0657f2a4bb70c7758138bae621e8c2a3f4c2c181) )
+	ROM_LOAD( "ewn23.2", 0x0400, 0x400, CRC(3950ebb4) SHA1(395a1823ea92f0f84c65413739b75d399b8b386a) )
+	ROM_LOAD( "ewn23.3", 0x0800, 0x400, CRC(410ff8b2) SHA1(36aa2207a6339e665ecb1834812d6fb3ec5f5fc8) )
+ROM_END
+
 ROM_START( j_ndu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ndu17.1", 0x0000, 0x400, CRC(174a8519) SHA1(3d9cc2a531ff91b3313aa893a9f774eea7847b8b) )
@@ -1365,6 +1405,13 @@ ROM_START( j_ewsb )
 	ROM_LOAD( "ews13.3", 0x0800, 0x400, CRC(4d8e197a) SHA1(1569327f0e4b5d7632658b69abf59076effb2600) )
 ROM_END
 
+ROM_START( j_ewsbl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ews.1", 0x0000, 0x400, CRC(e2f28e4f) SHA1(1ace28cd0da0a31264f5c7f7e885f2df1dff22d2) )
+	ROM_LOAD( "ews.2", 0x0400, 0x400, CRC(028ea40f) SHA1(541e450153f0076c63cd0f1f3074d0a44717ee11) )
+	ROM_LOAD( "ews.3", 0x0800, 0x400, CRC(9e871667) SHA1(b2119b119173e7a9f23a124cecc1efca7131a543) )
+ROM_END
+
 ROM_START( j_ewsdlx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewsdlx.1", 0x0000, 0x400, CRC(b628ef7d) SHA1(cd10a0bbaefd93cfbd14f1398de2d3a528760806) )
@@ -1427,6 +1474,14 @@ ROM_START( j_la )
 	ROM_LOAD( "la.3", 0x0800, 0x400, CRC(cb9362ac) SHA1(a16d43ba01b24e1b515881957c1559d33a03bcc4) )
 ROM_END
 
+// CASH NUDGER RV
+ROM_START( j_cnudgr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cnudgr.1", 0x0000, 0x400, CRC(3936c450) SHA1(bc7cd4698c5eb8fbbf990f8e55ddfdde0f48a387) )
+	ROM_LOAD( "cnudgr.2", 0x0400, 0x400, CRC(0b52b71e) SHA1(ce981baaeb254ec1f28d4dd030ac96f96405392f) )
+	ROM_LOAD( "cnudgr.3", 0x0800, 0x400, CRC(9e956248) SHA1(0ade65e9e48a240a5aaf0738ee64b374bee15c92) )
+ROM_END
+
 ROM_START( j_lc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lc8.a1", 0x0000, 0x400, CRC(48cf1e66) SHA1(22df81e7c82a009fbac0a3974f670d716820e6db) )
@@ -1445,13 +1500,14 @@ ROM_START( j_lca )
 	ROM_LOAD( "lc8.5", 0x1800, 0x400, CRC(76a720bc) SHA1(c7e6a8e2e2d1b5e6fcfd560ce7a93c4b5775cef8) )
 ROM_END
 
-#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_SOUND|MACHINE_SUPPORTS_SAVE
+#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_SUPPORTS_SAVE
 
 // AWP
 GAMEL( 1979?, j_ewn,     0,        ewn,       j_ewn,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 20, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn )
 GAMEL( 1981?, j_ewna,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 26A, £2 Jackpot)", GAME_FLAGS, layout_j_ewn )
 GAMEL( 1981?, j_ewnb,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_ewn )
 GAMEL( 1979?, j_ewnc,    j_ewn,    ewn,       j_ewn,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn ) // Earlier revision
+GAMEL( 1979?, j_ewnd,    j_ewn,    ewn2,      j_ewn1,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 23C, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn )
 GAMEL( 1979?, j_ndu,     0,        ndu,       j_ndu,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ndu )
 GAMEL( 1979?, j_ndua,    j_ndu,    ndu,       j_ndu,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot, lower %)", GAME_FLAGS, layout_j_ndu )
 GAMEL( 1979?, j_ndub,    j_ndu,    ndu,       j_ndu,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ndu )
@@ -1466,6 +1522,7 @@ GAMEL( 198?,  j_super2,  j_lan,    super2,    j_super2,      jpmsru_state, init_
 GAMEL( 1981,  j_ews,     0,        ews,       j_ews,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (JPM) (SRU) (revision 8A, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
 GAMEL( 1981,  j_ewsa,    j_ews,    ews,       j_ews,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (JPM) (SRU) (revision 13A, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
 GAMEL( 1981,  j_ewsb,    j_ews,    ews,       j_ews,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (JPM) (SRU) (revision 13C, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
+GAMEL( 198?,  j_ewsbl,   j_ews,    ews,       j_ewsbl,       jpmsru_state, init_jpmsru, ROT0, "bootleg?", "Each Way Shuffle (bootleg?) (SRU) (10p Stake, £3 Jackpot)", GAME_FLAGS, layout_j_ewsbl ) // Has extra "Jackpot" symbol
 GAMEL( 1983?, j_ewsdlx,  j_ews,    ews,       j_ewsdlx,      jpmsru_state, init_jpmsru, ROT0, "CTL", "Each Way Shuffle Deluxe (CTL) (SRU) (£3 Jackpot)", GAME_FLAGS, layout_j_ewsdlx ) // £3 rebuild of Each Way Shuffle
 GAMEL( 1983?, j_ssh,     j_ews,    ews,       j_ssh,         jpmsru_state, init_jpmsru, ROT0, "CTL", "Silver Shuffle (CTL) (SRU) (2p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_ssh ) // £1.50/2p rebuild of Each Way Shuffle
 GAMEL( 1981,  j_lt,      0,        lt,        j_lt,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky 2's (JPM) (SRU) (revision 9, 10p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_lt )
@@ -1474,6 +1531,7 @@ GAMEL( 198?,  j_plus2,   j_lt,     lt,        j_plus2,       jpmsru_state, init_
 GAMEL( 1983?, j_goldn2,  j_lt,     lt,        j_plus2,       jpmsru_state, init_jpmsru, ROT0, "CTL", "Golden 2's (CTL) (SRU) (2p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_plus2 ) // £1.50 JP version of above
 GAMEL( 198?,  j_sup2p,   0,        sup2p,     j_sup2p,       jpmsru_state, init_jpmsru, ROT0, "Mdm", "Super 2p Shuffle (Mdm) (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_sup2p )
 GAMEL( 1983?, j_la,      0,        lan,       j_la,          jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Lucky Aces (SRU) (£1.50 Jackpot)", GAME_FLAGS, layout_j_la )
+GAMEL( 198?,  j_cnudgr,  0,        lan,       j_cnudgr,      jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Cash Nudger? (SRU) (5p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_cnudgr )
 // Club
 GAMEL( 1981,  j_lc,      0,        lc,        j_lc,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8A)", GAME_FLAGS | MACHINE_IMPERFECT_SOUND, layout_j_lc )
 GAMEL( 1981,  j_lca,     j_lc,     lc,        j_lc,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky Casino (JPM) (SRU) (revision 8, lower %)", GAME_FLAGS | MACHINE_IMPERFECT_SOUND, layout_j_lc ) // Smaller hold chance, probably revision 8B/8C

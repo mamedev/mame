@@ -41,26 +41,28 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "emu.h"
 #include "video/apple2.h"
 
+#include "machine/apple2common.h"
+
+#include "bus/a2bus/a2bus.h"
+#include "bus/a2bus/cards.h"
+#include "bus/a2gameio/gameio.h"
 #include "cpu/m6502/m6502.h"
-
 #include "imagedev/cassette.h"
-
 #include "machine/74259.h"
 #include "machine/kb3600.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
-#include "machine/apple2common.h"
 
 #include "sound/spkrdev.h"
-
-#include "bus/a2bus/cards.h"
-#include "bus/a2gameio/gameio.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/ap2_dsk.h"
+
+
+namespace {
 
 #define A2_CPU_TAG "maincpu"
 #define A2_KBDC_TAG "ay3600"
@@ -162,7 +164,7 @@ public:
 	void apple2jp(machine_config &config);
 	void apple2(machine_config &config);
 	void space84(machine_config &config);
-	void dodo(machine_config &config);
+	[[maybe_unused]] void dodo(machine_config &config);
 	void albert(machine_config &config);
 	void ivelultr(machine_config &config);
 	void apple2p(machine_config &config);
@@ -1712,6 +1714,8 @@ ROM_START(dodo)
 	ROM_CONTINUE(0x1000, 0x1000)
 	ROM_LOAD( "dodo2732.bin", 0x3000, 0x1000, CRC(405cdb0c) SHA1(3ed133eb94ee33194c668c4ee3f67885dd489d13) )
 ROM_END
+
+} // anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY                FULLNAME
 COMP( 1977, apple2,   0,      0,      apple2,   apple2,  apple2_state, empty_init, "Apple Computer",      "Apple ][", MACHINE_SUPPORTS_SAVE )

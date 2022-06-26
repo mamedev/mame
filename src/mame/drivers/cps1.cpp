@@ -1521,10 +1521,15 @@ static INPUT_PORTS_START( unsquad )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
 INPUT_PORTS_END
 
-/* To enable other choices in the "test mode", you must press ("P1 Button 1" ('Ctrl')
-   or "P1 Button 2" ('Alt')) when "Service Mode" is ON */
+/* To access the hidden pattern test modes, turn the "Service Mode" dip to ON, and hold down "P1 Button 1"
+   ('Ctrl') or "P1 Button 2" ('Alt') during the bootup test. Button 1 will load the Scroll (Background) test,
+   and Button 2 will load an Obj (Sprite) viewer. */
+
 static INPUT_PORTS_START( ffight )
 	PORT_INCLUDE( cps1_3b )
+
+/* The button below is not officially documented, pressing it will allow you to escape from grabs and choke
+   holds instantly. */
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME ("P1 Button 3 (Cheat)")

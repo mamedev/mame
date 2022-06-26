@@ -2,22 +2,22 @@
 // copyright-holders:David Haywood
 
 /*
-	Supported Games:
+    Supported Games:
 
-	Marble Madness II (prototype)
+    Marble Madness II (prototype)
 
-	Not Dumped:
+    Not Dumped:
 
-	Marble Man: Marble Madness II (earlier version of the game before it was changed to use Joysticks)
+    Marble Man: Marble Madness II (earlier version of the game before it was changed to use Joysticks)
 
-	-------------------------------------------
+    -------------------------------------------
 
-	TODO:
-	- Issues in service mode (eg. RAM check fails) could just be prototype issues
-	- verify XTALs, clocks, volume balance, dipswitches etc.
+    TODO:
+    - Issues in service mode (eg. RAM check fails) could just be prototype issues
+    - verify XTALs, clocks, volume balance, dipswitches etc.
 
-	Non-Bugs:
-	- objects appear over text boxes during scroll before levels, verified to happen on hardware
+    Non-Bugs:
+    - objects appear over text boxes during scroll before levels, verified to happen on hardware
 
 */
 

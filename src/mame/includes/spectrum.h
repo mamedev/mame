@@ -46,7 +46,6 @@
 #define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizontal retrace */
 #define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
 
-
 class spectrum_state : public driver_device
 {
 public:
@@ -121,7 +120,6 @@ protected:
 	s8 m_contention_offset = -1;
 	u64 m_int_at;
 
-	uint8_t m_ram_disabled_by_beta;
 	uint8_t pre_opcode_fetch_r(offs_t offset);
 	void spectrum_rom_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_rom_r(offs_t offset);

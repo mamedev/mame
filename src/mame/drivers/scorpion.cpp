@@ -18,11 +18,8 @@ class scorpion_state : public spectrum_128_state
 public:
 	scorpion_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
 		, m_beta(*this, BETA_DISK_TAG)
+		, m_bank0_rom(*this, "bank0_rom")
 	{ }
 
 	void scorpion(machine_config &config);
@@ -30,34 +27,29 @@ public:
 	void quorum(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void machine_start() override;
+	void machine_reset() override;
+	void video_start() override;
+
+	rectangle get_screen_area() override;
 
 private:
-	uint8_t beta_neutral_r(offs_t offset);
-	uint8_t beta_enable_r(offs_t offset);
-	uint8_t beta_disable_r(offs_t offset);
-	void scorpion_0000_w(offs_t offset, uint8_t data);
-	void scorpion_port_7ffd_w(uint8_t data);
-	void scorpion_port_1ffd_w(uint8_t data);
+	u8 beta_neutral_r(offs_t offset);
+	u8 beta_enable_r(offs_t offset);
+	u8 beta_disable_r(offs_t offset);
+	void port_7ffd_w(offs_t offset, u8 data);
+	void port_1ffd_w(offs_t offset, u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
 
 	void scorpion_io(address_map &map);
 	void scorpion_mem(address_map &map);
 	void scorpion_switch(address_map &map);
-
 	void scorpion_update_memory();
 
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
-	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
 
-	uint8_t *m_ram_0000;
+	memory_view m_bank0_rom;
 	address_space *m_program;
-	uint8_t *m_p_ram;
-	uint16_t m_rom_selection;
 };
 
 /****************************************************************************************************/
@@ -90,44 +82,26 @@ D6-D7 - not used. ( yet ? )
 
 void scorpion_state::scorpion_update_memory()
 {
-	uint8_t *messram = m_ram->pointer();
+	m_screen->update_now();
+	m_screen_location = m_ram->pointer() + (((m_port_7ffd_data & 8) ? 7 : 5) << 14);
 
-	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
+	m_bank_ram[3]->set_entry((m_port_7ffd_data & 0x07) | ((m_port_1ffd_data & 0x10)>>1));
 
-	m_bank4->set_base(messram + (((m_port_7ffd_data & 0x07) | ((m_port_1ffd_data & 0x10)>>1)) * 0x4000));
-
-	if ((m_port_1ffd_data & 0x01)==0x01)
+	if (BIT(m_port_1ffd_data, 0))
 	{
-		m_ram_0000 = messram+(8<<14);
-		m_bank1->set_base(messram+(8<<14));
-		logerror("RAM\n");
+		m_bank_ram[0]->set_entry(8);
+		m_bank0_rom.disable();
 	}
 	else
 	{
-		if ((m_port_1ffd_data & 0x02)==0x02)
-			m_rom_selection = 2;
-		else
-			m_rom_selection = BIT(m_port_7ffd_data, 4);
-
-		m_bank1->set_base(&m_p_ram[0x10000 + (m_rom_selection<<14)]);
-	}
-}
-
-void scorpion_state::scorpion_0000_w(offs_t offset, uint8_t data)
-{
-	if ( ! m_ram_0000 )
-		return;
-
-	if ((m_port_1ffd_data & 0x01)==0x01)
-	{
-		if ( ! m_ram_disabled_by_beta )
-			m_ram_0000[offset] = data;
+		m_bank_rom[0]->set_entry(BIT(m_port_1ffd_data, 1) ? 2 : BIT(m_port_7ffd_data, 4));
+		m_bank0_rom.select(0);
 	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(scorpion_state::nmi_check_callback)
 {
-	if ((m_io_nmi->read() & 1)==1)
+	if (m_io_nmi->read() & 0x01)
 	{
 		m_port_1ffd_data |= 0x02;
 		scorpion_update_memory();
@@ -135,61 +109,60 @@ TIMER_DEVICE_CALLBACK_MEMBER(scorpion_state::nmi_check_callback)
 	}
 }
 
-void scorpion_state::scorpion_port_7ffd_w(uint8_t data)
+void scorpion_state::port_7ffd_w(offs_t offset, u8 data)
 {
 	/* disable paging */
 	if (m_port_7ffd_data & 0x20)
 		return;
 
-	/* store new state */
 	m_port_7ffd_data = data;
-
-	/* update memory */
 	scorpion_update_memory();
 }
 
-void scorpion_state::scorpion_port_1ffd_w(uint8_t data)
+void scorpion_state::port_1ffd_w(offs_t offset, u8 data)
 {
 	m_port_1ffd_data = data;
 	scorpion_update_memory();
 }
 
-uint8_t scorpion_state::beta_neutral_r(offs_t offset)
+u8 scorpion_state::beta_neutral_r(offs_t offset)
 {
+	if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
+
 	return m_program->read_byte(offset);
 }
 
-uint8_t scorpion_state::beta_enable_r(offs_t offset)
+u8 scorpion_state::beta_enable_r(offs_t offset)
 {
-	if (m_rom_selection == 1) {
-		m_rom_selection = 3;
-		if (m_beta->started()) {
-			m_beta->enable();
-			m_bank1->set_base(&m_p_ram[0x10000 + (m_rom_selection<<14)]);
-			m_ram_disabled_by_beta = 1;
-		}
+	if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
+
+	if (m_beta->started() && m_bank_rom[0]->entry() == 1) {
+		m_beta->enable();
+		m_bank_rom[0]->set_entry(3);
 	}
 	return m_program->read_byte(offset + 0x3d00);
 }
 
-uint8_t scorpion_state::beta_disable_r(offs_t offset)
+u8 scorpion_state::beta_disable_r(offs_t offset)
 {
+	if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
+
 	if (m_beta->started() && m_beta->is_active()) {
-		m_rom_selection = BIT(m_port_7ffd_data, 4);
 		m_beta->disable();
-		m_bank1->set_base(&m_p_ram[0x10000 + (m_rom_selection<<14)]);
-		m_ram_disabled_by_beta = 1;
-	} else
-		m_ram_disabled_by_beta = 0;
+		m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
+	}
 	return m_program->read_byte(offset + 0x4000);
 }
 
 void scorpion_state::scorpion_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bank1").w(FUNC(scorpion_state::scorpion_0000_w));
-	map(0x4000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankrw("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	map(0x0000, 0x3fff).bankr(m_bank_ram[0]).w(FUNC(scorpion_state::spectrum_128_ram_w<0>));
+	map(0x0000, 0x3fff).view(m_bank0_rom);
+	m_bank0_rom[0](0x0000, 0x3fff).bankr(m_bank_rom[0]);
+
+	map(0x4000, 0x7fff).bankr(m_bank_ram[1]).w(FUNC(scorpion_state::spectrum_128_ram_w<1>));
+	map(0x8000, 0xbfff).bankrw(m_bank_ram[2]);
+	map(0xc000, 0xffff).bankr(m_bank_ram[3]).w(FUNC(scorpion_state::spectrum_128_ram_w<3>));
 }
 
 void scorpion_state::scorpion_io(address_map &map)
@@ -201,10 +174,10 @@ void scorpion_state::scorpion_io(address_map &map)
 	map(0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
 	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(scorpion_state::spectrum_ula_r), FUNC(scorpion_state::spectrum_ula_w));
 	map(0x00ff, 0x00ff).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
-	map(0x4021, 0x4021).mirror(0x3fdc).w(FUNC(scorpion_state::scorpion_port_7ffd_w));
+	map(0x4021, 0x4021).mirror(0x3fdc).w(FUNC(scorpion_state::port_7ffd_w));
 	map(0x8021, 0x8021).mirror(0x3fdc).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc021, 0xc021).mirror(0x3fdc).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
-	map(0x0021, 0x0021).mirror(0x3fdc).w(FUNC(scorpion_state::scorpion_port_1ffd_w));
+	map(0x0021, 0x0021).mirror(0x3fdc).w(FUNC(scorpion_state::port_1ffd_w));
 }
 
 void scorpion_state::scorpion_switch(address_map &map)
@@ -214,110 +187,108 @@ void scorpion_state::scorpion_switch(address_map &map)
 	map(0x4000, 0xffff).r(FUNC(scorpion_state::beta_disable_r));
 }
 
-
 void scorpion_state::machine_start()
 {
 	spectrum_128_state::machine_start();
 
-	m_rom_selection = 0;
+	save_item(NAME(m_port_1ffd_data));
 
-	save_item(NAME(m_rom_selection));
+	// reconfigure ROMs
+	memory_region *rom = memregion("maincpu");
+	m_bank_rom[0]->configure_entries(0, 4*8, rom->base() + 0x10000, 0x4000);
+	m_bank_ram[0]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
+
+	m_program = &m_maincpu->space(AS_PROGRAM);
 }
 
 void scorpion_state::machine_reset()
 {
-	uint8_t *messram = m_ram->pointer();
-	m_program = &m_maincpu->space(AS_PROGRAM);
-	m_p_ram = memregion("maincpu")->base();
-
-	m_ram_0000 = nullptr;
-	m_program->install_read_bank(0x0000, 0x3fff, m_bank1);
-	m_program->install_write_handler(0x0000, 0x3fff, write8sm_delegate(*this, FUNC(scorpion_state::scorpion_0000_w)));
-
+	m_bank0_rom.select(0);
 	m_beta->disable();
 
-	memset(messram,0,256*1024);
-
-	/* Bank 5 is always in 0x4000 - 0x7fff */
-	m_bank2->set_base(messram + (5<<14));
-
-	/* Bank 2 is always in 0x8000 - 0xbfff */
-	m_bank3->set_base(messram + (2<<14));
-
+	m_port_fe_data = -1;
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = 0;
+
 	scorpion_update_memory();
+}
+
+void scorpion_state::video_start()
+{
+	spectrum_state::video_start();
+	m_screen_location = m_ram->pointer() + (5 << 14);
+	m_contention_pattern = {};
 }
 
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,                   /* 8 x 8 characters */
-	96,                 /* 96 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
+	8, 8,          /* 8 x 8 characters */
+	96,            /* 96 characters */
+	1,             /* 1 bits per pixel */
+	{ 0 },         /* no bitplanes */
+	{STEP8(0, 1)}, /* x offsets */
+	{STEP8(0, 8)}, /* y offsets */
+	8*8            /* every char takes 8 bytes */
 };
 
 static const gfx_layout quorum_charlayout =
 {
-	8, 8,                   /* 8 x 8 characters */
-	160,                    /* 160 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
+	8, 8,          /* 8 x 8 characters */
+	160,           /* 160 characters */
+	1,             /* 1 bits per pixel */
+	{ 0 },         /* no bitplanes */
+	{STEP8(0, 1)}, /* x offsets */
+	{STEP8(0, 8)}, /* y offsets */
+	8*8            /* every char takes 8 bytes */
 };
 
 static const gfx_layout profi_8_charlayout =
 {
-	8, 8,                   /* 8 x 8 characters */
-	224,                    /* 224 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
+	8, 8,          /* 8 x 8 characters */
+	224,           /* 224 characters */
+	1,             /* 1 bits per pixel */
+	{ 0 },         /* no bitplanes */
+	{STEP8(0, 1)}, /* x offsets */
+	{STEP8(0, 8)}, /* y offsets */
+	8*8            /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( gfx_scorpion )
-	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 7, 8 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_profi )
-	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
-	GFXDECODE_ENTRY( "maincpu", 0x1abfc, profi_8_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 7, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0x1abfc, profi_8_charlayout, 7, 8 )
 	/* There are more characters after this, that haven't been decoded */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_quorum )
-	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 7, 8 )
 GFXDECODE_END
+
+rectangle scorpion_state::get_screen_area()
+{
+	return spectrum_state::get_screen_area();
+}
 
 void scorpion_state::scorpion(machine_config &config)
 {
-	spectrum_128(config);
+	// Yellow PCB
+	spectrum(config);
+	m_ram->set_default_size("256K");
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &scorpion_state::scorpion_mem);
 	m_maincpu->set_addrmap(AS_IO, &scorpion_state::scorpion_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &scorpion_state::scorpion_switch);
+	m_maincpu->nomreq_cb().set_nop();
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_scorpion);
 
+	AY8912(config, "ay8912", X1 / 8).add_route(ALL_OUTPUTS, "mono", 0.25);
+
 	BETA_DISK(config, m_beta, 0);
-
-	/* internal ram */
-	m_ram->set_default_size("256K");
-
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(scorpion_state::nmi_check_callback), attotime::from_hz(50));
 
 	config.device_remove("exp");

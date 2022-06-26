@@ -16,7 +16,7 @@ license:CC0
 				<rom name="mountx37.img" size="655360" crc="351d1a0b" sha1="1ee3f7d4897be1ffe1977bf231e26187ce54a219"/>
 			</dataarea>
 		</part>
-		
+
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="mount2"/>
 			<dataarea name="flop" size="655360">

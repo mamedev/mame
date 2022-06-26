@@ -412,12 +412,12 @@ TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 			int16_t lsample = queue_pop() << 8;
 			lsample |= queue_pop();
 			m_ldac->write(lsample);
-		}	break;
+		}   break;
 		case 0x10: { // 16bit right only
 			int16_t rsample = queue_pop() << 8;
 			rsample |= queue_pop();
 			m_rdac->write(rsample);
-		}	break;
+		}   break;
 	}
 	if((queue_count() < m_irq_rate) && (m_pcm_ctrl & 0x20))
 	{

@@ -17,33 +17,13 @@
 #include "machine/macadb.h"
 
 #include "bus/nscsi/devices.h"
+#include "bus/nubus/cards.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/applepic.h"
 #include "machine/iwm.h"
 #include "machine/swim1.h"
 #include "machine/swim2.h"
-
-// NuBus and 030/040 PDS cards
-#include "bus/nubus/nubus_48gc.h"
-#include "bus/nubus/nubus_cb264.h"
-#include "bus/nubus/nubus_vikbw.h"
-#include "bus/nubus/nubus_specpdq.h"
-#include "bus/nubus/nubus_m2hires.h"
-#include "bus/nubus/nubus_spec8.h"
-#include "bus/nubus/nubus_radiustpd.h"
-#include "bus/nubus/nubus_wsportrait.h"
-#include "bus/nubus/nubus_asntmc3b.h"
-#include "bus/nubus/nubus_image.h"
-#include "bus/nubus/nubus_m2video.h"
-#include "bus/nubus/bootbug.h"
-#include "bus/nubus/quadralink.h"
-#include "bus/nubus/laserview.h"
-#include "bus/nubus/pds30_cb264.h"
-#include "bus/nubus/pds30_procolor816.h"
-#include "bus/nubus/pds30_sigmalview.h"
-#include "bus/nubus/pds30_30hr.h"
-#include "bus/nubus/pds30_mc30.h"
 
 #include "layout/generic.h"
 #include "softlist_dev.h"
@@ -596,36 +576,6 @@ void mac_state::maciifx_map(address_map &map)
     DEVICE CONFIG
 ***************************************************************************/
 
-static void mac_nubus_cards(device_slot_interface &device)
-{
-	device.option_add("m2video", NUBUS_M2VIDEO);    /* Apple Macintosh II Video Card */
-	device.option_add("48gc", NUBUS_48GC);      /* Apple 4*8 Graphics Card */
-	device.option_add("824gc", NUBUS_824GC);    /* Apple 8*24 Graphics Card */
-	device.option_add("cb264", NUBUS_CB264);    /* RasterOps ColorBoard 264 */
-	device.option_add("vikbw", NUBUS_VIKBW);    /* Moniterm Viking board */
-	device.option_add("image", NUBUS_IMAGE);    /* Disk Image Pseudo-Card */
-	device.option_add("specpdq", NUBUS_SPECPDQ);    /* SuperMac Spectrum PDQ */
-	device.option_add("m2hires", NUBUS_M2HIRES);    /* Apple Macintosh II Hi-Resolution Card */
-	device.option_add("spec8s3", NUBUS_SPEC8S3);    /* SuperMac Spectrum/8 Series III */
-//  device.option_add("thundergx", NUBUS_THUNDERGX);        /* Radius Thunder GX (not yet) */
-	device.option_add("radiustpd", NUBUS_RADIUSTPD);        /* Radius Two Page Display */
-	device.option_add("asmc3nb", NUBUS_ASNTMC3NB);  /* Asante MC3NB Ethernet card */
-	device.option_add("portrait", NUBUS_WSPORTRAIT);    /* Apple Macintosh II Portrait video card */
-	device.option_add("enetnb", NUBUS_APPLEENET);   /* Apple NuBus Ethernet */
-	device.option_add("bootbug", NUBUS_BOOTBUG);    /* Brigent BootBug debugger card */
-	device.option_add("quadralink", NUBUS_QUADRALINK);  /* AE Quadralink serial card */
-	device.option_add("laserview", NUBUS_LASERVIEW);  /* Sigma Designs LaserView monochrome video card */
-}
-
-static void mac_pds030_cards(device_slot_interface &device)
-{
-	device.option_add("cb264", PDS030_CB264SE30);   // RasterOps Colorboard 264/SE30
-	device.option_add("pc816", PDS030_PROCOLOR816); // Lapis ProColor Server 8*16 PDS
-	device.option_add("lview", PDS030_LVIEW);       // Sigma Designs L-View
-	device.option_add("30hr",  PDS030_XCEED30HR);   // Micron/XCEED Technology Color 30HR
-	device.option_add("mc30",  PDS030_XCEEDMC30);   // Micron/XCEED Technology MacroColor 30
-}
-
 static void mac_lcpds_cards(device_slot_interface &device)
 {
 }
@@ -772,7 +722,7 @@ void mac_state::add_nubus(machine_config &config, bool bank1, bool bank2)
 	nubus.out_irqe_callback().set(FUNC(mac_state::nubus_irq_e_w));
 	if (bank1)
 	{
-		NUBUS_SLOT(config, "nb9", "nubus", mac_nubus_cards, "48gc");
+		NUBUS_SLOT(config, "nb9", "nubus", mac_nubus_cards, "mdc824");
 		NUBUS_SLOT(config, "nba", "nubus", mac_nubus_cards, nullptr);
 		NUBUS_SLOT(config, "nbb", "nubus", mac_nubus_cards, nullptr);
 	}

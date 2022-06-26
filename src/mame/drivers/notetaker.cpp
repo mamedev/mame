@@ -113,8 +113,8 @@ DONE:
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_VIDEO			(1U << 1)
-#define LOG_READOP_STATUS	(1U << 2)
+#define LOG_VIDEO           (1U << 1)
+#define LOG_READOP_STATUS   (1U << 2)
 #define LOG_FIFO            (1U << 3)
 #define LOG_SPC_DSP         (1U << 4)
 #define LOG_FIFO_VERBOSE    (1U << 5)

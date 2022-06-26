@@ -30,7 +30,7 @@ R40 hardware notes:
 Documentation for the Toshiba chips is hard to find, but similar chips exist:
 T7778 is equivalent to T6A39, T7900 is equivalent to T6A40.
 
-EPROMs are interchangable between R30 and R40, with some limitations with
+EPROMs are interchangeable between R30 and R40, with some limitations with
 The King 2.50 (see below).
 
 Regarding RAM: The King 2.2x will work fine with RAM expanded up to 8MB.

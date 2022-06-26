@@ -56,7 +56,7 @@ static const double cd4049_al = 0.01;
     dkong color interface:
 
     All outputs are open-collector and pullup resistors are connected to 5V.
-    Red and Green outputs are routed through a complimentary darlington
+    Red and Green outputs are routed through a complementary darlington
     whereas blue is routed through a 1:1 stage leading to a 0.7V cutoff.
 */
 
