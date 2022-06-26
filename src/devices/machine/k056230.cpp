@@ -27,7 +27,7 @@ TODO: nearly everything
 #define LOG_UNKNOWNS	(1 << 5U)
 #define LOG_ALL (LOG_REG_READS | LOG_REG_WRITES | LOG_RAM_READS | LOG_RAM_WRITES | LOG_UNKNOWNS)
 
-#define VERBOSE (LOG_ALL)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(K056230, k056230_device, "k056230", "K056230 LANC")

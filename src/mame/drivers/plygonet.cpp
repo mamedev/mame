@@ -97,7 +97,7 @@
 #define LOG_ALL_DSP_B       (LOG_DSP_AB0 | LOG_DSP_B6 | LOG_DSP_B7 | LOG_DSP_B8)
 
 //#define VERBOSE (LOG_DSP_B6 | LOG_DSP_B7 | LOG_DSP_B8 | LOG_DSP_AE | LOG_DSP_HOST_INTF | LOG_DSP_CTRL | LOG_DSP_PORTC)
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 namespace {
