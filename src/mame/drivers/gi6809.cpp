@@ -80,16 +80,18 @@
 // castaway  credits vars 1Eh - 14Ah - 5025h(nvram) - bin
 
 #include "emu.h"
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/discrete.h"
 #include "video/mc6845.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 
 namespace {
@@ -133,7 +135,6 @@ protected:
 	virtual void video_start() override;
 
 private:
-
 	// Address Maps
 	void glckmain_map(address_map &map);
 	void glckslave_map(address_map &map);
@@ -170,7 +171,7 @@ private:
 	uint8_t gi6809_mux_port_r();
 	uint8_t cast_mux_port_r();
 
-	//Output ports
+	// Output ports
 	void lamps3_w(uint8_t data);
 	void lamps3h_w(uint8_t data);
 	void lamps5_w(uint8_t data);
@@ -194,7 +195,7 @@ private:
 	// states
 	bool m_cast_ca1 = true;
 	bool m_cast_ca2 = true;
-	bool m_vsync;
+	bool m_vsync = 0;
 
 	// internal
 	uint8_t m_stage = 0;
@@ -204,7 +205,6 @@ private:
 	uint8_t sn_read1_r() { return m_sernum1[(m_ser_ptr++)& 0x0f]; }
 	uint8_t sn_read2_r() { return m_sernum2[(m_ser_ptr++)& 0x0f]; }
 	uint8_t cast_sens_r() { return m_cast_sense; }
-
 };
 
 
@@ -220,7 +220,7 @@ WRITE_LINE_MEMBER( gi6809_state::crtc_vs_gl )
 
 WRITE_LINE_MEMBER( gi6809_state::crtc_vs_ca )
 {
-	if( state and ((m_coin_ca->read() == 0) | (m_stage != 0)))
+	if(state && ((m_coin_ca->read() == 0) || (m_stage != 0)))
 	{
 		switch(m_stage)
 		{
@@ -387,7 +387,7 @@ uint8_t gi6809_state::gi6809_mux_port_r()
 			data &= m_input[i]->read();
 			if(i == 1)
 			{
-				if((m_coin_gl->read() == 0) | (m_stage != 0))
+				if((m_coin_gl->read() == 0) || (m_stage != 0))
 				{
 					switch(m_stage)
 					{
