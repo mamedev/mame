@@ -887,7 +887,7 @@ void gi6809_state::castawayt(machine_config &config)
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps8_w));
 	m_pia[0]->readca1_handler().set(FUNC(gi6809_state::pia0_ca1));
-	m_pia[0]->ca2_handler().set([this](bool state) {});
+	m_pia[0]->ca2_handler().set([](bool state) {});
 
 	PIA6821(config, m_pia[1], 0);  // DDRA:FF (All Out) - DDRB:EO (OOOI-IIII)
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
@@ -896,7 +896,7 @@ void gi6809_state::castawayt(machine_config &config)
 	m_pia[1]->readca1_handler().set(FUNC(gi6809_state::cast_pia1_ca1));  // rel to coin a
 	m_pia[1]->readca2_handler().set(FUNC(gi6809_state::cast_pia1_ca2));  // rel to coin b
 	m_pia[1]->readcb1_handler().set(FUNC(gi6809_state::ret_vsync));
-	m_pia[1]->cb2_handler().set([this](bool state) {});
+	m_pia[1]->cb2_handler().set([](bool state) {});
 	m_pia[1]->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	m_pia[1]->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
@@ -924,15 +924,15 @@ void gi6809_state::jesterch(machine_config &config)
 	m_pia[0]->readpa_handler().set_ioport("PIA0_A");
 	m_pia[0]->writepb_handler().set(FUNC(gi6809_state::lamps5_w));
 	m_pia[0]->irqa_handler().set_inputline(m_slavecpu, M6809_IRQ_LINE);
-	m_pia[0]->ca2_handler().set([this](bool state) {});
-	m_pia[0]->cb2_handler().set([this](bool state) {});
+	m_pia[0]->ca2_handler().set([](bool state) {});
+	m_pia[0]->cb2_handler().set([](bool state) {});
 
 	PIA6821(config, m_pia[1], 0);  // DDRA:FF (All Out) - DDRB:EO (OOOI-IIII)
 	m_pia[1]->writepa_handler().set(FUNC(gi6809_state::snd_mux_w));
 	m_pia[1]->readpb_handler().set(FUNC(gi6809_state::cast_mux_port_r));
 	m_pia[1]->writepb_handler().set(FUNC(gi6809_state::lamps3_w));
-	m_pia[1]->ca2_handler().set([this](bool state) {});
-	m_pia[1]->cb2_handler().set([this](bool state) {});
+	m_pia[1]->ca2_handler().set([](bool state) {});
+	m_pia[1]->cb2_handler().set([](bool state) {});
 	m_pia[1]->irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_pia[1]->irqa_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 }
