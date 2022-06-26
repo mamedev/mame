@@ -4848,6 +4848,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/gamtor.cpp",
 	MAME_DIR .. "src/mame/drivers/gei.cpp",
 	MAME_DIR .. "src/mame/drivers/gfamily.cpp",
+	MAME_DIR .. "src/mame/drivers/gi6809.cpp",
 	MAME_DIR .. "src/mame/drivers/globalfr.cpp",
 	MAME_DIR .. "src/mame/drivers/globalvr.cpp",
 	MAME_DIR .. "src/mame/drivers/gluck2.cpp",

@@ -15453,6 +15453,11 @@ bballoon                        // (c) 2003 Eolith
 hapytour                        // (c) 2005 GAV Company (on Eolith's Ghost hardware)
 touryuu                         // (c) 200? Yuki Enterprise
 
+@source:gi6809.cpp
+castawayt
+glck6809
+jesterch
+
 @source:giclassic.cpp
 giclasex
 giclassvr
