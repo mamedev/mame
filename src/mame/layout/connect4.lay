@@ -4,47 +4,90 @@ license:CC0
 -->
 <mamelayout version="2">
 
-	<!-- Lua script (demo for -plugin layout) -->
-	<!-- this adds support for combining outputs to make an aggregated output -->
-	<script><![CDATA[
-		local ledlamps = {
-			{ 106, 107, 108, 109, 104, 105, 110    },
-			{ 114, 115, 116, 117, 112, 113, 118    }
-			}
-
-		function configure_view(view)
-			local led_items = {
-					view.items["compoundled0"],
-					view.items["compoundled1"]}
-			view:set_prepare_items_callback(
-					function ()
-						for ledno, lamps in pairs(ledlamps) do
-							local ledstate = 0
-							for bit, lampno in pairs(lamps) do
-								if machine.output:get_indexed_value("lamp", lampno) > 0 then
-									ledstate = ledstate | (1 << (bit - 1))
-								end
-							end
-							if led_items[ledno] ~= nil then
-								led_items[ledno]:set_state(ledstate)
-							end
-						end
-					end)
-		end
-
-		file:set_resolve_tags_callback(
-				function ()
-					for k, view in pairs(file.views) do
-						configure_view(view)
-					end
-				end)
-	]]></script>
-
-	<element name="digit">
-	<led7seg>
-			<color red="1.0" green="0.0" blue="0.0" />
-	</led7seg>
+	<element name="ledseg0">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" stroke="#ffffff" stroke-opacity="1" fill-opacity="1" stroke-width="0.265px" d="M 22.20542,9.1048101 28.73216,15.40339 90.121429,15.68542 98.067028,7.8827048 97.972444,6.3785695 91.634871,-0.01402362 H 30.245613 L 22.489191,7.8827048 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
 	</element>
+
+	<element name="ledseg1">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" stroke="#ffffff" stroke-opacity="1" fill-opacity="1" stroke-width="0.265px" d="M 100.27788,70.003783 V 70.003783 L 105.06448,16.31986 98.670479,10.214696 94.729561,13.241168 89.485916,18.262069 85.770371,70.989977 91.77302,76.645088 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
+	<element name="ledseg2">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" stroke="#ffffff" stroke-opacity="1" fill-opacity="1" stroke-width="0.265px" d="M 95.196435,139.14134 V 139.14134 L 99.575477,85.260092 93.725882,79.132488 90.12051,82.170085 85.323325,87.209441 81.258449,139.0652 88.377384,147.32974 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
+	<element name="ledseg3">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" stroke="#ffffff" stroke-opacity="1" fill-opacity="1" stroke-width="0.265px" d="M 8.3614993,151.77509 15.041155,158.70056 77.868647,159.01066 86.000403,150.43135 85.903597,148.77751 79.417554,141.74867 H 16.590061 L 8.651919,150.43135 Z" id="path1176" />
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
+	<element name="ledseg4">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" stroke="#ffffff" stroke-opacity="1" fill-opacity="1" stroke-width="0.265px" d="M 14.558811,138.94167 V 138.94167 L 19.193501,87.456057 13.002408,81.600896 9.1865559,84.503437 4.1093121,89.318734 0.18881344,137.65642 7.6209698,145.53443 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
+	<element name="ledseg5">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" stroke="#ffffff" stroke-opacity="1" fill-opacity="1" stroke-width="0.265px" d="M 20.773462,69.660587 V 69.660587 L 25.697055,15.534132 19.120048,9.3786417 15.066333,12.430062 9.6726043,17.492352 5.8507136,70.654911 12.02517,76.356638 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
+	<element name="ledseg6">
+		<image statemask="0x01">
+		<data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 109.2832 165.8748">
+				<path fill="#ffffff" stroke="#ffffff" stroke-opacity="1" fill-opacity="1" stroke-width="0.265px" d="M 15.232441,80.263244 21.75253,86.594345 83.079166,86.877827 91.016666,79.034823 90.922173,77.522917 84.591072,71.097323 H 23.264435 L 15.515923,79.034823 Z" />
+				</svg>
+			]]>
+		</data>
+		</image>
+	</element>
+
 
 	<element name="play" defstate="0">
 		<text string="PLAYER 1ST" state="1">
@@ -678,15 +721,63 @@ license:CC0
 		</element>
 
 
-		<element name="compoundled0" ref="digit" state="0">
+		<element name="lamp106" ref="ledseg0" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp107" ref="ledseg1" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp108" ref="ledseg2" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp109" ref="ledseg3" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp104" ref="ledseg4" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp105" ref="ledseg5" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp110" ref="ledseg6" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="56" width="8" height="10"/>
 		</element>
 
-
-		<element name="compoundled1" ref="digit" state="0">
+		<element name="lamp114" ref="ledseg0" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
 			<bounds x="9" y="56" width="8" height="10"/>
 		</element>
-
+		<element name="lamp115" ref="ledseg1" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="9" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp116" ref="ledseg2" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="9" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp117" ref="ledseg3" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="9" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp112" ref="ledseg4" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="9" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp113" ref="ledseg5" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="9" y="56" width="8" height="10"/>
+		</element>
+		<element name="lamp118" ref="ledseg6" state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="9" y="56" width="8" height="10"/>
+		</element>
 
 		<element name="lamp119" ref="timeout" state="0">
 			<bounds x="30" y="56" width="28" height="14"/>
