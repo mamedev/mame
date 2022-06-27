@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/sidearms.h"
+#include "sidearms.h"
 
 void sidearms_state::videoram_w(offs_t offset, uint8_t data)
 {

@@ -13,7 +13,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/namcond1.h"
+#include "namcond1.h"
 
 /* Perform basic machine initialisation */
 

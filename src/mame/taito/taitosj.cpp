@@ -166,7 +166,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/taitosj.h"
+#include "taitosj.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"

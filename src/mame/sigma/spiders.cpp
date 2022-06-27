@@ -190,7 +190,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/spiders.h"
+#include "spiders.h"
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"

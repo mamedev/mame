@@ -18,7 +18,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/csd.h"
+#include "csd.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/6821pia.h"

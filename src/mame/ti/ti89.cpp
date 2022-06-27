@@ -18,7 +18,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/ti89.h"
+#include "ti89.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/intelfsh.h"

@@ -47,13 +47,18 @@
 
 
 #include "emu.h"
+
+#include "pcshare.h"
+
 #include "cpu/i386/i386.h"
 #include "cpu/tms32031/tms32031.h"
-#include "machine/pcshare.h"
-#include "machine/idectrl.h"
-#include "video/pc_vga.h"
-#include "machine/pckeybrd.h"
 #include "machine/ds128x.h"
+#include "machine/idectrl.h"
+#include "machine/pckeybrd.h"
+#include "video/pc_vga.h"
+
+
+namespace {
 
 /*************************************
  *
@@ -278,7 +283,9 @@ ROM_START( su2000 )
 	ROM_LOAD("wi02p014.u82",                0x00000, 0x00892, CRC(845e4d48) SHA1(6aaeabad0e86fe480773b4b51ca4f7c1c8935993) )
 	ROM_LOAD("wi02p015.u74",                0x00000, 0x00892, CRC(a10d1876) SHA1(4091fa0a3abb2baeabcc6b250342cf29829af21a) )
 	ROM_LOAD("wi02p016.u52",                0x00000, 0x00892, CRC(d84b58c2) SHA1(087b5a56ddb6bef6b1bc93b9a8e0d23de27aa399) )
-	ROM_END
+ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

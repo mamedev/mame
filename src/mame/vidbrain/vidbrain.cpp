@@ -51,7 +51,7 @@ Using the system:
 */
 
 #include "emu.h"
-#include "includes/vidbrain.h"
+#include "vidbrain.h"
 
 #include "machine/rescap.h"
 #include "softlist_dev.h"

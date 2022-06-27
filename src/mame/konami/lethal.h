@@ -12,10 +12,10 @@
 
 #include "machine/bankdev.h"
 #include "sound/k054539.h"
-#include "video/konami_helper.h"
-#include "video/k054156_k054157_k056832.h"
-#include "video/k053244_k053245.h"
-#include "video/k054000.h"
+#include "konami_helper.h"
+#include "k054156_k054157_k056832.h"
+#include "k053244_k053245.h"
+#include "k054000.h"
 #include "machine/k054321.h"
 #include "emupal.h"
 

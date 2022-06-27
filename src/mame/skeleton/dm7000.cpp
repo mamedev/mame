@@ -39,7 +39,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/dm7000.h"
+#include "dm7000.h"
 #include "screen.h"
 
 #define VERBOSE_LEVEL ( 9 )

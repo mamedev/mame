@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "video/vsystem_spr.h"
+#include "vsystem_spr.h"
 #include "machine/gen_latch.h"
 #include "machine/mb3773.h"
 #include "tilemap.h"

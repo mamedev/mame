@@ -29,7 +29,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/scramble.h"
+#include "scramble.h"
 
 #include "cpu/s2650/s2650.h"
 #include "cpu/z80/z80.h"

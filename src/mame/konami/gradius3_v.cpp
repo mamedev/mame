@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 
 #include "emu.h"
-#include "includes/gradius3.h"
+#include "gradius3.h"
 #include "screen.h"
 
 

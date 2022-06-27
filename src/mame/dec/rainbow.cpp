@@ -325,7 +325,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
-#include "video/vtvideo.h"
+#include "vtvideo.h"
 #include "video/upd7220.h"
 
 #include "machine/wd_fdc.h"
@@ -345,7 +345,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "bus/rs232/terminal.h"
 
 #include "machine/i8251.h"
-#include "machine/dec_lk201.h"
+#include "dec_lk201.h"
 #include "machine/nvram.h"
 #include "machine/ripple_counter.h"
 #include "machine/timer.h"

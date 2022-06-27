@@ -11,7 +11,7 @@ ToDo: Fix Sprites & Rowscroll/Select for Cocktail
 */
 
 #include "emu.h"
-#include "includes/mcatadv.h"
+#include "mcatadv.h"
 #include "screen.h"
 
 #include <algorithm>

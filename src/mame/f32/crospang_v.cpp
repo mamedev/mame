@@ -12,7 +12,7 @@
 */
 
 #include "emu.h"
-#include "includes/crospang.h"
+#include "crospang.h"
 
 
 void crospang_state::tilebank_select_w(u16 data)

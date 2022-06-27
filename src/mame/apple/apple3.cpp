@@ -17,7 +17,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/apple3.h"
+#include "apple3.h"
 #include "formats/ap2_dsk.h"
 
 #include "bus/a2bus/cards.h"

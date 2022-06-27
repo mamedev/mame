@@ -12,7 +12,7 @@
 #include "sound/tms5220.h"
 #include "machine/6522via.h"
 #include "machine/wd_fdc.h"
-#include "includes/bbc.h"
+#include "bbc.h"
 #include "machine/mc146818.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"

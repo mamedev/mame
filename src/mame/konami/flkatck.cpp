@@ -15,9 +15,9 @@ NOTE: A USA version of Flak Attack is known to exist  - currently not dumped
 
 #include "emu.h"
 
-#include "includes/konamipt.h"
-#include "machine/k007452.h"
-#include "video/k007121.h"
+#include "konamipt.h"
+#include "k007452.h"
+#include "k007121.h"
 
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"

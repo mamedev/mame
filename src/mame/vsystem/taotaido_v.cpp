@@ -11,7 +11,7 @@ zooming might be wrong (only used on title logo?)
 */
 
 #include "emu.h"
-#include "includes/taotaido.h"
+#include "taotaido.h"
 #include "screen.h"
 
 /* sprite tile codes 0x4000 - 0x7fff get remapped according to the content of these registers */

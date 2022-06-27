@@ -17,7 +17,7 @@
 
 #define VERBOSE 0
 
-#include "includes/apollo.h"
+#include "apollo.h"
 
 #include "emupal.h"
 #include "screen.h"

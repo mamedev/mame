@@ -314,8 +314,8 @@ TODO:
 
 #include "emu.h"
 
-#include "video/vsystem_gga.h"
-#include "video/vsystem_spr2.h"
+#include "vsystem_gga.h"
+#include "vsystem_spr2.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

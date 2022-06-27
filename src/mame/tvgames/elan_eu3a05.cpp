@@ -207,6 +207,9 @@ Set 5043 bit 0 low
 */
 
 #include "emu.h"
+
+#include "elan_eu3a05_a.h"
+
 #include "cpu/m6502/m6502.h"
 //#include "cpu/m6502/m65c02.h"
 #include "emupal.h"
@@ -214,10 +217,9 @@ Set 5043 bit 0 low
 #include "softlist_dev.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
-#include "audio/elan_eu3a05.h"
-#include "machine/elan_eu3a05gpio.h"
-#include "machine/elan_eu3a05sys.h"
-#include "video/elan_eu3a05vid.h"
+#include "elan_eu3a05gpio.h"
+#include "elan_eu3a05sys.h"
+#include "elan_eu3a05vid.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 

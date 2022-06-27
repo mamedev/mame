@@ -115,7 +115,7 @@ $8000 - $ffff   ROM
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/renegade.h"
+#include "renegade.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"

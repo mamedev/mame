@@ -153,7 +153,7 @@ ht1080z    works
 *******************************************************************************************************/
 
 #include "emu.h"
-#include "includes/trs80.h"
+#include "trs80.h"
 #include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "softlist_dev.h"

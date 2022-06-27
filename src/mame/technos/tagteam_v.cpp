@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/tagteam.h"
+#include "tagteam.h"
 
 // TODO: fix or confirm resnet implementation
 // schematics say emitter circuit with 47 ohm pullup and 470 ohm pulldown but this results in a bad palette

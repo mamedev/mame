@@ -12,19 +12,19 @@
 
 #pragma once
 
-#include "machine/namco_c139.h"
-#include "machine/namco_c148.h"
+#include "namco_c139.h"
+#include "namco_c148.h"
 #include "machine/timer.h"
 #include "sound/c140.h"
-#include "video/namco_c45road.h"
-#include "video/namco_c116.h"
-#include "machine/namco65.h"
-#include "machine/namco68.h"
-#include "video/namco_c169roz.h"
-#include "video/namco_c355spr.h"
-#include "video/namco_c123tmap.h"
-#include "video/namcos2_sprite.h"
-#include "video/namcos2_roz.h"
+#include "namco_c45road.h"
+#include "namco_c116.h"
+#include "namco65.h"
+#include "namco68.h"
+#include "namco_c169roz.h"
+#include "namco_c355spr.h"
+#include "namco_c123tmap.h"
+#include "namcos2_sprite.h"
+#include "namcos2_roz.h"
 #include "screen.h"
 
 /*********************************************/

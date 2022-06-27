@@ -9,7 +9,7 @@ some of this can likely be moved into the actual MCU core too
 */
 
 #include "emu.h"
-#include "machine/namco65.h"
+#include "namco65.h"
 
 DEFINE_DEVICE_TYPE(NAMCOC65, namcoc65_device, "namcoc65", "Namco C65 I/O")
 

@@ -14,7 +14,7 @@
 #include "machine/8530scc.h"
 #include "machine/6522via.h"
 #include "machine/ram.h"
-#include "machine/cuda.h"
+#include "cuda.h"
 #include "machine/ncr539x.h"
 #include "sound/awacs.h"
 

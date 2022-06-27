@@ -182,11 +182,11 @@ Cisco Heat.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/cischeat.h"
+#include "cischeat.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/adc0804.h"
-#include "machine/jalcrpt.h"
+#include "jalcrpt.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"

@@ -14,8 +14,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galaga.h"
-#include "includes/bosco.h"
+#include "galaga.h"
+#include "bosco.h"
 
 
 void bosco_state::bosco_palette(palette_device &palette) const

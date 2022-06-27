@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
-#include "includes/tmc600.h"
+#include "tmc600.h"
 
 void tmc600_state::vismac_register_w(uint8_t data)
 {

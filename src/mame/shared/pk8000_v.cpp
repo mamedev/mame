@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
 #include "emu.h"
-#include "pk8000.h"
+#include "pk8000_v.h"
 
 uint8_t pk8000_base_state::video_color_r()
 {

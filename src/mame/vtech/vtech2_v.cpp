@@ -11,7 +11,7 @@
 
 #include "emu.h"
 
-#include "includes/vtech2.h"
+#include "vtech2.h"
 
 #define BORDER_H    64
 #define BORDER_V    32

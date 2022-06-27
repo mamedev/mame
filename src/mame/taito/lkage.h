@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-#ifndef MAME_INCLUDES_LKAGE_H
-#define MAME_INCLUDES_LKAGE_H
+#ifndef MAME_TAITO_LKAGE_H
+#define MAME_TAITO_LKAGE_H
 
 #pragma once
 
+#include "taito68705.h"
+
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
-#include "machine/taito68705interface.h"
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -91,4 +92,4 @@ private:
 	void lkage_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_LKAGE_H
+#endif // MAME_TAITO_LKAGE_H

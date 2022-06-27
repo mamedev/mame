@@ -163,7 +163,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ssv.h"
+#include "ssv.h"
 
 #include "cpu/v810/v810.h"
 #include "cpu/v60/v60.h"

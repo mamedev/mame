@@ -31,8 +31,8 @@ YM2151:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mustache.h"
-#include "audio/t5182.h"
+#include "mustache.h"
+#include "t5182.h"
 
 #include "cpu/z80/z80.h"
 #include "speaker.h"

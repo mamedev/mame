@@ -58,7 +58,7 @@ KISEKAE -- info
 */
 
 #include "emu.h"
-#include "machine/st0016.h"
+#include "st0016.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

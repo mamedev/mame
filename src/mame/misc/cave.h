@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_CAVE_H
-#define MAME_INCLUDES_CAVE_H
+#ifndef MAME_MISC_CAVE_H
+#define MAME_MISC_CAVE_H
 
 #pragma once
 
@@ -11,11 +11,13 @@
 
 ***************************************************************************/
 
+#include "tmap038.h"
+
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
-#include "video/tmap038.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -361,4 +363,4 @@ private:
 	void uopoko_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_CAVE_H
+#endif // MAME_MISC_CAVE_H

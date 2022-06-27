@@ -32,7 +32,7 @@ The driver has been updated accordingly.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/matmania.h"
+#include "matmania.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"

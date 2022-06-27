@@ -3,7 +3,7 @@
 
 #include "emu.h"
 #include "screen.h"
-#include "includes/playch10.h"
+#include "playch10.h"
 
 #include "video/ppu2c0x.h"
 

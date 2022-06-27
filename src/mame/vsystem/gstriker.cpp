@@ -176,10 +176,10 @@ Frequencies: 68k is XTAL_32MHZ/2
 
 #include "emu.h"
 
-#include "machine/vs9209.h"
-#include "video/mb60553.h"
-#include "video/vs920a.h"
-#include "video/vsystem_spr.h"
+#include "vs9209.h"
+#include "mb60553.h"
+#include "vs920a.h"
+#include "vsystem_spr.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

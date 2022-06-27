@@ -6,8 +6,7 @@
  * video hardware for DJ Boy
  */
 #include "emu.h"
-#include "video/kan_pand.h"
-#include "includes/djboy.h"
+#include "djboy.h"
 
 void djboy_state::djboy_scrollx_w(uint8_t data)
 {

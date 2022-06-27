@@ -33,7 +33,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/clshroad.h"
+#include "clshroad.h"
 
 
 WRITE_LINE_MEMBER(clshroad_state::flipscreen_w)

@@ -1,17 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski
-#ifndef MAME_INCLUDES_TOKI_H
-#define MAME_INCLUDES_TOKI_H
+#ifndef MAME_SEIBU_TOKI_H
+#define MAME_SEIBU_TOKI_H
 
 #pragma once
 
-#include "audio/seibu.h"
+#include "seibusound.h"
+
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "video/bufsprite.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class toki_state : public driver_device
 {
@@ -98,4 +101,4 @@ private:
 	void tokib_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TOKI_H
+#endif // MAME_SEIBU_TOKI_H

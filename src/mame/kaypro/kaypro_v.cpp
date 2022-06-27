@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 
 #include "emu.h"
-#include "includes/kaypro.h"
+#include "kaypro.h"
 #include "screen.h"
 
 

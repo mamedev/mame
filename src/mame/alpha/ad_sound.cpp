@@ -75,7 +75,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/ad_sound.h"
+#include "ad_sound.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

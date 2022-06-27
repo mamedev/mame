@@ -37,8 +37,8 @@ E I1     Vectored interrupt error
 
 
 #include "emu.h"
-#include "machine/m20_8086.h"
-#include "machine/m20_kbd.h"
+#include "m20_8086.h"
+#include "m20_kbd.h"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"

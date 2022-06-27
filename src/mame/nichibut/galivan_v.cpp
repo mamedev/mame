@@ -32,7 +32,7 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galivan.h"
+#include "galivan.h"
 
 /* Layers has only bits 5-7 active.
    7 selects text off/on

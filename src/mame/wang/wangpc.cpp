@@ -35,7 +35,7 @@
 #include "machine/scn_pci.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
-#include "machine/wangpckb.h"
+#include "wangpckb.h"
 
 #define I8086_TAG       "i8086"
 #define AM9517A_TAG     "am9517a"

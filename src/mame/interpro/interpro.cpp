@@ -230,10 +230,10 @@
 #include "cpu/clipper/clipper.h"
 #include "machine/cammu.h"
 
-#include "machine/interpro_ioga.h"
-#include "machine/interpro_mcga.h"
-#include "machine/interpro_sga.h"
-#include "machine/interpro_arbga.h"
+#include "interpro_ioga.h"
+#include "interpro_mcga.h"
+#include "interpro_sga.h"
+#include "interpro_arbga.h"
 
 #include "imagedev/floppy.h"
 #include "machine/ram.h"

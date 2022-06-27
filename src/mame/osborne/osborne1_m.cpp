@@ -10,7 +10,7 @@ There are three IRQ sources:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/osborne1.h"
+#include "osborne1.h"
 
 
 void osborne1_state::bank_0xxx_w(offs_t offset, u8 data)

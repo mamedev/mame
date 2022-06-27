@@ -147,10 +147,11 @@ http://www.z88forever.org.uk/zxplus3e/
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/timex.h"
+#include "timex.h"
+
+#include "beta_m.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/beta.h"
 #include "sound/ay8910.h"
 
 #include "screen.h"

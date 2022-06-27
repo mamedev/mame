@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "audio/zaccaria.h"
+#include "zaccaria_a.h"
 
 #include "cpu/s2650/s2650.h"
 

@@ -81,7 +81,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/clock.h"
-#include "machine/f5220_kbd.h"
+#include "f5220_kbd.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"

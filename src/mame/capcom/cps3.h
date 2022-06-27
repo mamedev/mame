@@ -13,7 +13,7 @@
 
 #include "machine/intelfsh.h"
 #include "cpu/sh/sh2.h"
-#include "audio/cps3.h"
+#include "cps3_a.h"
 #include "machine/timer.h"
 #include "emupal.h"
 

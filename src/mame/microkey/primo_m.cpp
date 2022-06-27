@@ -13,7 +13,7 @@
 
 /* Core includes */
 #include "emu.h"
-#include "includes/primo.h"
+#include "primo.h"
 
 /* Components */
 #include "cpu/z80/z80.h"

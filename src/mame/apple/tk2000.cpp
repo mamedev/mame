@@ -19,7 +19,8 @@
 ************************************************************************/
 
 #include "emu.h"
-#include "video/apple2.h"
+
+#include "apple2video.h"
 
 #include "cpu/m6502/m6502.h"
 #include "bus/centronics/ctronics.h"
@@ -36,6 +37,8 @@
 
 #include "formats/ap2_dsk.h"
 
+
+namespace {
 
 #define A2_CPU_TAG "maincpu"
 #define A2_BUS_TAG "a2bus"
@@ -636,6 +639,9 @@ ROM_START(mpf2)
 	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD( "mpf_ii.rom",   0x000000, 0x004000, CRC(8780189f) SHA1(92378b0db561632b58a9b36a85f8fb00796198bb) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME */
 COMP( 1984, tk2000, 0,      0,      tk2000,  tk2000, tk2000_state, empty_init, "Microdigital", "TK2000 Color Computer", MACHINE_NOT_WORKING )

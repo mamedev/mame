@@ -79,13 +79,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/raiden.h"
+#include "raiden.h"
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
-#include "video/seibu_crtc.h"
+#include "seibu_crtc.h"
 #include "screen.h"
 #include "speaker.h"
 

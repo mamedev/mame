@@ -10,7 +10,7 @@
 
 
 #include "emu.h"
-#include "includes/apple3.h"
+#include "apple3.h"
 #include "machine/ram.h"
 
 #define BLACK   0

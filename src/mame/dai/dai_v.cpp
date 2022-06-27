@@ -15,7 +15,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dai.h"
+#include "dai.h"
 
 #define DEBUG_DAI_VIDEO 0
 

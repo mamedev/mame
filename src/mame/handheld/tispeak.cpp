@@ -411,7 +411,7 @@ Y-1320 : T.I. Dataman
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/hh_tms1k.h"
+#include "hh_tms1k.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"

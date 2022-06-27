@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 #include "emu.h"
-#include "includes/taito_l.h"
+#include "taito_l.h"
 #include "screen.h"
 
 #include <algorithm>

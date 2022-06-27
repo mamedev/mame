@@ -15,7 +15,7 @@ Connector pinout:
 ************************************************************************************************************************************/
 
 #include "emu.h"
-#include "machine/tv955kb.h"
+#include "tv955kb.h"
 #include "machine/input_merger.h"
 #include "speaker.h"
 

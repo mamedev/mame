@@ -30,7 +30,7 @@ EEPROM chip: 93C46
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/xorworld.h"
+#include "xorworld.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/74259.h"

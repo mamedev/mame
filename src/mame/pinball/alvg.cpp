@@ -63,7 +63,7 @@ ToDo:
 
 ****************************************************************************************************/
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs51/mcs51.h"

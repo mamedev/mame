@@ -16,7 +16,7 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "machine/cdislavehle.h"
+#include "cdislavehle.h"
 
 #include <algorithm>
 

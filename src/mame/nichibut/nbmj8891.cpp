@@ -41,7 +41,7 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/nbmj8891.h"
+#include "nbmj8891.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"

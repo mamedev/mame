@@ -151,8 +151,8 @@ Note: The 'rastsagaa' set's ROM numbers were named as RSxx_37 through RSxx_42
 
 #include "emu.h"
 
-#include "audio/taitosnd.h"
-#include "includes/taitoipt.h"
+#include "taitosnd.h"
+#include "taitoipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -160,8 +160,8 @@ Note: The 'rastsagaa' set's ROM numbers were named as RSxx_37 through RSxx_42
 #include "machine/watchdog.h"
 #include "sound/msm5205.h"
 #include "sound/ymopm.h"
-#include "video/pc080sn.h"
-#include "video/pc090oj.h"
+#include "pc080sn.h"
+#include "pc090oj.h"
 
 #include "emupal.h"
 #include "screen.h"

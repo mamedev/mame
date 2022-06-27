@@ -4,7 +4,7 @@
 // Format not understood, it is not OKI ADPCM or IMA ADPCM, maybe something more basic?
 
 #include "emu.h"
-#include "elan_eu3a05.h"
+#include "elan_eu3a05_a.h"
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_SOUND, elan_eu3a05_sound_device, "elan_eu3a05sound", "Elan EU3A05 / EU3A14 Sound")
 

@@ -88,11 +88,11 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 */
 
 #include "emu.h"
-#include "includes/ms32.h"
+#include "ms32.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
-#include "machine/jalcrpt.h"
+#include "jalcrpt.h"
 
 #include "layout/generic.h"
 #include "speaker.h"

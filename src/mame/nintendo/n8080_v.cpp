@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/n8080.h"
+#include "n8080.h"
 
 
 void n8080_state::n8080_video_control_w(uint8_t data)

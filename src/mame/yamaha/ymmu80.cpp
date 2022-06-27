@@ -123,7 +123,7 @@
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/h8/h83002.h"
-#include "machine/mulcd.h"
+#include "mulcd.h"
 #include "sound/swp20.h"
 #include "sound/meg.h"
 

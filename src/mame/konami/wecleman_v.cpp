@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/wecleman.h"
+#include "wecleman.h"
 
 #define BMP_PAD     8
 #define BLEND_STEPS 16

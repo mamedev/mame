@@ -66,7 +66,7 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 
 #include "emu.h"
 #include "drawgfxt.ipp"
-#include "includes/psikyosh.h"
+#include "psikyosh.h"
 
 #include <algorithm>
 

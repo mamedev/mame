@@ -7,7 +7,7 @@ Atari Sprint 8 video emulation
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/sprint8.h"
+#include "sprint8.h"
 
 
 void sprint8_state::sprint8_palette(palette_device &palette) const

@@ -182,7 +182,7 @@ below are simply made to the banking address to run on other boards.
 */
 
 #include "emu.h"
-#include "includes/multfish.h"
+#include "multfish.h"
 
 #include "speaker.h"
 

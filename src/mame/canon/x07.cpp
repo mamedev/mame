@@ -29,7 +29,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/x07.h"
+#include "x07.h"
 
 #include "screen.h"
 #include "softlist_dev.h"

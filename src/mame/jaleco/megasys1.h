@@ -16,7 +16,7 @@
 #include "machine/timer.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
-#include "video/ms1_tmap.h"
+#include "ms1_tmap.h"
 #include "emupal.h"
 #include "screen.h"
 

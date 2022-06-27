@@ -181,8 +181,8 @@ Notes:
 
 #include "emu.h"
 
-#include "includes/konamipt.h"
-#include "machine/konami1.h"
+#include "konamipt.h"
+#include "konami1.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"

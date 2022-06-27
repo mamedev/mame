@@ -6,7 +6,7 @@
  */
 
 #include "emu.h"
-#include "includes/segas24.h"
+#include "segas24.h"
 
 #include <algorithm>
 #include <vector>

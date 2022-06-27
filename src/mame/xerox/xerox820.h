@@ -16,7 +16,7 @@
 #include "bus/scsi/scsihd.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
-#include "machine/x820kb.h"
+#include "x820kb.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"

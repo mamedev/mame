@@ -78,7 +78,7 @@
               Some games require dongles for security, need to figure this out.
 ******************************************************************************************/
 #include "emu.h"
-#include "includes/maygay1b.h"
+#include "maygay1b.h"
 
 #include "machine/74259.h"
 #include "speaker.h"

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "audio/taito_en.h"
+#include "taito_en.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"

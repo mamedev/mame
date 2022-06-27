@@ -10,7 +10,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ssozumo.h"
+#include "ssozumo.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"

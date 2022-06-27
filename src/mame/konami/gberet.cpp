@@ -186,8 +186,8 @@ TBP24S10.A12 - 256x4-bit bipolar PROM (possibly also a color PROM)
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gberet.h"
-#include "includes/konamipt.h"
+#include "gberet.h"
+#include "konamipt.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"

@@ -18,8 +18,8 @@ Radio, 1985, N6
 #include "machine/netlist.h"
 #include "netlist/devices/net_lib.h"
 
-#include "machine/nl_tp1983.h"
-#include "machine/nl_tp1985.h"
+#include "nl_tp1983.h"
+#include "nl_tp1985.h"
 #include "video/fixfreq.h"
 
 #include "screen.h"

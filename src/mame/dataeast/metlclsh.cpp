@@ -34,7 +34,7 @@ metlclsh:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/metlclsh.h"
+#include "metlclsh.h"
 
 #include "cpu/m6809/m6809.h"
 #include "sound/ymopn.h"

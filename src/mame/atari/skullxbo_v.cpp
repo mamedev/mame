@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/skullxbo.h"
+#include "skullxbo.h"
 
 
 

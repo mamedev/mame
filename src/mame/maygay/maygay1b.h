@@ -1,27 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_MAYGAY1B_H
-#define MAME_INCLUDES_MAYGAY1B_H
+#ifndef MAME_MAYGAY_MAYGAY1B_H
+#define MAME_MAYGAY_MAYGAY1B_H
 
 #pragma once
 
-#include "cpu/m6809/m6809.h"
-#include "machine/i8279.h"
+#include "awpvid.h"       //Fruit Machines Only
 
-#include "video/awpvid.h"       //Fruit Machines Only
+#include "cpu/m6809/m6809.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/6821pia.h"
+#include "machine/i8279.h"
 #include "machine/mc68681.h"
 #include "machine/meters.h"
+#include "machine/nvram.h"
 #include "machine/roc10937.h"   // vfd
 #include "machine/steppers.h"   // stepper motor
-#include "sound/ay8910.h"
-#include "sound/okim6376.h"
-#include "sound/ymopl.h"
-#include "machine/nvram.h"
 #include "machine/timer.h"
-#include "sound/upd7759.h"
-#include "cpu/mcs51/mcs51.h"
+#include "sound/ay8910.h"
 #include "sound/okim6295.h"
+#include "sound/okim6376.h"
+#include "sound/upd7759.h"
+#include "sound/ymopl.h"
 
 
 class maygay1b_state : public driver_device
@@ -147,4 +147,4 @@ private:
 
 INPUT_PORTS_EXTERN( maygay_m1 );
 
-#endif // MAME_INCLUDES_MAYGAY1B_H
+#endif // MAME_MAYGAY_MAYGAY1B_H

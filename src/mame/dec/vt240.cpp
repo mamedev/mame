@@ -7,15 +7,16 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "dec_lk201.h"
+
+#include "ms7004.h"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/t11/t11.h"
 #include "machine/clock.h"
-#include "machine/dec_lk201.h"
 #include "machine/i8251.h"
 #include "machine/mc68681.h"
-#include "machine/ms7004.h"
 #include "machine/bankdev.h"
 #include "machine/x2212.h"
 #include "video/upd7220.h"

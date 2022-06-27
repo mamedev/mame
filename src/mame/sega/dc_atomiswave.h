@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "machine/awboard.h"
+#include "awboard.h"
 #include "machine/intelfsh.h"
-#include "machine/dc-ctrl.h"
+#include "dc-ctrl.h"
 #include "machine/nvram.h"
 #include "machine/aicartc.h"
 //#include "machine/m3comm.h"

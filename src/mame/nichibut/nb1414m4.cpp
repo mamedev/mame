@@ -28,7 +28,7 @@ Notes:
 ********************************************************************************************************************/
 
 #include "emu.h"
-#include "machine/nb1414m4.h"
+#include "nb1414m4.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(NB1414M4, nb1414m4_device, "nb1414m4", "NB1414M4 Mahjong Custom")

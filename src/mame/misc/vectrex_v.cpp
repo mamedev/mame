@@ -2,7 +2,7 @@
 // copyright-holders:Mathis Rosenhauer
 #include <cmath>
 #include "emu.h"
-#include "includes/vectrex.h"
+#include "vectrex.h"
 #include "cpu/m6809/m6809.h"
 
 

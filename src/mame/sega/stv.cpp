@@ -41,8 +41,7 @@
 ************************************************************************************************************************/
 
 #include "emu.h"
-#include "includes/stv.h"
-#include "audio/rax.h"
+#include "stv.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"

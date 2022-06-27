@@ -13,8 +13,8 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/m62.h"
-#include "includes/iremipt.h"
+#include "m62.h"
+#include "iremipt.h"
 
 class m62_bkungfu_state : public m62_state
 {

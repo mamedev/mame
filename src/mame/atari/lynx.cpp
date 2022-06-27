@@ -17,7 +17,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/lynx.h"
+#include "lynx.h"
 
 #include "cpu/m6502/m65sc02.h"
 #include "softlist_dev.h"

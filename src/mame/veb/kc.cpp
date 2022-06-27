@@ -15,7 +15,7 @@
 
 /* Core includes */
 #include "emu.h"
-#include "includes/kc.h"
+#include "kc.h"
 
 #include "machine/input_merger.h"
 #include "softlist_dev.h"

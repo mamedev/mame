@@ -5,7 +5,7 @@
 //               - Scorpion's 'get over here' sounds don't decode well
 
 #include "emu.h"
-#include "includes/spg2xx.h"
+#include "spg2xx.h"
 #include "machine/nvram.h"
 
 class jakks_state : public spg2xx_game_state

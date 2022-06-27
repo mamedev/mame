@@ -54,7 +54,7 @@ Mighty Guy board layout:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cop01.h"
+#include "cop01.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

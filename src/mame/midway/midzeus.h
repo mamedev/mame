@@ -11,7 +11,7 @@
 #include "machine/timekpr.h"
 #include "emupal.h"
 #include "screen.h"
-#include "machine/midwayic.h"
+#include "midwayic.h"
 #include "video/poly.h"
 
 /*************************************

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tecmosys.h"
+#include "tecmosys.h"
 
 
 template<int Layer>

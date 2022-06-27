@@ -132,7 +132,7 @@
 #include "emu.h"
 
 // src/mame
-#include "video/snk_bbusters_spr.h"
+#include "snk_bbusters_spr.h"
 // src/devices
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"

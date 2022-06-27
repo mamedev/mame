@@ -6,12 +6,12 @@
 
 *************************************************************************/
 
-#include "audio/atarijsa.h"
+#include "atarijsa.h"
 #include "machine/adc0808.h"
-#include "machine/atarigen.h"
-#include "machine/slapstic.h"
+#include "atarigen.h"
+#include "slapstic.h"
 #include "machine/timer.h"
-#include "video/atarirle.h"
+#include "atarirle.h"
 #include "cpu/m68000/m68000.h"
 #include "tilemap.h"
 

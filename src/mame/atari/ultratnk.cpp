@@ -7,9 +7,10 @@ Atari Ultra Tank driver
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ultratnk.h"
+#include "ultratnk.h"
 
-#include "audio/sprint4.h"
+#include "sprint4_a.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
 #include "speaker.h"

@@ -45,7 +45,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/apple3.h"
+#include "apple3.h"
 
 #define LOG_MEMORY      0
 #define LOG_INDXADDR    0

@@ -2,7 +2,7 @@
 // copyright-holders:Samuele Zannoli
 
 #include "emu.h"
-#include "machine/315-6154.h"
+#include "315-6154.h"
 
 DEFINE_DEVICE_TYPE(SEGA315_6154, sega_315_6154_device, "sega315_6154", "Sega 315-6154 Northbridge")
 

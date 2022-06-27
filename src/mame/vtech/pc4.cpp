@@ -28,7 +28,7 @@
 
 
 #include "emu.h"
-#include "includes/pc4.h"
+#include "pc4.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/rp5c01.h"

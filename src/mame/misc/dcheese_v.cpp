@@ -7,7 +7,7 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/dcheese.h"
+#include "dcheese.h"
 
 #include <algorithm>
 

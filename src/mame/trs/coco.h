@@ -17,7 +17,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/6821pia.h"
 #include "bus/coco/cococart.h"
-#include "machine/coco_vhd.h"
+#include "coco_vhd.h"
 #include "bus/coco/coco_dwsock.h"
 #include "machine/ram.h"
 #include "machine/bankdev.h"

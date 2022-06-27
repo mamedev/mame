@@ -50,7 +50,7 @@ very few bytes difference between revisions. The first Corona is engine version 
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/saitek_stratos.h"
+#include "saitek_stratos.h"
 
 #include "cpu/m6502/m65c02.h"
 #include "machine/nvram.h"

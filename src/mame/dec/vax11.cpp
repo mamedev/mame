@@ -68,7 +68,7 @@
 #include "emu.h"
 #include "cpu/t11/t11.h"
 #include "machine/terminal.h"
-#include "machine/rx01.h"
+#include "rx01.h"
 
 
 class vax11_state : public driver_device

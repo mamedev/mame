@@ -120,7 +120,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/exerion.h"
+#include "exerion.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"

@@ -69,7 +69,7 @@
 */
 
 #include "emu.h"
-#include "includes/coleco.h"
+#include "coleco.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"

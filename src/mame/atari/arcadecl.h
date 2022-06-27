@@ -11,7 +11,7 @@
 #pragma once
 
 #include "machine/timer.h"
-#include "video/atarimo.h"
+#include "atarimo.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 

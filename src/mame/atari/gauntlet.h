@@ -12,9 +12,9 @@
 
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
-#include "machine/slapstic.h"
+#include "slapstic.h"
 #include "machine/timer.h"
-#include "video/atarimo.h"
+#include "atarimo.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
 #include "sound/ymopm.h"

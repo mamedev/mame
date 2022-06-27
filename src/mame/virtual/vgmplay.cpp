@@ -43,9 +43,10 @@
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
 #include "sound/ymz280b.h"
-#include "audio/vboy.h"
-#include "audio/wswan.h"
-#include "machine/mega32x.h"
+
+#include "mega32x.h"
+#include "vboysound.h"
+#include "wswansound.h"
 
 #include "vgmplay.lh"
 #include "debugger.h"

@@ -56,10 +56,10 @@ To load and play a game:
 */
 
 #include "emu.h"
-#include "includes/pdp1.h"
+#include "pdp1.h"
 
 #include "cpu/pdp1/pdp1.h"
-#include "video/crt.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 

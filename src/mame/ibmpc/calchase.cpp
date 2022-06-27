@@ -132,12 +132,13 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 
 #include "emu.h"
 
+#include "pcshare.h"
+
 #include "bus/isa/trident.h"
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-#include "machine/pcshare.h"
 #include "machine/ds128x.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"

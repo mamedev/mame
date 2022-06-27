@@ -18,7 +18,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "includes/compgolf.h"
+#include "compgolf.h"
 
 
 /*************************************

@@ -11,9 +11,9 @@
 #pragma once
 
 #include "cpu/tms32025/tms32025.h"
-#include "machine/taitoio.h"
-#include "machine/taitoio_yoke.h"
-#include "video/tc0080vco.h"
+#include "taitoio.h"
+#include "taitoio_yoke.h"
+#include "tc0080vco.h"
 #include "emupal.h"
 #include "screen.h"
 

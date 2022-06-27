@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods,Frank Palazzolo
 #include "emu.h"
-#include "video/stic.h"
+#include "stic.h"
 #include "video/tms9927.h"
-#include "includes/intv.h"
+#include "intv.h"
 #include "cpu/cp1610/cp1610.h"
 
 // Dual Port Memory handlers

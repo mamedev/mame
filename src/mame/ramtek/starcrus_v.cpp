@@ -4,7 +4,7 @@
 /* Ramtek - Star Cruiser */
 
 #include "emu.h"
-#include "includes/starcrus.h"
+#include "starcrus.h"
 #include "sound/samples.h"
 #include "screen.h"
 

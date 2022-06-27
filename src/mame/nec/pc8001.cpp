@@ -38,7 +38,7 @@
 */
 
 #include "emu.h"
-#include "includes/pc8001.h"
+#include "pc8001.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"

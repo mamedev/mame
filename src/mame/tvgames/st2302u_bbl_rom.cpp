@@ -3,7 +3,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/st2205u.h"
-#include "video/bl_handhelds_lcdc.h"
+#include "bl_handhelds_lcdc.h"
 #include "screen.h"
 #include "speaker.h"
 

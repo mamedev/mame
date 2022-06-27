@@ -1261,7 +1261,7 @@ Notes:
 #include "cpu/h8/h83337.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/sh/sh2.h"
-#include "machine/namco_settings.h"
+#include "namco_settings.h"
 #include "machine/nvram.h"
 #include "machine/rtc4543.h"
 #include "sound/c352.h"

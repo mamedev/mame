@@ -123,9 +123,9 @@
 class n64_periphs;
 class n64_rdp;
 
-#include "video/n64types.h"
-#include "video/rdpblend.h"
-#include "video/rdptpipe.h"
+#include "n64types.h"
+#include "rdpblend.h"
+#include "rdptpipe.h"
 
 class n64_state;
 

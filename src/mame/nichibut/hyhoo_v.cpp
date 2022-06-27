@@ -9,7 +9,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/hyhoo.h"
+#include "hyhoo.h"
 
 
 void hyhoo_state::hyhoo_blitter_w(offs_t offset, uint8_t data)

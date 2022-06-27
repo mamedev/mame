@@ -5,15 +5,18 @@
     Driver for Midway Wolf-unit games.
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_MIDWUNIT_H
-#define MAME_INCLUDES_MIDWUNIT_H
+#ifndef MAME_MIDWAY_MIDWUNIT_H
+#define MAME_MIDWAY_MIDWUNIT_H
 
 #pragma once
 
-#include "audio/dcs.h"
+#include "midwayic.h"
+#include "midtunit_v.h"
+
+#include "dcs.h"
+
 #include "cpu/tms34010/tms34010.h"
-#include "machine/midwayic.h"
-#include "video/midtunit.h"
+
 #include "emupal.h"
 
 class midwunit_state : public driver_device
@@ -88,4 +91,4 @@ private:
 	uint16_t *m_umk3_palette = nullptr;
 };
 
-#endif // MAME_INCLUDES_MIDWUNIT_H
+#endif // MAME_MIDWAY_MIDWUNIT_H

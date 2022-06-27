@@ -22,8 +22,8 @@
 
 
 #include "emu.h"
-#include "video/atarirle.h"
-#include "includes/atarigx2.h"
+#include "atarirle.h"
+#include "atarigx2.h"
 
 
 

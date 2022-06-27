@@ -34,7 +34,7 @@ this reason.
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
 
-#include "includes/megadriv.h"
+#include "megadriv.h"
 
 #define MASTER_CLOCK        53693100
 

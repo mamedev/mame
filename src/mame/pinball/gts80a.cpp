@@ -54,10 +54,13 @@ ToDo:
 *****************************************************************************************************************/
 
 #include "emu.h"
-#include "machine/input_merger.h"
-#include "machine/genpin.h"
-#include "audio/gottlieb.h"
+#include "genpin.h"
+
+#include "gottlieb_a.h"
+
 #include "cpu/i86/i86.h"
+#include "machine/input_merger.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

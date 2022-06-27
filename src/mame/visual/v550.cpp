@@ -20,7 +20,7 @@
 #include "machine/nvram.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/v102_kbd.h"
+#include "v102_kbd.h"
 #include "machine/z80sio.h"
 #include "video/scn2674.h"
 #include "video/upd7220.h"

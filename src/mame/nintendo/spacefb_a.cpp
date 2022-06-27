@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/spacefb.h"
+#include "spacefb.h"
 
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"

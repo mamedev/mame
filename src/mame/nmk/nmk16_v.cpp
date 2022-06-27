@@ -11,7 +11,7 @@
 */
 
 #include "emu.h"
-#include "includes/nmk16.h"
+#include "nmk16.h"
 
 // the larger tilemaps on macross2, rapid hero and thunder dragon 2 appear to act like 4 'banks'
 // of the smaller tilemaps, rather than being able to scroll into each other (not verified on real hw,

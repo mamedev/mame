@@ -17,7 +17,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "machine/mbc55x_kbd.h"
+#include "mbc55x_kbd.h"
 
 #include "cpu/mcs48/mcs48.h"
 #include "machine/keyboard.ipp"

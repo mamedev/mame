@@ -196,15 +196,16 @@ Reference of music tempo:
 ********************************************************************/
 
 #include "emu.h"
-#include "includes/nmk16.h"
-#include "audio/seibu.h"
+#include "nmk16.h"
+
+#include "nmk004.h"
+
+#include "nmk112.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/z80/z80.h"
-#include "machine/nmk004.h"
-#include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"

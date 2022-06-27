@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 #include "emu.h"
-#include "includes/shadfrce.h"
+#include "shadfrce.h"
 
 TILE_GET_INFO_MEMBER(shadfrce_state::get_fgtile_info)
 {

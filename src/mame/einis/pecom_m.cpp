@@ -9,7 +9,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/pecom.h"
+#include "pecom.h"
 
 
 TIMER_CALLBACK_MEMBER(pecom_state::reset_tick)

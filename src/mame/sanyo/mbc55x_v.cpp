@@ -71,7 +71,7 @@ give the leftmost column of the rectangle, the next four give the next column, a
 #include "emu.h"
 #include <functional>
 
-#include "includes/mbc55x.h"
+#include "mbc55x.h"
 
 #define DEBUG_LINES     1
 #define DEBUG_VSYNC     2

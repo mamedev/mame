@@ -1,16 +1,23 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski, Tomasz Slanina
+#ifndef MAME_TAITO_BIGEVGOLF_H
+#define MAME_TAITO_BIGEVGOLF_H
+
+#pragma once
+
+#include "taito68705.h"
+
 #include "sound/msm5232.h"
 #include "machine/gen_latch.h"
-#include "machine/taito68705interface.h"
+
 #include "emupal.h"
 #include "screen.h"
 
 class bigevglf_state : public driver_device
 {
 public:
-	bigevglf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bigevglf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
 		m_spriteram1(*this, "spriteram1"),
 		m_spriteram2(*this, "spriteram2"),
@@ -84,3 +91,5 @@ private:
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
 };
+
+#endif // MAME_TAITO_BIGEVGOLF_H

@@ -44,7 +44,7 @@ All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/vulgus.h"
+#include "vulgus.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"

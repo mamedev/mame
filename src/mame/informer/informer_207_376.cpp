@@ -38,7 +38,7 @@
 #include "sound/beep.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/printer.h"
-#include "machine/informer_207_376_kbd.h"
+#include "informer_207_376_kbd.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

@@ -3,7 +3,7 @@
 //***************************************************************************
 
 #include "emu.h"
-#include "includes/trs80.h"
+#include "trs80.h"
 
 // 7 or 8-bit video. Software control of 32/64 CPL = trs80, trs80l2.
 u32 trs80_state::screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

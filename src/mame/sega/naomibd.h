@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "machine/naomig1.h"
+#include "naomig1.h"
 #include "machine/x76f100.h"
 
 class naomi_board : public naomi_g1_device

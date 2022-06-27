@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
 #include "emu.h"
-#include "includes/superchs.h"
+#include "superchs.h"
 #include "screen.h"
 
 void superchs_state::video_start()

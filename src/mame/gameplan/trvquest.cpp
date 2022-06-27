@@ -37,12 +37,13 @@ Notes:
 */
 
 #include "emu.h"
-#include "includes/gameplan.h"
+#include "gameplan.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+
 #include "speaker.h"
 
 

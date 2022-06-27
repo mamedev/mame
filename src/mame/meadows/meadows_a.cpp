@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "includes/meadows.h"
+#include "meadows.h"
 #include "sound/samples.h"
 
 

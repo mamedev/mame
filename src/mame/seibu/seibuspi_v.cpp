@@ -9,8 +9,8 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/seibuspi.h"
-#include "machine/seibuspi.h"
+#include "seibuspi.h"
+#include "seibuspi_m.h"
 #include "screen.h"
 
 #include <algorithm>

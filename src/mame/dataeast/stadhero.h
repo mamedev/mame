@@ -2,8 +2,8 @@
 // copyright-holders:Bryan McPhail
 
 #include "machine/gen_latch.h"
-#include "video/decbac06.h"
-#include "video/decmxc06.h"
+#include "decbac06.h"
+#include "decmxc06.h"
 #include "screen.h"
 #include "tilemap.h"
 

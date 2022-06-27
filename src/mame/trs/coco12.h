@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include "includes/coco.h"
-#include "machine/6883sam.h"
+#include "coco.h"
+#include "6883sam.h"
 #include "video/mc6847.h"
 
 

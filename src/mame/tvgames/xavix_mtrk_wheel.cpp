@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 #include "emu.h"
-#include "machine/xavix_mtrk_wheel.h"
+#include "xavix_mtrk_wheel.h"
 
 DEFINE_DEVICE_TYPE(XAVIX_MTRK_WHEEL, xavix_mtrk_wheel_device, "xavix_mtrk_wheel", "XaviX / Radica Monster Truck Steering Wheel")
 

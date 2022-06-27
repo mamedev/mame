@@ -36,7 +36,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/suna8.h"
+#include "suna8.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"

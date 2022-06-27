@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "debug/debugbuf.h"
-#include "includes/apollo.h"
+#include "apollo.h"
 #include "cpu/m68000/m68000.h"
 
 #if 0

@@ -164,7 +164,7 @@ There is an Asura Buster known to exist on a FG3-SUB-EP containing all EPROMs
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/fuukifg3.h"
+#include "fuukifg3.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"

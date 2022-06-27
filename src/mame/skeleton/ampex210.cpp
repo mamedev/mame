@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/ampex210_kbd.h"
+#include "ampex210_kbd.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"

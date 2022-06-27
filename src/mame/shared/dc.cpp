@@ -9,13 +9,14 @@
 */
 
 #include "emu.h"
-//#include "debugger.h"
-#include "includes/dc.h"
+#include "dc.h"
+
+#include "mie.h"
+
 #include "cpu/sh/sh4.h"
 #include "cpu/arm7/arm7core.h"
-#include "machine/mie.h"
-#include "machine/naomig1.h"
-#include "video/powervr2.h"
+
+//#include "debugger.h"
 
 #define DEBUG_REGISTERS (1)
 

@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/zn.h"
+#include "zn.h"
 
 #define VERBOSE_LEVEL ( 0 )
 

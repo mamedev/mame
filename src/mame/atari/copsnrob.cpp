@@ -57,7 +57,7 @@ Added Dip locations according to manual.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/copsnrob.h"
+#include "copsnrob.h"
 
 #include "cpu/m6502/m6502.h"
 

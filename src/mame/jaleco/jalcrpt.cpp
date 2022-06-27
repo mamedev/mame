@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood
 #include "emu.h"
-#include "machine/jalcrpt.h"
+#include "jalcrpt.h"
 
 
 void phantasm_rom_decode(running_machine &machine, const char *region)

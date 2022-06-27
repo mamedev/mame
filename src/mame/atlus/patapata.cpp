@@ -18,7 +18,7 @@ maybe close to jalmah.cpp?
 */
 
 #include "emu.h"
-#include "machine/nmk112.h"
+#include "nmk112.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"

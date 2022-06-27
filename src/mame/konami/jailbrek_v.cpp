@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
 #include "emu.h"
-#include "includes/jailbrek.h"
+#include "jailbrek.h"
 
 void jailbrek_state::jailbrek_palette(palette_device &palette) const
 {

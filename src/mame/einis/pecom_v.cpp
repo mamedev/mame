@@ -9,7 +9,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/pecom.h"
+#include "pecom.h"
 
 
 void pecom_state::cdp1869_w(offs_t offset, uint8_t data)

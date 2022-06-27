@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 #include "emu.h"
-#include "includes/xexex.h"
+#include "xexex.h"
 
 K053246_CB_MEMBER(xexex_state::sprite_callback)
 {

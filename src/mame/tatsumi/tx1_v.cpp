@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/tx1.h"
+#include "tx1.h"
 
 #include "video/resnet.h"
 #include "cpu/i86/i86.h"

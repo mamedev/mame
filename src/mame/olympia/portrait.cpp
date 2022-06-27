@@ -91,7 +91,7 @@ DM81LS95 = TriState buffer
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/portrait.h"
+#include "portrait.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"

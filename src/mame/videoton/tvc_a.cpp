@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "tvc.h"
+#include "tvc_a.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(TVC_SOUND, tvc_sound_device, "tvc_sound", "TVC 64 Custom Sound")

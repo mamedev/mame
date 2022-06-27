@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/n8080.h"
+#include "n8080.h"
 #include "speaker.h"
 
 

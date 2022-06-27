@@ -10,12 +10,12 @@
 
 #pragma once
 
-#include "audio/atarijsa.h"
-#include "machine/atarigen.h"
-#include "video/atarirle.h"
+#include "atarijsa.h"
+#include "atarigen.h"
+#include "atarirle.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/adc0808.h"
-#include "machine/asic65.h"
+#include "asic65.h"
 #include "machine/timer.h"
 #include "tilemap.h"
 

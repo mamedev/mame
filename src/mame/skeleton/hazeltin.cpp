@@ -32,7 +32,7 @@ References:
 #include "machine/input_merger.h"
 #include "machine/kb3600.h"
 #include "machine/netlist.h"
-#include "machine/nl_hazelvid.h"
+#include "nl_hazelvid.h"
 #include "netlist/devices/net_lib.h"
 
 #include "emupal.h"

@@ -300,7 +300,7 @@ Mark Gordon
 */
 
 #include "emu.h"
-#include "includes/adam.h"
+#include "adam.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"

@@ -11,8 +11,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dragon.h"
-#include "includes/dgnalpha.h"
+#include "dragon.h"
+#include "dgnalpha.h"
 #include "imagedev/cassette.h"
 #include "formats/coco_cas.h"
 #include "cpu/m6809/m6809.h"

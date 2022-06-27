@@ -27,13 +27,15 @@ ToDo:
 
 *********************************************************************************************/
 #include "emu.h"
+#include "wpc_dmd.h"
+#include "wpc_shift.h"
+#include "wpc_lamp.h"
+#include "wpc_out.h"
+
+#include "dcs.h"
+
 #include "cpu/m6809/m6809.h"
-#include "audio/dcs.h"
 #include "machine/nvram.h"
-#include "video/wpc_dmd.h"
-#include "machine/wpc_shift.h"
-#include "machine/wpc_lamp.h"
-#include "machine/wpc_out.h"
 
 namespace {
 

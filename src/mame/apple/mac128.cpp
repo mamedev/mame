@@ -84,7 +84,7 @@ Scanline 0 is the start of vblank.
 
 #include "emu.h"
 
-#include "machine/macrtc.h"
+#include "macrtc.h"
 
 #include "bus/mackbd/mackbd.h"
 #include "bus/macpds/hyperdrive.h"
@@ -100,8 +100,8 @@ Scanline 0 is the start of vblank.
 #include "machine/applefdintf.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
-#include "machine/macadb.h"
-#include "machine/macscsi.h"
+#include "macadb.h"
+#include "macscsi.h"
 #include "sound/dac.h"
 #include "sound/flt_biquad.h"
 #include "bus/macpds/pds_tpdfpd.h"

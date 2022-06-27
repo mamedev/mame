@@ -118,7 +118,7 @@
 */
 
 #include "emu.h"
-#include "includes/micronic.h"
+#include "micronic.h"
 #include "screen.h"
 #include "speaker.h"
 

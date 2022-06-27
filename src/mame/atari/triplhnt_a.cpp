@@ -6,7 +6,7 @@
 
 *************************************************************************/
 #include "emu.h"
-#include "includes/triplhnt.h"
+#include "triplhnt.h"
 #include "sound/discrete.h"
 
 

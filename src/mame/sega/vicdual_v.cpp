@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/vicdual.h"
+#include "vicdual.h"
 
 
 static const pen_t pens_from_color_prom[] =

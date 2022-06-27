@@ -7,7 +7,7 @@ Taito Super Speed Race video emulation
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/sspeedr.h"
+#include "sspeedr.h"
 
 
 void sspeedr_state::driver_horz_w(uint8_t data)

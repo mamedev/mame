@@ -69,9 +69,9 @@
 ************************************************************************/
 
 #include "emu.h"
-#include "machine/agatkeyb.h"
-#include "video/agat7.h"
-#include "video/agat9.h"
+#include "agatkeyb.h"
+#include "agat7.h"
+#include "agat9.h"
 
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/agat7langcard.h"

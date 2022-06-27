@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/mace.h"
+#include "mace.h"
 
 #define LOG_READ_PCI        (1 << 0U)
 #define LOG_READ_VIN1       (1 << 1U)

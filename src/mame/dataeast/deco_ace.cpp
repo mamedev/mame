@@ -66,7 +66,7 @@
 
 
 #include "emu.h"
-#include "video/deco_ace.h"
+#include "deco_ace.h"
 #include <algorithm>
 
 

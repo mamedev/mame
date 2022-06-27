@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "machine/vt1682_alu.h"
+#include "vt1682_alu.h"
 
 #define LOG_ALU     (1U << 1)
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 #include "emu.h"
-#include "includes/deco32.h"
+#include "deco32.h"
 
 /******************************************************************************/
 

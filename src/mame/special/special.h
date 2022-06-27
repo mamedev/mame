@@ -6,14 +6,15 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_SPECIAL_H
-#define MAME_INCLUDES_SPECIAL_H
+#ifndef MAME_SPECIAL_SPECIAL_H
+#define MAME_SPECIAL_SPECIAL_H
 
 #pragma once
 
+#include "specialsound.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
-#include "audio/special.h"
 #include "sound/dac.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -142,4 +143,4 @@ private:
 	optional_device<timer_device> m_pit_timer; // specimx only
 };
 
-#endif // MAME_INCLUDES_SPECIAL_H
+#endif // MAME_SPECIAL_SPECIAL_H

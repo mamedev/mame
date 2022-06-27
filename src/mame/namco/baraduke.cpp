@@ -108,7 +108,7 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/baraduke.h"
+#include "baraduke.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"

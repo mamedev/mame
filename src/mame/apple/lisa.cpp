@@ -11,7 +11,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "includes/lisa.h"
+#include "lisa.h"
 #include "cpu/cop400/cop400.h"
 #include "formats/ap_dsk35.h"
 #include "screen.h"

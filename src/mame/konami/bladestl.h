@@ -14,9 +14,9 @@
 #include "machine/timer.h"
 #include "sound/flt_rc.h"
 #include "sound/upd7759.h"
-#include "video/k007342.h"
-#include "video/k007420.h"
-#include "video/k051733.h"
+#include "k007342.h"
+#include "k007420.h"
+#include "k051733.h"
 #include "emupal.h"
 
 class bladestl_state : public driver_device

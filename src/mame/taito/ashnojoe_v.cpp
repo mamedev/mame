@@ -8,7 +8,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "includes/ashnojoe.h"
+#include "ashnojoe.h"
 
 
 TILE_GET_INFO_MEMBER(ashnojoe_state::get_tile_info_highest)

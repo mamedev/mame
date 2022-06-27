@@ -12,11 +12,11 @@
 
 #include "emu.h"
 
-#include "includes/konamipt.h"
-#include "video/k052109.h"
-#include "video/k053244_k053245.h"
-#include "video/k053251.h"
-#include "video/konami_helper.h"
+#include "konamipt.h"
+#include "k052109.h"
+#include "k053244_k053245.h"
+#include "k053251.h"
+#include "konami_helper.h"
 
 #include "cpu/m6809/konami.h" // for the callback and the FIRQ IRQ definition
 #include "machine/bankdev.h"

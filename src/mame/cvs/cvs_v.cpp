@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "includes/cvs.h"
+#include "cvs.h"
 
 
 #define SPRITE_PEN_BASE     (0x820)

@@ -173,7 +173,7 @@ Rowscroll style:
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/deco16ic.h"
+#include "deco16ic.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(DECO16IC, deco16ic_device, "deco16ic", "DECO 55 / 56 / 74 / 141 Tilemap Generator")

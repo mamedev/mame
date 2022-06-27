@@ -109,7 +109,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
-#include "machine/hp2640_tape.h"
+#include "hp2640_tape.h"
 #include "sound/beep.h"
 #include "emupal.h"
 #include "speaker.h"

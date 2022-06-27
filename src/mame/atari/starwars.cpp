@@ -25,14 +25,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/starwars.h"
+#include "starwars.h"
+
+#include "avgdvg.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/74259.h"
 #include "machine/adc0808.h"
 #include "machine/watchdog.h"
 #include "video/vector.h"
-#include "video/avgdvg.h"
 #include "screen.h"
 #include "speaker.h"
 

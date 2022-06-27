@@ -115,7 +115,7 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/punchout.h"
+#include "punchout.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

@@ -22,7 +22,7 @@ ToDo:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/aim65.h"
+#include "aim65.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"

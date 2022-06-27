@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
 #include "emu.h"
-#include "includes/exprraid.h"
+#include "exprraid.h"
 
 
 void exprraid_state::exprraid_videoram_w(offs_t offset, uint8_t data)

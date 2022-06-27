@@ -1,16 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_FLSTORY_H
-#define MAME_INCLUDES_FLSTORY_H
+#ifndef MAME_TAITO_FLSTORY_H
+#define MAME_TAITO_FLSTORY_H
 
 #pragma once
+
+#include "taito68705.h"
 
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "sound/msm5232.h"
-#include "machine/taito68705interface.h"
 #include "sound/ta7630.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -124,4 +126,4 @@ private:
 	void victnine_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_FLSTORY_H
+#endif // MAME_TAITO_FLSTORY_H

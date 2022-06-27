@@ -58,7 +58,7 @@
  ***********************************************************************/
 
 #include "emu.h"
-#include "machine/pgmprot_igs027a_type1.h"
+#include "pgmprot_igs027a_type1.h"
 
 #include "screen.h"
 

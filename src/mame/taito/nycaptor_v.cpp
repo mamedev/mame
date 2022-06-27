@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 #include "emu.h"
-#include "includes/nycaptor.h"
+#include "nycaptor.h"
 
 #define NYCAPTOR_DEBUG  0
 

@@ -10,11 +10,11 @@
 
 #pragma once
 
-#include "machine/slapstic.h"
+#include "slapstic.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
-#include "video/atarimo.h"
+#include "atarimo.h"
 #include "screen.h"
 
 class rampart_state : public driver_device

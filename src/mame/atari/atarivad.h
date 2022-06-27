@@ -11,7 +11,7 @@
 #ifndef MAME_VIDEO_ATARIVAD_H
 #define MAME_VIDEO_ATARIVAD_H
 
-#include "video/atarimo.h"
+#include "atarimo.h"
 #include "tilemap.h"
 
 

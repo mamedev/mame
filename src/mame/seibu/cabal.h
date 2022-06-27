@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Carlos A. Lozano
-#ifndef MAME_INCLUDES_CABAL_H
-#define MAME_INCLUDES_CABAL_H
+#ifndef MAME_SEIBU_CABAL_H
+#define MAME_SEIBU_CABAL_H
 
 #pragma once
 
-#include "audio/seibu.h"
+#include "seibusound.h"
+
 #include "sound/msm5205.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -113,4 +115,4 @@ private:
 	void talk2_portmap(address_map &map);
 };
 
-#endif // MAME_INCLUDES_CABAL_H
+#endif // MAME_SEIBU_CABAL_H

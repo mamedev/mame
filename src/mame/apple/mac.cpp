@@ -12,9 +12,9 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/mac.h"
+#include "mac.h"
 
-#include "machine/macadb.h"
+#include "macadb.h"
 
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"

@@ -681,7 +681,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/snk.h"
+#include "snk.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/snkwave.h"

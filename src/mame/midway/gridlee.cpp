@@ -80,7 +80,7 @@
 
 
 #include "emu.h"
-#include "includes/gridlee.h"
+#include "gridlee.h"
 
 #include "cpu/m6809/m6809.h"
 #include "sound/samples.h"

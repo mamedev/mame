@@ -3,7 +3,7 @@
 /* This is MPU4 MOD4 with a Y2413 instead of an OKI */
 
 #include "emu.h"
-#include "includes/mpu4.h"
+#include "mpu4.h"
 
 namespace {
 

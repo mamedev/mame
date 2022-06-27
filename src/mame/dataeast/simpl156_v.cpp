@@ -5,7 +5,7 @@
 */
 
 #include "emu.h"
-#include "includes/simpl156.h"
+#include "simpl156.h"
 #include "screen.h"
 
 

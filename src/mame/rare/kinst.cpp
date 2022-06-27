@@ -190,7 +190,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/dcs.h"
+#include "dcs.h"
 
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"

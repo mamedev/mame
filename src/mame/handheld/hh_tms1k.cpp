@@ -193,7 +193,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/hh_tms1k.h"
+#include "hh_tms1k.h"
 
 #include "machine/clock.h"
 #include "machine/ds8874.h"

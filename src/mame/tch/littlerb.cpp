@@ -94,11 +94,16 @@ Dip sw.2
 */
 
 #include "emu.h"
+
+#include "inder_vid.h"
+
 #include "cpu/m68000/m68000.h"
-#include "machine/inder_vid.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
+
+namespace {
 
 #define littlerb_printf logerror
 #define littlerb_alt_printf logerror
@@ -331,5 +336,7 @@ void littlerb_state::init_littlerb()
 	   unless you overclock the TMS34010 to 120%, possible timing bug in the core? this is a hack */
 	m_indervid->subdevice<cpu_device>("tms")->set_clock_scale(1.2f);
 }
+
+} // anonymous namespace
 
 GAME( 1994, littlerb, 0, littlerb, littlerb, littlerb_state, init_littlerb, ROT0, "TCH", "Little Robin", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -13,7 +13,7 @@
 #include "machine/74259.h"
 #include "video/mc6845.h"
 #include "video/bufsprite.h"
-#include "video/toaplan_scu.h"
+#include "toaplan_scu.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

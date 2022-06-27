@@ -207,13 +207,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bzone.h"
+#include "bzone.h"
+
+#include "avgdvg.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "video/vector.h"
-#include "video/avgdvg.h"
 #include "sound/pokey.h"
+
 #include "speaker.h"
 
 #include "bzone.lh"

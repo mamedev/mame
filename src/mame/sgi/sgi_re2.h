@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "video/sgi_xmap2.h"
+#include "sgi_xmap2.h"
 #include "video/bt45x.h"
 #include "video/bt431.h"
 #include "screen.h"

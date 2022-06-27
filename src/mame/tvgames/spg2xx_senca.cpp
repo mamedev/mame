@@ -4,7 +4,7 @@
 /* Shenzhen Senca Technology Co., Ltd developed "Family Sport" systems - sold by various manufacturers */
 
 #include "emu.h"
-#include "includes/spg2xx.h"
+#include "spg2xx.h"
 
 
 class zon32bit_state : public spg2xx_game_state

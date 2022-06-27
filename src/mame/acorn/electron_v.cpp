@@ -7,7 +7,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/electron.h"
+#include "electron.h"
 #include "screen.h"
 
 /*

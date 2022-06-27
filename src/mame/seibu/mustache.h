@@ -1,15 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
-#ifndef MAME_INCLUDES_MUSTACHE_H
-#define MAME_INCLUDES_MUSTACHE_H
+#ifndef MAME_SEIBU_MUSTACHE_H
+#define MAME_SEIBU_MUSTACHE_H
 
 #pragma once
 
-#include "audio/seibu.h"    // for seibu_sound_decrypt on the MAIN cpu (not sound)
+#include "seibusound.h"    // for seibu_sound_decrypt on the MAIN cpu (not sound)
+
 #include "machine/timer.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class mustache_state : public driver_device
 {
@@ -58,4 +61,4 @@ private:
 	void memmap(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MUSTACHE_H
+#endif // MAME_SEIBU_MUSTACHE_H

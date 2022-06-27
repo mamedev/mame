@@ -355,7 +355,7 @@ Keyboard TX commands:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "includes/pc9801.h"
+#include "pc9801.h"
 #include "machine/input_merger.h"
 
 void pc98_base_state::rtc_w(uint8_t data)

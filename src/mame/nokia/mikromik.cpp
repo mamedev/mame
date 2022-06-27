@@ -53,7 +53,7 @@
 */
 
 #include "emu.h"
-#include "includes/mikromik.h"
+#include "mikromik.h"
 #include "machine/74259.h"
 #include "softlist_dev.h"
 

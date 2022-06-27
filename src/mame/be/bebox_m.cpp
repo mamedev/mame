@@ -91,7 +91,7 @@
 
 /* Core includes */
 #include "emu.h"
-#include "includes/bebox.h"
+#include "bebox.h"
 
 /* Components */
 #include "video/pc_vga.h"

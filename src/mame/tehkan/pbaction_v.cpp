@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/pbaction.h"
+#include "pbaction.h"
 
 void pbaction_state::pbaction_videoram_w(offs_t offset, uint8_t data)
 {

@@ -11,12 +11,17 @@
 
 
 #include "emu.h"
+
+#include "awpvid.h" // drawing reels
+
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "machine/steppers.h" // stepper motor
 #include "machine/meters.h"
-#include "video/awpvid.h" // drawing reels
+
 #include "ecoinf2.lh"
+
+namespace {
 
 class ecoinf2_state : public driver_device
 {
@@ -227,6 +232,7 @@ private:
 void ecoinf2_state::ox_port5c_out_w(uint8_t data)
 {
 	// Watchdog?
+	logerror("%s: port 5c write %02x\n", machine().describe_context(), data);
 }
 
 void ecoinf2_state::oxo_memmap(address_map &map)
@@ -248,7 +254,7 @@ void ecoinf2_state::oxo_portmap(address_map &map)
 //  map(0x54, 0x57).rw("ic25_dips", FUNC(i8255_device::read), FUNC(i8255_device::write)); // is this an 8255, or a mirrored byte read?
 
 
-//  map(0x5c, 0x5c).w(FUNC(ecoinf2_state::ox_port5c_out_w));
+	map(0x5c, 0x5c).w(FUNC(ecoinf2_state::ox_port5c_out_w));
 }
 
 
@@ -783,6 +789,9 @@ ROM_START( ec_sumnc )
 	ROM_LOAD( "smn94.bin", 0x0000, 0x010000, CRC(9ade016a) SHA1(1c75dc46436253c4e6730f40523d016098c20683) )
 	ROM_LOAD( "smncscst", 0x0000, 0x010000, CRC(1147531a) SHA1(c303187452afdcb79e0f182d26d2c27693f69d76) )
 ROM_END
+
+} // anonymous namespace
+
 
 // OXO wh type (Phoenix?) (watchdog on port 5c?)
 GAME( 19??, ec_oxocg, 0, ecoinf2_oxo, ecoinf2, ecoinf2_state, empty_init, ROT0, "Electrocoin",       "Oxo Classic Gold (Electrocoin) (?)",                        MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)

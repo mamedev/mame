@@ -229,7 +229,7 @@ A Korean version has been seen too (unless this can be switched?)
 */
 
 #include "emu.h"
-#include "includes/sms.h"
+#include "sms.h"
 
 #include "cpu/z80/z80.h"
 #include "speaker.h"

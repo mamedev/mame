@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "video/bl_handhelds_lcdc.h"
+#include "bl_handhelds_lcdc.h"
 
 DEFINE_DEVICE_TYPE(BL_HANDHELDS_LCDC, bl_handhelds_lcdc_device, "blhandheldlcdc", "BaoBaoLong Handhelds LCD Controller")
 

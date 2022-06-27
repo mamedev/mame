@@ -244,7 +244,7 @@ M2H   -  /%    \_____/  duty 1:1, 1.5MHz
 */
 
 #include "emu.h"
-#include "includes/ddragon.h"
+#include "ddragon.h"
 
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"

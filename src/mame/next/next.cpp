@@ -26,7 +26,7 @@
 
 
 #include "emu.h"
-#include "includes/next.h"
+#include "next.h"
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"

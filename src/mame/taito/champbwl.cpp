@@ -153,11 +153,14 @@ Notes:
 */
 
 #include "emu.h"
+
+#include "seta001.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/x1_010.h"
-#include "video/seta001.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

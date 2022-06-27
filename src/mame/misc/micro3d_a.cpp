@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/micro3d.h"
+#include "micro3d_a.h"
 
 
 #define MM5837_CLOCK        100000

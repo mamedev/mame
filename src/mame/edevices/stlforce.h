@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#include "video/edevices.h"
+#include "edevices.h"
 #include "machine/eepromser.h"
 #include "emupal.h"
 #include "cpu/m68000/m68000.h"

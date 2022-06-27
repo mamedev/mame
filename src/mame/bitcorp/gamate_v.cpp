@@ -25,7 +25,7 @@
 */
 
 #include "emu.h"
-#include "video/gamate.h"
+#include "gamate_v.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(GAMATE_VIDEO, gamate_video_device, "gamate_vid", "Gamate Video Hardware")

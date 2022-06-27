@@ -11,7 +11,7 @@
 
 
 #include "emu.h"
-#include "includes/dbz.h"
+#include "dbz.h"
 
 
 K056832_CB_MEMBER(dbz_state::tile_callback)

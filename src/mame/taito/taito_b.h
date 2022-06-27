@@ -6,9 +6,9 @@
 #pragma once
 
 #include "machine/mb87078.h"
-#include "machine/taitoio.h"
+#include "taitoio.h"
 #include "video/hd63484.h"
-#include "video/tc0180vcu.h"
+#include "tc0180vcu.h"
 #include "emupal.h"
 #include "screen.h"
 

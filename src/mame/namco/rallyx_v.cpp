@@ -30,7 +30,7 @@ needs more color combination to render its graphics.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/rallyx.h"
+#include "rallyx.h"
 #include "video/resnet.h"
 #include "screen.h"
 

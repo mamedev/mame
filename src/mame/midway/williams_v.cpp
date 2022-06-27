@@ -150,7 +150,7 @@ The full silkscreen markings of SC2 (under the "Special Chip 2" sticker, if it i
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/williams.h"
+#include "williams.h"
 
 /*************************************
  *

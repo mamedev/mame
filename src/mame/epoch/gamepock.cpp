@@ -3,7 +3,7 @@
 
 
 #include "emu.h"
-#include "includes/gamepock.h"
+#include "gamepock.h"
 
 #include "bus/generic/carts.h"
 #include "cpu/upd7810/upd7810.h"

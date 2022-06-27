@@ -48,14 +48,14 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
+#include "taitoipt.h"
+#include "taitosnd.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
-#include "machine/taitoio_yoke.h"
+#include "taitoio_yoke.h"
 #include "sound/msm5205.h"
 #include "sound/ymopm.h"
 

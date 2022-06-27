@@ -7,7 +7,7 @@
 */
 
 #include "emu.h"
-#include "includes/namcos22.h"
+#include "namcos22.h"
 
 
 // poly constructor

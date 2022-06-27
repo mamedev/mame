@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 
 #include "emu.h"
-#include "includes/spy.h"
+#include "spy.h"
 #include "screen.h"
 
 

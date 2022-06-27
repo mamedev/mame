@@ -15,7 +15,7 @@
 
 
 #include "emu.h"
-#include "includes/malzak.h"
+#include "malzak.h"
 
 void malzak_state::palette_init(palette_device &palette) const
 {

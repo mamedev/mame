@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include "emu.h"
-#include "includes/norautp.h"
+#include "norautp.h"
 
 
 /* Discrete Sound Input Nodes */

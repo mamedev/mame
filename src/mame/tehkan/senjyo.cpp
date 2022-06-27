@@ -78,11 +78,13 @@ I/O read/write
 /* 26.February 2012 Tsuyoshi Hasegawa fixed palette intensity */
 
 #include "emu.h"
-#include "includes/senjyo.h"
+#include "senjyo.h"
+
+#include "segacrpt_device.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/segacrpt_device.h"
 #include "sound/sn76496.h"
+
 #include "screen.h"
 #include "speaker.h"
 

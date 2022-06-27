@@ -11,12 +11,15 @@
 #ifndef MAME_INCLUDES_PCE_H
 #define MAME_INCLUDES_PCE_H
 
-#include "cdrom.h"
+#include "pce_cd.h"
+
 #include "cpu/h6280/h6280.h"
 #include "bus/pce/pce_slot.h"
 #include "bus/pce_ctrl/pcectrl.h"
-#include "machine/pce_cd.h"
 #include "video/huc6260.h"
+
+#include "cdrom.h"
+
 
 #define C6280_TAG           "c6280"
 

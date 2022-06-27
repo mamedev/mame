@@ -57,7 +57,7 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
-#include "machine/k7659kb.h"
+#include "k7659kb.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"

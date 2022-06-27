@@ -254,13 +254,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/zaxxon.h"
-#include "audio/segausb.h"
+#include "zaxxon.h"
+#include "segausb.h"
+
+#include "segacrpt_device.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
-#include "machine/segacrpt_device.h"
 #include "sound/samples.h"
 #include "sound/sn76496.h"
 

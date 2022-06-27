@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bsktball.h"
+#include "bsktball.h"
 
 
 void bsktball_state::bsktball_videoram_w(offs_t offset, uint8_t data)

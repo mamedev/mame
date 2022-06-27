@@ -58,7 +58,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "includes/sms.h"
+#include "sms.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"

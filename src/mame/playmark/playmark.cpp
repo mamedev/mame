@@ -91,7 +91,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/playmark.h"
+#include "playmark.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"

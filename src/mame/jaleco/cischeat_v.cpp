@@ -49,7 +49,7 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cischeat.h"
+#include "cischeat.h"
 
 
 #define cischeat_tmap_DRAW(_n_) \

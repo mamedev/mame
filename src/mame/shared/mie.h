@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "machine/mapledev.h"
+#include "mapledev.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"

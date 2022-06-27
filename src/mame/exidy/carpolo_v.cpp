@@ -9,7 +9,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/carpolo.h"
+#include "carpolo.h"
 
 
 /* the screen elements' priorties determine their color */

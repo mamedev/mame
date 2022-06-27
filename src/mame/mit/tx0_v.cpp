@@ -7,9 +7,7 @@
 */
 
 #include "emu.h"
-#include "includes/tx0.h"
-
-#include "video/crt.h"
+#include "tx0.h"
 
 #include <algorithm>
 

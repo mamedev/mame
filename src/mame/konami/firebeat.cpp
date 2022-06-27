@@ -149,14 +149,14 @@
 #include "machine/ins8250.h"
 #include "machine/intelfsh.h"
 #include "machine/mb8421.h"
-#include "machine/midikbd.h"
+#include "midikbd.h"
 #include "machine/rtc65271.h"
 #include "machine/timer.h"
 #include "sound/cdda.h"
 #include "sound/xt446.h"
 #include "sound/rf5c400.h"
 #include "sound/ymz280b.h"
-#include "video/k057714.h"
+#include "k057714.h"
 
 #include "imagedev/floppy.h"
 

@@ -3,12 +3,15 @@
 /* machine/n64.c - contains N64 hardware emulation shared between arcade and console */
 
 #include "emu.h"
-#include "debugger.h"
-#include "screen.h"
+#include "n64.h"
+
+#include "n64_v.h"
+
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/mips3com.h"
-#include "includes/n64.h"
-#include "video/n64.h"
+
+#include "debugger.h"
+#include "screen.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(N64PERIPH, n64_periphs, "n64_periphs", "N64 Peripheral Chips")

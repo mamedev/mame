@@ -789,7 +789,7 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/arkanoid.h"
+#include "arkanoid.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"

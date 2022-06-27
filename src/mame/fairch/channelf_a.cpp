@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller, Frank Palazzolo, Sean Riddle
 #include "emu.h"
-#include "audio/channelf.h"
+#include "channelf_a.h"
 
 
 #define MAX_AMPLITUDE  0x7fff

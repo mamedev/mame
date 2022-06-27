@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/divebomb.h"
+#include "divebomb.h"
 #include "video/resnet.h"
 
 

@@ -16,7 +16,7 @@
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "machine/74259.h"
-#include "video/dynax_blitter_rev2.h"
+#include "dynax_blitter_rev2.h"
 #include "emupal.h"
 #include "screen.h"
 

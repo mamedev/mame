@@ -16,7 +16,7 @@ Cursor is one position too far to the right.
 
 
 #include "emu.h"
-#include "includes/partner.h"
+#include "partner.h"
 
 #include "cpu/i8085/i8085.h"
 #include "screen.h"

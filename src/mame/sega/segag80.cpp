@@ -7,13 +7,13 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "audio/segag80.h"
+#include "segag80.h"
 
-#include "includes/segag80v.h" // FIXME: eliminate the need for this dependency
+#include "segag80v.h" // FIXME: eliminate the need for this dependency
 
-#include "audio/nl_astrob.h"
-#include "audio/nl_elim.h"
-#include "audio/nl_spacfury.h"
+#include "nl_astrob.h"
+#include "nl_elim.h"
+#include "nl_spacfury.h"
 
 #include "sound/samples.h"
 

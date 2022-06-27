@@ -197,7 +197,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gottlieb.h"
+#include "gottlieb.h"
 
 #include "machine/nvram.h"
 #include "machine/rescap.h"

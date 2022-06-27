@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_GALPANI2_H
-#define MAME_INCLUDES_GALPANI2_H
+#ifndef MAME_KANEKO_GALPANI2_H
+#define MAME_KANEKO_GALPANI2_H
 
 #pragma once
 
-#include "video/kaneko_spr.h"
+#include "kaneko_spr.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "machine/timer.h"
@@ -82,4 +82,4 @@ private:
 	void galpani2_mem2(address_map &map);
 };
 
-#endif // MAME_INCLUDES_GALPANI2_H
+#endif // MAME_KANEKO_GALPANI2_H

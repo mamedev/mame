@@ -38,20 +38,24 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/mips3.h"
-#include "cpu/adsp2100/adsp2100.h"
-#include "machine/idectrl.h"
-#include "machine/midwayic.h"
-#include "machine/ins8250.h"
+
+#include "midwayic.h"
+
+#include "dcs.h"
+
 #include "bus/rs232/rs232.h"
-#include "machine/terminal.h"
-#include "audio/dcs.h"
-#include "machine/pci.h"
-#include "machine/vrc4373.h"
-#include "machine/pci9050.h"
+#include "cpu/adsp2100/adsp2100.h"
+#include "cpu/mips/mips3.h"
+#include "machine/idectrl.h"
+#include "machine/ins8250.h"
 #include "machine/pci-ide.h"
-#include "video/zeus2.h"
+#include "machine/pci.h"
+#include "machine/pci9050.h"
+#include "machine/terminal.h"
 #include "machine/timekpr.h"
+#include "machine/vrc4373.h"
+#include "video/zeus2.h"
+
 #include "emupal.h"
 
 

@@ -72,7 +72,7 @@ Legacy notes from drivers:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/nb1412m2.h"
+#include "nb1412m2.h"
 
 
 

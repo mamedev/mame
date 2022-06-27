@@ -4,7 +4,7 @@
 /* Fisher Price / Mattel "I Can..." systems */
 
 #include "emu.h"
-#include "includes/spg2xx.h"
+#include "spg2xx.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

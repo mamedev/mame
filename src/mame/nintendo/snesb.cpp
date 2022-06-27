@@ -152,7 +152,7 @@ Iron PCB (same as Final Fight 2?)
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/snes.h"
+#include "snes.h"
 #include "speaker.h"
 
 

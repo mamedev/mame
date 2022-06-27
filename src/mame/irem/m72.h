@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "audio/m72.h"
+#include "m72_a.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/mb8421.h"
 #include "machine/pic8259.h"

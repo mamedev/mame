@@ -9,7 +9,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/tms32010/tms32010.h"
 #include "sound/ymopl.h"
-#include "includes/toaplan1.h"
+#include "toaplan1.h"
 
 
 void toaplan1_state::interrupt()

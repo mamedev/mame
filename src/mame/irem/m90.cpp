@@ -16,13 +16,13 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "includes/m90.h"
-#include "includes/iremipt.h"
+#include "m90.h"
+#include "iremipt.h"
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/irem_cpu.h"
+#include "irem_cpu.h"
 #include "machine/rstbuf.h"
 #include "sound/dac.h"
 #include "sound/ymopm.h"

@@ -1,14 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski, Andrea Mazzoleni
-#ifndef MAME_INCLUDES_RETOFINV_H
-#define MAME_INCLUDES_RETOFINV_H
+#ifndef MAME_TAITO_RETOFINV_H
+#define MAME_TAITO_RETOFINV_H
 
 #pragma once
 
+#include "taito68705.h"
+
 #include "machine/74259.h"
-#include "machine/taito68705interface.h"
+
 #include "emupal.h"
 #include "tilemap.h"
+
 
 class retofinv_state : public driver_device
 {
@@ -89,4 +92,4 @@ private:
 	tilemap_t *m_fg_tilemap = nullptr;
 };
 
-#endif // MAME_INCLUDES_RETOFINV_H
+#endif // MAME_TAITO_RETOFINV_H

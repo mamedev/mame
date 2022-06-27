@@ -25,8 +25,8 @@ Module PCB is the same as Super Mondial II College, label HGS 10 116 05.
 #include "cpu/m6502/m65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
-#include "machine/mmboard.h"
-#include "video/mmdisplay2.h"
+#include "mmboard.h"
+#include "mmdisplay2.h"
 #include "video/pwm.h"
 
 // internal artwork

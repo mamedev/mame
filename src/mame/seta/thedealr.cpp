@@ -34,7 +34,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "video/seta001.h"
+#include "seta001.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

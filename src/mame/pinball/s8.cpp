@@ -110,10 +110,11 @@ ToDo:
 ************************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
+
+#include "williamssound.h"
 
 #include "cpu/m6800/m6800.h"
-#include "audio/williams.h"
 #include "machine/6821pia.h"
 #include "sound/dac.h"
 #include "speaker.h"

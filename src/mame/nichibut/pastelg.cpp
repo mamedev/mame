@@ -23,7 +23,7 @@ Memo:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/pastelg.h"
+#include "pastelg.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"

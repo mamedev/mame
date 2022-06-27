@@ -4,7 +4,7 @@
 
 
 #include "emu.h"
-#include "includes/neogeo.h"
+#include "neogeo.h"
 
 #include "bus/neogeo/prot_pcm2.h"
 #include "bus/neogeo/prot_cmc.h"

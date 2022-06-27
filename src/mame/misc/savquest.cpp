@@ -67,17 +67,18 @@
 
 ***************************************************************************/
 
-
 #include "emu.h"
+
+#include "pcshare.h"
+
+#include "bus/isa/sblaster.h"
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
-#include "machine/pcshare.h"
-#include "machine/pckeybrd.h"
+#include "machine/ds128x.h"
 #include "machine/idectrl.h"
+#include "machine/lpci.h"
+#include "machine/pckeybrd.h"
 #include "video/pc_vga.h"
 #include "video/voodoo_2.h"
-#include "machine/ds128x.h"
-#include "bus/isa/sblaster.h"
 
 
 namespace {

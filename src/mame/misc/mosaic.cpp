@@ -42,7 +42,7 @@ NOTE: PIC16C5x protection chip at 5A (UC02 as silkscreened on PCB)
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mosaic.h"
+#include "mosaic.h"
 
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/z180/z180.h"

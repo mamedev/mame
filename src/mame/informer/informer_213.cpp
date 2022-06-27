@@ -22,7 +22,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
 #include "machine/z80scc.h"
-#include "machine/informer_213_kbd.h"
+#include "informer_213_kbd.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/printer.h"
 #include "sound/beep.h"

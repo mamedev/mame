@@ -20,7 +20,7 @@ TODO:
 #include "machine/netlist.h"
 
 #include "netlist/nl_setup.h"
-#include "audio/nl_destroyr.h"
+#include "nl_destroyr.h"
 
 #include "destroyr.lh"
 

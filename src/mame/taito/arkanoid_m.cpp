@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/arkanoid.h"
+#include "arkanoid.h"
 
 
 /* To log specific reads and writes of the bootlegs */

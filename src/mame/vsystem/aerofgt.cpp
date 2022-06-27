@@ -61,16 +61,16 @@ Verification still needed for the other PCBs.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/aerofgt.h"
+#include "aerofgt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/mb3773.h"
-#include "machine/vs9209.h"
+#include "vs9209.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
-#include "video/vsystem_gga.h"
+#include "vsystem_gga.h"
 #include "screen.h"
 #include "speaker.h"
 

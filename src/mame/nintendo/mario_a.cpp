@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 #include "emu.h"
-#include "includes/mario.h"
+#include "mario.h"
 
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
@@ -9,7 +9,7 @@
 #include "speaker.h"
 
 #if !OLD_SOUND
-#include "audio/nl_mario.h"
+#include "nl_mario.h"
 #endif
 
 /****************************************************************

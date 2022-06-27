@@ -216,13 +216,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "avgdvg.h"
+
 #include "cpu/z80/z80.h"
-#include "video/vector.h"
-#include "video/avgdvg.h"
-#include "sound/ay8910.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "video/vector.h"
+
 #include "screen.h"
 #include "speaker.h"
 

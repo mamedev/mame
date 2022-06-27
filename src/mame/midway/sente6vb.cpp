@@ -56,7 +56,7 @@
 
 #include "emu.h"
 #include "sound/mm5837.h"
-#include "audio/sente6vb.h"
+#include "sente6vb.h"
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
 #include "speaker.h"

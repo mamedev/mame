@@ -68,7 +68,7 @@
 #include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
-#include "machine/gridkeyb.h"
+#include "gridkeyb.h"
 #include "machine/i7220.h"
 #include "machine/i80130.h"
 #include "machine/i8255.h"

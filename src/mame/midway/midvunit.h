@@ -5,14 +5,21 @@
     Driver for Midway V-Unit games
 
 **************************************************************************/
+#ifndef MAME_MIDWAY_MIDVUNIT_H
+#define MAME_MIDWAY_MIDVUNIT_H
 
-#include "audio/dcs.h"
+#pragma once
+
+#include "midwayic.h"
+
+#include "dcs.h"
+
 #include "bus/ata/ataintf.h"
 #include "machine/adc0844.h"
-#include "machine/midwayic.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/poly.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -195,3 +202,5 @@ private:
 	void midvplus_map(address_map &map);
 	void midvunit_map(address_map &map);
 };
+
+#endif // MAME_MIDWAY_MIDVUNIT_H

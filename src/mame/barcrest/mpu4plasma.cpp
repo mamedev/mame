@@ -7,7 +7,7 @@
 // code currently uses a 'screen' but it has been since decided this is not how to handle such display types in MAME.
 
 #include "emu.h"
-#include "includes/mpu4.h"
+#include "mpu4.h"
 
 #include "cpu/m68000/m68000.h"
 #include "screen.h"

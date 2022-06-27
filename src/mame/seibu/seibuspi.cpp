@@ -876,16 +876,16 @@ Notes:
 */
 
 #include "emu.h"
-#include "includes/seibuspi.h"
+#include "seibuspi.h"
 
 #include "cpu/i386/i386.h"
 #include "cpu/z80/z80.h"
 #include "machine/ds2404.h"
 #include "machine/intelfsh.h"
-#include "machine/seibuspi.h"
+#include "seibuspi_m.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
-#include "video/seibu_crtc.h"
+#include "seibu_crtc.h"
 
 #include "screen.h"
 #include "speaker.h"

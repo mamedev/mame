@@ -105,8 +105,8 @@ Known Issues
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gijoe.h"
-#include "includes/konamipt.h"
+#include "gijoe.h"
+#include "konamipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

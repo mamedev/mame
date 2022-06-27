@@ -30,7 +30,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/hh_sm510.h"
+#include "hh_sm510.h"
 
 #include "machine/timer.h"
 #include "screen.h"

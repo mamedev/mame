@@ -125,9 +125,9 @@ The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or l
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/wrally.h"
+#include "wrally.h"
 
-#include "machine/gaelco_ds5002fp.h"
+#include "gaelco_ds5002fp.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"

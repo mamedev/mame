@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/segag80v.h"
+#include "segag80v.h"
 
 #define VECTOR_CLOCK        15468480            // master clock
 #define U34_CLOCK           (VECTOR_CLOCK/3)    // clock for interrupt chain

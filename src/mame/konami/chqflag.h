@@ -12,10 +12,10 @@
 
 #include "machine/bankdev.h"
 #include "sound/k007232.h"
-#include "video/k051960.h"
-#include "video/k051316.h"
-#include "video/k051733.h"
-#include "video/konami_helper.h"
+#include "k051960.h"
+#include "k051316.h"
+#include "k051733.h"
+#include "konami_helper.h"
 #include "emupal.h"
 
 class chqflag_state : public driver_device

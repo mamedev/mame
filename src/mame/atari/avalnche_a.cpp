@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/avalnche.h"
+#include "avalnche.h"
 #include "sound/discrete.h"
 #include "speaker.h"
 

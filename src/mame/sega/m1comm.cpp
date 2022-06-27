@@ -52,7 +52,7 @@ Notes:
 */
 
 #include "emu.h"
-#include "machine/m1comm.h"
+#include "m1comm.h"
 #include "emuopts.h"
 
 #define Z80_TAG     "commcpu"

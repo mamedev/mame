@@ -378,8 +378,8 @@ Shark   Zame
 
 
 #include "emu.h"
-#include "includes/twincobr.h"
-#include "includes/toaplipt.h"
+#include "twincobr.h"
+#include "toaplipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"

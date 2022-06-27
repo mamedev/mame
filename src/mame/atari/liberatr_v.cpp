@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/liberatr.h"
+#include "liberatr.h"
 
 
 #define NUM_PENS    (0x18)

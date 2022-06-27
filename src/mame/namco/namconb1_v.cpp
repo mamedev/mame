@@ -3,7 +3,7 @@
 /* video/namconb1.c */
 
 #include "emu.h"
-#include "includes/namconb1.h"
+#include "namconb1.h"
 
 #include <algorithm>
 

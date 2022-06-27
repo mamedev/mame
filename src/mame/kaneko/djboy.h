@@ -5,15 +5,20 @@
     DJ Boy
 
 *************************************************************************/
+#ifndef MAME_KANEKO_DJBOY_H
+#define MAME_KANEKO_DJBOY_H
+
+#pragma once
+
+#include "kan_pand.h"
 
 #include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
-#include "video/kan_pand.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
-#define PROT_OUTPUT_BUFFER_SIZE 8
 
 class djboy_state : public driver_device
 {
@@ -47,6 +52,8 @@ public:
 	void init_djboyj();
 
 private:
+	static constexpr unsigned PROT_OUTPUT_BUFFER_SIZE = 8;
+
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_paletteram;
@@ -118,3 +125,5 @@ private:
 	void soundcpu_am(address_map &map);
 	void soundcpu_port_am(address_map &map);
 };
+
+#endif // MAME_KANEKO_DJBOY_H

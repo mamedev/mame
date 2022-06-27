@@ -42,7 +42,7 @@ ToDo:
 
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 
 #include "cpu/cop400/cop400.h"
 #include "cpu/cosmac/cosmac.h"

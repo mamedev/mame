@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/kc.h"
+#include "kc.h"
 
 #include "screen.h"
 

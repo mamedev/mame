@@ -3,8 +3,8 @@
 /* Super Kaneko Nova System video */
 
 #include "emu.h"
-#include "video/sknsspr.h"
-#include "includes/suprnova.h"
+#include "sknsspr.h"
+#include "suprnova.h"
 
 
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */

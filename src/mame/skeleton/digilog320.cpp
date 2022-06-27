@@ -57,7 +57,7 @@
 #include "cpu/i86/i186.h"
 #include "cpu/z80/z80.h"
 #include "machine/am9519.h"
-#include "machine/digilog_kbd.h"
+#include "digilog_kbd.h"
 #include "machine/i8251.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"

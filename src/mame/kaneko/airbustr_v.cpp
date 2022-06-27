@@ -33,7 +33,7 @@
 
 **************************************************************************/
 #include "emu.h"
-#include "includes/airbustr.h"
+#include "airbustr.h"
 
 /*  Scroll Registers
 

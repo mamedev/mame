@@ -23,7 +23,7 @@
 
 
 #include "emu.h"
-#include "includes/midtunit.h"
+#include "midtunit.h"
 
 #include "cpu/adsp2100/adsp2100.h"
 #include "machine/nvram.h"

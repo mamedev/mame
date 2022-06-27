@@ -160,7 +160,7 @@ Notes: (All IC's shown)
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/dave.h"
-#include "video/nick.h"
+#include "nick.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"

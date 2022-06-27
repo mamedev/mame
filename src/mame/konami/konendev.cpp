@@ -62,7 +62,7 @@
 */
 
 #include "emu.h"
-#include "video/k057714.h"
+#include "k057714.h"
 
 #include "cpu/h8/h83006.h"
 #include "cpu/powerpc/ppc.h"

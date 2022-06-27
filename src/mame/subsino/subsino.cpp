@@ -223,10 +223,11 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
+#include "subsino_m.h"
+
 #include "cpu/z180/hd647180x.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
-#include "machine/subsino.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"

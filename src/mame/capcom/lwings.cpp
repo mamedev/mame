@@ -55,7 +55,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lwings.h"
+#include "lwings.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"

@@ -67,9 +67,9 @@ Stephh's additional notes :
 
 #include "emu.h"
 
-#include "includes/galpnipt.h"
-#include "machine/kaneko_hit.h"
-#include "video/kan_pand.h"
+#include "galpnipt.h"
+#include "kan_pand.h"
+#include "kaneko_hit.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"

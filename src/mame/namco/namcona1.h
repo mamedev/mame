@@ -11,7 +11,7 @@
 #pragma once
 
 #include "machine/eeprompar.h"
-#include "machine/namcomcu.h"
+#include "namcomcu.h"
 #include "machine/timer.h"
 #include "machine/msm6242.h"
 #include "sound/c140.h"

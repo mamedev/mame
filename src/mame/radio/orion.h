@@ -6,12 +6,12 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_ORION_H
-#define MAME_INCLUDES_ORION_H
+#ifndef MAME_RADIO_ORION_H
+#define MAME_RADIO_ORION_H
 
 #pragma once
 
-#include "includes/radio86.h"
+#include "radio86.h"
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
@@ -167,4 +167,4 @@ private:
 	void mem_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_ORION_H
+#endif // MAME_RADIO_ORION_H

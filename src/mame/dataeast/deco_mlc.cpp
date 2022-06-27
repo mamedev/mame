@@ -108,9 +108,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/deco_mlc.h"
+#include "deco_mlc.h"
 
-#include "machine/deco156.h"
+#include "deco156_m.h"
 #include "machine/eepromser.h"
 #include "cpu/arm/arm.h"
 #include "cpu/sh/sh2.h"

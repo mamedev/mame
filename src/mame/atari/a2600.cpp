@@ -87,7 +87,7 @@ E1 Prog ROM 42 DEMON/DIAMOND (CX2615)
 
 #include "emu.h"
 
-#include "includes/a2600.h"
+#include "a2600.h"
 
 #include "emupal.h"
 #include "screen.h"

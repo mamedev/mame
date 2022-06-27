@@ -20,8 +20,8 @@
 */
 
 #include "emu.h"
-#include "includes/megadriv.h"
-#include "includes/megadriv_rad.h"
+#include "megadriv.h"
+#include "megadriv_rad.h"
 
 // todo, use actual MD map, easier once maps are part of base class.
 void megadriv_radica_state::megadriv_base_map(address_map &map)

@@ -45,7 +45,7 @@
 #include "machine/output_latch.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/qx10kbd.h"
+#include "qx10kbd.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80sio.h"

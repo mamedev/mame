@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "includes/spbactn.h"
+#include "spbactn.h"
 
 
 

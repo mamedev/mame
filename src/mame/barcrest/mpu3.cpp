@@ -102,6 +102,8 @@ TODO: - Distinguish door switches using manual
 ***********************************************************************************************************/
 
 #include "emu.h"
+#include "awpvid.h"       //Fruit Machines Only
+
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/input_merger.h"
@@ -165,8 +167,6 @@ TODO: - Distinguish door switches using manual
 #endif
 
 #define LOG(x)  do { if (MPU3VERBOSE) logerror x; } while (0)
-
-#include "video/awpvid.h"       //Fruit Machines Only
 
 /* Lookup table for CHR data */
 

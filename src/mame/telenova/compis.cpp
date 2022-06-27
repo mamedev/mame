@@ -53,7 +53,7 @@
 #include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/cassette.h"
-#include "machine/compiskb.h"
+#include "compiskb.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/i80130.h"

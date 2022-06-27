@@ -107,7 +107,7 @@ www.multitech.com
 #include "machine/vrc4373.h"
 #include "video/voodoo_pci.h"
 #include "sound/es1373.h"
-#include "machine/iteagle_fpga.h"
+#include "iteagle_fpga.h"
 #include "machine/pci-ide.h"
 #include "screen.h"
 

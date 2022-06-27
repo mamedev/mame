@@ -13,7 +13,7 @@ Memo: The NB1413M3 is a Fujitsu ULA
 ******************************************************************************/
 
 #include "emu.h"
-#include "machine/nb1413m3.h"
+#include "nb1413m3.h"
 
 #include "cpu/z80/z80.h"
 

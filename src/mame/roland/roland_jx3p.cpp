@@ -13,7 +13,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/adc0804.h"
 #include "machine/nvram.h"
-#include "machine/pg200.h"
+#include "pg200.h"
 #include "machine/pit8253.h"
 #include "machine/rescap.h"
 

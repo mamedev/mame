@@ -23,7 +23,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/redclash.h"
+#include "redclash.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

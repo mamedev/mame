@@ -551,7 +551,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/neogeo.h"
+#include "neogeo.h"
 
 #include "machine/nvram.h"
 #include "machine/watchdog.h"

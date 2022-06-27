@@ -133,10 +133,10 @@ we have no way of knowing which is the later/corrected version.
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/mystwarr.h"
-#include "includes/konamigx.h"
-#include "includes/konamipt.h"
-#include "video/k053250.h"
+#include "mystwarr.h"
+#include "konamigx.h"
+#include "konamipt.h"
+#include "k053250.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

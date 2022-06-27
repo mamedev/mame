@@ -90,7 +90,7 @@ TODO:
    so ui disabled */
 
 #include "emu.h"
-#include "includes/pcw16.h"
+#include "pcw16.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"

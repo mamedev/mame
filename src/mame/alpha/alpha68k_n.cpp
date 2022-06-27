@@ -140,7 +140,7 @@ PCB Pinout
 
 
 #include "emu.h"
-#include "includes/alpha68k.h"
+#include "alpha68k.h"
 
 /*
  *

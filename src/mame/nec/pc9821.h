@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "includes/pc9801.h"
+#include "pc9801.h"
 
 class pc9821_state : public pc9801bx_state
 {

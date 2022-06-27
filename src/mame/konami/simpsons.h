@@ -6,10 +6,10 @@
 #pragma once
 
 #include "cpu/m6809/konami.h" // for the callback and the firq irq definition
-#include "video/k052109.h"
-#include "video/k053251.h"
-#include "video/k053246_k053247_k055673.h"
-#include "video/konami_helper.h"
+#include "k052109.h"
+#include "k053251.h"
+#include "k053246_k053247_k055673.h"
+#include "konami_helper.h"
 
 class simpsons_state : public driver_device
 {

@@ -5,7 +5,7 @@
 /* Crystal games tend to have scrambled ROM + a different sound chip */
 
 #include "emu.h"
-#include "includes/mpu4.h"
+#include "mpu4.h"
 
 namespace {
 

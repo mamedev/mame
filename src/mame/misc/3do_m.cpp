@@ -60,7 +60,7 @@ Expansion bus stuff:
 */
 
 #include "emu.h"
-#include "includes/3do.h"
+#include "3do.h"
 
 #include "cpu/arm7/arm7core.h"
 

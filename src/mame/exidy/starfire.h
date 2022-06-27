@@ -13,8 +13,8 @@
 #include "machine/netlist.h"
 #include "machine/pit8253.h"
 #include "netlist/nl_setup.h"
-#include "audio/nl_fireone.h"
-#include "audio/nl_starfire.h"
+#include "nl_fireone.h"
+#include "nl_starfire.h"
 #include "sound/dac.h"
 #include "screen.h"
 

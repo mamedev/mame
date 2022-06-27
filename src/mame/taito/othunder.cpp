@@ -276,9 +276,9 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/othunder.h"
-#include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
+#include "othunder.h"
+#include "taitoipt.h"
+#include "taitosnd.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

@@ -1,13 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour, Zsolt Vasvari
-#ifndef MAME_INCLUDES_BKING_H
-#define MAME_INCLUDES_BKING_H
+#ifndef MAME_TAITO_BKING_H
+#define MAME_TAITO_BKING_H
 
 #pragma once
 
-#include "machine/taito68705interface.h"
+#include "taito68705.h"
+
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -109,4 +111,4 @@ private:
 	void bking_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_BKING_H
+#endif // MAME_TAITO_BKING_H

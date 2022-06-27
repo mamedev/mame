@@ -22,7 +22,7 @@
 
 
 #include "emu.h"
-#include "includes/cyberbal.h"
+#include "cyberbal.h"
 
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"

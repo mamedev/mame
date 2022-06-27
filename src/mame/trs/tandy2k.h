@@ -16,7 +16,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
-#include "machine/tandy2kb.h"
+#include "tandy2kb.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "machine/bankdev.h"

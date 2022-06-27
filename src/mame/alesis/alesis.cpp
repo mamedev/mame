@@ -13,7 +13,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/alesis.h"
+#include "alesis.h"
 #include "sr16.lh"
 #include "screen.h"
 

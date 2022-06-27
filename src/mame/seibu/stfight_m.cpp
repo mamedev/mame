@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/stfight.h"
+#include "stfight.h"
 
 #include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"

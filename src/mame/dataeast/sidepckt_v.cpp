@@ -9,7 +9,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/sidepckt.h"
+#include "sidepckt.h"
 
 
 void sidepckt_state::sidepckt_palette(palette_device &palette) const

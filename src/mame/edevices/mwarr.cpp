@@ -46,7 +46,7 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "video/edevices.h"
+#include "edevices.h"
 
 #define MASTER_CLOCK     XTAL(12'000'000)
 #define SOUND_CLOCK      XTAL(45'000'000)

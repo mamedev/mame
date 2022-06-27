@@ -3,7 +3,7 @@
 
 
 #include "emu.h"
-#include "includes/spg2xx.h"
+#include "spg2xx.h"
 
 
 class spg2xx_game_mysprt_plus_state : public spg2xx_game_state

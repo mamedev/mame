@@ -27,7 +27,7 @@ BTANB:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/kncljoe.h"
+#include "kncljoe.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"

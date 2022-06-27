@@ -27,7 +27,7 @@ TODO
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galivan.h"
+#include "galivan.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"

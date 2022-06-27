@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/phoenix.h"
+#include "phoenix.h"
 
 #include "video/resnet.h"
 

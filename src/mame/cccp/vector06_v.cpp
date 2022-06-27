@@ -10,7 +10,7 @@
 
 
 #include "emu.h"
-#include "includes/vector06.h"
+#include "vector06.h"
 
 
 uint32_t vector06_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

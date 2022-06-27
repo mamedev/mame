@@ -120,7 +120,7 @@
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/h8/h8s2655.h"
-#include "machine/mulcd.h"
+#include "mulcd.h"
 #include "sound/swp30.h"
 
 #include "debugger.h"

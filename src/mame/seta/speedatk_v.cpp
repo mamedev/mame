@@ -6,7 +6,7 @@
 
 *****************************************************************************************/
 #include "emu.h"
-#include "includes/speedatk.h"
+#include "speedatk.h"
 
 
 void speedatk_state::speedatk_palette(palette_device &palette) const

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cop01.h"
+#include "cop01.h"
 
 
 void cop01_state::cop01_palette(palette_device &palette) const

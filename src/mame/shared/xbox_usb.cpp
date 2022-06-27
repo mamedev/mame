@@ -2,11 +2,12 @@
 // copyright-holders:Samuele Zannoli
 
 #include "emu.h"
+#include "xbox_pci.h"
+#include "xbox_usb.h"
+#include "xbox.h"
+
 #include "machine/pci.h"
 #include "machine/idectrl.h"
-#include "machine/xbox_pci.h"
-#include "machine/xbox_usb.h"
-#include "machine/xbox.h"
 
 //#define LOG_OHCI
 

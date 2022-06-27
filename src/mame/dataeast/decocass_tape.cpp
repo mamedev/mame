@@ -7,7 +7,7 @@
  ***********************************************************************/
 
 #include "emu.h"
-#include "machine/decocass_tape.h"
+#include "decocass_tape.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"

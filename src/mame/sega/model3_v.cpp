@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Ville Linde
 #include "emu.h"
 #include "video/rgbutil.h"
-#include "includes/model3.h"
+#include "model3.h"
 
 /*
     TODO:

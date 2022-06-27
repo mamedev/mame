@@ -276,17 +276,21 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 ***************************************************************************/
 
 #include "emu.h"
+#include "avgdvg.h"
+#include "mathbox.h"
+
 #include "cpu/m6502/m6502.h"
-#include "machine/mathbox.h"
+#include "machine/er2055.h"
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
-#include "video/avgdvg.h"
-#include "video/vector.h"
-#include "machine/er2055.h"
 #include "sound/pokey.h"
+#include "video/vector.h"
+
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 static constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;
 static constexpr XTAL CLOCK_3KHZ   = MASTER_CLOCK / 4096;
@@ -908,6 +912,8 @@ ROM_START( temptube )
 	ROMX_LOAD( "136002-128.f1", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
 	ROMX_LOAD( "136002-127.e1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

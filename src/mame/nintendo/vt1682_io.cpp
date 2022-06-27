@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "machine/vt1682_io.h"
+#include "vt1682_io.h"
 
 #define LOG_IO     (1U << 1)
 

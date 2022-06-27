@@ -93,10 +93,10 @@ even be configurable.
 */
 
 #include "emu.h"
-#include "includes/simpl156.h"
+#include "simpl156.h"
 
-#include "machine/decocrpt.h"
-#include "machine/deco156.h"
+#include "decocrpt.h"
+#include "deco156_m.h"
 #include "cpu/arm/arm.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"

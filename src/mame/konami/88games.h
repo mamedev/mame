@@ -12,10 +12,10 @@
 
 #include "cpu/m6809/konami.h"
 #include "sound/upd7759.h"
-#include "video/k051316.h"
-#include "video/k051960.h"
-#include "video/k052109.h"
-#include "video/konami_helper.h"
+#include "k051316.h"
+#include "k051960.h"
+#include "k052109.h"
+#include "konami_helper.h"
 
 class _88games_state : public driver_device
 {

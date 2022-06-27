@@ -75,7 +75,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/mac.h"
+#include "mac.h"
 
 #define INTS_RBV    ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || ((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_LC_580))
 

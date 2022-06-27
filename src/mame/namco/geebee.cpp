@@ -10,7 +10,7 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "audio/geebee.h"
+#include "geebee.h"
 
 
 DEFINE_DEVICE_TYPE(GEEBEE_SOUND, geebee_sound_device, "geebee_sound", "Gee Bee Custom Sound")

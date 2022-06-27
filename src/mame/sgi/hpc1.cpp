@@ -14,7 +14,7 @@
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "bus/sgikbd/sgikbd.h"
-#include "machine/hpc1.h"
+#include "hpc1.h"
 #include "speaker.h"
 
 #define LOG_UNKNOWN     (1 << 0)

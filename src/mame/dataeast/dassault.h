@@ -9,10 +9,10 @@
 #include "machine/gen_latch.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/okim6295.h"
-#include "video/deco16ic.h"
-#include "video/decocomn.h"
+#include "deco16ic.h"
+#include "decocomn.h"
 #include "video/bufsprite.h"
-#include "video/decospr.h"
+#include "decospr.h"
 #include "emupal.h"
 
 class dassault_state : public driver_device

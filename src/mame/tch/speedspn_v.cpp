@@ -3,7 +3,7 @@
 /* Speed Spin video, see driver file for notes */
 
 #include "emu.h"
-#include "includes/speedspn.h"
+#include "speedspn.h"
 
 
 TILE_GET_INFO_MEMBER(speedspn_state::get_tile_info)

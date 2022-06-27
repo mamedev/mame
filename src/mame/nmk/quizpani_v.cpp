@@ -7,7 +7,7 @@
 ************************************************************************/
 
 #include "emu.h"
-#include "includes/quizpani.h"
+#include "quizpani.h"
 
 
 TILEMAP_MAPPER_MEMBER(quizpani_state::bg_scan)

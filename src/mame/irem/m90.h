@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "audio/m72.h"
+#include "m72_a.h"
 #include "cpu/nec/v25.h"
 #include "emupal.h"
 #include "screen.h"

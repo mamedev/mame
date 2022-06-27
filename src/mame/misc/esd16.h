@@ -5,15 +5,18 @@
     ESD 16 Bit Games
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_ESD16_H
-#define MAME_INCLUDES_ESD16_H
+#ifndef MAME_MISC_ESD16_H
+#define MAME_MISC_ESD16_H
 
 #pragma once
 
+#include "decospr.h"
+
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
-#include "video/decospr.h"
+
 #include "tilemap.h"
+
 
 class esd16_state : public driver_device
 {
@@ -105,4 +108,4 @@ private:
 	void vram_area(address_map &map, u32 base);
 };
 
-#endif // MAME_INCLUDES_ESD16_H
+#endif // MAME_MISC_ESD16_H

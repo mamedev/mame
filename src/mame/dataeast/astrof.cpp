@@ -59,7 +59,7 @@
 
 
 #include "emu.h"
-#include "includes/astrof.h"
+#include "astrof.h"
 #include "cpu/m6502/m6502.h"
 
 

@@ -3,7 +3,7 @@
 //***************************************************************************
 
 #include "emu.h"
-#include "includes/trs80m3.h"
+#include "trs80m3.h"
 #include "screen.h"
 
 /* Bit assignment for "m_mode"

@@ -36,7 +36,7 @@ Memo:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/niyanpai.h"
+#include "niyanpai.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"

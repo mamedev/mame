@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "includes/cps1.h"
+#include "cps1.h"
 
 class fcrash_state : public cps_state
 {

@@ -7,7 +7,7 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/midwunit.h"
+#include "midwunit.h"
 
 #define LOG_UNKNOWN (1 << 0)
 #define LOG_CMOS    (1 << 1)

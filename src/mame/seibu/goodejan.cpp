@@ -71,17 +71,22 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 *******************************************************************************************/
 
 #include "emu.h"
-#include "audio/seibu.h"
+
+#include "seibu_crtc.h"
+
+#include "seibusound.h"
 
 #include "cpu/nec/nec.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
-#include "video/seibu_crtc.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
 
 class goodejan_state : public driver_device, public seibu_sound_common
 {
@@ -746,6 +751,8 @@ ROM_START( goodejana )
 	ROM_REGION( 0x100, "proms", 0 ) /* not used */
 	ROM_LOAD( "fmj08.083", 0x000, 0x100, CRC(9657b7ad) SHA1(e9b469c2b3534593f7fe0ea19cbbf93b55957e42) )
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1991, totmejan,  0,        totmejan, goodejan, goodejan_state, empty_init, ROT0, "Seibu Kaihatsu (Tecmo license)", "Tottemo E Jong",                                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, goodejan,  0,        goodejan, goodejan, goodejan_state, empty_init, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

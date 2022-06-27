@@ -5,7 +5,7 @@
 // also Waixing developed systems for the lower capacity (~40 game) units
 
 #include "emu.h"
-#include "includes/spg2xx.h"
+#include "spg2xx.h"
 
 
 class wireless60_state : public spg2xx_game_state

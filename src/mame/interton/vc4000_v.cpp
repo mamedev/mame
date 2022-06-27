@@ -2,7 +2,7 @@
 // copyright-holders:Peter Trauner, Manfred Schneider, Robbbert
 // thanks-to:Manfred Schneider
 #include "emu.h"
-#include "includes/vc4000.h"
+#include "vc4000.h"
 
 
 /*

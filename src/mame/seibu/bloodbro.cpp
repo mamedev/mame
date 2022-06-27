@@ -138,12 +138,12 @@ Video:
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/bloodbro.h"
+#include "bloodbro.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "video/seibu_crtc.h"
+#include "seibu_crtc.h"
 #include "screen.h"
 #include "speaker.h"
 

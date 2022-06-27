@@ -2,7 +2,7 @@
 // copyright-holders:Bryan McPhail
 
 #include "machine/eepromser.h"
-#include "machine/deco146.h"
+#include "deco146.h"
 #include "machine/timer.h"
 #include "sound/ymz280b.h"
 #include "emupal.h"

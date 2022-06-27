@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/route16.h"
+#include "route16.h"
 
 void route16_state::video_start()
 {

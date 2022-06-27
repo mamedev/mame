@@ -139,7 +139,7 @@ Notes:
 */
 
 #include "emu.h"
-#include "includes/djboy.h"
+#include "djboy.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"

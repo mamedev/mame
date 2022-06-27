@@ -95,8 +95,8 @@ G  171-8278G  315-6416  2x 512Mbit  RMI
 #include "emu.h"
 #include "cpu/sh/sh4.h"
 #include "debugger.h"
-#include "includes/segasp.h"
-#include "machine/naomim4.h"
+#include "segasp.h"
+#include "naomim4.h"
 
 uint64_t segasp_state::sp_bank_r(offs_t offset, uint64_t mem_mask)
 {

@@ -32,7 +32,7 @@
 */
 
 #include "emu.h"
-#include "includes/tmc2000e.h"
+#include "tmc2000e.h"
 
 #include "screen.h"
 #include "speaker.h"

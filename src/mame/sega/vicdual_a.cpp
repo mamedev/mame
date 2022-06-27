@@ -7,10 +7,10 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/vicdual.h"
+#include "vicdual.h"
 
-#include "audio/nl_brdrline.h"
-#include "audio/nl_frogs.h"
+#include "nl_brdrline.h"
+#include "nl_frogs.h"
 
 
 /************************************************************************

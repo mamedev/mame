@@ -3,7 +3,7 @@
 // TODO: LEDs
 
 #include "emu.h"
-#include "machine/qx10kbd.h"
+#include "qx10kbd.h"
 #include "cpu/mcs48/mcs48.h"
 
 

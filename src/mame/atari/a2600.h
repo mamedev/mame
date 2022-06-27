@@ -22,7 +22,7 @@
 #include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m6507.h"
 #include "sound/tiaintf.h"
-#include "video/tia.h"
+#include "tia.h"
 
 #define USE_NEW_RIOT 0
 

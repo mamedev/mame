@@ -23,7 +23,7 @@
 #define __MACHINE_SNES_C
 
 #include "emu.h"
-#include "includes/snes.h"
+#include "snes.h"
 
 
 #define DMA_REG(a) m_dma_regs[a - 0x4300]   // regs 0x4300-0x437f

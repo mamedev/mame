@@ -11,8 +11,8 @@
 #pragma once
 
 #include "machine/timer.h"
-#include "audio/atarijsa.h"
-#include "video/atarimo.h"
+#include "atarijsa.h"
+#include "atarimo.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

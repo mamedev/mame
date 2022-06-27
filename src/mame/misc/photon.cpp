@@ -18,7 +18,8 @@
 */
 
 #include "emu.h"
-#include "video/pk8000.h"
+
+#include "pk8000_v.h"
 
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"

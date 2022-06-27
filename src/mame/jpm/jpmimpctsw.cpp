@@ -25,7 +25,7 @@
 */
 
 #include "emu.h"
-#include "includes/jpmimpct.h"
+#include "jpmimpct.h"
 
 // MFME2MAME layouts:
 #include "j6aceclb.lh"

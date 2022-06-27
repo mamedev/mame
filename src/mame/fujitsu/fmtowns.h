@@ -9,7 +9,7 @@
 #include "imagedev/chd_cd.h"
 #include "imagedev/floppy.h"
 #include "machine/fm_scsi.h"
-#include "machine/fmt_icmem.h"
+#include "fmt_icmem.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"

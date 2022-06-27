@@ -7,7 +7,7 @@ Atari Wolf Pack (prototype) video emulation
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/wolfpack.h"
+#include "wolfpack.h"
 
 
 void wolfpack_state::wolfpack_palette(palette_device &palette) const

@@ -3,7 +3,7 @@
 /* One Shot One Kill Video Hardware */
 
 #include "emu.h"
-#include "includes/oneshot.h"
+#include "oneshot.h"
 
 
 /* bg tilemap */

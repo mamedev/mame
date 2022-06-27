@@ -7,7 +7,7 @@
 ********************************************************************************************************/
 
 #include "emu.h"
-#include "includes/raiden2.h"
+#include "raiden2.h"
 
 void raiden2_state::m_videoram_private_w(offs_t offset, uint16_t data)
 {

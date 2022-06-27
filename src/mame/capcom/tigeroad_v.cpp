@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
 #include "emu.h"
-#include "includes/tigeroad.h"
+#include "tigeroad.h"
 
 
 void tigeroad_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)

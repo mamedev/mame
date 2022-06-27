@@ -85,7 +85,7 @@
 */
 
 #include "emu.h"
-#include "includes/model2.h"
+#include "model2.h"
 
 #include "cpu/i960/i960.h"
 #include "cpu/m68000/m68000.h"
@@ -96,12 +96,12 @@
 #include "machine/mb8421.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
-#include "machine/315_5296.h"
-#include "machine/315_5649.h"
-#include "machine/model1io.h"
-#include "machine/model1io2.h"
+#include "315_5296.h"
+#include "315_5649.h"
+#include "model1io.h"
+#include "model1io2.h"
 #include "sound/ymopn.h"
-#include "video/segaic24.h"
+#include "segaic24.h"
 #include "speaker.h"
 
 #include "model1io2.lh"

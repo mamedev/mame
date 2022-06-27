@@ -7,7 +7,7 @@
 // it's possible some of the base units have ROM, although the US version does not.
 
 #include "emu.h"
-#include "includes/spg2xx.h"
+#include "spg2xx.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

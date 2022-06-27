@@ -97,8 +97,8 @@ Sound: VLM5030 at 7B
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/yiear.h"
-#include "includes/konamipt.h"
+#include "yiear.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"

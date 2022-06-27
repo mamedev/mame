@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include "alpha68k_palette.h"
+#include "snk68_spr.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
@@ -19,12 +22,11 @@
 #include "sound/ymopl.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
-#include "video/snk68_spr.h"
-#include "video/alpha68k_palette.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "tilemap.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class alpha68k_state : public driver_device

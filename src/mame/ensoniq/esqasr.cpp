@@ -41,7 +41,7 @@
 
 #include "cpu/es5510/es5510.h"
 #include "machine/68340.h"
-#include "machine/esqvfd.h"
+#include "esqvfd.h"
 #include "machine/upd765.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"

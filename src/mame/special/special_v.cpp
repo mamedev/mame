@@ -10,7 +10,7 @@
 
 
 #include "emu.h"
-#include "includes/special.h"
+#include "special.h"
 
 
 uint32_t special_state::screen_update_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

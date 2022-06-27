@@ -7,7 +7,7 @@
 
 #include "video/poly.h"
 #include "cpu/sharc/sharc.h"
-#include "video/k001006.h"
+#include "k001006.h"
 #include "video/rgbutil.h"
 
 #include <cfloat>

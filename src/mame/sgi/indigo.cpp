@@ -20,9 +20,9 @@
 #include "cpu/mips/mips1.h"
 #include "cpu/mips/r4000.h"
 #include "machine/eepromser.h"
-#include "machine/hpc1.h"
-#include "machine/sgi.h"
-#include "video/light.h"
+#include "hpc1.h"
+#include "sgi.h"
+#include "light.h"
 
 #define LOG_UNKNOWN     (1 << 0)
 #define LOG_INT         (1 << 1)

@@ -51,9 +51,9 @@ ToDo:
 *************************************************************************************************************/
 
 #include "emu.h"
-#include "includes/zorba.h"
+#include "zorba.h"
 
-#include "machine/zorbakbd.h"
+#include "zorbakbd.h"
 
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"

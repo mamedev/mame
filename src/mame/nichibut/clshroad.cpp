@@ -41,8 +41,8 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/clshroad.h"
-#include "audio/wiping.h"
+#include "clshroad.h"
+#include "wiping_a.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

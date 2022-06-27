@@ -5,7 +5,7 @@
 // Does writing to Enable actually turn on the timer, or writing to preload MSB? (which appears to be done AFTER turning on in many cases)
 
 #include "emu.h"
-#include "machine/vt1682_timer.h"
+#include "vt1682_timer.h"
 
 #define LOG_TIMER     (1U << 1)
 

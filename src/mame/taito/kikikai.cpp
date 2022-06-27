@@ -140,7 +140,7 @@ A85_12 to 17 - 27C512 EPROM
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/kikikai.h"
+#include "kikikai.h"
 
 #include "cpu/z80/z80.h"
 #include "screen.h"

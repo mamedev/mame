@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Tomasz Slanina
 #include "emu.h"
-#include "includes/mainsnk.h"
+#include "mainsnk.h"
 
 
 void mainsnk_state::mainsnk_palette(palette_device &palette) const

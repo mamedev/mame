@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ddribble.h"
+#include "ddribble.h"
 
 
 void ddribble_state::palette(palette_device &palette) const

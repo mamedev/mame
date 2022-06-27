@@ -51,7 +51,7 @@
 
 
 #include "emu.h"
-#include "video/ygv608.h"
+#include "ygv608.h"
 #include "screen.h"
 
 

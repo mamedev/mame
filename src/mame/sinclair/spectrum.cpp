@@ -276,10 +276,10 @@ SamRam
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/spectrum.h"
+#include "spectrum.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/spec_snqk.h"
+#include "spec_snqk.h"
 
 #include "screen.h"
 #include "softlist_dev.h"

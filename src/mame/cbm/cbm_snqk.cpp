@@ -7,7 +7,7 @@
  ***********************************************/
 
 #include "emu.h"
-#include "machine/cbm_snqk.h"
+#include "cbm_snqk.h"
 
 /* prg file format
  * sfx file format

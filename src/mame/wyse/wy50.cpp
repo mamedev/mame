@@ -29,7 +29,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/er1400.h"
 #include "machine/scn_pci.h"
-#include "machine/wy50kb.h"
+#include "wy50kb.h"
 #include "video/scn2674.h"
 #include "screen.h"
 

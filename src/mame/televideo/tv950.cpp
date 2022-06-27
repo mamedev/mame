@@ -42,7 +42,7 @@
 #include "machine/input_merger.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
-#include "machine/tv950kb.h"
+#include "tv950kb.h"
 #include "video/mc6845.h"
 #include "screen.h"
 

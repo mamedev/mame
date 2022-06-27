@@ -230,7 +230,7 @@ Interrupts:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/qix.h"
+#include "qix.h"
 
 #include "machine/nvram.h"
 

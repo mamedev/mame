@@ -222,7 +222,7 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 */
 
 #include "emu.h"
-#include "includes/40love.h"
+#include "40love.h"
 
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"

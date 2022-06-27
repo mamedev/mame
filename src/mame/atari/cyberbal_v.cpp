@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/cyberbal.h"
+#include "cyberbal.h"
 
 
 #define SCREEN_WIDTH        (42*16)

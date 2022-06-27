@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/flstory.h"
+#include "flstory.h"
 
 TILE_GET_INFO_MEMBER(flstory_state::get_tile_info)
 {

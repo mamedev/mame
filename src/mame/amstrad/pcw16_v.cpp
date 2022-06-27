@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Kevin Thacker
 #include "emu.h"
-#include "includes/pcw16.h"
+#include "pcw16.h"
 #include "machine/ram.h"
 #include "screen.h"
 

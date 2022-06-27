@@ -13,8 +13,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/battlnts.h"
-#include "includes/konamipt.h"
+#include "battlnts.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"

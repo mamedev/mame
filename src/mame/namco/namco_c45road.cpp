@@ -37,7 +37,7 @@
  */
 
 #include "emu.h"
-#include "video/namco_c45road.h"
+#include "namco_c45road.h"
 
 
 //****************************************************************************

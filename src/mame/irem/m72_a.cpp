@@ -44,7 +44,7 @@ Shisensho II                            1993  Rev 3.34 M81  Yes
 ***************************************************************************/
 
 #include "emu.h"
-#include "m72.h"
+#include "m72_a.h"
 
 
 DEFINE_DEVICE_TYPE(IREM_M72_AUDIO, m72_audio_device, "m72_audio", "Irem M72 Audio")

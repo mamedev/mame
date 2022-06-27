@@ -44,7 +44,7 @@ Dip locations and factory settings verified with US manual
 */
 
 #include "emu.h"
-#include "includes/deadang.h"
+#include "deadang.h"
 
 #include "cpu/nec/nec.h"
 #include "machine/watchdog.h"

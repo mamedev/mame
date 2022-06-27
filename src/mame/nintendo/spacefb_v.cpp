@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/spacefb.h"
+#include "spacefb.h"
 #include "video/resnet.h"
 
 

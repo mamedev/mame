@@ -34,7 +34,7 @@ There are known flyers that show an alternate title of HELL OUT
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
-#include "video/tigeroad_spr.h"
+#include "tigeroad_spr.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

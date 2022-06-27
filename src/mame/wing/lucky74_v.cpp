@@ -97,7 +97,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/lucky74.h"
+#include "lucky74.h"
 
 
 void lucky74_state::fg_videoram_w(offs_t offset, uint8_t data)

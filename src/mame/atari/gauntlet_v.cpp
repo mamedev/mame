@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/gauntlet.h"
+#include "gauntlet.h"
 
 
 

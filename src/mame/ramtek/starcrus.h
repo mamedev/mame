@@ -8,7 +8,7 @@
 #include "emupal.h"
 #include "machine/netlist.h"
 #include "netlist/nl_setup.h"
-#include "audio/nl_starcrus.h"
+#include "nl_starcrus.h"
 
 class starcrus_state : public driver_device
 {

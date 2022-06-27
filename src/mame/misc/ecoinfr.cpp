@@ -39,12 +39,15 @@
 
 
 #include "emu.h"
+
+#include "awpvid.h" // drawing reels
+
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
-#include "machine/timer.h"
-#include "ecoinfr.lh"
 #include "machine/steppers.h" // stepper motor
-#include "video/awpvid.h" // drawing reels
+#include "machine/timer.h"
+
+#include "ecoinfr.lh"
 
 
 #define UPD8251_TAG      "upd8251"

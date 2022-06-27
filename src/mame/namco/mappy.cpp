@@ -550,7 +550,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mappy.h"
+#include "mappy.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/74157.h"

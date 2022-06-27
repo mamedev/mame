@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "machine/spec_snqk.h"
+#include "spec_snqk.h"
 #include "machine/bankdev.h"
 #include "bus/spectrum/exp.h"
 #include "imagedev/cassette.h"

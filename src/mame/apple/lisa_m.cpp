@@ -39,7 +39,7 @@
 */
 
 #include "emu.h"
-#include "includes/lisa.h"
+#include "lisa.h"
 #include "screen.h"
 
 

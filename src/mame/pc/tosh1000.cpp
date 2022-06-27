@@ -39,7 +39,7 @@
 
 #include "emu.h"
 #include "machine/genpc.h"
-#include "machine/tosh1000_bram.h"
+#include "tosh1000_bram.h"
 
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"

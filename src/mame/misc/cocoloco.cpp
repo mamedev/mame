@@ -185,7 +185,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "audio/nl_cocoloco.h"
+#include "nl_cocoloco.h"
 
 
 #define MASTER_CLOCK    XTAL(20'000'000)     // confirmed

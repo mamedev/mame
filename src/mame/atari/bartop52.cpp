@@ -18,17 +18,19 @@
 */
 
 #include "emu.h"
-#include "includes/atari400.h"
+#include "atari400.h"
+#include "gtia.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/pokey.h"
-#include "video/gtia.h"
 
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class bartop52_state : public atari_common_state
 {
@@ -168,5 +170,7 @@ ROM_START(barbball)
 	ROM_LOAD( "barbball.bin", 0x4000, 0x8000, BAD_DUMP CRC(21d19c8f) SHA1(510ccb20df2ecdbe7f8373de6a9fc11493e8c3f2) )
 	ROM_LOAD( "5200.rom",     0xf800, 0x0800, BAD_DUMP CRC(4248d3e3) SHA1(6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530) )
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1983, barbball, 0, a5200, bartop52, bartop52_state, empty_init, ROT0, "Atari", "Barroom Baseball (prototype)", MACHINE_NOT_WORKING )

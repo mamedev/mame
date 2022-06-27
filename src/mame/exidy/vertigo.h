@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "audio/exidy440.h"
+#include "exidy440_a.h"
 #include "machine/74148.h"
 #include "machine/adc0808.h"
 #include "video/vector.h"

@@ -5,7 +5,7 @@
 #include "emu.h"
 
 #include "vsystem_spr.h"
-#include "includes/suprslam.h"
+#include "suprslam.h"
 
 /* FG 'SCREEN' LAYER */
 

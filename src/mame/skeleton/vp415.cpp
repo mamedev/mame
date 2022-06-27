@@ -39,7 +39,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/vp415.h"
+#include "vp415.h"
 
 const char *const vp415_state::DATACPU_TAG = "datacpu";
 const char *const vp415_state::DATAMCU_TAG = "datamcu";

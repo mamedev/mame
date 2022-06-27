@@ -759,7 +759,7 @@
 *****************************************************************************************/
 
 #include "emu.h"
-#include "includes/lucky74.h"
+#include "lucky74.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

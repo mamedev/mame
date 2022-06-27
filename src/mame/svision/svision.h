@@ -13,7 +13,7 @@
 
 #include "cpu/m6502/m65c02.h"
 #include "machine/timer.h"
-#include "audio/svis_snd.h"
+#include "svis_snd.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "emupal.h"

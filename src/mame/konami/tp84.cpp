@@ -64,8 +64,8 @@ C004      76489 #4 trigger
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tp84.h"
-#include "includes/konamipt.h"
+#include "tp84.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"

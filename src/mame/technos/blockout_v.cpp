@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/blockout.h"
+#include "blockout.h"
 
 
 rgb_t blockout_state::blockout_xBGR_444(u32 raw)

@@ -10,7 +10,7 @@ Additional tweaking by Jarek Burczynski
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/magmax.h"
+#include "magmax.h"
 
 
 /***************************************************************************

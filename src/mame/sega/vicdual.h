@@ -14,9 +14,9 @@
 #include "sound/discrete.h"
 #include "sound/samples.h"
 #include "screen.h"
-#include "audio/vicdual.h"
-#include "audio/vicdual-97271p.h"
-#include "video/vicdual-97269pb.h"
+#include "vicdual_a.h"
+#include "vicdual-97271p.h"
+#include "vicdual-97269pb.h"
 
 class vicdual_state : public driver_device
 {

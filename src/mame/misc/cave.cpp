@@ -85,17 +85,20 @@ Versions known to exist but not dumped:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cave.h"
+#include "cave.h"
+
+#include "nmk112.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/nmk112.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
 #include "sound/ymz280b.h"
+
 #include "speaker.h"
+
 #include <algorithm>
 
 #include "ppsatan.lh"

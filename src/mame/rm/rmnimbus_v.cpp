@@ -29,7 +29,7 @@
 */
 
 #include "emu.h"
-#include "includes/rmnimbus.h"
+#include "rmnimbus.h"
 
 #include "debugger.h"
 #include "debug/debugcon.h"

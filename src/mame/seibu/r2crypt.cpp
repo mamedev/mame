@@ -3,8 +3,8 @@
 /* Raiden 2 Sprite Decryption */
 
 #include "emu.h"
-#include "includes/raiden2.h"
-#include "seibuspi.h"
+#include "raiden2.h"
+#include "seibuspi_m.h"
 
 
 /*

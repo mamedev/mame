@@ -24,7 +24,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/z80scc.h"
 #include "machine/z8536.h"
-#include "video/abc1600.h"
+#include "abc1600_v.h"
 
 #define MC68010_TAG  "14m"
 #define NS32081_TAG  "06o"

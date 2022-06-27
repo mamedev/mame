@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bublbobl.h"
+#include "bublbobl.h"
 
 
 uint32_t bublbobl_state::screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

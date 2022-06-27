@@ -19,7 +19,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/carpolo.h"
+#include "carpolo.h"
 
 #include "machine/74153.h"
 #include "machine/6821pia.h"

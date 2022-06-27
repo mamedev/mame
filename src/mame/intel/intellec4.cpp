@@ -41,7 +41,7 @@
  */
 #include "emu.h"
 
-#include "machine/imm6_76.h"
+#include "imm6_76.h"
 
 #include "bus/intellec4/intellec4.h"
 #include "bus/rs232/rs232.h"

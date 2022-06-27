@@ -6,7 +6,7 @@
 
 *************************************************************************/
 #include "emu.h"
-#include "includes/skydiver.h"
+#include "skydiver.h"
 #include "sound/discrete.h"
 
 

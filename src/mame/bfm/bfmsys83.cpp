@@ -5,7 +5,7 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/ay8910.h"
-#include "machine/bfm_comn.h"
+#include "bfm_comn.h"
 #include "speaker.h"
 
 

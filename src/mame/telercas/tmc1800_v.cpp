@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
-#include "includes/tmc1800.h"
+#include "tmc1800.h"
 
 #include "cpu/cosmac/cosmac.h"
 #include "machine/rescap.h"

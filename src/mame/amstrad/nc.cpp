@@ -90,7 +90,7 @@
  ******************************************************************************/
 
 #include "emu.h"
-#include "includes/nc.h"
+#include "nc.h"
 
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"

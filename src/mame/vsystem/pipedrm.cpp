@@ -163,7 +163,7 @@ Added Multiple Coin Feature:
 
 
 #include "emu.h"
-#include "includes/fromance.h"
+#include "fromance.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"

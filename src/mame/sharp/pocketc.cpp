@@ -11,11 +11,11 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/pocketc.h"
-#include "includes/pc1401.h"
-#include "includes/pc1251.h"
-#include "includes/pc1350.h"
-#include "includes/pc1403.h"
+#include "pocketc.h"
+#include "pc1401.h"
+#include "pc1251.h"
+#include "pc1350.h"
+#include "pc1403.h"
 
 #include "machine/ram.h"
 

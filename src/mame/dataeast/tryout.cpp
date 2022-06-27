@@ -20,7 +20,7 @@ $208 strikes count
 ****************************************************************/
 
 #include "emu.h"
-#include "includes/tryout.h"
+#include "tryout.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/gen_latch.h"

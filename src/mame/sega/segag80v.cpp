@@ -135,9 +135,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/segag80.h"
-#include "includes/segag80v.h"
-#include "machine/segag80.h"
+#include "segag80.h"
+#include "segag80v.h"
+#include "segag80_m.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"

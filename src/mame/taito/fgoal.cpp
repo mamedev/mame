@@ -19,7 +19,7 @@ Differences between these sets include
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/fgoal.h"
+#include "fgoal.h"
 #include "cpu/m6800/m6800.h"
 
 

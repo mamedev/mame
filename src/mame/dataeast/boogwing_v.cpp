@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
 #include "emu.h"
-#include "includes/boogwing.h"
+#include "boogwing.h"
 
 
 void boogwing_state::video_start()

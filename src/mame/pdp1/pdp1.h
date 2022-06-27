@@ -5,13 +5,15 @@
  * includes/pdp1.h
  *
  ****************************************************************************/
+#ifndef MAME_PDP1_PDP1_H
+#define MAME_PDP1_PDP1_H
 
-#ifndef MAME_INCLUDES_PDP1_H
-#define MAME_INCLUDES_PDP1_H
+#pragma once
+
+#include "mitcrt.h"
 
 #include "cpu/pdp1/pdp1.h"
 #include "imagedev/papertape.h"
-#include "video/crt.h"
 #include "emupal.h"
 
 /* defines for each bit and mask in input port "CSW" */
@@ -479,4 +481,4 @@ public:
 	required_ioport m_lighty;
 };
 
-#endif // MAME_INCLUDES_PDP1_H
+#endif // MAME_PDP1_PDP1_H

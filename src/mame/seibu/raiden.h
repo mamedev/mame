@@ -5,13 +5,15 @@
     Seibu Raiden hardware
 
 *******************************************************************************/
-#ifndef MAME_INCLUDES_RAIDEN_H
-#define MAME_INCLUDES_RAIDEN_H
+#ifndef MAME_SEIBU_RAIDEN_H
+#define MAME_SEIBU_RAIDEN_H
 
 #pragma once
 
-#include "audio/seibu.h"
+#include "seibusound.h"
+
 #include "video/bufsprite.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -120,4 +122,4 @@ private:
 	void raidenb_main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_RAIDEN_H
+#endif // MAME_SEIBU_RAIDEN_H

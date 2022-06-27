@@ -29,7 +29,7 @@ ToDo:
 
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms7000/tms7000.h"
 #include "sound/dac.h"

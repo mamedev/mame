@@ -80,7 +80,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/leland.h"
+#include "leland_a.h"
 
 #include "cpu/z80/z80.h"
 #include "speaker.h"

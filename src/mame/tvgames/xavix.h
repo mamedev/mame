@@ -16,13 +16,13 @@
 #include "bus/ekara/slot.h"
 #include "machine/nvram.h"
 
-#include "machine/xavix_mtrk_wheel.h"
-#include "machine/xavix_madfb_ball.h"
-#include "machine/xavix2002_io.h"
-#include "machine/xavix_io.h"
-#include "machine/xavix_adc.h"
-#include "machine/xavix_anport.h"
-#include "machine/xavix_math.h"
+#include "xavix_mtrk_wheel.h"
+#include "xavix_madfb_ball.h"
+#include "xavix2002_io.h"
+#include "xavix_io.h"
+#include "xavix_adc.h"
+#include "xavix_anport.h"
+#include "xavix_math.h"
 
 // NTSC clock for regular XaviX?
 #define MAIN_CLOCK XTAL(21'477'272)

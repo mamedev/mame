@@ -97,8 +97,8 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/simpsons.h"
-#include "includes/konamipt.h"
+#include "simpsons.h"
+#include "konamipt.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"

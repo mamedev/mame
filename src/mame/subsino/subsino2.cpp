@@ -43,11 +43,12 @@ To do:
 ************************************************************************************************************/
 
 #include "emu.h"
+#include "subsino_m.h"
+
 #include "cpu/h8/h83048.h"
 #include "cpu/i86/i186.h"
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
-#include "machine/subsino.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"

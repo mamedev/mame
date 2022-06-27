@@ -584,7 +584,7 @@ Hardware registers info
 #include "cpu/sh/sh2.h"
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
-#include "includes/cps3.h"
+#include "cps3.h"
 #include "bus/nscsi/cd.h"
 #include "machine/wd33c9x.h"
 #include "screen.h"

@@ -15,7 +15,7 @@
 
 #include "emu.h"
 #include "powervr2.h"
-#include "includes/dc.h"
+#include "dc.h"
 
 #include "cpu/sh/sh4.h"
 #include "video/rgbutil.h"

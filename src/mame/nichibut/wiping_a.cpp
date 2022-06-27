@@ -15,7 +15,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/wiping.h"
+#include "wiping_a.h"
 
 DEFINE_DEVICE_TYPE(WIPING_CUSTOM, wiping_sound_device, "wiping_sound", "Wiping Custom Sound")
 

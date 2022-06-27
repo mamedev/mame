@@ -44,7 +44,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/zx.h"
+#include "zx.h"
 
 #include "speaker.h"
 

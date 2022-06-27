@@ -2,7 +2,7 @@
 // copyright-holders:Ville Linde, Nicola Salmoria
 
 #include "emu.h"
-#include "machine/seibuspi.h"
+#include "seibuspi_m.h"
 
 // add two numbers generating carry from one bit to the next only if
 // the corresponding bit in carry_mask is 1

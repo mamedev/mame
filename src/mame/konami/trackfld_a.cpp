@@ -3,8 +3,8 @@
 #include "emu.h"
 #include "sound/sn76496.h"
 #include "sound/msm5205.h"
-#include "includes/trackfld.h"
-#include "audio/trackfld.h"
+#include "trackfld.h"
+#include "trackfld_a.h"
 
 
 #define TIMER_RATE (4096/4)

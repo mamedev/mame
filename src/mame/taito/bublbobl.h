@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Moore, Nicola Salmoria
-#ifndef MAME_INCLUDES_BUBLBOBL_H
-#define MAME_INCLUDES_BUBLBOBL_H
+#ifndef MAME_TAITO_BUBLBOBL_H
+#define MAME_TAITO_BUBLBOBL_H
 
 #pragma once
 
@@ -14,8 +14,6 @@
 #include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
-
-#include "machine/taito68705interface.h"
 
 
 class bublbobl_state : public driver_device
@@ -185,4 +183,4 @@ protected:
 	required_device<i8749_device> m_mcu;
 };
 
-#endif // MAME_INCLUDES_BUBLBOBL_H
+#endif // MAME_TAITO_BUBLBOBL_H

@@ -97,7 +97,7 @@
  */
 
 #include "emu.h"
-#include "includes/konamigx.h"
+#include "konamigx.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms57002/tms57002.h"

@@ -55,17 +55,20 @@ ToDo:
 *********************************************************************************************************************/
 #include "emu.h"
 
+#include "decodmd1.h"
+#include "decodmd2.h"
+#include "decodmd3.h"
+#include "decopincpu.h"
+#include "genpin.h"
+
+#include "decobsmt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "sound/msm5205.h"
 #include "sound/ymopm.h"
+
 #include "speaker.h"
 
-#include "audio/decobsmt.h"
-#include "machine/decopincpu.h"
-#include "machine/genpin.h"
-#include "video/decodmd1.h"
-#include "video/decodmd2.h"
-#include "video/decodmd3.h"
 
 namespace {
 

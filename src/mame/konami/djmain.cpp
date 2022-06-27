@@ -66,7 +66,7 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 */
 
 #include "emu.h"
-#include "includes/djmain.h"
+#include "djmain.h"
 
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"

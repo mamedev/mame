@@ -7,7 +7,7 @@
 
 
 #include "emu.h"
-#include "video/decocomn.h"
+#include "decocomn.h"
 
 
 DEFINE_DEVICE_TYPE(DECOCOMN, decocomn_device, "decocomn", "DECO Common Video Functions")

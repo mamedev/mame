@@ -12,9 +12,9 @@
 #include "machine/adc0804.h"
 #include "machine/i8255.h"
 #include "machine/gen_latch.h"
-#include "video/segaic16.h"
-#include "video/segaic16_road.h"
-#include "video/sega16sp.h"
+#include "segaic16.h"
+#include "segaic16_road.h"
+#include "sega16sp.h"
 #include "screen.h"
 
 

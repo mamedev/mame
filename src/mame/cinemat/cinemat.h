@@ -11,7 +11,7 @@
 #pragma once
 
 #include "cpu/ccpu/ccpu.h"
-#include "audio/cinemat.h"
+#include "cinemat_a.h"
 #include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"

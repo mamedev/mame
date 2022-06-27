@@ -4,7 +4,7 @@
 /* see drivers/pgm.c for notes on where improvements can be made */
 
 #include "emu.h"
-#include "includes/pgm.h"
+#include "pgm.h"
 
 #include "screen.h"
 

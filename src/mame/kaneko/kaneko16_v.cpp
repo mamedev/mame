@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/kaneko16.h"
+#include "kaneko16.h"
 #include "screen.h"
 
 

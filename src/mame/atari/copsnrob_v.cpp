@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/copsnrob.h"
+#include "copsnrob.h"
 
 
 uint32_t copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

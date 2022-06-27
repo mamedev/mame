@@ -606,8 +606,8 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/toaplan1.h"
-#include "includes/toaplipt.h"
+#include "toaplan1.h"
+#include "toaplipt.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/z180/hd647180x.h"

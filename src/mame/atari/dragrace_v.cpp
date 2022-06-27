@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dragrace.h"
+#include "dragrace.h"
 
 
 TILE_GET_INFO_MEMBER(dragrace_state::get_tile_info)

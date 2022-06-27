@@ -12,7 +12,7 @@
 #include "machine/eepromser.h"
 #include "machine/vt83c461.h"
 #include "imagedev/snapquik.h"
-#include "video/jag_blitter.h"
+#include "jag_blitter.h"
 #include "cdrom.h"
 #include "imagedev/chd_cd.h"
 #include "screen.h"

@@ -22,7 +22,7 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "machine/cdicdic.h"
+#include "cdicdic.h"
 
 #include "cdrom.h"
 #include "romload.h"

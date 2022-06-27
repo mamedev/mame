@@ -23,11 +23,13 @@
 **************************************************************************/
 
 #include "emu.h"
+
+#include "midvunit.h"
+
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
-#include "audio/dcs.h"
 #include "machine/nvram.h"
-#include "includes/midvunit.h"
+
 #include "crusnusa.lh"
 
 

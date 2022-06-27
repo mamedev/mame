@@ -12,7 +12,7 @@ Nintendo VS UniSystem and DualSystem - (c) 1984 Nintendo of America
 #include "emu.h"
 #include "screen.h"
 #include "video/ppu2c0x.h"
-#include "includes/vsnes.h"
+#include "vsnes.h"
 
 
 /* PPU notes */

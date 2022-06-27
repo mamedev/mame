@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "video/poly.h"
-#include "includes/taitojc.h"
+#include "taitojc.h"
 
 static const gfx_layout taitojc_char_layout =
 {

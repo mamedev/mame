@@ -114,9 +114,9 @@ A21 |30| CE1
 */
 
 #include "emu.h"
-#include "includes/bfm_ad5.h"
+#include "bfm_ad5.h"
 #include "machine/mcf5206e.h"
-#include "machine/bfm_sc45_helper.h"
+#include "bfm_sc45_helper.h"
 #include "speaker.h"
 
 void adder5_state::init_ad5()

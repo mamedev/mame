@@ -41,14 +41,14 @@ CPU/Video Board Parts:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/sbasketb.h"
-#include "includes/konamipt.h"
+#include "sbasketb.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
-#include "machine/konami1.h"
+#include "konami1.h"
 #include "machine/watchdog.h"
 
 #include "speaker.h"

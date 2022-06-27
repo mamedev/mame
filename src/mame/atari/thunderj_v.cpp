@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/thunderj.h"
+#include "thunderj.h"
 
 
 

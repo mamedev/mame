@@ -52,13 +52,15 @@ it as ASCII text.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/btime.h"
+#include "btime.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+
 #include "speaker.h"
 
+namespace {
 
 class scregg_state : public btime_state
 {
@@ -425,6 +427,8 @@ void scregg_state::init_rockduck()
 
 	}
 }
+
+} // anonymous namespace
 
 
 GAME( 1983, dommy,    0,        dommy,  scregg,   scregg_state, empty_init,    ROT270, "Technos Japan", "Dommy", MACHINE_SUPPORTS_SAVE )

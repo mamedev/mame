@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/starwars.h"
+#include "starwars.h"
 
 
 /* Constants for matrix processor operations */

@@ -15,7 +15,7 @@
 #include "machine/am9519.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
-#include "machine/trs80m2kb.h"
+#include "trs80m2kb.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dma.h"

@@ -7,7 +7,7 @@
 /*************************************************************/
 
 #include "emu.h"
-#include "includes/lazercmd.h"
+#include "lazercmd.h"
 
 /* scale a markers vertical position */
 /* the following table shows how the markers */

@@ -2,7 +2,7 @@
 // copyright-holders:Bryan McPhail, Manuel Abadia
 
 #include "emu.h"
-#include "includes/thunderx.h"
+#include "thunderx.h"
 #include "screen.h"
 
 /***************************************************************************

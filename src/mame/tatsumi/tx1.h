@@ -12,7 +12,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "audio/tx1.h"
+#include "tx1_a.h"
 
 #define TX1_PIXEL_CLOCK     (XTAL(18'000'000) / 3)
 #define TX1_HBSTART         256

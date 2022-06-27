@@ -79,7 +79,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/champbas.h"
+#include "champbas.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m68705.h"
 #include "machine/gen_latch.h"

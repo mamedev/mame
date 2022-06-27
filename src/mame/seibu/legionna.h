@@ -1,15 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves, Angelo Salese, David Haywood, Tomasz Slanina
-#ifndef MAME_INCLUDES_LEGIONNA_H
-#define MAME_INCLUDES_LEGIONNA_H
+#ifndef MAME_SEIBU_LEGIONNA_H
+#define MAME_SEIBU_LEGIONNA_H
 
 #pragma once
 
+#include "seibu_crtc.h"
+#include "seibucop.h"
+
+#include "seibusound.h"
+
 #include "sound/okim6295.h"
-#include "audio/seibu.h"
 #include "machine/gen_latch.h"
-#include "machine/seibucop.h"
-#include "video/seibu_crtc.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -134,4 +137,4 @@ private:
 	optional_device<raiden2cop_device> m_raiden2cop;
 };
 
-#endif // MAME_INCLUDES_LEGIONNA_H
+#endif // MAME_SEIBU_LEGIONNA_H

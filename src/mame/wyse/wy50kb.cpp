@@ -30,7 +30,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "machine/wy50kb.h"
+#include "wy50kb.h"
 
 DEFINE_DEVICE_TYPE(WY50_KEYBOARD, wy50_keyboard_device, "wy50kb", "WY-50 Keyboard")
 DEFINE_DEVICE_TYPE(WY100_KEYBOARD, wy100_keyboard_device, "wy100kb", "WY-100 Keyboard")

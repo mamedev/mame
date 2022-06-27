@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/naughtyb.h"
+#include "naughtyb.h"
 
 
 #if 0

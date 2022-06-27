@@ -13,8 +13,8 @@
 
 */
 #include "emu.h"
-#include "includes/bfm_ad5.h"
-#include "includes/bfm_sc4.h" // TODO: untangle from this
+#include "bfm_ad5.h"
+#include "bfm_sc4.h" // TODO: untangle from this
 
 
 #define ad5plds \

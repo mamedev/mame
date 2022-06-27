@@ -65,7 +65,7 @@ TODO:
  ****************************************************************************/
 
 #include "emu.h"
-#include "includes/tsconf.h"
+#include "tsconf.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "speaker.h"

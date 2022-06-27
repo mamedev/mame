@@ -12,7 +12,7 @@
 */
 
 #include "emu.h"
-#include "includes/xavix_2002.h"
+#include "xavix_2002.h"
 
 // #define VERBOSE 1
 #include "logmacro.h"

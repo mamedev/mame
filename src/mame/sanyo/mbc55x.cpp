@@ -12,14 +12,14 @@
 
 
 #include "emu.h"
-#include "includes/mbc55x.h"
+#include "mbc55x.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "machine/i8087.h"
 #include "machine/input_merger.h"
-#include "machine/mbc55x_kbd.h"
+#include "mbc55x_kbd.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"

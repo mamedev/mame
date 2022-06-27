@@ -89,7 +89,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/system1.h"
+#include "system1.h"
 #include "video/resnet.h"
 
 void system1_state::system1_palette(palette_device &palette) const

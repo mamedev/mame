@@ -52,7 +52,7 @@ ToDo:
 
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"

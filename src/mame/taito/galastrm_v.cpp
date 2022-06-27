@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau
 #include "emu.h"
-#include "includes/galastrm.h"
+#include "galastrm.h"
 
 #define X_OFFSET 96
 #define Y_OFFSET 60

@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "audio/taitosnd.h"
-#include "machine/taitoio.h"
-#include "video/tc0100scn.h"
+#include "taitosnd.h"
+#include "taitoio.h"
+#include "tc0100scn.h"
 #include "emupal.h"
 #include "tilemap.h"
 

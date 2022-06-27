@@ -71,8 +71,8 @@ Address          Dir Data     Description
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/jackal.h"
-#include "includes/konamipt.h"
+#include "jackal.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"

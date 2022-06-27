@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bogeyman.h"
+#include "bogeyman.h"
 
 #include "cpu/m6502/m6502.h"
 #include "screen.h"

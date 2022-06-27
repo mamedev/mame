@@ -18,7 +18,7 @@
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
 #include "sound/ymopm.h"
-#include "machine/atariscom.h"
+#include "atariscom.h"
 
 
 //**************************************************************************

@@ -9,8 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/snk6502.h"
-#include "audio/snk6502.h"
+#include "snk6502.h"
+#include "snk6502_a.h"
 
 
 #define TOTAL_COLORS(gfxn) (m_gfxdecode->gfx(gfxn)->colors() * m_gfxdecode->gfx(gfxn)->granularity())

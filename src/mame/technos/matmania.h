@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver
-#ifndef MAME_INCLUDES_MATMANIA_H
-#define MAME_INCLUDES_MATMANIA_H
+#ifndef MAME_TECHNOS_MATMANIA_H
+#define MAME_TECHNOS_MATMANIA_H
 
 #pragma once
 
-#include "machine/taito68705interface.h"
+#include "taito68705.h"
 
 #include "machine/gen_latch.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -80,4 +81,4 @@ private:
 	void matmania_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MATMANIA_H
+#endif // MAME_TECHNOS_MATMANIA_H

@@ -5,14 +5,16 @@
   Toaplan Slap Fight hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_SLAPFGHT_H
-#define MAME_INCLUDES_SLAPFGHT_H
+#ifndef MAME_TOAPLAN_SLAPFGHT_H
+#define MAME_TOAPLAN_SLAPFGHT_H
 
 #pragma once
 
+#include "taito68705.h"
+
 #include "cpu/z80/z80.h"
 #include "video/bufsprite.h"
-#include "machine/taito68705interface.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -156,4 +158,4 @@ private:
 	void tigerhb2_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SLAPFGHT_H
+#endif // MAME_TOAPLAN_SLAPFGHT_H

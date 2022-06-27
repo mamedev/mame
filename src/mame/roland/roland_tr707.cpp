@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "audio/mb63h114.h"
+#include "mb63h114.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 //#include "bus/midi/midi.h"

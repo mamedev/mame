@@ -9,7 +9,7 @@
 #ifndef MAME_INCLUDES_DAI_H
 #define MAME_INCLUDES_DAI_H
 
-#include "audio/dai_snd.h"
+#include "dai_snd.h"
 
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"

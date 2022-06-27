@@ -152,7 +152,7 @@ Fax                  1982  6502   FXL, FLA
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/exidy.h"
+#include "exidysound.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"

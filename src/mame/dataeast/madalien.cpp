@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/madalien.h"
+#include "madalien.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"

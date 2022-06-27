@@ -4,7 +4,7 @@
 
 
 #include "emu.h"
-#include "machine/inder_sb.h"
+#include "inder_sb.h"
 
 #include "speaker.h"
 

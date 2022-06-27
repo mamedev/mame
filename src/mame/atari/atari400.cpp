@@ -40,13 +40,13 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/atari400.h"
+#include "atari400.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
-#include "machine/atarifdc.h"
+#include "atarifdc.h"
 #include "sound/dac.h"
 #include "sound/pokey.h"
 

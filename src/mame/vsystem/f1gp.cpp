@@ -25,7 +25,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/f1gp.h"
+#include "f1gp.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
@@ -35,7 +35,7 @@
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
 
-#include "video/vsystem_gga.h"
+#include "vsystem_gga.h"
 
 #include "screen.h"
 #include "speaker.h"

@@ -30,7 +30,7 @@ ToDo:
 
 #include "emu.h"
 #include "machine/clock.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "sound/spkrdev.h"
 #include "cpu/scmp/scmp.h"
 #include "speaker.h"

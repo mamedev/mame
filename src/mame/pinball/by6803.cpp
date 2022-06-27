@@ -67,7 +67,7 @@ ToDo:
 #include "emu.h"
 //#include "audio/midway.h"
 //#include "audio/williams.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 
 #include "cpu/m6800/m6801.h"
 //#include "cpu/m6809/m6809.h"

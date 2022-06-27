@@ -5,7 +5,7 @@
 /* updated by Hans Andersson, dec 2005     */
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/grchamp.h"
+#include "grchamp.h"
 
 #define FOG_SIZE 70
 

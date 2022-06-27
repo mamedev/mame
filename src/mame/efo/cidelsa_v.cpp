@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
-#include "includes/cidelsa.h"
+#include "cidelsa.h"
 #include "speaker.h"
 
 

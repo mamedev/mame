@@ -19,7 +19,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/momoko.h"
+#include "momoko.h"
 
 
 void momoko_state::fg_scrollx_w(u8 data)

@@ -82,7 +82,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gb.h"
+#include "gb.h"
 
 
 #define ENABLE_LOGGING 0

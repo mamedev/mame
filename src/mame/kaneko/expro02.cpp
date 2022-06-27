@@ -208,15 +208,15 @@ BTANB:
 */
 
 #include "emu.h"
-#include "includes/galpnipt.h"
+#include "galpnipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "machine/kaneko_hit.h"
+#include "kaneko_hit.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "video/kaneko_tmap.h"
-#include "video/kaneko_spr.h"
+#include "kaneko_tmap.h"
+#include "kaneko_spr.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

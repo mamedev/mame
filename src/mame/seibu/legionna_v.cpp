@@ -19,7 +19,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/legionna.h"
+#include "legionna.h"
 #include "screen.h"
 
 

@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/arabian.h"
+#include "arabian.h"
 
 /* Constants */
 #define BITMAP_WIDTH        256

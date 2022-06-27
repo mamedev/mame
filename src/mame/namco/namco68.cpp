@@ -9,7 +9,7 @@ output support
 */
 
 #include "emu.h"
-#include "machine/namco68.h"
+#include "namco68.h"
 
 DEFINE_DEVICE_TYPE(NAMCOC68, namcoc68_device, "namcoc68", "Namco C68 I/O")
 

@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "audio/vc4000.h"
+#include "vc4000_a.h"
 #include "cpu/s2650/s2650.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"

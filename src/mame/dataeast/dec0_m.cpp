@@ -9,7 +9,7 @@ Data East machine functions - Bryan McPhail, mish@tendril.co.uk
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/dec0.h"
+#include "dec0.h"
 
 #include "cpu/h6280/h6280.h"
 #include "cpu/m68000/m68000.h"

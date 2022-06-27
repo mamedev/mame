@@ -78,7 +78,7 @@ This was pointed out by Bart Puype
 *****/
 
 #include "emu.h"
-#include "includes/psikyo.h"
+#include "psikyo.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/lz8420m.h"

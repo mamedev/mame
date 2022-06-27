@@ -22,7 +22,7 @@
 #include "machine/bankdev.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
-#include "machine/km035.h"
+#include "km035.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"

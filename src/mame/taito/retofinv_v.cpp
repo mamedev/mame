@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/retofinv.h"
+#include "retofinv.h"
 
 
 void retofinv_state::retofinv_palette(palette_device &palette) const

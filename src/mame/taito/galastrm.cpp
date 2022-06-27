@@ -47,11 +47,11 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
-#include "machine/taitoio.h"
+#include "taitoio.h"
 #include "sound/es5506.h"
-#include "audio/taito_en.h"
+#include "taito_en.h"
 #include "speaker.h"
-#include "includes/galastrm.h"
+#include "galastrm.h"
 
 
 /*********************************************************************/

@@ -2,7 +2,7 @@
 // copyright-holders:Peter Trauner
 
 #include "emu.h"
-#include "includes/pocketc.h"
+#include "pocketc.h"
 
 void pocketc_state::out_a_w(uint8_t data)
 {

@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/8080bw.h"
+#include "8080bw.h"
 
 
 MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_vh)

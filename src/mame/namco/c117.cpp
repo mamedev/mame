@@ -23,7 +23,7 @@ two 6809s and as the reset generator for the entire system.
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/c117.h"
+#include "c117.h"
 
 
 DEFINE_DEVICE_TYPE(NAMCO_C117, namco_c117_device, "namco_c117", "Namco C117 MMU")

@@ -7,13 +7,13 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "audio/bu3905.h"
-#include "audio/sa16.h"
+#include "bu3905.h"
+#include "sa16.h"
 //#include "bus/midi/midi.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "imagedev/floppy.h"
 #include "machine/bankdev.h"
-#include "machine/mb63h149.h"
+#include "mb63h149.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "video/tms3556.h"

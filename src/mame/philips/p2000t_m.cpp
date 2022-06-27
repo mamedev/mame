@@ -10,7 +10,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "includes/p2000t.h"
+#include "p2000t.h"
 
 #define P2000M_101F_CASDAT 0x01
 #define P2000M_101F_CASCMD 0x02

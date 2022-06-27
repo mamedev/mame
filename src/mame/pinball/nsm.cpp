@@ -36,7 +36,7 @@ ToDo:
 *********************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 
 #include "cpu/tms9900/tms9995.h"
 #include "sound/ay8910.h"

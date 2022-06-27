@@ -3,7 +3,7 @@
 /* Inder / Dinamic Video */
 
 #include "emu.h"
-#include "machine/inder_vid.h"
+#include "inder_vid.h"
 
 #include "screen.h"
 

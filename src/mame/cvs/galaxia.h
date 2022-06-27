@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "includes/cvs.h"
+#include "cvs.h"
 #include "tilemap.h"
 
 class galaxia_state : public cvs_state

@@ -7,7 +7,7 @@
 #include "sound/dac.h"
 #include "sound/discrete.h"
 
-#include "machine/taitosjsec.h"
+#include "taitosjsec.h"
 
 #include "emupal.h"
 #include "screen.h"

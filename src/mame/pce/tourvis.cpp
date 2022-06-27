@@ -176,7 +176,7 @@ http://blog.system11.org/?p=1943
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/pcecommn.h"
+#include "pcecommn.h"
 
 #include "cpu/h6280/h6280.h"
 #include "cpu/i8085/i8085.h"

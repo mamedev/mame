@@ -621,8 +621,8 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tnzs.h"
-#include "includes/taitoipt.h"
+#include "tnzs.h"
+#include "taitoipt.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ymopm.h"

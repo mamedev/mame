@@ -118,11 +118,13 @@ C = MB3514 / 9325 M36
 */
 
 #include "emu.h"
-#include "includes/megadriv.h"
+#include "mdconsole.h"
 #include "sound/315-5641.h"
 #include "bus/megadrive/rom.h"
 #include "softlist.h"
 
+
+namespace {
 
 #define PICO_PENX   1
 #define PICO_PENY   2
@@ -468,10 +470,6 @@ void pico_base_state::init_picoj()
 }
 
 
-CONS( 1994, pico,  0,    0, picopal, pico, pico_state, init_pico,  "Sega", "Pico (Europe, PAL)", MACHINE_NOT_WORKING)
-CONS( 1994, picou, pico, 0, pico,    pico, pico_state, init_picou, "Sega", "Pico (USA, NTSC)", MACHINE_NOT_WORKING)
-CONS( 1993, picoj, pico, 0, pico,    pico, pico_state, init_picoj, "Sega", "Pico (Japan, NTSC)", MACHINE_NOT_WORKING)
-
 /*
 
 This looks a lot like a Pico with extra sound hardware...
@@ -629,5 +627,12 @@ ROM_START( copera )
 	ROM_REGION(MD_CPU_REGION_SIZE, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
+
+} // anonymous namespace
+
+
+CONS( 1994, pico,  0,    0, picopal, pico, pico_state, init_pico,  "Sega", "Pico (Europe, PAL)", MACHINE_NOT_WORKING)
+CONS( 1994, picou, pico, 0, pico,    pico, pico_state, init_picou, "Sega", "Pico (USA, NTSC)", MACHINE_NOT_WORKING)
+CONS( 1993, picoj, pico, 0, pico,    pico, pico_state, init_picoj, "Sega", "Pico (Japan, NTSC)", MACHINE_NOT_WORKING)
 
 CONS( 1993, copera, 0, 0, copera, pico, copera_state, init_picoj, "Yamaha / Sega", "Yamaha Mixt Book Player Copera", MACHINE_NOT_WORKING)

@@ -6,8 +6,8 @@
 #pragma once
 
 #include "machine/gen_latch.h"
-#include "video/vsystem_spr.h"
-#include "video/vsystem_spr2.h"
+#include "vsystem_spr.h"
+#include "vsystem_spr2.h"
 #include "sound/okim6295.h"
 #include "sound/upd7759.h"
 #include "emupal.h"

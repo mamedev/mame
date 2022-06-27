@@ -163,7 +163,7 @@ Exidy Sorcerer Video/Disk Unit:
 ********************************************************************************/
 
 #include "emu.h"
-#include "includes/sorcerer.h"
+#include "sorcerer.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"

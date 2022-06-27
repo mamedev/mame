@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/sprint2.h"
+#include "sprint2.h"
 
 
 void sprint2_state::palette(palette_device &palette) const

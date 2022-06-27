@@ -7,7 +7,7 @@ Atari Orbit video emulation
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/orbit.h"
+#include "orbit.h"
 
 void orbit_state::playfield_w(offs_t offset, uint8_t data)
 {

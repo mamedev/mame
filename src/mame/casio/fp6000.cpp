@@ -22,7 +22,7 @@
 #include "video/mc6845.h"
 #include "sound/spkrdev.h"
 #include "bus/centronics/ctronics.h"
-#include "machine/fp6000_kbd.h"
+#include "fp6000_kbd.h"
 #include "imagedev/cassette.h"
 #include "emupal.h"
 #include "screen.h"

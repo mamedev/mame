@@ -12,7 +12,7 @@
 #endif
 #define LOG(n,x)  do { if (LOGLEVEL >= n) logerror x; } while (0)
 
-#include "machine/decocass_tape.h"
+#include "decocass_tape.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"

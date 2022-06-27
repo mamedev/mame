@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/midtunit.h"
+#include "midtunit.h"
 
 
 /* constant definitions */

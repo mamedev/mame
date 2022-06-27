@@ -21,13 +21,17 @@ TODO:
 *******************************************************************************************************/
 
 #include "emu.h"
+
+#include "pcshare.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/eepromser.h"
 #include "machine/lpci.h"
-#include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/clgd542x.h"
+
+namespace {
 
 class photoply_state : public pcat_base_state
 {
@@ -603,6 +607,9 @@ ROM_START(photoply2k4)
 	// CYLS:1023,HEADS:64,SECS:63,BPS:512.
 	DISK_IMAGE( "pp2004", 0, SHA1(a3f8861cf91cf7e7446ec931f812e774ada20802) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1998, photoply98sp,    0,             photoply,         photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1998 (Spain)",               MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1999, photoply99sp,    0,             photoply_dx4_100, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 1999 (Spain)",               MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )

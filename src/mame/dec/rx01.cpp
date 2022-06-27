@@ -13,7 +13,7 @@
 */
 
 #include "emu.h"
-#include "machine/rx01.h"
+#include "rx01.h"
 #include "cpu/rx01/rx01.h"
 #include "formats/basicdsk.h"
 

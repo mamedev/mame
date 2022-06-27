@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/gottlieb.h"
+#include "gottlieb_a.h"
 
 #include "machine/input_merger.h"
 

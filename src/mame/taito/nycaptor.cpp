@@ -191,8 +191,8 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/nycaptor.h"
-#include "includes/taitoipt.h"
+#include "nycaptor.h"
+#include "taitoipt.h"
 
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"

@@ -25,9 +25,11 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/n64.h"
-#include "video/rdpblend.h"
-#include "video/rdptpipe.h"
+#include "n64.h"
+
+#include "rdpblend.h"
+#include "rdptpipe.h"
+
 #include "screen.h"
 
 #include <algorithm>

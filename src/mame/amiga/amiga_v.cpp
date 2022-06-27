@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/amiga.h"
+#include "amiga.h"
 
 
 

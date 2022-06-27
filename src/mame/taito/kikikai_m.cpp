@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
 #include "emu.h"
-#include "includes/kikikai.h"
+#include "kikikai.h"
 
 /*
 $f008 - write

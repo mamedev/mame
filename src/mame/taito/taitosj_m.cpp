@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "cpu/m6805/m6805.h"
-#include "includes/taitosj.h"
+#include "taitosj.h"
 
 
 #define VERBOSE 1

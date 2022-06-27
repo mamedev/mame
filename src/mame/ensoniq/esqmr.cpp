@@ -200,13 +200,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/esqvfd.h"
+#include "esqvfd.h"
 
 #include "cpu/m6805/m68hc05.h"
 #include "machine/68340.h"
 #include "machine/68340ser.h"
 #include "sound/es5506.h"
-#include "machine/esqpanel.h"
+#include "esqpanel.h"
 //#include "machine/mb8421.h"
 
 #include "speaker.h"

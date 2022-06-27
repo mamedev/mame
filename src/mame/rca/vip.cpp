@@ -235,7 +235,7 @@ Usage:
 */
 
 #include "emu.h"
-#include "includes/vip.h"
+#include "vip.h"
 
 #include "screen.h"
 #include "softlist_dev.h"

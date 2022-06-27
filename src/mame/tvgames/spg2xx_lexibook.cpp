@@ -6,7 +6,7 @@
 // of note, the way the audio is stored for Tiger Rescue has been updated and the core does not handle it properly at the moment
 
 #include "emu.h"
-#include "includes/spg2xx.h"
+#include "spg2xx.h"
 
 
 class spg2xx_lexizeus_game_state : public spg2xx_game_state

@@ -364,7 +364,7 @@ Sega 2005
 #include "machine/pci-sata.h"
 #include "machine/pci-smbus.h"
 #include "machine/i82541.h"
-#include "machine/segabb.h"
+#include "segabb.h"
 #include "sound/pci-ac97.h"
 #include "sound/sb0400.h"
 #include "video/gf7600gs.h"

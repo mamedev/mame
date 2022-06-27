@@ -94,12 +94,12 @@ Notes:
 
 
 #include "emu.h"
-#include "includes/midwunit.h"
-#include "audio/dcs.h"
+#include "midwunit.h"
 
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "machine/nvram.h"
+
 #include "screen.h"
 
 

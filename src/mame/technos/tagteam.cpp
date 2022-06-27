@@ -27,7 +27,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tagteam.h"
+#include "tagteam.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"

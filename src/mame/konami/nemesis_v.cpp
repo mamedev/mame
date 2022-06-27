@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/nemesis.h"
+#include "nemesis.h"
 #include "video/resnet.h"
 
 

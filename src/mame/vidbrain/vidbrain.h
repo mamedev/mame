@@ -10,7 +10,7 @@
 #include "machine/f3853.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
-#include "video/uv201.h"
+#include "uv201.h"
 
 #define F3850_TAG           "cd34"
 #define F3853_TAG           "cd5"

@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/meadows.h"
+#include "meadows.h"
 
 /* some constants to make life easier */
 #define SPR_ADJUST_X    -18

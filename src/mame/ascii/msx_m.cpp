@@ -14,7 +14,7 @@
  */
 
 #include "emu.h"
-#include "includes/msx.h"
+#include "msx.h"
 
 #define VERBOSE 0
 

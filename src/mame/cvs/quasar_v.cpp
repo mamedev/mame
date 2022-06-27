@@ -18,7 +18,7 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "includes/quasar.h"
+#include "quasar.h"
 
 void quasar_state::quasar_palette(palette_device &palette) const
 {

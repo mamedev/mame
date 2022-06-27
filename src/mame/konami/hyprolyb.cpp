@@ -2,7 +2,7 @@
 // copyright-holders:Chris Hardy
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "audio/hyprolyb.h"
+#include "hyprolyb.h"
 
 DEFINE_DEVICE_TYPE(HYPROLYB_ADPCM, hyprolyb_adpcm_device, "hyprolyb_adpcm", "Hyper Olympics Audio")
 

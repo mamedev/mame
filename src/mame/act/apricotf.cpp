@@ -24,7 +24,7 @@
 #include "cpu/i86/i86.h"
 #include "formats/apridisk.h"
 #include "imagedev/floppy.h"
-#include "machine/apricotkb.h"
+#include "apricotkb.h"
 #include "machine/buffer.h"
 #include "machine/input_merger.h"
 #include "machine/wd_fdc.h"

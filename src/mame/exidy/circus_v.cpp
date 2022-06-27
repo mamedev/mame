@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "sound/samples.h"
-#include "includes/circus.h"
+#include "circus.h"
 
 
 void circus_state::circus_videoram_w(offs_t offset, uint8_t data)

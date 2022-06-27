@@ -60,7 +60,7 @@ check more info and photo from cjdh2.zip!!!
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "machine/igs036crypt.h"
+#include "igs036crypt.h"
 #include "emupal.h"
 #include "screen.h"
 

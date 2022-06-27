@@ -37,7 +37,7 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-#include "audio/taitosnd.h"
+#include "taitosnd.h"
 
 
 namespace {

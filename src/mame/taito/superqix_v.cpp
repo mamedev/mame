@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/superqix.h"
+#include "superqix.h"
 
 
 

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/starfire.h"
+#include "starfire.h"
 
 
 

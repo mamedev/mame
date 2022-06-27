@@ -5,7 +5,7 @@
     Sound handler
 ****************************************************************************/
 #include "emu.h"
-#include "polepos.h"
+#include "polepos_a.h"
 
 #include "namco52.h"
 #include "namco54.h"

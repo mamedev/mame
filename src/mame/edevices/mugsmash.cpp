@@ -42,7 +42,7 @@ behavior we use .
 */
 
 #include "emu.h"
-#include "includes/mugsmash.h"
+#include "mugsmash.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"

@@ -93,7 +93,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cloud9.h"
+#include "cloud9.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"

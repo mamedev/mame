@@ -277,10 +277,10 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/segaorun.h"
-#include "includes/segaipt.h"
+#include "segaorun.h"
+#include "segaipt.h"
 
-#include "machine/fd1089.h"
+#include "fd1089.h"
 #include "sound/segapcm.h"
 #include "sound/ymopm.h"
 #include "speaker.h"

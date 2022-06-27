@@ -40,9 +40,9 @@ TODO:
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 
-#include "video/911_vdt.h"
+#include "911_vdt.h"
 #include "sound/beep.h"
-#include "video/733_asr.h"
+#include "733_asr.h"
 
 #include "bus/ti99x/990_dk.h"
 

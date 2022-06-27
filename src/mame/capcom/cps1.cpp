@@ -240,7 +240,7 @@ Stephh's log (2006.09.20) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cps1.h"
+#include "cps1.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/pic16c5x/pic16c5x.h"
@@ -250,7 +250,7 @@ Stephh's log (2006.09.20) :
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
 #include "sound/ymopm.h"
-#include "machine/kabuki.h"
+#include "kabuki.h"
 #include "speaker.h"
 
 

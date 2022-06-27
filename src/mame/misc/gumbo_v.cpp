@@ -3,7 +3,7 @@
 /* Gumbo video */
 
 #include "emu.h"
-#include "includes/gumbo.h"
+#include "gumbo.h"
 
 
 void gumbo_state::gumbo_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)

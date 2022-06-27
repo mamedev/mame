@@ -32,7 +32,7 @@ Also seem to be running on the same/similar hardware:
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "machine/315_5296.h"
+#include "315_5296.h"
 #include "sound/ymopn.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"

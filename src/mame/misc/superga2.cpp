@@ -18,12 +18,13 @@
 ************************************************************************/
 
 #include "emu.h"
-#include "video/apple2.h"
+
+#include "apple2common.h"
+#include "apple2video.h"
 
 #include "cpu/m6502/m6502.h"
 
 #include "machine/74259.h"
-#include "machine/apple2common.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 
@@ -32,6 +33,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 #define A2_CPU_TAG "maincpu"
 #define A2_VIDEO_TAG "a2video"
@@ -250,6 +253,9 @@ ROM_START(kuzmich)
 	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("ke.bin", 0x0000, 0x8000, CRC(102d246b) SHA1(492dcdf0cc31190a97057a69010e2c9c23b6e59d))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT,   COMPANY    FULLNAME
 GAME( 199?, kuzmich,  0,      superga2, superga2, superga2_state, empty_init, ROT0,  "Nippel",  "Kuzmich-Egorych", MACHINE_SUPPORTS_SAVE )

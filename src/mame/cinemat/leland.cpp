@@ -59,8 +59,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/leland.h"
-#include "audio/leland.h"
+#include "leland.h"
+#include "leland_a.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"

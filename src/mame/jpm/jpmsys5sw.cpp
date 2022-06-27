@@ -13,7 +13,7 @@
 
 
 #include "emu.h"
-#include "includes/jpmsys5.h"
+#include "jpmsys5.h"
 
 // MFME2MAME layouts:
 #include "j5ar80cla.lh"

@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/esripsys.h"
+#include "esripsys.h"
 
 
 INTERRUPT_GEN_MEMBER(esripsys_state::esripsys_vblank_irq)

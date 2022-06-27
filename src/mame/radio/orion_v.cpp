@@ -11,7 +11,7 @@
 
 
 #include "emu.h"
-#include "includes/orion.h"
+#include "orion.h"
 
 uint32_t orion_state::screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

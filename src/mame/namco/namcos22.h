@@ -13,7 +13,7 @@
 
 #include "machine/eeprompar.h"
 #include "machine/mb87078.h"
-#include "machine/namcomcu.h"
+#include "namcomcu.h"
 #include "machine/timer.h"
 #include "sound/c352.h"
 #include "video/rgbutil.h"

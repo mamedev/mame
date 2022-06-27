@@ -54,7 +54,7 @@ Notes:
 */
 
 #include "emu.h"
-#include "video/vicdual-97269pb.h"
+#include "vicdual-97269pb.h"
 
 #define S97269PB_TAG     "s97269pb"
 

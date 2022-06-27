@@ -39,7 +39,7 @@ ToDo:
 
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6532riot.h"

@@ -26,7 +26,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
-#include "machine/pce220_ser.h"
+#include "pce220_ser.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"

@@ -723,7 +723,7 @@
 ***********************************************************************************/
 
 #include "emu.h"
-#include "includes/calomega.h"
+#include "calomega.h"
 
 #include "kenokb.lh"
 

@@ -85,7 +85,7 @@ TODO (socrates):
 ******************************************************************************/
 
 #include "emu.h"
-#include "audio/socrates.h"
+#include "socrates_a.h"
 
 #include "cpu/z80/z80.h"
 

@@ -17,8 +17,8 @@
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ymopm.h"
-#include "video/segaic16.h"
-#include "video/sega16sp.h"
+#include "segaic16.h"
+#include "sega16sp.h"
 #include "screen.h"
 
 

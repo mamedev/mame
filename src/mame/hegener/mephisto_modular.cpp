@@ -88,8 +88,8 @@ Reminder: unsupported on Almeria and Portorose 1.01, this is not a bug.
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
-#include "machine/mmboard.h"
-#include "video/mmdisplay2.h"
+#include "mmboard.h"
+#include "mmdisplay2.h"
 
 // internal artwork
 #include "mephisto_alm16.lh" // clickable

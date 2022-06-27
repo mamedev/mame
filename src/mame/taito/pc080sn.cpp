@@ -43,7 +43,7 @@ Control registers
 
 #include "emu.h"
 #include "pc080sn.h"
-#include "video/taito_helper.h"
+#include "taito_helper.h"
 #include "screen.h"
 
 #define PC080SN_RAM_SIZE 0x10000

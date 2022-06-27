@@ -231,7 +231,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/xavix.h"
+#include "xavix.h"
 #include "softlist_dev.h"
 
 

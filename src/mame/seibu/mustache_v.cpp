@@ -9,7 +9,7 @@
 
 
 #include "emu.h"
-#include "includes/mustache.h"
+#include "mustache.h"
 
 
 void mustache_state::videoram_w(offs_t offset, uint8_t data)

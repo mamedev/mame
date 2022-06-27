@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood,AJR
 
-#ifndef MAME_AUDIO_EFO_ZSU_H
-#define MAME_AUDIO_EFO_ZSU_H
+#ifndef MAME_SHARED_EFO_ZSU_H
+#define MAME_SHARED_EFO_ZSU_H
 
 #pragma once
+
+#include "cedar_magnet_board.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
@@ -13,7 +15,6 @@
 #include "machine/40105.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-#include "machine/cedar_magnet_board.h"
 
 DECLARE_DEVICE_TYPE(EFO_ZSU,            efo_zsu_device)
 DECLARE_DEVICE_TYPE(EFO_ZSU1,           efo_zsu1_device)
@@ -95,4 +96,4 @@ private:
 	void ay0_porta_w(u8 data);
 };
 
-#endif // MAME_AUDIO_EFO_ZSU_H
+#endif // MAME_SHARED_EFO_ZSU_H

@@ -31,7 +31,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/blmbycar.h"
+#include "blmbycar.h"
 #include "screen.h"
 
 

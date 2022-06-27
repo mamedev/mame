@@ -8,7 +8,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/poly.h"
+#include "poly.h"
 
 
 inline offs_t poly_state::physical(offs_t offset)

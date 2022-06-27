@@ -107,12 +107,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/segag80r.h"
-#include "machine/segag80.h"
+#include "segag80r.h"
+#include "segag80_m.h"
+
+#include "segacrpt_device.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "machine/segacrpt_device.h"
 #include "speaker.h"
 
 

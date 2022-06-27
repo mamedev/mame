@@ -21,7 +21,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/ram.h"
-#include "machine/kc_keyb.h"
+#include "kc_keyb.h"
 #include "machine/rescap.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"

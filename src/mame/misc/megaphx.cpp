@@ -78,8 +78,8 @@
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/74166.h"
 #include "machine/i8255.h"
-#include "machine/inder_sb.h"
-#include "machine/inder_vid.h"
+#include "inder_sb.h"
+#include "inder_vid.h"
 
 
 

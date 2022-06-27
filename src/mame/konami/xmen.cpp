@@ -22,8 +22,8 @@ likewise a 2 screen game.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/xmen.h"
-#include "includes/konamipt.h"
+#include "xmen.h"
+#include "konamipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_SCRAMBLE_H
-#define MAME_INCLUDES_SCRAMBLE_H
+#ifndef MAME_GALAXIAN_SCRAMBLE_H
+#define MAME_GALAXIAN_SCRAMBLE_H
 
 #pragma once
 
+#include "galaxold.h"
+
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
-#include "includes/galaxold.h"
 #include "sound/digitalk.h"
 #include "sound/flt_rc.h"
 #include "sound/tms5110.h"
@@ -150,4 +151,4 @@ private:
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_opcodes;
 };
 
-#endif // MAME_INCLUDES_SCRAMBLE_H
+#endif // MAME_GALAXIAN_SCRAMBLE_H

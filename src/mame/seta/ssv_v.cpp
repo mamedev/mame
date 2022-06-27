@@ -134,7 +134,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ssv.h"
+#include "ssv.h"
 
 
 void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow, int realline, int line)

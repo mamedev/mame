@@ -132,7 +132,7 @@ Additional notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/sidepckt.h"
+#include "sidepckt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"

@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/truco.h"
+#include "truco.h"
 
 void truco_state::truco_palette(palette_device &palette) const
 {

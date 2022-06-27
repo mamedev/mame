@@ -20,17 +20,22 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "mc8123.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/mc8123.h"
-#include "machine/nvram.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
 #include "sound/msm5205.h"
 #include "sound/ymopn.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -610,6 +615,8 @@ ROM_START( mayumi )
 	ROM_LOAD( "my-9l.bin", 0x0100,  0x0100, CRC(f3fef561) SHA1(247f579fe91ad7e516c93a873b2ecca780bf6da0) ) // g
 	ROM_LOAD( "my-9k.bin", 0x0200,  0x0100, CRC(3e7a8012) SHA1(24129586a1c39f68dad274b5afbdd6c027ab0901) ) // b
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

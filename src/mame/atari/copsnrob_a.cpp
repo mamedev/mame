@@ -5,7 +5,7 @@
  * Nov 2010, Derrick Renaud
  ************************************************************************/
 #include "emu.h"
-#include "includes/copsnrob.h"
+#include "copsnrob.h"
 #include "sound/discrete.h"
 #include "speaker.h"
 

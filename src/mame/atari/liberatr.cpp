@@ -137,7 +137,7 @@
 
 
 #include "emu.h"
-#include "includes/liberatr.h"
+#include "liberatr.h"
 #include "machine/rescap.h"
 #include "speaker.h"
 

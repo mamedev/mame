@@ -68,7 +68,7 @@
 */
 
 #include "emu.h"
-#include "includes/generalplus_gpl16250.h"
+#include "generalplus_gpl16250.h"
 
 
 uint16_t gcm394_game_state::cs0_r(offs_t offset)

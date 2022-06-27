@@ -24,7 +24,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/coco12.h"
+#include "coco12.h"
 
 #include "bus/coco/cococart.h"
 #include "bus/coco/coco_t4426.h"

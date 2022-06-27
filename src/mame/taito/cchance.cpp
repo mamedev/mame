@@ -35,7 +35,7 @@ cha3    $10d8
 
 
 #include "emu.h"
-#include "includes/tnzs.h"
+#include "tnzs.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

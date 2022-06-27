@@ -62,7 +62,7 @@ lev 7 : 0x7c : 0000 0000 - x
 */
 
 #include "emu.h"
-#include "includes/kickgoal.h"
+#include "kickgoal.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"

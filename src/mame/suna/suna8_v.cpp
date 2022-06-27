@@ -20,7 +20,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/suna8.h"
+#include "suna8.h"
 #include "drawgfxt.ipp"
 
 uint8_t suna8_state::banked_paletteram_r(offs_t offset)

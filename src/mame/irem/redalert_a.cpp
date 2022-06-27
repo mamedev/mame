@@ -10,7 +10,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "redalert.h"
+#include "redalert_a.h"
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6502/m6502.h"

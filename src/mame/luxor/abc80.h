@@ -17,7 +17,7 @@
 #include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "machine/abc80kb.h"
+#include "abc80kb.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "machine/z80pio.h"

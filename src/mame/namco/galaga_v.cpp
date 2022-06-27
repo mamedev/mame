@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galaga.h"
+#include "galaga.h"
 
 #define LOG_DEBUG           (1 << 0U)
 #define LOG_ALL             (LOG_DEBUG)

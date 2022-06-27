@@ -38,7 +38,7 @@ More information:
 **********************************************************************************************/
 
 #include "emu.h"
-#include "includes/hec2hrp.h"
+#include "hec2hrp.h"
 
 #include "cpu/z80/z80.h"
 

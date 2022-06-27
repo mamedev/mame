@@ -7,7 +7,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
-#include "video/decospr.h"
+#include "decospr.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

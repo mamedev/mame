@@ -18,8 +18,8 @@
  ***********************************************************************/
 
 #include "emu.h"
-#include "includes/pgm.h"
-#include "machine/pgmprot_igs025_igs012.h"
+#include "pgm.h"
+#include "pgmprot_igs025_igs012.h"
 
 /* Dragon World 2 */
 

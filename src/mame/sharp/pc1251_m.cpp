@@ -3,8 +3,8 @@
 #include "emu.h"
 #include "cpu/sc61860/sc61860.h"
 
-#include "includes/pocketc.h"
-#include "includes/pc1251.h"
+#include "pocketc.h"
+#include "pc1251.h"
 
 /* C-CE while reset, program will not be destroyed! */
 

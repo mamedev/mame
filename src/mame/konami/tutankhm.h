@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "audio/timeplt.h"
+#include "timeplt_a.h"
 #include "emupal.h"
 #include "machine/timer.h"
 #include "screen.h"

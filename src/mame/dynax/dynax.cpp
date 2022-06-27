@@ -78,7 +78,7 @@ TODO:
 *********************************************************************************************************************/
 
 #include "emu.h"
-#include "includes/dynax.h"
+#include "dynax.h"
 
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/z80/z80.h"

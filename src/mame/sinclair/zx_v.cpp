@@ -19,7 +19,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/zx.h"
+#include "zx.h"
 
 
 TIMER_CALLBACK_MEMBER(zx_state::zx_ula_hsync)

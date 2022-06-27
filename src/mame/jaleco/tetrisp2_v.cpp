@@ -33,7 +33,7 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tetrisp2.h"
+#include "tetrisp2.h"
 #include "screen.h"
 
 

@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/polyplay.h"
+#include "polyplay.h"
 
 WRITE_LINE_MEMBER(polyplay_state::ctc_zc0_w)
 {

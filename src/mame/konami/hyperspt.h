@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "audio/trackfld.h"
+#include "trackfld_a.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"

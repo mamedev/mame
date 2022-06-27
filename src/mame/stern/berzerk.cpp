@@ -55,16 +55,20 @@ Game difference analysis by The Cutting Room Floor (tcrf.net)
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/exidy.h"
+
+#include "exidysound.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74181.h"
 #include "machine/nvram.h"
 #include "sound/s14001a.h"
-#include "video/resnet.h"
+
 #include "screen.h"
 #include "speaker.h"
+#include "video/resnet.h"
 
+
+namespace {
 
 class berzerk_state : public driver_device
 {
@@ -1430,6 +1434,9 @@ void berzerk_state::init_moonwarp()
 	save_item(NAME(m_p2_counter_74ls161));
 	save_item(NAME(m_p2_direction));
 }
+
+} // anonymous namespace
+
 
 /*************************************
  *

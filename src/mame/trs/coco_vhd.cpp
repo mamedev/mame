@@ -40,7 +40,7 @@
 
 #include "emu.h"
 #include "coco_vhd.h"
-#include "includes/coco.h"
+#include "coco.h"
 #include "machine/ram.h"
 
 

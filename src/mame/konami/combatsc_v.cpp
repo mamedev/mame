@@ -10,7 +10,7 @@
 
 #include "emu.h"
 
-#include "includes/combatsc.h"
+#include "combatsc.h"
 
 void combatsc_state::palette(palette_device &palette) const
 {

@@ -9,7 +9,7 @@
  */
 
 #include "emu.h"
-#include "bert.h"
+#include "bert_m.h"
 
 DEFINE_DEVICE_TYPE(BERT, bert_device, "ncd_bert_asic", "NCD BERT ASIC")
 

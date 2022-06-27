@@ -27,13 +27,15 @@ processor speed is 533MHz <- likely to be a Celeron or a Pentium III class CPU -
 
 
 #include "emu.h"
+#include "pcshare.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
-#include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
 
+namespace {
 
 class queen_state : public pcat_base_state
 {
@@ -314,6 +316,8 @@ ROM_START( queen )
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "pqiidediskonmodule", 0,SHA1(a56efcc711b1c5a2e63160b3088001a8c4fb56c2) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2002?, queen,  0,    queen, 0, queen_state, empty_init, ROT0, "STG", "Queen?", MACHINE_IS_SKELETON )

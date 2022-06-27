@@ -96,7 +96,7 @@ Todo & FIXME:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cvs.h"
+#include "cvs.h"
 #include "speaker.h"
 
 

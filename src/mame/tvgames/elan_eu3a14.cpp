@@ -61,15 +61,18 @@
 */
 
 #include "emu.h"
+
+#include "elan_eu3a05_a.h"
+#include "elan_eu3a14sys.h"
+#include "elan_eu3a14vid.h"
+
 #include "cpu/m6502/m6502.h"
+#include "machine/bankdev.h"
+#include "machine/timer.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "machine/bankdev.h"
-#include "audio/elan_eu3a05.h"
-#include "machine/timer.h"
-#include "machine/elan_eu3a14sys.h"
-#include "video/elan_eu3a14vid.h"
 
 
 

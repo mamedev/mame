@@ -3,7 +3,7 @@
 /* Super Slam - Video Hardware */
 
 #include "emu.h"
-#include "includes/sslam.h"
+#include "sslam.h"
 
 
 void sslam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

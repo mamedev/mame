@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bombjack.h"
+#include "bombjack.h"
 
 void bombjack_state::bombjack_videoram_w(offs_t offset, uint8_t data)
 {

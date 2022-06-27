@@ -15,7 +15,7 @@ priority should be given to
 
 
 #include "emu.h"
-#include "includes/ms32.h"
+#include "ms32.h"
 
 
 /********** Tilemaps **********/

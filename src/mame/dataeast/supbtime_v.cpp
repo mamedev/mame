@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/supbtime.h"
+#include "supbtime.h"
 
 
 uint32_t supbtime_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool use_offsets)

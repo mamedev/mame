@@ -1,15 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_F1GP_H
-#define MAME_INCLUDES_F1GP_H
+#ifndef MAME_VSYSTEM_F1GP_H
+#define MAME_VSYSTEM_F1GP_H
 
 #pragma once
 
+#include "vsystem_spr.h"
+#include "vsystem_spr2.h"
+
+#include "k053936.h"
+
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
-#include "video/vsystem_spr.h"
-#include "video/vsystem_spr2.h"
-#include "video/k053936.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -135,4 +138,4 @@ private:
 	void f1gp2_cpu1_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_F1GP_H
+#endif // MAME_VSYSTEM_F1GP_H

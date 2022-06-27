@@ -146,7 +146,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "includes/crvision.h"
+#include "crvision.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 

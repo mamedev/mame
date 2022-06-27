@@ -55,12 +55,14 @@ For Model III:
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/trs80.h"
+#include "trs80.h"
+
 #include "bus/centronics/ctronics.h"
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
+
 #include "emupal.h"
 #include "softlist_dev.h"
 

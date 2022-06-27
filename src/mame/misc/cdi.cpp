@@ -48,7 +48,7 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/cdi.h"
+#include "cdi.h"
 
 #include "cpu/m6805/m6805.h"
 #include "imagedev/chd_cd.h"

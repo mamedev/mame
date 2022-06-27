@@ -103,7 +103,7 @@
 
 #include "emu.h"
 
-#include "video/bfm_dm01.h"
+#include "bfm_dm01.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"

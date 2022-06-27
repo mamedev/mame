@@ -9,8 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/atarivad.h"
-#include "video/atarimo.h"
+#include "atarivad.h"
+#include "atarimo.h"
 #include "screen.h"
 
 

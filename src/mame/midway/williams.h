@@ -5,13 +5,14 @@
     Driver for early Williams games
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_WILLIAMS_H
-#define MAME_INCLUDES_WILLIAMS_H
+#ifndef MAME_MIDWAY_WILLIAMS_H
+#define MAME_MIDWAY_WILLIAMS_H
 
 #pragma once
 
-#include "audio/williams.h"
-#include "audio/s11c_bg.h"
+#include "s11c_bg.h"
+#include "williamssound.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -21,6 +22,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/hc55516.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -507,4 +509,4 @@ private:
 #define WILLIAMS_TILEMAP_TSHOOT     1       /* IC79 is a 74LS157 selector jumpered to be enabled */
 #define WILLIAMS_TILEMAP_JOUST2     2       /* IC79 is a 74LS157 selector jumpered to be disabled */
 
-#endif // MAME_INCLUDES_WILLIAMS_H
+#endif // MAME_MIDWAY_WILLIAMS_H

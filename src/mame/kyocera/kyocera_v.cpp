@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
-#include "includes/kyocera.h"
+#include "kyocera.h"
 
 #include "screen.h"
 

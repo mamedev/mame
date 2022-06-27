@@ -17,7 +17,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/kabuki.h"  // needed for decoding functions only
+#include "kabuki.h"  // needed for decoding functions only
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"

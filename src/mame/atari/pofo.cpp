@@ -37,7 +37,7 @@
 #include "bus/pofo/ccm.h"
 #include "bus/pofo/exp.h"
 #include "machine/nvram.h"
-#include "machine/pofo_kbd.h"
+#include "pofo_kbd.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/pcd3311.h"

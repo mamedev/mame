@@ -16,7 +16,7 @@ driver by David Haywood
 */
 
 #include "emu.h"
-#include "includes/news.h"
+#include "news.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"

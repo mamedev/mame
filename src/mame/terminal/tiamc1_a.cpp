@@ -34,7 +34,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/tiamc1.h"
+#include "tiamc1_a.h"
 
 #define CLOCK_DIVIDER 16
 #define BUF_LEN 100000

@@ -147,7 +147,7 @@ http://www.z88forever.org.uk/zxplus3e/
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/specpls3.h"
+#include "specpls3.h"
 
 #include "sound/ay8910.h"
 

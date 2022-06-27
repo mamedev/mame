@@ -79,7 +79,7 @@
 // the content of floppy disk.
 
 #include "emu.h"
-#include "machine/imds2ioc.h"
+#include "imds2ioc.h"
 
 #include "cpu/i8085/i8085.h"
 #include "machine/74259.h"

@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "video/ladybug.h"
+#include "ladybug_v.h"
 #include "emupal.h"
 #include "tilemap.h"
 

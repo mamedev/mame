@@ -11,7 +11,7 @@
 
 #include "emu.h"
 
-#include "machine/macrtc.h"
+#include "macrtc.h"
 
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
@@ -20,7 +20,7 @@
 #include "machine/6522via.h"
 #include "machine/applefdintf.h"
 #include "machine/dp83932c.h"
-#include "machine/macadb.h"
+#include "macadb.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
 #include "machine/ram.h"

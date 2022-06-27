@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
-#include "includes/pacman.h"
+#include "pacman.h"
 
 
 uint8_t pacman_state::jumpshot_decrypt(int addr, uint8_t e)

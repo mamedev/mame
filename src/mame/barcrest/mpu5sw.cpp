@@ -76,7 +76,7 @@ CON2 = Male DB9 for stake/jackpot
     D15 |_| 12V
 */
 #include "emu.h"
-#include "includes/mpu5.h"
+#include "mpu5.h"
 
 // MFME2MAME layouts:
 #include "m5addams.lh"

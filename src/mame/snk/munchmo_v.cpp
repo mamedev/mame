@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
 #include "emu.h"
-#include "includes/munchmo.h"
+#include "munchmo.h"
 
 
 void munchmo_state::munchmo_palette(palette_device &palette) const

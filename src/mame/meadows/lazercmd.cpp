@@ -234,7 +234,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lazercmd.h"
+#include "lazercmd.h"
 #include "screen.h"
 #include "speaker.h"
 

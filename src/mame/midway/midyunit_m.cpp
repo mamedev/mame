@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/midyunit.h"
+#include "midyunit.h"
 
 
 /* constant definitions */

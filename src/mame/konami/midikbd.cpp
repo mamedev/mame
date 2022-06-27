@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 #include "emu.h"
-#include "machine/midikbd.h"
+#include "midikbd.h"
 
 DEFINE_DEVICE_TYPE(MIDI_KBD, midi_keyboard_device, "midi_kbd", "Generic MIDI Keyboard")
 

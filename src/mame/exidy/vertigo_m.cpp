@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/vertigo.h"
+#include "vertigo.h"
 
 
 

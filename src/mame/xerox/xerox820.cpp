@@ -55,7 +55,7 @@
 
 
 #include "emu.h"
-#include "includes/xerox820.h"
+#include "xerox820.h"
 
 #include "screen.h"
 #include "softlist.h"

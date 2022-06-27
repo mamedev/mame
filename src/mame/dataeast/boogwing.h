@@ -8,11 +8,11 @@
 
 #include "cpu/h6280/h6280.h"
 #include "sound/okim6295.h"
-#include "video/deco16ic.h"
-#include "video/deco_ace.h"
+#include "deco16ic.h"
+#include "deco_ace.h"
 #include "video/bufsprite.h"
-#include "video/decospr.h"
-#include "machine/deco104.h"
+#include "decospr.h"
+#include "deco104.h"
 #include "screen.h"
 
 class boogwing_state : public driver_device

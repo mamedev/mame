@@ -69,12 +69,12 @@
 
 
 #include "emu.h"
-#include "includes/arcadecl.h"
+#include "arcadecl.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "video/atarimo.h"
+#include "atarimo.h"
 #include "emupal.h"
 #include "speaker.h"
 

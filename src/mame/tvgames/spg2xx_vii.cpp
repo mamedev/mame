@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz, David Haywood
 
 #include "emu.h"
-#include "includes/spg2xx.h"
+#include "spg2xx.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

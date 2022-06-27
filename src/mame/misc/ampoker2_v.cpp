@@ -70,7 +70,7 @@
 
 
 #include "emu.h"
-#include "includes/ampoker2.h"
+#include "ampoker2.h"
 
 #include "video/resnet.h"
 

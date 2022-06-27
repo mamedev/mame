@@ -30,7 +30,7 @@ knightsb3:       OK.
 */
 
 #include "emu.h"
-#include "includes/fcrash.h"
+#include "fcrash.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"

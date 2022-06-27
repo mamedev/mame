@@ -23,8 +23,8 @@
 
 #include "emu.h"
 
-#include "includes/pocketc.h"
-#include "includes/pc1403.h"
+#include "pocketc.h"
+#include "pc1403.h"
 
 
 void pc1403_state::video_start()

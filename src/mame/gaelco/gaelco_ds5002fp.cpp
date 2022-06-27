@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 #include "emu.h"
-#include "machine/gaelco_ds5002fp.h"
+#include "gaelco_ds5002fp.h"
 
 #include "cpu/mcs51/mcs51.h"
 #include "machine/nvram.h"

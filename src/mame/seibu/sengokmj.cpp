@@ -54,18 +54,21 @@ RSSENGO2.72   chr.
 *******************************************************************************************/
 
 #include "emu.h"
-#include "audio/seibu.h"
+
+#include "seibusound.h"
 
 #include "cpu/nec/nec.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
-#include "video/seibu_crtc.h"
+#include "seibu_crtc.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
 
 class sengokmj_state : public driver_device, public seibu_sound_common
 {
@@ -663,6 +666,8 @@ ROM_START( sengokmj )
 	ROM_REGION( 0x200, "user1", 0 ) /* not used */
 	ROM_LOAD( "rs006.89", 0x000, 0x200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, empty_init, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /*Non-Bet Version?*/

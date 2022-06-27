@@ -34,8 +34,8 @@ Both games run on Konami's PWB351024A PCB
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mainevt.h"
-#include "includes/konamipt.h"
+#include "mainevt.h"
+#include "konamipt.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/hd6309.h"

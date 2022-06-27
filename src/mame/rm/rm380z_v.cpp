@@ -9,7 +9,7 @@ RM 380Z video code
 
 
 #include "emu.h"
-#include "includes/rm380z.h"
+#include "rm380z.h"
 
 
 void rm380z_state::put_point(int charnum,int x,int y,int col)

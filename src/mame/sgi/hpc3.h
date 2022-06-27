@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "machine/hal2.h"
+#include "hal2.h"
 #include "machine/edlc.h"
 
 class hpc3_device : public device_t, public device_memory_interface

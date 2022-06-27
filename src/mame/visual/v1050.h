@@ -19,7 +19,7 @@
 #include "machine/timer.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
-#include "machine/v1050kb.h"
+#include "v1050kb.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 #include "emupal.h"

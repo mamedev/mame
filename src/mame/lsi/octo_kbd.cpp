@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald
 
 #include "emu.h"
-#include "machine/octo_kbd.h"
+#include "octo_kbd.h"
 #include "machine/keyboard.ipp"
 
 

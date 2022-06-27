@@ -52,7 +52,7 @@ write:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dday.h"
+#include "dday.h"
 
 #include "cpu/z80/z80.h"
 #include "speaker.h"

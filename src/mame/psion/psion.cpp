@@ -21,7 +21,7 @@
 
 
 #include "emu.h"
-#include "includes/psion.h"
+#include "psion.h"
 
 #include "screen.h"
 #include "softlist_dev.h"

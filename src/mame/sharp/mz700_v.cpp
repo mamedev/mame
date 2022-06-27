@@ -12,7 +12,7 @@
  ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mz700.h"
+#include "mz700.h"
 
 
 uint32_t mz_state::screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

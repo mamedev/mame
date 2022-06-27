@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
 #include "emu.h"
-#include "includes/bladestl.h"
+#include "bladestl.h"
 
 
 void bladestl_state::bladestl_palette(palette_device &palette) const

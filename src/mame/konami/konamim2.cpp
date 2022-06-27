@@ -216,7 +216,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/3dom2.h"
+#include "3dom2.h"
 
 #include "bus/ata/ataintf.h"
 #include "bus/ata/cr589.h"

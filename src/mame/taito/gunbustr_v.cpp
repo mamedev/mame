@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
 #include "emu.h"
-#include "includes/gunbustr.h"
+#include "gunbustr.h"
 #include "screen.h"
 
 /************************************************************/

@@ -118,7 +118,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mermaid.h"
+#include "mermaid.h"
 
 #include "cpu/z80/z80.h"
 #include "speaker.h"

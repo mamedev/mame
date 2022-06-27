@@ -336,7 +336,7 @@ protection subroutine and processing the command.
 ******************************************/
 
 #include "emu.h"
-#include "includes/gsword.h"
+#include "gsword.h"
 
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"

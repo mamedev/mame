@@ -39,7 +39,7 @@ the "America" release.
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/tsamurai.h"
+#include "tsamurai.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

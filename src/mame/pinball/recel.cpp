@@ -40,7 +40,7 @@ ToDo:
 
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "machine/ra17xx.h"
 #include "machine/r10696.h"
 #include "machine/r10788.h"

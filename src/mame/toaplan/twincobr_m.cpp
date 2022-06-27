@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
-#include "includes/twincobr.h"
+#include "twincobr.h"
 
 
 #define LOG_DSP_CALLS 0

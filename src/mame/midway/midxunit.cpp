@@ -110,8 +110,7 @@ ________________________________________________________________
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/midxunit.h"
-#include "audio/dcs.h"
+#include "midxunit.h"
 
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/tms34010/tms34010.h"

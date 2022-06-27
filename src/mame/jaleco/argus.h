@@ -2,7 +2,7 @@
 // copyright-holders:Yochizo
 
 #include "machine/timer.h"
-#include "video/jalblend.h"
+#include "jalblend.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

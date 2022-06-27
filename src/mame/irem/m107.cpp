@@ -26,12 +26,12 @@ confirmed for m107 games as well.
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/m107.h"
-#include "includes/iremipt.h"
+#include "m107.h"
+#include "iremipt.h"
 
 #include "cpu/nec/nec.h"
 #include "machine/gen_latch.h"
-#include "machine/irem_cpu.h"
+#include "irem_cpu.h"
 #include "sound/iremga20.h"
 #include "sound/ymopm.h"
 #include "speaker.h"

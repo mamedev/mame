@@ -14,9 +14,9 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/n64.h"
-#include "video/rdptpipe.h"
-#include "video/n64.h"
+#include "rdptpipe.h"
+#include "n64.h"
+#include "n64_v.h"
 #include "video/rgbutil.h"
 
 #define RELATIVE(x, y)  ((((x) >> 3) - (y)) << 3) | (x & 7);

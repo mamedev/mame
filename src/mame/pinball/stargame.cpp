@@ -20,7 +20,7 @@ Todo:
 *****************************************************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "cpu/z80/z80.h"
 #include "machine/7474.h"
 #include "machine/74259.h"

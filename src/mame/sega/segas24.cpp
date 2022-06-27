@@ -337,18 +337,18 @@ Notes:
 */
 
 #include "emu.h"
-#include "includes/segas24.h"
-#include "includes/segaipt.h"
+#include "segas24.h"
+#include "segaipt.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/fd1094.h"
+#include "fd1094.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
 #include "machine/upd4701.h"
-#include "machine/315_5296.h"
+#include "315_5296.h"
 #include "sound/dac.h"
 #include "sound/ymopm.h"
-#include "video/segaic24.h"
+#include "segaic24.h"
 #include "speaker.h"
 
 

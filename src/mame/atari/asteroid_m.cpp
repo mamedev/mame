@@ -10,8 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/avgdvg.h"
-#include "includes/asteroid.h"
+#include "asteroid.h"
 
 
 INTERRUPT_GEN_MEMBER(asteroid_state::asteroid_interrupt)

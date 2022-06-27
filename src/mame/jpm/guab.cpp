@@ -36,19 +36,20 @@
 
 #include "emu.h"
 
+#include "bacta_datalogger.h"
+
 #include "cpu/m68000/m68000.h"
 #include "formats/guab_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
-#include "machine/bacta_datalogger.h"
-
 #include "machine/clock.h"
 #include "machine/i8255.h"
 #include "machine/wd_fdc.h"
 #include "sound/sn76496.h"
 #include "video/ef9369.h"
 #include "video/tms34061.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"

@@ -124,7 +124,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/kyugo.h"
+#include "kyugo.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

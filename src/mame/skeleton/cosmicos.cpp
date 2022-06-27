@@ -38,7 +38,7 @@
 */
 
 #include "emu.h"
-#include "includes/cosmicos.h"
+#include "cosmicos.h"
 
 #include "screen.h"
 #include "speaker.h"

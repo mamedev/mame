@@ -10,12 +10,12 @@
 
 #pragma once
 
-#include "audio/segag80.h"
-#include "audio/segaspeech.h"
-#include "audio/segausb.h"
+#include "segag80.h"
+#include "segaspeech.h"
+#include "segausb.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/segag80.h"
+#include "segag80_m.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "sound/tms5110.h"

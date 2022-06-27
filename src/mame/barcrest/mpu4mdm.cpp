@@ -3,7 +3,7 @@
 /* MPU4 games by MDM */
 
 #include "emu.h"
-#include "includes/mpu4.h"
+#include "mpu4.h"
 
 namespace {
 

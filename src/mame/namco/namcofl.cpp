@@ -161,7 +161,7 @@ OSC3: 48.384MHz
 */
 
 #include "emu.h"
-#include "includes/namcofl.h"
+#include "namcofl.h"
 
 #include "sound/c352.h"
 #include "machine/nvram.h"

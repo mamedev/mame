@@ -16,7 +16,7 @@
 #include "cpu/tms32031/tms32031.h"
 #include "machine/74259.h"
 #include "machine/eepromser.h"
-#include "machine/gaelco3d.h"
+#include "gaelco3d_m.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/dmadac.h"

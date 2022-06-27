@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
-#include "machine/nb1413m3.h"
+#include "nb1413m3.h"
 #include "screen.h"
 
 class hyhoo_state : public driver_device

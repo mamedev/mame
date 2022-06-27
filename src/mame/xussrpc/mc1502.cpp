@@ -15,7 +15,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/kb_7007_3.h"
+#include "kb_7007_3.h"
 
 #include "bus/centronics/ctronics.h"
 #include "bus/isa/isa.h"

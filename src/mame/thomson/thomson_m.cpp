@@ -9,7 +9,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "includes/thomson.h"
+#include "thomson.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 

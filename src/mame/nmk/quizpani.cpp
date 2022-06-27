@@ -48,7 +48,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/quizpani.h"
+#include "quizpani.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"

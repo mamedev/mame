@@ -1,15 +1,18 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
-#ifndef MAME_INCLUDES_STV_H
-#define MAME_INCLUDES_STV_H
+#ifndef MAME_SEGA_STV_H
+#define MAME_SEGA_STV_H
 
 #pragma once
 
-#include "includes/saturn.h"
-#include "audio/rax.h"
+#include "saturn.h"
+
+#include "segabill.h"
+
+#include "rax.h"
+
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
-#include "machine/segabill.h"
 
 class stv_state : public saturn_state
 {
@@ -200,4 +203,4 @@ public:
 
 extern gfx_decode_entry const gfx_stv[];
 
-#endif // MAME_INCLUDES_STV_H
+#endif // MAME_SEGA_STV_H

@@ -26,7 +26,7 @@ Revisions:
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/aeroboto.h"
+#include "aeroboto.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"

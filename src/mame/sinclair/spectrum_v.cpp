@@ -16,8 +16,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/spectrum.h"
-#include "includes/spec128.h"
+#include "spectrum.h"
+#include "spec128.h"
 
 TIMER_CALLBACK_MEMBER(spectrum_state::finish_screen_update)
 {

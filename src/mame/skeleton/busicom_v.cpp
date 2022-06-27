@@ -8,7 +8,7 @@
 
 ****************************************************************************/
 #include "emu.h"
-#include "includes/busicom.h"
+#include "busicom.h"
 
 // Printer font 34x44 as provided by MIT Media Lab
 

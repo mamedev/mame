@@ -94,7 +94,7 @@
 #include "cpu/t11/t11.h"
 #include "cpu/i86/i186.h"
 #include "machine/dl11.h"
-#include "machine/rx01.h"
+#include "rx01.h"
 
 
 namespace {

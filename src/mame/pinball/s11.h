@@ -10,10 +10,10 @@
 #define MAME_INCLUDES_S11_H
 
 #include "cpu/m6800/m6800.h"
-#include "audio/pinsnd88.h"
-#include "audio/s11c_bg.h"
+#include "pinsnd88.h"
+#include "s11c_bg.h"
 #include "machine/6821pia.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "machine/input_merger.h"
 #include "machine/rescap.h"
 #include "sound/dac.h"

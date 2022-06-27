@@ -1,14 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef MAME_INCLUDES_N64_H
-#define MAME_INCLUDES_N64_H
+#ifndef MAME_NINTENDO_N64_H
+#define MAME_NINTENDO_N64_H
 
 #pragma once
+
+#include "n64_v.h"
 
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
-#include "video/n64.h"
 
 /*----------- driver state -----------*/
 
@@ -406,4 +407,4 @@ const unsigned int ddStartOffset[16] =
 	{0x0,0x5F15E0,0xB79D00,0x10801A0,0x1523720,0x1963D80,0x1D414C0,0x20BBCE0,
 		0x23196E0,0x28A1E00,0x2DF5DC0,0x3299340,0x36D99A0,0x3AB70E0,0x3E31900,0x4149200};
 
-#endif // MAME_INCLUDES_N64_H
+#endif // MAME_NINTENDO_N64_H

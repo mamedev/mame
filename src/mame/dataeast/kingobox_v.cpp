@@ -2,7 +2,7 @@
 // copyright-holders:Ernesto Corvi
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/kingobox.h"
+#include "kingobox.h"
 
 
 /***************************************************************************

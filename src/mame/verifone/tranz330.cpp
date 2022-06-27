@@ -21,7 +21,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/tranz330.h"
+#include "tranz330.h"
 
 #include "machine/input_merger.h"
 #include "speaker.h"

@@ -38,7 +38,7 @@ ToDo:
 *********************************************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8279.h"

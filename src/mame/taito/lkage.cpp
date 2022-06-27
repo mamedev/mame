@@ -86,7 +86,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lkage.h"
+#include "lkage.h"
 
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"

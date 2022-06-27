@@ -9,7 +9,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/nbmj8688.h"
+#include "nbmj8688.h"
 
 
 /* the blitter can copy data both in "direct" mode, where every byte of the source

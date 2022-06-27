@@ -10,7 +10,7 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "audio/warpwarp.h"
+#include "warpwarp_a.h"
 
 
 DEFINE_DEVICE_TYPE(WARPWARP_SOUND, warpwarp_sound_device, "warpwarp_sound", "Warp Warp Custom Sound")

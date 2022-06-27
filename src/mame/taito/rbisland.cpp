@@ -320,9 +320,9 @@ Stephh's notes (based on the game M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/rbisland.h"
-#include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
+#include "rbisland.h"
+#include "taitoipt.h"
+#include "taitosnd.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

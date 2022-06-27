@@ -3,7 +3,7 @@
 
 #include "machine/bankdev.h"
 #include "machine/timer.h"
-#include "video/jalblend.h"
+#include "jalblend.h"
 #include "emupal.h"
 #include "tilemap.h"
 

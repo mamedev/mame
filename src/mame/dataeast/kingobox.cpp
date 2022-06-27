@@ -18,7 +18,7 @@ Main CPU:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/kingobox.h"
+#include "kingobox.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"

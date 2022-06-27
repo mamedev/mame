@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "machine/namco_c67.h"
-#include "video/namcos21_3d.h"
+#include "namco_c67.h"
+#include "namcos21_3d.h"
 
 #include <algorithm>
 

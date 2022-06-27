@@ -143,7 +143,7 @@ GND | 20
 #include "emu.h"
 #include "cpu/z80/tmpz84c011.h"
 #include "machine/mb89363b.h"
-#include "includes/cps1.h"
+#include "cps1.h"
 #include "kenseim.lh"
 
 class kenseim_state : public cps_state

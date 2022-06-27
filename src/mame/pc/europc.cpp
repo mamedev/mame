@@ -34,7 +34,7 @@
 #include "bus/isa/fdc.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-#include "machine/europc_kbd.h"
+#include "europc_kbd.h"
 #include "machine/genpc.h"
 #include "machine/m3002.h"
 #include "machine/ram.h"

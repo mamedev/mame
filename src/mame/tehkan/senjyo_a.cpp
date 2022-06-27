@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
 #include "emu.h"
-#include "includes/senjyo.h"
+#include "senjyo.h"
 
 
 const z80_daisy_config senjyo_daisy_chain[] =

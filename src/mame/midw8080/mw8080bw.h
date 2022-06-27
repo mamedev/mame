@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "audio/mw8080bw.h"
+#include "mw8080bw_a.h"
 
 #include "machine/mb14241.h"
 #include "machine/timer.h"

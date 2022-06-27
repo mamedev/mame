@@ -57,19 +57,25 @@ ___________________________________________________________________________
 ***************************************************************************/
 
 #include "emu.h"
+#include "bfm_comn.h"
+
+#include "awpvid.h"
+
 #include "cpu/m6809/m6809.h"
-#include "video/awpvid.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/meters.h"
+#include "machine/nvram.h"
 #include "machine/roc10937.h"  // vfd
 #include "machine/steppers.h" // stepper motor
 #include "sound/ay8910.h"
-#include "machine/nvram.h"
-#include "machine/bfm_comn.h"
+
 #include "speaker.h"
 
 #include "bfmsys85.lh"
+
+
+namespace {
 
 class bfmsys85_state : public driver_device
 {
@@ -766,6 +772,9 @@ void bfmsys85_state::init_nodecode()
 {
 	b85_find_project_string();
 }
+
+} // anonymous namespace
+
 
 #define MACHINE_FLAGS                   MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK
 #define MACHINE_FLAGS_MECHANICAL        MACHINE_FLAGS|MACHINE_MECHANICAL

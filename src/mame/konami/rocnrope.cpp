@@ -9,13 +9,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/rocnrope.h"
-#include "includes/konamipt.h"
-#include "audio/timeplt.h"
+#include "rocnrope.h"
+#include "konamipt.h"
+#include "timeplt_a.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/74259.h"
-#include "machine/konami1.h"
+#include "konami1.h"
 #include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"

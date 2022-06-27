@@ -47,7 +47,7 @@
 **************************************************************************************/
 
 #include "emu.h"
-#include "includes/amiga.h"
+#include "amiga.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ldp1450.h"
 #include "machine/nvram.h"

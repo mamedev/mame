@@ -194,7 +194,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/rallyx.h"
+#include "rallyx.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

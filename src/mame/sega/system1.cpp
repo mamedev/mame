@@ -304,11 +304,13 @@ seem to have access to.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/system1.h"
+#include "system1.h"
 
-#include "machine/segacrpt_device.h"
-#include "machine/mc8123.h"
+#include "mc8123.h"
+#include "segacrpt_device.h"
+
 #include "sound/sn76496.h"
+
 #include "speaker.h"
 
 

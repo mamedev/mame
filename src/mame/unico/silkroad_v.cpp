@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, R. Belmont
 #include "emu.h"
-#include "includes/silkroad.h"
+#include "silkroad.h"
 #include "screen.h"
 
 /* Sprites probably need to be delayed */

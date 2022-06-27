@@ -118,8 +118,8 @@
 */
 
 #include "emu.h"
-#include "includes/tiamc1.h"
-#include "audio/tiamc1.h"
+#include "tiamc1.h"
+#include "tiamc1_a.h"
 
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"

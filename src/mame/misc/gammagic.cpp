@@ -48,11 +48,15 @@ Additional CD-ROM games: "99 Bottles of Beer"
 **************************************************************************************************/
 
 #include "emu.h"
+
+#include "pcshare.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
-#include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 #include "video/pc_vga.h"
+
+namespace {
 
 class gammagic_state : public pcat_base_state
 {
@@ -161,6 +165,8 @@ ROM_START( 99bottles )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "99bottles", 0, BAD_DUMP SHA1(0b874178c8dd3cfc451deb53dc7936dc4ad5a04f))
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

@@ -127,7 +127,7 @@ playing the automaton. Bits 0-2 of PORTB control the organ.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/polyplay.h"
+#include "polyplay.h"
 
 #include "machine/z80daisy.h"
 

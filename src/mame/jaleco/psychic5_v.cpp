@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/psychic5.h"
+#include "psychic5.h"
 
 
 #define BG_PAL_INTENSITY_RG 0x1fe

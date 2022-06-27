@@ -5,15 +5,16 @@
     Air Buster
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_AIRBUSTR_H
-#define MAME_INCLUDES_AIRBUSTR_H
+#ifndef MAME_KANEKO_AIRBUSTR_H
+#define MAME_KANEKO_AIRBUSTR_H
 
 #pragma once
+
+#include "kan_pand.h"
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "video/kan_pand.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -96,4 +97,4 @@ public:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_AIRBUSTR_H
+#endif // MAME_KANEKO_AIRBUSTR_H

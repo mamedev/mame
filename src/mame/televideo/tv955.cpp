@@ -7,7 +7,7 @@ Skeleton driver for "third generation" TeleVideo terminals (905, 955, 9220).
 ************************************************************************************************************************************/
 
 #include "emu.h"
-#include "machine/tv955kb.h"
+#include "tv955kb.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/input_merger.h"

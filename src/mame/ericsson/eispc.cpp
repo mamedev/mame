@@ -43,7 +43,7 @@
 
 #include "emu.h"
 
-#include "machine/eispc_kb.h"
+#include "eispc_kb.h"
 #include "epc.lh"
 
 // Devices

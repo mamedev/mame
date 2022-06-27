@@ -17,7 +17,7 @@
 */
 
 #include "emu.h"
-#include "audio/redbaron.h"
+#include "redbaron.h"
 #include "sound/pokey.h"
 
 #include <algorithm>

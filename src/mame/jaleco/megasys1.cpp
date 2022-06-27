@@ -124,13 +124,13 @@ RAM             RW      0e0000-0effff*        <               <
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/megasys1.h"
+#include "megasys1.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
-#include "machine/jalcrpt.h"
+#include "jalcrpt.h"
 #include "speaker.h"
 
 #define SYS_A_CPU_CLOCK     (XTAL(12'000'000) / 2)    /* clock for main 68000 */

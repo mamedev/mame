@@ -17,7 +17,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/vaportra.h"
+#include "vaportra.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"

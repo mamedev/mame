@@ -141,7 +141,7 @@ irq vector 0x26:                                                                
 ***************************************************************************************************/
 
 #include "emu.h"
-#include "includes/pc6001.h"
+#include "pc6001.h"
 
 #include "softlist_dev.h"
 

@@ -4,7 +4,7 @@
 // TODO: multibus
 
 #include "emu.h"
-#include "machine/acs8600_ics.h"
+#include "acs8600_ics.h"
 #include "machine/z80sio.h"
 #include "machine/am9513.h"
 #include "bus/rs232/rs232.h"

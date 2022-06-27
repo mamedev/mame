@@ -10,7 +10,7 @@
 
 
 #include "emu.h"
-#include "includes/pp01.h"
+#include "pp01.h"
 
 
 void pp01_state::video_write_mode_w(uint8_t data)

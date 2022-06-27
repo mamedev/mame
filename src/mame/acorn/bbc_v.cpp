@@ -13,7 +13,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/bbc.h"
+#include "bbc.h"
 #include "video/saa5050.h"
 #include "video/mc6845.h"
 #include "screen.h"

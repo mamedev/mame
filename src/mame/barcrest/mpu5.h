@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_MPU5_H
-#define MAME_INCLUDES_MPU5_H
+#ifndef MAME_BARCREST_MPU5_H
+#define MAME_BARCREST_MPU5_H
 
 #pragma once
 
+#include "sec.h"
+
 #include "machine/68340.h"
-#include "machine/sec.h"
 
 
 class mpu5_state : public driver_device
@@ -56,4 +57,4 @@ private:
 
 INPUT_PORTS_EXTERN( mpu5 );
 
-#endif // MAME_INCLUDES_MPU5_H
+#endif // MAME_BARCREST_MPU5_H

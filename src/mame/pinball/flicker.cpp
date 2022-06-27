@@ -40,7 +40,7 @@ The programming seems to be incomplete with some bugs and omissions.
 *************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "cpu/mcs40/mcs40.h"
 
 #include "flicker.lh"

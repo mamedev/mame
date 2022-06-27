@@ -76,8 +76,8 @@ other supported games as well.
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/m62.h"
-#include "includes/iremipt.h"
+#include "m62.h"
+#include "iremipt.h"
 
 #include "cpu/z80/z80.h"
 #include "screen.h"

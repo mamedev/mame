@@ -280,8 +280,8 @@ Stephh's notes (based on the games M6502 code and some tests) :
 */
 
 #include "emu.h"
-#include "includes/snk6502.h"
-#include "audio/snk6502.h"
+#include "snk6502.h"
+#include "snk6502_a.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/samples.h"

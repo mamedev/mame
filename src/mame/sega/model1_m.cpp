@@ -8,7 +8,7 @@
 #include "debugger.h"
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/v60/v60.h"
-#include "includes/model1.h"
+#include "model1.h"
 
 void model1_state::machine_start()
 {

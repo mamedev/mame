@@ -73,7 +73,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/vtech2.h"
+#include "vtech2.h"
 #include "cpu/z80/z80.h"
 #include "formats/vt_cas.h"
 #include "screen.h"

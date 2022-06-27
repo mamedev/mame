@@ -15,7 +15,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/spectrum.h"
+#include "spectrum.h"
 
 /* Components */
 #include "cpu/z80/z80.h"

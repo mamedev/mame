@@ -24,7 +24,7 @@ ToDo:
 ******************************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i8155.h"

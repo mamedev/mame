@@ -9,7 +9,7 @@
  ******************************************************************************/
 
 #include "emu.h"
-#include "machine/kay_kbd.h"
+#include "kay_kbd.h"
 
 #include "speaker.h"
 

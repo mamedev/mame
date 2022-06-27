@@ -53,7 +53,7 @@ Dip locations verified with manual for ddragon & ddragon2
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ddragon.h"
+#include "ddragon.h"
 
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6800/m6801.h"

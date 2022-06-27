@@ -12,8 +12,8 @@
 
 #include "sound/msm5205.h"
 #include "sound/flt_vol.h"
-#include "machine/taitoio.h"
-#include "video/pc080sn.h"
+#include "taitoio.h"
+#include "pc080sn.h"
 
 class topspeed_state : public driver_device
 {

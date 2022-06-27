@@ -28,8 +28,8 @@
 #include "machine/z80scc.h"
 #include "machine/am79c90.h"
 #include "machine/upd765.h"
-#include "machine/dmac_0448.h"
-#include "machine/news_hid.h"
+#include "dmac_0448.h"
+#include "news_hid.h"
 #include "machine/cxd1185.h"
 
 // video

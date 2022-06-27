@@ -21,7 +21,7 @@ GP1 HDD data contents:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/qdrmfgp.h"
+#include "qdrmfgp.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"

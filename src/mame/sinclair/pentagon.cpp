@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic, MetalliC
 #include "emu.h"
-#include "includes/spec128.h"
+#include "spec128.h"
 
-#include "machine/beta.h"
+#include "beta_m.h"
+
 #include "sound/ay8910.h"
 
 #include "screen.h"

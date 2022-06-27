@@ -34,7 +34,7 @@
 
 #include "emu.h"
 #include "bingoct.h"
-#include "machine/315_5338a.h"
+#include "315_5338a.h"
 #include "machine/i8251.h"
 #include "machine/nvram.h"
 #include "machine/pit8253.h"

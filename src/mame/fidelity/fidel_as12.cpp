@@ -16,7 +16,7 @@ magnetic chess board sensors. See fidel_sc12.cpp for a more technical descriptio
 ******************************************************************************/
 
 #include "emu.h"
-#include "machine/fidel_clockdiv.h"
+#include "fidel_clockdiv.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"

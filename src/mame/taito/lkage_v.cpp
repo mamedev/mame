@@ -40,7 +40,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lkage.h"
+#include "lkage.h"
 #include "screen.h"
 
 

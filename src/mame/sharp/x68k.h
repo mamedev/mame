@@ -26,7 +26,7 @@
 #include "sound/flt_vol.h"
 #include "sound/okim6258.h"
 #include "sound/ymopm.h"
-#include "video/x68k_crtc.h"
+#include "x68k_crtc.h"
 #include "bus/x68k/x68kexp.h"
 
 #include "emupal.h"

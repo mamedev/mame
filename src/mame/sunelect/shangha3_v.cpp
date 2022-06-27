@@ -61,7 +61,7 @@ Word | Bit(s)           | Use
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/shangha3.h"
+#include "shangha3.h"
 
 
 

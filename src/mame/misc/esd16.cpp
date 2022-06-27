@@ -66,7 +66,7 @@ ToDo:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/esd16.h"
+#include "esd16.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

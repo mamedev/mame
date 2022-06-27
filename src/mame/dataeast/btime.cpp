@@ -145,13 +145,13 @@ A few notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/btime.h"
+#include "btime.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
-#include "machine/decocpu7.h"
-#include "machine/deco222.h"
+#include "decocpu7.h"
+#include "deco222.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK      XTAL(12'000'000)

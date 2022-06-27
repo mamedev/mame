@@ -52,7 +52,7 @@
 *************************************************************************************************************/
 
 #include "emu.h"
-#include "includes/neogeo.h"
+#include "neogeo.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
@@ -63,6 +63,8 @@
 #include "emupal.h"
 #include "speaker.h"
 
+
+namespace {
 
 class midas_state : public driver_device
 {
@@ -910,6 +912,9 @@ ROM_START( hammer )
 	ROM_REGION( 0x20000, "spritegen:zoomy", ROMREGION_ERASE00 )
 	/* uploaded */
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, init_livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
 GAME( 2000, hammer,   0, hammer,   hammer,   midas_state, empty_init,    ROT0, "Andamiro", "Hammer",         0 )

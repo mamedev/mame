@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ddragon3.h"
+#include "ddragon3.h"
 
 void ddragon3_state::ddragon3_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {

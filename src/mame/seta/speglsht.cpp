@@ -107,7 +107,7 @@ Notes:
 
 #include "emu.h"
 #include "emupal.h"
-#include "machine/st0016.h"
+#include "st0016.h"
 #include "cpu/mips/mips1.h"
 #include "speaker.h"
 #include <algorithm>

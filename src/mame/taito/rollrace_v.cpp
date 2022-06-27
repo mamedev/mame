@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
 #include "emu.h"
-#include "includes/rollrace.h"
+#include "rollrace.h"
 
 
 #define RA_FGCHAR_BASE  0

@@ -23,7 +23,7 @@ Etched in copper on top of board:
 #include "machine/netlist.h"
 
 #include "netlist/nl_setup.h"
-#include "audio/nl_flyball.h"
+#include "nl_flyball.h"
 
 static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
 static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;

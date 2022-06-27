@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "includes/nes.h"
+#include "nes.h"
 
 /***************************************************************************
     FUNCTIONS

@@ -22,7 +22,7 @@ ToDo:
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
-#include "includes/super6.h"
+#include "super6.h"
 #include "softlist_dev.h"
 
 //**************************************************************************

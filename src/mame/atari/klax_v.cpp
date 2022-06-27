@@ -7,8 +7,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "video/atarimo.h"
-#include "includes/klax.h"
+#include "atarimo.h"
+#include "klax.h"
 
 
 /*************************************

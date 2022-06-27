@@ -13,12 +13,12 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/finalizr.h"
-#include "includes/konamipt.h"
+#include "finalizr.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
-#include "machine/konami1.h"
+#include "konami1.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"

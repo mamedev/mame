@@ -41,7 +41,7 @@ documentation still exists.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dgn_beta.h"
+#include "dgn_beta.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"

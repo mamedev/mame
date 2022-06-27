@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/fgoal.h"
+#include "fgoal.h"
 
 
 void fgoal_state::color_w(uint8_t data)

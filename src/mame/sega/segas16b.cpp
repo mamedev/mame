@@ -870,10 +870,10 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/segas16b.h"
-#include "includes/segaipt.h"
+#include "segas16b.h"
+#include "segaipt.h"
 
-#include "machine/mc8123.h"
+#include "mc8123.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
 
@@ -882,7 +882,7 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 #if USE_NL
 #include "machine/netlist.h"
 #include "netlist/nl_setup.h"
-#include "audio/nl_segas16b.h"
+#include "nl_segas16b.h"
 #endif
 
 //**************************************************************************

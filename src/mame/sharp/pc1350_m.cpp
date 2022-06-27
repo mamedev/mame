@@ -3,8 +3,8 @@
 #include "emu.h"
 #include "cpu/sc61860/sc61860.h"
 
-#include "includes/pocketc.h"
-#include "includes/pc1350.h"
+#include "pocketc.h"
+#include "pc1350.h"
 #include "machine/ram.h"
 
 void pc1350_state::out_b_w(uint8_t data)

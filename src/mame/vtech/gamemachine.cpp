@@ -102,7 +102,7 @@ Grand Prix:
 
 #include "speaker.h"
 
-#include "audio/nl_gamemachine.h"
+#include "nl_gamemachine.h"
 
 // internal artwork
 #include "gamemach.lh"

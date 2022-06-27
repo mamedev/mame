@@ -11,7 +11,7 @@
 
 
 #include "emu.h"
-#include "includes/pk8020.h"
+#include "pk8020.h"
 
 #define DESCRIBE_DECPLM 1
 

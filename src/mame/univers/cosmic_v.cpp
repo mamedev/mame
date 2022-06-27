@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cosmic.h"
+#include "cosmic.h"
 
 
 void cosmic_state::cosmic_color_register_w(offs_t offset, uint8_t data)

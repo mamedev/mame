@@ -3,7 +3,7 @@
 /* Fit of Fighting Video Hardware */
 
 #include "emu.h"
-#include "includes/fitfight.h"
+#include "fitfight.h"
 
 
 void fitfight_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )

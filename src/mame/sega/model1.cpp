@@ -591,12 +591,12 @@ Notes:
 */
 
 #include "emu.h"
-#include "includes/model1.h"
+#include "model1.h"
 
 #include "cpu/i386/i386.h"
 #include "machine/clock.h"
-#include "machine/model1io.h"
-#include "machine/model1io2.h"
+#include "model1io.h"
+#include "model1io2.h"
 #include "machine/nvram.h"
 #include "speaker.h"
 

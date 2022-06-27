@@ -2,7 +2,7 @@
 // copyright-holders:Andrei I. Holub
 
 #include "emu.h"
-#include "includes/tsconf.h"
+#include "tsconf.h"
 
 #define PAGE4K(_r) ((_r) << 14)
 

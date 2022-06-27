@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "machine/cedar_magnet_board.h"
+#include "cedar_magnet_board.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"

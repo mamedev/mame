@@ -22,7 +22,7 @@ Todo:
 **********************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 
 #include "cpu/cosmac/cosmac.h"
 #include "machine/clock.h"

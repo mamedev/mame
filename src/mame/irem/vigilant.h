@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "audio/m72.h"
+#include "m72_a.h"
 #include "machine/timer.h"
 #include "emupal.h"
 

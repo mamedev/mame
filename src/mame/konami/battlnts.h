@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "video/k007342.h"
-#include "video/k007420.h"
+#include "k007342.h"
+#include "k007420.h"
 
 class battlnts_state : public driver_device
 {

@@ -10,14 +10,14 @@
 
 #pragma once
 
-#include "audio/taitosnd.h"
+#include "taitosnd.h"
 #include "machine/eepromser.h"
-#include "machine/taitoio.h"
+#include "taitoio.h"
 #include "sound/flt_vol.h"
-#include "video/tc0100scn.h"
-#include "video/tc0110pcr.h"
-#include "video/tc0150rod.h"
-#include "video/tc0480scp.h"
+#include "tc0100scn.h"
+#include "tc0110pcr.h"
+#include "tc0150rod.h"
+#include "tc0480scp.h"
 #include "screen.h"
 
 

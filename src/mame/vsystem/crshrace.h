@@ -1,15 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_CRSHRACE_H
-#define MAME_INCLUDES_CRSHRACE_H
+#ifndef MAME_VSYSTEM_CRSHRACE_H
+#define MAME_VSYSTEM_CRSHRACE_H
 
 #pragma once
+
+#include "vsystem_spr.h"
+
+#include "k053936.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
-#include "video/vsystem_spr.h"
-#include "video/k053936.h"
 
 #include "emupal.h"
 #include "tilemap.h"
@@ -82,4 +84,4 @@ private:
 	[[maybe_unused]] void patch_code(uint16_t offset);
 };
 
-#endif // MAME_INCLUDES_CRSHRACE_H
+#endif // MAME_VSYSTEM_CRSHRACE_H

@@ -9,7 +9,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/pastelg.h"
+#include "pastelg.h"
 
 
 // pastelg specific methods

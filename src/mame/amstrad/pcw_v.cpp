@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/pcw.h"
+#include "pcw.h"
 #include "machine/ram.h"
 
 #define LOG_PALETTE  (1U <<  1) // LOGs what palette is choosen

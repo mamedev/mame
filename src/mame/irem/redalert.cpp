@@ -113,8 +113,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/redalert.h"
-#include "audio/redalert.h"
+#include "redalert.h"
+#include "redalert_a.h"
 
 #include "cpu/m6502/m6502.h"
 

@@ -34,7 +34,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/bankdev.h"
-#include "machine/e22_kbd.h"
+#include "e22_kbd.h"
 #include "machine/i8251.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"

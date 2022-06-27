@@ -15,7 +15,7 @@ written, so it may be normal behaviour.
 */
 
 #include "emu.h"
-#include "includes/bublbobl.h"
+#include "bublbobl.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"

@@ -88,7 +88,7 @@ MF-0x are locations silkscreened on the PCB
 */
 
 #include "emu.h"
-#include "includes/drgnmst.h"
+#include "drgnmst.h"
 
 #include "cpu/m68000/m68000.h"
 #include "screen.h"

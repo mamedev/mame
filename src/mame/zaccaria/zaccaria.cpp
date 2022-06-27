@@ -44,7 +44,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/zaccaria.h"
+#include "zaccaria.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

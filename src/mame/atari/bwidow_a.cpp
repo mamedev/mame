@@ -4,7 +4,7 @@
 
 
 #include "emu.h"
-#include "includes/bwidow.h"
+#include "bwidow.h"
 
 #include "sound/pokey.h"
 #include "sound/discrete.h"

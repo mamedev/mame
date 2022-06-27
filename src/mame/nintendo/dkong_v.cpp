@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/dkong.h"
+#include "dkong.h"
 
 #define RADARSCP_BCK_COL_OFFSET         256
 #define RADARSCP_GRID_COL_OFFSET        (RADARSCP_BCK_COL_OFFSET + 256)

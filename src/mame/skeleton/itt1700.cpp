@@ -18,7 +18,7 @@ This device may be related to the Intel 8251, but it is definitely not a SCN2651
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/itt1700_kbd.h"
+#include "itt1700_kbd.h"
 #include "video/mc6845.h"
 #include "screen.h"
 #include "speaker.h"

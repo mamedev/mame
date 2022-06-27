@@ -7,11 +7,11 @@
 
 #include "cpu/m6800/m6801.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/c117.h"
+#include "c117.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
-#include "video/namco_c116.h"
-#include "video/namco_c123tmap.h"
+#include "namco_c116.h"
+#include "namco_c123tmap.h"
 #include "machine/74157.h"
 
 class namcos1_state : public driver_device

@@ -16,7 +16,7 @@
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "includes/tnzs.h"
+#include "tnzs.h"
 
 uint8_t tnzs_mcu_state::mcu_r(offs_t offset)
 {

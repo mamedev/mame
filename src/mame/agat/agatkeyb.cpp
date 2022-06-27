@@ -8,7 +8,7 @@
 
 #include "emu.h"
 
-#include "machine/agatkeyb.h"
+#include "agatkeyb.h"
 #include "machine/keyboard.ipp"
 
 

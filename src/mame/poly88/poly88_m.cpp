@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "includes/poly88.h"
+#include "poly88.h"
 
 
 bool poly88_state::is_onboard(offs_t offset)

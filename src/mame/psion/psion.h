@@ -12,7 +12,7 @@
 
 #include "cpu/m6800/m6801.h"
 #include "machine/nvram.h"
-#include "machine/psion_pack.h"
+#include "psion_pack.h"
 #include "machine/timer.h"
 #include "video/hd44780.h"
 #include "sound/beep.h"

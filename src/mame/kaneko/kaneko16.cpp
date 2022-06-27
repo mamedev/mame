@@ -98,7 +98,7 @@ Non-Bugs (happen on real PCB)
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/kaneko16.h"
+#include "kaneko16.h"
 
 #include "speaker.h"
 

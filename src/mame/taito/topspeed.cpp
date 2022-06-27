@@ -154,13 +154,13 @@ From JP manual
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/topspeed.h"
-#include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
+#include "topspeed.h"
+#include "taitoipt.h"
+#include "taitosnd.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/taitoio.h"
+#include "taitoio.h"
 #include "machine/z80ctc.h"
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"

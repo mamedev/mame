@@ -546,7 +546,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/norautp.h"
+#include "norautp.h"
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"

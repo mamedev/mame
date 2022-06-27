@@ -80,7 +80,7 @@ SEGA 1998
 
 #include "emu.h"
 #include "emuopts.h"
-#include "machine/m3comm.h"
+#include "m3comm.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"

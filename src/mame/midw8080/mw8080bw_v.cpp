@@ -8,7 +8,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/mw8080bw.h"
+#include "mw8080bw.h"
 
 
 uint32_t mw8080bw_state::screen_update_mw8080bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

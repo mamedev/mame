@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/pasopia.h"
+#include "pasopia.h"
 
 #include "bus/pasopia/pac2.h"
 #include "bus/rs232/rs232.h"

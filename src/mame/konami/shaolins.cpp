@@ -99,7 +99,7 @@ Konami games from this era with some pins not used.
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/shaolins.h"
+#include "shaolins.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"

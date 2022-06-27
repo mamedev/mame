@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galaxy.h"
+#include "galaxy.h"
 #include "cpu/z80/z80.h"
 
 

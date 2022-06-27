@@ -13,7 +13,7 @@
 #pragma once
 
 #include "cpu/saturn/saturn.h"
-#include "machine/hp48_port.h"
+#include "hp48_port.h"
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"

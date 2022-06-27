@@ -3,7 +3,7 @@
 /* Kick Goal - video */
 
 #include "emu.h"
-#include "includes/kickgoal.h"
+#include "kickgoal.h"
 
 
 void kickgoal_state::fgram_w(offs_t offset, u16 data, u16 mem_mask)

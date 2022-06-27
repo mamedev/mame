@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/cybstorm.h"
+#include "cybstorm.h"
 
 
 

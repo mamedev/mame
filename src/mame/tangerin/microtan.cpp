@@ -58,7 +58,7 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "includes/microtan.h"
+#include "microtan.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"

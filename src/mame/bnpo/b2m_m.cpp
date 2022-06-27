@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "includes/b2m.h"
+#include "b2m.h"
 
 uint8_t b2m_state::keyboard_r(offs_t offset)
 {

@@ -404,7 +404,7 @@ earlier TK games, so it appears to be optional or is only used by the later TK51
 */
 
 #include "emu.h"
-#include "machine/ns10crypt.h"
+#include "ns10crypt.h"
 
 #include "cpu/psx/psx.h"
 #include "cpu/tlcs900/tmp95c061.h"

@@ -158,7 +158,7 @@ Updates by Bryan McPhail, 12/12/2004:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/xain.h"
+#include "xain.h"
 
 #include "cpu/m6809/m6809.h"
 #include "sound/ymopn.h"

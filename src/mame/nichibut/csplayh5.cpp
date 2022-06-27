@@ -38,7 +38,7 @@
 #include "machine/idectrl.h"
 #include "machine/timer.h"
 #include "video/v9938.h"
-#include "audio/nichisnd.h"
+#include "nichisnd.h"
 
 #define USE_H8 0
 #define DVD_CLOCK XTAL(27'000'000)

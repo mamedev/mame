@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Angelo Salese
 #include "emu.h"
-#include "includes/tatsumi.h"
+#include "tatsumi.h"
 #include "screen.h"
 
 

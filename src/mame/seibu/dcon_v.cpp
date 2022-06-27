@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dcon.h"
+#include "dcon.h"
 #include "screen.h"
 
 

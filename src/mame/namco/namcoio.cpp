@@ -111,7 +111,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/namcoio.h"
+#include "namcoio.h"
 
 
 #define VERBOSE 0

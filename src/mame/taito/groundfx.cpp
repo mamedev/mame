@@ -65,9 +65,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/groundfx.h"
-#include "audio/taito_en.h"
-#include "machine/taitoio.h"
+#include "groundfx.h"
+#include "taito_en.h"
+#include "taitoio.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/adc0808.h"

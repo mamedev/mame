@@ -13,7 +13,7 @@
 
 
 #include "emu.h"
-#include "includes/arcadia.h"
+#include "arcadia.h"
 
 //known UVI audio clocks
 #define UVI_NTSC 15734

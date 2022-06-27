@@ -12,7 +12,7 @@
 */
 
 #include "emu.h"
-#include "video/atarist.h"
+#include "atarist_v.h"
 #include "cpu/m68000/m68000.h"
 #include "screen.h"
 

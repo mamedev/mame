@@ -269,17 +269,18 @@ MASTER BOARD
 */
 
 #include "emu.h"
+#include "cedar_magnet_plane.h"
+#include "cedar_magnet_sprite.h"
+#include "cedar_magnet_flop.h"
+
+#include "efo_zsu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/bankdev.h"
 #include "machine/z80ctc.h"
 #include "sound/ay8910.h"
-
-#include "audio/efo_zsu.h"
-#include "machine/cedar_magnet_plane.h"
-#include "machine/cedar_magnet_sprite.h"
-#include "machine/cedar_magnet_flop.h"
 
 #include "emupal.h"
 #include "screen.h"

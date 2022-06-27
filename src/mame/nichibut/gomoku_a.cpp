@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/gomoku.h"
+#include "gomoku_a.h"
 
 
 // device type definition

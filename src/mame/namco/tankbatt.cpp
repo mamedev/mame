@@ -74,7 +74,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tankbatt.h"
+#include "tankbatt.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"

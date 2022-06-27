@@ -12,8 +12,8 @@
 
 */
 #include "emu.h"
-#include "includes/bfm_sc5.h"
-#include "includes/bfm_sc4.h" // TODO: untangle from this
+#include "bfm_sc5.h"
+#include "bfm_sc4.h" // TODO: untangle from this
 
 
 #define sc5pld \

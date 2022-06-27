@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "video/atarimo.h"
-#include "video/atarivad.h"
+#include "atarimo.h"
+#include "atarivad.h"
 #include "screen.h"
 #include "tilemap.h"
 

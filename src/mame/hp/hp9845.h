@@ -16,7 +16,7 @@
 #include "screen.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
-#include "machine/hp98x5_io_sys.h"
+#include "hp98x5_io_sys.h"
 
 class hp9845_base_state : public driver_device
 {

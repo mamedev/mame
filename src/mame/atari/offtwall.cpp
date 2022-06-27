@@ -20,7 +20,7 @@
 
 
 #include "emu.h"
-#include "includes/offtwall.h"
+#include "offtwall.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"

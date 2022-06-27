@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/bagman.h"
+#include "bagman.h"
 
 
 void bagman_state::videoram_w(offs_t offset, uint8_t data)

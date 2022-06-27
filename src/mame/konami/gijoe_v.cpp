@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 #include "emu.h"
-#include "includes/gijoe.h"
+#include "gijoe.h"
 
 K053246_CB_MEMBER(gijoe_state::sprite_callback)
 {

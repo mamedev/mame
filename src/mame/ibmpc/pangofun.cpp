@@ -98,11 +98,15 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 **************************************************************************************************/
 
 #include "emu.h"
+
+#include "pcshare.h"
+
 #include "cpu/i386/i386.h"
-#include "machine/pcshare.h"
 #include "video/pc_vga.h"
 #include "screen.h"
 
+
+namespace {
 
 class pangofun_state : public pcat_base_state
 {
@@ -201,5 +205,8 @@ ROM_END
 void pangofun_state::init_pangofun()
 {
 }
+
+} // anonymous namespace
+
 
 GAME( 1995, pangofun,  0,   pangofun, pangofun, pangofun_state, init_pangofun, ROT0, "InfoCube", "Pango Fun (Italy)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

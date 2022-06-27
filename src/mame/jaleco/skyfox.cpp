@@ -24,7 +24,7 @@ Verified Dip locations and recommended settings with manual
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/skyfox.h"
+#include "skyfox.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ymopn.h"

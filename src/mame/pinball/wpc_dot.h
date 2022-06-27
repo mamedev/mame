@@ -7,15 +7,16 @@
  *      Author: bsr
  */
 
-#ifndef MAME_INCLUDES_WPC_DOT_H
-#define MAME_INCLUDES_WPC_DOT_H
+#ifndef MAME_PINBALL_WPC_DOT_H
+#define MAME_PINBALL_WPC_DOT_H
 
 #pragma once
 
+#include "dcs.h"
+
 #include "cpu/m6809/m6809.h"
-#include "audio/wpcsnd.h"
-#include "audio/dcs.h"
-#include "machine/wpc.h"
+#include "wpcsnd.h"
+#include "wpc.h"
 
 class wpc_dot_state : public driver_device
 {
@@ -99,4 +100,4 @@ protected:
 	void wpc_flip2_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_WPC_DOT_H
+#endif // MAME_PINBALL_WPC_DOT_H

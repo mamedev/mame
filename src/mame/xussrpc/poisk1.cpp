@@ -22,7 +22,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/kb_poisk1.h"
+#include "kb_poisk1.h"
 
 #include "bus/isa/isa.h"
 #include "bus/isa/p1_fdc.h"

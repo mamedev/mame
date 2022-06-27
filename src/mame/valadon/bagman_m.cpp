@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bagman.h"
+#include "bagman.h"
 
 
 /*Creation date: 98-02-18 */

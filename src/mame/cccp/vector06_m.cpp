@@ -10,7 +10,7 @@
 
 
 #include "emu.h"
-#include "includes/vector06.h"
+#include "vector06.h"
 #include "screen.h"
 
 

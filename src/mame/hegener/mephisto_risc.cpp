@@ -22,9 +22,9 @@ Hardware notes:
 #include "cpu/m6502/m65sc02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
-#include "machine/mmboard.h"
+#include "mmboard.h"
 #include "machine/chessmachine.h"
-#include "video/mmdisplay2.h"
+#include "mmdisplay2.h"
 
 // internal artwork
 #include "mephisto_risc.lh"

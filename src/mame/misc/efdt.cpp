@@ -158,7 +158,7 @@
 **********************************************************************************/
 
 #include "emu.h"
-#include "includes/efdt.h"
+#include "efdt.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"

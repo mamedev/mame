@@ -7,12 +7,11 @@
 */
 
 #include "emu.h"
-#include "includes/tx0.h"
+#include "tx0.h"
 
 #include "imagedev/magtape.h"
 #include "imagedev/papertape.h"
 
-#include "video/crt.h"
 #include "screen.h"
 #include "softlist_dev.h"
 

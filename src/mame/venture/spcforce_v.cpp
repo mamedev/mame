@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/spcforce.h"
+#include "spcforce.h"
 
 
 WRITE_LINE_MEMBER(spcforce_state::flip_screen_w)

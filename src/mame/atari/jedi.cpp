@@ -118,7 +118,7 @@
 #include "machine/adc0808.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/jedi.h"
+#include "jedi.h"
 
 
 /*************************************

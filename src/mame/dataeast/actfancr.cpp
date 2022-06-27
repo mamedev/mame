@@ -19,8 +19,8 @@
 
 #include "emu.h"
 
-#include "video/decbac06.h"
-#include "video/decmxc06.h"
+#include "decbac06.h"
+#include "decmxc06.h"
 
 #include "cpu/h6280/h6280.h"
 #include "cpu/m6502/m6502.h"

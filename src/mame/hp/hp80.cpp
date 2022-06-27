@@ -79,7 +79,7 @@
 #include "sound/beep.h"
 #include "sound/dac.h"
 #include "machine/1ma6.h"
-#include "machine/hp80_optrom.h"
+#include "hp80_optrom.h"
 #include "machine/ram.h"
 #include "softlist_dev.h"
 #include "machine/bankdev.h"

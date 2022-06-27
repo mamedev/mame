@@ -54,7 +54,7 @@
 
 
 #include "emu.h"
-#include "includes/atarigt.h"
+#include "atarigt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"

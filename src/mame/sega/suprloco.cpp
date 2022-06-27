@@ -22,14 +22,17 @@ Sega PCB 834-5137
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/suprloco.h"
+#include "suprloco.h"
+
+#include "segacrpt_device.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "machine/segacrpt_device.h"
 #include "sound/sn76496.h"
+
 #include "screen.h"
 #include "speaker.h"
+
 
 void suprloco_state::main_map(address_map &map)
 {

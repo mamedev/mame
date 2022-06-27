@@ -190,7 +190,7 @@ Some logic, resistors/caps/transistors, some connectors etc.
 *************************************************************/
 
 #include "emu.h"
-#include "includes/namcond1.h"
+#include "namcond1.h"
 
 #include "cpu/h8/h83002.h"
 #include "cpu/m68000/m68000.h"

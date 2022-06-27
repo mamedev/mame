@@ -8,8 +8,8 @@
  */
 
 #include "emu.h"
-#include "includes/konamigx.h"
-#include "includes/mystwarr.h"
+#include "konamigx.h"
+#include "mystwarr.h"
 
 
 // create a decoding buffer to hold decodable tiles so that the ROM test will pass by

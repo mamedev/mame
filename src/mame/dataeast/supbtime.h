@@ -11,10 +11,10 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
-#include "machine/decocrpt.h"
+#include "decocrpt.h"
 #include "machine/gen_latch.h"
-#include "video/decospr.h"
-#include "video/deco16ic.h"
+#include "decospr.h"
+#include "deco16ic.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "screen.h"

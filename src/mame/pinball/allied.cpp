@@ -44,7 +44,7 @@ ToDo:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "cpu/m6502/m6504.h"
 #include "machine/mos6530.h"
 #include "machine/6821pia.h"

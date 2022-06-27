@@ -24,12 +24,13 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 */
 
 #include "emu.h"
+#include "decospr.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
-#include "video/decospr.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

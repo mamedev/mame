@@ -8,9 +8,9 @@
 
 #include "machine/bankdev.h"
 #include "screen.h"
-#include "video/sgi_ge5.h"
-#include "video/sgi_re2.h"
-#include "video/sgi_xmap2.h"
+#include "sgi_ge5.h"
+#include "sgi_re2.h"
+#include "sgi_xmap2.h"
 #include "video/bt45x.h"
 #include "video/bt431.h"
 

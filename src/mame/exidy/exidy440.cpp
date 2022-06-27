@@ -234,7 +234,7 @@ Who Dunit            1988  6809
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/exidy440.h"
+#include "exidy440.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"

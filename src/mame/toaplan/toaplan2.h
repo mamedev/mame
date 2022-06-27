@@ -11,7 +11,7 @@
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "machine/upd4992.h"
-#include "video/gp9001.h"
+#include "gp9001.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "screen.h"

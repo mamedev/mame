@@ -47,10 +47,13 @@ ToDO:
 
 
 #include "emu.h"
+#include "genpin.h"
+
+#include "gottlieb_a.h"
+
 #include "machine/input_merger.h"
-#include "machine/genpin.h"
-#include "audio/gottlieb.h"
 #include "speaker.h"
+
 #include "gts80.lh"
 
 namespace {

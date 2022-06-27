@@ -58,9 +58,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dgn_beta.h"
+#include "dgn_beta.h"
 
-#include "includes/coco.h" // for CoCo OS-9 disassembler enhancements
+#include "coco.h" // for CoCo OS-9 disassembler enhancements
 
 #include "cpu/m6809/m6809.h"
 #include "imagedev/floppy.h"

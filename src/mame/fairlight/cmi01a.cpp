@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/cmi01a.h"
+#include "cmi01a.h"
 
 #define VERBOSE     (0)
 #include "logmacro.h"

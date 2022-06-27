@@ -18,7 +18,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lemmings.h"
+#include "lemmings.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"

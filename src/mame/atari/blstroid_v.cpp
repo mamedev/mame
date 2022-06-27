@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/blstroid.h"
+#include "blstroid.h"
 #include "cpu/m68000/m68000.h"
 
 

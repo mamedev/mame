@@ -219,7 +219,7 @@
 // i/o devices (rx3230)
 #include "machine/timekpr.h"
 #include "machine/ncr5390.h"
-#include "machine/mips_rambo.h"
+#include "mips_rambo.h"
 
 // busses and connectors
 #include "machine/nscsi_bus.h"

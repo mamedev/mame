@@ -20,7 +20,7 @@ ToDo:
 
 ********************************************************************************/
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "cpu/tms9900/tms9980a.h"
 #include "cpu/tms9900/tms9995.h"
 #include "cpu/m6800/m6800.h"

@@ -49,13 +49,15 @@ NOTE: The Atari 136002-125 PROM in the sets below wasn't dumped from an actual
 ***************************************************************************/
 
 #include "emu.h"
+#include "avgdvg.h"
+
 #include "cpu/m68000/m68000.h"
-#include "video/vector.h"
-#include "video/avgdvg.h"
-#include "sound/pokey.h"
-#include "sound/discrete.h"
 #include "machine/watchdog.h"
 #include "machine/x2212.h"
+#include "sound/discrete.h"
+#include "sound/pokey.h"
+#include "video/vector.h"
+
 #include "screen.h"
 #include "speaker.h"
 

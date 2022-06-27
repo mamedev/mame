@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/aquarius.h"
+#include "aquarius.h"
 
 
 static constexpr unsigned short aquarius_pens[] =

@@ -15,7 +15,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/mouser.h"
+#include "mouser.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

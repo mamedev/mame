@@ -169,7 +169,7 @@ Protection Notes:
 ********************************************************************************************************/
 
 #include "emu.h"
-#include "includes/raiden2.h"
+#include "raiden2.h"
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
@@ -177,7 +177,7 @@ Protection Notes:
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "sound/ymopl.h"
-#include "machine/r2crypt.h"
+#include "r2crypt.h"
 
 #include "debugger.h"
 #include "speaker.h"

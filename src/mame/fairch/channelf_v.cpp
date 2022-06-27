@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller, Frank Palazzolo, Sean Riddle
 #include "emu.h"
-#include "includes/channelf.h"
+#include "channelf.h"
 
 static constexpr rgb_t channelf_pens[] =
 {

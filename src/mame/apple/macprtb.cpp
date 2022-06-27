@@ -88,7 +88,7 @@
 
 #include "emu.h"
 
-#include "machine/macrtc.h"
+#include "macrtc.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m5074x.h"
 #include "machine/6522via.h"
@@ -97,8 +97,8 @@
 #include "machine/swim1.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
-#include "machine/macadb.h"
-#include "machine/macscsi.h"
+#include "macadb.h"
+#include "macscsi.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/devices.h"

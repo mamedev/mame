@@ -11,7 +11,7 @@ Quite similar to Appoooh
 *****************************************************************************/
 
 #include "emu.h"
-#include "includes/drmicro.h"
+#include "drmicro.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"

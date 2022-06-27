@@ -4,7 +4,7 @@
 #ifndef MAME_INCLUDES_BWIDOW_H
 #define MAME_INCLUDES_BWIDOW_H
 
-#include "video/avgdvg.h"
+#include "avgdvg.h"
 #include "machine/er2055.h"
 
 #define MASTER_CLOCK (XTAL(12'096'000))

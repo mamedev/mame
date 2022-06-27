@@ -3,7 +3,7 @@
 /* Big Striker (bootleg) Video Hardware */
 
 #include "emu.h"
-#include "includes/bigstrkb.h"
+#include "bigstrkb.h"
 
 
 /* Sprites */

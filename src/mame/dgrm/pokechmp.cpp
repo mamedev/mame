@@ -41,7 +41,7 @@ ClawGrip, Jul 2006
 */
 
 #include "emu.h"
-#include "includes/pokechmp.h"
+#include "pokechmp.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/okim6295.h"

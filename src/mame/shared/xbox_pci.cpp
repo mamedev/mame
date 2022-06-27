@@ -2,10 +2,12 @@
 // copyright-holders:Samuele Zannoli
 
 #include "emu.h"
+#include "xbox_pci.h"
+
+#include "xbox.h"
+
 #include "machine/pci.h"
 #include "machine/idectrl.h"
-#include "machine/xbox_pci.h"
-#include "machine/xbox.h"
 #include "machine/ds128x.h"
 
 #include <functional>

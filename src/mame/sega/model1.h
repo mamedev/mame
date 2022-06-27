@@ -5,17 +5,18 @@
 
 #pragma once
 
-#include "audio/dsbz80.h"
-#include "audio/segam1audio.h"
+#include "dsbz80.h"
+#include "m1comm.h"
+#include "segaic24.h"
+
+#include "segam1audio.h"
 
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/v60/v60.h"
 #include "machine/i8251.h"
 #include "machine/gen_fifo.h"
 #include "machine/mb8421.h"
-#include "machine/m1comm.h"
 #include "machine/timer.h"
-#include "video/segaic24.h"
 
 #include "emupal.h"
 #include "screen.h"

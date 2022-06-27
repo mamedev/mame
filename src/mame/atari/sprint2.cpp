@@ -20,7 +20,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/sprint2.h"
+#include "sprint2.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/discrete.h"

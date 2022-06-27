@@ -5,13 +5,14 @@
  * includes/tx0.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_TX0_H
-#define MAME_INCLUDES_TX0_H
+#ifndef MAME_MIT_TX0_H
+#define MAME_MIT_TX0_H
 
 #pragma once
 
+#include "mitcrt.h"
+
 #include "cpu/tx0/tx0.h"
-#include "video/crt.h"
 
 #include "emupal.h"
 
@@ -338,4 +339,4 @@ enum
 };
 
 
-#endif // MAME_INCLUDES_TX0_H
+#endif // MAME_MIT_TX0_H

@@ -18,7 +18,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/konamipt.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
@@ -26,8 +26,8 @@
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ymopm.h"
-#include "video/k052109.h"
-#include "video/k051960.h"
+#include "k052109.h"
+#include "k051960.h"
 
 #include "emupal.h"
 #include "speaker.h"

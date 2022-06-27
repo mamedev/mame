@@ -11,7 +11,7 @@
 #pragma once
 
 #include "sound/ay8910.h"
-#include "video/stic.h"
+#include "stic.h"
 #include "video/tms9927.h"
 
 #include "bus/intv/ecs.h"

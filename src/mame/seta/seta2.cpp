@@ -91,7 +91,7 @@ funcube series:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/seta2.h"
+#include "seta2.h"
 
 #include "cpu/h8/h83006.h"
 #include "cpu/m68000/m68000.h"

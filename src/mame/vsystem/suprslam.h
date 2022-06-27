@@ -5,15 +5,19 @@
     Super Slams
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SUPRSLAM_H
-#define MAME_INCLUDES_SUPRSLAM_H
+#ifndef MAME_VSYSTEM_SUPRSLAM_H
+#define MAME_VSYSTEM_SUPRSLAM_H
 
 #pragma once
 
-#include "video/vsystem_spr.h"
+#include "vsystem_spr.h"
+
+#include "k053936.h"
+
 #include "machine/gen_latch.h"
-#include "video/k053936.h"
+
 #include "tilemap.h"
+
 
 class suprslam_state : public driver_device
 {
@@ -80,4 +84,4 @@ private:
 	void suprslam_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SUPRSLAM_H
+#endif // MAME_VSYSTEM_SUPRSLAM_H

@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/firetrk.h"
+#include "firetrk.h"
 #include "sound/discrete.h"
 
 

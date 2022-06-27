@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/pcshare.h"
+#include "pcshare.h"
 #include "cpu/i86/i286.h"
 #include "bus/isa/trident.h"
 #include "video/pc_vga.h"

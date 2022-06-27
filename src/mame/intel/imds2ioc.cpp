@@ -12,7 +12,7 @@
 // - Adjust speed of processors. Wait states are not accounted for yet.
 
 #include "emu.h"
-#include "machine/imds2ioc.h"
+#include "imds2ioc.h"
 #include "screen.h"
 #include "speaker.h"
 

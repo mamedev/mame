@@ -2,8 +2,8 @@
 // copyright-holders:Vas Crabb
 
 #include "emu.h"
-#include "audio/cheekyms.h"
-#include "audio/nl_cheekyms.h"
+#include "cheekyms_a.h"
+#include "nl_cheekyms.h"
 
 #include "speaker.h"
 

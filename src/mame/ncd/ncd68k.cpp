@@ -54,6 +54,8 @@
  */
 #include "emu.h"
 
+#include "bert_m.h"
+
 // processors
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m68705.h"
@@ -63,7 +65,6 @@
 #include "machine/mc68681.h"
 #include "machine/am79c90.h"
 #include "machine/eepromser.h"
-#include "machine/bert.h"
 
 // busses and connectors
 #include "bus/pc_kbd/pc_kbdc.h"

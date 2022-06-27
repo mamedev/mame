@@ -76,7 +76,7 @@ PS / PD :  key matrix
 *****************************************************************************************/
 
 #include "emu.h"
-#include "includes/speedatk.h"
+#include "speedatk.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"

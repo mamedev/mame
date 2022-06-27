@@ -6,7 +6,7 @@
 
 *************************************************************************/
 #include "emu.h"
-#include "includes/nitedrvr.h"
+#include "nitedrvr.h"
 #include "sound/discrete.h"
 
 

@@ -13,7 +13,7 @@
 
 
 #include "emu.h"
-#include "audio/snk6502.h"
+#include "snk6502_a.h"
 
 #include "speaker.h"
 

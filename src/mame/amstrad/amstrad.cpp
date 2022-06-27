@@ -90,7 +90,7 @@ Some bugs left :
 
 /* Core includes */
 #include "emu.h"
-#include "includes/amstrad.h"
+#include "amstrad.h"
 
 /* Components */
 #include "machine/i8255.h"  /* for 8255 ppi */

@@ -60,7 +60,7 @@
 #include "model1io.h"
 #include "cpu/z80/z80.h"
 #include "machine/msm6253.h"
-#include "machine/315_5338a.h"
+#include "315_5338a.h"
 
 
 //**************************************************************************

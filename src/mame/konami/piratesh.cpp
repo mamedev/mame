@@ -30,7 +30,7 @@
 
 #include "emu.h"
 
-#include "includes/konamigx.h" // TODO: WHY?
+#include "konamigx.h" // TODO: WHY?
 
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
@@ -39,11 +39,11 @@
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/k054539.h"
-#include "video/k053246_k053247_k055673.h"
-#include "video/k053250_ps.h"
-#include "video/k054000.h"
-#include "video/k055555.h"
-#include "video/konami_helper.h"
+#include "k053246_k053247_k055673.h"
+#include "k053250_ps.h"
+#include "k054000.h"
+#include "k055555.h"
+#include "konami_helper.h"
 
 #include "speaker.h"
 

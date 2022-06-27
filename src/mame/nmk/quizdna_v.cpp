@@ -12,7 +12,7 @@ Video hardware
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/quizdna.h"
+#include "quizdna.h"
 
 
 TILE_GET_INFO_MEMBER(quizdna_state::get_bg_tile_info)

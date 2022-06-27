@@ -46,7 +46,7 @@ used XTA (8-bit IDE) harddisks.
 #include "machine/pckeybrd.h"
 #include "machine/nvram.h"
 #include "machine/bankdev.h"
-#include "video/pc_t1t.h"
+#include "pc_t1t.h"
 #include "sound/sn76496.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"

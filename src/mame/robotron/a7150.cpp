@@ -24,6 +24,8 @@ To do:
 
 #include "emu.h"
 
+#include "isbc_215g.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
@@ -32,7 +34,6 @@ To do:
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
-#include "machine/isbc_215g.h"
 #include "machine/keyboard.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"

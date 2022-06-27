@@ -47,15 +47,16 @@
 */
 
 #include "emu.h"
-#include "includes/dccons.h"
+#include "dccons.h"
+
+#include "dc-ctrl.h"
+#include "gdrom.h"
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "cpu/sh/sh4.h"
 #include "imagedev/chd_cd.h"
 #include "machine/aicartc.h"
-#include "machine/dc-ctrl.h"
-#include "machine/gdrom.h"
 
 //#include "emupal.h"
 #include "screen.h"

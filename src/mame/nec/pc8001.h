@@ -15,7 +15,7 @@
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/upd1990a.h"
-#include "machine/pc80s31k.h"
+#include "pc80s31k.h"
 #include "sound/beep.h"
 #include "video/upd3301.h"
 #include "emupal.h"

@@ -113,7 +113,7 @@ Notes (couriersud)
 
 ***************************************************************************/
 #include "emu.h"
-#include "includes/m10.h"
+#include "m10.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"

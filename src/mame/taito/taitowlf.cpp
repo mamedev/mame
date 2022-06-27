@@ -62,9 +62,10 @@ Taito W Rom Board:
 
 #define TAITOWLF_ENABLE_VGA 0
 
+#include "pcshare.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
-#include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 #if TAITOWLF_ENABLE_VGA
 #include "video/pc_vga.h"

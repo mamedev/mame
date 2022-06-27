@@ -262,7 +262,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/slapfght.h"
+#include "slapfght.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"

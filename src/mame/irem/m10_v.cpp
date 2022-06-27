@@ -13,7 +13,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/m10.h"
+#include "m10.h"
 
 static const uint32_t extyoffs[] =
 {

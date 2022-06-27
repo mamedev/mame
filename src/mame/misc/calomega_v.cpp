@@ -17,7 +17,7 @@
 
 
 #include "emu.h"
-#include "includes/calomega.h"
+#include "calomega.h"
 
 
 void calomega_state::calomega_videoram_w(offs_t offset, uint8_t data)

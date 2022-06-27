@@ -1,9 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_TAITO_LSASQAD_H
+#define MAME_TAITO_LSASQAD_H
+
+#pragma once
+
+#include "taito68705.h"
 
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
-#include "machine/taito68705interface.h"
 #include "emupal.h"
 
 class lsasquad_state : public driver_device
@@ -75,3 +80,5 @@ private:
 	void lsasquad_sound_map(address_map &map);
 	void storming_map(address_map &map);
 };
+
+#endif // MAME_TAITO_LSASQAD_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 #include "emu.h"
-#include "includes/asterix.h"
+#include "asterix.h"
 #include "screen.h"
 
 

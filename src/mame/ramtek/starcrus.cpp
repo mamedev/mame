@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/starcrus.h"
+#include "starcrus.h"
 
 #include "cpu/i8085/i8085.h"
 #include "screen.h"

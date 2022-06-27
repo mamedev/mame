@@ -74,16 +74,20 @@ video card
 */
 
 #include "emu.h"
+
+#include "pcshare.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/pic8259.h"
 #include "machine/mc146818.h"
-#include "machine/pcshare.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
 #include "bus/isa/trident.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/sblaster.h"
+
+namespace {
 
 class magtouch_state : public pcat_base_state
 {
@@ -267,5 +271,7 @@ ROM_START(magtouch)
 	ROM_FILL(0x511fb, 1, 0x03)
 	ROM_FILL(0x511ba, 1, 0xeb) // skip csum
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1995, magtouch, 0, magtouch, magtouch, magtouch_state, empty_init, ROT0, "Micro Manufacturing",     "Magical Touch", MACHINE_UNEMULATED_PROTECTION )

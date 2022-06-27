@@ -5,13 +5,14 @@
     Gotcha
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_GOTCHA_H
-#define MAME_INCLUDES_GOTCHA_H
+#ifndef MAME_MISC_GOTCHA_H
+#define MAME_MISC_GOTCHA_H
 
 #pragma once
 
+#include "decospr.h"
+
 #include "sound/okim6295.h"
-#include "video/decospr.h"
 #include "tilemap.h"
 
 class gotcha_state : public driver_device
@@ -82,4 +83,4 @@ private:
 	output_finder<3> m_lamp_s;
 };
 
-#endif // MAME_INCLUDES_GOTCHA_H
+#endif // MAME_MISC_GOTCHA_H

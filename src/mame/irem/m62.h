@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "audio/irem.h"
+#include "irem.h"
 #include "emupal.h"
 #include "tilemap.h"
 

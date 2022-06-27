@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/nitedrvr.h"
+#include "nitedrvr.h"
 
 
 void nitedrvr_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, int bx, int by, int ex, int ey)

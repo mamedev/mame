@@ -46,7 +46,7 @@ More notes about Funny Strip protection issues at the bottom of source file (ini
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/splash.h"
+#include "splash.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"

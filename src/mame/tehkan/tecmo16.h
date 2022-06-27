@@ -6,8 +6,8 @@
 #pragma once
 
 #include "video/bufsprite.h"
-#include "video/tecmo_spr.h"
-#include "video/tecmo_mix.h"
+#include "tecmo_spr.h"
+#include "tecmo_mix.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

@@ -295,7 +295,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/snes.h"
+#include "snes.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/m6m80011ap.h"

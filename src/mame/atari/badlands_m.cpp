@@ -14,7 +14,7 @@
 
 #include "emu.h"
 #include "machine/gen_latch.h"
-#include "video/atarimo.h"
+#include "atarimo.h"
 #include "screen.h"
 
 /*************************************

@@ -48,8 +48,8 @@
 #include "machine/input_merger.h"
 #include "machine/ins8250.h"
 #include "machine/rstbuf.h"
-#include "machine/vt100_kbd.h"
-#include "video/vtvideo.h"
+#include "vt100_kbd.h"
+#include "vtvideo.h"
 #include "screen.h"
 
 #include "vt100.lh"

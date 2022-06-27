@@ -67,14 +67,14 @@
 ***************************************************************************************************************************/
 
 #include "emu.h"
-#include "includes/seibuspi.h"
+#include "seibuspi.h"
 
 #include "cpu/i386/i386.h"
 //#include "bus/rs232/rs232.h"
 #include "machine/i8251.h"
 //#include "machine/microtch.h"
 //#include "machine/rtc4543.h"
-#include "machine/seibuspi.h"
+#include "seibuspi_m.h"
 #include "sound/ymz280b.h"
 #include "screen.h"
 #include "speaker.h"

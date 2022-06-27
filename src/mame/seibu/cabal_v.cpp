@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cabal.h"
+#include "cabal.h"
 
 TILE_GET_INFO_MEMBER(cabal_base_state::get_back_tile_info)
 {

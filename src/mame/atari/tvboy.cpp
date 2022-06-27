@@ -11,7 +11,7 @@ TODO:
 
 #include "emu.h"
 
-#include "includes/a2600.h"
+#include "a2600.h"
 #include "machine/bankdev.h"
 
 #include "screen.h"

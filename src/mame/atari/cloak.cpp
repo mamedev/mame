@@ -117,7 +117,7 @@
 */
 
 #include "emu.h"
-#include "includes/cloak.h"
+#include "cloak.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/pokey.h"

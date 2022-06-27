@@ -340,9 +340,9 @@ Boards:
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/pacman.h"
-#include "machine/jumpshot.h"
-#include "machine/pacplus.h"
+#include "pacman.h"
+#include "jumpshot.h"
+#include "pacplus.h"
 
 #include "cpu/s2650/s2650.h"
 #include "cpu/z80/z80.h"

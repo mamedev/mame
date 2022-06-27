@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "audio/exidy440.h"
+#include "exidy440_a.h"
 #include "emupal.h"
 #include "screen.h"
 

@@ -2,7 +2,7 @@
 // copyright-holders:Ernesto Corvi,Tim Lindquist,Carlos A. Lozano,Bryan McPhail,Jarek Parchanski,Nicola Salmoria,Tomasz Slanina,Phil Stroffolino,Acho A. Tang,Victor Trucco
 // thanks-to:Marco Cassili
 #include "emu.h"
-#include "includes/snk.h"
+#include "snk.h"
 
 /*******************************************************************************
  Shadow Handling Notes

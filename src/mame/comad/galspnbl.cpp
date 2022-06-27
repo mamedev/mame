@@ -45,7 +45,7 @@ Other: Actel A1020B 84pin PLCC, Cypress CY7384A 84pin PLCC
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galspnbl.h"
+#include "galspnbl.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

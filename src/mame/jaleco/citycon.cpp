@@ -10,7 +10,7 @@ Dip locations added from dip listing at crazykong.com
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/citycon.h"
+#include "citycon.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"

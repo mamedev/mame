@@ -735,16 +735,16 @@ JP4/5/6/7 - Jumpers to configure ROMs
 */
 
 #include "emu.h"
-#include "includes/model3.h"
+#include "model3.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/kl5c80a16.h"
-#include "machine/315_5296.h"
+#include "315_5296.h"
 #include "machine/clock.h"
 #include "machine/eepromser.h"
 #include "machine/53c810.h"
 #include "machine/nvram.h"
-#include "machine/m3comm.h"
+#include "m3comm.h"
 #include "speaker.h"
 
 #include "segabill.lh"

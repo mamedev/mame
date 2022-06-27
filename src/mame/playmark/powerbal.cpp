@@ -16,7 +16,7 @@ Magic Sticks:
 */
 
 #include "emu.h"
-#include "includes/playmark.h"
+#include "playmark.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"

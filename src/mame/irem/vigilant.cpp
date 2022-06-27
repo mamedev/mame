@@ -31,8 +31,8 @@ The game uses derivative hardware.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/vigilant.h"
-#include "includes/iremipt.h"
+#include "vigilant.h"
+#include "iremipt.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"

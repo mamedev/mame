@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include "emu.h"
-#include "includes/skyraid.h"
+#include "skyraid.h"
 
 
 /* Discrete Sound Input Nodes */

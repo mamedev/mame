@@ -31,7 +31,7 @@
 */
 
 #include "emu.h"
-#include "includes/tecmosys.h"
+#include "tecmosys.h"
 
 enum DEV_STATUS
 {

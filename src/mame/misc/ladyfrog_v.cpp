@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 #include "emu.h"
-#include "includes/ladyfrog.h"
+#include "ladyfrog.h"
 
 
 void ladyfrog_state::ladyfrog_spriteram_w(offs_t offset, uint8_t data)

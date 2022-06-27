@@ -84,8 +84,8 @@
 /***************************************************************************/
 
 #include "emu.h"
-#include "includes/tutankhm.h"
-#include "includes/konamipt.h"
+#include "tutankhm.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/74259.h"

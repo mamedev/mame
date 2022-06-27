@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
 #include "emu.h"
-#include "includes/dynduke.h"
+#include "dynduke.h"
 
 
 

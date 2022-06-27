@@ -3,8 +3,8 @@
 
 #include "machine/tmp68301.h"
 #include "screen.h"
-#include "audio/nichisnd.h"
-#include "machine/nb1413m3.h"
+#include "nichisnd.h"
+#include "nb1413m3.h"
 #include "emupal.h"
 
 #define VRAM_MAX    3

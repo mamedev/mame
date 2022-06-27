@@ -67,7 +67,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/blockout.h"
+#include "blockout.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

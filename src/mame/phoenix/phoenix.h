@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "audio/pleiads.h"
+#include "pleiads.h"
 #include "emupal.h"
 #include "tilemap.h"
 

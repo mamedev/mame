@@ -76,12 +76,14 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 
 */
 #include "emu.h"
+#include "megadriv.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
 
-#include "includes/megadriv.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "softlist_dev.h"
 
 #include "layout/generic.h"
 

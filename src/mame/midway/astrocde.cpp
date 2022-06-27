@@ -114,7 +114,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/astrocde.h"
+#include "astrocde.h"
 
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"

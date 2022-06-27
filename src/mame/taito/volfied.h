@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "machine/taitocchip.h"
-#include "video/pc090oj.h"
+#include "taitocchip.h"
+#include "pc090oj.h"
 #include "screen.h"
 #include "machine/timer.h"
 

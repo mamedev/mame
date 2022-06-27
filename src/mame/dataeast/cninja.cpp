@@ -43,11 +43,11 @@ Note about version levels using Mutant Fighter as the example:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cninja.h"
+#include "cninja.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/decocrpt.h"
+#include "decocrpt.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"

@@ -70,6 +70,9 @@ Notes:
 
 
 #include "emu.h"
+
+#include "pcshare.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/i386/i386.h"
 #include "machine/bankdev.h"
@@ -78,12 +81,14 @@ Notes:
 #include "machine/intelfsh.h"
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
-#include "machine/pcshare.h"
-#include "video/voodoo.h"
 #include "sound/ks0164.h"
+#include "video/voodoo.h"
+
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class funkball_state : public pcat_base_state
 {
@@ -807,6 +812,8 @@ ROM_START( funkball )
 	ROM_REGION16_BE(0x400000, "u30", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "flash.u30",0x000000, 0x400000, CRC(1d46717a) SHA1(acfbd0a2ccf4d717779733c4a9c639296c3bbe0e) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(1998, funkball, 0, funkball, funkball, funkball_state, empty_init, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING)

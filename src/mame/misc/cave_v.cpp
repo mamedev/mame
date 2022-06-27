@@ -48,7 +48,7 @@ Note:   if MAME_DEBUG is defined, pressing:
 
 #include "emu.h"
 #include "crsshair.h"
-#include "includes/cave.h"
+#include "cave.h"
 
 
 #define CAVE_SPRITETYPE_ZBUF        0x01

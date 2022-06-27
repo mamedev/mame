@@ -18,7 +18,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/videopin.h"
+#include "videopin.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"

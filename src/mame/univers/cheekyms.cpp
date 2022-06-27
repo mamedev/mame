@@ -7,7 +7,7 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/cheekyms.h"
+#include "cheekyms.h"
 
 #include "cpu/z80/z80.h"
 

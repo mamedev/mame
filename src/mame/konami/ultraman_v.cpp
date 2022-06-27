@@ -2,7 +2,7 @@
 // copyright-holders:Manuel Abadia
 
 #include "emu.h"
-#include "includes/ultraman.h"
+#include "ultraman.h"
 #include "screen.h"
 
 /***************************************************************************

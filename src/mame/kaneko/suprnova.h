@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "video/sknsspr.h"
+#include "sknsspr.h"
 
 #include "cpu/sh/sh2.h"
 #include "machine/timer.h"

@@ -299,14 +299,14 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tumbleb.h"
+#include "tumbleb.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "cpu/mcs51/mcs51.h" // for semicom mcu
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "machine/decocrpt.h"
+#include "decocrpt.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "sound/ymopl.h"

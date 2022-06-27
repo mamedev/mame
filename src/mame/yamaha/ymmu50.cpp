@@ -13,7 +13,7 @@
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/h8/h83003.h"
-#include "machine/mulcd.h"
+#include "mulcd.h"
 #include "sound/swp00.h"
 
 #include "debugger.h"

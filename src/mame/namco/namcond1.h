@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "video/ygv608.h"
+#include "ygv608.h"
 #include "machine/nvram.h"
 
 class namcond1_state : public driver_device

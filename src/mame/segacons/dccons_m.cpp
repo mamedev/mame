@@ -22,12 +22,12 @@
 */
 
 #include "emu.h"
+#include "dccons.h"
+
 #include "cdrom.h"
 //#include "debugger.h"
-#include "includes/dc.h"
 #include "cpu/sh/sh4.h"
 #include "sound/aica.h"
-#include "includes/dccons.h"
 
 // TODO: fine grain this value
 #define ATAPI_CYCLES_PER_SECTOR (5000)

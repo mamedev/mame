@@ -7,8 +7,8 @@
 
 #include "machine/74259.h"
 #include "machine/watchdog.h"
-#include "audio/geebee.h"
-#include "audio/warpwarp.h"
+#include "geebee.h"
+#include "warpwarp_a.h"
 #include "emupal.h"
 #include "tilemap.h"
 

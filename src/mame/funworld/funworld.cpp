@@ -744,7 +744,7 @@
 ****************************************************************************************/
 
 #include "emu.h"
-#include "includes/funworld.h"
+#include "funworld.h"
 
 #include "cpu/m6502/m65sc02.h"
 #include "cpu/m6502/r65c02.h"

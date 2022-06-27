@@ -7,7 +7,7 @@ Atari Sky Raider video emulation
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/skyraid.h"
+#include "skyraid.h"
 
 
 void skyraid_state::video_start()

@@ -51,7 +51,7 @@ Note: SW2, SW3 & SW4 not populated
 
 
 #include "emu.h"
-#include "includes/funybubl.h"
+#include "funybubl.h"
 
 #include "cpu/z80/z80.h"
 #include "screen.h"

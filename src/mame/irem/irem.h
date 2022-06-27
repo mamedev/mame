@@ -8,7 +8,7 @@
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "machine/netlist.h"
-#include "audio/nl_kidniki.h"
+#include "nl_kidniki.h"
 
 class irem_audio_device : public device_t
 {

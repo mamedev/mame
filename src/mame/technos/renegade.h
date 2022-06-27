@@ -1,15 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
-#ifndef MAME_INCLUDES_RENEGADE_H
-#define MAME_INCLUDES_RENEGADE_H
+#ifndef MAME_TECHNOS_RENEGADE_H
+#define MAME_TECHNOS_RENEGADE_H
 
 #pragma once
 
-#include "machine/taito68705interface.h"
+#include "taito68705.h"
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/msm5205.h"
+
 #include "tilemap.h"
 #include "screen.h"
 
@@ -96,4 +97,4 @@ private:
 	void renegade_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_RENEGADE_H
+#endif // MAME_TECHNOS_RENEGADE_H

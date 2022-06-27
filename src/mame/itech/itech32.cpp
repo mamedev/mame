@@ -390,7 +390,7 @@ Notes:
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/itech32.h"
+#include "itech32.h"
 
 #include "cpu/m6800/m6801.h"
 #include "cpu/m68000/m68000.h"

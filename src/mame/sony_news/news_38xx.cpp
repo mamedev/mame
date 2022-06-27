@@ -27,8 +27,8 @@
 #include "machine/z80scc.h"
 #include "machine/am79c90.h"
 #include "machine/upd765.h"
-#include "machine/dmac_0266.h"
-#include "machine/news_hid.h"
+#include "dmac_0266.h"
+#include "news_hid.h"
 #include "machine/ncr5380.h"
 
 // video

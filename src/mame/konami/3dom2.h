@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "video/3dom2_te.h"
+#include "3dom2_te.h"
 
 #include "cpu/dspp/dspp.h"
 #include "cpu/powerpc/ppc.h"

@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver,Stephane Humbert
-#ifndef MAME_INCLUDES_ARKANOID_H
-#define MAME_INCLUDES_ARKANOID_H
+#ifndef MAME_TAITO_ARKANOID_H
+#define MAME_TAITO_ARKANOID_H
 
 #pragma once
 
-#include "machine/taito68705interface.h"
+#include "taito68705.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -120,4 +121,4 @@ private:
 	void hexaa_sub_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_ARKANOID_H
+#endif // MAME_TAITO_ARKANOID_H

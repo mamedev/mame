@@ -18,7 +18,7 @@ DIP Locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bking.h"
+#include "bking.h"
 
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"

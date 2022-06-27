@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "video/crime.h"
+#include "crime.h"
 
 #define LOG_UNKNOWN         (1 << 0U)
 #define LOG_READS           (1 << 1U)

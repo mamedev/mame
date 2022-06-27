@@ -8,7 +8,7 @@ Mr. F. Lea
 ******************************************************************/
 
 #include "emu.h"
-#include "includes/mrflea.h"
+#include "mrflea.h"
 
 void mrflea_state::mrflea_gfx_bank_w(uint8_t data)
 {

@@ -9,7 +9,7 @@ Video functions
 *************************************************************************************/
 
 #include "emu.h"
-#include "includes/sub.h"
+#include "sub.h"
 
 void sub_state::sub_palette(palette_device &palette) const
 {

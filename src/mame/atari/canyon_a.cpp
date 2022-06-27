@@ -6,7 +6,7 @@
 
 *************************************************************************/
 #include "emu.h"
-#include "includes/canyon.h"
+#include "canyon.h"
 #include "sound/discrete.h"
 
 

@@ -11,7 +11,7 @@
 #pragma once
 
 #include "cpu/s2650/s2650.h"
-#include "audio/arcadia.h"
+#include "arcadia_a.h"
 
 #include "bus/arcadia/slot.h"
 #include "bus/arcadia/rom.h"

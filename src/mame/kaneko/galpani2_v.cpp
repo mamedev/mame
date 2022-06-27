@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galpani2.h"
+#include "galpani2.h"
 #include "screen.h"
 
 /*

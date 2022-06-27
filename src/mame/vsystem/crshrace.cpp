@@ -130,7 +130,7 @@ Dip locations verified with Service Mode.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/crshrace.h"
+#include "crshrace.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/ymopn.h"

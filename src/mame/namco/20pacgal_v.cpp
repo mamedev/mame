@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/20pacgal.h"
+#include "20pacgal.h"
 #include "screen.h"
 
 

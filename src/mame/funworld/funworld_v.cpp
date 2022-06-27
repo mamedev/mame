@@ -47,7 +47,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/funworld.h"
+#include "funworld.h"
 
 
 void funworld_state::funworld_palette(palette_device &palette) const

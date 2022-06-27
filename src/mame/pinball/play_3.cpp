@@ -60,8 +60,9 @@ ToDo:
 
 
 #include "emu.h"
-#include "machine/genpin.h"
-#include "audio/efo_zsu.h"
+#include "genpin.h"
+
+#include "efo_zsu.h"
 
 #include "cpu/cosmac/cosmac.h"
 #include "machine/clock.h"

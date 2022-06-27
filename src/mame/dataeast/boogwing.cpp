@@ -83,11 +83,11 @@
 */
 
 #include "emu.h"
-#include "includes/boogwing.h"
+#include "boogwing.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/deco102.h"
-#include "machine/decocrpt.h"
+#include "deco102.h"
+#include "decocrpt.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"

@@ -8,9 +8,9 @@
 
 #include "emu.h"
 
-#include "audio/tx1.h"
+#include "tx1_a.h"
 #include "cpu/z80/z80.h"
-#include "includes/tx1.h"
+#include "tx1.h"
 #include "video/resnet.h"
 #include "speaker.h"
 

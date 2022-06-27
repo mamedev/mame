@@ -89,7 +89,7 @@ TO DO :
 */
 
 #include "emu.h"
-#include "includes/tehkanwc.h"
+#include "tehkanwc.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"

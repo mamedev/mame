@@ -119,7 +119,7 @@ mw-9.rom = ST M27C1001 / GFX
 
 #include "emu.h"
 
-#include "machine/kabuki.h"  // needed for decoding functions only
+#include "kabuki.h"  // needed for decoding functions only
 
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"

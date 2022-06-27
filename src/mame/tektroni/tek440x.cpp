@@ -51,7 +51,7 @@
 #include "machine/mc146818.h"
 #include "machine/mc68681.h"
 #include "machine/ncr5385.h"
-#include "machine/tek410x_kbd.h"
+#include "tek410x_kbd.h"
 #include "sound/sn76496.h"
 #include "emupal.h"
 #include "screen.h"

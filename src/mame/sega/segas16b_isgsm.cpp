@@ -23,8 +23,8 @@ removed.
 */
 
 #include "emu.h"
-#include "includes/segas16b.h"
-#include "includes/segaipt.h"
+#include "segas16b.h"
+#include "segaipt.h"
 
 #include "speaker.h"
 

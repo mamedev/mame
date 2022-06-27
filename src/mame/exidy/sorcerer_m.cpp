@@ -7,8 +7,10 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/sorcerer.h"
-#include "machine/z80bin.h"
+#include "sorcerer.h"
+
+#include "z80bin.h"
+
 
 // ************ TIMERS **************
 /* timer for sorcerer serial chip transmit and receive */

@@ -44,8 +44,8 @@
  ***********************************************************************/
 
 #include "emu.h"
-#include "includes/pgm.h"
-#include "machine/pgmprot_igs027a_type3.h"
+#include "pgm.h"
+#include "pgmprot_igs027a_type3.h"
 
 void pgm_arm_type3_state::svg_arm7_ram_sel_w(u32 data)
 {

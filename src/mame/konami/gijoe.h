@@ -11,10 +11,10 @@
 #pragma once
 
 #include "sound/k054539.h"
-#include "video/k053251.h"
-#include "video/k054156_k054157_k056832.h"
-#include "video/k053246_k053247_k055673.h"
-#include "video/konami_helper.h"
+#include "k053251.h"
+#include "k054156_k054157_k056832.h"
+#include "k053246_k053247_k055673.h"
+#include "konami_helper.h"
 #include "machine/k054321.h"
 #include "emupal.h"
 

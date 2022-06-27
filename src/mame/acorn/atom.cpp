@@ -116,7 +116,7 @@ Hardware:   PPIA 8255
 */
 
 #include "emu.h"
-#include "includes/atom.h"
+#include "atom.h"
 #include "machine/clock.h"
 #include "formats/imageutl.h"
 #include "screen.h"

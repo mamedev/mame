@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "generalplus_gpl16250.h"
+#include "generalplus_gpl16250_m.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(FULL_MEMORY, full_memory_device, "full_memory", "SunPlus Full CS Memory Map")

@@ -174,7 +174,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/namcona1.h"
+#include "namcona1.h"
 #include "cpu/m68000/m68000.h"
 #include "speaker.h"
 

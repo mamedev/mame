@@ -60,7 +60,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/suna16.h"
+#include "suna16.h"
 
 void suna16_state::flipscreen_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {

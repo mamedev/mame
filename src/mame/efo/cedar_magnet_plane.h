@@ -6,7 +6,7 @@
 #pragma once
 
 
-#include "machine/cedar_magnet_board.h"
+#include "cedar_magnet_board.h"
 #include "machine/z80pio.h"
 
 DECLARE_DEVICE_TYPE(CEDAR_MAGNET_PLANE, cedar_magnet_plane_device)

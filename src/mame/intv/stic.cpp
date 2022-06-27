@@ -8,7 +8,7 @@
  *********************************************************************/
 
 #include "emu.h"
-#include "video/stic.h"
+#include "stic.h"
 #include "screen.h"
 
 

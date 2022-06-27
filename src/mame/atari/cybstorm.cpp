@@ -19,7 +19,7 @@
 
 
 #include "emu.h"
-#include "includes/cybstorm.h"
+#include "cybstorm.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"

@@ -12,8 +12,8 @@
 
 #include "machine/gen_latch.h"
 #include "sound/vlm5030.h"
-#include "video/k007342.h"
-#include "video/k007420.h"
+#include "k007342.h"
+#include "k007420.h"
 #include "emupal.h"
 
 class rockrage_state : public driver_device

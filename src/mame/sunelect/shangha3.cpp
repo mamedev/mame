@@ -42,7 +42,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/shangha3.h"
+#include "shangha3.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

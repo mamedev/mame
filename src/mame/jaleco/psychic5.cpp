@@ -330,7 +330,7 @@ Notes (23-Jan-2016 AS):
 */
 
 #include "emu.h"
-#include "includes/psychic5.h"
+#include "psychic5.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"

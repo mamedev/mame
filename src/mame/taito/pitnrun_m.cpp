@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "cpu/m6805/m6805.h"
-#include "includes/pitnrun.h"
+#include "pitnrun.h"
 
 
 void pitnrun_state::machine_start()

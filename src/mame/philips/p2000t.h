@@ -14,7 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/spkrdev.h"
 #include "video/saa5050.h"
-#include "machine/p2000t_mdcr.h"
+#include "p2000t_mdcr.h"
 #include "machine/ram.h"
 #include "emupal.h"
 

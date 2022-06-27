@@ -10,7 +10,7 @@
 
 /* Core includes */
 #include "emu.h"
-#include "includes/bebox.h"
+#include "bebox.h"
 
 /* Components */
 #include "video/clgd542x.h"

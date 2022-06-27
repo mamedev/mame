@@ -23,7 +23,7 @@ Credits:
 ******************************************************************/
 
 #include "emu.h"
-#include "includes/thief.h"
+#include "thief.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"

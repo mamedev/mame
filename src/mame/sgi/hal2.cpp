@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/hal2.h"
+#include "hal2.h"
 
 #define LOG_UNKNOWN     (1 << 0U)
 #define LOG_READS       (1 << 1U)

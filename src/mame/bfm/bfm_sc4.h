@@ -7,17 +7,17 @@
 
 #pragma once
 
-#include "machine/sec.h"
+#include "sec.h"
 #include "machine/steppers.h" // stepper motor
 
-#include "machine/bfm_bda.h"
+#include "bfm_bda.h"
 
 #include "sound/ymz280b.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "machine/68307.h"
 #include "machine/68340.h"
-#include "video/bfm_dm01.h"
+#include "bfm_dm01.h"
 
 #define SC45_BUTTON_MATRIX_1_0 IPT_BUTTON1
 #define SC45_BUTTON_MATRIX_1_1 IPT_BUTTON2

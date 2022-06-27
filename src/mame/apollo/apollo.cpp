@@ -26,7 +26,7 @@
 
 #define VERBOSE 0
 
-#include "includes/apollo.h"
+#include "apollo.h"
 
 #include "cpu/m68000/m68000.h"
 

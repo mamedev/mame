@@ -159,7 +159,7 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/docastle.h"
+#include "docastle.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"

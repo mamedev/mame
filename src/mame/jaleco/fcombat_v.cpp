@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/fcombat.h"
+#include "fcombat.h"
 
 
 TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)

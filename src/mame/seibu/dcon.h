@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#ifndef MAME_INCLUDES_DCON_H
-#define MAME_INCLUDES_DCON_H
+#ifndef MAME_SEIBU_DCON_H
+#define MAME_SEIBU_DCON_H
 
 #pragma once
 
-#include "audio/seibu.h"
+#include "seibusound.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -74,4 +75,4 @@ private:
 	void sdgndmps_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DCON_H
+#endif // MAME_SEIBU_DCON_H

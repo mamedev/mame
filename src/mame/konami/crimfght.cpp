@@ -14,8 +14,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/konamipt.h"
-#include "includes/crimfght.h"
+#include "konamipt.h"
+#include "crimfght.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"

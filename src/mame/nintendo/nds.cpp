@@ -15,7 +15,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/nds.h"
+#include "nds.h"
 
 #define VERBOSE_LEVEL   (0)
 

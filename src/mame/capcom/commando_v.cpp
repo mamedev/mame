@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/commando.h"
+#include "commando.h"
 
 
 void commando_state::commando_videoram_w(offs_t offset, uint8_t data)

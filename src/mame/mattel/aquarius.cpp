@@ -24,7 +24,7 @@ X-6026 : Roll of paper for the printer
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/aquarius.h"
+#include "aquarius.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"

@@ -25,7 +25,7 @@ ToDo:
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "machine/k7659kb.h"
+#include "k7659kb.h"
 #include "machine/ram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80daisy.h"

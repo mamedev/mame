@@ -158,7 +158,7 @@ Notes on floppy drive:
 #include "machine/i8257.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/ibm6580_kbd.h"
+#include "ibm6580_kbd.h"
 //nclude "machine/ibm6580_fdc.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"

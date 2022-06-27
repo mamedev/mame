@@ -124,7 +124,7 @@
  ***********************************************************************/
 
 #include "emu.h"
-#include "includes/decocass.h"
+#include "decocass.h"
 
 
 static const uint32_t tile_offset[32*32] = {

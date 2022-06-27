@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/rohga.h"
+#include "rohga.h"
 #include "screen.h"
 
 

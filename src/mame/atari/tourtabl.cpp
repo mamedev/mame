@@ -13,7 +13,7 @@
 #include "cpu/m6502/m6507.h"
 #include "machine/watchdog.h"
 #include "sound/tiaintf.h"
-#include "video/tia.h"
+#include "tia.h"
 #include "screen.h"
 #include "speaker.h"
 

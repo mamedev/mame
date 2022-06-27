@@ -13,7 +13,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/polyplay.h"
+#include "polyplay.h"
 
 void polyplay_state::polyplay_palette(palette_device &palette) const
 {

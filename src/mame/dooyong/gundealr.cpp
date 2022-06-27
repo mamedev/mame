@@ -69,7 +69,7 @@ Z80 CPU - 12MHz/2
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gundealr.h"
+#include "gundealr.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ymopn.h"

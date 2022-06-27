@@ -20,7 +20,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dynax.h"
+#include "dynax.h"
 
 // Log Blitter
 //#define VERBOSE 1

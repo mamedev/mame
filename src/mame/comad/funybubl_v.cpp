@@ -8,7 +8,7 @@ todo - convert to tilemap
 
 
 #include "emu.h"
-#include "includes/funybubl.h"
+#include "funybubl.h"
 
 rgb_t funybubl_state::funybubl_R6B6G6(uint32_t raw)
 {

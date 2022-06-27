@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galaxold.h"
+#include "galaxold.h"
 
 
 uint8_t galaxold_state::hunchbkg_intack()

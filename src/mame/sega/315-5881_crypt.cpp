@@ -18,7 +18,7 @@
 */
 
 #include "emu.h"
-#include "machine/315-5881_crypt.h"
+#include "315-5881_crypt.h"
 
 DEFINE_DEVICE_TYPE(SEGA315_5881_CRYPT, sega_315_5881_crypt_device, "sega315_5881", "Sega 315-5881 Encryption")
 

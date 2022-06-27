@@ -10,7 +10,7 @@
 */
 
 #include "emu.h"
-#include "includes/n64.h"
+#include "n64.h"
 
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"

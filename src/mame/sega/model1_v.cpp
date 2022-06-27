@@ -5,7 +5,7 @@
 
 #include "emu.h"
 #include "cpu/mb86233/mb86233.h"
-#include "includes/model1.h"
+#include "model1.h"
 
 #define LOG_TGP_VIDEO 0
 

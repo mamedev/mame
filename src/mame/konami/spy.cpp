@@ -20,8 +20,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/spy.h"
-#include "includes/konamipt.h"
+#include "spy.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"

@@ -19,7 +19,7 @@
 #include "machine/74153.h"
 #include "machine/netlist.h"
 #include "netlist/nl_setup.h"
-#include "audio/nl_carpolo.h"
+#include "nl_carpolo.h"
 #include "emupal.h"
 
 class carpolo_state : public driver_device

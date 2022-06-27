@@ -11,7 +11,7 @@ Video hardware driver by Uki
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/ikki.h"
+#include "ikki.h"
 
 void ikki_state::ikki_palette(palette_device &palette)
 {

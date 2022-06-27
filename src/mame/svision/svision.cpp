@@ -7,7 +7,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/svision.h"
+#include "svision.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"

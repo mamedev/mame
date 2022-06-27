@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "video/starfield_05xx.h"
+#include "starfield_05xx.h"
 #include "machine/74259.h"
 #include "sound/discrete.h"
 #include "sound/namco.h"

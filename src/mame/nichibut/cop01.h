@@ -11,7 +11,7 @@
 #pragma once
 
 #include "machine/gen_latch.h"
-#include "machine/nb1412m2.h"
+#include "nb1412m2.h"
 #include "emupal.h"
 #include "tilemap.h"
 

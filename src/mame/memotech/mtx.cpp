@@ -19,7 +19,7 @@
  */
 
 #include "emu.h"
-#include "includes/mtx.h"
+#include "mtx.h"
 
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"

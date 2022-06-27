@@ -10,8 +10,8 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/sspeedr.h"
-#include "audio/nl_sspeedr.h"
+#include "sspeedr.h"
+#include "nl_sspeedr.h"
 #include "speaker.h"
 
 #include "cpu/z80/z80.h"

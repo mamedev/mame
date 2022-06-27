@@ -7,9 +7,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/3dom2_te.h"
+#include "3dom2_te.h"
 
-#include "machine/3dom2.h"
+#include "3dom2.h"
 
 #include <cmath>
 

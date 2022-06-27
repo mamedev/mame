@@ -335,7 +335,7 @@ Notes:
 
 
 #include "emu.h"
-#include "includes/jaguar.h"
+#include "jaguar.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

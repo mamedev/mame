@@ -26,7 +26,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/bw12.h"
+#include "bw12.h"
 #include "bus/rs232/rs232.h"
 #include "sound/dac.h"
 #include "screen.h"

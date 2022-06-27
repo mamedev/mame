@@ -295,13 +295,13 @@ DIP locations verified for:
 
 #include "emu.h"
 
-#include "audio/taitosnd.h"
-#include "includes/taitoipt.h"
-#include "machine/taitocchip.h"
-#include "machine/taitoio.h"
-#include "video/pc090oj.h"
-#include "video/tc0100scn.h"
-#include "video/tc0110pcr.h"
+#include "taitosnd.h"
+#include "taitoipt.h"
+#include "taitocchip.h"
+#include "taitoio.h"
+#include "pc090oj.h"
+#include "tc0100scn.h"
+#include "tc0110pcr.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/z180.h"

@@ -5,7 +5,7 @@
 */
 
 #include "emu.h"
-#include "includes/tsamurai.h"
+#include "tsamurai.h"
 
 
 /***************************************************************************

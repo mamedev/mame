@@ -268,12 +268,15 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bublbobl.h"
+#include "bublbobl.h"
+
+#include "taito68705.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
+
 #include "screen.h"
 #include "speaker.h"
 

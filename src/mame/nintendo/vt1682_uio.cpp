@@ -4,7 +4,7 @@
 // UIO seems to be a different IO module to the vt1682_io.cpp one, 8-bit ports instead of 4-bit
 
 #include "emu.h"
-#include "machine/vt1682_uio.h"
+#include "vt1682_uio.h"
 
 #define LOG_UIO     (1U << 1)
 

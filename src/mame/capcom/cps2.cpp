@@ -626,9 +626,9 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 #include "emu.h"
 
-#include "includes/cps1.h"
-#include "machine/cps2comm.h"
-#include "machine/cps2crypt.h"
+#include "cps1.h"
+#include "cps2comm.h"
+#include "cps2crypt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

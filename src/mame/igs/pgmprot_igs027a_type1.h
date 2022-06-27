@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi, Xing Xing
-#include "includes/pgm.h"
+#include "pgm.h"
 
 class pgm_arm_type1_state : public pgm_state
 {

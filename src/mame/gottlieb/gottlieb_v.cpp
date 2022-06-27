@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gottlieb.h"
+#include "gottlieb.h"
 #include "video/resnet.h"
 
 

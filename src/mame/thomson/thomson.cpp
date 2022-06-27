@@ -77,7 +77,7 @@
 */
 
 #include "emu.h"
-#include "includes/thomson.h"
+#include "thomson.h"
 
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"

@@ -16,8 +16,8 @@
 
 #include "emu.h"
 
-#include "machine/deco222.h"
-#include "video/decbac06.h"
+#include "deco222.h"
+#include "decbac06.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/gen_latch.h"

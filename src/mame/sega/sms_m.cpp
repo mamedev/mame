@@ -5,7 +5,7 @@
 #include "cpu/z80/z80.h"
 #include "video/315_5124.h"
 #include "sound/ymopl.h"
-#include "includes/sms.h"
+#include "sms.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)

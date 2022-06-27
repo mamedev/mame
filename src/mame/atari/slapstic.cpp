@@ -197,7 +197,7 @@
 
 
 #include "emu.h"
-#include "machine/slapstic.h"
+#include "slapstic.h"
 
 #include "cpu/m68000/m68000.h"
 

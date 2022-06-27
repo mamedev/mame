@@ -58,7 +58,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mcr68.h"
+#include "mcr68.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"

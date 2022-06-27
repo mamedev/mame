@@ -37,7 +37,7 @@ OKI M2128-15 RAM
 #include "emu.h"
 #include "speaker.h"
 
-#include "includes/sms.h"
+#include "sms.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ymopl.h"

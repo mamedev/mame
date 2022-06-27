@@ -15,9 +15,9 @@ TODO:
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/mmboard.h"
+#include "mmboard.h"
 #include "sound/dac.h"
-#include "video/mmdisplay1.h"
+#include "mmdisplay1.h"
 
 #include "speaker.h"
 

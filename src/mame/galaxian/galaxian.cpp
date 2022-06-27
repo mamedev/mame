@@ -719,13 +719,13 @@ TODO:
 - streakng/ghostmun: $4800-4bff
 - smooncrs : fix read/writes at/to unmapped memory (when player 2, "cocktail" mode) + fix the ?#! bug with "bullets" (when player 2, "cocktail" mode)
 - timefgtr : missing player bullets, sprite ROM extend(see later levels), sound is too slow, some sprites missing
-- zigzag   : full Dip Switches and Inputs
-- zigzag2  : full Dip Switches and Inputs
-- jumpbug  : full Dip Switches and Inputs - missing possible discrete sounds
-- jumpbugb : full Dip Switches and Inputs - missing possible discrete sounds
-- levers   : full Dip Switches and Inputs
-- kingball : full Dip Switches and Inputs
-- kingbalj : full Dip Switches and Inputs
+- zigzag   : full DIP Switches and Inputs
+- zigzag2  : full DIP Switches and Inputs
+- jumpbug  : full DIP Switches and Inputs - missing possible discrete sounds
+- jumpbugb : full DIP Switches and Inputs - missing possible discrete sounds
+- levers   : full DIP Switches and Inputs
+- kingball : full DIP Switches and Inputs
+- kingbalj : full DIP Switches and Inputs
 - frogg    : fix read/writes at/to unmapped/wrong memory
 - scprpng  : fix read/writes at/to unmapped/wrong memory
 - scorpion : check whether konami filters are used
@@ -734,10 +734,11 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galaxian.h"
 
-#include "audio/cclimber.h"
-#include "audio/galaxian.h"
+#include "galaxian.h"
+#include "galaxian_a.h"
+
+#include "cclimber_a.h"
 
 #include "cpu/s2650/s2650.h"
 #include "cpu/z80/z80.h"
@@ -747,7 +748,7 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-#include "audio/nl_konami.h"
+#include "nl_konami.h"
 
 
 /*************************************

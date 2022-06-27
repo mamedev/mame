@@ -1,10 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
-#ifndef _VIDEO_N64TYPES_H_
-#define _VIDEO_N64TYPES_H_
+#ifndef MAME_NINTENDO_N64TYPES_H
+#define MAME_NINTENDO_N64TYPES_H
+
+#pragma once
+
 
 #include "video/rgbutil.h"
+
+class n64_rdp;
 
 struct misc_state_t
 {
@@ -337,4 +342,4 @@ class span_param_t
 		};
 };
 
-#endif // _VIDEO_N64TYPES_H_
+#endif // MAME_NINTENDO_N64TYPES_H

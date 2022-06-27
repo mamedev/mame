@@ -30,7 +30,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cinemat.h"
+#include "cinemat.h"
 #include "speaker.h"
 
 #include "armora.lh"

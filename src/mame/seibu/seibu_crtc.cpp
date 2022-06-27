@@ -222,7 +222,7 @@ List of default vregs (title screen):
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/seibu_crtc.h"
+#include "seibu_crtc.h"
 
 
 

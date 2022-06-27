@@ -190,7 +190,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gladiatr.h"
+#include "gladiatr.h"
 
 #include "machine/74259.h"
 #include "machine/clock.h"

@@ -89,8 +89,8 @@
 */
 
 #include "emu.h"
-#include "includes/system16.h"
-#include "includes/segaipt.h"
+#include "system16.h"
+#include "segaipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

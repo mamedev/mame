@@ -44,7 +44,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/bbc.h"
+#include "bbc.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 

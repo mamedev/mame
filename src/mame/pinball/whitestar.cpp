@@ -70,10 +70,13 @@ ToDo:
 
 *********************************************************************************************************************/
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
+
+#include "decodmd2.h"
+
+#include "decobsmt.h"
+
 //#include "video/mc6845.h"
-#include "audio/decobsmt.h"
-#include "video/decodmd2.h"
 
 namespace {
 

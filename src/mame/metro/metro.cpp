@@ -94,7 +94,7 @@ driver modified by Hau
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/metro.h"
+#include "metro.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"

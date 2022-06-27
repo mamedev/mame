@@ -136,11 +136,12 @@ PL1 = Compact Flash Slot
 
 
 #include "emu.h"
-#include "includes/bfm_sc5.h"
+#include "bfm_sc5.h"
 
-#include "machine/bfm_sc45_helper.h"
+#include "awpvid.h"
+
+#include "bfm_sc45_helper.h"
 #include "machine/mcf5206e.h"
-#include "video/awpvid.h"
 #include "speaker.h"
 
 #include "bfm_sc5.lh"

@@ -147,10 +147,12 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/turbo.h"
+#include "turbo.h"
+
+#include "segacrpt_device.h"
+
 #include "machine/74259.h"
 #include "machine/i8279.h"
-#include "machine/segacrpt_device.h"
 
 #include "turbo.lh"
 #include "subroc3d.lh"

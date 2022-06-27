@@ -23,7 +23,7 @@ is also 8106 and has the same sound chips.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mrdo.h"
+#include "mrdo.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"

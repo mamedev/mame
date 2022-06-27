@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 #include "video/bufsprite.h"
-#include "video/decospr.h"
-#include "machine/deco146.h"
+#include "decospr.h"
+#include "deco146.h"
 #include "machine/gen_latch.h"
 #include "emupal.h"
 #include "tilemap.h"

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
-#include "includes/galspnbl.h"
+#include "galspnbl.h"
 
 
 void galspnbl_state::galspnbl_palette(palette_device &palette) const

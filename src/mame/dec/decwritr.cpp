@@ -14,7 +14,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/74259.h"
-#include "machine/dc305.h"
+#include "dc305.h"
 #include "machine/er1400.h"
 #include "machine/i8251.h"
 #include "machine/input_merger.h"

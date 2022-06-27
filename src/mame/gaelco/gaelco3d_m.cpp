@@ -29,7 +29,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "gaelco3d.h"
+#include "gaelco3d_m.h"
 
 //#define SHARED_MEM_DRIVER      (1)
 

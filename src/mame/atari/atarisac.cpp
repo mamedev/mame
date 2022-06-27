@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/atarisac.h"
+#include "atarisac.h"
 
 #include "cpu/m68000/m68000.h"
 

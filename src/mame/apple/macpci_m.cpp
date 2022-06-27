@@ -11,7 +11,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/macpci.h"
+#include "macpci.h"
 
 #define LOG_ADB         0
 #define LOG_VIA         0

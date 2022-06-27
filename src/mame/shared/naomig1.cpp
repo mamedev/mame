@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 
 #include "emu.h"
-#include "machine/naomig1.h"
+#include "naomig1.h"
 
 void naomi_g1_device::amap(address_map &map)
 {

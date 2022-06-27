@@ -10,8 +10,8 @@ Preliminary driver by:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/aliens.h"
-#include "includes/konamipt.h"
+#include "aliens.h"
+#include "konamipt.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"

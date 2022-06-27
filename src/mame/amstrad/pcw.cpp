@@ -96,7 +96,7 @@
  ******************************************************************************/
 #include "emu.h"
 // pcw video hardware
-#include "includes/pcw.h"
+#include "pcw.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8243.h"

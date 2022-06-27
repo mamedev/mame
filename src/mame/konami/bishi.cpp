@@ -86,7 +86,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bishi.h"
+#include "bishi.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"

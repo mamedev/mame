@@ -13,7 +13,7 @@
 */
 
 #include "emu.h"
-#include "includes/generalplus_gpl16250_romram.h"
+#include "generalplus_gpl16250_romram.h"
 
 
 static INPUT_PORTS_START( wrlshunt )

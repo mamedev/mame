@@ -73,7 +73,7 @@ U089 MAX232 Dual EIA Driver/Receiver
 
 #include "emu.h"
 #include "cpu/sh/sh2.h"
-#include "machine/seibuspi.h"
+#include "seibuspi_m.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "machine/rtc4543.h"

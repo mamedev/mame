@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "includes/scramble.h"
+#include "scramble.h"
 
 
 MACHINE_RESET_MEMBER(scramble_state,scramble)

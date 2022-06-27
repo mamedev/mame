@@ -1,15 +1,15 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, R. Belmont
-#ifndef MAME_INCLUDES_DCCONS_H
-#define MAME_INCLUDES_DCCONS_H
+#ifndef MAME_SEGACONS_DCCONS_H
+#define MAME_SEGACONS_DCCONS_H
 
 #pragma once
 
 #include "dc.h"
+#include "gdrom.h"
 
 #include "bus/ata/ataintf.h"
 #include "imagedev/chd_cd.h"
-#include "machine/gdrom.h"
 #include "machine/intelfsh.h"
 
 class dc_cons_state : public dc_state
@@ -58,4 +58,4 @@ private:
 	int atapi_xferlen = 0, atapi_xferbase = 0, atapi_xfercomplete;
 };
 
-#endif // MAME_INCLUDES_DCCONS_H
+#endif // MAME_SEGACONS_DCCONS_H

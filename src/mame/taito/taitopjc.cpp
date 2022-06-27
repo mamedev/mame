@@ -88,7 +88,7 @@
 #include "cpu/tlcs900/tmp95c063.h"
 #include "cpu/mn10200/mn10200.h"
 #include "cpu/tms32051/tms32051.h"
-#include "video/tc0780fpa.h"
+#include "tc0780fpa.h"
 #include "machine/nvram.h"
 #include "emupal.h"
 #include "screen.h"

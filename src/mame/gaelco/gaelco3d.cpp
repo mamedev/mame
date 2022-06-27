@@ -146,7 +146,7 @@ REF. 970429
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/gaelco3d.h"
+#include "gaelco3d.h"
 
 #include "cpu/m68000/m68000.h"
 #include "emupal.h"

@@ -434,10 +434,11 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 #include "emu.h"
 
-#include "includes/seta.h"
-#include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
-#include "machine/taitocchip.h"
+#include "taitoipt.h"
+#include "taitosnd.h"
+#include "taitocchip.h"
+
+#include "seta001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -445,17 +446,22 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 namespace {
 
-class taitox_state : public seta_state
+class taitox_state : public driver_device
 {
 public:
 	taitox_state(const machine_config &mconfig, device_type type, const char *tag) :
-		seta_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_seta001(*this, "spritegen"),
+		m_palette(*this, "palette"),
 		m_z80bank(*this, "z80bank"),
 		m_dswa_io(*this, "DSWA"),
 		m_dswb_io(*this, "DSWB"),
@@ -470,10 +476,17 @@ public:
 protected:
 	virtual void machine_start() override;
 
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	u16 dsw_input_r(offs_t offset);
 
 	void taito_x_base_map(address_map &map);
 	void sound_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<seta001_device> m_seta001;
+	required_device<palette_device> m_palette;
 
 private:
 	u16 input_r(offs_t offset);
@@ -989,6 +1002,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitox_cchip_state::cchip_irq_clear_cb)
 	m_cchip->ext_interrupt(CLEAR_LINE);
 }
 
+u32 taitox_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0x1f0, cliprect);
+
+	m_seta001->draw_sprites(screen, bitmap,cliprect,0x1000);
+	return 0;
+}
+
 
 /**************************************************************************/
 
@@ -1023,7 +1044,7 @@ void taitox_cchip_state::superman(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(52*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(taitox_cchip_state::screen_update_seta_no_layers));
+	screen.set_screen_update(FUNC(taitox_cchip_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
@@ -1067,7 +1088,7 @@ void taitox_state::daisenpu(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(52*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(taitox_state::screen_update_seta_no_layers));
+	screen.set_screen_update(FUNC(taitox_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
@@ -1108,7 +1129,7 @@ void taitox_state::gigandes(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(52*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(taitox_state::screen_update_seta_no_layers));
+	screen.set_screen_update(FUNC(taitox_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
@@ -1152,7 +1173,7 @@ void taitox_state::ballbros(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(52*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(taitox_state::screen_update_seta_no_layers));
+	screen.set_screen_update(FUNC(taitox_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);

@@ -112,11 +112,12 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/apple2.h"
+
+#include "apple2video.h"
 
 #define IICP_NEW_IWM (0)
 
-#include "machine/apple2common.h"
+#include "apple2common.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"

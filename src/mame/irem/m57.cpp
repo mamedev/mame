@@ -50,11 +50,11 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/m57.h"
-#include "includes/iremipt.h"
+#include "m57.h"
+#include "iremipt.h"
 
 #include "cpu/z80/z80.h"
-#include "audio/irem.h"
+#include "irem.h"
 
 #include "screen.h"
 

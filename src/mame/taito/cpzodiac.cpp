@@ -30,7 +30,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "audio/taitosnd.h"
+#include "taitosnd.h"
 #include "machine/te7750.h"
 #include "machine/z80ctc.h"
 #include "sound/ymopn.h"

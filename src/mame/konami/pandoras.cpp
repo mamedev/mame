@@ -24,8 +24,8 @@ Boards:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/pandoras.h"
-#include "includes/konamipt.h"
+#include "pandoras.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"

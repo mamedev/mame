@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Priest, David Haywood
-#ifndef MAME_INCLUDES_MCATADV_H
-#define MAME_INCLUDES_MCATADV_H
+#ifndef MAME_MISC_MCATADV_H
+#define MAME_MISC_MCATADV_H
 
 #pragma once
 
+#include "tmap038.h"
+
 #include "machine/watchdog.h"
-#include "video/tmap038.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -67,4 +69,4 @@ private:
 	void nost_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MCATADV_H
+#endif // MAME_MISC_MCATADV_H

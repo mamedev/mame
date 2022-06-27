@@ -155,7 +155,7 @@ PL2 Button | 7A | 7B | PL1 Button
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/route16.h"
+#include "route16.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

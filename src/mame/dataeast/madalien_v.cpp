@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/madalien.h"
+#include "madalien.h"
 #include "video/mc6845.h"
 #include "screen.h"
 

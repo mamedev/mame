@@ -134,9 +134,9 @@ better notes (complete chip lists) for each board still needed
 #include "sound/c140.h"
 #include "layout/generic.h"
 #include "speaker.h"
-#include "video/namco_c355spr.h"
-#include "machine/namcos21_dsp_c67.h"
-#include "video/namcos21_3d.h"
+#include "namco_c355spr.h"
+#include "namcos21_dsp_c67.h"
+#include "namcos21_3d.h"
 #include "emupal.h"
 
 class gal3_state : public driver_device

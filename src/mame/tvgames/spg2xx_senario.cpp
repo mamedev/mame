@@ -15,7 +15,7 @@
 */
 
 #include "emu.h"
-#include "includes/spg2xx.h"
+#include "spg2xx.h"
 
 #include "machine/intelfsh.h"
 

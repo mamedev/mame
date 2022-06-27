@@ -3,7 +3,7 @@
 //***************************************************************************
 
 #include "emu.h"
-#include "includes/trs80.h"
+#include "trs80.h"
 
 
 #define IRQ_M1_RTC      0x80    /* RTC on Model I */

@@ -88,20 +88,24 @@ Optional (on expansion card) (Viper)
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "bfm_adr2.h"
+#include "bfm_bd1.h" // vfd
+#include "bfm_comn.h"
+
+#include "awpvid.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
-#include "video/awpvid.h"
-#include "video/bfm_adr2.h"
-#include "machine/steppers.h" // stepper motor
-#include "machine/bfm_bd1.h" // vfd
+#include "machine/gen_latch.h"
 #include "machine/meters.h"
+#include "machine/nvram.h"
+#include "machine/rescap.h"
+#include "machine/steppers.h" // stepper motor
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/upd7759.h"
-#include "machine/nvram.h"
-#include "machine/gen_latch.h"
-#include "machine/watchdog.h"
-#include "machine/bfm_comn.h"
-#include "machine/rescap.h"
+
 #include "speaker.h"
 
 #include "sc1_vfd.lh"
@@ -118,6 +122,8 @@ Optional (on expansion card) (Viper)
 #include "sc1spct.lh"
 #include "sc1str4.lh"
 
+
+namespace {
 
 class bfm_sc1_state : public driver_device
 {
@@ -1292,6 +1298,8 @@ void bfm_sc1_state::init_clatt()
 	sc1_find_project_string();
 	save_state();
 }
+
+} // anonymous namespace
 
 
 // ROM definition ///////////////////////////////////////////////////////////////////

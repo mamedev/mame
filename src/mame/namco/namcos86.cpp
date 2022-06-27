@@ -175,7 +175,7 @@ TODO:
 *******************************************************************/
 
 #include "emu.h"
-#include "includes/namcos86.h"
+#include "namcos86.h"
 
 #include "cpu/m6809/m6809.h"
 #include "sound/ymopm.h"

@@ -109,7 +109,7 @@
 #include "emu.h"
 
 // mame
-#include "video/vsystem_gga.h"
+#include "vsystem_gga.h"
 
 // devices
 #include "cpu/m68000/m68000.h"

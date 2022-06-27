@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "video/k055555.h" // still needs k055555_get_palette_index
+#include "k055555.h" // still needs k055555_get_palette_index
 #include "tilemap.h"
 
 #define K056832_CB_MEMBER(_name)   void _name(int layer, int *code, int *color, int *flags, int *priority)

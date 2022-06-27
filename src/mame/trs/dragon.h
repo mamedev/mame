@@ -14,7 +14,7 @@
 #pragma once
 
 
-#include "includes/coco12.h"
+#include "coco12.h"
 #include "imagedev/printer.h"
 #include "machine/mos6551.h"
 #include "video/mc6845.h"

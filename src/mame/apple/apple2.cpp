@@ -39,9 +39,9 @@ II Plus: RAM options reduced to 16/32/48 KB.
 ************************************************************************/
 
 #include "emu.h"
-#include "video/apple2.h"
 
-#include "machine/apple2common.h"
+#include "apple2common.h"
+#include "apple2video.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/cards.h"

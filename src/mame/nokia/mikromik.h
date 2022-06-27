@@ -11,7 +11,7 @@
 #include "machine/am9517a.h"
 #include "machine/bankdev.h"
 #include "machine/i8212.h"
-#include "machine/mm1kb.h"
+#include "mm1kb.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"

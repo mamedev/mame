@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lvcards.h"
+#include "lvcards.h"
 
 
 void lvcards_state::lvcards_palette(palette_device &palette) const//Ever so slightly different, but different enough.

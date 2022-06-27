@@ -207,13 +207,13 @@ psoldier dip locations still need verification.
 *****************************************************************************/
 
 #include "emu.h"
-#include "includes/m92.h"
-#include "includes/iremipt.h"
+#include "m92.h"
+#include "iremipt.h"
 
 #include "cpu/nec/nec.h"
 #include "machine/eeprompar.h"
 #include "machine/gen_latch.h"
-#include "machine/irem_cpu.h"
+#include "irem_cpu.h"
 #include "sound/iremga20.h"
 #include "sound/ymopm.h"
 #include "speaker.h"

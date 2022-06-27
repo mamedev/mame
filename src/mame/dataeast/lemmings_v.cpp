@@ -15,7 +15,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lemmings.h"
+#include "lemmings.h"
 
 #include <algorithm>
 

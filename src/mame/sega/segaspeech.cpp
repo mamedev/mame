@@ -15,7 +15,7 @@
 
 #include "netlist/nl_setup.h"
 
-#include "audio/nl_segaspeech.h"
+#include "nl_segaspeech.h"
 
 #define VERBOSE 0
 #include "logmacro.h"

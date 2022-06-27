@@ -13,7 +13,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/timeplt.h"
+#include "timeplt_a.h"
 
 #include "machine/gen_latch.h"
 #include "speaker.h"

@@ -7,7 +7,7 @@
  */
 
 #include "emu.h"
-#include "includes/konamigx.h"
+#include "konamigx.h"
 
 /***************************************************************************/
 /*                                                                         */

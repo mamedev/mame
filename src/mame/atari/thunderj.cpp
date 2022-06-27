@@ -37,7 +37,7 @@
 
 
 #include "emu.h"
-#include "includes/thunderj.h"
+#include "thunderj.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"

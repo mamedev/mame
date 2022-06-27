@@ -9,7 +9,7 @@
 #include "machine/netlist.h"
 
 #include "netlist/nl_setup.h"
-#include "audio/nl_tankbatt.h"
+#include "nl_tankbatt.h"
 
 #include "emupal.h"
 #include "tilemap.h"

@@ -25,7 +25,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "machine/akiko.h"
 #include "machine/i2cmem.h"
 #include "machine/8364_paula.h"
-#include "video/amigaaga.h"
+#include "amigaaga.h"
 #include "emupal.h"
 #include "screen.h"
 

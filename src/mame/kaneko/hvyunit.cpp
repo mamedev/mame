@@ -60,12 +60,15 @@ To Do:
 ***************************************************************************************/
 
 #include "emu.h"
+
+#include "kan_pand.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/ymopn.h"
-#include "video/kan_pand.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

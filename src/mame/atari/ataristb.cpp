@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder, Olivier Galibert
 
 #include "emu.h"
-#include "machine/ataristb.h"
+#include "ataristb.h"
 
 
 

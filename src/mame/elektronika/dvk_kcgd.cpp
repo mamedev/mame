@@ -39,7 +39,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
 #include "machine/dl11.h"
-#include "machine/ms7004.h"
+#include "ms7004.h"
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"

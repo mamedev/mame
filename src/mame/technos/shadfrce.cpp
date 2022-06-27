@@ -140,7 +140,7 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 */
 
 #include "emu.h"
-#include "includes/shadfrce.h"
+#include "shadfrce.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

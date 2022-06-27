@@ -41,7 +41,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tx1.h"
+#include "tx1.h"
 
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"

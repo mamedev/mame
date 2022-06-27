@@ -55,15 +55,16 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/vicdual.h"
-#include "audio/vicdual-97271p.h"
-#include "video/vicdual-97269pb.h"
+#include "vicdual.h"
+#include "vicdual-97271p.h"
+#include "vicdual-97269pb.h"
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
 #include "speaker.h"
 
 #include "depthch.lh"
+
 
 
 #define VICDUAL_MASTER_CLOCK                (XTAL(15'468'480))
@@ -80,6 +81,634 @@
 #define VICDUAL_VBSTART                     (0x0e0)
 #define VICDUAL_VSSTART                     (0x0ec)
 #define VICDUAL_VSEND                       (0x0f0)
+
+
+
+/*
+ *  Carnival sound routines
+ *
+ */
+
+/* output port 0x01 definitions - sound effect drive outputs */
+#define OUT_CARNIVAL_PORT_1_RIFLE        0x01
+#define OUT_CARNIVAL_PORT_1_CLANG        0x02
+#define OUT_CARNIVAL_PORT_1_DUCK1        0x04
+#define OUT_CARNIVAL_PORT_1_DUCK2        0x08
+#define OUT_CARNIVAL_PORT_1_DUCK3        0x10
+#define OUT_CARNIVAL_PORT_1_PIPEHIT      0x20
+#define OUT_CARNIVAL_PORT_1_BONUS1       0x40
+#define OUT_CARNIVAL_PORT_1_BONUS2       0x80
+
+/* output port 0x02 definitions - sound effect drive outputs */
+#define OUT_CARNIVAL_PORT_2_BEAR         0x04
+#define OUT_CARNIVAL_PORT_2_RANKING      0x20
+
+
+#define PLAY(samp,id,loop)      samp->start( id, id, loop )
+#define STOP(samp,id)           samp->stop( id )
+
+
+/* sample file names */
+static const char *const carnival_sample_names[] =
+{
+	"*carnival",
+	"bear",
+	"bonus1",
+	"bonus2",
+	"clang",
+	"duck1",
+	"duck2",
+	"duck3",
+	"pipehit",
+	"ranking",
+	"rifle",
+	nullptr
+};
+
+
+/* sample IDs - must match sample file name table above */
+enum
+{
+	SND_CARNIVAL_BEAR = 0,
+	SND_CARNIVAL_BONUS1,
+	SND_CARNIVAL_BONUS2,
+	SND_CARNIVAL_CLANG,
+	SND_CARNIVAL_DUCK1,
+	SND_CARNIVAL_DUCK2,
+	SND_CARNIVAL_DUCK3,
+	SND_CARNIVAL_PIPEHIT,
+	SND_CARNIVAL_RANKING,
+	SND_CARNIVAL_RIFLE
+};
+
+
+void carnival_state::carnival_audio_1_w(uint8_t data)
+{
+	int bitsChanged;
+	int bitsGoneHigh;
+	int bitsGoneLow;
+
+	bitsChanged  = m_port1State ^ data;
+	bitsGoneHigh = bitsChanged & data;
+	bitsGoneLow  = bitsChanged & ~data;
+
+	m_port1State = data;
+
+	if ( bitsGoneLow & OUT_CARNIVAL_PORT_1_RIFLE )
+	{
+		PLAY( m_samples, SND_CARNIVAL_RIFLE, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_CARNIVAL_PORT_1_CLANG )
+	{
+		PLAY( m_samples, SND_CARNIVAL_CLANG, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_CARNIVAL_PORT_1_DUCK1 )
+	{
+		PLAY( m_samples, SND_CARNIVAL_DUCK1, 1 );
+	}
+	if ( bitsGoneHigh & OUT_CARNIVAL_PORT_1_DUCK1 )
+	{
+		STOP( m_samples, SND_CARNIVAL_DUCK1 );
+	}
+
+	if ( bitsGoneLow & OUT_CARNIVAL_PORT_1_DUCK2 )
+	{
+		PLAY( m_samples, SND_CARNIVAL_DUCK2, 1 );
+	}
+	if ( bitsGoneHigh & OUT_CARNIVAL_PORT_1_DUCK2 )
+	{
+		STOP( m_samples, SND_CARNIVAL_DUCK2 );
+	}
+
+	if ( bitsGoneLow & OUT_CARNIVAL_PORT_1_DUCK3 )
+	{
+		PLAY( m_samples, SND_CARNIVAL_DUCK3, 1 );
+	}
+	if ( bitsGoneHigh & OUT_CARNIVAL_PORT_1_DUCK3 )
+	{
+		STOP( m_samples, SND_CARNIVAL_DUCK3 );
+	}
+
+	if ( bitsGoneLow & OUT_CARNIVAL_PORT_1_PIPEHIT )
+	{
+		PLAY( m_samples, SND_CARNIVAL_PIPEHIT, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_CARNIVAL_PORT_1_BONUS1 )
+	{
+		PLAY( m_samples, SND_CARNIVAL_BONUS1, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_CARNIVAL_PORT_1_BONUS2 )
+	{
+		PLAY( m_samples, SND_CARNIVAL_BONUS2, 0 );
+	}
+}
+
+void carnival_state::carnival_audio_2_w(uint8_t data)
+{
+	int bitsChanged;
+	//int bitsGoneHigh;
+	int bitsGoneLow;
+
+	bitsChanged  = m_port2State ^ data;
+	//bitsGoneHigh = bitsChanged & data;
+	bitsGoneLow  = bitsChanged & ~data;
+
+	m_port2State = data;
+
+	if ( bitsGoneLow & OUT_CARNIVAL_PORT_2_BEAR )
+	{
+		PLAY( m_samples, SND_CARNIVAL_BEAR, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_CARNIVAL_PORT_2_RANKING )
+	{
+		PLAY( m_samples, SND_CARNIVAL_RANKING, 0 );
+	}
+
+	// d4: music board MCU reset
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
+/* Music board */
+
+// common
+
+void carnival_state::mboard_map(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();
+}
+
+READ_LINE_MEMBER( carnival_state::carnival_music_port_t1_r )
+{
+	// T1: comms from audio port 2 d3
+	return ~m_port2State >> 3 & 1;
+}
+
+
+// AY8912 music
+
+void carnival_state::carnival_psg_latch()
+{
+	if (m_musicBus & 1)
+	{
+		// BDIR W, BC1 selects address or data
+		if (m_musicBus & 2)
+			m_psg->address_w(m_musicData);
+		else
+			m_psg->data_w(m_musicData);
+	}
+}
+
+void carnival_state::carnivala_music_port_1_w(uint8_t data)
+{
+	// P1: AY8912 d0-d7
+	m_musicData = data;
+	carnival_psg_latch();
+}
+
+void carnival_state::carnivala_music_port_2_w(uint8_t data)
+{
+	// P2 d6: AY8912 BDIR(R/W)
+	// P2 d7: AY8912 BC1
+	m_musicBus = data >> 6 & 3;
+	carnival_psg_latch();
+}
+
+void carnival_state::carnivala_audio(machine_config &config)
+{
+	/* music board */
+	I8035(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &carnival_state::mboard_map);
+	m_audiocpu->p1_out_cb().set(FUNC(carnival_state::carnivala_music_port_1_w));
+	m_audiocpu->p2_out_cb().set(FUNC(carnival_state::carnivala_music_port_2_w));
+	m_audiocpu->t1_in_cb().set(FUNC(carnival_state::carnival_music_port_t1_r));
+
+	AY8912(config, m_psg, XTAL(3'579'545)/3).add_route(ALL_OUTPUTS, "mono", 0.25); // also seen with AY-3-8910, daughterboard has place for either chip
+
+	/* samples */
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(10);
+	m_samples->set_samples_names(carnival_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+
+// PIT8253 music
+
+void carnival_state::carnivalb_music_port_1_w(uint8_t data)
+{
+	// P1: PIT8253 d0-d7
+	m_musicData = data;
+}
+
+void carnival_state::carnivalb_music_port_2_w(uint8_t data)
+{
+	// P2 d7: PIT8253 write strobe
+	// P2 d5,d6: PIT8253 A0,A1
+	if (~m_musicBus & data & 0x80)
+		m_pit->write(data >> 5 & 3, m_musicData);
+
+	m_musicBus = data;
+}
+
+void carnival_state::carnivalb_audio(machine_config &config)
+{
+	// already inherited carnivala_audio
+	config.device_remove("psg");
+
+	m_audiocpu->p1_out_cb().set(FUNC(carnival_state::carnivalb_music_port_1_w));
+	m_audiocpu->p2_out_cb().set(FUNC(carnival_state::carnivalb_music_port_2_w));
+
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(3'579'545)/3);
+	m_pit->set_clk<1>(XTAL(3'579'545)/3);
+	m_pit->set_clk<2>(XTAL(3'579'545)/3);
+
+	m_pit->out_handler<0>().set(m_dac[0], FUNC(dac_bit_interface::write));
+	m_pit->out_handler<1>().set(m_dac[1], FUNC(dac_bit_interface::write));
+	m_pit->out_handler<2>().set(m_dac[2], FUNC(dac_bit_interface::write));
+
+	for (int i = 0; i < 3; i++)
+		DAC_1BIT(config, m_dac[i]).add_route(ALL_OUTPUTS, "mono", 0.15);
+}
+
+
+
+/*
+ *  Deptch Charge sound routines
+ *
+ */
+
+/* output port 0x01 definitions - sound effect drive outputs */
+#define OUT_DEPTHCH_PORT_1_LONGEXPL     0x01
+#define OUT_DEPTHCH_PORT_1_SHRTEXPL     0x02
+#define OUT_DEPTHCH_PORT_1_SPRAY        0x04
+#define OUT_DEPTHCH_PORT_1_SONAR        0x08
+
+
+#define PLAY(samp,id,loop)      samp->start( id, id, loop )
+#define STOP(samp,id)           samp->stop( id )
+
+
+/* sample file names */
+static const char *const depthch_sample_names[] =
+{
+	"*depthch",
+	"longex",
+	"shortex",
+	"spray",
+	"bonus",
+	"sonar",
+	nullptr
+};
+
+
+/* sample IDs - must match sample file name table above */
+enum
+{
+	SND_DEPTHCH_LONGEXPL = 0,
+	SND_DEPTHCH_SHRTEXPL,
+	SND_DEPTHCH_SPRAY,
+	SND_DEPTHCH_BONUS,
+	SND_DEPTHCH_SONAR
+};
+
+
+void vicdual_state::depthch_audio_w(uint8_t data)
+{
+	int bitsChanged;
+	int bitsGoneHigh;
+	int bitsGoneLow;
+
+	bitsChanged  = m_port1State ^ data;
+	bitsGoneHigh = bitsChanged & data;
+	bitsGoneLow  = bitsChanged & ~data;
+
+	m_port1State = data;
+
+	if ( bitsGoneHigh & OUT_DEPTHCH_PORT_1_LONGEXPL )
+	{
+		PLAY( m_samples, SND_DEPTHCH_LONGEXPL, 0 );
+	}
+
+	if ( bitsGoneHigh & OUT_DEPTHCH_PORT_1_SHRTEXPL )
+	{
+		PLAY( m_samples, SND_DEPTHCH_SHRTEXPL, 0 );
+	}
+
+	if ( bitsGoneHigh & OUT_DEPTHCH_PORT_1_SPRAY )
+	{
+		PLAY( m_samples, SND_DEPTHCH_SPRAY, 0 );
+	}
+
+	if ( bitsGoneHigh & OUT_DEPTHCH_PORT_1_SONAR )
+	{
+		PLAY( m_samples, SND_DEPTHCH_SONAR, 1 );
+	}
+	if ( bitsGoneLow & OUT_DEPTHCH_PORT_1_SONAR )
+	{
+		STOP( m_samples, SND_DEPTHCH_SONAR );
+
+		// bonus sound on same line as sonar
+		PLAY( m_samples, SND_DEPTHCH_BONUS, 0 );
+	}
+}
+
+
+void vicdual_state::depthch_audio(machine_config &config)
+{
+	/* samples */
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(5);
+	m_samples->set_samples_names(depthch_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+
+
+/*
+ *  Invinco sound routines
+ *
+ */
+
+/* output port 0x02 definitions - sound effect drive outputs */
+#define OUT_INVINCO_PORT_2_SAUCER       0x04
+#define OUT_INVINCO_PORT_2_MOVE1        0x08
+#define OUT_INVINCO_PORT_2_MOVE2        0x10
+#define OUT_INVINCO_PORT_2_FIRE         0x20
+#define OUT_INVINCO_PORT_2_INVHIT       0x40
+#define OUT_INVINCO_PORT_2_SHIPHIT      0x80
+
+
+#define PLAY(samp,id,loop)      samp->start( id, id, loop )
+#define STOP(samp,id)           samp->stop( id )
+
+
+/* sample file names */
+static const char *const invinco_sample_names[] =
+{
+	"*invinco",
+	"saucer",
+	"move1",
+	"move2",
+	"fire",
+	"invhit",
+	"shiphit",
+	"move3",    /* currently not used */
+	"move4",    /* currently not used */
+	nullptr
+};
+
+
+/* sample IDs - must match sample file name table above */
+enum
+{
+	SND_INVINCO_SAUCER = 0,
+	SND_INVINCO_MOVE1,
+	SND_INVINCO_MOVE2,
+	SND_INVINCO_FIRE,
+	SND_INVINCO_INVHIT,
+	SND_INVINCO_SHIPHIT,
+	SND_INVINCO_MOVE3,
+	SND_INVINCO_MOVE4
+};
+
+
+void vicdual_state::invinco_audio_w(uint8_t data)
+{
+	int bitsChanged;
+	//int bitsGoneHigh;
+	int bitsGoneLow;
+
+	bitsChanged  = m_port2State ^ data;
+	//bitsGoneHigh = bitsChanged & data;
+	bitsGoneLow  = bitsChanged & ~data;
+
+	m_port2State = data;
+
+	if ( bitsGoneLow & OUT_INVINCO_PORT_2_SAUCER )
+	{
+		PLAY( m_samples, SND_INVINCO_SAUCER, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_INVINCO_PORT_2_MOVE1 )
+	{
+		PLAY( m_samples, SND_INVINCO_MOVE1, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_INVINCO_PORT_2_MOVE2 )
+	{
+		PLAY( m_samples, SND_INVINCO_MOVE2, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_INVINCO_PORT_2_FIRE )
+	{
+		PLAY( m_samples, SND_INVINCO_FIRE, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_INVINCO_PORT_2_INVHIT )
+	{
+		PLAY( m_samples, SND_INVINCO_INVHIT, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_INVINCO_PORT_2_SHIPHIT )
+	{
+		PLAY( m_samples, SND_INVINCO_SHIPHIT, 0 );
+	}
+}
+
+
+void vicdual_state::invinco_audio(machine_config &config)
+{
+	/* samples */
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(invinco_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+
+
+/*
+ *  Pulsar sound routines
+ *
+ *  TODO: change heart rate based on bit 7 of Port 1
+ *
+ */
+
+/* output port 0x01 definitions - sound effect drive outputs */
+#define OUT_PULSAR_PORT_1_CLANG        0x01
+#define OUT_PULSAR_PORT_1_KEY          0x02
+#define OUT_PULSAR_PORT_1_ALIENHIT     0x04
+#define OUT_PULSAR_PORT_1_PHIT         0x08
+#define OUT_PULSAR_PORT_1_ASHOOT       0x10
+#define OUT_PULSAR_PORT_1_PSHOOT       0x20
+#define OUT_PULSAR_PORT_1_BONUS        0x40
+#define OUT_PULSAR_PORT_1_HBEAT_RATE   0x80    /* currently not used */
+
+/* output port 0x02 definitions - sound effect drive outputs */
+#define OUT_PULSAR_PORT_2_SIZZLE       0x01
+#define OUT_PULSAR_PORT_2_GATE         0x02
+#define OUT_PULSAR_PORT_2_BIRTH        0x04
+#define OUT_PULSAR_PORT_2_HBEAT        0x08
+#define OUT_PULSAR_PORT_2_MOVMAZE      0x10
+
+
+#define PLAY(samp,id,loop)           samp->start( id, id, loop )
+#define STOP(samp,id)                samp->stop( id )
+
+
+/* sample file names */
+static const char *const pulsar_sample_names[] =
+{
+	"*pulsar",
+	"clang",
+	"key",
+	"alienhit",
+	"phit",
+	"ashoot",
+	"pshoot",
+	"bonus",
+	"sizzle",
+	"gate",
+	"birth",
+	"hbeat",
+	"movmaze",
+	nullptr
+};
+
+
+/* sample IDs - must match sample file name table above */
+enum
+{
+	SND_PULSAR_CLANG = 0,
+	SND_PULSAR_KEY,
+	SND_PULSAR_ALIENHIT,
+	SND_PULSAR_PHIT,
+	SND_PULSAR_ASHOOT,
+	SND_PULSAR_PSHOOT,
+	SND_PULSAR_BONUS,
+	SND_PULSAR_SIZZLE,
+	SND_PULSAR_GATE,
+	SND_PULSAR_BIRTH,
+	SND_PULSAR_HBEAT,
+	SND_PULSAR_MOVMAZE
+};
+
+
+void vicdual_state::pulsar_audio_1_w(uint8_t data)
+{
+	int bitsChanged;
+	//int bitsGoneHigh;
+	int bitsGoneLow;
+
+	bitsChanged  = m_port1State ^ data;
+	//bitsGoneHigh = bitsChanged & data;
+	bitsGoneLow  = bitsChanged & ~data;
+
+	m_port1State = data;
+
+	if ( bitsGoneLow & OUT_PULSAR_PORT_1_CLANG )
+	{
+		PLAY( m_samples, SND_PULSAR_CLANG, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_PULSAR_PORT_1_KEY )
+	{
+		PLAY( m_samples, SND_PULSAR_KEY, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_PULSAR_PORT_1_ALIENHIT )
+	{
+		PLAY( m_samples, SND_PULSAR_ALIENHIT, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_PULSAR_PORT_1_PHIT )
+	{
+		PLAY( m_samples, SND_PULSAR_PHIT, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_PULSAR_PORT_1_ASHOOT )
+	{
+		PLAY( m_samples, SND_PULSAR_ASHOOT, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_PULSAR_PORT_1_PSHOOT )
+	{
+		PLAY( m_samples, SND_PULSAR_PSHOOT, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_PULSAR_PORT_1_BONUS )
+	{
+		PLAY( m_samples, SND_PULSAR_BONUS, 0 );
+	}
+}
+
+
+void vicdual_state::pulsar_audio_2_w(uint8_t data)
+{
+	int bitsChanged;
+	int bitsGoneHigh;
+	int bitsGoneLow;
+
+	bitsChanged  = m_port2State ^ data;
+	bitsGoneHigh = bitsChanged & data;
+	bitsGoneLow  = bitsChanged & ~data;
+
+	m_port2State = data;
+
+	if ( bitsGoneLow & OUT_PULSAR_PORT_2_SIZZLE )
+	{
+		PLAY( m_samples, SND_PULSAR_SIZZLE, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_PULSAR_PORT_2_GATE )
+	{
+		m_samples->start(SND_PULSAR_CLANG, SND_PULSAR_GATE);
+	}
+	if ( bitsGoneHigh & OUT_PULSAR_PORT_2_GATE )
+	{
+		STOP( m_samples, SND_PULSAR_CLANG );
+	}
+
+	if ( bitsGoneLow & OUT_PULSAR_PORT_2_BIRTH )
+	{
+		PLAY( m_samples, SND_PULSAR_BIRTH, 0 );
+	}
+
+	if ( bitsGoneLow & OUT_PULSAR_PORT_2_HBEAT )
+	{
+		PLAY( m_samples, SND_PULSAR_HBEAT, 1 );
+	}
+	if ( bitsGoneHigh & OUT_PULSAR_PORT_2_HBEAT )
+	{
+		STOP( m_samples, SND_PULSAR_HBEAT );
+	}
+
+	if ( bitsGoneLow & OUT_PULSAR_PORT_2_MOVMAZE )
+	{
+		PLAY( m_samples, SND_PULSAR_MOVMAZE, 1 );
+	}
+	if ( bitsGoneHigh & OUT_PULSAR_PORT_2_MOVMAZE )
+	{
+		STOP( m_samples, SND_PULSAR_MOVMAZE );
+	}
+}
+
+
+void vicdual_state::pulsar_audio(machine_config &config)
+{
+	/* samples */
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(12);
+	m_samples->set_samples_names(pulsar_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 

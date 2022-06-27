@@ -25,7 +25,7 @@ Known issues:
 // Directives
 
 #include "emu.h"
-#include "includes/bwing.h"
+#include "bwing.h"
 
 #include "cpu/m6502/deco16.h"
 #include "cpu/m6809/m6809.h"

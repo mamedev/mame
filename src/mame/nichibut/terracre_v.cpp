@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/terracre.h"
+#include "terracre.h"
 
 
 TILE_GET_INFO_MEMBER(terracre_state::get_bg_tile_info)

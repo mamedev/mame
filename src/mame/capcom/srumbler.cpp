@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/srumbler.h"
+#include "srumbler.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"

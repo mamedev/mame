@@ -497,7 +497,7 @@
 
 
 #include "emu.h"
-#include "includes/itech8.h"
+#include "itech8.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/hd6309.h"

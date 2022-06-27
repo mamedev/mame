@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 #include "emu.h"
-#include "includes/microtan.h"
+#include "microtan.h"
 
 
 void microtan_state::videoram_w(offs_t offset, uint8_t data)

@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/itech32.h"
+#include "itech32.h"
 #include <algorithm>
 
 

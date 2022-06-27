@@ -10,7 +10,7 @@ YGR019B - Hitachi YGR019B CD-Subsystem LSI. Earlier revision is YGR019A. Later r
 */
 
 #include "emu.h"
-#include "machine/saturn_cdb.h"
+#include "saturn_cdb.h"
 
 DEFINE_DEVICE_TYPE(SATURN_CDB, saturn_cdb_device, "satcdb", "Saturn CDB (CD Block)")
 

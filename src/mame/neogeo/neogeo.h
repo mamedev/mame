@@ -18,8 +18,8 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/upd1990a.h"
-#include "machine/ng_memcard.h"
-#include "video/neogeo_spr.h"
+#include "ng_memcard.h"
+#include "neogeo_spr.h"
 
 #include "bus/neogeo/slot.h"
 #include "bus/neogeo/carts.h"

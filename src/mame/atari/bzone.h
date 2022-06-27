@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "audio/redbaron.h"
+#include "redbaron.h"
 #include "machine/er2055.h"
-#include "machine/mathbox.h"
+#include "mathbox.h"
 #include "sound/discrete.h"
 #include "screen.h"
 

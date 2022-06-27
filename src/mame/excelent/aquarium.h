@@ -8,7 +8,7 @@
 #include "machine/gen_latch.h"
 #include "machine/mb3773.h"
 #include "sound/okim6295.h"
-#include "video/excellent_spr.h"
+#include "excellent_spr.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

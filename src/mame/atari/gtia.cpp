@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/gtia.h"
+#include "gtia.h"
 #include "screen.h"
 
 #define GTIA_P0 0x01

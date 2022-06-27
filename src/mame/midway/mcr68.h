@@ -5,17 +5,20 @@
     Midway MCR-68k system
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_MCR68_H
-#define MAME_INCLUDES_MCR68_H
+#ifndef MAME_MIDWAY_MCR68_H
+#define MAME_MIDWAY_MCR68_H
 
 #pragma once
 
-#include "machine/timer.h"
-#include "machine/watchdog.h"
-#include "audio/midway.h"
-#include "audio/s11c_bg.h"
+#include "midway.h"
+
+#include "s11c_bg.h"
+
 #include "machine/6840ptm.h"
 #include "machine/adc0844.h"
+#include "machine/timer.h"
+#include "machine/watchdog.h"
+
 #include "screen.h"
 #include "tilemap.h"
 
@@ -109,4 +112,4 @@ private:
 	void trisport_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MCR68_H
+#endif // MAME_MIDWAY_MCR68_H

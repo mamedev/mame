@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "audio/trackfld.h"
+#include "trackfld_a.h"
 #include "machine/74259.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"

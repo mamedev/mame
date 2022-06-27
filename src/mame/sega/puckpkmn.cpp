@@ -50,8 +50,8 @@ Notes:
 #include "sound/sn76496.h"
 #include "sound/ymopn.h"
 
-#include "includes/megadriv.h"
-#include "includes/megadriv_acbl.h"
+#include "megadriv.h"
+#include "megadriv_acbl.h"
 
 /* Puckman Pockimon Input Ports */
 static INPUT_PORTS_START( puckpkmn )

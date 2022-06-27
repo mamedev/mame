@@ -8,7 +8,7 @@
 ****************************************************************/
 
 #include "emu.h"
-#include "includes/tryout.h"
+#include "tryout.h"
 
 
 void tryout_state::palette(palette_device &palette) const

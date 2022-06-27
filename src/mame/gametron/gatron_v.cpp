@@ -20,7 +20,7 @@
 
 
 #include "emu.h"
-#include "includes/gatron.h"
+#include "gatron.h"
 
 
 void gatron_state::videoram_w(offs_t offset, uint8_t data)

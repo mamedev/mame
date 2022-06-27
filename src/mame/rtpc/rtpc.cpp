@@ -80,8 +80,8 @@
 #include "cpu/mcs51/mcs51.h"
 
 // various hardware
-#include "machine/rosetta.h"
-#include "machine/rtpc_iocc.h"
+#include "rosetta.h"
+#include "rtpc_iocc.h"
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/i8255.h"

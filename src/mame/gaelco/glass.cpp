@@ -12,9 +12,9 @@ Todo:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/glass.h"
+#include "glass.h"
 
-#include "machine/gaelco_ds5002fp.h"
+#include "gaelco_ds5002fp.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"

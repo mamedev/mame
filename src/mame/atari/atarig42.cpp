@@ -19,7 +19,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/atarig42.h"
+#include "atarig42.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "emupal.h"

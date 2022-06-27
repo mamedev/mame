@@ -166,7 +166,7 @@ Sega PC BD MODEL2 C-CRX COMMUNICATION 837-12839
 
 #include "emu.h"
 #include "emuopts.h"
-#include "machine/m2comm.h"
+#include "m2comm.h"
 
 #define VERBOSE 0
 #include "logmacro.h"

@@ -81,7 +81,7 @@ Stephh's Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/jack.h"
+#include "jack.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

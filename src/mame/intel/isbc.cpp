@@ -28,8 +28,8 @@ able to deal with 256byte sectors so fails to load the irmx 512byte sector image
 #include "machine/z80sio.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/isbx/isbx.h"
-#include "machine/isbc_215g.h"
-#include "machine/isbc_208.h"
+#include "isbc_215g.h"
+#include "isbc_208.h"
 
 class isbc_state : public driver_device
 {

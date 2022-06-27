@@ -13,9 +13,9 @@
 
 #include "emu.h"
 
-#include "includes/konamipt.h"
-#include "video/k007121.h"
-#include "video/k051733.h"
+#include "konamipt.h"
+#include "k007121.h"
+#include "k051733.h"
 
 #include "cpu/m6809/hd6309.h"
 #include "machine/timer.h"

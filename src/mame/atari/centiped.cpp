@@ -415,7 +415,7 @@ each direction to assign the boundries.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/centiped.h"
+#include "centiped.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/s2650/s2650.h"

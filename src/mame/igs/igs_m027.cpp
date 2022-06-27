@@ -25,8 +25,8 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/nvram.h"
-#include "machine/pgmcrypt.h"
-#include "video/igs017_igs031.h"
+#include "pgmcrypt.h"
+#include "igs017_igs031.h"
 #include "screen.h"
 
 

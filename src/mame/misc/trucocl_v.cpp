@@ -35,7 +35,7 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/trucocl.h"
+#include "trucocl.h"
 
 
 void trucocl_state::trucocl_palette(palette_device &palette) const

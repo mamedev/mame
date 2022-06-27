@@ -12,7 +12,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/rungun.h"
+#include "rungun.h"
 
 
 /* TTL text plane stuff */

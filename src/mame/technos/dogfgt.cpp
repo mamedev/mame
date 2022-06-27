@@ -10,7 +10,7 @@ driver by Nicola Salmoria
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dogfgt.h"
+#include "dogfgt.h"
 
 #include "cpu/m6502/m6502.h"
 #include "speaker.h"

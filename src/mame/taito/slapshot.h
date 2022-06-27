@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "audio/taitosnd.h"
-#include "machine/taitoio.h"
-#include "video/tc0360pri.h"
-#include "video/tc0480scp.h"
+#include "taitosnd.h"
+#include "taitoio.h"
+#include "tc0360pri.h"
+#include "tc0480scp.h"
 #include "emupal.h"
 
 class slapshot_state : public driver_device

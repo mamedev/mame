@@ -22,7 +22,7 @@
 #include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "machine/rc759_kbd.h"
+#include "rc759_kbd.h"
 #include "sound/sn76496.h"
 #include "sound/spkrdev.h"
 #include "video/i82730.h"

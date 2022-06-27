@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cps3.h"
+#include "cps3_a.h"
 
 
 // device type definition

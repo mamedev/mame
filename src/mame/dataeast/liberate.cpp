@@ -17,12 +17,12 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/liberate.h"
+#include "liberate.h"
 
 #include "cpu/m6502/deco16.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-#include "machine/deco222.h"
+#include "deco222.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/namco62.h"
+#include "namco62.h"
 
 #define VERBOSE 0
 #include "logmacro.h"

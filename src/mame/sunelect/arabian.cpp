@@ -45,7 +45,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/arabian.h"
+#include "arabian.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

@@ -13,8 +13,8 @@
 #include "machine/gen_latch.h"
 #include "cpu/h6280/h6280.h"
 #include "video/bufsprite.h"
-#include "video/decospr.h"
-#include "video/deco16ic.h"
+#include "decospr.h"
+#include "deco16ic.h"
 #include "emupal.h"
 
 class cbuster_state : public driver_device

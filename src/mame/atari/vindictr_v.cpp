@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/vindictr.h"
+#include "vindictr.h"
 
 
 

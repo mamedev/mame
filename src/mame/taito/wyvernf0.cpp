@@ -32,9 +32,11 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "taito68705.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
-#include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
@@ -44,6 +46,8 @@ TODO:
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
 
 class wyvernf0_state : public driver_device
 {
@@ -753,6 +757,8 @@ ROM_START( wyvernf0a ) /* Possibly the first version or even an earlier developm
 	ROM_LOAD( "sch_2.ic100", 0x4000, 0x2000, CRC(be708238) SHA1(f12d433af7bf6010dea9454a1b3bb2990a42a372) ) /* == a39_13.ic100 */
 	ROM_LOAD( "sch_1.ic74",  0x6000, 0x2000, CRC(1cc389de) SHA1(4213484d3a82688f312811e7a5c4d128e40584c3) ) /* == a39_12.ic74  */
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1985, wyvernf0,  0,        wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito Corporation", "Wyvern F-0 (Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)
 GAME( 1985, wyvernf0a, wyvernf0, wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito Corporation", "Wyvern F-0",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND) // First version or earlier dev version?

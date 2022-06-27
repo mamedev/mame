@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 #include "emu.h"
-#include "includes/taito_b.h"
+#include "taito_b.h"
 
 void hitice_state::pixelram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {

@@ -8,15 +8,17 @@
 // Currently these checksums fail in MAME due to the interrupt hack mapping over ROM, if you remove that hack they pass
 
 #include "emu.h"
+#include "elan_eu3a05_a.h"
+#include "elan_eu3a05gpio.h"
+#include "elan_ep3a19asys.h"
+#include "elan_eu3a05vid.h"
+
 #include "cpu/m6502/m6502.h"
+#include "machine/bankdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "machine/bankdev.h"
-#include "audio/elan_eu3a05.h"
-#include "machine/elan_eu3a05gpio.h"
-#include "machine/elan_ep3a19asys.h"
-#include "video/elan_eu3a05vid.h"
 
 class elan_ep3a19a_state : public driver_device
 {

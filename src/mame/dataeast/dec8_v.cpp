@@ -44,7 +44,7 @@ sprites.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dec8.h"
+#include "dec8.h"
 
 void dec8_state::dec8_bg_data_w(offs_t offset, uint8_t data)
 {

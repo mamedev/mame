@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
 #include "emu.h"
-#include "includes/rockrage.h"
+#include "rockrage.h"
 
 void rockrage_state::rockrage_palette(palette_device &palette) const
 {

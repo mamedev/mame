@@ -22,8 +22,9 @@ If the output isn't satisfactory, it prints "I/O BOARD FAILURE".
 
 #include "emu.h"
 
+#include "pcshare.h"
+
 #include "cpu/i386/i386.h"
-#include "machine/pcshare.h"
 #include "machine/bankdev.h"
 #include "machine/ds128x.h"
 #include "machine/ins8250.h"
@@ -38,6 +39,7 @@ If the output isn't satisfactory, it prints "I/O BOARD FAILURE".
 
 #include "screen.h"
 
+namespace {
 
 class pcat_dyn_state : public pcat_base_state
 {
@@ -276,6 +278,8 @@ ROM_START(toursol1)
 	ROM_REGION(128, "rtc", 0)
 	ROM_LOAD("rtc", 0, 128, BAD_DUMP CRC(732f64c8) SHA1(5386eac3afef9b16af8dd7766e577f7ac700d9cc))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1995, toursol,  0,       pcat_dyn, pcat_dyn, pcat_dyn_state, empty_init, ROT0, "Dynamo", "Tournament Solitaire (V1.06, 08/03/95)", MACHINE_UNEMULATED_PROTECTION )

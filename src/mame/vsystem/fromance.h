@@ -15,8 +15,8 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
-#include "video/vsystem_gga.h"
-#include "video/vsystem_spr2.h"
+#include "vsystem_gga.h"
+#include "vsystem_spr2.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

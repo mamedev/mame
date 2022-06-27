@@ -29,7 +29,7 @@
 #include "formats/apridisk.h"
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
-#include "machine/apricotkb.h"
+#include "apricotkb.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"

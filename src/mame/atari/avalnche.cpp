@@ -33,7 +33,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/avalnche.h"
+#include "avalnche.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
 #include "machine/watchdog.h"

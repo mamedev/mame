@@ -2,8 +2,8 @@
 // copyright-holders:Luca Elia
 
 #include "machine/gen_latch.h"
-#include "machine/jaleco_ms32_sysctrl.h"
-#include "video/ms32_sprite.h"
+#include "jaleco_ms32_sysctrl.h"
+#include "ms32_sprite.h"
 #include "emupal.h"
 #include "tilemap.h"
 

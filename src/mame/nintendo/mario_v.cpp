@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "video/resnet.h"
 
-#include "includes/mario.h"
+#include "mario.h"
 
 static const res_net_decode_info mario_decode_info =
 {

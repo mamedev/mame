@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/hpc3.h"
+#include "hpc3.h"
 
 #define LOG_UNKNOWN     (1 << 0)
 #define LOG_PBUS_DMA    (1 << 1)

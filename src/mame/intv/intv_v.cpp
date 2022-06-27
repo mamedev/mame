@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods,Frank Palazzolo
 #include "emu.h"
 #include "video/tms9927.h"
-#include "includes/intv.h"
+#include "intv.h"
 
 void intv_state::video_start()
 {

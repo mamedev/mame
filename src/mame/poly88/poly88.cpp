@@ -46,7 +46,7 @@ at least some models of the Poly-88 are known to have used.)
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/poly88.h"
+#include "poly88.h"
 
 #include "bus/s100/ascsasi.h"
 #include "bus/s100/poly16k.h"

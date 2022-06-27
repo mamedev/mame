@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/alpha68k.h"
+#include "alpha68k.h"
 
 // TODO: used by alpha68k_i.cpp and _n.cpp, move to own file
 void alpha68k_prom_state::palette_init(palette_device &palette) const

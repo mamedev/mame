@@ -43,7 +43,7 @@ Verify Color PROM resistor values (Last 8 colors)
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/stactics.h"
+#include "stactics.h"
 #include "stactics.lh"
 
 #include "cpu/i8085/i8085.h"

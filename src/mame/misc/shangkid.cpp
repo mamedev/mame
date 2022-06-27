@@ -52,7 +52,7 @@ Games by Nihon Game/Culture Brain:
 */
 
 #include "emu.h"
-#include "includes/shangkid.h"
+#include "shangkid.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

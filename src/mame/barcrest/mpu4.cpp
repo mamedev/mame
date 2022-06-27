@@ -215,9 +215,9 @@ To change between them, follow these instructions:
 
 ***********************************************************************************************************/
 #include "emu.h"
-#include "includes/mpu4.h"
+#include "mpu4.h"
 
-#include "video/awpvid.h"       //Fruit Machines Only
+#include "awpvid.h"       //Fruit Machines Only
 
 #include "machine/rescap.h"
 #include "speaker.h"

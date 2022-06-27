@@ -84,12 +84,16 @@ Smitdogg
 
 
 #include "emu.h"
+
+#include "pcshare.h"
+
 #include "cpu/i386/i386.h"
-#include "machine/pcshare.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
-#include "video/clgd542x.h"
 #include "machine/nvram.h"
+#include "video/clgd542x.h"
+
+namespace {
 
 class pcat_nit_state : public pcat_base_state
 {
@@ -446,6 +450,8 @@ void pcat_nit_state::init_pcat_nit()
 	m_banked_nvram = std::make_unique<uint8_t[]>(0x2000);
 	subdevice<nvram_device>("nvram")->set_base(m_banked_nvram.get(), 0x2000);
 }
+
+} // anonymous namespace
 
 GAME( 1993, streetg,    0,         pcat_nit,  pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 GAME( 1993, streetgr3,  streetg,   pcat_nit,  pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 3)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

@@ -14,7 +14,7 @@
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/pc80s31k.h"
+#include "pc80s31k.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/ay8910.h"

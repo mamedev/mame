@@ -70,7 +70,7 @@
 #include "machine/am9517a.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
-#include "machine/ngen_kb.h"
+#include "ngen_kb.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/wd2010.h"

@@ -5,10 +5,10 @@
 #define MAME_INCLUDES_CDI_H
 
 #include "machine/scc68070.h"
-#include "machine/cdislavehle.h"
-#include "machine/cdicdic.h"
+#include "cdislavehle.h"
+#include "cdicdic.h"
 #include "sound/dmadac.h"
-#include "video/mcd212.h"
+#include "mcd212.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/m6805/m68hc05.h"
 #include "screen.h"

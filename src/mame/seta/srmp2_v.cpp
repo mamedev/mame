@@ -8,7 +8,7 @@ Functions to emulate the video hardware of the machine.
 
 
 #include "emu.h"
-#include "includes/srmp2.h"
+#include "srmp2.h"
 
 void srmp2_state::srmp2_palette(palette_device &palette) const
 {

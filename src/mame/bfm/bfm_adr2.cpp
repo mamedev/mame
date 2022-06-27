@@ -94,10 +94,10 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 
 #include "emu.h"
 
-#include "video/bfm_adr2.h"
+#include "bfm_adr2.h"
 
 #include "cpu/m6809/m6809.h"
-#include "machine/bfm_bd1.h"  // vfd
+#include "bfm_bd1.h"  // vfd
 
 #include "emupal.h"
 #include "screen.h"

@@ -16,7 +16,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/mouser.h"
+#include "mouser.h"
 
 void mouser_state::mouser_palette(palette_device &palette) const
 {

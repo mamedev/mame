@@ -7,7 +7,7 @@ Atari Poolshark video emulation
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/poolshrk.h"
+#include "poolshrk.h"
 
 
 

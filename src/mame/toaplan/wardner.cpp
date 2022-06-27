@@ -127,8 +127,8 @@ out:
 
 
 #include "emu.h"
-#include "includes/twincobr.h"
-#include "includes/toaplipt.h"
+#include "twincobr.h"
+#include "toaplipt.h"
 
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/z80/z80.h"

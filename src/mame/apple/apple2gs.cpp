@@ -49,15 +49,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/apple2.h"
+
+#include "apple2video.h"
 
 #define RUN_ADB_MICRO (0)       // use the ADB microcontroller for keyboard/mouse input
 #define ADB_HLE (0)             // connect the ADB microcontroller to the macadb.cpp ADB bit-serial keyboard+mouse
 #define LOG_ADB (0)             // log ADB activity in the old-style HLE simulation of the microcontroller and GLU
 
-#include "machine/apple2common.h"
+#include "apple2common.h"
 //#include "machine/apple2host.h"
-#include "machine/macadb.h"
+#include "macadb.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/cards.h"

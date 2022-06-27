@@ -187,14 +187,14 @@ other supported games as well.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/m72.h"
-#include "includes/iremipt.h"
+#include "m72.h"
+#include "iremipt.h"
 
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/irem_cpu.h"
+#include "irem_cpu.h"
 #include "machine/rstbuf.h"
 #include "sound/ymopm.h"
 #include "speaker.h"

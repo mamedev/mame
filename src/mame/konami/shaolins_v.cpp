@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/shaolins.h"
+#include "shaolins.h"
 
 
 /***************************************************************************

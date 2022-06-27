@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "audio/cheekyms.h"
+#include "cheekyms_a.h"
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"

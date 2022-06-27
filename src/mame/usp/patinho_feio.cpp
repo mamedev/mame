@@ -9,7 +9,7 @@
 #include "bus/generic/carts.h"
 #include "softlist.h"
 #include "cpu/patinhofeio/patinhofeio_cpu.h"
-#include "includes/patinhofeio.h"
+#include "patinhofeio.h"
 #include "patinho.lh"
 
 /*

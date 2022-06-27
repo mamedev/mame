@@ -195,9 +195,9 @@ perhaps? The two writes seem to take only two values.
  */
 
 #include "emu.h"
-#include "includes/taitoair.h"
-#include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
+#include "taitoair.h"
+#include "taitoipt.h"
+#include "taitosnd.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

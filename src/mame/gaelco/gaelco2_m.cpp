@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gaelco2.h"
+#include "gaelco2.h"
 
 #include "machine/eepromser.h"
 #include "chd.h"

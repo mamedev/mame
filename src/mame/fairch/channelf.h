@@ -11,7 +11,7 @@
 #pragma once
 
 #include "cpu/f8/f8.h"
-#include "audio/channelf.h"
+#include "channelf_a.h"
 
 #include "bus/chanf/slot.h"
 #include "bus/chanf/rom.h"

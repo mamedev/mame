@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "machine/nb1413m3.h"
+#include "nb1413m3.h"
 #include "emupal.h"
 #include "screen.h"
 

@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/cloak.h"
+#include "cloak.h"
 
 
 #define NUM_PENS    (0x40)

@@ -141,7 +141,7 @@ MPU5 Horizon and Genesis machines use also a mux PCB for LEDs, lamps and buttons
 
 
 #include "emu.h"
-#include "includes/mpu5.h"
+#include "mpu5.h"
 
 #include "speaker.h"
 

@@ -105,8 +105,8 @@ initials
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/nemesis.h"
-#include "includes/konamipt.h"
+#include "nemesis.h"
+#include "konamipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

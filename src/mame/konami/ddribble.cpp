@@ -14,8 +14,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ddribble.h"
-#include "includes/konamipt.h"
+#include "ddribble.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"

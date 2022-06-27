@@ -5,10 +5,15 @@
     Midway MCR system
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_MCR_H
-#define MAME_INCLUDES_MCR_H
+#ifndef MAME_MIDWAY_MCR_H
+#define MAME_MIDWAY_MCR_H
 
 #pragma once
+
+#include "csd.h"
+#include "midway.h"
+
+#include "ballysound.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
@@ -17,12 +22,11 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/watchdog.h"
-#include "audio/bally.h"
-#include "audio/midway.h"
-#include "audio/csd.h"
 #include "sound/samples.h"
+
 #include "emupal.h"
 #include "tilemap.h"
+
 
 /* constants */
 #define MAIN_OSC_MCR_I      XTAL(19'968'000)
@@ -232,4 +236,4 @@ extern const z80_daisy_config mcr_ipu_daisy_chain[];
 extern const gfx_layout mcr_bg_layout;
 extern const gfx_layout mcr_sprite_layout;
 
-#endif // MAME_INCLUDES_MCR_H
+#endif // MAME_MIDWAY_MCR_H

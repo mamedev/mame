@@ -202,7 +202,7 @@ TI-86 ports:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ti85.h"
+#include "ti85.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/ez80.h"

@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/aztarac.h"
+#include "aztarac.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"

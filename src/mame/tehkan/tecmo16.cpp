@@ -33,7 +33,7 @@ Notes:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/tecmo16.h"
+#include "tecmo16.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

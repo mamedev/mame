@@ -2,9 +2,10 @@
 // copyright-holders:Miodrag Milanovic
 
 #include "emu.h"
-#include "includes/spec128.h"
+#include "spec128.h"
 
-#include "machine/beta.h"
+#include "beta_m.h"
+
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 

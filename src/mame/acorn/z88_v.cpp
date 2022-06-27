@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/z88.h"
+#include "z88.h"
 
 
 inline void z88_state::plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint16_t color)

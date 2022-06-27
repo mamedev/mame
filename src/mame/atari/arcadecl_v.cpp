@@ -11,8 +11,8 @@
 
 
 #include "emu.h"
-#include "video/atarimo.h"
-#include "includes/arcadecl.h"
+#include "atarimo.h"
+#include "arcadecl.h"
 
 /*************************************
  *

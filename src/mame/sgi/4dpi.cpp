@@ -59,7 +59,7 @@
 #include "bus/rs232/hlemouse.h"
 
 // video and audio
-#include "video/sgi_gr1.h"
+#include "sgi_gr1.h"
 
 #include "4dpi.lh"
 

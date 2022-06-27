@@ -6,8 +6,8 @@
 #pragma once
 
 #include "machine/74259.h"
-#include "machine/gaelcrpt.h"
-#include "video/gaelco_wrally_sprites.h"
+#include "gaelcrpt.h"
+#include "gaelco_wrally_sprites.h"
 #include "emupal.h"
 #include "tilemap.h"
 

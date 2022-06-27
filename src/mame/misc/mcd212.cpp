@@ -22,7 +22,7 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "video/mcd212.h"
+#include "mcd212.h"
 #include "screen.h"
 
 #define LOG_UNKNOWNS        (1U << 1)

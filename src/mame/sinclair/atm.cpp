@@ -9,11 +9,12 @@ Not working because of banking issues.
 *******************************************************************************************/
 
 #include "emu.h"
-#include "includes/spec128.h"
-#include "includes/specpls3.h"
+#include "spec128.h"
+#include "specpls3.h"
+
+#include "beta_m.h"
 
 #include "sound/ay8910.h"
-#include "machine/beta.h"
 
 
 namespace {

@@ -13,7 +13,7 @@
 #include "machine/ram.h"
 #include "sound/sn76496.h"
 #include "sound/spkrdev.h"
-#include "video/pc_t1t.h"
+#include "pc_t1t.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"

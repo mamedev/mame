@@ -223,7 +223,7 @@ collisions, one is for sprite/sprite collisions.
 
 
 #include "emu.h"
-#include "includes/arcadia.h"
+#include "arcadia.h"
 
 static const uint8_t chars[0x40][8]={
 	// read from the screen generated from a palladium

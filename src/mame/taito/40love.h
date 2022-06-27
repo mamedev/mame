@@ -1,15 +1,17 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
-#ifndef MAME_INCLUDES_40LOVE_H
-#define MAME_INCLUDES_40LOVE_H
+#ifndef MAME_TAITO_40LOVE_H
+#define MAME_TAITO_40LOVE_H
 
 #pragma once
 
-#include "machine/taito68705interface.h"
+#include "taito68705.h"
+
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
 #include "sound/ay8910.h"
 #include "sound/ta7630.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -115,4 +117,4 @@ private:
 	uint8_t       m_snd_ctrl3 = 0U;
 };
 
-#endif // MAME_INCLUDES_40LOVE_H
+#endif // MAME_TAITO_40LOVE_H

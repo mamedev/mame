@@ -19,7 +19,7 @@ ToDo:
 
 
 #include "emu.h"
-#include "includes/cybiko.h"
+#include "cybiko.h"
 
 #include "screen.h"
 #include "speaker.h"

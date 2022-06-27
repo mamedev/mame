@@ -98,7 +98,7 @@ Dip Locations and factory settings verified with manual
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bombjack.h"
+#include "bombjack.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

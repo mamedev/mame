@@ -170,7 +170,7 @@ code at z80:0093:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/superqix.h"
+#include "superqix.h"
 
 #include "cpu/z80/z80.h"
 #include "screen.h"

@@ -14,9 +14,9 @@
 
 #include "emu.h"
 
-#include "video/k051316.h"
-#include "video/k053244_k053245.h"
-#include "video/konami_helper.h"
+#include "k051316.h"
+#include "k053244_k053245.h"
+#include "konami_helper.h"
 
 #include "cpu/m6809/konami.h" // for the callback and the firq irq definition
 #include "cpu/z80/z80.h"

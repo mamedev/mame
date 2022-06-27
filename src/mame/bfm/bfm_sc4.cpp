@@ -33,15 +33,15 @@
 */
 
 #include "emu.h"
-#include "includes/bfm_sc4.h"
-#include "machine/bfm_sc45_helper.h"
+#include "bfm_sc4.h"
+#include "bfm_sc45_helper.h"
+
+#include "awpvid.h" //DMD01
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6809/m6809.h"
 #include "machine/68307.h"
 #include "machine/68340.h"
-#include "video/awpvid.h"
-//DMD01
-#include "cpu/m6809/m6809.h"
 
 #include "speaker.h"
 

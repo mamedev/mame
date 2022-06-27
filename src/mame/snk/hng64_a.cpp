@@ -40,7 +40,7 @@ so levels 0,1,2,5 are unmasked, vectors get set during the sound CPU init code.
 
 
 #include "emu.h"
-#include "includes/hng64.h"
+#include "hng64.h"
 #include "speaker.h"
 
 

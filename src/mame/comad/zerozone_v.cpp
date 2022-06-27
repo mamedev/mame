@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/zerozone.h"
+#include "zerozone.h"
 
 void zerozone_state::tilemap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {

@@ -21,7 +21,7 @@
  */
 
 #include "emu.h"
-#include "includes/maygay1b.h"
+#include "maygay1b.h"
 
 #include "m1albsqp.lh"
 #include "m1apollo2.lh"

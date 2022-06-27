@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/cclimber.h"
+#include "cclimber.h"
 
 
 #define CCLIMBER_BG_PEN     (0)

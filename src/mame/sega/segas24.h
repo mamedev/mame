@@ -10,7 +10,7 @@
 #pragma once
 
 #include "machine/timer.h"
-#include "video/segaic24.h"
+#include "segaic24.h"
 #include "emupal.h"
 #include "screen.h"
 

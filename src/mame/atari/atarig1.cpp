@@ -21,7 +21,7 @@
 
 
 #include "emu.h"
-#include "includes/atarig1.h"
+#include "atarig1.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "emupal.h"

@@ -90,7 +90,7 @@ Notes:
 ---*/
 
 #include "emu.h"
-#include "includes/pirates.h"
+#include "pirates.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"

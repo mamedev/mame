@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/harddriv.h"
+#include "harddriv.h"
 
 #include "cpu/tms32010/tms32010.h"
 #include "speaker.h"

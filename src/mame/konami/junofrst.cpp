@@ -80,15 +80,15 @@ Blitter source graphics
 
 
 #include "emu.h"
-#include "includes/tutankhm.h"
-#include "includes/konamipt.h"
+#include "tutankhm.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
-#include "machine/konami1.h"
+#include "konami1.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"

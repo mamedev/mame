@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/exerion.h"
+#include "exerion.h"
 
 
 #define BACKGROUND_X_START      32

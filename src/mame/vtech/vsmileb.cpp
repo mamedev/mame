@@ -24,7 +24,7 @@
 
 #include "emu.h"
 
-#include "includes/vsmile.h"
+#include "vsmile.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"

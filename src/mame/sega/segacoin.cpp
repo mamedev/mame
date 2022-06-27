@@ -19,7 +19,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/315_5338a.h"
+#include "315_5338a.h"
 #include "machine/pit8253.h"
 #include "sound/ymopn.h"
 #include "speaker.h"

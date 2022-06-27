@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald,Carl
 
 #include "emu.h"
-#include "video/x68k_crtc.h"
+#include "x68k_crtc.h"
 #include "screen.h"
 
 //#define VERBOSE 1

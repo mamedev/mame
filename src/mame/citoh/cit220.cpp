@@ -15,7 +15,7 @@ and the SCN2674 video timing parameters appear to be identical.
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/cit220_kbd.h"
+#include "cit220_kbd.h"
 //#include "machine/eeprompar.h"
 #include "machine/i8251.h"
 #include "machine/mc68681.h"

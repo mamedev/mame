@@ -2,7 +2,7 @@
 // copyright-holders:smf, Mike Balfour, David Widel
 
 #include "emu.h"
-#include "includes/pacman.h"
+#include "pacman.h"
 
 uint8_t epospm_state::epos_decryption_w(offs_t offset)
 {

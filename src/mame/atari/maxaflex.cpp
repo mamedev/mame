@@ -13,7 +13,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/atari400.h"
+#include "atari400.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6805/m68705.h"
@@ -25,7 +25,7 @@
 #include "sound/spkrdev.h"
 #include "sound/pokey.h"
 
-#include "video/gtia.h"
+#include "gtia.h"
 
 #include "screen.h"
 #include "speaker.h"

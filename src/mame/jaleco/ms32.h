@@ -7,8 +7,8 @@
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
-#include "machine/jaleco_ms32_sysctrl.h"
-#include "video/ms32_sprite.h"
+#include "jaleco_ms32_sysctrl.h"
+#include "ms32_sprite.h"
 #include "sound/ymf271.h"
 #include "emupal.h"
 #include "screen.h"

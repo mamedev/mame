@@ -390,8 +390,8 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 
 
 #include "emu.h"
-#include "includes/toaplan2.h"
-#include "includes/toaplipt.h"
+#include "toaplan2.h"
+#include "toaplipt.h"
 
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"

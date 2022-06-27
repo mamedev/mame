@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "includes/xavix.h"
+#include "xavix.h"
 
 // #define VERBOSE 1
 #include "logmacro.h"

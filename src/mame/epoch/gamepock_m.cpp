@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 #include "emu.h"
-#include "includes/gamepock.h"
+#include "gamepock.h"
 
 #include "cpu/upd7810/upd7810.h"
 

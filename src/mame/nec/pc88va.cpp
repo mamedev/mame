@@ -26,7 +26,7 @@
 ********************************************************************************************/
 
 #include "emu.h"
-#include "includes/pc88va.h"
+#include "pc88va.h"
 
 #include "softlist_dev.h"
 

@@ -7,7 +7,7 @@ Atari Tank 8 video emulation
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tank8.h"
+#include "tank8.h"
 
 
 void tank8_state::tank8_palette(palette_device &palette) const

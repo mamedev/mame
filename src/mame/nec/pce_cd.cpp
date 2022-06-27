@@ -70,7 +70,7 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 
 #include "emu.h"
 #include "coreutil.h"
-#include "machine/pce_cd.h"
+#include "pce_cd.h"
 
 
 #define PCE_CD_CLOCK    9216000

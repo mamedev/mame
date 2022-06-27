@@ -79,7 +79,7 @@ PROM  : Type MB7051
 
 #include "emu.h"
 #include "machine/74259.h"
-#include "machine/alpha8201.h"
+#include "alpha8201.h"
 #include "machine/watchdog.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

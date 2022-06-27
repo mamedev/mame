@@ -8,7 +8,7 @@
 */
 
 #include "emu.h"
-#include "includes/laserbat.h"
+#include "laserbat.h"
 
 
 uint8_t laserbat_state_base::rhsc_r()

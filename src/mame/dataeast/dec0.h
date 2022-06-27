@@ -12,8 +12,8 @@
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "video/bufsprite.h"
-#include "video/decbac06.h"
-#include "video/decmxc06.h"
+#include "decbac06.h"
+#include "decmxc06.h"
 #include "emupal.h"
 #include "screen.h"
 

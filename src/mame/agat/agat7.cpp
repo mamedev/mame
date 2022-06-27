@@ -21,7 +21,7 @@
 
 #include "emu.h"
 
-#include "video/agat7.h"
+#include "agat7.h"
 
 #include "screen.h"
 

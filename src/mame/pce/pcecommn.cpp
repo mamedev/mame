@@ -2,7 +2,7 @@
 // copyright-holders:Mariusz Wojcieszek
 
 #include "emu.h"
-#include "machine/pcecommn.h"
+#include "pcecommn.h"
 #include "cpu/h6280/h6280.h"
 
 #define TG_16_JOY_SIG       0x00

@@ -16,7 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
-#include "machine/dmv_keyb.h"
+#include "dmv_keyb.h"
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"

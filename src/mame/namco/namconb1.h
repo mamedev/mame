@@ -11,13 +11,13 @@
 #pragma once
 
 #include "machine/eeprompar.h"
-#include "machine/namcomcu.h"
+#include "namcomcu.h"
 #include "machine/timer.h"
 #include "screen.h"
-#include "video/namco_c116.h"
-#include "video/namco_c355spr.h"
-#include "video/namco_c123tmap.h"
-#include "video/namco_c169roz.h"
+#include "namco_c116.h"
+#include "namco_c355spr.h"
+#include "namco_c123tmap.h"
+#include "namco_c169roz.h"
 
 
 class namconb1_state : public driver_device

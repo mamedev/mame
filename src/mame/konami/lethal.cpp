@@ -247,7 +247,7 @@ maybe some sprite placement issues
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lethal.h"
+#include "lethal.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"

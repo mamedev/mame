@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/qdrmfgp.h"
+#include "qdrmfgp.h"
 
 
 K056832_CB_MEMBER(qdrmfgp_state::qdrmfgp_tile_callback)

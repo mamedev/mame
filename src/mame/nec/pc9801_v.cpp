@@ -10,7 +10,7 @@
  ******************************************************************/
 
 #include "emu.h"
-#include "includes/pc9801.h"
+#include "pc9801.h"
 
 
 void pc9801_state::video_start()

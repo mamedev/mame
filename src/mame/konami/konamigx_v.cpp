@@ -6,8 +6,8 @@
  */
 
 #include "emu.h"
-#include "video/k053250.h"
-#include "includes/konamigx.h"
+#include "k053250.h"
+#include "konamigx.h"
 
 
 //#define GX_DEBUG

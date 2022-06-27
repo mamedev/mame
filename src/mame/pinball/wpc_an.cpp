@@ -87,11 +87,11 @@ TODO: (wpc in general)
 
 
 #include "emu.h"
-#include "audio/s11c_bg.h"
-#include "audio/wpcsnd.h"
+#include "s11c_bg.h"
+#include "wpcsnd.h"
 
 #include "cpu/m6809/m6809.h"
-#include "machine/wpc.h"
+#include "wpc.h"
 #include "speaker.h"
 
 #include "wpc_an.lh"

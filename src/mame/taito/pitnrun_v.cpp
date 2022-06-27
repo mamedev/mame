@@ -19,7 +19,7 @@ In debug build press 'w' for spotlight and 'e' for lightning
 
 ***************************************************************************/
 #include "emu.h"
-#include "includes/pitnrun.h"
+#include "pitnrun.h"
 
 
 

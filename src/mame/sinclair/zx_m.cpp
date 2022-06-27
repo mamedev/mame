@@ -9,7 +9,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/zx.h"
+#include "zx.h"
 
 void zx_state::init_zx()
 {

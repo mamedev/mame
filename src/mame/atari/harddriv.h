@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "audio/atarijsa.h"
-#include "machine/slapstic.h"
+#include "atarijsa.h"
+#include "slapstic.h"
 
 #include "bus/rs232/rs232.h"
 
@@ -23,7 +23,7 @@
 
 #include "machine/74259.h"
 #include "machine/adc0808.h"
-#include "machine/asic65.h"
+#include "asic65.h"
 #include "machine/eeprompar.h"
 #include "machine/mc68681.h"
 #include "machine/timekpr.h"

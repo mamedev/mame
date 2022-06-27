@@ -16,11 +16,11 @@
 
 #include "emu.h"
 
-#include "includes/konamipt.h"
-#include "video/k051316.h"
-#include "video/k051960.h"
-#include "video/k052109.h"
-#include "video/konami_helper.h"
+#include "konamipt.h"
+#include "k051316.h"
+#include "k051960.h"
+#include "k052109.h"
+#include "konami_helper.h"
 
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"

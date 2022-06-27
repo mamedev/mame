@@ -6,15 +6,19 @@
 
 #pragma once
 
-#include "audio/seibu.h"
+#include "nmk004.h"
+#include "nmk16spr.h"
+
+#include "seibusound.h"
+
 #include "machine/gen_latch.h"
-#include "machine/nmk004.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
-#include "video/nmk16spr.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class nmk16_state : public driver_device, public seibu_sound_common
 {

@@ -22,7 +22,7 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/speedspn.h"
+#include "speedspn.h"
 
 #include "cpu/z80/z80.h"
 #include "screen.h"

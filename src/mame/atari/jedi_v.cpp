@@ -17,7 +17,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/jedi.h"
+#include "jedi.h"
 
 #include <algorithm>
 

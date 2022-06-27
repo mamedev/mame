@@ -51,12 +51,15 @@ ToDo (granny):
 
 
 #include "emu.h"
-#include "machine/genpin.h"
+
+#include "genpin.h"
+
+#include "ballysound.h"
+
 #include "cpu/m6800/m6801.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
-#include "audio/bally.h"
 #include "sound/beep.h"
 #include "video/tms9928a.h"
 #include "speaker.h"

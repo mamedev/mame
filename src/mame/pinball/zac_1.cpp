@@ -76,7 +76,7 @@ ToDo:
 #include "cpu/mcs48/mcs48.h"
 #include "machine/clock.h"
 #include "machine/gen_latch.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/mm5837.h"

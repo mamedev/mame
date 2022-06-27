@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
 #include "emu.h"
-#include "machine/z80bin.h"
+#include "z80bin.h"
 
 /*-------------------------------------------------
     z80bin_load_file - load a z80bin file into

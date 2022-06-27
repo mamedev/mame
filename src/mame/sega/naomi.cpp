@@ -1182,9 +1182,9 @@ key matrix is shown in below
 **************************************************************************************************/
 
 #include "emu.h"
-#include "includes/naomi.h"
+#include "naomi.h"
 
-#include "machine/gunsense.h"
+#include "gunsense.h"
 //#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

@@ -15,7 +15,7 @@
  */
 
 #include "emu.h"
-#include "includes/zac2650.h"
+#include "zac2650.h"
 
 #include "cpu/s2650/s2650.h"
 #include "speaker.h"

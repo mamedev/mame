@@ -7,7 +7,7 @@ Atari Triple Hunt video emulation
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/triplhnt.h"
+#include "triplhnt.h"
 
 
 TILE_GET_INFO_MEMBER(triplhnt_state::get_tile_info)

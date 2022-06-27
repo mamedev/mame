@@ -10,7 +10,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/pk8020.h"
+#include "pk8020.h"
 
 void pk8020_state::video_start()
 {

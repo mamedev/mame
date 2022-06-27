@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder, Olivier Galibert
 #include "emu.h"
 
-#include "machine/ataristb.h"
-#include "video/atarist.h"
+#include "ataristb.h"
+#include "atarist_v.h"
 
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"

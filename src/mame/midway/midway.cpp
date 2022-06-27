@@ -18,9 +18,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mcr.h"
-#include "audio/midway.h"
-#include "audio/williams.h"
+#include "mcr.h"
+#include "midway.h"
+
+#include "williamssound.h"
 
 #include <algorithm>
 

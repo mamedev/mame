@@ -20,7 +20,7 @@
 #include "emu.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/bankdev.h"
-#include "machine/mb63h149.h"
+#include "mb63h149.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "video/msm6222b.h"

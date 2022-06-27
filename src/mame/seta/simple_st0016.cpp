@@ -21,7 +21,7 @@ Dips verified for Neratte Chu (nratechu) from manual
 #include "emu.h"
 #include "cpu/v810/v810.h"
 #include "cpu/z80/z80.h"
-#include "machine/st0016.h"
+#include "st0016.h"
 #include "machine/timer.h"
 #include "sound/st0016.h"
 #include "screen.h"

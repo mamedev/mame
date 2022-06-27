@@ -14,7 +14,7 @@
 
 #define VERBOSE 0
 
-#include "machine/apollo_kbd.h"
+#include "apollo_kbd.h"
 #include "speaker.h"
 
 

@@ -7,7 +7,7 @@
 */
 
 #include "emu.h"
-#include "includes/model3.h"
+#include "model3.h"
 
 
 /******************************************************************/

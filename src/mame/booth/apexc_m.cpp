@@ -9,7 +9,7 @@
 */
 
 #include "emu.h"
-#include "machine/apexc.h"
+#include "apexc_m.h"
 
 DEFINE_DEVICE_TYPE(APEXC_CYLINDER, apexc_cylinder_image_device, "apexc_cylinder_image", "APEXC Cylinder")
 DEFINE_DEVICE_TYPE(APEXC_TAPE_PUNCHER, apexc_tape_puncher_image_device, "apexc_tape_puncher_image", "APEXC Tape Puncher")

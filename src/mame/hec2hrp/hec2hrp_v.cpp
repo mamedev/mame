@@ -6,7 +6,7 @@
 
 
 #include "emu.h"
-#include "includes/hec2hrp.h"
+#include "hec2hrp.h"
 
 #include "screen.h"
 

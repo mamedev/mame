@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/metro.h"
+#include "metro.h"
 
 TILE_GET_INFO_MEMBER(metro_state::k053936_get_tile_info)
 {

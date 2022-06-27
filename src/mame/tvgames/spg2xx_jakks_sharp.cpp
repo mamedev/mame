@@ -4,7 +4,7 @@
 // Sharp Cookie units were published by JAKKS Pacific under the 'Child Guidance' brand (battery compartments etc. still have JAKKS branding)
 
 #include "emu.h"
-#include "includes/spg2xx.h"
+#include "spg2xx.h"
 #include "machine/nvram.h"
 
 class jakks_sharp_state : public spg2xx_game_state

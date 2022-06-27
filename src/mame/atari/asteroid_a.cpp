@@ -7,7 +7,7 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "includes/asteroid.h"
+#include "asteroid.h"
 #include "machine/74259.h"
 #include "speaker.h"
 

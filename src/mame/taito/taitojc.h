@@ -6,8 +6,8 @@
 
 *************************************************************************/
 
-#include "video/tc0780fpa.h"
-#include "machine/taitoio.h"
+#include "tc0780fpa.h"
+#include "taitoio.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

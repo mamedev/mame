@@ -243,8 +243,8 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/cclimber.h"
-#include "audio/cclimber.h"
+#include "cclimber.h"
+#include "cclimber_a.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

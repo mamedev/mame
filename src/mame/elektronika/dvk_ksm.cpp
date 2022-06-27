@@ -57,7 +57,7 @@ ksm|DVK KSM,
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/ms7004.h"
+#include "ms7004.h"
 #include "machine/pic8259.h"
 #include "machine/timer.h"
 

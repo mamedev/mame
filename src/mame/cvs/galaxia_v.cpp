@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galaxia.h"
+#include "galaxia.h"
 
 #define SPRITE_PEN_BASE     (0x10)
 #define STAR_PEN            (0x18)

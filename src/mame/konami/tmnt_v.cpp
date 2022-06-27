@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 
 #include "emu.h"
-#include "includes/tmnt.h"
+#include "tmnt.h"
 #include "screen.h"
 
 TILE_GET_INFO_MEMBER(glfgreat_state::glfgreat_get_roz_tile_info)

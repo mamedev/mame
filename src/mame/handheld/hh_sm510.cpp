@@ -137,7 +137,7 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/hh_sm510.h"
+#include "hh_sm510.h"
 
 #include "screen.h"
 #include "speaker.h"

@@ -71,7 +71,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/itech8.h"
+#include "itech8.h"
 
 
 #define MINDY           100

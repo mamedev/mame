@@ -84,14 +84,18 @@ ToDo:
 
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
+
+#include "gottlieb_a.h"
+
 #include "machine/ra17xx.h"
 #include "machine/r10696.h"
 #include "machine/r10788.h"
 #include "cpu/pps4/pps4.h"
-#include "audio/gottlieb.h"
 #include "sound/beep.h"
+
 #include "speaker.h"
+
 #include "gts1.lh"
 
 #define VERBOSE    1

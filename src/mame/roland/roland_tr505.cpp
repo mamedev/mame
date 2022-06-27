@@ -10,7 +10,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "audio/mb63h114.h"
+#include "mb63h114.h"
 //#include "bus/midi/midi.h"
 #include "cpu/m6800/m6801.h"
 //#include "machine/nvram.h"

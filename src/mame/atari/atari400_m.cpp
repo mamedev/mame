@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/atari400.h"
+#include "atari400.h"
 #include "sound/pokey.h"
 
 #define VERBOSE_POKEY   1

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gsword.h"
+#include "gsword.h"
 
 
 void gsword_state_base::videoram_w(offs_t offset, u8 data)

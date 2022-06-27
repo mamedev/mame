@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/swtpc09.h"
+#include "swtpc09.h"
 
 #define DMAC_IRQ 0x01             // interrupt handler IDs
 #define PTM_IRQ 0x04

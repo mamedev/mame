@@ -11,10 +11,10 @@
 #pragma once
 
 
-#include "machine/taitocchip.h"
+#include "taitocchip.h"
 
-#include "video/pc080sn.h"
-#include "video/pc090oj.h"
+#include "pc080sn.h"
+#include "pc090oj.h"
 #include "machine/timer.h"
 #include "emupal.h"
 

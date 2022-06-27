@@ -30,7 +30,7 @@ Game Status:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gamecom.h"
+#include "gamecom.h"
 
 #include "screen.h"
 #include "softlist_dev.h"

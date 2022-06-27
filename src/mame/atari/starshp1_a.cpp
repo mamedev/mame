@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include "emu.h"
-#include "includes/starshp1.h"
+#include "starshp1.h"
 #include "sound/discrete.h"
 
 

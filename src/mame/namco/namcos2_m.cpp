@@ -14,7 +14,7 @@ Namco System II
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6805/m6805.h"
-#include "includes/namcos2.h"
+#include "namcos2.h"
 #include "machine/nvram.h"
 
 

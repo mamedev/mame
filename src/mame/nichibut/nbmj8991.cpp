@@ -31,7 +31,7 @@ Notes:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/nbmj8991.h"
+#include "nbmj8991.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"

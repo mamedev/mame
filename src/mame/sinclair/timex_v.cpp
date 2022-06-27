@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/timex.h"
+#include "timex.h"
 
 #include "machine/ram.h"
 

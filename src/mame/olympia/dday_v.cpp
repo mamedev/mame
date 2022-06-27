@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "sound/ay8910.h"
-#include "includes/dday.h"
+#include "dday.h"
 
 
 /* Note: There seems to be no way to reset this timer via hardware.

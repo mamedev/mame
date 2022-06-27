@@ -52,7 +52,7 @@ single plane board.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tigeroad.h"
+#include "tigeroad.h"
 #include "machine/gen_latch.h"
 #include "screen.h"
 #include "speaker.h"

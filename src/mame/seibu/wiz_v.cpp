@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/wiz.h"
+#include "wiz.h"
 
 #include "video/resnet.h"
 

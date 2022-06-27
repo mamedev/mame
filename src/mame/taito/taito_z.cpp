@@ -1267,8 +1267,8 @@ DIP switches are not verified
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/taito_z.h"
-#include "includes/taitoipt.h"
+#include "taito_z.h"
+#include "taitoipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

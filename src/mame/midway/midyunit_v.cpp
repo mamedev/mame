@@ -8,7 +8,7 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/midyunit.h"
+#include "midyunit.h"
 #include "screen.h"
 
 

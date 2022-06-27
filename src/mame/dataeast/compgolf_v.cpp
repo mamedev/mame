@@ -8,7 +8,7 @@
 ****************************************************************************************/
 
 #include "emu.h"
-#include "includes/compgolf.h"
+#include "compgolf.h"
 
 
 void compgolf_state::compgolf_palette(palette_device &palette) const

@@ -24,7 +24,7 @@ ToDo:
 
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "machine/timer.h"
 
 #include "cpu/z80/z80.h"

@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lviv.h"
+#include "lviv.h"
 
 #include "cpu/i8085/i8085.h"
 

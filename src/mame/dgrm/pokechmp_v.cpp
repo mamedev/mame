@@ -3,7 +3,7 @@
 /* Poke Champ */
 
 #include "emu.h"
-#include "includes/pokechmp.h"
+#include "pokechmp.h"
 
 
 void pokechmp_state::pokechmp_videoram_w(offs_t offset, uint8_t data)

@@ -4,7 +4,7 @@
 
 #include "cpu/m6809/konami.h"
 #include "machine/eepromser.h"
-#include "includes/simpsons.h"
+#include "simpsons.h"
 
 /***************************************************************************
 

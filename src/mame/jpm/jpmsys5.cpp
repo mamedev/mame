@@ -33,13 +33,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/jpmsys5.h"
+#include "jpmsys5.h"
 
-#include "machine/bacta_datalogger.h"
+#include "bacta_datalogger.h"
 
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "sound/saa1099.h"
+
 #include "screen.h"
 #include "speaker.h"
 

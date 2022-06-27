@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include "video/gtia.h"
+#include "gtia.h"
 
 
 class antic_device : public device_t, public device_video_interface

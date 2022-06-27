@@ -27,9 +27,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/snes.h"
+#include "snes.h"
 
-#include "machine/snescx4.h"
+#include "snescx4.h"
 
 #include "bus/snes/snes_slot.h"
 #include "bus/snes/snes_carts.h"

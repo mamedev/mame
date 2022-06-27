@@ -15,7 +15,7 @@ BUGS:
 
 */
 #include "emu.h"
-#include "machine/beta.h"
+#include "beta_m.h"
 
 #include "formats/trd_dsk.h"
 

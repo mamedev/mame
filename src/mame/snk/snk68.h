@@ -1,10 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Acho A. Tang, Nicola Salmoria
+#ifndef MAME_SNK_SNK68K_H
+#define MAME_SNK_SNK68K_H
+
+#include "alpha68k_palette.h"
+#include "snk68_spr.h"
 
 #include "machine/gen_latch.h"
 #include "sound/upd7759.h"
-#include "video/snk68_spr.h"
-#include "video/alpha68k_palette.h"
+
 #include "screen.h"
 #include "tilemap.h"
 
@@ -116,3 +120,5 @@ private:
 
 	void searchar_map(address_map &map);
 };
+
+#endif // MAME_SNK_SNK68K_H

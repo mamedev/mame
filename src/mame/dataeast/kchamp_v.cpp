@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/kchamp.h"
+#include "kchamp.h"
 
 
 void kchamp_state::kchamp_palette(palette_device &palette) const

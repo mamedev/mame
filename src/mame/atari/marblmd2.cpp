@@ -23,9 +23,9 @@
 
 #include "emu.h"
 
-#include "audio/atarijsa.h"
-#include "video/atarimo.h"
-#include "video/atarivad.h"
+#include "atarijsa.h"
+#include "atarimo.h"
+#include "atarivad.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"

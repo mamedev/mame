@@ -100,7 +100,7 @@
 
 
 #include "emu.h"
-#include "includes/beathead.h"
+#include "beathead.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "speaker.h"

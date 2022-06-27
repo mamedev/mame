@@ -7,13 +7,13 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "audio/jx8p_synth.h"
+#include "jx8p_synth.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 //#include "bus/midi/midi.h"
 #include "cpu/m6800/m6801.h"
 //#include "cpu/upd7500/upd7500.h"
-#include "machine/mb63h149.h"
+#include "mb63h149.h"
 #include "machine/nvram.h"
 //#include "machine/pg800.h"
 #include "machine/rescap.h"

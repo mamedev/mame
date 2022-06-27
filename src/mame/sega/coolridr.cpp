@@ -286,7 +286,7 @@ to the same bank as defined through A20.
 #include "cpu/sh/sh2.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
-#include "machine/315_5649.h"
+#include "315_5649.h"
 #include "sound/scsp.h"
 #include "emupal.h"
 #include "layout/generic.h"

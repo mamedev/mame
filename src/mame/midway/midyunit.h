@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "audio/williams.h"
+#include "williamssound.h"
 
 #include "cpu/tms34010/tms34010.h"
 #include "machine/adc0844.h"

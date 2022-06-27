@@ -49,8 +49,8 @@ ToDo:
 *********************************************************************************************************************/
 #include "emu.h"
 
-#include "machine/decopincpu.h"
-#include "machine/genpin.h"
+#include "decopincpu.h"
+#include "genpin.h"
 
 #include "cpu/m6809/m6809.h"
 #include "sound/msm5205.h"

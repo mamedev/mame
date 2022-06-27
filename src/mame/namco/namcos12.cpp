@@ -1101,7 +1101,7 @@ The lever must be wired to analog port 0 (pin B22 parts side) of the Namco 48-wa
 #include "machine/ram.h"
 #include "sound/c352.h"
 #include "machine/rtc4543.h"
-#include "machine/namco_settings.h"
+#include "namco_settings.h"
 #include "screen.h"
 #include "speaker.h"
 

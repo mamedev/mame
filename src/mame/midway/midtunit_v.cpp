@@ -8,8 +8,8 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "midtunit.h"
-#include "midtunit.ipp"
+#include "midtunit_v.h"
+#include "midtunit_v.ipp"
 #include "screen.h"
 #include "midtview.ipp"
 

@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "sound/samples.h"
-#include "includes/suna8.h"
+#include "suna8.h"
 
 #define FREQ_HZ 8000
 #define SAMPLEN 0x1000

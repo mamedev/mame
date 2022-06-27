@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "includes/cvs.h"
+#include "cvs.h"
 
 class quasar_state : public cvs_state
 {

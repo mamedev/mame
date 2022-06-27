@@ -6,7 +6,7 @@
 #pragma once
 
 #include "video/hd61830.h"
-#include "machine/nb1413m3.h"
+#include "nb1413m3.h"
 #include "emupal.h"
 
 class nbmj8688_state : public driver_device

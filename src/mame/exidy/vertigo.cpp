@@ -12,8 +12,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/vertigo.h"
-#include "audio/exidy440.h"
+#include "vertigo.h"
+#include "exidy440_a.h"
 #include "speaker.h"
 
 #include "cpu/m6805/m68705.h"

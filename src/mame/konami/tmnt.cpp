@@ -139,8 +139,8 @@ Updates:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tmnt.h"
-#include "includes/konamipt.h"
+#include "tmnt.h"
+#include "konamipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m68705.h"

@@ -89,7 +89,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/osborne1.h"
+#include "osborne1.h"
 
 #include "bus/rs232/rs232.h"
 #include "speaker.h"

@@ -22,7 +22,7 @@
 */
 
 #include "emu.h"
-#include "includes/trs80m2.h"
+#include "trs80m2.h"
 
 #include "screen.h"
 #include "softlist_dev.h"

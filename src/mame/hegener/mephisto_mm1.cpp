@@ -43,9 +43,9 @@ TODO:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/cosmac/cosmac.h"
-#include "machine/mmboard.h"
+#include "mmboard.h"
 #include "sound/dac.h"
-#include "video/mmdisplay1.h"
+#include "mmdisplay1.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"

@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/wiping.h"
+#include "wiping.h"
 
 
 /***************************************************************************

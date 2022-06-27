@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/turrett.h"
+#include "turrett.h"
 
 DEFINE_DEVICE_TYPE(TURRETT, turrett_device, "ttsnd", "Turret Tower Sound")
 

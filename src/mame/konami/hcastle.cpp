@@ -10,8 +10,8 @@
 
 #include "emu.h"
 
-#include "includes/konamipt.h"
-#include "video/k007121.h"
+#include "konamipt.h"
+#include "k007121.h"
 
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"

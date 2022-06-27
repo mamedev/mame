@@ -46,16 +46,19 @@ ToDo:
 *****************************************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
+
+#include "gottlieb_a.h"
 
 #include "cpu/m6502/m65c02.h"
-#include "audio/gottlieb.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
 
 namespace {
 

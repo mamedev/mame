@@ -23,14 +23,18 @@
 **************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
-#include "machine/pci.h"
-#include "machine/pckeybrd.h"
-#include "machine/idectrl.h"
-#include "video/pc_vga.h"
-#include "machine/pcshare.h"
+
+#include "pcshare.h"
+
 #include "bus/isa/isa.h"
 #include "bus/isa/sblaster.h"
+#include "cpu/i386/i386.h"
+#include "machine/idectrl.h"
+#include "machine/pci.h"
+#include "machine/pckeybrd.h"
+#include "video/pc_vga.h"
+
+namespace {
 
 class paokaipc_state : public pcat_base_state
 {
@@ -120,5 +124,7 @@ ROM_START( gogostrk )
 	DISK_REGION( "ide:0:hdd:image" )    // 128 MB CF Card
 	DISK_IMAGE( "ggs-5-2-07", 0,SHA1(f214fd39ec8ac02f008823f4b179ea6c6835e1b8) )
 ROM_END
+
+} // anonymous namespace
 
 GAME( 2007?, gogostrk, 0, paokaipc, gogostrk, paokaipc_state, empty_init, ROT0, "American Alpha / Paokai", "Go Go Strike", MACHINE_IS_SKELETON ) // motherboard is dated 2006, if the CF card string is a date it's 2007

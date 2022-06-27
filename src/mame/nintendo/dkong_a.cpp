@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 #include "emu.h"
-#include "includes/dkong.h"
+#include "dkong.h"
 
 #include "sound/discrete.h"
 #include "speaker.h"

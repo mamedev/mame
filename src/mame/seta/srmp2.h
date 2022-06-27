@@ -6,7 +6,7 @@
 #pragma once
 
 #include "sound/msm5205.h"
-#include "video/seta001.h"
+#include "seta001.h"
 #include "emupal.h"
 
 class srmp2_state : public driver_device

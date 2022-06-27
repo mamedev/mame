@@ -544,7 +544,7 @@ C102 - Controls CPU access to ROZ Memory Area.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/namcos2.h"
+#include "namcos2.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"

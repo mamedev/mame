@@ -73,15 +73,18 @@ Is there another alt program rom set labeled 9 & 10?
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+
+#include "kan_pand.h"
+#include "kaneko_hit.h"
+#include "kaneko_tmap.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
-#include "video/kan_pand.h"
-#include "machine/kaneko_hit.h"
-#include "video/kaneko_tmap.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

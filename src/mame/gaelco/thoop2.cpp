@@ -55,9 +55,9 @@ Measurements from actual PCB:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/thoop2.h"
+#include "thoop2.h"
 
-#include "machine/gaelco_ds5002fp.h"
+#include "gaelco_ds5002fp.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"

@@ -9,7 +9,7 @@
 */
 
 #include "emu.h"
-#include "includes/newbrain.h"
+#include "newbrain.h"
 #include "screen.h"
 
 #define VERBOSE 0

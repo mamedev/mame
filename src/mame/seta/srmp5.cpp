@@ -37,7 +37,7 @@ This is not a bug (real machine behaves the same).
 
 
 #include "emu.h"
-#include "machine/st0016.h"
+#include "st0016.h"
 #include "cpu/mips/mips1.h"
 #include "emupal.h"
 #include "speaker.h"

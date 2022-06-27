@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/orca40c.h"
+#include "orca40c.h"
 
 #include "emupal.h"
 #include "screen.h"

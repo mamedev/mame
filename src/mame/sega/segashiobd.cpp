@@ -2,7 +2,7 @@
 // copyright-holders:Samuele Zannoli
 
 #include "emu.h"
-#include "machine/segashiobd.h"
+#include "segashiobd.h"
 
 /*
     837-14438 SH I/O BD

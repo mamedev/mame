@@ -51,8 +51,8 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/travrusa.h"
-#include "audio/irem.h"
+#include "travrusa.h"
+#include "irem.h"
 
 #include "cpu/z80/z80.h"
 #include "screen.h"

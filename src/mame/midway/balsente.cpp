@@ -206,14 +206,14 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/balsente.h"
+#include "balsente.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "audio/sente6vb.h"
+#include "sente6vb.h"
 #include "machine/6821pia.h"
 #include "machine/z80ctc.h"
 #include "sound/ay8910.h"

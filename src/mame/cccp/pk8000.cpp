@@ -10,7 +10,8 @@ PK-8000
 ****************************************************************************/
 
 #include "emu.h"
-#include "video/pk8000.h"
+
+#include "pk8000_v.h"
 
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
@@ -23,6 +24,8 @@ PK-8000
 
 #include "formats/fmsx_cas.h"
 
+
+namespace {
 
 class pk8000_state : public pk8000_base_state
 {
@@ -404,6 +407,9 @@ ROM_START( pk8002 )
 	// there is actually 1 rom 0000-07ff (U3) mirrored to 0800,1000,1800, then another rom 2000-27ff (U4) mirrored to 2800,3000,3800
 	ROM_LOAD( "pk8002.rom", 0x0000, 0x4000, CRC(07b9ae71) SHA1(2137a41cc095c7aba58b7b109fce63f30a4568b2))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

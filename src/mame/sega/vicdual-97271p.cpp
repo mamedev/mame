@@ -9,7 +9,7 @@ for the time being this is a simple sample player based on the work by MASH.
 
 #include "emu.h"
 #include "speaker.h"
-#include "audio/vicdual-97271p.h"
+#include "vicdual-97271p.h"
 
 #define S97271P_TAG     "s97271p"
 

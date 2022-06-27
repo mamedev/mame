@@ -11,10 +11,10 @@
 #pragma once
 
 #include "machine/timer.h"
-#include "video/k054156_k054157_k056832.h"
-#include "video/k055555.h"
-#include "video/k054338.h"
-#include "video/konami_helper.h"
+#include "k054156_k054157_k056832.h"
+#include "k055555.h"
+#include "k054338.h"
+#include "konami_helper.h"
 #include "emupal.h"
 #include "screen.h"
 

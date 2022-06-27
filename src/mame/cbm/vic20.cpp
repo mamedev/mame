@@ -20,7 +20,7 @@
 #include "bus/vic20/user.h"
 #include "cpu/m6502/m6510.h"
 #include "machine/6522via.h"
-#include "machine/cbm_snqk.h"
+#include "cbm_snqk.h"
 #include "machine/ram.h"
 #include "sound/mos6560.h"
 

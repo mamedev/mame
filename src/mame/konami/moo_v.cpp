@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/moo.h"
+#include "moo.h"
 
 K053246_CB_MEMBER(moo_state::sprite_callback)
 {

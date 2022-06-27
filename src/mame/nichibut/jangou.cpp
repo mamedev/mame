@@ -26,19 +26,23 @@ $c088-$c095 player tiles
 *******************************************************************************************/
 
 #include "emu.h"
+
+#include "segacrpt_device.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
 #include "sound/msm5205.h"
 #include "video/jangou_blitter.h"
-#include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "video/resnet.h"
+
 
 #define MASTER_CLOCK    XTAL(19'968'000)
 

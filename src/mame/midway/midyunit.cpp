@@ -118,7 +118,7 @@ Notes:
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/midyunit.h"
+#include "midyunit.h"
 
 #include "cpu/z80/z80.h"
 #include "screen.h"

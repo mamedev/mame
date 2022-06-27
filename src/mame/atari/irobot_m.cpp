@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/irobot.h"
+#include "irobot.h"
 
 /* Note:
  * There's probably something wrong with the way the Mathbox gets started.

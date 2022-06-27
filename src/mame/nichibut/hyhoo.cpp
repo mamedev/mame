@@ -24,7 +24,7 @@ Memo:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/hyhoo.h"
+#include "hyhoo.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"

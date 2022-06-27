@@ -20,7 +20,7 @@
 #include "machine/eepromser.h"
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
-#include "machine/mb87013.h"
+#include "mb87013.h"
 
 
 namespace {

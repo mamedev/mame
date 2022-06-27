@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "audio/cage.h"
+#include "cage.h"
 
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/m68000/m68000.h"

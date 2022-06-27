@@ -9,8 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "ladybug_v.h"
 #include "ladybug.h"
-#include "includes/ladybug.h"
 
 #include "video/resnet.h"
 

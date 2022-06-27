@@ -40,8 +40,8 @@ dip: 6.7 7.7
 
 ***************************************************************************/
 #include "emu.h"
-#include "includes/wiping.h"
-#include "audio/wiping.h"
+#include "wiping.h"
+#include "wiping_a.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

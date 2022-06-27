@@ -17,7 +17,7 @@
 #include "cpu/psx/psx.h"
 #include "imagedev/chd_cd.h"
 #include "imagedev/snapquik.h"
-#include "machine/psxcd.h"
+#include "psxcd.h"
 #include "machine/ram.h"
 #include "sound/spu.h"
 #include "video/psx.h"

@@ -110,7 +110,7 @@ Notes:
 */
 
 #include "emu.h"
-#include "includes/chaknpop.h"
+#include "chaknpop.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"

@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/upd78k/upd78k3.h"
 #include "machine/bankdev.h"
-#include "machine/mb63h149.h"
+#include "mb63h149.h"
 #include "machine/nvram.h"
 
 class roland_d50_state : public driver_device

@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/redalert.h"
+#include "redalert.h"
 
 
 #define NUM_CHARMAP_PENS    0x200

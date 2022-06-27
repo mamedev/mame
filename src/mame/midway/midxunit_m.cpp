@@ -7,7 +7,7 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/midxunit.h"
+#include "midxunit.h"
 
 #define LOG_IO      (1 << 0)
 #define LOG_UART    (1 << 1)

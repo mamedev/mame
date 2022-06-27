@@ -96,11 +96,11 @@ Bounty2:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/zodiack.h"
+#include "zodiack.h"
 
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "video/orca40c.h"
+#include "orca40c.h"
 #include "speaker.h"
 
 

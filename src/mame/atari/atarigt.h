@@ -6,11 +6,11 @@
 
 *************************************************************************/
 
-#include "audio/cage.h"
+#include "cage.h"
 #include "machine/adc0808.h"
-#include "machine/atarigen.h"
+#include "atarigen.h"
 #include "machine/timer.h"
-#include "video/atarirle.h"
+#include "atarirle.h"
 #include "emupal.h"
 #include "tilemap.h"
 

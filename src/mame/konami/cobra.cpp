@@ -322,7 +322,7 @@
 #include "machine/jvshost.h"
 #include "machine/jvsdev.h"
 #include "machine/timekpr.h"
-#include "video/k001604.h"
+#include "k001604.h"
 #include "video/poly.h"
 #include "video/rgbutil.h"
 #include "sound/rf5c400.h"

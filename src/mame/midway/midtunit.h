@@ -6,16 +6,18 @@
     Driver for Midway T-unit games.
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_MIDTUNIT_H
-#define MAME_INCLUDES_MIDTUNIT_H
+#ifndef MAME_MIDWAY_MIDTUNIT_H
+#define MAME_MIDWAY_MIDTUNIT_H
 
 #pragma once
 
-#include "audio/dcs.h"
-#include "audio/williams.h"
-#include "video/midtunit.h"
+#include "midtunit_v.h"
+
+#include "dcs.h"
+#include "williamssound.h"
 
 #include "cpu/tms34010/tms34010.h"
+
 #include "emupal.h"
 
 
@@ -105,4 +107,4 @@ private:
 	void main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MIDTUNIT_H
+#endif // MAME_MIDWAY_MIDTUNIT_H

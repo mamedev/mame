@@ -317,7 +317,7 @@ routines :
 */
 
 #include "emu.h"
-#include "includes/amiga.h"
+#include "amiga.h"
 #include "imagedev/chd_cd.h"
 #include "machine/microtch.h"
 #include "speaker.h"

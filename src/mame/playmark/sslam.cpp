@@ -83,7 +83,7 @@ Notes:
 
 
 #include "emu.h"
-#include "includes/sslam.h"
+#include "sslam.h"
 
 #include "cpu/m68000/m68000.h"
 #include "screen.h"

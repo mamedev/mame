@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/renegade.h"
+#include "renegade.h"
 
 
 void renegade_state::bg_videoram_w(offs_t offset, uint8_t data)

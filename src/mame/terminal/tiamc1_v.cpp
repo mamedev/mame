@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tiamc1.h"
+#include "tiamc1.h"
 
 
 void tiamc1_state::tiamc1_videoram_w(offs_t offset, uint8_t data)

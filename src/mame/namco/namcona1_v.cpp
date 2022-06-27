@@ -18,7 +18,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "includes/namcona1.h"
+#include "namcona1.h"
 
 
 void namcona1_state::tilemap_get_info(

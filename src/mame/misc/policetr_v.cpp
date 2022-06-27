@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/mips/mips1.h"
-#include "includes/policetr.h"
+#include "policetr.h"
 
 
 /*************************************

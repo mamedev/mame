@@ -21,7 +21,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/metlclsh.h"
+#include "metlclsh.h"
 
 
 void metlclsh_state::metlclsh_rambank_w(uint8_t data)

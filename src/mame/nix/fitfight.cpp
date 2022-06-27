@@ -84,7 +84,7 @@ Stephh's notes :
 */
 
 #include "emu.h"
-#include "includes/fitfight.h"
+#include "fitfight.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/upd7810/upd7810.h"

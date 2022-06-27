@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dai.h"
+#include "dai.h"
 
 #define DEBUG_DAI_PORTS 0
 

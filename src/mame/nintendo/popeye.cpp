@@ -16,13 +16,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/popeye.h"
+#include "popeye.h"
 #include "machine/eepromser.h"
 #include "machine/netlist.h"
 #include "netlist/devices/net_lib.h"
 #include "screen.h"
 #include "speaker.h"
-#include "audio/nl_popeye.h"
+#include "nl_popeye.h"
 
 void tnx1_state::driver_start()
 {

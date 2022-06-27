@@ -5,6 +5,10 @@
     Input port macros used by games in the galpanic.c driver
 
 *******************************************************************************/
+#ifndef MAME_KANEKO_GALPNIPT_H
+#define MAME_KANEKO_GALPNIPT_H
+
+#pragma once
 
 
 /**************************** Inputs ****************************/
@@ -157,3 +161,5 @@
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )\
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )\
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )
+
+#endif // MAME_KANEKO_GALPNIPT_H

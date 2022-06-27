@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Thacker,Sandro Ronco
 /* Core includes */
 #include "emu.h"
-#include "includes/kc.h"
+#include "kc.h"
 
 #define KC_DEBUG 0
 #define LOG(x) do { if (KC_DEBUG) logerror x; } while (0)

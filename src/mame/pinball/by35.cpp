@@ -129,12 +129,14 @@ ToDo:
 
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
+
+#include "ballysound.h"
 
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
-#include "audio/bally.h"
+
 #include "speaker.h"
 
 //#define VERBOSE 1

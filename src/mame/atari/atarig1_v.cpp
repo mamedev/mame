@@ -7,8 +7,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "video/atarirle.h"
-#include "includes/atarig1.h"
+#include "atarirle.h"
+#include "atarig1.h"
 
 
 

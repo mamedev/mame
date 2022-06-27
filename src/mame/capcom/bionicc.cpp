@@ -86,7 +86,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "video/bufsprite.h"
-#include "video/tigeroad_spr.h"
+#include "tigeroad_spr.h"
 #include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"

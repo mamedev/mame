@@ -189,7 +189,7 @@ GFX check (these don't explicitly fails):
 
 */
 #include "emu.h"
-#include "machine/mega32x.h"
+#include "mega32x.h"
 #include "machine/timer.h"
 
 

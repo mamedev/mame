@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/scramble.h"
+#include "scramble.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/7474.h"

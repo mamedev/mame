@@ -1,11 +1,11 @@
 // license:GPL2+
 // copyright-holders:Felipe Sanches
-#ifndef MAME_INCLUDES_PATINHOFEIO_H
-#define MAME_INCLUDES_PATINHOFEIO_H
+#ifndef MAME_USP_PATINHOFEIO_H
+#define MAME_USP_PATINHOFEIO_H
 
 #pragma once
 
-#include "machine/teleprinter.h"
+#include "teleprinter.h"
 
 class patinho_feio_state : public driver_device {
 public:
@@ -58,4 +58,4 @@ private:
 	uint16_t m_prev_RC = 0;
 };
 
-#endif // MAME_INCLUDES_PATINHOFEIO_H
+#endif // MAME_USP_PATINHOFEIO_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina,Pierpaolo Prazzoli
 #include "emu.h"
-#include "includes/eolith.h"
+#include "eolith.h"
 
 
 void eolith_state::eolith_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)

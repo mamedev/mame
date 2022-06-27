@@ -83,11 +83,11 @@ EB26IC73.BIN    27C240      /  Main Program
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/suprslam.h"
+#include "suprslam.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/vs9209.h"
+#include "vs9209.h"
 #include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"

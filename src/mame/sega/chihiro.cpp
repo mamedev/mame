@@ -429,16 +429,18 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 */
 
 #include "emu.h"
+
+#include "xbox_pci.h"
+#include "xbox.h"
+
 #include "machine/pci.h"
 #include "machine/idectrl.h"
-#include "machine/xbox_pci.h"
-#include "machine/xbox.h"
 
 #include "bus/ata/idehd.h"
 #include "cpu/i386/i386.h"
-#include "machine/jvs13551.h"
+#include "jvs13551.h"
 #include "machine/jvshost.h"
-#include "machine/naomigd.h"
+#include "naomigd.h"
 
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"

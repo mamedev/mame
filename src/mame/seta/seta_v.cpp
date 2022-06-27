@@ -138,7 +138,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/seta.h"
+#include "seta.h"
 #include "screen.h"
 
 /*      76-- ----

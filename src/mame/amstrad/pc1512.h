@@ -19,11 +19,11 @@
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/pc1512kb.h"
+#include "pc1512kb.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
-#include "video/ams40041.h"
+#include "ams40041.h"
 
 #include "formats/pc_dsk.h"
 

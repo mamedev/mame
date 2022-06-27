@@ -20,7 +20,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
-#include "machine/micropolis.h"
+#include "micropolis.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"

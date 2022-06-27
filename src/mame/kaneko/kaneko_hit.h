@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood,Stephane Humbert
 /* Kaneko Hit protection */
-#ifndef MAME_MACHINE_KANEKO_HIT_H
-#define MAME_MACHINE_KANEKO_HIT_H
+#ifndef MAME_KANEKO_KANEKO_HIT_H
+#define MAME_KANEKO_KANEKO_HIT_H
 
 #pragma once
 
@@ -84,4 +84,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KANEKO_HIT, kaneko_hit_device)
 
-#endif // MAME_MACHINE_KANEKO_HIT_H
+#endif // MAME_KANEKO_KANEKO_HIT_H

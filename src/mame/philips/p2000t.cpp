@@ -29,7 +29,7 @@ Philips P2000 1 Memory map
 ************************************************************************/
 
 #include "emu.h"
-#include "includes/p2000t.h"
+#include "p2000t.h"
 
 #include "screen.h"
 #include "speaker.h"

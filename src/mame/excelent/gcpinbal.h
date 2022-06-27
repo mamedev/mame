@@ -9,7 +9,7 @@
 #include "machine/mb3773.h"
 #include "sound/es8712.h"
 #include "sound/okim6295.h"
-#include "video/excellent_spr.h"
+#include "excellent_spr.h"
 #include "emupal.h"
 #include "machine/timer.h"
 #include "screen.h"

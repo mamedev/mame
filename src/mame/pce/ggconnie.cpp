@@ -19,7 +19,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/pcecommn.h"
+#include "pcecommn.h"
 
 #include "video/huc6270.h"
 #include "video/huc6260.h"

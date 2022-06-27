@@ -25,7 +25,7 @@
 
 
 #include "emu.h"
-#include "includes/rampart.h"
+#include "rampart.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"

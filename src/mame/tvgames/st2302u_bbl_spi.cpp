@@ -29,7 +29,7 @@
 
 #include "cpu/m6502/st2205u.h"
 #include "machine/bl_handhelds_menucontrol.h"
-#include "video/bl_handhelds_lcdc.h"
+#include "bl_handhelds_lcdc.h"
 
 #include "screen.h"
 #include "emupal.h"

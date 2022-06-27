@@ -6,13 +6,15 @@
   driver by Zsolt Vasvari
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_FASTFRED_H
-#define MAME_INCLUDES_FASTFRED_H
+#ifndef MAME_GALAXIAN_FASTFRED_H
+#define MAME_GALAXIAN_FASTFRED_H
 
 #pragma once
 
+#include "galaxold.h"
+
 #include "machine/74259.h"
-#include "includes/galaxold.h"
+
 #include "tilemap.h"
 
 class fastfred_state : public galaxold_state
@@ -106,4 +108,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_FASTFRED_H
+#endif // MAME_GALAXIAN_FASTFRED_H

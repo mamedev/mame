@@ -1,14 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:smf, R. Belmont
 
-#ifndef MAME_INCLUDES_ZN_H
-#define MAME_INCLUDES_ZN_H
+#ifndef MAME_SONY_ZN_H
+#define MAME_SONY_ZN_H
 
 #pragma once
 
-#include "audio/rax.h"
-#include "audio/taito_zm.h"
-#include "audio/taitosnd.h"
+#include "taito_zm.h"
+#include "znmcu.h"
+
+#include "rax.h"
+#include "taitosnd.h"
 
 #include "bus/ata/atadev.h"
 #include "bus/ata/ataintf.h"
@@ -19,14 +21,13 @@
 #include "machine/7200fifo.h"
 #include "machine/at28c16.h"
 #include "machine/bankdev.h"
-#include "machine/cat702.h"
+#include "cat702.h"
 #include "machine/gen_latch.h"
 #include "machine/mb3773.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/vt83c461.h"
 #include "machine/watchdog.h"
-#include "machine/znmcu.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
 #include "sound/spu.h"
@@ -582,4 +583,4 @@ private:
 	required_device_array<fifo7200_device, 2> m_fifo;
 };
 
-#endif // MAME_INCLUDES_ZN_H
+#endif // MAME_SONY_ZN_H

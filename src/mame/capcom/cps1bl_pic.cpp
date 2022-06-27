@@ -43,7 +43,7 @@ brightness circuity present on pcb?
 */
 
 #include "emu.h"
-#include "includes/fcrash.h"
+#include "fcrash.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"

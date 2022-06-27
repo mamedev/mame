@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/astrocde.h"
+#include "astrocde.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/astrocde.h"

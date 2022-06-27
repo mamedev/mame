@@ -78,9 +78,9 @@
 
 #include "emu.h"
 
-#include "audio/cmi01a.h"
-#include "machine/cmi_ankbd.h"
-#include "machine/cmi_mkbd.h"
+#include "cmi01a.h"
+#include "cmi_ankbd.h"
+#include "cmi_mkbd.h"
 
 #include "bus/midi/midi.h"
 

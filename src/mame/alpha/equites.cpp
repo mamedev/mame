@@ -369,9 +369,9 @@ D                                                                               
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/equites.h"
+#include "equites.h"
 
-#include "audio/ad_sound.h"
+#include "ad_sound.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"

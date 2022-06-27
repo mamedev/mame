@@ -181,14 +181,14 @@ MAIN BOARD:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/trackfld.h"
-#include "includes/konamipt.h"
-#include "audio/hyprolyb.h"
+#include "trackfld.h"
+#include "konamipt.h"
+#include "hyprolyb.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/konami1.h"
+#include "konami1.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "speaker.h"

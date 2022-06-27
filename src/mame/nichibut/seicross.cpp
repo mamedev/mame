@@ -41,7 +41,7 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/seicross.h"
+#include "seicross.h"
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"

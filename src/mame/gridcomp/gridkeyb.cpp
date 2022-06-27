@@ -12,7 +12,7 @@
 
 #include "emu.h"
 
-#include "machine/gridkeyb.h"
+#include "gridkeyb.h"
 #include "machine/keyboard.ipp"
 
 

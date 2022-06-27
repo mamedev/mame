@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/mappy.h"
+#include "mappy.h"
 
 
 /***************************************************************************

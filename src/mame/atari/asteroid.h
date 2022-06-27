@@ -5,11 +5,16 @@
     Atari Asteroids hardware
 
 *************************************************************************/
+#ifndef MAME_ATARI_ASTEROID_H
+#define MAME_ATARI_ASTEROID_H
 
-#include "sound/discrete.h"
-#include "video/avgdvg.h"
+#pragma once
+
+#include "avgdvg.h"
+
 #include "machine/74153.h"
 #include "machine/er2055.h"
+#include "sound/discrete.h"
 
 class asteroid_state : public driver_device
 {
@@ -86,3 +91,5 @@ public:
 	void asteroid_map(address_map &map);
 	void llander_map(address_map &map);
 };
+
+#endif // MAME_ATARI_ASTEROID_H

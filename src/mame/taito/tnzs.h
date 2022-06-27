@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, Mirko Buffoni, Takahiro Nogi
-#ifndef MAME_INCLUDES_TNZS_H
-#define MAME_INCLUDES_TNZS_H
+#ifndef MAME_TAITO_TNZS_H
+#define MAME_TAITO_TNZS_H
 
 #pragma once
 
+#include "seta001.h"
 
 #include "cpu/mcs48/mcs48.h"
 #include "machine/bankdev.h"
@@ -12,9 +13,10 @@
 #include "machine/upd4701.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
-#include "video/seta001.h"
+
 #include "emupal.h"
 #include "screen.h"
+
 
 class tnzs_base_state : public driver_device
 {
@@ -299,4 +301,4 @@ private:
 	required_memory_bank m_audiobank;
 };
 
-#endif // MAME_INCLUDES_TNZS_H
+#endif // MAME_TAITO_TNZS_H

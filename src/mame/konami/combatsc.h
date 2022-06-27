@@ -11,10 +11,10 @@
 #pragma once
 
 #include "machine/gen_latch.h"
-#include "machine/k007452.h"
+#include "k007452.h"
 #include "sound/msm5205.h"
 #include "sound/upd7759.h"
-#include "video/k007121.h"
+#include "k007121.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

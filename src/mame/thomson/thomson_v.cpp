@@ -9,7 +9,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "includes/thomson.h"
+#include "thomson.h"
 
 #include <algorithm>
 #include <cmath>

@@ -65,7 +65,7 @@ Notes:
 
 
 #include "emu.h"
-#include "includes/sg1000.h"
+#include "sg1000.h"
 #include "bus/rs232/rs232.h"
 #include "softlist_dev.h"
 #include "speaker.h"

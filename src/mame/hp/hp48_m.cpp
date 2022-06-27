@@ -9,7 +9,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "includes/hp48.h"
+#include "hp48.h"
 
 #include "cpu/saturn/saturn.h"
 #include "machine/nvram.h"

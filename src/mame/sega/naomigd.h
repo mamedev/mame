@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include "machine/naomibd.h"
+#include "naomibd.h"
 #include "cpu/pic16c62x/pic16c62x.h"
 #include "machine/i2cmem.h"
 #include "machine/eepromser.h"
-#include "machine/315-6154.h"
+#include "315-6154.h"
 #include "machine/idectrl.h"
-#include "machine/gdrom.h"
+#include "gdrom.h"
 
 // For ide gdrom controller
 

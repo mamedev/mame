@@ -105,7 +105,7 @@ TODO:
  ***************************************************************************/
 
 #include "emu.h"
-#include "includes/naughtyb.h"
+#include "naughtyb.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/tms36xx.h"

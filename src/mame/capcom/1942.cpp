@@ -165,14 +165,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/1942.h"
+#include "1942.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/netlist.h"
 #include "speaker.h"
 
-#include "audio/nl_1942.h"
+#include "nl_1942.h"
 
 namespace {
 

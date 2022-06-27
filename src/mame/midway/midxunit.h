@@ -5,16 +5,19 @@
     Driver for Midway X-unit games.
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_MIDXUNIT_H
-#define MAME_INCLUDES_MIDXUNIT_H
+#ifndef MAME_MIDWAY_MIDXUNIT_H
+#define MAME_MIDWAY_MIDXUNIT_H
 
 #pragma once
 
-#include "audio/dcs.h"
+#include "midtunit_v.h"
+
+#include "dcs.h"
+
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/nvram.h"
-#include "video/midtunit.h"
+
 #include "emupal.h"
 
 
@@ -81,4 +84,4 @@ private:
 	uint8_t m_pic_status = 0;
 };
 
-#endif // MAME_INCLUDES_MIDXUNIT_H
+#endif // MAME_MIDWAY_MIDXUNIT_H

@@ -15,7 +15,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/vtech2.h"
+#include "vtech2.h"
 
 /* public */
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
 #include "emu.h"
-#include "includes/kikikai.h"
+#include "kikikai.h"
 
 
 void kikikai_state::main_bankswitch_w(uint8_t data)

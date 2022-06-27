@@ -3,7 +3,7 @@
 /* video/mugsmash.c - see drivers/mugsmash.c for more info */
 
 #include "emu.h"
-#include "includes/mugsmash.h"
+#include "mugsmash.h"
 
 void mugsmash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {

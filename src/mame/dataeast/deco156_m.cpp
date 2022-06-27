@@ -33,7 +33,7 @@
 */
 
 #include "emu.h"
-#include "machine/deco156.h"
+#include "deco156_m.h"
 
 
 static void decrypt(uint32_t *src, uint32_t *dst, int length)

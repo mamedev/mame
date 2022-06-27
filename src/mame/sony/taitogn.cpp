@@ -330,11 +330,13 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 */
 
 #include "emu.h"
-#include "includes/zn.h"
+#include "zn.h"
 
 #include "machine/ataflash.h"
 #include "machine/intelfsh.h"
 #include "machine/rf5c296.h"
+
+namespace {
 
 //
 // Taito GNET specific
@@ -1084,6 +1086,8 @@ ROM_START(xiistag)
 	DISK_REGION( "pccard:taitopccard1:image" )
 	DISK_IMAGE( "xiistag", 0, SHA1(586e37c8d926293b2bd928e5f0d693910cfb05a2))
 ROM_END
+
+} // aononymous namespace
 
 
 /* A dummy driver, so that the bios can be debugged, and to serve as */

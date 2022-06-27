@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
-#include "includes/cclimber.h"
+#include "cclimber.h"
 
 /* set to 1 to fix protection check after bonus round (see notes in pacman.c driver) */
 #define CANNONB_HACK    0

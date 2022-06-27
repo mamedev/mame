@@ -33,7 +33,7 @@ Need a schematic so that the fdc could be repaired.
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
-#include "includes/b2m.h"
+#include "b2m.h"
 #include "formats/smx_dsk.h"
 #include "screen.h"
 #include "softlist_dev.h"

@@ -9,7 +9,7 @@ driver by Chris Moore
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/gameplan.h"
+#include "gameplan.h"
 
 
 

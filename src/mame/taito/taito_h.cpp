@@ -144,9 +144,9 @@ some kind of zoom table?
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/taito_h.h"
-#include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
+#include "taito_h.h"
+#include "taitoipt.h"
+#include "taitosnd.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"

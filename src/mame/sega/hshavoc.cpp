@@ -39,8 +39,8 @@ help with figuring out the encryption on the coin-op parts of the program.
 
 #include "emu.h"
 
-#include "includes/megadriv.h"
-#include "includes/megadriv_acbl.h"
+#include "megadriv.h"
+#include "megadriv_acbl.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"

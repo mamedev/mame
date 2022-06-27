@@ -126,7 +126,7 @@
 
 
 #include "emu.h"
-#include "includes/atarisy2.h"
+#include "atarisy2.h"
 
 #include "machine/adc0808.h"
 #include "machine/eeprompar.h"

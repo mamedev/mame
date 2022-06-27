@@ -3,7 +3,7 @@
 /* Mogura Desse */
 
 #include "emu.h"
-#include "includes/konamipt.h"
+#include "konamipt.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"

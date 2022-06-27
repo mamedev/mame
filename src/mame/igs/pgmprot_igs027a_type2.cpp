@@ -33,8 +33,8 @@
  ***********************************************************************/
 
 #include "emu.h"
-#include "includes/pgm.h"
-#include "machine/pgmprot_igs027a_type2.h"
+#include "pgm.h"
+#include "pgmprot_igs027a_type2.h"
 
 u32 pgm_arm_type2_state::arm7_latch_arm_r(offs_t offset, u32 mem_mask)
 {

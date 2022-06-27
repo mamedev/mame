@@ -27,7 +27,7 @@
 ****************************************/
 
 #include "emu.h"
-#include "machine/namcoio.h"
+#include "namcoio.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"

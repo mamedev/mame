@@ -3,7 +3,7 @@
 /* video/pass.c - see drivers/pass.c for more info */
 
 #include "emu.h"
-#include "includes/pass.h"
+#include "pass.h"
 
 /* background tilemap stuff */
 

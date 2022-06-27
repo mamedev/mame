@@ -31,7 +31,7 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lasso.h"
+#include "lasso.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"

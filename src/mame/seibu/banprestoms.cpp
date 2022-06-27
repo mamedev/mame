@@ -36,7 +36,7 @@ TODO:
 
 #include "emu.h"
 
-#include "video/seibu_crtc.h"
+#include "seibu_crtc.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"

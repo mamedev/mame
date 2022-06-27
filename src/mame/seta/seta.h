@@ -20,8 +20,8 @@
 #include "machine/upd4701.h"
 #include "machine/upd4992.h"
 #include "sound/x1_010.h"
-#include "video/seta001.h"
-#include "video/x1_012.h"
+#include "seta001.h"
+#include "x1_012.h"
 #include "emupal.h"
 #include "tilemap.h"
 

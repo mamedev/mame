@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/atarisy1.h"
+#include "atarisy1.h"
 #include "cpu/m68000/m68000.h"
 
 

@@ -12,7 +12,7 @@ Tomasz Slanina
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/changela.h"
+#include "changela.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

@@ -16,7 +16,7 @@
 
 ****************************************************************************/
 
-#include "includes/psion5.h"
+#include "psion5.h"
 
 #define LOG_UNKNOWNS        (1 << 0)
 #define LOG_IRQ             (1 << 1)

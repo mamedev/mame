@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino
-#ifndef MAME_INCLUDES_XAIN_H
-#define MAME_INCLUDES_XAIN_H
+#ifndef MAME_TECHNOS_XAIN_H
+#define MAME_TECHNOS_XAIN_H
 
 #pragma once
 
-#include "machine/taito68705interface.h"
+#include "taito68705.h"
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -100,4 +100,4 @@ private:
 	u8      m_scrolly[2][2]{};
 };
 
-#endif // MAME_INCLUDES_XAIN_H
+#endif // MAME_TECHNOS_XAIN_H

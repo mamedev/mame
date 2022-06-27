@@ -41,7 +41,7 @@
 **************************************************************************************************/
 
 #include "emu.h"
-#include "includes/pc9801_epson.h"
+#include "pc9801_epson.h"
 
 template <unsigned which> void pc98_epson_state::shadow_ipl_w(offs_t offset, u16 data, u16 mem_mask)
 {

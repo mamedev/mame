@@ -92,7 +92,7 @@ write:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mario.h"
+#include "mario.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

@@ -11,7 +11,7 @@
 #pragma once
 
 #include "cpu/z80/tmpz84c011.h"
-#include "machine/nb1413m3.h"      // needed for mahjong input controller
+#include "nb1413m3.h"      // needed for mahjong input controller
 #include "machine/gen_latch.h"
 #include "emupal.h"
 #include "screen.h"

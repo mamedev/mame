@@ -12,7 +12,8 @@
 
 #include "spec128.h"
 
-#include "machine/beta.h"
+#include "beta_m.h"
+
 #include "machine/glukrs.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"

@@ -273,8 +273,9 @@
 
 #include "emu.h"
 
-#include "audio/dcs.h"
-#include "machine/midwayic.h"
+#include "midwayic.h"
+
+#include "dcs.h"
 
 #include "bus/ata/idehd.h"
 #include "bus/rs232/rs232.h"

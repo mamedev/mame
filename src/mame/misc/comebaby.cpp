@@ -183,8 +183,11 @@ Nearly everything.
 
 
 #include "emu.h"
+
+#include "pcshare.h"
+
 #include "cpu/i386/i386.h"
-#include "machine/pcshare.h"
+
 #include "emupal.h"
 #include "screen.h"
 

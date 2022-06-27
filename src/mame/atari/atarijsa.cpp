@@ -74,7 +74,7 @@ ALL: the LPF (low pass filter) bit which selectively places a lowpass filter in 
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/atarijsa.h"
+#include "atarijsa.h"
 
 
 #define JSA_MASTER_CLOCK            XTAL(3'579'545)

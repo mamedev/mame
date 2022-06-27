@@ -30,7 +30,7 @@ BE02 and BE03 - read data, write data
 
 
 #include "emu.h"
-#include "machine/micropolis.h"
+#include "micropolis.h"
 
 
 /***************************************************************************

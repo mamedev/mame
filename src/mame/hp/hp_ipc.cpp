@@ -356,7 +356,7 @@ Software to look for
 ******************************************************************************/
 
 #include "emu.h"
-#include "machine/hp_ipc_optrom.h"
+#include "hp_ipc_optrom.h"
 
 #include "bus/hp_hil/hil_devices.h"
 #include "bus/hp_hil/hp_hil.h"

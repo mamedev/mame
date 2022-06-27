@@ -12,10 +12,10 @@
  ******************************************************************************/
 
 #include "emu.h"
+#include "gamate_v.h"
 #include "sound/ay8910.h"
 #include "bus/gamate/slot.h"
 #include "cpu/m6502/m6502.h"
-#include "video/gamate.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"

@@ -9,8 +9,8 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
-#include "includes/decocass.h"
-#include "machine/decocass_tape.h"
+#include "decocass.h"
+#include "decocass_tape.h"
 
 /* dongle type #1: jumpers C and D assignments */
 #define MAKE_MAP(m0,m1,m2,m3,m4,m5,m6,m7)   \

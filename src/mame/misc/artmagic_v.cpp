@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
-#include "includes/artmagic.h"
+#include "artmagic.h"
 
 
 #define INSTANT_BLIT        1

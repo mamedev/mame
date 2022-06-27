@@ -20,7 +20,7 @@ Skeleton driver for Visual 102 display terminal.
 //#include "video/crt9021.h"
 #include "screen.h"
 
-#include "machine/v102_kbd.h"
+#include "v102_kbd.h"
 
 class v102_state : public driver_device
 {

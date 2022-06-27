@@ -11,7 +11,7 @@
 #pragma once
 
 #include "machine/74259.h"
-#include "machine/alpha8201.h"
+#include "alpha8201.h"
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"

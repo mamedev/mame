@@ -34,7 +34,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/efo_zsu.h"
+#include "efo_zsu.h"
 
 #include "machine/input_merger.h"
 #include "speaker.h"

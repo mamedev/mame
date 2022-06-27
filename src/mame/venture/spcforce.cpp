@@ -36,7 +36,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/spcforce.h"
+#include "spcforce.h"
 
 #include "cpu/i8085/i8085.h"
 #include "machine/gen_latch.h"

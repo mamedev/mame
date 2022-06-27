@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "machine/taitoio.h"
-#include "video/tc0080vco.h"
+#include "taitoio.h"
+#include "tc0080vco.h"
 #include "emupal.h"
 
 

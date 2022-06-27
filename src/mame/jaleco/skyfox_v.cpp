@@ -39,7 +39,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/skyfox.h"
+#include "skyfox.h"
 
 
 /***************************************************************************

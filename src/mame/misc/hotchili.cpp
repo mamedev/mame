@@ -152,17 +152,23 @@
 ***************************************************************************************/
 
 #include "emu.h"
+
+#include "seta001.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "video/seta001.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
 #include "hotchili.lh"
+
+
+namespace {
 
 #define MAIN_CLOCK XTAL(8'000'000)
 
@@ -197,9 +203,6 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void hc_palette(palette_device &palette) const;
-
-	void seta001_ctrl_write(offs_t offs, uint8_t data);
-	uint8_t seta001_ctrl_read(offs_t offs);
 
 	//external ram
 	void extram_w(offs_t offset, uint8_t data);
@@ -236,20 +239,6 @@ private:
 /*********************************************
 *               Video Hardware               *
 *********************************************/
-
-void hotchili_state::seta001_ctrl_write(offs_t offs, uint8_t data)
-{
-	offs = (offs & 0x0c) >> 2;
-	m_seta001->spritectrl_w8(offs, data);
-	logerror("m_seta001_offs_w:%x: data:%x\n", offs, data);
-}
-
-uint8_t hotchili_state::seta001_ctrl_read(offs_t offs)
-{
-	offs = (offs & 0x0c) >> 2;
-	logerror("m_seta001_offs_r:%x:\n", offs);
-	return m_seta001->spritectrl_r8(offs);
-}
 
 void hotchili_state::hc_palette(palette_device &palette) const
 {
@@ -629,6 +618,8 @@ void hotchili_state::init_hc()
 	ROM[0x1c54] = 0x84;  // Avoids meter error
 	ROM[0x1c5b] = 0x84;  // Avoids meter error
 }
+
+} // anonymous namespace
 
 
 /*********************************************

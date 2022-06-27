@@ -8,11 +8,11 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "audio/mw8080bw.h"
-#include "audio/nl_gunfight.h"
-#include "audio/nl_280zzzap.h"
+#include "mw8080bw_a.h"
+#include "nl_gunfight.h"
+#include "nl_280zzzap.h"
 
-#include "includes/mw8080bw.h"
+#include "mw8080bw.h"
 #include "speaker.h"
 
 

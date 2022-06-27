@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/nes.h"
+#include "nes.h"
 
 void nes_state::video_reset()
 {

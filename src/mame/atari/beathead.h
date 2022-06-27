@@ -12,7 +12,7 @@
 
 #include "machine/timer.h"
 #include "cpu/asap/asap.h"
-#include "audio/atarijsa.h"
+#include "atarijsa.h"
 #include "emupal.h"
 #include "screen.h"
 

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "vc4000.h"
+#include "vc4000_a.h"
 
 
 DEFINE_DEVICE_TYPE(VC4000_SND, vc4000_sound_device, "vc4000_sound", "Interton Electronic VC 4000 Custom Sound")

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/subs.h"
+#include "subs.h"
 #include "sound/discrete.h"
 
 WRITE_LINE_MEMBER(subs_state::invert1_w)

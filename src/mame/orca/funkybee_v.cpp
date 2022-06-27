@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/funkybee.h"
+#include "funkybee.h"
 
 void funkybee_state::funkybee_palette(palette_device &palette) const
 {

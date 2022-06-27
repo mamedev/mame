@@ -61,7 +61,7 @@ D.9B         [f99cac4b] /
 */
 
 #include "emu.h"
-#include "audio/t5182.h"
+#include "t5182.h"
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"

@@ -13,7 +13,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "audio/tvc.h"
+#include "tvc_a.h"
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"

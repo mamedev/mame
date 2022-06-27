@@ -15,7 +15,7 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
-#include "machine/fidel_clockdiv.h"
+#include "fidel_clockdiv.h"
 
 
 // machine start

@@ -57,7 +57,7 @@ ToDo:
 ****************************************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"

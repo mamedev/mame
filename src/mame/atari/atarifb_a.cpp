@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/atarifb.h"
+#include "atarifb.h"
 #include "sound/discrete.h"
 
 

@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/spdheat.h"
+#include "spdheat.h"
 #include "spdheat.lh"
 
 #include "speaker.h"

@@ -7,8 +7,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/atarimo.h"
-#include "includes/badlands.h"
+#include "atarimo.h"
+#include "badlands.h"
 
 
 

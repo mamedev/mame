@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/alesis.h"
+#include "alesis.h"
 #include "speaker.h"
 
 #define LOG 1

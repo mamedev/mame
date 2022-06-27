@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 #include "emu.h"
-#include "includes/ssrj.h"
+#include "ssrj.h"
 
 /* tilemap 1 */
 

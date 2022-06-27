@@ -82,7 +82,7 @@ the access to the video memory is unclear to me at the moment.
 */
 
 #include "emu.h"
-#include "includes/dgn_beta.h"
+#include "dgn_beta.h"
 
 /* GCtrl bitmasks, inferred from bits of Beta schematic */
 #define GCtrlWI         0x01

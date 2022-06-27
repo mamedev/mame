@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/segam1audio.h"
+#include "segam1audio.h"
 
 #include "machine/clock.h"
 #include "speaker.h"

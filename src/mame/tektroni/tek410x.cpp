@@ -12,7 +12,7 @@
 #include "cpu/i86/i186.h"
 #include "machine/i8255.h"
 #include "machine/mc68681.h"
-#include "machine/tek410x_kbd.h"
+#include "tek410x_kbd.h"
 #include "video/crt9007.h"
 #include "emupal.h"
 #include "screen.h"

@@ -32,7 +32,7 @@ ToDo:
  ************************************************************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "cpu/m6502/m6504.h"
 #include "machine/clock.h"
 #include "inderp.lh"

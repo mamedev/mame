@@ -18,7 +18,7 @@
 #include "machine/watchdog.h"
 #include "machine/timer.h"
 #include "sound/ymopm.h"
-#include "video/atarimo.h"
+#include "atarimo.h"
 
 #include "speaker.h"
 #include "tilemap.h"

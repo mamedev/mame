@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 #include "emu.h"
-#include "audio/zaccaria.h"
-#include "audio/nl_zac1b11142.h"
+#include "zaccaria_a.h"
+#include "nl_zac1b11142.h"
 
 #include "cpu/m6800/m6800.h"
 #include "machine/clock.h"

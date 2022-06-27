@@ -26,6 +26,8 @@
 
 #include "emu.h"
 
+#include "awpvid.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/meters.h"
 #include "machine/roc10937.h"
@@ -33,7 +35,6 @@
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
-#include "video/awpvid.h"
 
 #include "speaker.h"
 

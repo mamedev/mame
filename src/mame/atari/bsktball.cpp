@@ -27,7 +27,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bsktball.h"
+#include "bsktball.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"

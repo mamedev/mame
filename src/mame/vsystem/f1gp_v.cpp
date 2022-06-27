@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
-#include "includes/f1gp.h"
+#include "f1gp.h"
 
 #include "screen.h"
 

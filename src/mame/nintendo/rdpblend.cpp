@@ -14,8 +14,8 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/n64.h"
-#include "video/n64.h"
+#include "n64.h"
+#include "n64_v.h"
 
 n64_blender_t::n64_blender_t()
 {

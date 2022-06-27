@@ -3,8 +3,8 @@
 #ifndef MAME_INCLUDES_POWERINS_H
 #define MAME_INCLUDES_POWERINS_H
 
-#include "includes/nmk16.h"
-#include "video/nmk16spr.h"
+#include "nmk16.h"
+#include "nmk16spr.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

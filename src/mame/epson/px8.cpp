@@ -30,7 +30,7 @@
 */
 
 #include "emu.h"
-#include "includes/px8.h"
+#include "px8.h"
 
 #include "machine/rescap.h"
 #include "machine/upd7001.h"

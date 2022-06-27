@@ -26,7 +26,7 @@ ToDo:
 ***************************************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "cpu/mcs48/mcs48.h"
 #include "lckydraw.lh"
 

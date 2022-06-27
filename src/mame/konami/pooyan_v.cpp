@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/pooyan.h"
+#include "pooyan.h"
 
 /***************************************************************************
 

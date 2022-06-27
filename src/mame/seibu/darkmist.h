@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "audio/t5182.h"
+#include "t5182.h"
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"

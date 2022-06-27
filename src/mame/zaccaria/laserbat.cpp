@@ -82,7 +82,7 @@
 */
 
 #include "emu.h"
-#include "includes/laserbat.h"
+#include "laserbat.h"
 
 #include "cpu/m6800/m6800.h"
 

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ccastles.h"
+#include "ccastles.h"
 #include "video/resnet.h"
 
 

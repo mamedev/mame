@@ -1,13 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_RALLYX_H
-#define MAME_INCLUDES_RALLYX_H
+#ifndef MAME_NAMCO_RALLYX_H
+#define MAME_NAMCO_RALLYX_H
 
 #pragma once
 
-#include "audio/timeplt.h"
+#include "timeplt_a.h"
+
 #include "sound/namco.h"
 #include "sound/samples.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -127,4 +129,4 @@ private:
 	void rallyx_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_RALLYX_H
+#endif // MAME_NAMCO_RALLYX_H

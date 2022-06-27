@@ -423,7 +423,7 @@ test1f diagnostic hacks:
 ****************************************************************************************************/
 
 #include "emu.h"
-#include "includes/saturn.h"
+#include "saturn.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
@@ -431,7 +431,7 @@ test1f diagnostic hacks:
 #include "machine/nvram.h"
 #include "machine/smpc.h"
 #include "machine/stvcd.h"
-#include "machine/saturn_cdb.h"
+#include "saturn_cdb.h"
 
 #include "bus/saturn/bram.h"
 #include "bus/saturn/dram.h"

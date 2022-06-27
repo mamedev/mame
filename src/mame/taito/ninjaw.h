@@ -10,11 +10,11 @@
 
 #pragma once
 
-#include "audio/taitosnd.h"
-#include "machine/taitoio.h"
+#include "taitosnd.h"
+#include "taitoio.h"
 #include "sound/flt_vol.h"
-#include "video/tc0100scn.h"
-#include "video/tc0110pcr.h"
+#include "tc0100scn.h"
+#include "tc0110pcr.h"
 #include "emupal.h"
 
 

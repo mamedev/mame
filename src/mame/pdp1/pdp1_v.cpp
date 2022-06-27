@@ -19,7 +19,7 @@
 
 #include "emu.h"
 #include "cpu/pdp1/pdp1.h"
-#include "includes/pdp1.h"
+#include "pdp1.h"
 
 #include <cmath>
 #include <algorithm>

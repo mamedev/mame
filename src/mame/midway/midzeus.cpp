@@ -27,17 +27,18 @@ The Grid         v1.2   10/18/2000
 **************************************************************************/
 
 #include "emu.h"
-#include "audio/dcs.h"
+
+#include "midzeus.h"
+
+#include "dcs.h"
 
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/pic16c5x/pic16c5x.h"
-
-#include "includes/midzeus.h"
-
 #include "machine/ibm21s850.h"
 #include "machine/nvram.h"
 #include "machine/tsb12lv01a.h"
+#include "video/zeus2.h"
 
 #include "crusnexo.lh"
 
@@ -54,7 +55,6 @@ The Grid         v1.2   10/18/2000
 /*************************************************************************
 Driver for Midway Zeus2 games
 **************************************************************************/
-#include "video/zeus2.h"
 
 class midzeus2_state : public midzeus_state
 {

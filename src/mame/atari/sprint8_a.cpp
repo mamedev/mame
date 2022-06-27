@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include "emu.h"
-#include "includes/sprint8.h"
+#include "sprint8.h"
 
 #include "speaker.h"
 

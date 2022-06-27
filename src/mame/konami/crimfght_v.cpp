@@ -2,7 +2,7 @@
 // copyright-holders:Manuel Abadia
 
 #include "emu.h"
-#include "includes/crimfght.h"
+#include "crimfght.h"
 #include "screen.h"
 
 /***************************************************************************

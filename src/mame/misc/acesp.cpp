@@ -28,7 +28,7 @@
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 
-#include "machine/ace_sp_reelctrl.h"
+#include "ace_sp_reelctrl.h"
 
 #include "ace_sp_dmd.lh"
 

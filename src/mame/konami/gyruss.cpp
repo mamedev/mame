@@ -58,14 +58,14 @@ and 1 SFX channel controlled by an 8039:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gyruss.h"
-#include "includes/konamipt.h"
+#include "gyruss.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
-#include "machine/konami1.h"
+#include "konami1.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
 

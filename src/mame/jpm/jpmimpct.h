@@ -5,17 +5,24 @@
     JPM IMPACT with Video hardware
 
 ****************************************************************************/
+#ifndef MAME_JPM_JPMIMPCT_H
+#define MAME_JPM_JPMIMPCT_H
+
+#pragma once
+
+#include "bacta_datalogger.h"
+
+#include "cpu/tms34010/tms34010.h"
+#include "machine/i8255.h"
+#include "machine/mc68681.h"
 #include "machine/meters.h"
 #include "machine/roc10937.h"
 #include "machine/steppers.h"
 #include "machine/timer.h"
-#include "cpu/tms34010/tms34010.h"
-#include "video/bt47x.h"
-#include "machine/i8255.h"
-#include "machine/mc68681.h"
 #include "sound/upd7759.h"
+#include "video/bt47x.h"
+
 #include "diserial.h"
-#include "machine/bacta_datalogger.h"
 #include "emupal.h"
 
 
@@ -215,3 +222,5 @@ private:
 	optional_ioport m_touchx;
 	optional_ioport m_touchy;
 };
+
+#endif // MAME_JPM_JPMIMPCT_H

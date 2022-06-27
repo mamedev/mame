@@ -10,7 +10,7 @@ driver by Nicola Salmoria
 
 #include "emu.h"
 
-#include "audio/m72.h"
+#include "m72_a.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"

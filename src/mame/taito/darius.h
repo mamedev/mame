@@ -12,7 +12,7 @@
 
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"
-#include "video/pc080sn.h"
+#include "pc080sn.h"
 #include "emupal.h"
 #include "tilemap.h"
 

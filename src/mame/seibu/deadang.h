@@ -1,13 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
-#ifndef MAME_INCLUDES_DEADANG_H
-#define MAME_INCLUDES_DEADANG_H
+#ifndef MAME_SEIBU_DEADANG_H
+#define MAME_SEIBU_DEADANG_H
 
 #pragma once
 
-#include "audio/seibu.h"
+#include "seibusound.h"
+
 #include "machine/timer.h"
 #include "sound/ymopm.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -116,4 +118,4 @@ private:
 	void popnrun_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#endif // MAME_INCLUDES_DEADANG_H
+#endif // MAME_SEIBU_DEADANG_H

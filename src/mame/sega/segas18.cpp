@@ -32,8 +32,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/segas18.h"
-#include "includes/segaipt.h"
+#include "segas18.h"
+#include "segaipt.h"
 
 #include "machine/nvram.h"
 #include "sound/rf5c68.h"

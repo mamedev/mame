@@ -57,7 +57,7 @@ and two large (paddles pretending to be) guns.
 */
 
 #include "emu.h"
-#include "includes/m79amb.h"
+#include "m79amb.h"
 
 #include "screen.h"
 #include "speaker.h"

@@ -13,8 +13,8 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/mb3773.h"
-#include "video/segaic16.h"
-#include "video/sega16sp.h"
+#include "segaic16.h"
+#include "sega16sp.h"
 #include "screen.h"
 
 

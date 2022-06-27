@@ -81,7 +81,7 @@ AT-2
 */
 
 #include "emu.h"
-#include "includes/terracre.h"
+#include "terracre.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

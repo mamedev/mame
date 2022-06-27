@@ -169,7 +169,7 @@ ROM sockets:  UA3   2K or 4K character
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
-#include "machine/cbm_snqk.h"
+#include "cbm_snqk.h"
 #include "machine/input_merger.h"
 #include "machine/pla.h"
 #include "machine/ram.h"

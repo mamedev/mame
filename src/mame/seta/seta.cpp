@@ -1486,7 +1486,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/seta.h"
+#include "seta.h"
 
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m68000/m68000.h"

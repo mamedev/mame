@@ -10,8 +10,8 @@
 */
 
 #include "emu.h"
-#include "includes/rmnimbus.h"
-#include "machine/rmnkbd.h"
+#include "rmnimbus.h"
+#include "rmnkbd.h"
 
 #include "cpu/mcs51/mcs51.h"
 #include "imagedev/floppy.h"

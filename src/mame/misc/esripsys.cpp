@@ -27,7 +27,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/esripsys.h"
+#include "esripsys.h"
 
 #include "cpu/esrip/esrip.h"
 #include "cpu/m6809/m6809.h"

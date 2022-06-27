@@ -370,13 +370,14 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/deco32.h"
+#include "deco32.h"
+
+#include "deco156_m.h"
+#include "decocrpt.h"
 
 #include "cpu/arm/arm.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
-#include "machine/decocrpt.h"
-#include "machine/deco156.h"
 #include "machine/input_merger.h"
 #include "speaker.h"
 

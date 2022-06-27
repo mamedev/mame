@@ -8,9 +8,9 @@
 #include "machine/eepromser.h"
 
 #include "video/poly.h"
-#include "video/tc0100scn.h"
-#include "video/tc0110pcr.h"
-#include "video/tc0480scp.h"
+#include "tc0100scn.h"
+#include "tc0110pcr.h"
+#include "tc0480scp.h"
 
 #include "emupal.h"
 #include "screen.h"

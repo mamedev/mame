@@ -9,8 +9,8 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/hp48_port.h"
-#include "includes/hp48.h"
+#include "hp48_port.h"
+#include "hp48.h"
 
 #include "logmacro.h"
 

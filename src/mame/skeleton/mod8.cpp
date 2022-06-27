@@ -55,8 +55,12 @@ While in 'space' mode, press a letter to increment CLP, or shift-delete
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "teleprinter.h"
+
 #include "cpu/i8008/i8008.h"
-#include "machine/teleprinter.h"
+
+namespace {
 
 class mod8_state : public driver_device
 {
@@ -175,6 +179,8 @@ ROM_START( mod8 )
 	ROM_LOAD( "mon8.006", 0x0500, 0x0100, CRC(b7e2f585) SHA1(5408adabc3df6e6ea8dcfb2327b2883b435ab85e))
 	ROM_LOAD( "mon8.007", 0x0600, 0x0100, CRC(49a5c626) SHA1(66c1865db9151818d3b20ec3c68dd793cb98a221))
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 

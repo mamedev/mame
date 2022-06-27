@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "machine/input_merger.h"
-#include "machine/ioc2.h"
+#include "ioc2.h"
 
 #define LOG_PI1         (1 << 0)
 #define LOG_SERIAL      (1 << 1)

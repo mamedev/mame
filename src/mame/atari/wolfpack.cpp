@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/wolfpack.h"
+#include "wolfpack.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"

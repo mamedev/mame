@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bloodbro.h"
+#include "bloodbro.h"
 #include "screen.h"
 
 

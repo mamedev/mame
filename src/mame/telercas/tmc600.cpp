@@ -95,7 +95,7 @@ Notes:
 */
 
 #include "emu.h"
-#include "includes/tmc600.h"
+#include "tmc600.h"
 
 uint8_t tmc600_state::rtc_r()
 {

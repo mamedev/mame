@@ -45,7 +45,7 @@ If control Q4 is set, printer data can be read from I0.
 ******************************************************************************/
 
 #include "emu.h"
-#include "machine/fidel_clockdiv.h"
+#include "fidel_clockdiv.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"

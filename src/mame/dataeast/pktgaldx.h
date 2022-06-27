@@ -11,9 +11,9 @@
 #pragma once
 
 #include "sound/okim6295.h"
-#include "video/decospr.h"
-#include "video/deco16ic.h"
-#include "machine/deco104.h"
+#include "decospr.h"
+#include "deco16ic.h"
+#include "deco104.h"
 #include "emupal.h"
 
 class pktgaldx_state : public driver_device

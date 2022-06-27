@@ -17,7 +17,7 @@ Tile/sprite priority system (for the Kung Fu Master M62 board):
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/m62.h"
+#include "m62.h"
 
 /***************************************************************************
 

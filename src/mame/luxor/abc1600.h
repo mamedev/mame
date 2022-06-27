@@ -11,7 +11,7 @@
 #include "cpu/m68000/m68000.h"
 #include "formats/abc1600_dsk.h"
 #include "imagedev/floppy.h"
-#include "machine/abc1600mac.h"
+#include "abc1600mac.h"
 #include "machine/e0516.h"
 #include "machine/nmc9306.h"
 #include "machine/ram.h"
@@ -20,7 +20,7 @@
 #include "machine/z80scc.h"
 #include "machine/z80sio.h"
 #include "machine/z8536.h"
-#include "video/abc1600.h"
+#include "abc1600_v.h"
 
 
 

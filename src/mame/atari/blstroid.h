@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "machine/atarigen.h"
+#include "atarigen.h"
 #include "machine/timer.h"
-#include "audio/atarijsa.h"
-#include "video/atarimo.h"
+#include "atarijsa.h"
+#include "atarimo.h"
 #include "tilemap.h"
 
 class blstroid_state : public atarigen_state

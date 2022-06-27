@@ -79,7 +79,7 @@ BTANB:
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "video/mmdisplay1.h"
+#include "mmdisplay1.h"
 #include "video/pwm.h"
 
 #include "speaker.h"

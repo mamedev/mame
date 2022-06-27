@@ -24,7 +24,7 @@ function createProjects_mame_dummy(_target, _subtarget)
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/devices",
-		MAME_DIR .. "src/mame",
+		MAME_DIR .. "src/mame/shared",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
@@ -32,10 +32,10 @@ function createProjects_mame_dummy(_target, _subtarget)
 	}
 
 files{
-	MAME_DIR .. "src/mame/drivers/coleco.cpp",
-	MAME_DIR .. "src/mame/includes/coleco.h",
-	MAME_DIR .. "src/mame/machine/coleco.cpp",
-	MAME_DIR .. "src/mame/machine/coleco.h",
+	MAME_DIR .. "src/mame/coleco/coleco.cpp",
+	MAME_DIR .. "src/mame/coleco/coleco.h",
+	MAME_DIR .. "src/mame/coleco/coleco_m.cpp",
+	MAME_DIR .. "src/mame/coleco/coleco_m.h",
 }
 end
 

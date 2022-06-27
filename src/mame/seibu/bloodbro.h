@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Carlos A. Lozano
-#ifndef MAME_INCLUDES_BLOODBRO_H
-#define MAME_INCLUDES_BLOODBRO_H
+#ifndef MAME_SEIBU_BLOODBRO_H
+#define MAME_SEIBU_BLOODBRO_H
 
 #pragma once
 
-#include "audio/seibu.h"
+#include "seibusound.h"
+
 #include "sound/ymopl.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -91,4 +93,4 @@ private:
 	void weststry_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_BLOODBRO_H
+#endif // MAME_SEIBU_BLOODBRO_H

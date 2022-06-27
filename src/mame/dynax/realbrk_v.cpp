@@ -22,7 +22,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/realbrk.h"
+#include "realbrk.h"
 
 
 void realbrk_state::realbrk_flipscreen_w(offs_t offset, u16 data, u16 mem_mask)

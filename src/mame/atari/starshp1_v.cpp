@@ -7,7 +7,7 @@ Atari Starship 1 video emulation
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/starshp1.h"
+#include "starshp1.h"
 
 
 void starshp1_state::set_pens()

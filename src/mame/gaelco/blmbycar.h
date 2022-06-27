@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "video/gaelco_wrally_sprites.h"
+#include "gaelco_wrally_sprites.h"
 #include "emupal.h"
 #include "tilemap.h"
 

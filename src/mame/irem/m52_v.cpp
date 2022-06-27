@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/m52.h"
+#include "m52.h"
 
 #define BGHEIGHT 128
 

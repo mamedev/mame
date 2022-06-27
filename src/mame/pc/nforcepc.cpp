@@ -20,21 +20,21 @@
 
 */
 
-
 #include "emu.h"
+#include "nforcepc.h"
+
+#include "xbox_pci.h"
+
 #include "bus/ata/atadev.h"
-#include "cpu/i386/athlon.h"
-#include "machine/pci.h"
-#include "machine/pci-ide.h"
-#include "machine/intelfsh.h"
-#include "video/virge_pci.h"
-#include "bus/rs232/rs232.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
-#include "machine/xbox_pci.h"
-#include "includes/nforcepc.h"
+#include "cpu/i386/athlon.h"
+#include "machine/pci-ide.h"
+#include "video/virge_pci.h"
+
 
 #if 1
 // for now let's use this as the contents of the spd chip in the ddr dimm memory module

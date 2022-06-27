@@ -11,9 +11,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/pooyan.h"
-#include "includes/konamipt.h"
-#include "audio/timeplt.h"
+#include "pooyan.h"
+#include "konamipt.h"
+#include "timeplt_a.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

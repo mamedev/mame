@@ -9,7 +9,7 @@ driver by Mirko Buffoni
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/solomon.h"
+#include "solomon.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

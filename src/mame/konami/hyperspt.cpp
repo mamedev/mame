@@ -9,16 +9,16 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/hyperspt.h"
-#include "includes/konamipt.h"
-#include "audio/hyprolyb.h"
+#include "hyperspt.h"
+#include "konamipt.h"
+#include "hyprolyb.h"
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
-#include "machine/konami1.h"
+#include "konami1.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 

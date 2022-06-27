@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "machine/esqvfd.h"
-#include "machine/esqlcd.h"
+#include "esqvfd.h"
+#include "esqlcd.h"
 
 #include "diserial.h"
 

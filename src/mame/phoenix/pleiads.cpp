@@ -9,7 +9,7 @@
  *
  ****************************************************************************/
 #include "emu.h"
-#include "audio/pleiads.h"
+#include "pleiads.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"

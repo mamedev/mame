@@ -87,7 +87,7 @@ ROM labels are in this format:
 
 
 #include "emu.h"
-#include "includes/relief.h"
+#include "relief.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"

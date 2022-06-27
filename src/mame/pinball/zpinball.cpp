@@ -14,11 +14,14 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
-#include "audio/efo_zsu.h"
+
+#include "efo_zsu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "sound/saa1099.h"
+
 #include "speaker.h"
 
 

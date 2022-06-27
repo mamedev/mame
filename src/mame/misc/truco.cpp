@@ -194,7 +194,7 @@
 
 
 #include "emu.h"
-#include "includes/truco.h"
+#include "truco.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"

@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/taitosj.h"
+#include "taitosj.h"
 
 
 #define GLOBAL_FLIP_X           (*m_video_mode & 0x01)

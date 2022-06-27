@@ -325,7 +325,7 @@ Notes:
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/harddriv.h"
+#include "harddriv.h"
 
 #include "machine/timer.h"
 #include "machine/watchdog.h"

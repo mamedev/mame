@@ -35,8 +35,8 @@ Stephh's notes (based on the game M6502 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/scotrsht.h"
-#include "includes/konamipt.h"
+#include "scotrsht.h"
+#include "konamipt.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"

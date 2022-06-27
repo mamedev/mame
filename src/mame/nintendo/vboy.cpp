@@ -27,7 +27,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "audio/vboy.h"
+
+#include "vboysound.h"
 
 #include "cpu/v810/v810.h"
 #include "bus/vboy/slot.h"

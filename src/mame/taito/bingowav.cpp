@@ -45,7 +45,7 @@
 #include "machine/te7750.h"
 #include "machine/tmp68301.h"
 #include "sound/ymopn.h"
-#include "audio/taitosnd.h"
+#include "taitosnd.h"
 
 class bingowav_state : public driver_device
 {

@@ -3,7 +3,7 @@
 /* Sega System 32 Protection related functions */
 
 #include "emu.h"
-#include "includes/segas32.h"
+#include "segas32.h"
 
 
 /******************************************************************************

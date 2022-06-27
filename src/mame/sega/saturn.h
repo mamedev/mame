@@ -14,8 +14,8 @@
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 
-#include "machine/315-5881_crypt.h"
-#include "machine/315-5838_317-0229_comp.h"
+#include "315-5881_crypt.h"
+#include "315-5838_317-0229_comp.h"
 #include "machine/sega_scu.h"
 #include "machine/smpc.h"
 #include "machine/timer.h"

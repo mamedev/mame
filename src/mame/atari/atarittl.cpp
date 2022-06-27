@@ -71,9 +71,9 @@
 
 #include "machine/netlist.h"
 #include "netlist/nl_setup.h"
-#include "machine/nl_stuntcyc.h"
-#include "machine/nl_gtrak10.h"
-#include "machine/nl_tank.h"
+#include "nl_stuntcyc.h"
+#include "nl_gtrak10.h"
+#include "nl_tank.h"
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 #include "screen.h"

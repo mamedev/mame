@@ -11,7 +11,7 @@
 */
 
 #include "emu.h"
-#include "includes/generalplus_gpl16250.h"
+#include "generalplus_gpl16250.h"
 
 class generalplus_gpspi_direct_game_state : public gcm394_game_state
 {

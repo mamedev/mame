@@ -333,7 +333,7 @@ ROM Usage
 */
 
 #include "emu.h"
-#include "includes/psikyosh.h"
+#include "psikyosh.h"
 
 #include "cpu/sh/sh2.h"
 #include "machine/eepromser.h"

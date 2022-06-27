@@ -20,7 +20,7 @@
 
 
 #include "emu.h"
-#include "includes/vindictr.h"
+#include "vindictr.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"

@@ -2,7 +2,7 @@
 // copyright-holders:Phil Stroffolino
 
 #include "emu.h"
-#include "includes/shangkid.h"
+#include "shangkid.h"
 
 
 TILE_GET_INFO_MEMBER(chinhero_state::get_bg_tile_info)

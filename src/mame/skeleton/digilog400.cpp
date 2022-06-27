@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
-#include "machine/digilog_kbd.h"
+#include "digilog_kbd.h"
 #include "emupal.h"
 
 

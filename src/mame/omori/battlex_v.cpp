@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/battlex.h"
+#include "battlex.h"
 
 
 void battlex_state::battlex_palette_w(offs_t offset, uint8_t data)

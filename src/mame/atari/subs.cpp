@@ -20,7 +20,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/subs.h"
+#include "subs.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"

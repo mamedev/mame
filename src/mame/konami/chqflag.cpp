@@ -20,8 +20,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/chqflag.h"
-#include "includes/konamipt.h"
+#include "chqflag.h"
+#include "konamipt.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h"

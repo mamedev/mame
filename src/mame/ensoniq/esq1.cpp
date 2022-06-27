@@ -186,7 +186,7 @@ NOTES:
 #include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
-#include "machine/esqpanel.h"
+#include "esqpanel.h"
 #include "sound/es5503.h"
 #include "speaker.h"
 

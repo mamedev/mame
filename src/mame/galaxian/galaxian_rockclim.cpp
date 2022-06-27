@@ -2,7 +2,7 @@
 // copyright-holders:Tomasz Slanina, David Haywood
 
 #include "emu.h"
-#include "includes/galaxian.h"
+#include "galaxian.h"
 
 namespace {
 

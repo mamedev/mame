@@ -30,10 +30,10 @@
 
 #include "machine/k053252.h"
 #include "machine/timer.h"
-#include "video/k051316.h"
-#include "video/k053246_k053247_k055673.h"
-#include "video/k053251.h"
-#include "video/konami_helper.h"
+#include "k051316.h"
+#include "k053246_k053247_k055673.h"
+#include "k053251.h"
+#include "konami_helper.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
@@ -42,7 +42,7 @@
 #include "machine/rescap.h"
 #include "sound/k053260.h"
 #include "sound/ymopm.h"
-#include "video/k053250.h"
+#include "k053250.h"
 
 #include "emupal.h"
 #include "screen.h"

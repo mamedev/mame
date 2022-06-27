@@ -53,7 +53,7 @@ Notes:
 */
 
 #include "emu.h"
-#include "includes/dbz.h"
+#include "dbz.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

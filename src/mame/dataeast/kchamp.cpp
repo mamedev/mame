@@ -65,7 +65,7 @@ IO ports and memory map changes. Dip switches differ too.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/kchamp.h"
+#include "kchamp.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

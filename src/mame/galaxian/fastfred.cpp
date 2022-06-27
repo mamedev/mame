@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/fastfred.h"
+#include "fastfred.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"

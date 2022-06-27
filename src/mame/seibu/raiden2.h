@@ -1,14 +1,17 @@
 // license:LGPL-2.1+
 // copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
-#ifndef MAME_INCLUDES_RAIDEN2_H
-#define MAME_INCLUDES_RAIDEN2_H
+#ifndef MAME_SEIBU_RAIDEN2_H
+#define MAME_SEIBU_RAIDEN2_H
 
 #pragma once
 
-#include "audio/seibu.h"
-#include "machine/seibucop.h"
+#include "seibu_crtc.h"
+#include "seibucop.h"
+
+#include "seibusound.h"
+
 #include "video/bufsprite.h"
-#include "video/seibu_crtc.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -180,4 +183,4 @@ private:
 	void zeroteam_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_RAIDEN2_H
+#endif // MAME_SEIBU_RAIDEN2_H

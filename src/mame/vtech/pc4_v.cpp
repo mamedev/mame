@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/pc4.h"
+#include "pc4.h"
 
 void pc4_state::set_busy_flag(uint16_t usec)
 {

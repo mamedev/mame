@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lockon.h"
+#include "lockon.h"
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"

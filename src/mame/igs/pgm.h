@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "machine/igs025.h"
-#include "machine/igs022.h"
-#include "machine/igs028.h"
-#include "machine/pgmcrypt.h"
+#include "igs025.h"
+#include "igs022.h"
+#include "igs028.h"
+#include "pgmcrypt.h"
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"

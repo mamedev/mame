@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/irobot.h"
+#include "irobot.h"
 
 #define BITMAP_WIDTH    256
 

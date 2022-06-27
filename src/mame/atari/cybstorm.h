@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "audio/atarijsa.h"
+#include "atarijsa.h"
 #include "machine/bankdev.h"
-#include "video/atarivad.h"
+#include "atarivad.h"
 #include "screen.h"
 #include "tilemap.h"
 

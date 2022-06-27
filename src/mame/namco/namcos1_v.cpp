@@ -7,7 +7,7 @@ Namco System 1 Video Hardware
 *******************************************************************/
 
 #include "emu.h"
-#include "includes/namcos1.h"
+#include "namcos1.h"
 #include "screen.h"
 
 

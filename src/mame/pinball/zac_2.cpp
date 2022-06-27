@@ -48,7 +48,7 @@ ToDo:
 
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/timer.h"
 #include "speaker.h"

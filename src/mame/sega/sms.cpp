@@ -243,7 +243,7 @@ DC00      - Selection buttons #2, 9-16 (R)
  ******************************************************************************/
 
 #include "emu.h"
-#include "includes/sms.h"
+#include "sms.h"
 
 #include "cpu/z80/z80.h"
 #include "softlist_dev.h"

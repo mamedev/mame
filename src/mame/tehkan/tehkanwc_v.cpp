@@ -14,7 +14,7 @@ robbiex@rocketmail.com
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tehkanwc.h"
+#include "tehkanwc.h"
 
 
 void tehkanwc_state::videoram_w(offs_t offset, uint8_t data)

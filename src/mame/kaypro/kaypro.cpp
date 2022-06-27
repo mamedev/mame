@@ -47,8 +47,8 @@
 **************************************************************************************************/
 
 #include "emu.h"
-#include "includes/kaypro.h"
-#include "machine/kay_kbd.h"
+#include "kaypro.h"
+#include "kay_kbd.h"
 #include "formats/kaypro_dsk.h"
 
 #include "bus/rs232/rs232.h"

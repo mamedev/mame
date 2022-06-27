@@ -3,7 +3,7 @@
 /* video/namcofl.cpp */
 
 #include "emu.h"
-#include "includes/namcofl.h"
+#include "namcofl.h"
 
 void namcofl_state::TilemapCB(uint16_t code, int *tile, int *mask)
 {

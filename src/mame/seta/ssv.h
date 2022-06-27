@@ -6,7 +6,7 @@
 #pragma once
 
 #include "cpu/upd7725/upd7725.h"
-#include "video/st0020.h"
+#include "st0020.h"
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "machine/timer.h"

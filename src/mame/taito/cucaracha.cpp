@@ -19,7 +19,7 @@
 #include "machine/te7750.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
-#include "audio/taitosnd.h"
+#include "taitosnd.h"
 
 namespace {
 

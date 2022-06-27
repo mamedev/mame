@@ -8,7 +8,7 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "includes/mz700.h"
+#include "mz700.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74145.h"

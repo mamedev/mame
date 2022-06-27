@@ -27,12 +27,12 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ojankohs.h"
+#include "ojankohs.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "video/vsystem_gga.h"
+#include "vsystem_gga.h"
 #include "speaker.h"
 
 

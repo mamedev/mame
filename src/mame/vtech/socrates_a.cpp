@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "socrates.h"
+#include "socrates_a.h"
 
 
 // device type definition

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "machine/k573fpga.h"
+#include "k573fpga.h"
 #include "machine/ds2401.h"
 
 class k573dio_device : public device_t

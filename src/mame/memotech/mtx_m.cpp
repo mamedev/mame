@@ -7,7 +7,7 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/mtx.h"
+#include "mtx.h"
 
 #include "formats/imageutl.h"
 

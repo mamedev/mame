@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/arkanoid.h"
+#include "arkanoid.h"
 
 
 void arkanoid_state::arkanoid_videoram_w(offs_t offset, uint8_t data)

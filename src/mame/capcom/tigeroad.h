@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
 
-#include "video/tigeroad_spr.h"
+#include "tigeroad_spr.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m68705.h"

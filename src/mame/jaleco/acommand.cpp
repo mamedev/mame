@@ -58,16 +58,20 @@ JALCF1   BIN     1,048,576  02-07-99  1:11a JALCF1.BIN
 *******************************************************************************************/
 
 #include "emu.h"
+
+#include "ms1_tmap.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
-#include "video/ms1_tmap.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include "acommand.lh"
 
+namespace {
 
 class acommand_state : public driver_device
 {
@@ -527,5 +531,7 @@ ROM_START( acommand )
 	ROM_LOAD( "jalmr14.bin",   0x000000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
 	ROM_LOAD( "jalmr17.bin",   0x080000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
 ROM_END
+
+} // anonymous namespace
 
 GAMEL( 1994, acommand, 0, acommand, acommand, acommand_state, empty_init, ROT0, "Jaleco", "Alien Command" , MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_acommand )

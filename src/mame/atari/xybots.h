@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "machine/slapstic.h"
-#include "audio/atarijsa.h"
-#include "video/atarimo.h"
+#include "slapstic.h"
+#include "atarijsa.h"
+#include "atarimo.h"
 #include "screen.h"
 #include "tilemap.h"
 

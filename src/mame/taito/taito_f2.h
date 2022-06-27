@@ -5,15 +5,15 @@
 
 #pragma once
 
-#include "machine/taitocchip.h"
-#include "machine/taitoio.h"
+#include "taitocchip.h"
+#include "taitoio.h"
 
 #include "sound/okim6295.h"
-#include "video/tc0100scn.h"
-#include "video/tc0110pcr.h"
-#include "video/tc0280grd.h"
-#include "video/tc0360pri.h"
-#include "video/tc0480scp.h"
+#include "tc0100scn.h"
+#include "tc0110pcr.h"
+#include "tc0280grd.h"
+#include "tc0360pri.h"
+#include "tc0480scp.h"
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"

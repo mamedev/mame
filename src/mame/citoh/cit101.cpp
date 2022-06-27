@@ -65,7 +65,7 @@ The NVR checksum error reported when the terminal is first used is nonfatal. Def
 #include "machine/i8255.h"
 #include "screen.h"
 
-#include "machine/cit101_kbd.h"
+#include "cit101_kbd.h"
 
 class cit101_state : public driver_device
 {

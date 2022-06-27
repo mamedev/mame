@@ -67,7 +67,7 @@ K1000233A
 */
 
 #include "emu.h"
-#include "includes/pitnrun.h"
+#include "pitnrun.h"
 
 #include "cpu/z80/z80.h"
 

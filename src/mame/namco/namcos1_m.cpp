@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
 #include "emu.h"
-#include "includes/namcos1.h"
+#include "namcos1.h"
 
 
 /*******************************************************************************

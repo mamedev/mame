@@ -2,7 +2,7 @@
 // copyright-holders:Mike Coates
 #include "emu.h"
 #include "sound/samples.h"
-#include "includes/circus.h"
+#include "circus.h"
 
 const char *const circus_sample_names[] =
 {

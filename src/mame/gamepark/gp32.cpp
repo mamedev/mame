@@ -32,7 +32,7 @@
  **************************************************************************/
 
 #include "emu.h"
-#include "includes/gp32.h"
+#include "gp32.h"
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"

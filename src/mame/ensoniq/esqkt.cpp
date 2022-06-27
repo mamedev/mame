@@ -91,7 +91,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/esqpanel.h"
+#include "esqpanel.h"
 
 #include "bus/midi/midi.h"
 #include "cpu/es5510/es5510.h"

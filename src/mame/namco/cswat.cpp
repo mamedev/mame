@@ -22,7 +22,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/namco52.h"
+#include "namco52.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/mb88xx/mb88xx.h"

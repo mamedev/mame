@@ -5,19 +5,21 @@
     Metro Games
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_METRO_H
-#define MAME_INCLUDES_METRO_H
+#ifndef MAME_METRO_METRO_H
+#define MAME_METRO_METRO_H
 
 #pragma once
 
-#include "sound/es8712.h"
-#include "sound/okim6295.h"
-#include "sound/ymopm.h"
-#include "video/k053936.h"
-#include "video/imagetek_i4100.h"
+#include "k053936.h"
+
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "sound/es8712.h"
+#include "sound/okim6295.h"
+#include "sound/ymopm.h"
+#include "video/imagetek_i4100.h"
+
 #include "screen.h"
 #include "tilemap.h"
 
@@ -226,4 +228,4 @@ private:
 	bool m_ext_irq_enable = false;
 };
 
-#endif // MAME_INCLUDES_METRO_H
+#endif // MAME_METRO_METRO_H

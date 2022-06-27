@@ -183,7 +183,7 @@ ROMs (All ROMs are 27C010 EPROM. - means not populated)
 
 
 #include "emu.h"
-#include "includes/ddragon3.h"
+#include "ddragon3.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"

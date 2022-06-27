@@ -15,7 +15,7 @@
 */
 
 #include "emu.h"
-#include "includes/elf.h"
+#include "elf.h"
 #include "screen.h"
 #include "speaker.h"
 #include "elf2.lh"

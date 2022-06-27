@@ -2,12 +2,12 @@
 // copyright-holders:R. Belmont, ElSemi
 
 #include "cpu/i960/i960.h"
-#include "machine/namcomcu.h"
+#include "namcomcu.h"
 #include "machine/timer.h"
-#include "video/namco_c123tmap.h"
-#include "video/namco_c116.h"
-#include "video/namco_c169roz.h"
-#include "video/namco_c355spr.h"
+#include "namco_c123tmap.h"
+#include "namco_c116.h"
+#include "namco_c169roz.h"
+#include "namco_c355spr.h"
 
 #include "emupal.h"
 #include "screen.h"

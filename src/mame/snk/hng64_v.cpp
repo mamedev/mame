@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner
 #include "emu.h"
-#include "includes/hng64.h"
+#include "hng64.h"
 
 #define BLEND_TEST 0
 
@@ -1270,5 +1270,5 @@ void hng64_state::video_start()
 	m_vertsrom_size = memregion("verts")->bytes();
 }
 
-#include "video/hng64_3d.ipp"
-#include "video/hng64_sprite.ipp"
+#include "hng64_3d.ipp"
+#include "hng64_sprite.ipp"

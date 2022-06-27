@@ -17,18 +17,20 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bacta_datalogger.h"
+
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "cpu/i386/i386.h"
 #include "cpu/tms32031/tms32031.h"
 #include "machine/53c7xx.h"
-#include "machine/bacta_datalogger.h"
 #include "machine/mc146818.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "machine/z80scc.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

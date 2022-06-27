@@ -30,7 +30,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/snookr10.h"
+#include "snookr10.h"
 
 
 void snookr10_state::snookr10_videoram_w(offs_t offset, uint8_t data)

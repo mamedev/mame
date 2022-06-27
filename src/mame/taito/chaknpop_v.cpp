@@ -6,7 +6,7 @@
  */
 
 #include "emu.h"
-#include "includes/chaknpop.h"
+#include "chaknpop.h"
 
 #define GFX_FLIP_X  0x01
 #define GFX_FLIP_Y  0x02

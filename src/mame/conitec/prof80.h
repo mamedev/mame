@@ -10,7 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
-#include "machine/prof80mmu.h"
+#include "prof80mmu.h"
 #include "machine/74259.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"

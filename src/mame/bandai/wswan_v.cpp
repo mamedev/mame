@@ -14,7 +14,7 @@
  ***************************************************************************/
 
 #include "emu.h"
-#include "wswan.h"
+#include "wswan_v.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device, "wswan_video", "Bandai WonderSwam VDP")

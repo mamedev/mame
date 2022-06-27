@@ -27,7 +27,7 @@ BK8T - Keys to navigate initial config screen are mostly unknown
 
 
 #include "emu.h"
-#include "includes/pk8020.h"
+#include "pk8020.h"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"

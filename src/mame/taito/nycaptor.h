@@ -1,16 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
-#ifndef MAME_INCLUDES_NYCAPTOR_H
-#define MAME_INCLUDES_NYCAPTOR_H
+#ifndef MAME_TAITO_NYCAPTOR_H
+#define MAME_TAITO_NYCAPTOR_H
 
 #pragma once
+
+#include "taito68705.h"
 
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "sound/msm5232.h"
-#include "machine/taito68705interface.h"
+
 #include "emupal.h"
 #include "tilemap.h"
+
 
 class nycaptor_state : public driver_device
 {
@@ -119,4 +122,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_NYCAPTOR_H
+#endif // MAME_TAITO_NYCAPTOR_H

@@ -21,7 +21,7 @@
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
 #include "machine/scn_pci.h"
-#include "machine/wy50kb.h"
+#include "wy50kb.h"
 #include "sound/spkrdev.h"
 #include "video/i8275.h"
 #include "screen.h"

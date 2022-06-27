@@ -41,9 +41,10 @@
 
 #include "emu.h"
 
-#include "audio/fruitsamples.h"
-#include "audio/nl_jpmsru.h"
-#include "video/awpvid.h"
+#include "nl_jpmsru.h"
+
+#include "awpvid.h"
+#include "fruitsamples.h"
 
 #include "cpu/tms9900/tms9980a.h"
 

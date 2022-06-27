@@ -186,9 +186,10 @@
 
 #include "emu.h"
 
-#include "audio/cage.h"
-#include "audio/dcs.h"
-#include "machine/midwayic.h"
+#include "midwayic.h"
+
+#include "cage.h"
+#include "dcs.h"
 
 #include "bus/ata/idehd.h"
 #include "cpu/adsp2100/adsp2100.h"

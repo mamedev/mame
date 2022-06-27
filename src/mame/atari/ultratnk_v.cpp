@@ -7,8 +7,8 @@ Atari Ultra Tank video emulation
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ultratnk.h"
-#include "audio/sprint4.h"
+#include "ultratnk.h"
+#include "sprint4_a.h"
 
 
 void ultratnk_state::ultratnk_palette(palette_device &palette) const

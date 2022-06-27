@@ -173,7 +173,7 @@
 
 
 #include "emu.h"
-#include "includes/funworld.h"
+#include "funworld.h"
 
 #include "cpu/m6502/m65c02.h"
 #include "machine/nvram.h"

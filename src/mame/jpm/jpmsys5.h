@@ -1,23 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett, James Wallace, David Haywood
-#ifndef MAME_INCLUDES_JPMSYS5_H
-#define MAME_INCLUDES_JPMSYS5_H
+#ifndef MAME_JPM_JPMSYS5_H
+#define MAME_JPM_JPMSYS5_H
 
 #pragma once
+
+#include "awpvid.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
+#include "machine/meters.h"
+#include "machine/nvram.h"
+#include "machine/roc10937.h"
+#include "machine/steppers.h"
 #include "sound/upd7759.h"
 #include "sound/ymopl.h"
 #include "video/tms34061.h"
-#include "machine/nvram.h"
-#include "video/awpvid.h"
-#include "machine/steppers.h"
-#include "machine/roc10937.h"
-#include "machine/meters.h"
+
 #include "emupal.h"
+
 
 class jpmsys5_state : public driver_device
 {
@@ -192,4 +195,4 @@ private:
 	int m_touch_shift_cnt = 0;
 };
 
-#endif // MAME_INCLUDES_JPMSYS5_H
+#endif // MAME_JPM_JPMSYS5_H

@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/champbas.h"
+#include "champbas.h"
 
 
 /***************************************************************************

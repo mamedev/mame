@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/portrait.h"
+#include "portrait.h"
 
 
 void portrait_state::bgvideo_write(offs_t offset, uint8_t data)

@@ -123,7 +123,7 @@ Abnormalities:
 
 
 #include "emu.h"
-#include "includes/toaplan1.h"
+#include "toaplan1.h"
 
 
 #define TOAPLAN1_TILEVRAM_SIZE       0x4000 /* 4 tile layers each this RAM size */

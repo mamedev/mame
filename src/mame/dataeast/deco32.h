@@ -1,22 +1,31 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_DATAEAST_DECO32_H
+#define MAME_DATAEAST_DECO32_H
+
+#pragma once
+
+#include "deco104.h"
+#include "deco146.h"
+#include "deco16ic.h"
+#include "deco_ace.h"
+#include "deco_irq.h"
+#include "decospr.h"
+
+#include "decobsmt.h"
+#include "namco_c355spr.h"
+
 #include "cpu/h6280/h6280.h"
-#include "audio/decobsmt.h"
-#include "video/bufsprite.h"
-#include "video/decospr.h"
-#include "video/deco16ic.h"
-#include "video/deco_ace.h"
-#include "machine/deco_irq.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "sound/lc7535.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
-#include "machine/deco146.h"
-#include "machine/deco104.h"
-#include "video/namco_c355spr.h"
+#include "video/bufsprite.h"
+
 #include "emupal.h"
 #include "screen.h"
+
 
 class deco32_state : public driver_device
 {
@@ -308,3 +317,5 @@ private:
 	void lockloadu_sound_map(address_map &map);
 	bool m_gun_speaker_disabled;
 };
+
+#endif // MAME_DATAEAST_DECO32_H

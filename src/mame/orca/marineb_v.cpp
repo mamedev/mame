@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/marineb.h"
+#include "marineb.h"
 
 
 void marineb_state::marineb_palette(palette_device &palette) const

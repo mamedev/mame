@@ -3,7 +3,7 @@
 /* Free Kick Video Hardware */
 
 #include "emu.h"
-#include "includes/freekick.h"
+#include "freekick.h"
 
 
 TILE_GET_INFO_MEMBER(freekick_state::get_freek_tile_info)

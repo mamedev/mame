@@ -20,8 +20,8 @@ The 10MHz version has a W65C02P-8 @ 9.83MHz.
 #include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
-#include "machine/mmboard.h"
-#include "video/mmdisplay2.h"
+#include "mmboard.h"
+#include "mmdisplay2.h"
 
 // internal artwork
 #include "mephisto_polgar.lh"

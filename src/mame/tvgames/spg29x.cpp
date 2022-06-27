@@ -76,8 +76,8 @@
 #include "machine/spg290_i2c.h"
 #include "machine/spg290_ppu.h"
 #include "machine/spg290_timer.h"
-#include "machine/hyperscan_card.h"
-#include "machine/hyperscan_ctrl.h"
+#include "hyperscan_card.h"
+#include "hyperscan_ctrl.h"
 #include "screen.h"
 #include "softlist_dev.h"
 

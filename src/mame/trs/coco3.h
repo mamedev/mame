@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include "includes/coco12.h"
-#include "video/gime.h"
+#include "coco12.h"
+#include "gime.h"
 
 
 //**************************************************************************

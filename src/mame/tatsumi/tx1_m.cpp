@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "cpu/i86/i86.h"
-#include "includes/tx1.h"
+#include "tx1.h"
 
 
 /*

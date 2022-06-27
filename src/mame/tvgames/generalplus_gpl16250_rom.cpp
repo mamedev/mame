@@ -13,7 +13,7 @@
 */
 
 #include "emu.h"
-#include "includes/generalplus_gpl16250.h"
+#include "generalplus_gpl16250.h"
 
 
 static INPUT_PORTS_START( smartfp )

@@ -151,11 +151,13 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/ninjakd2.h"
+#include "ninjakd2.h"
+
+#include "mc8123.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/mc8123.h"
+
 #include "sound/ymopn.h"
 #include "speaker.h"
 

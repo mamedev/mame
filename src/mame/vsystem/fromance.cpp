@@ -80,13 +80,13 @@ with the following code:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fromance.h"
+#include "fromance.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "sound/ymopl.h"
-#include "video/vsystem_gga.h"
+#include "vsystem_gga.h"
 #include "speaker.h"
 
 

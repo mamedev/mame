@@ -18,7 +18,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/darkseal.h"
+#include "darkseal.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"

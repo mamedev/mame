@@ -5,7 +5,7 @@
 // layer priority register not fully understood
 
 #include "emu.h"
-#include "includes/drgnmst.h"
+#include "drgnmst.h"
 
 
 rgb_t drgnmst_base_state::drgnmst_IIIIRRRRGGGGBBBB(uint32_t raw)

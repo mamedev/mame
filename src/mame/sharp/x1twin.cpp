@@ -15,14 +15,20 @@
 ************************************************************************************************/
 
 #include "emu.h"
-#include "includes/x1.h"
-#include "includes/pce.h"
+#include "x1.h"
+//#include "nec/pce.h" FIXME: turn necessary parts of PCE into a device that can be put somewhere common
+
+#include "video/huc6260.h"
 
 #include "layout/generic.h"
 #include "screen.h"
 #include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
+
+// copied from pce.h until it's turned into a device properly
+#define MAIN_CLOCK      21477270
 
 namespace {
 

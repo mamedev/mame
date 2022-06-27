@@ -37,7 +37,7 @@
 #include "bus/msx_slot/fs4600.h"
 #include "bus/msx_slot/panasonic08.h"
 #include "bus/msx_slot/sony08.h"
-#include "machine/msx_switched.h"
+#include "msx_switched.h"
 
 
 #define TC8521_TAG  "rtc"

@@ -9,8 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/pcd_kbd.h"
-#include "video/pcd.h"
+#include "pcd_kbd.h"
+#include "pcd.h"
 
 #include "bus/rs232/rs232.h"
 #include "bus/scsi/omti5100.h"

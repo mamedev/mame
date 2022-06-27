@@ -10,9 +10,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/segag80r.h"
+#include "segag80r.h"
 
-#include "audio/segag80r.h"
+#include "segag80r_a.h"
 #include "sound/dac.h"
 
 #include "speaker.h"

@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/nes_vt_soc.h"
+#include "nes_vt_soc.h"
 
 class nes_vt_base_state : public driver_device
 {

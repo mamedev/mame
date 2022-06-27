@@ -9,7 +9,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/raiden.h"
+#include "raiden.h"
 #include "screen.h"
 
 

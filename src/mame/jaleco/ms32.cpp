@@ -470,8 +470,8 @@ Notes from Charles MacDonald
 /********** BITS & PIECES **********/
 
 #include "emu.h"
-#include "includes/ms32.h"
-#include "machine/jalcrpt.h"
+#include "ms32.h"
+#include "jalcrpt.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"

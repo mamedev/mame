@@ -1,26 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#include "mpu4_characteriser_bootleg.h"
+#include "mpu4_characteriser_pal.h"
+#include "mpu4_characteriser_pal_bwb.h"
+
+#include "bacta_datalogger.h"
+
+#include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/mc68681.h"
+#include "machine/meters.h"
 #include "machine/nvram.h"
+#include "machine/roc10937.h"
+#include "machine/steppers.h"
 #include "machine/timer.h"
-
-#include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
 #include "sound/upd7759.h"
 #include "sound/ymopl.h"
-
-#include "machine/bacta_datalogger.h"
-#include "machine/meters.h"
-#include "machine/mpu4_characteriser_bootleg.h"
-#include "machine/mpu4_characteriser_pal.h"
-#include "machine/mpu4_characteriser_pal_bwb.h"
-#include "machine/roc10937.h"
-#include "machine/steppers.h"
-
 
 #include "emupal.h"
 

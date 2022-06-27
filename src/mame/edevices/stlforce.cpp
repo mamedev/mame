@@ -70,7 +70,7 @@ TO DO :
 */
 
 #include "emu.h"
-#include "includes/stlforce.h"
+#include "stlforce.h"
 
 
 void stlforce_state::eeprom_w(uint8_t data)

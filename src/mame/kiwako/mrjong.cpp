@@ -46,7 +46,7 @@ ROMs 6A, 7A, 8A, 9A: 2764
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mrjong.h"
+#include "mrjong.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"

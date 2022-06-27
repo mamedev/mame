@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dragrace.h"
+#include "dragrace.h"
 
 #include "cpu/m6800/m6800.h"
 #include "machine/74259.h"

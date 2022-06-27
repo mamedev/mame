@@ -59,12 +59,12 @@
 */
 
 #include "emu.h"
-#include "machine/m6502_swap_op_d2_d7.h"
-#include "machine/m6502_swap_op_d5_d6.h"
-#include "machine/vt1682_io.h"
-#include "machine/vt1682_uio.h"
-#include "machine/vt1682_alu.h"
-#include "machine/vt1682_timer.h"
+#include "m6502_swap_op_d2_d7.h"
+#include "m6502_swap_op_d5_d6.h"
+#include "vt1682_io.h"
+#include "vt1682_uio.h"
+#include "vt1682_alu.h"
+#include "vt1682_timer.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 #include "sound/dac.h"

@@ -115,9 +115,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/rohga.h"
+#include "rohga.h"
 
-#include "machine/decocrpt.h"
+#include "decocrpt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/ymopm.h"

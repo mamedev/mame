@@ -12,8 +12,8 @@
  ***************************************************************************/
 
 #include "emu.h"
-#include "machine/nes_vt369_vtunknown_soc.h"
-#include "machine/nes_vt32_soc.h"
+#include "nes_vt369_vtunknown_soc.h"
+#include "nes_vt32_soc.h"
 
 class nes_vt32_base_state : public driver_device
 {

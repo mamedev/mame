@@ -16,11 +16,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/segahang.h"
-#include "includes/segaipt.h"
+#include "segahang.h"
+#include "segaipt.h"
 
-#include "machine/fd1089.h"
-#include "machine/fd1094.h"
+#include "fd1089.h"
+#include "fd1094.h"
 #include "sound/segapcm.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"

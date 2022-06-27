@@ -7,7 +7,7 @@
 
 #include "sound/namco.h"
 #include "sound/samples.h"
-#include "machine/namcoio.h"
+#include "namcoio.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

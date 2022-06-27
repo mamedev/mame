@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "machine/slapstic.h"
-#include "audio/atarijsa.h"
-#include "audio/atarisac.h"
-#include "video/atarimo.h"
+#include "slapstic.h"
+#include "atarijsa.h"
+#include "atarisac.h"
+#include "atarimo.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "emupal.h"

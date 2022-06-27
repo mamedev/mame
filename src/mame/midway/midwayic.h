@@ -5,15 +5,17 @@
     Emulation of various Midway ICs
 
 ***************************************************************************/
-#ifndef MAME_MACHINE_MIDWAY_IC_H
-#define MAME_MACHINE_MIDWAY_IC_H
+#ifndef MAME_MIDWAY_MIDWAY_IC_H
+#define MAME_MIDWAY_MIDWAY_IC_H
 
 #pragma once
 
 
-#include "audio/cage.h"
-#include "audio/dcs.h"
+#include "cage.h"
+#include "dcs.h"
+
 #include "cpu/pic16c5x/pic16c5x.h"
+
 
 /* 1st generation Midway serial PIC - simulation*/
 
@@ -246,4 +248,4 @@ enum
 	MIDWAY_IOASIC_HYPRDRIV
 };
 
-#endif // MAME_MACHINE_MIDWAY_IC_H
+#endif // MAME_MIDWAY_MIDWAY_IC_H

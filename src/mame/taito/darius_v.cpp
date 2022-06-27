@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:David Graves, Jarek Burczynski
 #include "emu.h"
-#include "includes/darius.h"
+#include "darius.h"
 #include "screen.h"
 
 /***************************************************************************/

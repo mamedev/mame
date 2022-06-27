@@ -7,7 +7,7 @@ Atari Canyon Bomber video emulation
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/canyon.h"
+#include "canyon.h"
 
 
 void canyon_state::canyon_videoram_w(offs_t offset, uint8_t data)

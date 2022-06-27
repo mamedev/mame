@@ -43,13 +43,15 @@ ToDo:
 ************************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
+
+#include "williamssound.h"
 
 #include "cpu/m6800/m6800.h"
-#include "audio/williams.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
 #include "machine/timer.h"
+
 #include "speaker.h"
 
 #include "s3.lh"

@@ -54,18 +54,17 @@ puzznici note
 */
 
 #include "emu.h"
-#include "includes/taito_l.h"
-#include "includes/taitoipt.h"
-#include "machine/taito68705interface.h"
-#include "machine/taitoio.h"
+#include "taito_l.h"
 
-#include "audio/taitosnd.h"
+#include "taitoio.h"
+#include "taitoipt.h"
+#include "taitosnd.h"
+
+#include "taito68705.h"
 
 #include "cpu/z80/z80.h"
-
 #include "machine/i8255.h"
 #include "machine/mb8421.h"
-
 #include "sound/msm5205.h"
 #include "sound/ymopn.h"
 

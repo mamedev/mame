@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "video/k053251.h"
-#include "video/k054156_k054157_k056832.h"
-#include "video/k053244_k053245.h"
-#include "video/konami_helper.h"
+#include "k053251.h"
+#include "k054156_k054157_k056832.h"
+#include "k053244_k053245.h"
+#include "konami_helper.h"
 
 class asterix_state : public driver_device
 {

@@ -37,8 +37,8 @@ TODO:
 
 #include "emu.h"
 
-#include "audio/taitosnd.h"
-#include "includes/taitoipt.h"
+#include "taitosnd.h"
+#include "taitoipt.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ymopm.h"

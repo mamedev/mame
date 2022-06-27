@@ -57,10 +57,10 @@ TODO: Volleyball...
 
 #include "netlist/devices/net_lib.h"
 
-#include "machine/nl_breakout.h"
-#include "machine/nl_rebound.h"
-#include "machine/nl_pong.h"
-#include "machine/nl_pongdoubles.h"
+#include "nl_breakout.h"
+#include "nl_rebound.h"
+#include "nl_pong.h"
+#include "nl_pongdoubles.h"
 
 #include "screen.h"
 #include "speaker.h"

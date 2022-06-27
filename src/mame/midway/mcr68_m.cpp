@@ -7,8 +7,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/midway.h"
-#include "includes/mcr68.h"
+#include "midway.h"
+#include "mcr68.h"
 
 #define VERBOSE 0
 

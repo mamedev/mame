@@ -178,7 +178,7 @@ Pin #11(+) | | R               |
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lethalj.h"
+#include "lethalj.h"
 
 #include "sound/okim6295.h"
 #include "emupal.h"

@@ -5,7 +5,7 @@
 */
 
 #include "emu.h"
-#include "includes/thief.h"
+#include "thief.h"
 
 
 enum {

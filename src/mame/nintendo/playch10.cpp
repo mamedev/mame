@@ -289,7 +289,7 @@ Notes & Todo:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/playch10.h"
+#include "playch10.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

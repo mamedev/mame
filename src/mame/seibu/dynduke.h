@@ -1,14 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
-#ifndef MAME_INCLUDES_DYNDUKE_H
-#define MAME_INCLUDES_DYNDUKE_H
+#ifndef MAME_SEIBU_DYNDUKE_H
+#define MAME_SEIBU_DYNDUKE_H
 
 #pragma once
 
-#include "audio/seibu.h"
+#include "seibusound.h"
+
 #include "video/bufsprite.h"
+
 #include "emupal.h"
 #include "tilemap.h"
+
 
 class dynduke_state : public driver_device
 {
@@ -80,4 +83,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DYNDUKE_H
+#endif // MAME_SEIBU_DYNDUKE_H

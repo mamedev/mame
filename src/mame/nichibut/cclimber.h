@@ -1,13 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_CCLIMBER_H
-#define MAME_INCLUDES_CCLIMBER_H
+#ifndef MAME_NICHIBUT_CCLIMBER_H
+#define MAME_NICHIBUT_CCLIMBER_H
 
 #pragma once
 
+#include "segacrpt_device.h"
+
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
-#include "machine/segacrpt_device.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -157,4 +159,4 @@ private:
 	void yamato_portmap(address_map &map);
 };
 
-#endif // MAME_INCLUDES_CCLIMBER_H
+#endif // MAME_NICHIBUT_CCLIMBER_H

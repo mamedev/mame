@@ -26,7 +26,7 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/nbmj8900.h"
+#include "nbmj8900.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"

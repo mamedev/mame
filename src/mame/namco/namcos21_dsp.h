@@ -6,7 +6,7 @@
 #pragma once
 
 #include "cpu/tms32025/tms32025.h"
-#include "video/namcos21_3d.h"
+#include "namcos21_3d.h"
 
 #define WINRUN_MAX_POLY_PARAM (1+256*3)
 

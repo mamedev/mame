@@ -12,8 +12,10 @@
 
 #pragma once
 
+#include "tecmo_spr.h"
+
 #include "machine/gen_latch.h"
-#include "video/tecmo_spr.h"
+
 #include "emupal.h"
 #include "screen.h"
 

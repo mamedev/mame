@@ -34,7 +34,7 @@ Status:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/genpin.h"
+#include "genpin.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/timer.h"

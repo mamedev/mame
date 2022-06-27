@@ -76,11 +76,11 @@
 ***********************************************************************************************/
 
 #include "emu.h"
-#include "includes/segaipt.h"
+#include "segaipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
-#include "machine/315_5296.h"
+#include "315_5296.h"
 #include "sound/sn76496.h"
 #include "sound/upd7759.h"
 #include "sound/ymopn.h"

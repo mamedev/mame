@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bishi.h"
+#include "bishi.h"
 
 
 K056832_CB_MEMBER(bishi_state::tile_callback)

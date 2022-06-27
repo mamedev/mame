@@ -167,9 +167,9 @@
 #include "cpu/m68000/m68000.h"
 #include "formats/esq16_dsk.h"
 #include "imagedev/floppy.h"
-#include "machine/esqlcd.h"
-#include "machine/esqpanel.h"
-#include "machine/esqvfd.h"
+#include "esqlcd.h"
+#include "esqpanel.h"
+#include "esqvfd.h"
 #include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"

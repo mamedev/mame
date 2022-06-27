@@ -3,7 +3,7 @@
 
 #include "emu.h"
 
-#include "machine/pofo_kbd.h"
+#include "pofo_kbd.h"
 
 #include "machine/keyboard.ipp"
 

@@ -391,7 +391,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/dec0.h"
+#include "dec0.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"

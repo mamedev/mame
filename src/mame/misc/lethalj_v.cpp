@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lethalj.h"
+#include "lethalj.h"
 
 
 #define BLITTER_SOURCE_WIDTH        1024

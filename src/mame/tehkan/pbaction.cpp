@@ -95,11 +95,12 @@ Stephh's notes (based on the game Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/pbaction.h"
+#include "pbaction.h"
+
+#include "segacrpt_device.h"
 
 #include "machine/74259.h"
 #include "sound/ay8910.h"
-#include "machine/segacrpt_device.h"
 #include "screen.h"
 #include "speaker.h"
 #include "pbactiont.lh"

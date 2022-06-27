@@ -43,7 +43,7 @@
 **************************************************************************************************/
 
 #include "emu.h"
-#include "includes/pc9821.h"
+#include "pc9821.h"
 
 UPD7220_DISPLAY_PIXELS_MEMBER( pc9821_state::pegc_display_pixels )
 {

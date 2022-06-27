@@ -28,7 +28,7 @@
 ***************************************************************************************************/
 
 #include "emu.h"
-#include "includes/pasopia.h"
+#include "pasopia.h"
 
 #include "bus/pasopia/pac2.h"
 #include "cpu/z80/z80.h"

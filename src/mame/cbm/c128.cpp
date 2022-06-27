@@ -24,7 +24,7 @@
 #include "imagedev/snapquik.h"
 #include "cpu/m6502/m8502.h"
 #include "cpu/z80/z80.h"
-#include "machine/cbm_snqk.h"
+#include "cbm_snqk.h"
 #include "machine/input_merger.h"
 #include "machine/mos6526.h"
 #include "machine/mos8722.h"

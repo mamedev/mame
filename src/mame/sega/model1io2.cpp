@@ -50,7 +50,7 @@
 #include "model1io2.h"
 #include "cpu/z80/tmpz84c015.h"
 #include "machine/msm6253.h"
-#include "machine/315_5338a.h"
+#include "315_5338a.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
 

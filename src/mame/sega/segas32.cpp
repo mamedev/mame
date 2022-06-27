@@ -525,7 +525,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/segas32.h"
+#include "segas32.h"
 
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
@@ -540,7 +540,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/mb89352.h"
 #include "machine/msm6253.h"
 #include "machine/upd4701.h"
-#include "machine/315_5296.h"
+#include "315_5296.h"
 #include "sound/rf5c68.h"
 #include "sound/ymopn.h"
 #include "speaker.h"

@@ -147,7 +147,7 @@ NEP-16
 */
 
 #include "emu.h"
-#include "includes/suprnova.h"
+#include "suprnova.h"
 
 #include "cpu/sh/sh2.h"
 #include "machine/msm6242.h"

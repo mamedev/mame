@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 #include "emu.h"
-#include "includes/bogeyman.h"
+#include "bogeyman.h"
 
 
 void bogeyman_state::bogeyman_palette(palette_device &palette) const

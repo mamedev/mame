@@ -25,12 +25,13 @@ TODO: VIA KT133a chipset support, GeForce 2MX video support, lots of things ;-)
 
 #include "emu.h"
 
+#include "pcshare.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/idectrl.h"
 #include "machine/lpci.h"
 #include "machine/nvram.h"
 #include "machine/pckeybrd.h"
-#include "machine/pcshare.h"
 #include "video/pc_vga.h"
 
 #include "bus/isa/trident.h"
@@ -38,6 +39,8 @@ TODO: VIA KT133a chipset support, GeForce 2MX video support, lots of things ;-)
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class voyager_state : public pcat_base_state
 {
@@ -554,6 +557,8 @@ ROM_START( policet2 )
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "pt2", 0, SHA1(11d29548c685f12bc9bc1db7791957cd5e62db10))
 ROM_END
+
+} // anonymous namespace
 
 GAME( 2002, voyager,  0,       voyager, voyager, voyager_state, init_voyager, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 GAME( 2002, voyagers, voyager, voyager, voyager, voyager_state, init_voyager, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager (stand-up version 1.002)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

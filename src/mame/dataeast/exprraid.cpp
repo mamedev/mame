@@ -206,7 +206,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/exprraid.h"
+#include "exprraid.h"
 
 #include "cpu/m6502/deco16.h"
 #include "cpu/m6502/m6502.h"

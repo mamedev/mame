@@ -44,7 +44,7 @@ PCB Layout
 */
 
 #include "emu.h"
-#include "includes/gumbo.h"
+#include "gumbo.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"

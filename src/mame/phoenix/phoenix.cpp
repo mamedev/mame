@@ -48,8 +48,8 @@ Pleiads:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/phoenix.h"
-#include "audio/phoenix.h"
+#include "phoenix.h"
+#include "phoenix_a.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"

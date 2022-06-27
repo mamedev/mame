@@ -102,7 +102,7 @@
 #include "sound/tiaintf.h"
 #include "sound/tiasound.h"
 #include "machine/mos6530n.h"
-#include "video/maria.h"
+#include "maria.h"
 #include "bus/a7800/a78_carts.h"
 #include "emupal.h"
 #include "screen.h"

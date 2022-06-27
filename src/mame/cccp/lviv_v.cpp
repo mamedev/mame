@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lviv.h"
+#include "lviv.h"
 
 const rgb_t lviv_state::s_palette[8] =
 {

@@ -190,10 +190,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mhavoc.h"
+#include "mhavoc.h"
+
+#include "avgdvg.h"
 
 #include "cpu/m6502/m6502.h"
-#include "video/avgdvg.h"
 #include "video/vector.h"
 #include "machine/eeprompar.h"
 #include "machine/rescap.h"

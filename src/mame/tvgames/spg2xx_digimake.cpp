@@ -5,7 +5,7 @@
 //  - why do we need a hack to boot?
 
 #include "emu.h"
-#include "includes/spg2xx.h"
+#include "spg2xx.h"
 #include "machine/nvram.h"
 
 class spg2xx_game_digimake_state : public spg2xx_game_state

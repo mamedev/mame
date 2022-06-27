@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/vt100_kbd.h"
+#include "vt100_kbd.h"
 
 #include "logmacro.h"
 

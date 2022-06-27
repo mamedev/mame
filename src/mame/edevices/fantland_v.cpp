@@ -61,7 +61,7 @@
 ***************************************************************************************/
 
 #include "emu.h"
-#include "includes/fantland.h"
+#include "fantland.h"
 
 void fantland_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {

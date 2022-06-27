@@ -80,7 +80,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/irobot.h"
+#include "irobot.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/adc0808.h"
 #include "machine/nvram.h"

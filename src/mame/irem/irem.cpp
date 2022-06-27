@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/irem.h"
+#include "irem.h"
 
 #include "cpu/m6800/m6801.h"
 #include "sound/discrete.h"

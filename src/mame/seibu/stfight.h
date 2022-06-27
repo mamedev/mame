@@ -8,8 +8,8 @@
 #include "cpu/m6805/m68705.h"
 #include "sound/ymopn.h"
 #include "sound/msm5205.h"
-#include "video/stfight_dev.h"
-#include "video/airraid_dev.h"
+#include "stfight_dev.h"
+#include "airraid_dev.h"
 
 class stfight_state : public driver_device
 {

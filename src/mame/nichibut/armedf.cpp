@@ -315,7 +315,7 @@ Notes:
 ***********************************************************************/
 
 #include "emu.h"
-#include "includes/armedf.h"
+#include "armedf.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"

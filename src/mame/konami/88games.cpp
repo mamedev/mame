@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/88games.h"
+#include "88games.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"

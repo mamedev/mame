@@ -24,7 +24,7 @@
 #include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m7501.h"
 #include "imagedev/snapquik.h"
-#include "machine/cbm_snqk.h"
+#include "cbm_snqk.h"
 #include "machine/input_merger.h"
 #include "machine/mos6529.h"
 #include "machine/mos6551.h"

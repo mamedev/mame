@@ -1,28 +1,31 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
-#ifndef MAME_INCLUDES_MODEL2_H
-#define MAME_INCLUDES_MODEL2_H
+#ifndef MAME_SEGA_MODEL2_H
+#define MAME_SEGA_MODEL2_H
 
 #pragma once
 
-#include "audio/dsbz80.h"
-#include "audio/segam1audio.h"
+#include "315-5881_crypt.h"
+#include "315-5838_317-0229_comp.h"
+#include "dsbz80.h"
+#include "m2comm.h"
+#include "segabill.h"
+#include "segaic24.h"
+
+#include "segam1audio.h"
+
 #include "cpu/i960/i960.h"
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86235/mb86235.h"
-#include "machine/315-5881_crypt.h"
-#include "machine/315-5838_317-0229_comp.h"
 #include "machine/bankdev.h"
 #include "machine/eepromser.h"
 #include "machine/gen_fifo.h"
 #include "machine/i8251.h"
-#include "machine/m2comm.h"
-#include "machine/segabill.h"
 #include "machine/timer.h"
 #include "sound/scsp.h"
-#include "video/segaic24.h"
 #include "video/poly.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -663,56 +666,56 @@ public:
 	/* checker = 0, textured = 0, transparent = 0 */
 	#define MODEL2_FUNC 0
 	#define MODEL2_FUNC_NAME    model2_3d_render_0
-	#include "video/model2rd.ipp"
+	#include "model2rd.ipp"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 0, textured = 0, translucent = 1 */
 	#define MODEL2_FUNC 1
 	#define MODEL2_FUNC_NAME    model2_3d_render_1
-	#include "video/model2rd.ipp"
+	#include "model2rd.ipp"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 0, textured = 1, translucent = 0 */
 	#define MODEL2_FUNC 2
 	#define MODEL2_FUNC_NAME    model2_3d_render_2
-	#include "video/model2rd.ipp"
+	#include "model2rd.ipp"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 0, textured = 1, translucent = 1 */
 	#define MODEL2_FUNC 3
 	#define MODEL2_FUNC_NAME    model2_3d_render_3
-	#include "video/model2rd.ipp"
+	#include "model2rd.ipp"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 1, textured = 0, translucent = 0 */
 	#define MODEL2_FUNC 4
 	#define MODEL2_FUNC_NAME    model2_3d_render_4
-	#include "video/model2rd.ipp"
+	#include "model2rd.ipp"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 1, textured = 0, translucent = 1 */
 	#define MODEL2_FUNC 5
 	#define MODEL2_FUNC_NAME    model2_3d_render_5
-	#include "video/model2rd.ipp"
+	#include "model2rd.ipp"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 1, textured = 1, translucent = 0 */
 	#define MODEL2_FUNC 6
 	#define MODEL2_FUNC_NAME    model2_3d_render_6
-	#include "video/model2rd.ipp"
+	#include "model2rd.ipp"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 
 	/* checker = 1, textured = 1, translucent = 1 */
 	#define MODEL2_FUNC 7
 	#define MODEL2_FUNC_NAME    model2_3d_render_7
-	#include "video/model2rd.ipp"
+	#include "model2rd.ipp"
 	#undef MODEL2_FUNC
 	#undef MODEL2_FUNC_NAME
 

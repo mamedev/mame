@@ -36,9 +36,9 @@
 // - Fast LPU processor (dump of microcode PROMs is not available)
 
 #include "emu.h"
-#include "includes/hp9845.h"
+#include "hp9845.h"
 
-#include "machine/hp9845_optrom.h"
+#include "hp9845_optrom.h"
 #include "bus/hp9845_io/hp9845_io.h"
 #include "machine/timer.h"
 
@@ -48,7 +48,7 @@
 
 #include "hp9845b.lh"
 
-#include "machine/hp9845_printer.h"
+#include "hp9845_printer.h"
 
 // Debugging
 #define VERBOSE 0

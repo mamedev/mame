@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
 #include "emu.h"
-#include "includes/higemaru.h"
+#include "higemaru.h"
 
 void higemaru_state::higemaru_videoram_w(offs_t offset, uint8_t data)
 {

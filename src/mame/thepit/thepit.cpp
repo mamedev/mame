@@ -153,7 +153,7 @@ Player 2 and Player 1 share the same controls !
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/thepit.h"
+#include "thepit.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"

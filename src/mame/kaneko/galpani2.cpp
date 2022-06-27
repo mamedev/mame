@@ -79,7 +79,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galpani2.h"
+#include "galpani2.h"
 
 #include "cpu/m68000/m68000.h"
 #include "screen.h"

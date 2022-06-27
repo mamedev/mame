@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/gridlee.h"
+#include "gridlee.h"
 
 
 // device type definition

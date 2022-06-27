@@ -78,7 +78,7 @@ HB-PCB-A5   M6100691A (distributed by Taito)
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/sshangha.h"
+#include "sshangha.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"

@@ -5,18 +5,21 @@
                             -= Kaneko 16 Bit Games =-
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_KANEKO16_H
-#define MAME_INCLUDES_KANEKO16_H
+#ifndef MAME_KANEKO_KANEKO16_H
+#define MAME_KANEKO_KANEKO16_H
 
 #pragma once
+
+#include "kaneko_calc3.h"
+#include "kaneko_hit.h"
+#include "kaneko_spr.h"
+#include "kaneko_tmap.h"
+#include "kaneko_toybox.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
-#include "machine/kaneko_calc3.h"
-#include "machine/kaneko_hit.h"
-#include "machine/kaneko_toybox.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
@@ -24,10 +27,10 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "video/bufsprite.h"
-#include "video/kaneko_spr.h"
-#include "video/kaneko_tmap.h"
+
 #include "emupal.h"
 #include "screen.h"
+
 
 class kaneko16_state : public driver_device
 {
@@ -250,4 +253,4 @@ private:
 	void shogwarr_map(address_map &map);
 };
 
-#endif
+#endif // MAME_KANEKO_KANEKO16_H

@@ -27,9 +27,9 @@
 
 ***************************************************************************/
 #include "emu.h"
-#include "includes/system16.h"
+#include "system16.h"
 #include "video/resnet.h"
-#include "video/segaic16.h"
+#include "segaic16.h"
 
 
 void segas1x_bootleg_state::setup_system16_bootleg_spritebanking(  )

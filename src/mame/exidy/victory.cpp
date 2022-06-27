@@ -97,9 +97,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "victory.h"
+
+#include "exidysound.h"
+
 #include "cpu/z80/z80.h"
-#include "audio/exidy.h"
-#include "includes/victory.h"
 #include "machine/nvram.h"
 #include "machine/z80pio.h"
 

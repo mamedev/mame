@@ -3,7 +3,7 @@
 /* Space Bugger - Video Hardware */
 
 #include "emu.h"
-#include "includes/sbugger.h"
+#include "sbugger.h"
 
 TILE_GET_INFO_MEMBER(sbugger_state::get_tile_info)
 {

@@ -13,7 +13,7 @@
 */
 
 #include "emu.h"
-#include "includes/cybiko.h"
+#include "cybiko.h"
 
 #define LOG_LEVEL  1
 #define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)

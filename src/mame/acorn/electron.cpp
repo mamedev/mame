@@ -81,7 +81,7 @@ Other internal boards to emulate:
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "includes/electron.h"
+#include "electron.h"
 #include "imagedev/cassette.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"

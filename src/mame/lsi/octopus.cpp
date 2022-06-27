@@ -116,7 +116,7 @@ It's a very rare computer. It has 2 processors, Z80 and 8088, so it can run both
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
-#include "machine/octo_kbd.h"
+#include "octo_kbd.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"

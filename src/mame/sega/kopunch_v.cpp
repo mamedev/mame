@@ -9,7 +9,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/kopunch.h"
+#include "kopunch.h"
 
 
 void kopunch_state::kopunch_palette(palette_device &palette) const

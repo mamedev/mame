@@ -46,9 +46,9 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "audio/irem.h"
-#include "includes/iremipt.h"
-#include "includes/m52.h"
+#include "irem.h"
+#include "iremipt.h"
+#include "m52.h"
 
 #define MASTER_CLOCK        XTAL(18'432'000)
 

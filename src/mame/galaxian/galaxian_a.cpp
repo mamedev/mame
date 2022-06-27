@@ -23,8 +23,8 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/galaxian.h"
-#include "includes/galaxian.h"
+#include "galaxian_a.h"
+#include "galaxian.h"
 #include "speaker.h"
 
 /*************************************

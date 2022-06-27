@@ -6,7 +6,7 @@
 */
 
 #include "emu.h"
-#include "video/light.h"
+#include "light.h"
 #include "screen.h"
 
 #define LOG_REX (1 << 0)

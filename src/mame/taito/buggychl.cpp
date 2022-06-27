@@ -94,7 +94,7 @@ Schematics show the jumper set to the 6mhz setting.
 
 #include "emu.h"
 
-#include "machine/taito68705interface.h"
+#include "taito68705.h"
 
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"

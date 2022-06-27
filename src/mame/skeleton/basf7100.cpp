@@ -58,7 +58,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "imagedev/floppy.h"
-#include "machine/basf7100_kbd.h"
+#include "basf7100_kbd.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"

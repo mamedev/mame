@@ -401,7 +401,7 @@
 *********************************************************************************/
 
 #include "emu.h"
-#include "includes/ampoker2.h"
+#include "ampoker2.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"

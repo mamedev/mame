@@ -111,7 +111,7 @@ ToDO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/primo.h"
+#include "primo.h"
 
 #include "cpu/z80/z80.h"
 #include "emupal.h"

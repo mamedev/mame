@@ -20,14 +20,18 @@
 =====================================================================================*/
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
-#include "machine/pci.h"
-#include "machine/pckeybrd.h"
-#include "machine/idectrl.h"
-#include "video/pc_vga.h"
-#include "machine/pcshare.h"
+#include "pcshare.h"
+
 #include "bus/isa/isa.h"
 #include "bus/isa/sblaster.h"
+#include "cpu/i386/i386.h"
+#include "machine/idectrl.h"
+#include "machine/pci.h"
+#include "machine/pckeybrd.h"
+#include "video/pc_vga.h"
+
+
+namespace {
 
 class fruitpc_state : public pcat_base_state
 {
@@ -169,5 +173,8 @@ ROM_START( fruitpc )
 	DISK_REGION( "ide:0:hdd:image" )    // 8 MB Compact Flash card
 	DISK_IMAGE( "fruit", 0,SHA1(df250ff06a97fa141a4144034f7035ac2947c53c) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2006, fruitpc, 0, fruitpc, fruitpc, fruitpc_state, empty_init, ROT0, "<unknown>", "Fruit Land", MACHINE_IMPERFECT_GRAPHICS )

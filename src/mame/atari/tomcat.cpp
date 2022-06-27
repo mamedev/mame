@@ -25,11 +25,12 @@
 */
 
 #include "emu.h"
+#include "avgdvg.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/m6502/m6502.h"
 #include "video/vector.h"
-#include "video/avgdvg.h"
 #include "machine/74259.h"
 #include "machine/adc0808.h"
 #include "machine/timekpr.h"
@@ -39,6 +40,7 @@
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
 #include "sound/ymopm.h"
+
 #include "screen.h"
 #include "speaker.h"
 

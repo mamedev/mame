@@ -25,7 +25,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/artmagic.h"
+#include "artmagic.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"

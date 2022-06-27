@@ -83,7 +83,7 @@ TODO:
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
 #include "video/bufsprite.h"
-#include "video/vsystem_spr.h"
+#include "vsystem_spr.h"
 
 #include "emupal.h"
 #include "screen.h"

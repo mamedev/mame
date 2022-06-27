@@ -31,7 +31,7 @@ I8085 Sound Board
 ************************************************************************/
 
 #include "emu.h"
-#include "includes/quasar.h"
+#include "quasar.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/mcs48/mcs48.h"
 #include "speaker.h"

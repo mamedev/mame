@@ -14,7 +14,7 @@
 #include "machine/ds2401.h"
 #include "machine/x76f041.h"
 #include "machine/x76f100.h"
-#include "machine/zs01.h"
+#include "zs01.h"
 
 
 DECLARE_DEVICE_TYPE(KONAMI573_CASSETTE_SLOT, konami573_cassette_slot_device)

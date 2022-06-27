@@ -57,11 +57,11 @@ bootleg todo:
 */
 
 #include "emu.h"
-#include "includes/pktgaldx.h"
+#include "pktgaldx.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/decocrpt.h"
-#include "machine/deco102.h"
+#include "decocrpt.h"
+#include "deco102.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"

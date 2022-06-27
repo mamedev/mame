@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 #include "emu.h"
-#include "includes/bigevglf.h"
+#include "bigevglf.h"
 
 
 void bigevglf_state::bigevglf_palette_w(offs_t offset, uint8_t data)

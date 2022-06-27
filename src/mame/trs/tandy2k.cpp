@@ -23,7 +23,7 @@
 */
 
 #include "emu.h"
-#include "includes/tandy2k.h"
+#include "tandy2k.h"
 
 #include "screen.h"
 #include "softlist.h"

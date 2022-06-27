@@ -2,8 +2,8 @@
 // copyright-holders:Peter Trauner
 #include "emu.h"
 
-#include "includes/pocketc.h"
-#include "includes/pc1350.h"
+#include "pocketc.h"
+#include "pc1350.h"
 
 // TODO: Convert to SVG rendering or internal layout
 

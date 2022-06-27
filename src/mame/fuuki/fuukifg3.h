@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "video/fuukifg.h"
+#include "fuukifg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

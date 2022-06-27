@@ -7,7 +7,7 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/midzeus.h"
+#include "midzeus.h"
 #include "video/rgbutil.h"
 
 

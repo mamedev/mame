@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
 #include "emu.h"
-#include "includes/mermaid.h"
+#include "mermaid.h"
 
 
 void mermaid_state::common_palette(palette_device &palette) const

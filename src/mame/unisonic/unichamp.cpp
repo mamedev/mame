@@ -42,7 +42,7 @@
 #include "emu.h"
 
 #include "cpu/cp1610/cp1610.h"
-#include "video/gic.h"
+#include "gic.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

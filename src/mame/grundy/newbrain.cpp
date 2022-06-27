@@ -49,7 +49,7 @@
 */
 
 #include "emu.h"
-#include "includes/newbrain.h"
+#include "newbrain.h"
 #include "speaker.h"
 #include "screen.h"
 

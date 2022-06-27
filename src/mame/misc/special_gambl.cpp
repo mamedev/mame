@@ -26,8 +26,9 @@
 */
 
 #include "emu.h"
+#include "specialsound.h"
+
 #include "cpu/z80/z80.h"
-#include "audio/special.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/nvram.h"
@@ -35,6 +36,8 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+namespace {
 
 class dinaris_state : public driver_device
 {
@@ -278,5 +281,7 @@ ROM_START(dindice)
 	ROM_REGION( 0x8000, "maincpu", 0)
 	ROM_LOAD( "27256.bin", 0x0000, 0x8000, CRC(511f8ba8) SHA1(e75a2cab80ac6b08a19d1adb8ba9bb321aa5e7a8))
 ROM_END
+
+} // anonymous namespace
 
 GAME( 199?, dindice, 0,    dice,     dice,     dinaris_state, empty_init, ROT0,  "Dinaris",   "Dice game", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_COLORS)

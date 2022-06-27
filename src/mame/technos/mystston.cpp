@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mystston.h"
+#include "mystston.h"
 
 #include "cpu/m6502/m6502.h"
 #include "speaker.h"

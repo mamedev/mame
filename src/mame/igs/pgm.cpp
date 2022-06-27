@@ -192,15 +192,15 @@ Notes:
 */
 
 #include "emu.h"
-#include "includes/pgm.h"
+#include "pgm.h"
 
-#include "machine/pgmprot_igs025_igs012.h"
-#include "machine/pgmprot_igs025_igs022.h"
-#include "machine/pgmprot_igs025_igs028.h"
-#include "machine/pgmprot_igs027a_type1.h"
-#include "machine/pgmprot_igs027a_type2.h"
-#include "machine/pgmprot_igs027a_type3.h"
-#include "machine/pgmprot_orlegend.h"
+#include "pgmprot_igs025_igs012.h"
+#include "pgmprot_igs025_igs022.h"
+#include "pgmprot_igs025_igs028.h"
+#include "pgmprot_igs027a_type1.h"
+#include "pgmprot_igs027a_type2.h"
+#include "pgmprot_igs027a_type3.h"
+#include "pgmprot_orlegend.h"
 
 #include "screen.h"
 #include "speaker.h"

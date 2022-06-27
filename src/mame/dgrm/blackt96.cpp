@@ -80,10 +80,12 @@ Bugs (all of these looks BTANBs):
 */
 
 #include "emu.h"
+#include "snk68_spr.h"
+
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "video/snk68_spr.h"
+
 #include "emupal.h"
 #include "speaker.h"
 #include "tilemap.h"

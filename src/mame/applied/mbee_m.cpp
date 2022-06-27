@@ -10,8 +10,9 @@ Rewritten by Robbbert (see notes in driver file).
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/mbee.h"
-#include "machine/z80bin.h"
+#include "mbee.h"
+
+#include "z80bin.h"
 
 
 /***********************************************************

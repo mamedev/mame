@@ -75,7 +75,7 @@ TODO :
 #include "bus/ti99x/990_tap.h"
 #include "cpu/tms9900/ti990_10.h"
 #include "sound/beep.h"
-#include "video/911_vdt.h"
+#include "911_vdt.h"
 
 
 class ti990_10_state : public driver_device

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/galaxold.h"
+#include "galaxold.h"
 
 #define STARS_COLOR_BASE        (memregion("proms")->bytes())
 #define BULLETS_COLOR_BASE      (STARS_COLOR_BASE + 64)

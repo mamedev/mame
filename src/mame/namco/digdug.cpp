@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
-#include "includes/galaga.h"
-#include "includes/digdug.h"
+#include "galaga.h"
+#include "digdug.h"
 
 
 /***************************************************************************

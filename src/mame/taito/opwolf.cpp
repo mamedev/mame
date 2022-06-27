@@ -273,11 +273,11 @@ register. So what is controlling priority.
 
 #include "emu.h"
 
-#include "audio/taitosnd.h"
-#include "includes/taitoipt.h"
-#include "machine/taitocchip.h"
-#include "video/pc080sn.h"
-#include "video/pc090oj.h"
+#include "taitosnd.h"
+#include "taitoipt.h"
+#include "taitocchip.h"
+#include "pc080sn.h"
+#include "pc090oj.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"

@@ -147,13 +147,13 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/segas16a.h"
-#include "includes/segaipt.h"
+#include "segas16a.h"
+#include "segaipt.h"
 
-#include "machine/fd1089.h"
-#include "machine/fd1094.h"
+#include "fd1089.h"
+#include "fd1094.h"
 #include "machine/nvram.h"
-#include "machine/segacrp2_device.h"
+#include "segacrp2_device.h"
 #include "sound/dac.h"
 #include "speaker.h"
 

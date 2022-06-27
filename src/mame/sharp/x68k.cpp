@@ -116,9 +116,9 @@
 */
 
 #include "emu.h"
-#include "includes/x68k.h"
-#include "machine/x68k_hdc.h"
-#include "machine/x68k_kbd.h"
+#include "x68k.h"
+#include "x68k_hdc.h"
+#include "x68k_kbd.h"
 
 #include "machine/nvram.h"
 

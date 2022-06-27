@@ -11,7 +11,7 @@ different compared to Stratos/Turbo King.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/saitek_stratos.h"
+#include "saitek_stratos.h"
 
 #include "cpu/m6502/m65c02.h"
 #include "machine/nvram.h"

@@ -23,8 +23,8 @@ NOTE: The default Sgi O2 Keyboard (Model No. RT6856T, Part No. 121472-101-B,
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "machine/ds17x85.h"
-#include "machine/mace.h"
-#include "video/crime.h"
+#include "mace.h"
+#include "crime.h"
 
 class o2_state : public driver_device
 {

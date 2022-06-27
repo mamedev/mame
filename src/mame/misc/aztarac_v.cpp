@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/aztarac.h"
+#include "aztarac.h"
 
 #define AVECTOR(x, y, color, intensity) \
 m_vector->add_point (m_xcenter + ((x) << 16), m_ycenter - ((y) << 16), color, intensity)

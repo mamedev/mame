@@ -260,8 +260,8 @@ connector, but of course, I can be wrong.
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/megadriv.h"
-#include "includes/megadriv_acbl.h"
+#include "megadriv.h"
+#include "megadriv_acbl.h"
 
 
 /************************************ Mega Drive Bootlegs *************************************/

@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lethal.h"
+#include "lethal.h"
 #include "screen.h"
 
 

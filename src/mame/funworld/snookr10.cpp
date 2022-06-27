@@ -617,7 +617,7 @@
 
 
 #include "emu.h"
-#include "includes/snookr10.h"
+#include "snookr10.h"
 
 #include "cpu/m6502/m65sc02.h"
 #include "machine/nvram.h"

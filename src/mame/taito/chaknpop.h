@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:BUT
-#ifndef MAME_INCLUDES_CHAKNPOP_H
-#define MAME_INCLUDES_CHAKNPOP_H
+#ifndef MAME_TAITO_CHAKNPOP_H
+#define MAME_TAITO_CHAKNPOP_H
 
 #pragma once
 
-#include "machine/taito68705interface.h"
+#include "taito68705.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -73,4 +74,4 @@ private:
 	void chaknpop_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_CHAKNPOP_H
+#endif // MAME_TAITO_CHAKNPOP_H

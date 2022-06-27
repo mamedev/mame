@@ -74,7 +74,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lvcards.h"
+#include "lvcards.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"

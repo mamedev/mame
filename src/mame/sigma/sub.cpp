@@ -109,7 +109,7 @@ PCB2  (Top board, CPU board)
 *************************************************************************************/
 
 #include "emu.h"
-#include "includes/sub.h"
+#include "sub.h"
 
 void sub_state::machine_start()
 {

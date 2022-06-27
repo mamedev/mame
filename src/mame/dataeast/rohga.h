@@ -10,11 +10,11 @@
 
 #pragma once
 
-#include "machine/deco104.h"
-#include "machine/deco146.h"
-#include "video/deco16ic.h"
-#include "video/decocomn.h"
-#include "video/decospr.h"
+#include "deco104.h"
+#include "deco146.h"
+#include "deco16ic.h"
+#include "decocomn.h"
+#include "decospr.h"
 
 #include "cpu/h6280/h6280.h"
 #include "sound/okim6295.h"

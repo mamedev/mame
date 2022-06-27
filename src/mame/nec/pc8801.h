@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "includes/pc8001.h"
+#include "pc8001.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
@@ -20,7 +20,7 @@
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
-#include "machine/pc80s31k.h"
+#include "pc80s31k.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
 #include "bus/centronics/ctronics.h"

@@ -10,8 +10,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/exidy440.h"
-#include "includes/exidy440.h"
+#include "exidy440_a.h"
+#include "exidy440.h"
 
 #include "cpu/m6809/m6809.h"
 

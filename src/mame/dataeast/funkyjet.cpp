@@ -93,13 +93,13 @@ Notes:
 
 #include "emu.h"
 
-#include "machine/deco146.h"
-#include "video/deco16ic.h"
-#include "video/decospr.h"
+#include "deco146.h"
+#include "deco16ic.h"
+#include "decospr.h"
 
 #include "cpu/h6280/h6280.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/decocrpt.h"
+#include "decocrpt.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"

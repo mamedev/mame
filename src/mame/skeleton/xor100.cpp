@@ -43,7 +43,7 @@ TODO:
 
 
 #include "emu.h"
-#include "includes/xor100.h"
+#include "xor100.h"
 #include "bus/rs232/rs232.h"
 
 /* Read/Write Handlers */

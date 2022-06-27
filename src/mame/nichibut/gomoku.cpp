@@ -24,8 +24,8 @@ todo:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/gomoku.h"
-#include "audio/gomoku.h"
+#include "gomoku.h"
+#include "gomoku_a.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

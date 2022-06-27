@@ -52,13 +52,13 @@ This bug is due to 380_r02.6h, it differs from 380_q02.6h by 2 bytes, at
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/circusc.h"
+#include "circusc.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
-#include "machine/konami1.h"
+#include "konami1.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 

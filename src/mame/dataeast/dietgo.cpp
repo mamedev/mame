@@ -28,11 +28,11 @@ PAL16R6A 11H
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
-#include "machine/decocrpt.h"
-#include "machine/deco102.h"
-#include "machine/deco104.h"
-#include "video/deco16ic.h"
-#include "video/decospr.h"
+#include "decocrpt.h"
+#include "deco102.h"
+#include "deco104.h"
+#include "deco16ic.h"
+#include "decospr.h"
 
 #include "emupal.h"
 #include "screen.h"

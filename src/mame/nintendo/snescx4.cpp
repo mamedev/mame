@@ -13,7 +13,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/snescx4.h"
+#include "snescx4.h"
 
 static CX4 cx4;
 
@@ -25,8 +25,8 @@ static void CX4_writew(address_space &space, uint16_t addr, uint16_t data);
 
 static void CX4_C4DrawLine(int32_t X1, int32_t Y1, int16_t Z1, int32_t X2, int32_t Y2, int16_t Z2, uint8_t Color);
 
-#include "machine/cx4data.ipp"
-#include "machine/cx4fn.ipp"
+#include "cx4data.ipp"
+#include "cx4fn.ipp"
 
 static uint32_t CX4_ldr(uint8_t r)
 {
@@ -114,8 +114,8 @@ static void CX4_transfer_data(address_space &space)
 	}
 }
 
-#include "machine/cx4oam.ipp"
-#include "machine/cx4ops.ipp"
+#include "cx4oam.ipp"
+#include "cx4ops.ipp"
 
 void CX4_write(address_space &space, uint32_t addr, uint8_t data)
 {

@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/jackal.h"
+#include "jackal.h"
 
 
 void jackal_state::palette(palette_device &palette) const

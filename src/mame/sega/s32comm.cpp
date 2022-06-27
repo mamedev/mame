@@ -68,7 +68,7 @@ Sega System Multi32 Comm PCB 837-8792-91
 
 #include "emu.h"
 #include "emuopts.h"
-#include "machine/s32comm.h"
+#include "s32comm.h"
 
 #define VERBOSE 0
 #include "logmacro.h"

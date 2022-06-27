@@ -5,7 +5,7 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/nvram.h"
-#include "machine/pgmcrypt.h"
+#include "pgmcrypt.h"
 #include "sound/ics2115.h"
 #include "emupal.h"
 #include "screen.h"

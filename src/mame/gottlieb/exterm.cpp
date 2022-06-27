@@ -63,7 +63,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/exterm.h"
+#include "exterm.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/nvram.h"

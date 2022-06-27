@@ -12,7 +12,7 @@
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "video/ms1_tmap.h"
+#include "ms1_tmap.h"
 #include "emupal.h"
 #include "screen.h"
 

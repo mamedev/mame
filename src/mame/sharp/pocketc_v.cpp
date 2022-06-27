@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner
 #include "emu.h"
-#include "includes/pocketc.h"
+#include "pocketc.h"
 
 // TODO: Convert to SVG rendering or internal layout
 

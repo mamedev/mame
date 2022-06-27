@@ -16,7 +16,7 @@
 #ifndef _VIDEO_RDPBLEND_H_
 #define _VIDEO_RDPBLEND_H_
 
-#include "video/n64.h"
+#include "n64_v.h"
 
 class n64_blender_t
 {

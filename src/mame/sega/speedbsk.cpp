@@ -63,7 +63,7 @@
 
 #include "emu.h"
 
-#include "machine/315_5338a.h"
+#include "315_5338a.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves, R. Belmont, David Haywood
 #include "emu.h"
-#include "includes/gcpinbal.h"
+#include "gcpinbal.h"
 #include "screen.h"
 
 

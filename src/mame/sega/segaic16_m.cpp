@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "segaic16.h"
+#include "segaic16_m.h"
 
 #include <algorithm>
 

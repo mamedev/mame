@@ -227,7 +227,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tecmo.h"
+#include "tecmo.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"

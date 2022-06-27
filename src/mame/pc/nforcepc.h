@@ -1,20 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders: Samuele Zannoli
-#ifndef MAME_MACHINE_NFORCEPC_H
-#define MAME_MACHINE_NFORCEPC_H
+#ifndef MAME_PC_NFORCEPC_H
+#define MAME_PC_NFORCEPC_H
 
 #pragma once
-// floppy disk controller
-#include "machine/upd765.h"
+
+#include "xbox_pci.h"
+
 #include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
-#include "formats/naslite_dsk.h"
-// keyboard
 #include "machine/8042kbdc.h"
-// parallel port
-#include "machine/pc_lpt.h"
-// serial port
 #include "machine/ins8250.h"
+#include "machine/intelfsh.h"
+#include "machine/pc_lpt.h"
+#include "machine/pci.h"
+#include "machine/upd765.h"
+
+#include "formats/naslite_dsk.h"
+#include "formats/pc_dsk.h"
+
 
 // NVIDIA Corporation nForce CPU bridge
 
@@ -327,5 +330,4 @@ private:
 
 DECLARE_DEVICE_TYPE(IT8703F, it8703f_device)
 
-
-#endif
+#endif // MAME_PC_NFORCEPC_H

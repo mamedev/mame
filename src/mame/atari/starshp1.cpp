@@ -10,7 +10,7 @@ Atari Starship 1 driver
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/starshp1.h"
+#include "starshp1.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"

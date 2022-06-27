@@ -9,7 +9,7 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "includes/speedbal.h"
+#include "speedbal.h"
 
 
 TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_bg)

@@ -9,8 +9,8 @@
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/upd7759.h"
-#include "video/sega16sp.h"
-#include "video/segaic16.h"
+#include "sega16sp.h"
+#include "segaic16.h"
 #include "screen.h"
 #include "tilemap.h"
 

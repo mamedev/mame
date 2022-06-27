@@ -26,7 +26,7 @@
 
 
 #include "emu.h"
-#include "includes/eprom.h"
+#include "eprom.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"

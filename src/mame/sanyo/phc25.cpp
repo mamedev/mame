@@ -40,7 +40,7 @@ RUN
 *****************************************************************************/
 
 #include "emu.h"
-#include "includes/phc25.h"
+#include "phc25.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"

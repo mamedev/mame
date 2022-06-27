@@ -16,7 +16,7 @@ Might be some priority glitches
 
 #include "emu.h"
 
-#include "video/tecmo_spr.h"
+#include "tecmo_spr.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"

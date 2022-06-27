@@ -13,7 +13,9 @@
 */
 
 #include "emu.h"
-#include "includes/megadriv.h"
+#include "megadriv.h"
+
+namespace {
 
 class megadriv_vt0203_state : public md_base_state
 {
@@ -141,6 +143,8 @@ void megadriv_vt0203_state::megadriv_vt0203_pal(machine_config &config)
 	// TODO: add the VT part, this might require refactoring of the VT stuff as the SoC currently contains the screen
 	//       but instead we'll need to use a shared screen that is reconfigured depending on which part is enabled
 }
+
+} // anonymous namespace
 
 
 ROM_START( sarc110 )

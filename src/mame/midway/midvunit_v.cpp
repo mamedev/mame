@@ -7,10 +7,12 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
+#include "midvunit.h"
+
+#include "williamssound.h"
+
 #include "cpu/adsp2100/adsp2100.h"
-#include "audio/williams.h"
-#include "includes/midvunit.h"
+#include "cpu/tms34010/tms34010.h"
 
 
 #define WATCH_RENDER        (0)
@@ -26,8 +28,10 @@
 
 
 midvunit_renderer::midvunit_renderer(midvunit_state &state)
-	: poly_manager<float, midvunit_object_data, 2>(state.machine()),
-		m_state(state) { }
+	: poly_manager<float, midvunit_object_data, 2>(state.machine())
+	, m_state(state)
+{
+}
 
 
 /*************************************

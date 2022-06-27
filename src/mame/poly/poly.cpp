@@ -31,7 +31,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/poly.h"
+#include "poly.h"
 #include "formats/flex_dsk.h"
 #include "softlist_dev.h"
 

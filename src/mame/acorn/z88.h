@@ -15,8 +15,8 @@
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
-#include "machine/upd65031.h"
-#include "machine/z88_impexp.h"
+#include "upd65031.h"
+#include "z88_impexp.h"
 #include "sound/spkrdev.h"
 
 #include "bus/rs232/rs232.h"

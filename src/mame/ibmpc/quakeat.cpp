@@ -82,11 +82,15 @@ TODO:
 */
 
 #include "emu.h"
+
+#include "pcshare.h"
+
 #include "cpu/i386/i386.h"
-#include "machine/pcshare.h"
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class quakeat_state : public pcat_base_state
 {
@@ -175,6 +179,8 @@ ROM_START(quake)
 	DISK_REGION( "disks" )
 	DISK_IMAGE( "quakeat", 0, SHA1(c44695b9d521273c9d3c0e18c88f0dca0185bd7b) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1998, quake,  0,   quake, quake, quakeat_state, empty_init, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_IS_SKELETON )

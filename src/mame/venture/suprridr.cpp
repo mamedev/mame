@@ -84,7 +84,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/suprridr.h"
+#include "suprridr.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"

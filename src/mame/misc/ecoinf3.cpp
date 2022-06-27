@@ -14,11 +14,13 @@
 
 #include "emu.h"
 
+#include "awpvid.h" // drawing reels
+
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "machine/steppers.h" // stepper motor
 #include "sound/sn76496.h"
-#include "video/awpvid.h" // drawing reels
+
 #include "speaker.h"
 
 #include "ecoinf3.lh"

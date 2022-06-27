@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Pierpaolo Prazzoli
-#ifndef MAME_INCLUDES_QUIZPANI_H
-#define MAME_INCLUDES_QUIZPANI_H
+#ifndef MAME_NMK_QUIZPANI_H
+#define MAME_NMK_QUIZPANI_H
 
 #pragma once
 
-#include "machine/nmk112.h"
+#include "nmk112.h"
+
 #include "tilemap.h"
 
 class quizpani_state : public driver_device
@@ -47,4 +48,4 @@ public:
 	void quizpani_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_QUIZPANI_H
+#endif // MAME_NMK_QUIZPANI_H

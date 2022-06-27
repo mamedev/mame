@@ -1,16 +1,19 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
-#ifndef MAME_INCLUDES_MSISAAC_H
-#define MAME_INCLUDES_MSISAAC_H
+#ifndef MAME_TAITO_MSISAAC_H
+#define MAME_TAITO_MSISAAC_H
 
 #pragma once
 
-#include "machine/taito68705interface.h"
+#include "taito68705.h"
+
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
 #include "sound/ta7630.h"
+
 #include "emupal.h"
 #include "tilemap.h"
+
 
 /* Disabled because the mcu dump is currently unavailable. -AS */
 //#define USE_MCU
@@ -110,4 +113,4 @@ private:
 	void msisaac_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MSISAAC_H
+#endif // MAME_TAITO_MSISAAC_H

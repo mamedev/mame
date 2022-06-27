@@ -70,7 +70,7 @@
 */
 
 #include "emu.h"
-#include "includes/malzak.h"
+#include "malzak.h"
 
 #include "machine/nvram.h"
 #include "sound/sn76477.h"

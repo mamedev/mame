@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "cpu/m6502/deco16.h"
 #include "cpu/m6502/m6502.h"
-#include "includes/liberate.h"
+#include "liberate.h"
 
 #if 0
 void liberate_state::debug_print(bitmap_ind16 &bitmap)

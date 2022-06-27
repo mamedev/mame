@@ -8,7 +8,7 @@
 
 
 #include "emu.h"
-#include "machine/megacdcd.h"
+#include "megacdcd.h"
 
 #define READ_MAIN (0x0200)
 #define READ_SUB  (0x0300)

@@ -227,7 +227,7 @@ Keyboard notes and BTANBs:
 */
 
 #include "emu.h"
-#include "includes/osi.h"
+#include "osi.h"
 
 #include "machine/clock.h"
 #include "screen.h"

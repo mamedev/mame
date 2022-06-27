@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "machine/namcoio.h"
+#include "namcoio.h"
 #include "sound/namco.h"
 #include "emupal.h"
 #include "screen.h"

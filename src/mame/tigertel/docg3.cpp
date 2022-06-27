@@ -9,7 +9,7 @@
 */
 
 #include "emu.h"
-#include "machine/docg3.h"
+#include "docg3.h"
 
 #define VERBOSE_LEVEL ( 0 )
 

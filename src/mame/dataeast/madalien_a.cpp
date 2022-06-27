@@ -6,7 +6,7 @@
  ************************************************************************/
 
 #include "emu.h"
-#include "includes/madalien.h"
+#include "madalien.h"
 #include "sound/discrete.h"
 
 

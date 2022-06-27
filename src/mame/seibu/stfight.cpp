@@ -264,7 +264,7 @@ TODO:
 *****************************************************************************/
 
 #include "emu.h"
-#include "includes/stfight.h"
+#include "stfight.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ymopn.h"

@@ -1,13 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
-#ifndef MAME_INCLUDES_XBOX_PCI_H
-#define MAME_INCLUDES_XBOX_PCI_H
+#ifndef MAME_SHARED_XBOX_PCI_H
+#define MAME_SHARED_XBOX_PCI_H
 
 #pragma once
 
-#include "machine/xbox_usb.h"
-#include "video/xbox_nv2a.h"
+#include "xbox_nv2a.h"
+#include "xbox_usb.h"
 
+#include "machine/pci.h"
+#include "machine/pci-ide.h"
 #include "machine/pit8253.h"
 
 /*
@@ -490,4 +492,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NV2A_GPU, nv2a_gpu_device)
 
-#endif // MAME_INCLUDES_XBOX_PCI_H
+#endif // MAME_SHARED_XBOX_PCI_H

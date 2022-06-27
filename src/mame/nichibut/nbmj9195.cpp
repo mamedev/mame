@@ -22,7 +22,7 @@ Notes:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/nbmj9195.h"
+#include "nbmj9195.h"
 
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"

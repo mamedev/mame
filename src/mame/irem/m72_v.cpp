@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
-#include "includes/m72.h"
+#include "m72.h"
 #include "cpu/nec/v25.h"
 
 /***************************************************************************

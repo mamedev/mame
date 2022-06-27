@@ -13,7 +13,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/amiga.h"
+#include "amiga.h"
 
 #include "bus/amiga/keyboard/keyboard.h"
 #include "bus/amiga/zorro/zorro.h"

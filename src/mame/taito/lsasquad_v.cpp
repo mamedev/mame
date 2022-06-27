@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 
 #include "emu.h"
-#include "includes/lsasquad.h"
+#include "lsasquad.h"
 
 void lsasquad_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *scrollram)
 {

@@ -12,7 +12,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "sound/ymopl.h"
-#include "video/toaplan_scu.h"
+#include "toaplan_scu.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

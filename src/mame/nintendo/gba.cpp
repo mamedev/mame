@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/gba.h"
+#include "gba.h"
 
 #include "bus/gba/rom.h"
 #include "cpu/arm7/arm7.h"

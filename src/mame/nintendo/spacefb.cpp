@@ -116,7 +116,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/spacefb.h"
+#include "spacefb.h"
 #include "sound/dac.h"
 
 

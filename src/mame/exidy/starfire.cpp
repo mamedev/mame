@@ -51,7 +51,7 @@ a Star Fire set with labels r1436-11 to r1445-11 is known to exist.
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/starfire.h"
+#include "starfire.h"
 
 #include "cpu/z80/z80.h"
 #include "speaker.h"

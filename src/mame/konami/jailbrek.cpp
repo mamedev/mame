@@ -86,9 +86,9 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/jailbrek.h"
-#include "includes/konamipt.h"
-#include "machine/konami1.h"
+#include "jailbrek.h"
+#include "konamipt.h"
+#include "konami1.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"

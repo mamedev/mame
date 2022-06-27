@@ -93,7 +93,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/namco06.h"
+#include "namco06.h"
 
 #define VERBOSE 0
 #include "logmacro.h"

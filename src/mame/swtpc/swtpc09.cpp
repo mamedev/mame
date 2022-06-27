@@ -22,7 +22,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/swtpc09.h"
+#include "swtpc09.h"
 #include "bus/ss50/interface.h"
 #include "formats/flex_dsk.h"
 #include "formats/os9_dsk.h"

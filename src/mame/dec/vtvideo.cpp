@@ -58,7 +58,7 @@ FIXME: work out the differences and identify common code between VT and Rainbow.
 **********************************************************************/
 
 #include "emu.h"
-#include "video/vtvideo.h"
+#include "vtvideo.h"
 #include "screen.h"
 
 /***************************************************************************

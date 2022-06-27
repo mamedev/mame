@@ -316,8 +316,8 @@ rumbling on a subwoofer in the cabinet.)
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ninjaw.h"
-#include "includes/taitoipt.h"
+#include "ninjaw.h"
+#include "taitoipt.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"

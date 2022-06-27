@@ -54,7 +54,7 @@ Newer version of the I/O chip ?
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/taitoio.h"
+#include "taitoio.h"
 
 #include <algorithm>
 

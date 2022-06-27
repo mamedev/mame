@@ -80,7 +80,7 @@
 */
 
 #include "emu.h"
-#include "includes/laserbat.h"
+#include "laserbat.h"
 
 
 void laserbat_state_base::videoram_w(offs_t offset, uint8_t data)

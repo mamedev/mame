@@ -32,7 +32,7 @@
 
 #include "emu.h"
 
-#include "machine/hds200_kbd.h"
+#include "hds200_kbd.h"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"

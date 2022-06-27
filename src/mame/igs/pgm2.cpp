@@ -92,7 +92,7 @@
 */
 
 #include "emu.h"
-#include "includes/pgm2.h"
+#include "pgm2.h"
 
 // checked on startup, or doesn't boot
 u32 pgm2_state::unk_startup_r()

@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/deco102.h"
+#include "deco102.h"
 
 static uint16_t decrypt(uint16_t data, int address, int select_xor)
 {

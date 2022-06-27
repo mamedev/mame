@@ -17,8 +17,8 @@
 */
 
 #include "emu.h"
-#include "includes/generalplus_gpl16250_nand.h"
-#include "includes/generalplus_gpl16250_romram.h"
+#include "generalplus_gpl16250_nand.h"
+#include "generalplus_gpl16250_romram.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

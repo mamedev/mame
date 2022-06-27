@@ -101,7 +101,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/pacman.h"
+#include "pacman.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"

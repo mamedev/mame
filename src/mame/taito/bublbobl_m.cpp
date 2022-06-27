@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bublbobl.h"
+#include "bublbobl.h"
 
 #include "cpu/z80/z80.h"
 

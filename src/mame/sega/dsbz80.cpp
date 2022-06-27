@@ -10,7 +10,7 @@
 
 
 #include "emu.h"
-#include "audio/dsbz80.h"
+#include "dsbz80.h"
 #include "machine/clock.h"
 
 #define Z80_TAG "mpegcpu"

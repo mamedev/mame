@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "includes/pgm2.h"
+#include "pgm2.h"
 
 inline void pgm2_state::draw_sprite_pixel(const rectangle &cliprect, u32 palette_offset, s16 realx, s16 realy, u16 pal)
 {

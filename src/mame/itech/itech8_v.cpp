@@ -91,7 +91,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/itech8.h"
+#include "itech8.h"
 
 
 /*************************************
