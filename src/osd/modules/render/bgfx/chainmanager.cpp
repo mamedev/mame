@@ -73,8 +73,7 @@ void chain_manager::refresh_available_chains()
 	m_available_chains.clear();
 	m_available_chains.push_back(chain_desc("none", ""));
 
-	std::string chains_path;
-	osd_subst_env(chains_path, util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path()));
+	const std::string chains_path  = osd_subst_env(util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path()));
 	find_available_chains(chains_path, "");
 
 	destroy_unloaded_chains();
@@ -151,8 +150,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 	{
 		name = name + ".json";
 	}
-	std::string path;
-	osd_subst_env(path, util::string_format("%s" PATH_SEPARATOR "chains" PATH_SEPARATOR, m_options.bgfx_path()));
+	std::string path = osd_subst_env(util::string_format("%s" PATH_SEPARATOR "chains" PATH_SEPARATOR, m_options.bgfx_path()));
 	path += name;
 
 	bx::FileReader reader;

@@ -31,8 +31,7 @@ static bool prepare_effect_document(std::string &name, osd_options &options, rap
 		full_name = full_name + ".json";
 	}
 
-	std::string path;
-	osd_subst_env(path, util::string_format("%s" PATH_SEPARATOR "effects" PATH_SEPARATOR, options.bgfx_path()));
+	std::string path = osd_subst_env(util::string_format("%s" PATH_SEPARATOR "effects" PATH_SEPARATOR, options.bgfx_path()));
 	path += full_name;
 
 	bx::FileReader reader;

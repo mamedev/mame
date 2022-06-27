@@ -4,7 +4,7 @@
 
     Slogger Plus 2
 
-    The Plus 2 interface from Slogger has been designed to compliment
+    The Plus 2 interface from Slogger has been designed to complement
     the Slogger Rombox Plus and Acorn Plus 1 by offering further
     expansion capabilities. This has been achieved by providing two
     extra cartridge slots, three ROM sockets and connections for a

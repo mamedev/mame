@@ -590,17 +590,18 @@ void tipi_card_device::device_stop()
 {
 	// MZ: Without this I'm getting segfaults/list corruption
 	// when leaving the emulation
-	m_wsclient = NULL;
+	m_wsclient->stop();
 	LOG("Stopping TIPI\n");
 }
 
 /*
     The CRU address base for the card.
+    For the Geneve OS version 7.30, CRU base 1800 is mandatory.
 */
 INPUT_PORTS_START( tipi )
 	PORT_START("SW1")
-	PORT_DIPNAME(0x1f, 0x10, "CRU base")
-		PORT_DIPSETTING(0x10, "1000") // Default setting
+	PORT_DIPNAME(0x1f, 0x18, "CRU base")
+		PORT_DIPSETTING(0x10, "1000")
 		PORT_DIPSETTING(0x11, "1100")
 		PORT_DIPSETTING(0x12, "1200")
 		PORT_DIPSETTING(0x13, "1300")
@@ -608,7 +609,7 @@ INPUT_PORTS_START( tipi )
 		PORT_DIPSETTING(0x15, "1500")
 		PORT_DIPSETTING(0x16, "1600")
 		PORT_DIPSETTING(0x17, "1700")
-		PORT_DIPSETTING(0x18, "1800")
+		PORT_DIPSETTING(0x18, "1800") // Default setting
 		PORT_DIPSETTING(0x19, "1900")
 		PORT_DIPSETTING(0x1a, "1a00")
 		PORT_DIPSETTING(0x1b, "1b00")

@@ -19,9 +19,14 @@
 #include "render.h"
 #include "ui/uimain.h"
 
+#include <cstdio>
+
 // for quick and dirty debugging
 #define VERBOSE 0
+#define LOG_GENERAL (1U << 0)
+
 #define LOG_OUTPUT_STREAM std::cerr
+
 #include "logmacro.h"
 
 #include <algorithm>

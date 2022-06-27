@@ -521,6 +521,12 @@ menu_game_info::~menu_game_info()
 {
 }
 
+void menu_game_info::menu_activated()
+{
+	// screen modes can be reconfigured while the menu isn't displayed, etc.
+	reset_layout();
+}
+
 void menu_game_info::populate_text(std::optional<text_layout> &layout, float &width, int &lines)
 {
 	if (!layout || (layout->width() != width))

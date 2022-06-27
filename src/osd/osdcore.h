@@ -390,11 +390,10 @@ void osd_list_network_adapters();
 
     Parameters:
 
-        dst - result pointer
         src - source string
 
 -----------------------------------------------------------------------------*/
-void osd_subst_env(std::string &dst, std::string const &src);
+std::string osd_subst_env(std::string_view src);
 
 class osd_gpu
 {

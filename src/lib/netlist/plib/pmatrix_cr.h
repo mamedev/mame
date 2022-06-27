@@ -505,7 +505,7 @@ namespace plib
 		~pLUmatrix_cr() = default;
 
 		template <typename M>
-		void build(M &fill, std::size_t ilup) noexcept
+		void build(M &fill, std::size_t ilup) noexcept(false)
 		{
 			std::size_t p(0);
 			// build ilu_rows
