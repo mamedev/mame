@@ -4,9 +4,9 @@
 #include "emu.h"
 #include "machine/pci.h"
 #include "machine/idectrl.h"
-#include "includes/xbox_pci.h"
-#include "includes/xbox_usb.h"
-#include "includes/xbox.h"
+#include "machine/xbox_pci.h"
+#include "machine/xbox_usb.h"
+#include "machine/xbox.h"
 
 //#define LOG_OHCI
 

@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "xbox_nv2a.h"
-#include "xbox_usb.h"
+#include "machine/xbox_usb.h"
+#include "video/xbox_nv2a.h"
 
 #include "machine/idectrl.h"
 #include "machine/pic8259.h"

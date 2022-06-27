@@ -483,4 +483,4 @@ COMP( 19??, spt1500,  pilot1k, 0,      palmvx,  palm, palm_state, empty_init, "S
 COMP( 19??, spt1700,  pilot1k, 0,      palmvx,  palm, palm_state, empty_init, "Symbol",        "SPT 1700",            MACHINE_NOT_WORKING )
 COMP( 19??, spt1740,  pilot1k, 0,      palmvx,  palm, palm_state, empty_init, "Symbol",        "SPT 1740",            MACHINE_NOT_WORKING )
 
-#include "palm_dbg.hxx"
+#include "palm_dbg.ipp"

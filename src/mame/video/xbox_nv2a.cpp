@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "video/poly.h"
 #include "bitmap.h"
-#include "includes/xbox_nv2a.h"
+#include "video/xbox_nv2a.h"
 #include <bitset>
 #include <cfloat>
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#ifndef MAME_INCLUDES_PK8000_H
-#define MAME_INCLUDES_PK8000_H
+#ifndef MAME_VIDEO_PK8000_H
+#define MAME_VIDEO_PK8000_H
 
 #pragma once
 
@@ -9,13 +9,12 @@
 
 class pk8000_base_state : public driver_device
 {
-public:
+protected:
 	pk8000_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-protected:
 	uint8_t _84_porta_r();
 	void _84_porta_w(uint8_t data);
 	void _84_portc_w(uint8_t data);
@@ -48,4 +47,4 @@ protected:
 	required_device<cpu_device> m_maincpu;
 };
 
-#endif // MAME_INCLUDES_PK8000_H
+#endif // MAME_VIDEO_PK8000_H

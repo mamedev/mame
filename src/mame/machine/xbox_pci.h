@@ -5,9 +5,10 @@
 
 #pragma once
 
+#include "machine/xbox_usb.h"
+#include "video/xbox_nv2a.h"
+
 #include "machine/pit8253.h"
-#include "xbox_nv2a.h"
-#include "xbox_usb.h"
 
 /*
  * Host

@@ -33,7 +33,7 @@
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
-#include "includes/xbox_pci.h"
+#include "machine/xbox_pci.h"
 #include "includes/nforcepc.h"
 
 #if 1

@@ -27,20 +27,30 @@ def resolve_conflicts(root, *parts):
     for part in parts:
         c = part[0]
         for file in walk(part):
+            base, ext = os.path.splitext(file)
+            key = part + '/' + base
             if file in present:
-                base, ext = os.path.splitext(file)
                 if not ext:
                     raise Exception('File %s has no extension' % (file, ))
-                nf = base + '_' + c + ext
+                nb = base + '_' + c
+                nf = nb + ext
                 #print('%s -> %s' % (os.path.join(part, file), nf))
                 if nf in present:
                     raise Exception('File %s still conflicted after renaming from %s' % (nf, file))
+                result[key] = nb
             else:
                 nf = file
+                if key not in result:
+                    result[key] = base
             present.add(nf)
-            result[part + '/' + file] = nf
 
     return result
+
+
+def remap_file(renaming, filename):
+    parts = filename.split('/')
+    parts[-1], ext = os.path.splitext(parts[-1])
+    return renaming.get('/'.join(parts), parts[-1]) + ext
 
 
 def update_projects(root, renaming, *scripts):
@@ -78,17 +88,12 @@ def update_projects(root, renaming, *scripts):
                     else:
                         if fn not in result:
                             bad = True
-                            #print("Missing in projects and seen in another .lua: %s" % fn)
+                            print("Missing in projects and seen in another .lua: %s" % fn)
                             ap = '?'
                         else:
                             ap = result[fn]
-                    ls = ls[:p+22] + ap + '/' + renaming[fn] + ls[p2:]
+                    ls = ls[:p+22] + ap + '/' + remap_file(renaming, fn) + ls[p2:]
                 print(ls, file=f)
-
-    for k in renaming:
-        if k not in result:
-            print('Missing in projects: %s' % (k, ))
-            bad = True
 
     if bad:
         raise Exception('Error updating project scripts')
@@ -105,7 +110,7 @@ def update_driver_list(fname, renaming, projectmap):
             match = re.match('(.*@source:)([-_0-9a-z]+\\.cpp)\\b(\s*)(.*)', ls)
             if match:
                 f = 'drivers/' + match.group(2)
-                r = projectmap[f] + '/' + renaming.get(f, match.group(2))
+                r = projectmap[f] + '/' + remap_file(renaming, f)
                 if match.group(3):
                     w = len(match.group(2)) + len(match.group(3))
                     if len(r) < w:
@@ -126,7 +131,7 @@ def update_driver_filter(fname, renaming, projectmap):
             match = re.match('(.*)(?<![-_0-9a-z])([-_0-9a-z]+\\.cpp)\\b(.*)', ls)
             if match:
                 f = 'drivers/' + match.group(2)
-                b = renaming.get(f, match.group(2))
+                b = remap_file(renaming, f)
                 print(match.group(1) + projectmap[f] + '/' + b + match.group(3), file=outfile)
             else:
                 print(ls, file=outfile)
@@ -163,11 +168,18 @@ def relocate_source(root, filename, destbase, renaming, projectmap):
                     if (fik is not None) and (fik in projectmap):
                         fim = fpmap[fik]
                         if fim == destproject:
-                            nfi = renaming[fik]
+                            nfi = remap_file(renaming, fik)
                         else:
-                            nfi = fim + '/' + renaming[fik]
+                            nfi = fim + '/' + remap_file(renaming, fik)
                         l = l[:si] + nfi + l[ei:]
             fdh.write(l)
+
+
+def relocate_sources(root, renaming, projectmap):
+    for src, dst in renaming.items():
+        for file in glob.glob(os.path.join(root, 'src', 'mame', *src.split('/')) + '.*'):
+            extension = os.path.splitext(file)[1]
+            relocate_source(root, src + extension, dst + extension, renaming, projectmap)
 
 
 if __name__ == '__main__':
@@ -194,8 +206,7 @@ if __name__ == '__main__':
         os.makedirs(os.path.join(src, d), exist_ok=True)
 
     # Move the files around
-    for fs, bfd in renaming.items():
-        relocate_source(options.srcroot, fs, bfd, renaming, fpmap)
+    relocate_sources(options.srcroot, renaming, fpmap)
 
     for d in areas:
         os.rmdir(os.path.join(src, d))

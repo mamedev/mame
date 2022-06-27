@@ -115,8 +115,8 @@
 #define LOG_Move0205    0
 #define LOG_Move0905    0
 
-#include "seibucop_dma.hxx"
-#include "seibucop_cmd.hxx"
+#include "seibucop_dma.ipp"
+#include "seibucop_cmd.ipp"
 
 #include <algorithm>
 

@@ -431,8 +431,8 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "emu.h"
 #include "machine/pci.h"
 #include "machine/idectrl.h"
-#include "includes/xbox_pci.h"
-#include "includes/xbox.h"
+#include "machine/xbox_pci.h"
+#include "machine/xbox.h"
 
 #include "bus/ata/idehd.h"
 #include "cpu/i386/i386.h"

@@ -70,7 +70,7 @@ bool n64_rdp::rdp_range_check(uint32_t addr)
 /*****************************************************************************/
 
 // The functions in this file should be moved into the parent Processor class.
-#include "rdpfiltr.hxx"
+#include "rdpfiltr.ipp"
 
 int32_t n64_rdp::get_alpha_cvg(int32_t comb_alpha, rdp_span_aux* userdata, const rdp_poly_state &object)
 {

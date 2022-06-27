@@ -10,8 +10,8 @@
 #include "emu.h"
 #include "machine/pci.h"
 #include "machine/idectrl.h"
-#include "includes/xbox_pci.h"
-#include "includes/xbox.h"
+#include "machine/xbox_pci.h"
+#include "machine/xbox.h"
 
 #include "cpu/i386/i386.h"
 #include "bus/ata/atapicdr.h"
