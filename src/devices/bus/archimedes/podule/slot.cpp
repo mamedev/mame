@@ -258,10 +258,10 @@ void device_archimedes_podule_interface::interface_post_start()
 //#include "g8.h"
 #include "greyhawk.h"
 //#include "hdfc_rdev.h"
-//#include "hdisc.h"
-//#include "hdisc_cw.h"
-//#include "hdisc_morley.h"
-//#include "hdisc_we.h"
+#include "hdisc.h"
+#include "hdisc_cw.h"
+#include "hdisc_morley.h"
+#include "hdisc_we.h"
 #include "ide_be.h"
 //#include "ide_castle.h"
 //#include "ide_dt.h"
@@ -323,10 +323,10 @@ void archimedes_exp_devices(device_slot_interface &device)
 	//device.option_add("g16", ARC_G16);                    // State Machine G16 Graphic Accelerator
 	device.option_add("greyhawk", ARC_GREYHAWK);          // Computer Concepts GreyHawk Video Digitiser
 	//device.option_add("hdfc_rdev", ARC_HDFC_RDEV);        // RISC Developments High Density Floppy Controller
-	//device.option_add("hdisc_akd52", ARC_HDISC_AKD52);    // Acorn AKD52 Hard Disc Podule
-	//device.option_add("hdisc_cw", ARC_HDISC_CW);          // Computerware Hard Disk Podule
-	//device.option_add("hdisc_morley", ARC_HDISC_MORLEY);  // Morley Electronics Hard Disc Podule
-	//device.option_add("hdisc_we", ARC_HDISC_WE);          // Watford Electronics Archimedes Hard Disk Podule
+	device.option_add("hdisc_akd52", ARC_HDISC_AKD52);    // Acorn AKD52 Hard Disc Podule
+	device.option_add("hdisc_cw", ARC_HDISC_CW);          // Computerware Hard Disk Podule
+	device.option_add("hdisc_morley", ARC_HDISC_MORLEY);  // Morley Electronics Hard Disc Podule
+	device.option_add("hdisc_we", ARC_HDISC_WE);          // Watford Electronics Archimedes Hard Disk Podule
 	device.option_add("ide_be", ARC_IDE_BE);              // Baildon Electronics IDE HD Interface
 	//device.option_add("ide_dt", ARC_IDE_DT);              // D.T. Software IDE Interface
 	//device.option_add("ide_hccs", ARC_IDE_HCCS);          // HCCS IDE Interface

@@ -42,7 +42,7 @@ namespace netlist::devices {
 		{
 			// Start in off condition
 			// FIXME: is ROFF correct?
-			m_R.set_R(plib::reciprocal(exec().gmin()));
+			m_R().set_R(plib::reciprocal(exec().gmin()));
 		}
 
 	private:
@@ -67,11 +67,11 @@ namespace netlist::devices {
 			if (R > nlconst::zero() && (m_last != new_state))
 			{
 				m_last = new_state;
-				m_R.change_state([this, &R]() -> void { this->m_R.set_R(R);});
+				m_R().change_state([this, &R]() -> void { this->m_R().set_R(R);});
 			}
 		}
 
-		analog::NETLIB_SUB(R_base) m_R;
+		NETLIB_SUB_NS(analog, R_base) m_R;
 		analog_input_t             m_control;
 		param_fp_t                 m_base_r;
 		state_var<bool>            m_last;

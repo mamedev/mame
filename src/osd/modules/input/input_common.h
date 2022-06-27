@@ -14,7 +14,7 @@
 
 #include "input_module.h"
 
-#include "inputdev.h"
+#include "interface/inputman.h"
 
 #include <algorithm>
 #include <chrono>
@@ -204,7 +204,7 @@ class device_info
 private:
 	const std::string       m_name;
 	const std::string       m_id;
-	input_device *          m_device;
+	osd::input_device *     m_device;
 	running_machine &       m_machine;
 	input_module &          m_module;
 	input_device_class      m_deviceclass;
@@ -228,7 +228,7 @@ public:
 	running_machine &         machine() const { return m_machine; }
 	const std::string &       name() const { return m_name; }
 	const std::string &       id() const { return m_id; }
-	input_device *            device() const { return m_device; }
+	osd::input_device *       device() const { return m_device; }
 	input_module &            module() const { return m_module; }
 	input_device_class        deviceclass() const { return m_deviceclass; }
 
@@ -255,8 +255,8 @@ protected:
 	virtual void process_event(TEvent &ev) = 0;
 
 public:
-	event_based_device(running_machine &machine, std::string &&name, std::string &&id, input_device_class deviceclass, input_module &module)
-		: device_info(machine, std::move(name), std::move(id), deviceclass, module)
+	event_based_device(running_machine &machine, std::string &&name, std::string &&id, input_device_class deviceclass, input_module &module) :
+		device_info(machine, std::move(name), std::move(id), deviceclass, module)
 	{
 	}
 
@@ -338,14 +338,14 @@ public:
 		// allocate the device object
 		auto devinfo = std::make_unique<TActual>(machine, std::move(name), std::move(id), module, std::forward<TArgs>(args)...);
 
-		return add_device(machine, std::move(devinfo));
+		return add_device(machine.input(), std::move(devinfo));
 	}
 
 	template <typename TActual>
-	TActual &add_device(running_machine &machine, std::unique_ptr<TActual> &&devinfo)
+	TActual &add_device(osd::input_manager &manager, std::unique_ptr<TActual> &&devinfo)
 	{
 		// Add the device to the machine
-		devinfo->m_device = &machine.input().device_class(devinfo->deviceclass()).add_device(devinfo->name(), devinfo->id(), devinfo.get());
+		devinfo->m_device = &manager.add_device(devinfo->deviceclass(), devinfo->name(), devinfo->id(), devinfo.get());
 
 		// append us to the list
 		return *static_cast<TActual *>(m_list.emplace_back(std::move(devinfo)).get());
@@ -453,9 +453,9 @@ public:
 	bool                  mouse_enabled() const { return m_mouse_enabled; }
 	bool                  lightgun_enabled() const { return m_lightgun_enabled; }
 
-	int init(const osd_options &options) override;
+	virtual int init(const osd_options &options) override;
 
-	void poll_if_necessary(running_machine &machine) override
+	virtual void poll_if_necessary(running_machine &machine) override
 	{
 		auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(m_clock.now() - m_last_poll);
 		if (elapsed.count() >= MIN_POLLING_INTERVAL)
@@ -464,51 +464,13 @@ public:
 		}
 	}
 
-	virtual void poll(running_machine &machine)
-	{
-		// ignore if not enabled
-		if (m_input_enabled)
-		{
-			// grab the current time
-			m_last_poll = m_clock.now();
-
-			before_poll(machine);
-
-			// track if mouse/lightgun is enabled, for mouse hiding purposes
-			m_mouse_enabled = machine.input().device_class(DEVICE_CLASS_MOUSE).enabled();
-			m_lightgun_enabled = machine.input().device_class(DEVICE_CLASS_LIGHTGUN).enabled();
-		}
-
-		// poll all of the devices
-		if (should_poll_devices(machine))
-		{
-			m_devicelist.poll_devices();
-		}
-		else
-		{
-			m_devicelist.reset_devices();
-		}
-	}
-
-	virtual void pause() override
-	{
-		// keep track of the paused state
-		m_input_paused = true;
-	}
-
-	virtual void resume() override
-	{
-		// keep track of the paused state
-		m_input_paused = false;
-	}
-
-	virtual void exit() override
-	{
-		devicelist().free_all_devices();
-	}
+	virtual void pause() override;
+	virtual void resume() override;
+	virtual void exit() override;
 
 protected:
 	virtual int init_internal() { return 0; }
+	virtual void poll(running_machine &machine);
 	virtual bool should_poll_devices(running_machine &machine) = 0;
 	virtual void before_poll(running_machine &machine) { }
 };
@@ -571,14 +533,14 @@ inline int32_t normalize_absolute_axis(double raw, double rawmin, double rawmax)
 	if (raw >= center)
 	{
 		// above center
-		double result = (raw - center) * INPUT_ABSOLUTE_MAX / (rawmax - center);
-		return std::min(result, (double)INPUT_ABSOLUTE_MAX);
+		double result = (raw - center) * osd::INPUT_ABSOLUTE_MAX / (rawmax - center);
+		return std::min(result, (double)osd::INPUT_ABSOLUTE_MAX);
 	}
 	else
 	{
 		// below center
-		double result = -((center - raw) * (double)-INPUT_ABSOLUTE_MIN / (center - rawmin));
-		return std::max(result, (double)INPUT_ABSOLUTE_MIN);
+		double result = -((center - raw) * (double)-osd::INPUT_ABSOLUTE_MIN / (center - rawmin));
+		return std::max(result, (double)osd::INPUT_ABSOLUTE_MIN);
 	}
 }
 

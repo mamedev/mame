@@ -193,16 +193,6 @@ public:
 	void update_icount(netlist::netlist_time_ext time) noexcept;
 	void check_mame_abort_slice() noexcept;
 
-	netlist::netlist_time_ext nltime_ext_from_clocks(unsigned c) const noexcept
-	{
-		return (m_div * c).shr(MDIV_SHIFT);
-	}
-
-	netlist::netlist_time nltime_from_clocks(unsigned c) const noexcept
-	{
-		return static_cast<netlist::netlist_time>((m_div * c).shr(MDIV_SHIFT));
-	}
-
 protected:
 	// netlist_mame_device
 	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
@@ -229,6 +219,9 @@ protected:
 	address_space_config m_program_config;
 
 private:
+	netlist::netlist_time_ext nltime_ext_from_clocks(unsigned c) const noexcept;
+	netlist::netlist_time nltime_from_clocks(unsigned c) const noexcept;
+
 	int m_icount;
 	netlist::netlist_time_ext    m_div;
 	netlist::netlist_time_ext    m_rem;
@@ -255,6 +248,8 @@ private:
 
 // ----------------------------------------------------------------------------------------
 // netlist_mame_sound_input_buffer
+//
+// This is a wrapper device to provide operator[] on read_stream_view.
 // ----------------------------------------------------------------------------------------
 
 class netlist_mame_sound_input_buffer : public read_stream_view

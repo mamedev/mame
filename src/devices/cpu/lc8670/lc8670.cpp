@@ -19,8 +19,8 @@
 #include "lc8670.h"
 #include "lc8670dsm.h"
 
-#define LOG_TIMERS		(1U << 1)
-#define LOG_IRQ			(1U << 2)
+#define LOG_TIMERS      (1U << 1)
+#define LOG_IRQ         (1U << 2)
 
 #define VERBOSE (0)
 #include "logmacro.h"

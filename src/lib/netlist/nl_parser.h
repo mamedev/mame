@@ -8,8 +8,10 @@
 #ifndef NL_PARSER_H_
 #define NL_PARSER_H_
 
-#include "core/setup.h"
 #include "nltypes.h" // for setup_t
+
+#include "core/setup.h"
+
 #include "plib/ptokenizer.h"
 
 #include <unordered_map>
@@ -51,6 +53,7 @@ namespace netlist
 		void net_truth_table_start(const pstring &nlname);
 
 		void verror(const pstring &msg) override;
+
 	private:
 		void register_local_as_source(const pstring &name);
 
@@ -86,16 +89,17 @@ namespace netlist
 		token_id_t m_tok_TT_FAMILY;
 
 		plib::tokenizer_t m_tokenizer;
-		nlparse_t &m_setup;
+		nlparse_t &       m_setup;
 
 		std::unordered_map<pstring, token_store_t> m_local;
-		token_store_t *m_cur_local;
+		token_store_t *                            m_cur_local;
 	};
 
 	class source_token_t : public source_netlist_t
 	{
 	public:
-		source_token_t(const pstring &name, const parser_t::token_store_t &store)
+		source_token_t(const pstring &     name,
+			const parser_t::token_store_t &store)
 		: m_store(store)
 		, m_name(name)
 		{
@@ -108,9 +112,8 @@ namespace netlist
 
 	private:
 		parser_t::token_store_t m_store;
-		pstring m_name;
+		pstring                 m_name;
 	};
-
 
 } // namespace netlist
 

@@ -11,7 +11,7 @@
 
 /* Use CPUs */
 
-@source:1942.cpp
+@source:capcom/1942.cpp
 1942                            // 12/1984 (c) 1984
 1942a                           // 12/1984 (c) 1984
 1942abl                         // bootleg
@@ -22,7 +22,7 @@
 
 /* FIXME: games commented out complain about being a clone of a game not in the driver */
 
-@source:cinemat.cpp
+@source:cinemat/cinemat.cpp
 armora                          // (c) 1980
 armorap                         // (c) 1980
 armorar                         // (c) 1980 Cinematronics (Rock-ola license)
@@ -49,19 +49,19 @@ warrior                         // (c) 1979 Vectorbeam
 wotw                            // (c) 1981
 wotwc                           // (c) 1981
 
-@source:carpolo.cpp
+@source:exidy/carpolo.cpp
 carpolo                         // (c) 1977
 
-@source:starfire.cpp
+@source:exidy/starfire.cpp
 fireone                         // (c) 1979 Exidy
 starfir2                        // (c) 1979 Exidy
 starfire                        // Exidy [1979?]
 starfirea                       // Exidy [1979?]
 
-@source:flyball.cpp
+@source:atari/flyball.cpp
 flyball
 
-@source:galaxian.cpp
+@source:galaxian/galaxian.cpp
 600                             // GX353 (c) 1981 Konami
 amidar                          // GX337 (c) 1982 Konami
 amidar1                         // GX337 (c) 1981 Konami
@@ -276,13 +276,13 @@ zerotimemc                      // hack (Marti Colls)
 zigzagb                         // (c) 1982 LAX (bootleg)
 zigzagb2                        // (c) 1982 LAX (bootleg)
 
-@source:gamemachine.cpp
+@source:vtech/gamemachine.cpp
 gamemach                        //
 
-@source:hazeltin.cpp
+@source:skeleton/hazeltin.cpp
 hazl1500                        // Hazeltine 1500 (c) 1977
 
-@source:jpmsru.cpp
+@source:jpm/jpmsru.cpp
 j_ewn                           // Each Way Nudger (JPM)
 j_ewna                          //
 j_ewnb                          //
@@ -310,7 +310,7 @@ j_goldn2                        // Golden 2's (CTL)
 j_sup2p                         // Super 2p Shuffle (MDM)
 j_la                            // Lucky Aces
 
-@source:m62.cpp                 // m62.cpp
+@source:irem/m62.cpp            // m62.cpp
 battroad                        // (c) 1984
 horizon                         // (c) 1985
 kidniki                         // (c) 1986 + Data East USA license
@@ -334,23 +334,23 @@ spelunkrj                       // (c) 1985 licensed from Broderbund
 yanchamr                        // (c) 1986 (Japan)
 youjyudn                        // (c) 1986 (Japan)
 
-@source:mario.cpp
+@source:nintendo/mario.cpp
 mario                           // (c) 1983 Nintendo of America
 mariof                          // (c) 1983 Nintendo of America
 marioe                          // (c) 1983 Nintendo of America
 marioj                          // (c) 1983 Nintendo
 masao                           // bootleg
 
-@source:mw8080bw.cpp
+@source:midw8080/mw8080bw.cpp
 gunfight                        // 597 [1975] Dave Nutting Associates / Midway
 gunfighto                       // 597 [1975] Dave Nutting Associates / Midway
 280zzzap                        // 610 [1976] Dave Nutting Associates / Midway
 lagunar                         // 622 [1977] Midway
 
-@source:palestra.cpp
+@source:skeleton/palestra.cpp
 palestra
 
-@source:popeye.cpp
+@source:nintendo/popeye.cpp
 skyskipr
 popeye                          // (c) 1982
 popeyeu                         // (c) 1982
@@ -362,7 +362,7 @@ popeyej
 popeyejo
 popeyehs
 
-@source:segag80r.cpp
+@source:sega/segag80r.cpp
 005                             // (c) 1981
 astrob                          // (c) 1981
 astrob1                         // (c) 1981
@@ -378,7 +378,7 @@ sindbadm                        // 834-5244 (c) 1983 Sega
 spaceod                         // (c) 1981
 spaceod2                        // (c) 1981
 
-@source:segag80v.cpp
+@source:sega/segag80v.cpp
 elim2                           // (c) 1981 Gremlin
 elim2a                          // (c) 1981 Gremlin
 elim2c                          // (c) 1981 Gremlin
@@ -391,7 +391,7 @@ startrek                        // (c) 1982
 tacscan                         // (c) 1982
 zektor                          // (c) 1982
 
-@source:vicdual.cpp
+@source:sega/vicdual.cpp
 brdrlinb                        // Karateco bootleg
 brdrline                        // (c) 1980 Sega
 brdrlinet                       // (c) 1981 Sega
@@ -400,7 +400,7 @@ starrkr                         // (c) 1981 Sega
 tranqgun                        // 413-428 (c) 1980 Sega
 frogs                           // 112-119 [1978 Gremlin?]
 
-@source:zaxxon.cpp
+@source:sega/zaxxon.cpp
 congo                           // 605-5167 (c) 1983 (2 board stack)
 congoa                          // 605-5167 (c) 1983 (3 board stack)
 futspy                          // (c) 1984
@@ -414,7 +414,7 @@ zaxxon3                         // (c) 1982
 zaxxonb                         // bootleg
 zaxxonj                         // (c) 1982
 
-@source:segas16b.cpp
+@source:sega/segas16b.cpp
 aceattac                        // (c) 1988 (FD1094)
 //afightere
 //afighterf
@@ -554,18 +554,18 @@ wrestwar1d                      //
 wrestwar2                       // (c) 1989 (FD1094)
 wrestwar2d                      //
 
-@source:segas16b_isgsm.cpp
+@source:sega/segas16b_isgsm.cpp
 isgsm                           //
 shinfz                          //
 tetrbx                          //
 
-@source:sspeedr.cpp
+@source:midway/sspeedr.cpp
 sspeedr                         // Midway
 
-@source:starcrus.cpp
+@source:ramtek/starcrus.cpp
 starcrus
 
-@source:testpat.cpp
+@source:skeleton/testpat.cpp
 tp1983
 tp1985
 
@@ -573,7 +573,7 @@ tp1985
 
 /* Do not use CPUs */
 
-@source:atarittl.cpp
+@source:atari/atarittl.cpp
 antiairc                        // (c) 1975 Atari
 crashnsc                        // (c) 1975 Atari
 gtrak10                         // (c) 1974 Atari / Kee
@@ -592,21 +592,21 @@ stuntcyc                        // (c) 1976 Atari
 tank                            // (c) 1974 Atari / Kee
 tankii                          // (c) 1975 Atari / Kee
 
-@source:pong.cpp
+@source:atari/pong.cpp
 breakout                        // (c) 1976 Atari
 pong                            // (c) 1972 Atari
 pongd                           // (c) 1973 Atari
 rebound                         //
 
-@source:cheekyms.cpp
+@source:univers/cheekyms.cpp
 cheekyms                        // 8004 (c) [1980?]
 
-@source:cocoloco.cpp
+@source:misc/cocoloco.cpp
 cocoloco                        // 198?, Petaco S.A.
 cocolocoa                       // 198?, Recel S.A.
 cocolocob                       // 198?, Petaco S.A.
 
-@source:zaccaria.cpp
+@source:zaccaria/zaccaria.cpp
 jackrabt                        // (c) 1984
 jackrabt2                       // (c) 1984
 jackrabts                       // (c) 1984
@@ -616,56 +616,56 @@ monymony                        // (c) 1983
 // Skeletons
 // ******************************************************************************
 
-@source:a1supply.cpp
+@source:misc/a1supply.cpp
 tv21                            // (c) 197? A-1 Supply
 tv21_3                          // (c) 197? A-1 Supply
 tvpoker                         // (c) 197? A-1 Supply
 
-@source:aleisttl.cpp
+@source:alliedl/aleisttl.cpp
 sburners                        // (c) 1975 Allied Leisure
 
-@source:bailey.cpp
+@source:misc/bailey.cpp
 fun4                            // (c) 1976 Bailey
 fun4a                           // (c) 1976 Bailey
 
-@source:chicago.cpp
+@source:misc/chicago.cpp
 dmodrbcc                        // (c) 1976 Chicago Coin
 
-@source:crazybal.cpp
+@source:misc/crazybal.cpp
 crazybal                        // (c) 1978 EGS
 
-@source:electra.cpp
+@source:misc/electra.cpp
 avenger                         // (c) 1975 Electra
 
-@source:exidyttl.cpp
+@source:exidy/exidyttl.cpp
 attckexd                        // (c) 1977 Exidy
 attckexd2                       // (c) 1977 Exidy
 deathrac                        // (c) 1976 Exidy
 rhunting                        // bootleg of deathrac
 
-@source:fungames.cpp
+@source:misc/fungames.cpp
 biplane                         // (c) 1975 Fun Games
 biplane4                        // (c) 1976 Fun Games
 take5                           // (c) 1975 Fun Games
 
-@source:meadwttl.cpp
+@source:meadows/meadwttl.cpp
 bombaway                        // (c) 1976 Meadows
 cgunship                        // (c) 1976 Meadows
 ckidzo                          // (c) 1976 Meadows
 mead4in1                        // (c) 197? Meadows
 
-@source:monacogp.cpp
+@source:sega/monacogp.cpp
 monacogp                        // (c) 1980 Sega
 monacogpa                       // (c) 1980 Sega
 
-@source:pse.cpp
+@source:misc/pse.cpp
 bazooka                         // (c) 1976 PSE
 bazookabr                       // (c) 1977 Taito do Brasil
 dpatrol                         // (c) 1977 PSE
 dpatrola                        // (c) 1977 PSE / Telegames
 gametree                        // (c) 1978 PSE
 
-@source:ramtek.cpp
+@source:ramtek/ramtek.cpp
 bballrmt                        // (c) 1974 Ramtek
 cleanswp                        // (c) 1974 Ramtek
 hockyrmt                        // (c) 1973 Ramtek
@@ -674,10 +674,10 @@ trivia                          // (c) 1976 Ramtek
 vollyrmt                        // (c) 1973 Ramtek
 wipeormt                        // (c) 1974 Ramtek
 
-@source:segattl.cpp
+@source:sega/segattl.cpp
 fonz                            //
 
-@source:taitottl.cpp
+@source:taito/taitottl.cpp
 fisco400                        // (c) 1977 Taito
 gunman                          // (c) 1977 Taito
 missilex                        // (c) 1977 Taito
@@ -685,5 +685,5 @@ ttblock                         // (c) 1977 Taito
 ttsracec                        // (c) 1978 Taito
 zzblock                         // (c) 1979 Taito
 
-@source:usbilliards.cpp
+@source:misc/usbilliards.cpp
 sharkusb                        // (c) 1975 US Billiards

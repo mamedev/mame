@@ -456,11 +456,7 @@ if (_OPTIONS["subtarget"] == nil) then return false end
 if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 	solution (_OPTIONS["target"])
 else
-	if (_OPTIONS["subtarget"]=="mess") then
-		solution (_OPTIONS["subtarget"])
-	else
-		solution (_OPTIONS["target"] .. _OPTIONS["subtarget"])
-	end
+	solution (_OPTIONS["target"] .. _OPTIONS["subtarget"])
 end
 
 
@@ -558,10 +554,20 @@ if (_OPTIONS["PROJECT"] ~= nil) then
 	dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
 end
 if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["PROJECT"] == nil) then
-	if (not os.isfile(path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
+	local subtargetscript = path.join("target", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".lua")
+	local subtargetfilter = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".flt")
+	if os.isfile(subtargetscript) then
+		dofile(subtargetscript)
+	elseif os.isfile(subtargetfilter) then
+		local cmd = string.format(
+			"%s %s filterproject -r %s -t %s -f %s %s",
+			PYTHON, path.join(MAME_DIR, "scripts", "build", "makedep.py"),
+			MAME_DIR, _OPTIONS["subtarget"], subtargetfilter, path.join(MAME_DIR, "src", _OPTIONS["target"] , _OPTIONS["target"] .. ".lst"))
+		local OUT_STR = os.outputof(cmd)
+		load(OUT_STR)()
+	else
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
-	dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
 end
 
 configuration { "gmake or ninja" }
@@ -1242,6 +1248,9 @@ configuration { "linux-*" }
 			"dl",
 			"rt",
 		}
+		flags {
+			"LinkSupportCircularDependencies",
+		}
 		if _OPTIONS["distro"]=="debian-stable" then
 			defines
 			{
@@ -1421,7 +1430,7 @@ if (_OPTIONS["SOURCES"] ~= nil) then
 		end
 		sourceargs = sourceargs .. " " .. word
 	end
-	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesproject -r " .. MAME_DIR .. " -t " .. _OPTIONS["subtarget"] .. sourceargs )
+	local OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesproject -r " .. MAME_DIR .. " -t " .. _OPTIONS["subtarget"] .. sourceargs )
 	load(OUT_STR)()
 	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py sourcesfilter -l " .. MAME_DIR .. "src/" .. _OPTIONS["target"] .. "/" .. _OPTIONS["target"] .. ".lst" .. sourceargs .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"] .. ".flt" )
 end
@@ -1468,11 +1477,7 @@ if (_OPTIONS["SOURCES"] == nil) then
 	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 		startproject (_OPTIONS["target"])
 	else
-		if (_OPTIONS["subtarget"]=="mess") then
-			startproject (_OPTIONS["subtarget"])
-		else
-			startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
-		end
+		startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
 	end
 else
 	startproject (_OPTIONS["subtarget"])

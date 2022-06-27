@@ -9,21 +9,22 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "speaker.h"
 #include "emuopts.h"
 #include "osdepend.h"
 #include "config.h"
 #include "wavwrite.h"
 
-#include <vector>
 
 //**************************************************************************
 //  DEBUGGING
 //**************************************************************************
 
-#define VERBOSE         (0)
+//#define VERBOSE 1
+#define LOG_OUTPUT_FUNC osd_printf_debug
 
-#define VPRINTF(x)      do { if (VERBOSE) osd_printf_debug x; } while (0)
+#include "logmacro.h"
 
 #define LOG_OUTPUT_WAV  (0)
 
@@ -651,8 +652,8 @@ void sound_stream::set_sample_rate(u32 new_rate)
 
 void sound_stream::set_input(int index, sound_stream *input_stream, int output_index, float gain)
 {
-	VPRINTF(("stream_set_input(%p, '%s', %d, %p, %d, %f)\n", (void *)this, m_device.tag(),
-			index, (void *)input_stream, output_index, (double) gain));
+	LOG("stream_set_input(%p, '%s', %d, %p, %d, %f)\n", (void *)this, m_device.tag(),
+			index, (void *)input_stream, output_index, gain);
 
 	// make sure it's a valid input
 	if (index >= m_input.size())
@@ -1100,7 +1101,7 @@ sound_manager::sound_manager(running_machine &machine) :
 	// count the mixers
 #if VERBOSE
 	mixer_interface_enumerator iter(machine.root_device());
-	VPRINTF(("total mixers = %d\n", iter.count()));
+	LOG("total mixers = %d\n", iter.count());
 #endif
 
 	// register callbacks
@@ -1472,7 +1473,7 @@ stream_buffer::sample_t sound_manager::adjust_toward_compressor_scale(stream_buf
 
 void sound_manager::update(int param)
 {
-	VPRINTF(("sound_update\n"));
+	LOG("sound_update\n");
 
 	g_profiler.start(PROFILER_SOUND);
 

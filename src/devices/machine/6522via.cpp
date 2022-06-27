@@ -449,7 +449,7 @@ void via6522_device::shift_out()
 	}
 	else // Check for INT condition, eg the last and raising edge of the 15-0 falling/raising edges
 	{
-		if (!SO_T2_RATE(m_acr)) // The T2 continous shifter doesn't do interrupts (mode 4)
+		if (!SO_T2_RATE(m_acr)) // The T2 continuous shifter doesn't do interrupts (mode 4)
 		{
 			if (m_shift_counter == 0 && (SO_O2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr)))
 			{
@@ -470,7 +470,7 @@ void via6522_device::shift_in()
 		m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
 		LOGSHIFT("%02x\n", m_sr);
 
-		if (m_shift_counter == 0)
+		if (m_shift_counter == 0 && !SR_DISABLED(m_acr))
 		{
 			LOGINT("SHIFT in INT request ");
 //            set_int(INT_SR);// TODO: this interrupt is 1-2 clock cycles too early
@@ -503,7 +503,7 @@ TIMER_CALLBACK_MEMBER(via6522_device::shift_tick)
 		shift_in();
 	}
 
-	// If in continous mode or the shifter is still shifting we re-arm the timer
+	// If in continuous mode or the shifter is still shifting we re-arm the timer
 	if (SO_T2_RATE(m_acr) || (m_shift_counter < 0x0f))
 	{
 		if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
@@ -1017,7 +1017,7 @@ void via6522_device::write(offs_t offset, u8 data)
 			if (SI_T2_CONTROL(m_acr))  LOGSHIFT("IN on T2");
 			if (SI_O2_CONTROL(m_acr))  LOGSHIFT("IN on O2");
 			if (SI_EXT_CONTROL(m_acr)) LOGSHIFT("IN on EXT");
-			if (SO_T2_RATE(m_acr))     LOGSHIFT("OUT on continous T2");
+			if (SO_T2_RATE(m_acr))     LOGSHIFT("OUT on continuous T2");
 			if (SO_T2_CONTROL(m_acr))  LOGSHIFT("OUT on T2");
 			if (SO_O2_CONTROL(m_acr))  LOGSHIFT("OUT on O2");
 			if (SO_EXT_CONTROL(m_acr)) LOGSHIFT("OUT on EXT");
@@ -1187,7 +1187,7 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 			LOGSHIFT("SHIFT OUT EXT/CB1 falling edge, %d\n",  m_shift_counter);
 			shift_out();
 		}
-		else if (SI_EXT_CONTROL(m_acr))
+		else if (SI_EXT_CONTROL(m_acr) || SR_DISABLED(m_acr))
 		{
 			LOGSHIFT("SHIFT IN EXT/CB1 raising edge, %d\n", m_shift_counter);
 			shift_in();

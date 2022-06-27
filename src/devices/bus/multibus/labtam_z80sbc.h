@@ -41,7 +41,7 @@ private:
 	void cpu_pio(address_map &map);
 
 	// cpu memory handlers
-	u8 mem_r(address_space &space, offs_t offset);
+	u8 mem_r(offs_t offset);
 	void mem_w(offs_t offset, u8 data);
 
 	// memory mapping handlers
@@ -85,6 +85,7 @@ private:
 
 	u8 m_map_mux;
 	u8 m_map_num;
+	u8 m_map_cnt;
 
 	u8 m_fdcstatus;
 	std::optional<u8> m_drive;

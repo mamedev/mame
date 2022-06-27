@@ -1,0 +1,103 @@
+// license:BSD-3-Clause
+// copyright-holders:Sebastien Monassa
+/*************************************************************************
+
+    Atari Video Pinball video emulation
+
+*************************************************************************/
+
+#include "emu.h"
+#include "videopin.h"
+
+
+
+
+
+TILEMAP_MAPPER_MEMBER(videopin_state::get_memory_offset)
+{
+	return num_rows * ((col + 16) % 48) + row;
+}
+
+
+TILE_GET_INFO_MEMBER(videopin_state::get_tile_info)
+{
+	uint8_t code = m_video_ram[tile_index];
+
+	tileinfo.set(0, code, 0, (code & 0x40) ? TILE_FLIPY : 0);
+}
+
+
+void videopin_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(videopin_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(videopin_state::get_memory_offset)), 8, 8, 48, 32);
+
+	save_item(NAME(m_ball_x));
+	save_item(NAME(m_ball_y));
+}
+
+
+uint32_t videopin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int col;
+	int row;
+
+	m_bg_tilemap->set_scrollx(0, -8);   /* account for delayed loading of shift reg C6 */
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	for (row = 0; row < 32; row++)
+	{
+		for (col = 0; col < 48; col++)
+		{
+			uint32_t offset = m_bg_tilemap->memory_index(col, row);
+
+			if (m_video_ram[offset] & 0x80)   /* ball bit found */
+			{
+				int x = 8 * col;
+				int y = 8 * row;
+
+				int i;
+				int j;
+
+				x += 4;   /* account for delayed loading of flip-flop C4 */
+
+				rectangle rect(x, x + 15, y, y + 15);
+				rect &= cliprect;
+
+				x -= m_ball_x;
+				y -= m_ball_y;
+
+				/* ball placement is still 0.5 pixels off but don't tell anyone */
+
+				for (i = 0; i < 2; i++)
+				{
+					for (j = 0; j < 2; j++)
+					{
+						m_gfxdecode->gfx(1)->transpen(bitmap,rect,
+							0, 0,
+							0, 0,
+							x + 16 * i,
+							y + 16 * j, 0);
+					}
+				}
+
+				return 0;   /* keep things simple and ignore the rest */
+			}
+		}
+	}
+	return 0;
+}
+
+
+void videopin_state::ball_w(uint8_t data)
+{
+	m_ball_x = data & 15;
+	m_ball_y = data >> 4;
+}
+
+
+void videopin_state::video_ram_w(offs_t offset, uint8_t data)
+{
+	m_video_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}

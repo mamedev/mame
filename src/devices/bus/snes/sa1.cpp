@@ -1352,9 +1352,9 @@ void sns_sa1_device::sa1_hi_w(offs_t offset, u8 data)
 void sns_sa1_device::sa1_lo_w(offs_t offset, u8 data)
 {
 	if (offset >= 0x400000 && offset < 0x500000)
-		sa1_bwram_w(offset & 0xfffff, data, false);	// SA-1 BWRAM (not mirrored above)
+		sa1_bwram_w(offset & 0xfffff, data, false); // SA-1 BWRAM (not mirrored above)
 	else if (offset >= 0x600000 && offset < 0x700000)
-		sa1_bwram_w(offset & 0xfffff, data, true);	// SA-1 BWRAM Bitmap mode
+		sa1_bwram_w(offset & 0xfffff, data, true);  // SA-1 BWRAM Bitmap mode
 	else
 		sa1_hi_w(offset, data);
 }

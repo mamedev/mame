@@ -1,149 +1,178 @@
 local dat = {}
-local db = require("data/database")
+
+local db = require('data/database')
 local ver, info
-local file = "history.xml"
+local file = 'history.xml'
+local tablename
 
 local function init()
-	local filepath
-	local dbver
-	local fh
-
-	for path in mame_manager.ui.options.entries.historypath:value():gmatch("([^;]+)") do
-		filepath = emu.subst_env(path) .. "/" .. file
-		fh = io.open(filepath, "r")
-		if fh then
-			break
-		end
-	end
-
 	-- check for old history table
-	local stmt = db.prepare("SELECT version FROM version WHERE datfile = ?")
-	stmt:bind_values("history.dat")
-	if stmt:step() == db.ROW then
-		stmt:finalize()
-		db.exec("DROP TABLE \"history.dat\"")
-		db.exec("DROP TABLE \"history.dat_idx\"")
-		stmt = db.prepare("DELETE FROM version WHERE datfile = ?")
-		stmt:bind_values("history.dat")
-		stmt:step()
+	if db.get_version('history.dat') then
+		db.exec([[DROP TABLE "history.dat";]])
+		db.exec([[DROP TABLE "history.dat_idx";]])
+		db.set_version('history.dat', nil)
 	end
-	stmt:finalize()
 
-
-	local stmt = db.prepare("SELECT version FROM version WHERE datfile = ?")
-	db.check("reading history version")
-	stmt:bind_values(file)
-	if stmt:step() == db.ROW then
-		dbver = stmt:get_value(0)
-	end
-	stmt:finalize()
-
-	if not fh and dbver then
-		-- data in database but missing file, just use what we have
-		ver = dbver
+	local fh, filepath, dbver
+	fh, filepath, tablename, dbver = db.open_data_file(file)
+	if not fh then
+		if dbver then
+			-- data in database but missing file, just use what we have
+			ver = dbver
+		end
 		return
-	elseif not fh then
-		return
-	elseif not dbver then
-		db.exec("CREATE TABLE \"" .. file .. [[_idx" (
-				name VARCHAR NOT NULL,
-				list VARCHAR,
-				data INTEGER NOT NULL)]])
-		db.check("creating index")
-		db.exec("CREATE TABLE \"" .. file .. "\" (data CLOB NOT NULL)")
-		db.check("creating table")
-		db.exec("CREATE INDEX \"name_" .. file .. "\" ON \"" .. file .. "_idx\"(name)")
-		db.check("creating system index")
 	end
 
+	-- scan file for version
 	for line in fh:lines() do
-		local match = line:match("<history([^>]*)>")
+		local match = line:match('<history([^>]*)>')
 		if match then
-			match = match:match("version=\"([^\"]*)\"")
+			match = match:match('version="([^"]*)"')
 			if match then
 				ver = match
 				break
 			end
 		end
 	end
-
-	if not ver then
+	if (not ver) or (ver == dbver) then
 		fh:close()
+		ver = dbver
 		return
 	end
 
-	if ver == dbver then
+	if not dbver then
+		db.exec(
+			string.format(
+				[[CREATE TABLE "%s_idx" (
+					name VARCHAR NOT NULL,
+					list VARCHAR NOT NULL,
+					data INTEGER NOT NULL);]],
+				tablename))
+		db.check(string.format('creating %s index table', file))
+		db.exec(string.format([[CREATE TABLE "%s" (data CLOB NOT NULL);]], tablename))
+		db.check(string.format('creating %s data table', file))
+		db.exec(
+			string.format(
+				[[CREATE INDEX "namelist_%s" ON "%s_idx" (name, list);]],
+				tablename, tablename))
+		db.check(string.format('creating %s name/list index', file))
+	end
+
+	local slaxml = require('xml')
+
+	db.exec([[BEGIN TRANSACTION;]])
+	if not db.check(string.format('starting %s transaction', file)) then
 		fh:close()
+		ver = dbver
 		return
 	end
 
+	-- clean out previous data and update the version
 	if dbver then
-		db.exec("DELETE FROM \"" .. file .. "\"")
-		db.check("deleting history")
-		db.exec("DELETE FROM \"" .. file .. "_idx\"")
-		db.check("deleting index")
-		stmt = db.prepare("UPDATE version SET version = ? WHERE datfile = ?")
-		db.check("updating history version")
-	else
-		stmt = db.prepare("INSERT INTO version VALUES (?, ?)")
-		db.check("inserting history version")
+		db.exec(string.format([[DELETE FROM "%s";]], tablename))
+		if not db.check(string.format('deleting previous %s data', file)) then
+			db.exec([[ROLLBACK TRANSACTION;]])
+			fh:close()
+			ver = dbver
+			return
+		end
+		db.exec(string.format([[DELETE FROM "%s_idx";]], tablename))
+		if not db.check(string.format('deleting previous %s data', file)) then
+			db.exec([[ROLLBACK TRANSACTION;]])
+			fh:close()
+			ver = dbver
+			return
+		end
 	end
-	stmt:bind_values(ver, file)
-	stmt:step()
-	stmt:finalize()
+	db.set_version(file, ver)
+	if not db.check(string.format('updating %s version', file)) then
+		db.exec([[ROLLBACK TRANSACTION;]])
+		fh:close()
+		ver = dbver
+		return
+	end
 
-	fh:seek("set")
-	local buffer = fh:read("a")
-	db.exec("BEGIN TRANSACTION")
-	db.check("beginning history transation")
+	fh:seek('set')
+	local buffer = fh:read('a')
 
 	local lasttag
 	local entry = {}
 	local rowid
-	local slaxml = require("xml")
+
+	local dataquery = db.prepare(
+		string.format([[INSERT INTO "%s" (data) VALUES (?);]], tablename))
+	local indexquery = db.prepare(
+		string.format([[INSERT INTO "%s_idx" (name, list, data) VALUES (?, ?, ?);]], tablename))
 
 	local parser = slaxml:parser{
 		startElement = function(name)
 			lasttag = name
-			if name == "entry" then
+			if name == 'entry' then
 				entry = {}
 				rowid = nil
-			elseif (name == "system") or (name == "item") then
-				entry[#entry + 1] = {}
+			elseif (name == 'system') or (name == 'item') then
+				table.insert(entry, {})
 			end
 		end,
 		attribute = function(name, value)
-			if (name == "name") or (name == "list") then
+			if (name == 'name') or (name == 'list') then
 				entry[#entry][name] = value
 			end
 		end,
 		text = function(text, cdata)
-			if lasttag == "text" then
-				text = text:gsub("\r", "") -- strip crs
-				stmt = db.prepare("INSERT INTO \"" .. file .. "\" VALUES (?)")
-				db.check("inserting values")
-				stmt:bind_values(text)
-				stmt:step()
-				rowid = stmt:last_insert_rowid()
-				stmt:finalize()
+			if lasttag == 'text' then
+				text = text:gsub('\r', '') -- strip carriage returns
+				dataquery:bind_values(text)
+				while true do
+					local status = dataquery:step()
+					if status == db.DONE then
+						rowid = dataquery:last_insert_rowid();
+						break
+					elseif result == db.BUSY then
+						emu.print_error(string.format('Database busy: inserting %s data', file))
+						-- FIXME: how to abort parse and roll back?
+						break
+					elseif result ~= db.ROW then
+						db.check(string.format('inserting %s data', file))
+						break
+					end
+				end
+				dataquery:reset()
 			end
 		end,
 		closeElement = function(name)
-			if name == "entry" then
+			if (name == 'entry') and rowid then
 				for num, entry in pairs(entry) do
-					stmt = db.prepare("INSERT INTO \"" .. file .. "_idx\" VALUES (?, ?, ?)")
-					db.check("inserting into index")
-					stmt:bind_values(entry.name, entry.list, rowid)
-					stmt:step()
-					stmt:finalize()
+					indexquery:bind_values(entry.name, entry.list or '', rowid)
+					while true do
+						local status = indexquery:step()
+						if status == db.DONE then
+							break
+						elseif status == db.BUSY then
+							emu.print_error(string.format('Database busy: inserting %s data', file))
+							-- FIXME: how to abort parse and roll back?
+							break
+						elseif result ~= db.ROW then
+							db.check(string.format('inserting %s data', file))
+							break
+						end
+					end
+					indexquery:reset()
 				end
 			end
 		end
 	}
-	parser:parse(buffer, {stripWhitespace=true})
+
+	parser:parse(buffer, { stripWhitespace = true })
+	dataquery:finalize()
+	indexquery:finalize()
 	fh:close()
-	db.exec("END TRANSACTION")
-	db.check("ending history transation")
+
+	db.exec([[COMMIT TRANSACTION;]])
+	if not db.check(string.format('committing %s transaction', file)) then
+		db.exec([[ROLLBACK TRANSACTION;]])
+		ver = dbver
+	end
 end
 
 if db then
@@ -151,25 +180,31 @@ if db then
 end
 
 function dat.check(set, softlist)
-	if not ver or not db then
+	if not ver then
 		return nil
 	end
+
 	info = nil
-	local stmt
-	if softlist then
-		stmt = db.prepare("SELECT f.data FROM \"" .. file .. "_idx\" AS fi, \"" .. file .. [["
-			AS f WHERE fi.name = ? AND fi.list = ? AND f.rowid = fi.data]])
-		stmt:bind_values(set, softlist)
-	else
-		stmt = db.prepare("SELECT f.data FROM \"" .. file .. "_idx\" AS fi, \"" .. file .. [["
-			AS f WHERE fi.name = ? AND fi.list ISNULL AND f.rowid = fi.data]])
-		stmt:bind_values(set)
+	local query = db.prepare(
+		string.format(
+			[[SELECT f.data
+				FROM "%s_idx" AS fi LEFT JOIN "%s" AS f ON fi.data = f.rowid
+				WHERE fi.name = ? AND fi.list = ?;]],
+			tablename, tablename))
+	query:bind_values(set, softlist or '')
+	while not info do
+		local status = query:step()
+		if status == db.ROW then
+			info = query:get_value(0)
+		elseif status == db.DONE then
+			break
+		elseif status ~= db.BUSY then
+			db.check(string.format('reading %s data', file))
+			break
+		end
 	end
-	if stmt:step() == db.ROW then
-		info = stmt:get_value(0)
-	end
-	stmt:finalize()
-	return info and _p("plugin-data", "History") or nil
+	query:finalize()
+	return info and _p('plugin-data', 'History') or nil
 end
 
 function dat.get()

@@ -233,8 +233,8 @@ std::string joystick_map::to_string() const
 u8 joystick_map::update(s32 xaxisval, s32 yaxisval)
 {
 	// now map the X and Y axes to a 9x9 grid using the raw values
-	xaxisval = ((xaxisval - INPUT_ABSOLUTE_MIN) * 9) / (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN + 1);
-	yaxisval = ((yaxisval - INPUT_ABSOLUTE_MIN) * 9) / (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN + 1);
+	xaxisval = ((xaxisval - osd::INPUT_ABSOLUTE_MIN) * 9) / (osd::INPUT_ABSOLUTE_MAX - osd::INPUT_ABSOLUTE_MIN + 1);
+	yaxisval = ((yaxisval - osd::INPUT_ABSOLUTE_MIN) * 9) / (osd::INPUT_ABSOLUTE_MAX - osd::INPUT_ABSOLUTE_MIN + 1);
 	u8 mapval = m_map[yaxisval][xaxisval];
 
 	// handle stickiness
@@ -412,8 +412,8 @@ input_device_lightgun::input_device_lightgun(input_manager &manager, std::string
 
 input_device_joystick::input_device_joystick(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
 	: input_device(manager, _name, _id, _internal),
-		m_joystick_deadzone(s32(manager.machine().options().joystick_deadzone() * INPUT_ABSOLUTE_MAX)),
-		m_joystick_saturation(s32(manager.machine().options().joystick_saturation() * INPUT_ABSOLUTE_MAX))
+		m_joystick_deadzone(s32(manager.machine().options().joystick_deadzone() * osd::INPUT_ABSOLUTE_MAX)),
+		m_joystick_saturation(s32(manager.machine().options().joystick_saturation() * osd::INPUT_ABSOLUTE_MAX))
 {
 	// get the default joystick map
 	const char *mapstring = machine().options().joystick_map();
@@ -453,11 +453,11 @@ s32 input_device_joystick::adjust_absolute_value(s32 result) const
 
 	// if saturated, return the max
 	else if (result > m_joystick_saturation)
-		result = INPUT_ABSOLUTE_MAX;
+		result = osd::INPUT_ABSOLUTE_MAX;
 
 	// otherwise, scale
 	else
-		result = s64(result - m_joystick_deadzone) * s64(INPUT_ABSOLUTE_MAX) / s64(m_joystick_saturation - m_joystick_deadzone);
+		result = s64(result - m_joystick_deadzone) * s64(osd::INPUT_ABSOLUTE_MAX) / s64(m_joystick_saturation - m_joystick_deadzone);
 
 	// re-apply sign and return
 	return negative ? -result : result;
@@ -708,8 +708,8 @@ input_device_item::~input_device_item()
 
 bool input_device_item::check_axis(input_item_modifier modifier, s32 memory)
 {
-	// use INVALID_AXIS_VALUE as a short-circuit
-	return (memory != INVALID_AXIS_VALUE) && item_check_axis(modifier, memory);
+	// use osd::INVALID_AXIS_VALUE as a short-circuit
+	return (memory != osd::INVALID_AXIS_VALUE) && item_check_axis(modifier, memory);
 }
 
 
@@ -894,7 +894,7 @@ bool input_device_relative_item::item_check_axis(input_item_modifier modifier, s
 	const s32 curval = read_as_relative(modifier);
 
 	// for relative axes, look for ~20 pixels movement
-	return std::abs(curval - memory) > (20 * INPUT_RELATIVE_PER_PIXEL);
+	return std::abs(curval - memory) > (20 * osd::INPUT_RELATIVE_PER_PIXEL);
 }
 
 
@@ -922,7 +922,7 @@ s32 input_device_absolute_item::read_as_switch(input_item_modifier modifier)
 {
 	// start with the current value
 	s32 result = m_device.adjust_absolute(update_value());
-	assert(result >= INPUT_ABSOLUTE_MIN && result <= INPUT_ABSOLUTE_MAX);
+	assert(result >= osd::INPUT_ABSOLUTE_MIN && result <= osd::INPUT_ABSOLUTE_MAX);
 
 	// left/right/up/down: if this is a joystick, fetch the paired X/Y axis values and convert
 	if (m_device.devclass() == DEVICE_CLASS_JOYSTICK && modifier >= ITEM_MODIFIER_LEFT && modifier <= ITEM_MODIFIER_DOWN)
@@ -977,7 +977,7 @@ s32 input_device_absolute_item::read_as_absolute(input_item_modifier modifier)
 {
 	// start with the current value
 	s32 result = m_device.adjust_absolute(update_value());
-	assert(result >= INPUT_ABSOLUTE_MIN && result <= INPUT_ABSOLUTE_MAX);
+	assert(result >= osd::INPUT_ABSOLUTE_MIN && result <= osd::INPUT_ABSOLUTE_MAX);
 
 	// if we're doing a lightgun reload hack, override the value
 	if (m_device.devclass() == DEVICE_CLASS_LIGHTGUN && m_device.lightgun_reload_button())
@@ -985,16 +985,16 @@ s32 input_device_absolute_item::read_as_absolute(input_item_modifier modifier)
 		// if it is pressed, return (min,max)
 		input_device_item *button2_item = m_device.item(ITEM_ID_BUTTON2);
 		if (button2_item != nullptr && button2_item->update_value())
-			result = (m_itemid == ITEM_ID_XAXIS) ? INPUT_ABSOLUTE_MIN : INPUT_ABSOLUTE_MAX;
+			result = (m_itemid == ITEM_ID_XAXIS) ? osd::INPUT_ABSOLUTE_MIN : osd::INPUT_ABSOLUTE_MAX;
 	}
 
 	// positive/negative: scale to full axis
 	if (modifier == ITEM_MODIFIER_REVERSE)
 		result = -result;
 	else if (modifier == ITEM_MODIFIER_POS)
-		result = std::max(result, 0) * 2 + INPUT_ABSOLUTE_MIN;
+		result = std::max(result, 0) * 2 + osd::INPUT_ABSOLUTE_MIN;
 	else if (modifier == ITEM_MODIFIER_NEG)
-		result = std::max(-result, 0) * 2 + INPUT_ABSOLUTE_MIN;
+		result = std::max(-result, 0) * 2 + osd::INPUT_ABSOLUTE_MIN;
 	return result;
 }
 
@@ -1010,9 +1010,9 @@ bool input_device_absolute_item::item_check_axis(input_item_modifier modifier, s
 	// so the selection will not be affected by a gun going out of range
 	const s32 curval = read_as_absolute(modifier);
 	if (m_device.devclass() == DEVICE_CLASS_LIGHTGUN &&
-		(curval == INPUT_ABSOLUTE_MAX || curval == INPUT_ABSOLUTE_MIN))
+		(curval == osd::INPUT_ABSOLUTE_MAX || curval == osd::INPUT_ABSOLUTE_MIN))
 		return false;
 
 	// for absolute axes, look for 25% of maximum
-	return std::abs(curval - memory) > ((INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN) / 4);
+	return std::abs(curval - memory) > ((osd::INPUT_ABSOLUTE_MAX - osd::INPUT_ABSOLUTE_MIN) / 4);
 }
