@@ -577,7 +577,7 @@ namespace plib {
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		auto p = reinterpret_cast<const typename late_pmfp<T>::traits::template specific_member_function<O> *>(raw);
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		auto o = reinterpret_cast<O *>(obj);
+		auto *o = reinterpret_cast<O *>(obj);
 		return return_type(*p, o);
 	}
 

@@ -108,6 +108,7 @@ namespace netlist
 	PERRMSGV(MW_TERMINAL_1_WITHOUT_CONNECTIONS,     1, "Found terminal {1} without connections")
 
 	PERRMSGV(ME_TERMINAL_1_WITHOUT_NET,             1, "Found terminal {1} without a net")
+	PERRMSGV(ME_TERMINALS_1_2_WITHOUT_NET,           2, "Found terminals {1} and {2} without a net")
 	PERRMSGV(MF_TERMINALS_WITHOUT_NET,              0, "Found terminals without a net")
 	PERRMSGV(ME_TRISTATE_NO_PROXY_FOUND_2,          2,
 		"Tristate output {1} on device {2} is not connected to a proxy. You "

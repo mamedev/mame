@@ -353,7 +353,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="alexkiddb" cloneof="alexkidd">
-		<description>Alex Kidd in Miracle World (Bra, v1, Pirate)</description>
+		<description>Alex Kidd in Miracle World (Bra, v1, pirate)</description>
 		<year>1986</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -557,7 +557,7 @@ license:CC0
 	</software>
 
 	<software name="argosnj1" cloneof="argosnj">
-		<description>Argos no Juujiken (Jpn, Pirate?)</description>
+		<description>Argos no Juujiken (Jpn, pirate?)</description>
 		<year>1988</year>
 		<publisher>Tecmo</publisher>
 		<part name="cart" interface="sms_cart">
@@ -692,7 +692,7 @@ license:CC0
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<!-- This has been found in unlicensed GG compilation too (or has it been ripped from such a compilation only?) -->
 	<software name="astrofl1" cloneof="transbot">
-		<description>Astro Flash (Jpn, Pirate)</description>
+		<description>Astro Flash (Jpn, pirate)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2321,7 +2321,7 @@ license:CC0
 	</software>
 
 	<software name="eswatc">
-		<description>E-SWAT - City Under Siege (Euro, USA, Easy Version)</description>
+		<description>E-SWAT - City Under Siege (Euro, USA, easy version)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7042"/>
@@ -2333,7 +2333,7 @@ license:CC0
 	</software>
 
 	<software name="eswatc1" cloneof="eswatc">
-		<description>E-SWAT - City Under Siege (Euro, USA, Bra, Hard Version)</description>
+		<description>E-SWAT - City Under Siege (Euro, USA, Bra, hard version)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2797,7 +2797,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="pitpot1" cloneof="pitpot">
-		<description>Fushigi no Oshiro Pit Pot (Jpn, Pirate?)</description>
+		<description>Fushigi no Oshiro Pit Pot (Jpn, pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2996,7 +2996,7 @@ license:CC0
 
 <!-- no sound on smsj -->
 	<software name="goldaxed">
-		<description>Golden Axe CES Demo</description>
+		<description>Golden Axe (CES demo)</description>
 		<year>198?</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3088,7 +3088,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosthj1" cloneof="ghosth">
-		<description>Ghost House (Jpn, Pirate?)</description>
+		<description>Ghost House (Jpn, pirate?)</description>
 		<year>1986</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3124,7 +3124,7 @@ license:CC0
 	</software>
 
 	<software name="ghoulsd" cloneof="ghouls">
-		<description>Ghouls'n Ghosts (USA, Demo)</description>
+		<description>Ghouls'n Ghosts (USA, demo)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3255,7 +3255,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatbasj1" cloneof="greatbas">
-		<description>Great Baseball (Jpn, Pirate?)</description>
+		<description>Great Baseball (Jpn, pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5833,7 +5833,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="satell7a" cloneof="satell7">
-		<description>Satellite 7 (Jpn, Pirate?)</description>
+		<description>Satellite 7 (Jpn, pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5970,7 +5970,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="seishun1" cloneof="myhero">
-		<description>Seishun Scandal (Jpn, Pirate?)</description>
+		<description>Seishun Scandal (Jpn, pirate?)</description>
 		<year>1986</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6682,7 +6682,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="spyvsspyj1" cloneof="spyvsspy">
-		<description>Spy vs. Spy (Jpn, Pirate?)</description>
+		<description>Spy vs. Spy (Jpn, pirate?)</description>
 		<year>1986</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6911,7 +6911,7 @@ license:CC0
 	</software>
 
 	<software name="suprbskt">
-		<description>Super Basketball (USA, CES Demo)</description>
+		<description>Super Basketball (USA, CES demo)</description>
 		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7173,7 +7173,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="teddyboyj1" cloneof="teddyboy">
-		<description>Teddy Boy Blues (Jpn, Pirate?)</description>
+		<description>Teddy Boy Blues (Jpn, pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7739,7 +7739,7 @@ license:CC0
 	</software>
 
 	<software name="wcup90d" cloneof="wcup90">
-		<description>World Cup Italia '90 (USA, Demo)</description>
+		<description>World Cup Italia '90 (USA, demo)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -8047,7 +8047,7 @@ license:CC0
 
 	<!-- Notes: FM support, video code relies on the tilemap mirroring bug of the 315-5124 VDP -->
 	<software name="ysd" cloneof="ys">
-		<description>Ys (USA, Demo)</description>
+		<description>Ys (USA, demo)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="usage" value="Video only works correctly on drivers with SMS1 VDP, e.g. smsj" />
@@ -8191,7 +8191,7 @@ license:CC0
   It is unsure if Probe has ever written any game code for these licensed titles -->
 
 	<software name="sn_ateam">
-		<description>The A-Team (Music prototype)</description>
+		<description>The A-Team (music prototype)</description>
 		<year>1992</year>
 		<publisher>Probe</publisher>
 		<part name="cart" interface="sms_cart">
@@ -8202,7 +8202,7 @@ license:CC0
 	</software>
 
 	<software name="sn_lwep3">
-		<description>Lethal Weapon 3 (Music prototype)</description>
+		<description>Lethal Weapon 3 (music prototype)</description>
 		<year>1992</year>
 		<publisher>Probe</publisher>
 		<part name="cart" interface="sms_cart">

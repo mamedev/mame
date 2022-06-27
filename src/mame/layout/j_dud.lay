@@ -59,7 +59,7 @@ license:CC0
 	<element name="Reel 2">
 		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
 		<text string="Orange">  <bounds x="0" y="40" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
-		<text string="Plum">    <bounds x="0" y="60" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">  <bounds x="0" y="60" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="Melon">   <bounds x="0" y="80" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="Plum">    <bounds x="0" y="100" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 		<text string="Grapes">  <bounds x="0" y="120" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>

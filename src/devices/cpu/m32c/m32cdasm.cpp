@@ -508,6 +508,10 @@ void m32c_disassembler::dasm_general(std::ostream &stream, offs_t &pc, offs_t &f
 			util::stream_format(stream, "%-11sR1H, ", BIT(op2, 4) ? "sha.l" : "shl.l");
 			dasm_operand(stream, pc, opcodes, (op1 & 0x0e) << 1 | BIT(op2, 6, 2), 2, indirect_dest);
 			break;
+
+		default:
+			stream << "und";
+			break;
 		}
 		break;
 
@@ -687,6 +691,10 @@ void m32c_disassembler::dasm_general(std::ostream &stream, offs_t &pc, offs_t &f
 			}
 			else
 				stream << "und";
+			break;
+
+		default:
+			stream << "und";
 			break;
 		}
 		break;

@@ -1325,16 +1325,30 @@ int upd765_family_device::check_command()
 
 	// MSDOS 6.22 format uses 0xcd to format a track, which makes one
 	// think only the bottom 5 bits are decoded.
+	// The real 765 completely decodes the commands that don't have
+	// variable upper bits.  Some later superio chips don't.
+	// The MCS Powerview depends on this.
 
-	switch(command[0] & 0x1f) {
-	case 0x02:
-		return command_pos == 9 ? C_READ_TRACK         : C_INCOMPLETE;
-
+	switch(command[0]) {
 	case 0x03:
 		return command_pos == 3 ? C_SPECIFY            : C_INCOMPLETE;
 
 	case 0x04:
 		return command_pos == 2 ? C_SENSE_DRIVE_STATUS : C_INCOMPLETE;
+
+	case 0x07:
+		return command_pos == 2 ? C_RECALIBRATE        : C_INCOMPLETE;
+
+	case 0x08:
+		return C_SENSE_INTERRUPT_STATUS;
+
+	case 0x0f:
+		return command_pos == 3 ? C_SEEK               : C_INCOMPLETE;
+	}
+
+	switch(command[0] & 0x1f) {
+	case 0x02:
+		return command_pos == 9 ? C_READ_TRACK         : C_INCOMPLETE;
 
 	case 0x05:
 	case 0x09:
@@ -1344,20 +1358,11 @@ int upd765_family_device::check_command()
 	case 0x0c:
 		return command_pos == 9 ? C_READ_DATA          : C_INCOMPLETE;
 
-	case 0x07:
-		return command_pos == 2 ? C_RECALIBRATE        : C_INCOMPLETE;
-
-	case 0x08:
-		return C_SENSE_INTERRUPT_STATUS;
-
 	case 0x0a:
 		return command_pos == 2 ? C_READ_ID            : C_INCOMPLETE;
 
 	case 0x0d:
 		return command_pos == 6 ? C_FORMAT_TRACK       : C_INCOMPLETE;
-
-	case 0x0f:
-		return command_pos == 3 ? C_SEEK               : C_INCOMPLETE;
 
 	case 0x11:
 		return command_pos == 9 ? C_SCAN_EQUAL         : C_INCOMPLETE;

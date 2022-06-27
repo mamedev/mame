@@ -375,7 +375,7 @@ namespace plib {
 			if (build_enabled && enabled && m_enabled)
 			{
 				pfmt pf(fmt);
-				dynamic_cast<T &>(*this).upstream_write(log_translate(pf, std::forward<Args>(args)...));
+				plib::dynamic_downcast<T &>(*this).upstream_write(log_translate(pf, std::forward<Args>(args)...));
 			}
 		}
 

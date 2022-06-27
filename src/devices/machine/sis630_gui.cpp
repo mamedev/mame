@@ -688,7 +688,7 @@ void sis630_bridge_device::map_extra(
 	// forward to "primary PCI" (host & LPC?) for A8 or A9 blocks for each 1KB blocks in I/O spaces,
 	// (i.e. $100-$3ff, $500-$7ff, $900-$bff etc.)
 	// even if I/O range is inside base and limits
-//	if (BIT(bridge_control, 2))
+//  if (BIT(bridge_control, 2))
 	// ...
 }
 
