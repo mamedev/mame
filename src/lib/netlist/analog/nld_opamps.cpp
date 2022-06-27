@@ -101,9 +101,11 @@ namespace netlist
 	};
 
 
-	NETLIB_BASE_OBJECT(opamp)
+	class nld_opamp : public base_device_t
 	{
-		NETLIB_CONSTRUCTOR(opamp)
+	public:
+		nld_opamp(constructor_param_t data)
+		: base_device_t(data)
 		, m_RP(*this, "RP1")
 		, m_G1(*this, "G1")
 		, m_VCC(*this, "VCC", NETLIB_DELEGATE(supply))
@@ -113,8 +115,8 @@ namespace netlist
 		, m_VH(*this, "VH")
 		, m_VL(*this, "VL")
 		, m_VREF(*this, "VREF")
+		, m_type(plib::narrow_cast<int>(m_modacc.m_TYPE))
 		{
-			m_type = plib::narrow_cast<int>(m_modacc.m_TYPE);
 			if (m_type < 1 || m_type > 3)
 			{
 				log().fatal(MF_OPAMP_UNKNOWN_TYPE(m_type));
@@ -201,8 +203,8 @@ namespace netlist
 
 	private:
 
-		analog::NETLIB_SUB(R_base) m_RP;
-		analog::NETLIB_SUB(VCCS) m_G1;
+		NETLIB_SUB_NS(analog, R_base) m_RP;
+		NETLIB_SUB_NS(analog, VCCS) m_G1;
 		NETLIB_SUB_UPTR(analog, C) m_CP;
 #if TEST_ALT_OUTPUT
 		NETLIB_SUB_UPTR(analog, R_base) m_RO;
@@ -226,14 +228,14 @@ namespace netlist
 
 	NETLIB_UPDATE_PARAM(opamp)
 	{
-		m_G1.m_RI.set(m_modacc.m_RI);
+		m_G1().m_RI.set(m_modacc.m_RI);
 
 		if (m_type == 1)
 		{
 			nl_fptype RO = m_modacc.m_RO;
 			nl_fptype G = m_modacc.m_UGF / m_modacc.m_FPF / RO;
-			m_RP.set_R(RO);
-			m_G1.m_G.set(G);
+			m_RP().set_R(RO);
+			m_G1().m_G.set(G);
 		}
 		if (m_type == 3 || m_type == 2)
 		{
@@ -246,8 +248,8 @@ namespace netlist
 				log().warning(MW_OPAMP_FAIL_CONVERGENCE(this->name()));
 
 			m_CP->set_cap_embedded(CP);
-			m_RP.set_R(RP);
-			m_G1.m_G.set(G);
+			m_RP().set_R(RP);
+			m_G1().m_G.set(G);
 
 		}
 		if (m_type == 2)

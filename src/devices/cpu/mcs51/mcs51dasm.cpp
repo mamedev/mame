@@ -226,7 +226,7 @@ const mcs51_disassembler::mem_info mcs51_disassembler::i8xc51gb_names[] = {
 	{  0xd4, "ad5"    },
 	{  0xe4, "ad6"    },
 	{  0xf4, "ad7"    },
-	{  0x85, "acon"   },
+	{  0x97, "acon"   },
 	{  0xc7, "acmp"   },
 
 	{  0xe8, "c1con"  },

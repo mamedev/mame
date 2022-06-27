@@ -100,16 +100,16 @@ void upd78k2_device::device_start()
 		[this](u8 data) { m_psw = (m_psw & 0xd7) | (data & 2) << 4 | (data & 1) << 3; }
 	).mask(3).noshow();
 	state_add(UPD78K2_SP, "SP", m_sp);
-	void *iram = memshare("iram")->ptr();
+	u16 *iram = static_cast<u16 *>(memshare("iram")->ptr());
 	for (int n = 0; n < 4; n++)
 		state_add<u16>(UPD78K2_AX + n, std::array<const char *, 4>{{"AX", "BC", "DE", "HL"}}[n],
-			[this, iram, n]() { return static_cast<u16 *>(iram)[(register_base() >> 1) | n]; },
-			[this, iram, n](u16 data) { static_cast<u16 *>(iram)[(register_base() >> 1) | n] = data; }
+			[this, iram, n]() { return iram[(register_base() >> 1) | n]; },
+			[this, iram, n](u16 data) { iram[(register_base() >> 1) | n] = data; }
 		);
 	for (int n = 0; n < 8; n++)
 		state_add<u8>(UPD78K2_X + n, std::array<const char *, 8>{{"X", "A", "C", "B", "E", "D", "L", "H"}}[n],
-			[this, iram, n]() { return static_cast<u8 *>(iram)[BYTE_XOR_LE(register_base() | n)]; },
-			[this, iram, n](u8 data) { static_cast<u8 *>(iram)[BYTE_XOR_LE(register_base() | n)] = data; }
+			[this, iram, n]() { return util::little_endian_cast<const u8>(iram)[register_base() | n]; },
+			[this, iram, n](u8 data) { util::little_endian_cast<u8>(iram)[register_base() | n] = data; }
 		).noshow();
 
 	// save state

@@ -114,8 +114,8 @@ namespace netlist::devices {
 		{
 			if (!m_RESET())
 			{
-				m_A.reset_shifter();
-				m_B.reset_shifter();
+				m_A().reset_shifter();
+				m_B().reset_shifter();
 			}
 		}
 
@@ -123,8 +123,8 @@ namespace netlist::devices {
 		{
 			if (!m_last_CLK && m_CLK())
 			{
-				m_A.shift();
-				m_B.shift();
+				m_A().shift();
+				m_B().shift();
 			}
 			m_last_CLK = m_CLK();
 			m_last_CLKA = m_CLKA();
@@ -135,7 +135,7 @@ namespace netlist::devices {
 		{
 			if (!m_last_CLKA && m_CLKA())
 			{
-				m_A.shift();
+				m_A().shift();
 			}
 			m_last_CLKA = m_CLKA();
 		}
@@ -144,7 +144,7 @@ namespace netlist::devices {
 		{
 			if (!m_last_CLKB && m_CLKB())
 			{
-				m_B.shift();
+				m_B().shift();
 			}
 			m_last_CLKB = m_CLKB();
 		}

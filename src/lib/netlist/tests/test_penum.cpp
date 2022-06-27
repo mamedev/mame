@@ -14,6 +14,7 @@
 
 #include <string>
 #include <type_traits>
+#include <string_view>
 
 #if 0
 namespace plib
@@ -166,6 +167,58 @@ operator == (const E &lhs, const char * rhs)
 }
 #endif
 
+// ---------------------------------------
+
+template <typename T>
+struct ret_t
+{
+	bool success;
+	T value;
+};
+
+template <typename T, T BASE>
+constexpr ret_t<T> stl_h(std::string_view sv)
+{
+	T r(0);
+	for (const auto &c : sv)
+	{
+		if (c >= '0' && c < '0' + std::min(10,BASE))
+		{
+			r = r * BASE + (c - '0');
+		}
+		else if (c >= 'A' && c < ('A' + BASE - 10))
+		{
+			r = r * BASE + (10 + c - 'A');
+		}
+		else if (c >= 'a' && c < ('a' + BASE - 10))
+		{
+			r = r * BASE + (10 + c - 'a');
+		}
+		else
+			return { false, T(0) };
+	}
+	return { true, r };
+}
+
+template <typename T, T BASE = 0>
+constexpr ret_t<T> stl(std::string_view sv)
+{
+	if constexpr (BASE == 0)
+	{
+		if (sv.size() > 2)
+		{
+			if (sv.substr(0,2) == "0x" || sv.substr(0,2) == "0X")
+					return stl_h<T,16>(sv.substr(2));
+			if (sv.substr(0,2) == "0b")
+					return stl_h<T,2>(sv.substr(2));
+		}
+		if (sv.size() > 1 && sv.substr(0,1) == "0" )
+			return stl_h<T,8>(sv.substr(1));
+		return stl_h<T, 10>(sv);
+	}
+	return stl_h<T, BASE>(sv);
+}
+
 #include "plib/ptests.h"
 
 //PENUM_NS(plibx, teste, A, B, C)
@@ -179,6 +232,12 @@ PENUM(testf, A, B, C)
 
 PTEST(penum, conversion)
 {
+	static_assert(stl<int,0>("0xa0bc").success,"no");
+	static_assert(stl<int,0>("0xa0bc").value==0xa0bc,"no");
+	static_assert(stl<int,0>("0b1010").value==0b1010,"no");
+	static_assert(stl<int,0>("0123").value==0123,"no");
+	//const auto x(stl<int,0>("123"));
+	//static_assert(x.value==123,"no");
 
 	plibx::teste x = plib::functor<plibx::teste>("A");
 	PEXPECT_NE(x, plibx::teste::B);

@@ -121,8 +121,8 @@ namespace netlist::devices {
 	private:
 		NETLIB_RESETI()
 		{
-			m_R_FC.set_R( nlconst::magic(90000.0));
-			m_R_RNG.set_R(nlconst::magic(90000.0));
+			m_R_FC().set_R( nlconst::magic(90000.0));
+			m_R_RNG().set_R(nlconst::magic(90000.0));
 		}
 
 		NETLIB_UPDATE_PARAMI()
@@ -131,8 +131,8 @@ namespace netlist::devices {
 		}
 
 		SN74LS629clk m_clock;
-		analog::NETLIB_SUB(R_base) m_R_FC;
-		analog::NETLIB_SUB(R_base) m_R_RNG;
+		NETLIB_SUB_NS(analog, R_base) m_R_FC;
+		NETLIB_SUB_NS(analog, R_base) m_R_RNG;
 
 		logic_input_t m_ENQ;
 		analog_input_t m_RNG;

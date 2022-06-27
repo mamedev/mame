@@ -42,27 +42,27 @@ namespace netlist::devices {
 
 		NETLIB_RESETI()
 		{
-			m_R.set_R(plib::reciprocal(exec().gmin()));
+			m_R().set_R(plib::reciprocal(exec().gmin()));
 		}
 
 		NETLIB_HANDLERI(inputs)
 		{
-			m_R.change_state([this]()
+			m_R().change_state([this]()
 				{
 					if (m_S() && !m_E())
-						m_R.set_R(m_base_r());
+						m_R().set_R(m_base_r());
 					else
-						m_R.set_R(plib::reciprocal(exec().gmin()));
+						m_R().set_R(plib::reciprocal(exec().gmin()));
 				});
 		}
 
 	private:
-		analog::NETLIB_SUB(R_base) m_R;
+		NETLIB_SUB_NS(analog, R_base) m_R;
 
-		logic_input_t              m_S;
-		logic_input_t              m_E;
-		param_fp_t             m_base_r;
-		nld_power_pins             m_supply;
+		logic_input_t                 m_S;
+		logic_input_t                 m_E;
+		param_fp_t                    m_base_r;
+		nld_power_pins                m_supply;
 	};
 
 	NETLIB_DEVICE_IMPL(CD4316_GATE, "CD4316_GATE", "")
