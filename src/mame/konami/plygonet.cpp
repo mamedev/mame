@@ -69,6 +69,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/k054321.h"
+#include "machine/k056230.h"
 #include "machine/watchdog.h"
 #include "sound/k054539.h"
 #include "k053936.h"
@@ -111,6 +112,7 @@ public:
 		m_dsp(*this, "dsp"),
 		m_watchdog(*this, "watchdog"),
 		m_eeprom(*this, "eeprom"),
+		m_k056230(*this, "lanc"),
 		m_k053936(*this, "k053936"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -166,7 +168,6 @@ private:
 	u32 shared_ram_read(offs_t offset, u32 mem_mask = ~0);
 	void shared_ram_write(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void dsp_w_lines(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 network_r();
 
 	// DSP handlers
 	u16 dsp_bootload_r();
@@ -193,7 +194,6 @@ private:
 	// Video handlers
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
 	void ttl_vram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 fix_regs_r(offs_t offset, u32 mem_mask = ~0);
 	void fix_regs_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -204,6 +204,7 @@ private:
 	// Sound handlers
 	void sound_ctrl_w(u8 data);
 	void update_sound_nmi();
+	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
 
 	template <int PolyPage> void process_polys();
 	template <int PolyPage> void draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const u16 span_ptr, const u16 raw_start, const u16 raw_end);
@@ -213,6 +214,9 @@ private:
 	required_device<dsp56156_device> m_dsp;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<eeprom_serial_er5911_device> m_eeprom;
+
+	required_device<k056230_device> m_k056230;
+
 	required_device<k053936_device> m_k053936;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -254,7 +258,7 @@ private:
 
 	// Sound members
 	u8 m_sound_ctrl;
-	u8 m_sound_intck;
+	int m_sound_intck;
 
 	// Span drawer management
 	bitmap_rgb32 m_pla_bitmaps[2];
@@ -269,10 +273,10 @@ private:
 
 void polygonet_state::machine_start()
 {
-	m_pla_bitmaps[0].allocate(368, 256);
-	m_pla_bitmaps[1].allocate(368, 256);
-	m_plb_bitmaps[0].allocate(368, 256);
-	m_plb_bitmaps[1].allocate(368, 256);
+	m_pla_bitmaps[0].allocate(384, 256);
+	m_pla_bitmaps[1].allocate(384, 256);
+	m_plb_bitmaps[0].allocate(384, 256);
+	m_plb_bitmaps[1].allocate(384, 256);
 
 	m_sound_bank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
@@ -297,8 +301,8 @@ void polygonet_state::machine_reset()
 	m_sound_bank->set_entry(0);
 
 	m_sys1 = 0;
-	m_sound_intck = 0;
 	m_sound_ctrl = 0;
+	m_sound_intck = 0;
 	m_dsp_portc = 0;
 
 	std::fill(std::begin(m_render_buf_idx), std::end(m_render_buf_idx), 0);
@@ -410,10 +414,11 @@ void polygonet_state::sys_w(offs_t offset, u8 data)
 			// D16 = COIN1        - Coin counter 1
 			machine().bookkeeping().coin_counter_w(0, data & 1);
 			machine().bookkeeping().coin_counter_w(1, data & 2);
-			if (~data & 0x20)
+			if (BIT(~data, 5))
 				m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 
 			m_sys1 = data;
+			LOGMASKED(LOG_GENERAL, "sys1 write: %02x\n", data);
 			break;
 
 		default:
@@ -521,10 +526,6 @@ void polygonet_state::dsp_w_lines(offs_t offset, u32 data, u32 mem_mask)
 	// 0x04000000 is the COMBNK line - it switches who has access to the shared RAM - the dsp or the 68020
 }
 
-u32 polygonet_state::network_r()
-{
-	return 0x08000000;
-}
 
 
 //-------------------------------------------------
@@ -782,7 +783,7 @@ void polygonet_state::draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const
 			for (s16 x = x_start; x <= x_end; x++)
 			{
 				const u16 bitmap_x = (u16)(x + 1024) - 832;
-				if (bitmap_x < 368 && (dst[bitmap_x] & 0xff000000) == 0)
+				if (bitmap_x < 384 && (dst[bitmap_x] & 0xff000000) == 0)
 				{
 					dst[bitmap_x] = color888;
 				}
@@ -824,11 +825,17 @@ TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
 
 TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 {
-	const auto roz_vram = util::big_endian_cast<const u16>(m_roz_vram.target());
-	const int code = roz_vram[tile_index] & 0x7ff;
-	const int attr = (roz_vram[tile_index] >> 12) + 16; // ROZ base palette is palette index 16 onward
-
-	tileinfo.set(0, code, attr, 0);
+	if (tile_index < 0x800)
+	{
+		const auto roz_vram = util::big_endian_cast<const u16>(m_roz_vram.target());
+		const int code = roz_vram[tile_index] & 0x7ff;
+		const int attr = (roz_vram[tile_index] >> 12) + 16; // ROZ base palette is palette index 16 onward
+		tileinfo.set(0, code, attr, 0);
+	}
+	else
+	{
+		tileinfo.set(0, 0, 0, 0);
+	}
 }
 
 void polygonet_state::ttl_vram_w(offs_t offset, u32 data, u32 mem_mask)
@@ -886,7 +893,7 @@ void polygonet_state::video_start()
 	m_ttl_tilemap->set_transparent_pen(0);
 
 	// Set up the ROZ tilemap
-	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(polygonet_state::roz_get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(polygonet_state::roz_get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_roz_tilemap->set_transparent_pen(0);
 
 	// Register save states
@@ -896,7 +903,7 @@ void polygonet_state::video_start()
 u32 polygonet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0);
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(m_palette->pens()[0x100], cliprect);
 
 	m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, 0, 0, 0);
 
@@ -907,7 +914,7 @@ u32 polygonet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		u32 *dst = &bitmap.pix(y, cliprect.min_x);
 		u32 *src_b = &bitmap_b.pix(y);
 		u32 *src_a = &bitmap_a.pix(y);
-		for (int x = 0; x < 368; x++)
+		for (int x = 0; x < 384; x++)
 		{
 			u32 a_pix = *src_a++ & 0x00ffffff;
 			u32 b_pix = *src_b++ & 0x00ffffff;
@@ -946,8 +953,8 @@ void polygonet_state::main_map(address_map &map)
 	map(0x506000, 0x50600f).rw(FUNC(polygonet_state::dsp_host_interface_r), FUNC(polygonet_state::dsp_host_interface_w));
 	map(0x540000, 0x540fff).ram().share(m_ttl_vram).w(FUNC(polygonet_state::ttl_vram_w));
 	map(0x541000, 0x54101f).ram().share(m_fix_regs).rw(FUNC(polygonet_state::fix_regs_r), FUNC(polygonet_state::fix_regs_w));
-	map(0x580000, 0x5807ff).ram();
-	map(0x580800, 0x580803).r(FUNC(polygonet_state::network_r)).nopw(); // Network RAM and registers?
+	map(0x580000, 0x5807ff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));
+	map(0x580800, 0x580803).rw(m_k056230, FUNC(k056230_device::regs_r), FUNC(k056230_device::regs_w));
 	map(0x600000, 0x60000f).m(m_k054321, FUNC(k054321_device::main_map));
 	map(0x640000, 0x640003).w(FUNC(polygonet_state::sound_irq_w));
 	map(0x680000, 0x680003).w(m_watchdog, FUNC(watchdog_timer_device::reset32_w));
@@ -1017,7 +1024,7 @@ void polygonet_state::sound_ctrl_w(u8 data)
 
 void polygonet_state::update_sound_nmi()
 {
-	if (m_sound_intck) // checking m_sound_ctrl & 0x10 seems logical based on other Konami games, but polynetw doesn't like it?
+	if (m_sound_intck) // checking m_sound_ctrl & 0x10 seems logical based on other Konami games, but polynetw doesn't like it
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	else
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -1047,21 +1054,25 @@ void polygonet_state::plygonet(machine_config &config)
 	Z80(config, m_audiocpu, 8000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &polygonet_state::sound_map);
 
-	config.set_perfect_quantum(m_maincpu); // TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE
+	config.set_maximum_quantum(attotime::from_hz(600)); // NOTE: This does not appear to be necessary, but is retained for later testing.
 
 	EEPROM_ER5911_8BIT(config, m_eeprom);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_plygonet);
+	// Networking hardware
+	K056230(config, m_k056230);
+	m_k056230->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(64, 64+368-1, 0, 32*8-1);
+	screen.set_visarea(64, 64+384-1, 0, 32*8-1);
 	screen.set_screen_update(FUNC(polygonet_state::screen_update));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_plygonet);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
@@ -1099,7 +1110,7 @@ ROM_START( plygonet )
 	ROMX_LOAD( "305b06.18g", 0x000000, 0x20000, CRC(decd6e42) SHA1(4c23dcb1d68132d3381007096e014ee4b6007086), ROM_GROUPDWORD | ROM_REVERSE )
 
 	ROM_REGION32_BE( 0x40000, "gfx2", 0 ) // '936 tiles
-	ROMX_LOAD( "305b07.20d", 0x000000, 0x40000, CRC(e4320bc3) SHA1(b0bb2dac40d42f97da94516d4ebe29b1c3d77c37), ROM_GROUPDWORD )
+	ROM_LOAD( "305b07.20d", 0x000000, 0x40000, CRC(e4320bc3) SHA1(b0bb2dac40d42f97da94516d4ebe29b1c3d77c37) )
 
 	ROM_REGION( 0x200000, "k054539", 0 ) // Sound data
 	ROM_LOAD( "305b08.2e", 0x000000, 0x200000, CRC(874607df) SHA1(763b44a80abfbc355bcb9be8bf44373254976019) )
@@ -1122,7 +1133,7 @@ ROM_START( polynetw )
 	ROMX_LOAD( "305a06.18g", 0x000000, 0x020000, CRC(4b9b7e9c) SHA1(8c3c0f1ec7e26fd9552f6da1e6bdd7ff4453ba57), ROM_GROUPDWORD | ROM_REVERSE )
 
 	ROM_REGION32_BE( 0x40000, "gfx2", 0 ) // '936 tiles
-	ROMX_LOAD( "305a07.20d", 0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203), ROM_GROUPDWORD )
+	ROM_LOAD( "305a07.20d", 0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203) )
 
 	ROM_REGION( 0x400000, "k054539", 0 ) // Sound data
 	ROM_LOAD( "305a08.2e", 0x000000, 0x200000, CRC(7ddb8a52) SHA1(3199b347fc433ffe0de8521001df77672d40771e) )
